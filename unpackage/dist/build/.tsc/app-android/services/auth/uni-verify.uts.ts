@@ -41,7 +41,7 @@ function getErrorMessage(error: UniVerifyManagerLoginFail): string {
 	if (errCode == 30007) return '本机号码授权已过期，请重试'
 	if (errCode == 30008) return '正在进行本机号码授权，请稍候'
 	if (errCode == 40001 || errCode == 40002) return '网络异常，请检查移动网络后重试'
-	return '本机号码授权失败（错误码：' + errCode + '），请使用验证码登录'
+	return '本机号码授权失败（错误码：' + errCode + '），请稍后重试'
 }
 
 function getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): string {
@@ -55,13 +55,13 @@ function getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): string {
 	if (errCode == 30001) return '本机号码预取已取消'
 	if (errCode == 30004) {
 		if (errMsg.indexOf('-20102') >= 0) return '一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK'
-		if (errMsg.indexOf('-20201') >= 0) return '未检测到可用 SIM 卡，请使用验证码登录'
+		if (errMsg.indexOf('-20201') >= 0) return '未检测到可用 SIM 卡，暂无法使用本机号码一键登录'
 		if (errMsg.indexOf('-20202') >= 0) return '未开启蜂窝移动网络，请开启移动数据后重试'
-		if (errMsg.indexOf('-20203') >= 0) return '当前运营商暂不支持一键登录，请使用验证码登录'
-		return '本机号码预取失败，请稍后重试或使用验证码登录'
+		if (errMsg.indexOf('-20203') >= 0) return '当前运营商暂不支持本机号码一键登录'
+		return '本机号码预取失败，请稍后重试'
 	}
 	if (errCode == 40001 || errCode == 40002) return '网络异常，无法获取本机号码，请检查移动网络后重试'
-	return '本机号码预取失败（错误码：' + errCode + '），请使用验证码登录'
+	return '本机号码预取失败（错误码：' + errCode + '），请稍后重试'
 }
 
 function createPreLoginResult(ok: boolean, message: string): UniVerifyPreLoginResult {
@@ -135,17 +135,20 @@ export function loginByUniVerify(clientVersion: string): Promise<UniVerifyResult
 							openId: result.openId,
 							accessToken: result.accessToken,
 							platform: getPlatform(),
-							clientVersion: clientVersion
+							clientVersion: clientVersion,
+							clientId: "428a8310cd442757ae699df5d894f051",
+							grantType: "univerify",
+							tenantId: "000000",
 						}).then((response) => {
 							const loginData = response.data
-							const token = loginData != null ? loginData.getString('token', '') : ''
-							if (response.code == 0 && token != '') {
+							const token = loginData != null ? loginData.getString('access_token', '') : ''
+							if (response.code == 200 && token != '') {
 								resolve(createResult(true, false, '', token))
 							} else {
-								resolve(createResult(false, false, response.msg || '本机号码登录失败，请使用验证码登录', ''))
+								resolve(createResult(false, false, response.msg || '本机号码登录失败，请稍后重试', ''))
 							}
 						}).catch(() => {
-							resolve(createResult(false, false, '登录服务连接失败，请使用验证码登录', ''))
+							resolve(createResult(false, false, '登录服务连接失败，请检查网络后重试', ''))
 						}).finally(() => {
 							closeLoginPage(uniVerifyManager)
 							requesting = false
@@ -159,7 +162,7 @@ export function loginByUniVerify(clientVersion: string): Promise<UniVerifyResult
 					}
 				})
 			} catch (error) {
-				resolve(createResult(false, false, '当前设备不支持本机号码一键登录，请使用验证码登录', ''))
+				resolve(createResult(false, false, '当前设备不支持本机号码一键登录', ''))
 				requesting = false
 			}
 		}).catch(() => {

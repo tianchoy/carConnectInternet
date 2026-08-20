@@ -37,7 +37,7 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                             uni_showLoading(ShowLoadingOptions(title = "提交中...", mask = true))
                             val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/userCenter/editPassword/editPassword.uvue", 78, 10), "password" to formData.value["password"], "newPassword" to formData.value["newPassword"])
                             val res = await(changePassWord(submitData))
-                            if (res.msg == "success") {
+                            if (res.code == 200) {
                                 uni_hideLoading(null)
                                 showAppToast(ShowToastOptions(title = "密码修改成功", icon = "success", duration = 2000))
                                 setTimeout(fun(){

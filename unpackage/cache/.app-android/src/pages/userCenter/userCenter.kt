@@ -36,10 +36,34 @@ open class GenPagesUserCenterUserCenter : BasePage {
             val loadData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 70, 9))
-                        val res = await(getUserInfo())
-                        userInfo.value = _uO("avatar" to res.data.getString("avatar", "/static/avatar.png"), "nickname" to res.data.getString("nickname", ""))
-                        val resCars = await(getUserDeviceList(params))
-                        carsnumber.value = resCars.data.totalCount
+                        try {
+                            val res = await(getUserInfo())
+                            if (res.code == 200 && res.data != null) {
+                                userInfo.value = _uO("avatar" to res.data!!.getString("avatar", "/static/avatar.png"), "nickname" to res.data!!.getString("nickname", ""))
+                            } else {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "获取用户信息失败"
+                                }
+                                , icon = "none"))
+                            }
+                            val resCars = await(getUserDeviceList(params))
+                            if (resCars.code == 200 && resCars.data != null) {
+                                carsnumber.value = resCars.data!!.totalCount
+                            } else {
+                                showAppToast(ShowToastOptions(title = if (resCars.msg != "") {
+                                    resCars.msg
+                                } else {
+                                    "获取车辆数量失败"
+                                }
+                                , icon = "none"))
+                            }
+                        }
+                         catch (error: Throwable) {
+                            console.error("加载用户中心数据失败:", error, " at pages/userCenter/userCenter.uvue:89")
+                            showAppToast(ShowToastOptions(title = "加载用户信息失败", icon = "none"))
+                        }
                 })
             }
             onShow(fun(){
@@ -81,7 +105,7 @@ open class GenPagesUserCenterUserCenter : BasePage {
             }
             val userInfoDetail = fun(){
                 if (Login.value) {
-                    uni_navigateTo(NavigateToOptions(url = "/pages/userCenter/userInfo/userInfo?userInfo=" + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:146")))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/userCenter/userInfo/userInfo?userInfo=" + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:159")))
                 } else {
                     uni_navigateTo(NavigateToOptions(url = "/pages/login/login"))
                 }

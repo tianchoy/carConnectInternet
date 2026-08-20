@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -66,12 +67,17 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
             val logoutBtn = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         val res = await(logout())
-                        if (res.code == 0) {
+                        if (res.code == 200) {
                             uni_removeStorageSync("token")
                             clearPushSessionState()
                             uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
                         } else {
-                            showAppToast(ShowToastOptions(title = "退出账户失败"))
+                            showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                res.msg
+                            } else {
+                                "退出账户失败"
+                            }
+                            ))
                         }
                 })
             }

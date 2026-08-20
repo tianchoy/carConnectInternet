@@ -134,7 +134,7 @@ open class GenPagesAddCarAddCar : BasePage {
                             console.log("✅ 添加设备返回:", res, " at pages/addCar/addCar.uvue:242")
                             uni_hideLoading(null)
                             loading.value = false
-                            if (res.code == 0) {
+                            if (res.code == 200) {
                                 showAppToast(ShowToastOptions(title = "添加成功", icon = "success"))
                                 uni_setStorageSync("needRefreshHome", true)
                                 refreshDeviceList()

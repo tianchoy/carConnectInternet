@@ -55,7 +55,7 @@ const userInfo = ref<UserInfo>({
 	// 退出登录方法
 	const logoutBtn = async () => {
 		const res = await logout()
-		if(res.code == 0){
+		if(res.code == 200){
 			uni.removeStorageSync('token')
 			clearPushSessionState()
 			uni.reLaunch({
@@ -63,7 +63,7 @@ const userInfo = ref<UserInfo>({
 			})
 		}else{
 			showAppToast({
-				title:'退出账户失败'
+				title: res.msg || '退出账户失败'
 			})
 		}
 	}

@@ -28,6 +28,8 @@ import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import uts.sdk.modules.jgJpushU.init as initAndroidJPush
 import uts.sdk.modules.jgJpushU.setEventCallBack as setJPushEventCallBack
 import uts.sdk.modules.jgJpushU.getRegistrationId as getAndroidJPushRegistrationId
+import uts.sdk.modules.jgJpushU.setBadgeNumber as setAndroidJPushBadgeNumber
+import uts.sdk.modules.jgJpushUHuawei.init as initHuaweiJPushVendor
 import io.dcloud.uniapp.extapi.onPushMessage as uni_onPushMessage
 import uts.sdk.modules.externalMapNavigation.openExternalMap
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
@@ -125,7 +127,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.180"
     val port: String = "8090"
-    val id: String = "app-android_uhw_mX"
+    val id: String = "app-android_nthYqA"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -174,8 +176,8 @@ val LEGACY_PUSH_SESSION_KEY = "push_session_key"
 val PUSH_REGISTRATION_ID_MAX_RETRY_COUNT: Number = 5
 val PUSH_REGISTRATION_ID_RETRY_DELAY: Number = 3000
 val PUSH_REGISTRATION_ID_REQUEST_TIMEOUT: Number = 18000
-val DEFAULT_PUSH_PROVIDER: PushProviderName = "unipush"
-val ENABLE_LOCAL_PROVIDER_SWITCH = true
+val DEFAULT_PUSH_PROVIDER: PushProviderName = "jpush"
+val ENABLE_LOCAL_PROVIDER_SWITCH = false
 fun registrationIdKey(provider: PushProviderName): String {
     return PUSH_REGISTRATION_ID_KEY_PREFIX + provider
 }
@@ -190,7 +192,7 @@ fun sessionKey(provider: PushProviderName): String {
 }
 fun pushDebug(provider: PushProviderName, message: String): Unit {
     AndroidLog.e("PushManager", "[" + provider + "] " + message)
-    console.error("[PushManager][" + provider + "] " + message, " at services/push.uts:72")
+    console.error("[PushManager][" + provider + "] " + message, " at services/push.uts:82")
 }
 fun stringValue(value: Any): String {
     if (value == null) {
@@ -212,7 +214,7 @@ fun payloadValue(payload: Any, key: String): String {
     }
     if (UTSAndroid.`typeof`(payload) == "string") {
         try {
-            val parsedPayload = UTSAndroid.consoleDebugError(JSON.parse<UTSJSONObject>(payload as String), " at services/push.uts:61")
+            val parsedPayload = UTSAndroid.consoleDebugError(JSON.parse<UTSJSONObject>(payload as String), " at services/push.uts:66")
             if (parsedPayload == null) {
                 return ""
             }
@@ -269,15 +271,7 @@ fun pushMessageId(payload: Any): String {
     return id
 }
 fun selectedPushProvider(): PushProviderName {
-    if (!ENABLE_LOCAL_PROVIDER_SWITCH) {
-        return DEFAULT_PUSH_PROVIDER
-    }
-    val override = storageString(PUSH_LOCAL_PROVIDER_OVERRIDE_KEY)
-    return if (override == "jpush") {
-        "jpush"
-    } else {
-        DEFAULT_PUSH_PROVIDER
-    }
+    return DEFAULT_PUSH_PROVIDER
 }
 fun migrateLegacyStorage(provider: PushProviderName): Unit {
     if (provider != "unipush") {
@@ -319,7 +313,7 @@ interface PushAdapter {
 }
 open class UniPushAdapter : PushAdapter, IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniPushAdapter", "services/push.uts", 145, 7)
+        return UTSSourceMapPosition("UniPushAdapter", "services/push.uts", 154, 7)
     }
     override var provider: PushProviderName = "unipush"
     private var initialized = false
@@ -356,6 +350,7 @@ open class UniPushAdapter : PushAdapter, IUTSSourceMap {
                     onFailure("CID 为空")
                     return
                 }
+                pushDebug(this.provider, "UniPush CID: " + registrationId)
                 onSuccess(registrationId)
             }
             , fail = fun(error: Any){
@@ -370,7 +365,7 @@ open class UniPushAdapter : PushAdapter, IUTSSourceMap {
 }
 open class JPushAdapter : PushAdapter, IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("JPushAdapter", "services/push.uts", 191, 7)
+        return UTSSourceMapPosition("JPushAdapter", "services/push.uts", 201, 7)
     }
     override var provider: PushProviderName = "jpush"
     private var initialized = false
@@ -400,6 +395,7 @@ open class JPushAdapter : PushAdapter, IUTSSourceMap {
                 }
             }
             ))
+            initHuaweiJPushVendor()
             initAndroidJPush("")
             onRegistrationAvailable()
         }
@@ -419,7 +415,7 @@ open class JPushAdapter : PushAdapter, IUTSSourceMap {
 }
 open class PushManager : IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PushManager", "services/push.uts", 240, 7)
+        return UTSSourceMapPosition("PushManager", "services/push.uts", 252, 7)
     }
     private var provider: PushProviderName = "unipush"
     private var adapter: PushAdapter? = null
@@ -440,6 +436,7 @@ open class PushManager : IUTSSourceMap {
             return
         }
         this.provider = selectedProvider
+        pushDebug(this.provider, "已选择推送 provider: " + this.provider)
         migrateLegacyStorage(this.provider)
         uni_setStorageSync(PUSH_PROVIDER_KEY, this.provider)
         this.adapter = if (this.provider == "jpush") {
@@ -521,7 +518,16 @@ open class PushManager : IUTSSourceMap {
         uni_setStorageSync(PUSH_LOCAL_PROVIDER_OVERRIDE_KEY, provider)
         pushDebug(provider, "本地测试 provider 已设置；请完全重启应用后生效")
     }
+    open fun clearBadge(): Unit {
+        try {
+            setAndroidJPushBadgeNumber(0)
+        }
+         catch (error: Throwable) {
+            pushDebug(this.provider, "清除 Android 应用角标失败: " + error.toString())
+        }
+    }
     private fun handlePushEvent(event: NormalizedPushEvent): Unit {
+        this.clearBadge()
         val messageId = pushMessageId(event.payload)
         if (messageId != "") {
             uni_setStorageSync(pendingMessageIdKey(event.provider), messageId)
@@ -568,9 +574,9 @@ open class PushManager : IUTSSourceMap {
         this.registrationRetryCount = 0
         uni_setStorageSync(registrationIdKey(this.provider), registrationId)
         val registrationIdLabel = if (this.provider == "unipush") {
-            "UniPush CID"
+            "UniPush CID 已就绪"
         } else {
-            "JPush RegistrationID"
+            "JPush RegistrationID 已就绪"
         }
         pushDebug(this.provider, registrationIdLabel + ": " + registrationId)
     }
@@ -624,6 +630,9 @@ fun initPush(): Unit {
 }
 fun refreshPushRegistrationId(): Unit {
     pushManager.refreshRegistrationId()
+}
+fun clearPushBadge(): Unit {
+    pushManager.clearBadge()
 }
 fun refreshPushClientId(): Unit {
     refreshPushRegistrationId()
@@ -744,23 +753,26 @@ open class GenApp : BaseApp {
             console.log("App onLaunch", " at App.uvue:76")
             checkForUpdates()
             initPush()
+            clearPushBadge()
             ensureNotificationPermission(fun(status){
-                console.log("[NotificationPermission] " + status, " at App.uvue:81")
+                console.log("[NotificationPermission] " + status, " at App.uvue:82")
             }
             )
         }
         , __ins)
         onAppShow(fun(_: OnShowOptions) {
-            console.log("App Show", " at App.uvue:86")
+            console.log("App Show", " at App.uvue:87")
+            clearPushBadge()
             refreshPushClientId()
         }
         , __ins)
         onAppHide(fun() {
-            console.log("App Hide", " at App.uvue:90")
+            console.log("App Hide", " at App.uvue:92")
+            clearPushBadge()
         }
         , __ins)
         onLastPageBackPress(fun() {
-            console.log("App LastPageBackPress", " at App.uvue:94")
+            console.log("App LastPageBackPress", " at App.uvue:97")
             if (firstBackTime == 0) {
                 uni_showToast(ShowToastOptions(title = "再按一次退出应用", position = "bottom"))
                 firstBackTime = Date.now()
@@ -774,7 +786,7 @@ open class GenApp : BaseApp {
         }
         , __ins)
         onExit(fun() {
-            console.log("App Exit", " at App.uvue:111")
+            console.log("App Exit", " at App.uvue:114")
         }
         , __ins)
     }
@@ -4175,19 +4187,27 @@ open class HttpError (
         return UTSSourceMapPosition("HttpError", "api/http.uts", 16, 6)
     }
 }
-val BASE_URL = "https://car.zdiot.cn:18443/api"
+val BASE_URL = "https://gpsapp.zdiot.cn"
+var isHandlingTokenExpired = false
+fun resetTokenExpiredState(): Unit {
+    isHandlingTokenExpired = false
+}
 fun handleTokenExpired(): Unit {
-    console.log("检测到token过期，执行跳转登录页逻辑", " at api/http.uts:40")
+    if (isHandlingTokenExpired) {
+        return
+    }
+    isHandlingTokenExpired = true
+    console.log("检测到token过期，执行跳转登录页逻辑", " at api/http.uts:48")
     uni_removeStorageSync("token")
     clearPushSessionState()
     showAppToast(ShowToastOptions(title = "登录已过期，请重新登录", icon = "none", duration = 2000))
     setTimeout(fun(){
-        console.log("正在跳转到登录页...", " at api/http.uts:55")
+        console.log("正在跳转到登录页...", " at api/http.uts:63")
         uni_redirectTo(RedirectToOptions(url = "/pages/login/login", success = fun(_){
-            console.log("跳转登录页成功", " at api/http.uts:59")
+            console.log("跳转登录页成功", " at api/http.uts:67")
         }
         , fail = fun(err){
-            console.log("跳转登录页失败:", err, " at api/http.uts:62")
+            console.log("跳转登录页失败:", err, " at api/http.uts:70")
             uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
         }
         ))
@@ -4211,7 +4231,7 @@ fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
     if (config.showLoading != false) {
         uni_hideLoading(null)
     }
-    console.log("请求错误详情:", error, " at api/http.uts:114")
+    console.log("请求错误详情:", error, " at api/http.uts:122")
     if (error.statusCode != 0) {
         when (error.statusCode) {
             401 -> 
@@ -4336,9 +4356,9 @@ val trackPos = "/gps/trackPos?"
 val userinfo = "/sys/user/info"
 val addDeviceUrl = "/userDevice/add"
 val userDeviceList = "/userDevice/list"
-val uniVerifyLoginUrl = "/authLogin/uniVerify"
-val smsSendCodeUrl = "/authLogin/sms/send"
-val smsLoginUrl = "/authLogin/sms/login"
+val uniVerifyLoginUrl = "/auth/login"
+val smsSendCodeUrl = "/auth/sms/send"
+val smsLoginUrl = "/auth/sms/login"
 val changePSW = "/sys/user/password"
 val userMsgList = "/usermessage/listForUser"
 val msgState = "/usermessage/detail/"
@@ -5633,7 +5653,7 @@ open class FormData (
     open var password: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 143, 7)
+        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 144, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return FormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5685,7 +5705,7 @@ open class SavedAccount (
     open var password: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 147, 7)
+        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 148, 7)
     }
 }
 val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
@@ -9329,7 +9349,7 @@ open class CoordinateBounds (
     open var maxLng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 677, 7)
+        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 682, 7)
     }
 }
 val GenPagesGeofencingGeofencingClass = CreateVueComponent(GenPagesGeofencingGeofencing::class.java, fun(): VueComponentOptions {
@@ -9563,7 +9583,7 @@ fun main(app: IApp) {
     (createApp()["app"] as VueApp).mount(app, GenUniApp())
 }
 open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
-    override var name: String = "车载GPS"
+    override var name: String = "中导物联"
     override var appid: String = "__UNI__662B0B4"
     override var versionName: String = "1.0.0"
     override var versionCode: String = "100"
@@ -9613,6 +9633,17 @@ fun defineAppConfig() {
     __uniConfig.conditionUrl = ""
     __uniConfig.uniIdRouter = _uM()
     __uniConfig.ready = true
+}
+open class UniCloudConfig : io.dcloud.unicloud.InternalUniCloudConfig, IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("UniCloudConfig", "main.uts", 79, 14)
+    }
+    override var isDev: Boolean = true
+    override var spaceList: String = "[{\"provider\":\"aliyun\",\"spaceName\":\"zdiot-car\",\"spaceId\":\"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff\",\"clientSecret\":\"s9pFKgenncFnOUhRGOJpcw==\",\"endpoint\":\"https://api.next.bspapp.com\",\"failoverEndpoint\":\"\"}]"
+    override var debuggerInfo: String? = "{\"address\":[\"127.0.0.1\",\"192.168.1.180\"],\"servePort\":7001,\"debugPort\":9000,\"initialLaunchType\":\"remote\",\"skipFiles\":[\"<node_internals>/**\",\"/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js\"]}"
+    override var secureNetworkEnable: Boolean = false
+    override var secureNetworkConfig: String? = "[]"
+    constructor() : super() {}
 }
 open class GenUniApp : UniAppImpl() {
     open val vm: GenApp?

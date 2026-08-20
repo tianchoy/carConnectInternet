@@ -5,6 +5,7 @@ import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/com
 import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue';
 import _easycom_i_empty from '@/uni_modules/i-ui-x/components/i-empty/i-empty.uvue';
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
+import { showAppToast } from '../../utils/toast.uts';
 import { openLocation } from '../../utils/openLocation.uts';
 import { ref, reactive, onMounted, computed } from 'vue';
 import { getTrackPos } from '../../api/request.uts';
@@ -66,19 +67,31 @@ const __sfc__ = defineComponent({
                 withPos: false,
                 withTrip: false
             } as UTSJSONObject;
-            const res = await getTrackPos(data);
-            let stopsWithAddress: Array<StopRecord> = [];
-            const trackData = res.data;
-            const stops = trackData?.getArray<UTSJSONObject>('stops') ?? [];
-            stops.forEach((stop: UTSJSONObject): void => {
-                // 转换坐标到腾讯地图坐标系
-                const convertedCoord = CoordTransform.wgs84ToTencent(stop.getNumber('latitude', 0), stop.getNumber('longitude', 0));
-                stop.set('latitude', convertedCoord.lat);
-                stop.set('longitude', convertedCoord.lng);
-                stopsWithAddress.push(stop);
-            });
-            carStopDetail.value = stopsWithAddress;
-            uni.hideLoading();
+            try {
+                const res = await getTrackPos(data);
+                const trackData = res.data;
+                if (res.code != 200 || trackData == null) {
+                    showAppToast({ title: res.msg != "" ? res.msg : '数据加载失败', icon: 'none' } as ShowToastOptions);
+                    carStopDetail.value = [];
+                    return;
+                }
+                const stopsWithAddress: Array<StopRecord> = [];
+                const stops = trackData.getArray<UTSJSONObject>('stops') ?? [];
+                stops.forEach((stop: UTSJSONObject): void => {
+                    const convertedCoord = CoordTransform.wgs84ToTencent(stop.getNumber('latitude', 0), stop.getNumber('longitude', 0));
+                    stop.set('latitude', convertedCoord.lat);
+                    stop.set('longitude', convertedCoord.lng);
+                    stopsWithAddress.push(stop);
+                });
+                carStopDetail.value = stopsWithAddress;
+            }
+            catch (error: any) {
+                console.error('获取停车数据失败:', error);
+                showAppToast({ title: '数据加载失败', icon: 'none' } as ShowToastOptions);
+            }
+            finally {
+                uni.hideLoading();
+            }
         };
         // 初始化加载
         onMounted(() => {

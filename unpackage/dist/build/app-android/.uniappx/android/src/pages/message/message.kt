@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -65,9 +66,11 @@ open class GenPagesMessageMessage : BasePage {
                         isLoading.value = true
                         try {
                             val res = await(getUserMsgList(_uO("page" to 1, "pageSize" to 50)))
-                            if (res.code != 0 || res.data.list == null) {
+                            val pageData = res.data
+                            if (res.code != 200 || pageData == null) {
                                 return@w1 0
                             }
+                            val latestList: UTSArray<UTSJSONObject> = pageData.list
                             val existingIds = Set<String>()
                             msgList.value.forEach(fun(message: UTSJSONObject): Unit {
                                 val messageId = message.getString("messageId", "")
@@ -77,7 +80,7 @@ open class GenPagesMessageMessage : BasePage {
                             }
                             )
                             val latestMessages: UTSArray<UTSJSONObject> = _uA()
-                            res.data.list.forEach(fun(message: UTSJSONObject): Unit {
+                            latestList.forEach(fun(message: UTSJSONObject): Unit {
                                 val messageId = message.getString("messageId", "")
                                 if (messageId != "" && !existingIds.has(messageId)) {
                                     existingIds.add(messageId)
@@ -152,11 +155,15 @@ open class GenPagesMessageMessage : BasePage {
                                 loadStatus.value = "loading"
                             }
                             val res = await(getUserMsgList(_uO("page" to currPage.value, "pageSize" to pageSize.value)))
-                            if (res.code != 0) {
+                            if (res.code != 200) {
                                 loadStatus.value = "loadmore"
                                 return@w1
                             }
                             val data = res.data
+                            if (data == null) {
+                                loadStatus.value = "nomore"
+                                return@w1
+                            }
                             val totalPages = if (data.totalPage > 0) {
                                 data.totalPage
                             } else {
@@ -242,7 +249,7 @@ open class GenPagesMessageMessage : BasePage {
                             try {
                                 val messageId = item.getString("messageId", "")
                                 val res = await(setMsgState(messageId))
-                                if (res.code == 0 || res.msg == "success") {
+                                if (res.code == 200) {
                                     val index = msgList.value.findIndex(fun(message: UTSJSONObject): Boolean {
                                         return message.getString("messageId", "") == messageId
                                     }

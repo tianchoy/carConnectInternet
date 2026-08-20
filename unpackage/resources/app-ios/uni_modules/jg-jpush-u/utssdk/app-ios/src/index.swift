@@ -513,6 +513,7 @@ public func setBadgeNumber(_ curNum: Int) -> Void {
 public func resetBadge() -> Void {
     log("resetBadge")
     JPUSHService.resetBadge()
+    UIApplication.shared.applicationIconBadgeNumber = 0
     if #available(iOS 16.0, *) {
         UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: {
         (error: Error?) -> Void in
@@ -520,8 +521,6 @@ public func resetBadge() -> Void {
             log("resetBadge setBadgeCount error:", error)
         }
         })
-    } else {
-        UIApplication.shared.applicationIconBadgeNumber = 0
     }
 }
 public func getBadgeNumber() -> NSNumber {

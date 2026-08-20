@@ -10,15 +10,15 @@
       function fulfilled(value) {
         try {
           step(generator.next(value));
-        } catch (e) {
-          reject(e);
+        } catch (e2) {
+          reject(e2);
         }
       }
       function rejected(value) {
         try {
           step(generator["throw"](value));
-        } catch (e) {
-          reject(e);
+        } catch (e2) {
+          reject(e2);
         }
       }
       function step(result) {
@@ -27,44 +27,44 @@
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   }
-  function __values(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m)
-      return m.call(o);
-    if (o && typeof o.length === "number")
+  function __values(o2) {
+    var s2 = typeof Symbol === "function" && Symbol.iterator, m2 = s2 && o2[s2], i2 = 0;
+    if (m2)
+      return m2.call(o2);
+    if (o2 && typeof o2.length === "number")
       return {
         next: function() {
-          if (o && i >= o.length)
-            o = void 0;
-          return { value: o && o[i++], done: !o };
+          if (o2 && i2 >= o2.length)
+            o2 = void 0;
+          return { value: o2 && o2[i2++], done: !o2 };
         }
       };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+    throw new TypeError(s2 ? "Object is not iterable." : "Symbol.iterator is not defined.");
   }
-  function __read(o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m)
-      return o;
-    var i = m.call(o), r, ar = [], e;
+  function __read(o2, n2) {
+    var m2 = typeof Symbol === "function" && o2[Symbol.iterator];
+    if (!m2)
+      return o2;
+    var i2 = m2.call(o2), r2, ar2 = [], e2;
     try {
-      while ((n === void 0 || n-- > 0) && !(r = i.next()).done)
-        ar.push(r.value);
+      while ((n2 === void 0 || n2-- > 0) && !(r2 = i2.next()).done)
+        ar2.push(r2.value);
     } catch (error) {
-      e = { error };
+      e2 = { error };
     } finally {
       try {
-        if (r && !r.done && (m = i["return"]))
-          m.call(i);
+        if (r2 && !r2.done && (m2 = i2["return"]))
+          m2.call(i2);
       } finally {
-        if (e)
-          throw e.error;
+        if (e2)
+          throw e2.error;
       }
     }
-    return ar;
+    return ar2;
   }
   typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
-    var e = new Error(message);
-    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+    var e2 = new Error(message);
+    return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
   };
   const _sfc_main$L = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
     name: {
@@ -405,8 +405,8 @@
     return target;
   };
   const __easycom_2$4 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["styles", [_style_0$J]]]);
-  function resolveEasycom(component, easycom) {
-    return typeof component === "string" ? easycom : component;
+  function resolveEasycom(component, easycom2) {
+    return typeof component === "string" ? easycom2 : component;
   }
   const _sfc_main$K = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
     percent: { type: Number, default: 45 },
@@ -603,7 +603,7 @@
       const canvasHeight = config.canvasHeight;
       this.setupCanvas(canvasWidth, canvasHeight);
       ctx.reset();
-      const x = canvasWidth / 2;
+      const x2 = canvasWidth / 2;
       const itemActiveFontWeight = (_a = config === null || config === void 0 ? null : config.itemActiveFontWeight) !== null && _a !== void 0 ? _a : 700;
       const color = (_b = config === null || config === void 0 ? null : config.itemColor) !== null && _b !== void 0 ? _b : isDarkMode ? "rgba(255,255,255,0.88)" : "rgba(0,0,0,0.88)";
       const itemActiveColor = (_c = config === null || config === void 0 ? null : config.itemActiveColor) !== null && _c !== void 0 ? _c : isDarkMode ? "rgba(255,255,255,0.88)" : "rgba(0,0,0,0.88)";
@@ -614,16 +614,16 @@
       options.forEach((item, index) => {
         let offset = 0.4;
         offset = 0.55;
-        const y = itemHeight * index + fontSize + (itemHeight - fontSize) * offset;
+        const y2 = itemHeight * index + fontSize + (itemHeight - fontSize) * offset;
         const isActive = index == curIndex && itemActiveFontWeight > 600;
         ctx.fillStyle = isActive ? itemActiveColor : color;
         ctx.strokeStyle = isActive ? itemActiveColor : color;
-        ctx.fillText(item.label, x, y);
+        ctx.fillText(item.label, x2, y2);
         if (isActive) {
-          ctx.fillText(item.label, x - 0.2, y);
-          ctx.fillText(item.label, x + 0.2, y);
-          ctx.fillText(item.label, x, y - 0.2);
-          ctx.fillText(item.label, x, y + 0.2);
+          ctx.fillText(item.label, x2 - 0.2, y2);
+          ctx.fillText(item.label, x2 + 0.2, y2);
+          ctx.fillText(item.label, x2, y2 - 0.2);
+          ctx.fillText(item.label, x2, y2 + 0.2);
         }
       });
       ctx.update();
@@ -734,10 +734,10 @@
           return null;
         updateItems === null || updateItems === void 0 ? null : updateItems(curItem, index, column.value);
       };
-      const handlePick = (e) => {
+      const handlePick = (e2) => {
         if (props.options.length == 0)
           return null;
-        const index = clamp(e.detail.value[0], 0, props.options.length - 1);
+        const index = clamp(e2.detail.value[0], 0, props.options.length - 1);
         const curItem = props.options[index];
         if (index == curIndex.value)
           return null;
@@ -746,8 +746,8 @@
       };
       vue.watch(() => {
         return props.value;
-      }, (v = null) => {
-        setValue(v);
+      }, (v2 = null) => {
+        setValue(v2);
         setUpdateItems();
       }, { immediate: true });
       const itemRef = vue.ref(null);
@@ -860,8 +860,8 @@
   const _style_0$H = { "l-picker-item__group": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-picker-item__group-item": { "": { "height": "var(--l-picker-item-height, 50px)", "lineHeight": "var(--l-picker-item-height, 50px)", "textAlign": "center", "transitionDuration": "100ms", "transitionProperty": "fontWeight,color", "transitionTimingFunction": "linear", "fontWeight": 400, "color": "var(--l-picker-item-color, #000000E0)", "fontSize": "var(--l-picker-item-font-size, 16px)", "whiteSpace": "nowrap" } }, "l-picker-item__group-item--active": { "": { "color": "var(--l-picker-item-active-color, #000000E0)", "fontWeight": "var(--l-picker-item-active-font-weight, 700)" } }, "l-picker-item__wrapper": { "": { "width": "100%" } }, "@TRANSITION": { "l-picker-item__group-item": { "duration": "100ms", "property": "fontWeight,color", "timingFunction": "linear" } } };
   const __easycom_0$6 = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["styles", [_style_0$H]]]);
   function arrayEqual(arr1, arr2) {
-    return arr1.length == arr2.length && arr1.every((val, i) => {
-      return val == arr2[i];
+    return arr1.length == arr2.length && arr1.every((val, i2) => {
+      return val == arr2[i2];
     });
   }
   function assignAtIndex(arr, index, value) {
@@ -1173,208 +1173,208 @@
     }
     return value != null;
   }
-  function isPercentage(n = null) {
-    return isString(n) && n.indexOf("%") != -1;
+  function isPercentage(n2 = null) {
+    return isString(n2) && n2.indexOf("%") != -1;
   }
-  function isOnePointZero(n = null) {
-    return isString(n) && n.indexOf(".") != -1 && parseFloat(n) == 1;
+  function isOnePointZero(n2 = null) {
+    return isString(n2) && n2.indexOf(".") != -1 && parseFloat(n2) == 1;
   }
-  function bound01(n = null, max) {
-    if (!(isNumber$1(n) || isString(n))) {
+  function bound01(n2 = null, max) {
+    if (!(isNumber$1(n2) || isString(n2))) {
       return 1;
     }
-    if (isOnePointZero(n)) {
-      n = "100%";
+    if (isOnePointZero(n2)) {
+      n2 = "100%";
     }
-    const isPercent = isPercentage(n);
-    n = isNumber$1(n) ? n : parseFloat(n);
-    n = max == 360 ? n : Math.min(max, Math.max(0, n));
+    const isPercent = isPercentage(n2);
+    n2 = isNumber$1(n2) ? n2 : parseFloat(n2);
+    n2 = max == 360 ? n2 : Math.min(max, Math.max(0, n2));
     if (isPercent) {
-      n = parseInt("".concat(Math.min(n, 100) * max), 10) / 100;
+      n2 = parseInt("".concat(Math.min(n2, 100) * max), 10) / 100;
     }
-    if (Math.abs(n - max) < 1e-6) {
+    if (Math.abs(n2 - max) < 1e-6) {
       return 1;
     }
     if (max == 360) {
-      n = (n < 0 ? n % max + max : n % max) / max;
+      n2 = (n2 < 0 ? n2 % max + max : n2 % max) / max;
     } else {
-      n = n % max / max;
+      n2 = n2 % max / max;
     }
-    return n;
+    return n2;
   }
   function clamp01(val) {
     return Math.min(1, Math.max(0, val));
   }
-  function boundAlpha(a = null) {
-    let n = a == null ? 1 : isString(a) ? parseFloat(a) : a;
-    if (isNaN(n) || n < 0 || n > 1) {
-      n = 1;
+  function boundAlpha(a2 = null) {
+    let n2 = a2 == null ? 1 : isString(a2) ? parseFloat(a2) : a2;
+    if (isNaN(n2) || n2 < 0 || n2 > 1) {
+      n2 = 1;
     }
-    return n;
+    return n2;
   }
-  function convertToPercentage(n = null) {
-    n = isNumeric(n) ? parseFloat("".concat(n)) : n;
-    if (isNumber$1(n) && n <= 1) {
-      return "".concat(n * 100, "%").replace(".0%", "%");
+  function convertToPercentage(n2 = null) {
+    n2 = isNumeric(n2) ? parseFloat("".concat(n2)) : n2;
+    if (isNumber$1(n2) && n2 <= 1) {
+      return "".concat(n2 * 100, "%").replace(".0%", "%");
     }
-    return n;
+    return n2;
   }
-  function pad2(c) {
-    return c.length == 1 ? "0" + c : "".concat(c);
+  function pad2(c2) {
+    return c2.length == 1 ? "0" + c2 : "".concat(c2);
   }
-  function rgbToRgb(r = null, g = null, b = null) {
+  function rgbToRgb(r2 = null, g2 = null, b2 = null) {
     return new RGB({
-      r: bound01(r, 255) * 255,
-      g: bound01(g, 255) * 255,
-      b: bound01(b, 255) * 255
+      r: bound01(r2, 255) * 255,
+      g: bound01(g2, 255) * 255,
+      b: bound01(b2, 255) * 255
     });
   }
-  function rgbToHsl(r = null, g = null, b = null) {
-    r = bound01(r, 255);
-    g = bound01(g, 255);
-    b = bound01(b, 255);
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0;
-    let s;
-    const l = (max + min) / 2;
+  function rgbToHsl(r2 = null, g2 = null, b2 = null) {
+    r2 = bound01(r2, 255);
+    g2 = bound01(g2, 255);
+    b2 = bound01(b2, 255);
+    const max = Math.max(r2, g2, b2);
+    const min = Math.min(r2, g2, b2);
+    let h2 = 0;
+    let s2;
+    const l2 = (max + min) / 2;
     if (max == min) {
-      s = 0;
-      h = 0;
+      s2 = 0;
+      h2 = 0;
     } else {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      const d2 = max - min;
+      s2 = l2 > 0.5 ? d2 / (2 - max - min) : d2 / (max + min);
       switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
+        case r2:
+          h2 = (g2 - b2) / d2 + (g2 < b2 ? 6 : 0);
           break;
-        case g:
-          h = (b - r) / d + 2;
+        case g2:
+          h2 = (b2 - r2) / d2 + 2;
           break;
-        case b:
-          h = (r - g) / d + 4;
+        case b2:
+          h2 = (r2 - g2) / d2 + 4;
           break;
         default:
           uni.__log__("log", "at uni_modules/lime-color/common/conversion.uts:64", "h");
           break;
       }
-      h /= 6;
+      h2 /= 6;
     }
-    return new HSL({ h, s, l });
+    return new HSL({ h: h2, s: s2, l: l2 });
   }
-  function hue2rgb(p, q, t) {
-    let _t = t;
-    if (_t < 0) {
-      _t += 1;
+  function hue2rgb(p2, q2, t2) {
+    let _t2 = t2;
+    if (_t2 < 0) {
+      _t2 += 1;
     }
-    if (_t > 1) {
-      _t -= 1;
+    if (_t2 > 1) {
+      _t2 -= 1;
     }
-    if (_t < 1 / 6) {
-      return p + (q - p) * (6 * _t);
+    if (_t2 < 1 / 6) {
+      return p2 + (q2 - p2) * (6 * _t2);
     }
-    if (_t < 1 / 2) {
-      return q;
+    if (_t2 < 1 / 2) {
+      return q2;
     }
-    if (_t < 2 / 3) {
-      return p + (q - p) * (2 / 3 - _t) * 6;
+    if (_t2 < 2 / 3) {
+      return p2 + (q2 - p2) * (2 / 3 - _t2) * 6;
     }
-    return p;
+    return p2;
   }
-  function hslToRgb(h = null, s = null, l = null) {
-    let r;
-    let g;
-    let b;
-    h = bound01(h, 360);
-    s = bound01(s, 100);
-    l = bound01(l, 100);
-    if (s == 0) {
-      g = l;
-      b = l;
-      r = l;
+  function hslToRgb(h2 = null, s2 = null, l2 = null) {
+    let r2;
+    let g2;
+    let b2;
+    h2 = bound01(h2, 360);
+    s2 = bound01(s2, 100);
+    l2 = bound01(l2, 100);
+    if (s2 == 0) {
+      g2 = l2;
+      b2 = l2;
+      r2 = l2;
     } else {
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1 / 3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1 / 3);
+      const q2 = l2 < 0.5 ? l2 * (1 + s2) : l2 + s2 - l2 * s2;
+      const p2 = 2 * l2 - q2;
+      r2 = hue2rgb(p2, q2, h2 + 1 / 3);
+      g2 = hue2rgb(p2, q2, h2);
+      b2 = hue2rgb(p2, q2, h2 - 1 / 3);
     }
-    return new RGB({ r: r * 255, g: g * 255, b: b * 255 });
+    return new RGB({ r: r2 * 255, g: g2 * 255, b: b2 * 255 });
   }
-  function rgbToHsv(r, g, b) {
-    r = bound01(r, 255);
-    g = bound01(g, 255);
-    b = bound01(b, 255);
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0;
-    const v = max;
-    const d = max - min;
-    const s = max == 0 ? 0 : d / max;
+  function rgbToHsv(r2, g2, b2) {
+    r2 = bound01(r2, 255);
+    g2 = bound01(g2, 255);
+    b2 = bound01(b2, 255);
+    const max = Math.max(r2, g2, b2);
+    const min = Math.min(r2, g2, b2);
+    let h2 = 0;
+    const v2 = max;
+    const d2 = max - min;
+    const s2 = max == 0 ? 0 : d2 / max;
     if (max == min) {
-      h = 0;
+      h2 = 0;
     } else {
       switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
+        case r2:
+          h2 = (g2 - b2) / d2 + (g2 < b2 ? 6 : 0);
           break;
-        case g:
-          h = (b - r) / d + 2;
+        case g2:
+          h2 = (b2 - r2) / d2 + 2;
           break;
-        case b:
-          h = (r - g) / d + 4;
+        case b2:
+          h2 = (r2 - g2) / d2 + 4;
           break;
         default:
           uni.__log__("log", "at uni_modules/lime-color/common/conversion.uts:171", "1");
           break;
       }
-      h /= 6;
+      h2 /= 6;
     }
-    return new HSV({ h, s, v });
+    return new HSV({ h: h2, s: s2, v: v2 });
   }
-  function hsvToRgb(h = null, s = null, v = null) {
-    h = bound01(h, 360) * 6;
-    s = bound01(s, 100);
-    v = bound01(v, 100);
-    const i = Math.floor(h);
-    const f = h - i;
-    const p = v * (1 - s);
-    const q = v * (1 - f * s);
-    const t = v * (1 - (1 - f) * s);
-    const mod = i % 6;
-    const r = [v, q, p, p, t, v][mod];
-    const g = [t, v, v, q, p, p][mod];
-    const b = [p, p, t, v, v, q][mod];
-    return new RGB({ r: r * 255, g: g * 255, b: b * 255 });
+  function hsvToRgb(h2 = null, s2 = null, v2 = null) {
+    h2 = bound01(h2, 360) * 6;
+    s2 = bound01(s2, 100);
+    v2 = bound01(v2, 100);
+    const i2 = Math.floor(h2);
+    const f2 = h2 - i2;
+    const p2 = v2 * (1 - s2);
+    const q2 = v2 * (1 - f2 * s2);
+    const t2 = v2 * (1 - (1 - f2) * s2);
+    const mod = i2 % 6;
+    const r2 = [v2, q2, p2, p2, t2, v2][mod];
+    const g2 = [t2, v2, v2, q2, p2, p2][mod];
+    const b2 = [p2, p2, t2, v2, v2, q2][mod];
+    return new RGB({ r: r2 * 255, g: g2 * 255, b: b2 * 255 });
   }
-  function rgbToHex(r, g, b, allow3Char = false) {
+  function rgbToHex(r2, g2, b2, allow3Char = false) {
     const hex = [
-      pad2(Math.round(r).toString(16)),
-      pad2(Math.round(g).toString(16)),
-      pad2(Math.round(b).toString(16))
+      pad2(Math.round(r2).toString(16)),
+      pad2(Math.round(g2).toString(16)),
+      pad2(Math.round(b2).toString(16))
     ];
     if (allow3Char && hex[0].startsWith(hex[0].charAt(1)) && hex[1].startsWith(hex[1].charAt(1)) && hex[2].startsWith(hex[2].charAt(1))) {
       return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0);
     }
     return hex.join("");
   }
-  function rgbaToHex(r, g, b, a, allow4Char = false) {
+  function rgbaToHex(r2, g2, b2, a2, allow4Char = false) {
     const hex = [
-      pad2(Math.round(r).toString(16)),
-      pad2(Math.round(g).toString(16)),
-      pad2(Math.round(b).toString(16)),
-      pad2(convertDecimalToHex(a))
+      pad2(Math.round(r2).toString(16)),
+      pad2(Math.round(g2).toString(16)),
+      pad2(Math.round(b2).toString(16)),
+      pad2(convertDecimalToHex(a2))
     ];
     if (allow4Char && hex[0].startsWith(hex[0].charAt(1)) && hex[1].startsWith(hex[1].charAt(1)) && hex[2].startsWith(hex[2].charAt(1)) && hex[3].startsWith(hex[3].charAt(1))) {
       return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0) + hex[3].charAt(0);
     }
     return hex.join("");
   }
-  function convertDecimalToHex(d = null) {
-    return Math.round(parseFloat("".concat(d)) * 255).toString(16);
+  function convertDecimalToHex(d2 = null) {
+    return Math.round(parseFloat("".concat(d2)) * 255).toString(16);
   }
-  function convertHexToDecimal(h) {
-    return parseIntFromHex(h) / 255;
+  function convertHexToDecimal(h2) {
+    return parseIntFromHex(h2) / 255;
   }
   function parseIntFromHex(val) {
     return parseInt(val, 16);
@@ -1605,10 +1605,10 @@
     var _a;
     let _color = null;
     let rgb = new RGB({ r: 0, g: 0, b: 0 });
-    let a = 1;
-    let s = null;
-    let v = null;
-    let l = null;
+    let a2 = 1;
+    let s2 = null;
+    let v2 = null;
+    let l2 = null;
     let ok = false;
     let format = null;
     if (typeof color == "string") {
@@ -1624,30 +1624,30 @@
         format = "".concat(_color["r"]).endsWith("%") ? "prgb" : "rgb";
       } else if (isValidCSSUnit(_color["h"]) && isValidCSSUnit(_color["s"]) && (isValidCSSUnit(_color["v"]) || isValidCSSUnit(_color["b"]))) {
         const isHSV = _color["v"] != null;
-        s = convertToPercentage(_color["s"]);
-        v = isHSV ? convertToPercentage(_color["v"]) : convertToPercentage(_color["b"]);
-        rgb = hsvToRgb(_color["h"], s, v);
+        s2 = convertToPercentage(_color["s"]);
+        v2 = isHSV ? convertToPercentage(_color["v"]) : convertToPercentage(_color["b"]);
+        rgb = hsvToRgb(_color["h"], s2, v2);
         ok = true;
         format = isHSV ? "hsv" : "hsb";
       } else if (isValidCSSUnit(_color["h"]) && isValidCSSUnit(_color["s"]) && isValidCSSUnit(_color["l"])) {
-        s = convertToPercentage(_color["s"]);
-        l = convertToPercentage(_color["l"]);
-        rgb = hslToRgb(_color["h"], s, l);
+        s2 = convertToPercentage(_color["s"]);
+        l2 = convertToPercentage(_color["l"]);
+        rgb = hslToRgb(_color["h"], s2, l2);
         ok = true;
         format = "hsl";
       }
       if (_color["a"] != null) {
-        a = _color["a"];
+        a2 = _color["a"];
       }
     }
-    a = boundAlpha(a);
+    a2 = boundAlpha(a2);
     return new LColorInfo({
       ok,
       format: (_a = _color === null || _color === void 0 ? null : _color["format"]) !== null && _a !== void 0 ? _a : format,
       r: Math.min(255, Math.max(rgb.r, 0)),
       g: Math.min(255, Math.max(rgb.g, 0)),
       b: Math.min(255, Math.max(rgb.b, 0)),
-      a
+      a: a2
     });
   }
   function stringInputToObject(color) {
@@ -1664,98 +1664,98 @@
     }
     let match = matchers.rgb.exec(_color);
     if (match != null) {
-      const r = match[1];
-      const g = match[2];
-      const b = match[3];
-      return new UTSJSONObject({ r, g, b });
+      const r2 = match[1];
+      const g2 = match[2];
+      const b2 = match[3];
+      return new UTSJSONObject({ r: r2, g: g2, b: b2 });
     }
     match = matchers.rgba.exec(_color);
     if (match != null) {
-      const r = match[1];
-      const g = match[2];
-      const b = match[3];
-      const a = match[4];
-      return new UTSJSONObject({ r, g, b, a });
+      const r2 = match[1];
+      const g2 = match[2];
+      const b2 = match[3];
+      const a2 = match[4];
+      return new UTSJSONObject({ r: r2, g: g2, b: b2, a: a2 });
     }
     match = matchers.hsl.exec(_color);
     if (match != null) {
       match[1];
-      const s = match[2];
-      const l = match[3];
-      return new UTSJSONObject({ h: vue.h, s, l });
+      const s2 = match[2];
+      const l2 = match[3];
+      return new UTSJSONObject({ h: vue.h, s: s2, l: l2 });
     }
     match = matchers.hsla.exec(_color);
     if (match != null) {
       match[1];
-      const s = match[2];
-      const l = match[3];
-      const a = match[4];
-      return new UTSJSONObject({ h: vue.h, s, l, a });
+      const s2 = match[2];
+      const l2 = match[3];
+      const a2 = match[4];
+      return new UTSJSONObject({ h: vue.h, s: s2, l: l2, a: a2 });
     }
     match = matchers.hsv.exec(_color);
     if (match != null) {
       match[1];
-      const s = match[2];
-      const v = match[3];
-      return new UTSJSONObject({ h: vue.h, s, v });
+      const s2 = match[2];
+      const v2 = match[3];
+      return new UTSJSONObject({ h: vue.h, s: s2, v: v2 });
     }
     match = matchers.hsva.exec(_color);
     if (match != null) {
       match[1];
-      const s = match[2];
-      const v = match[3];
-      const a = match[4];
-      return new UTSJSONObject({ h: vue.h, s, v, a });
+      const s2 = match[2];
+      const v2 = match[3];
+      const a2 = match[4];
+      return new UTSJSONObject({ h: vue.h, s: s2, v: v2, a: a2 });
     }
     match = matchers.hex8.exec(_color);
     if (match != null) {
-      const r = parseIntFromHex(match[1]);
-      const g = parseIntFromHex(match[2]);
-      const b = parseIntFromHex(match[3]);
-      const a = convertHexToDecimal(match[4]);
+      const r2 = parseIntFromHex(match[1]);
+      const g2 = parseIntFromHex(match[2]);
+      const b2 = parseIntFromHex(match[3]);
+      const a2 = convertHexToDecimal(match[4]);
       return new UTSJSONObject({
-        r,
-        g,
-        b,
-        a,
+        r: r2,
+        g: g2,
+        b: b2,
+        a: a2,
         format: named ? "name" : "hex8"
       });
     }
     match = matchers.hex6.exec(_color);
     if (match != null) {
-      const r = parseIntFromHex(match[1]);
-      const g = parseIntFromHex(match[2]);
-      const b = parseIntFromHex(match[3]);
+      const r2 = parseIntFromHex(match[1]);
+      const g2 = parseIntFromHex(match[2]);
+      const b2 = parseIntFromHex(match[3]);
       return new UTSJSONObject({
-        r,
-        g,
-        b,
+        r: r2,
+        g: g2,
+        b: b2,
         format: named ? "name" : "hex"
       });
     }
     match = matchers.hex4.exec(_color);
     if (match != null) {
-      const r = parseIntFromHex(match[1] + match[1]);
-      const g = parseIntFromHex(match[2] + match[2]);
-      const b = parseIntFromHex(match[3] + match[3]);
-      const a = convertHexToDecimal(match[4] + match[4]);
+      const r2 = parseIntFromHex(match[1] + match[1]);
+      const g2 = parseIntFromHex(match[2] + match[2]);
+      const b2 = parseIntFromHex(match[3] + match[3]);
+      const a2 = convertHexToDecimal(match[4] + match[4]);
       return new UTSJSONObject({
-        r,
-        g,
-        b,
-        a,
+        r: r2,
+        g: g2,
+        b: b2,
+        a: a2,
         format: named ? "name" : "hex8"
       });
     }
     match = matchers.hex3.exec(_color);
     if (match != null) {
-      const r = parseIntFromHex(match[1] + match[1]);
-      const g = parseIntFromHex(match[2] + match[2]);
-      const b = parseIntFromHex(match[3] + match[3]);
+      const r2 = parseIntFromHex(match[1] + match[1]);
+      const g2 = parseIntFromHex(match[2] + match[2]);
+      const b2 = parseIntFromHex(match[3] + match[3]);
       return new UTSJSONObject({
-        r,
-        g,
-        b,
+        r: r2,
+        g: g2,
+        b: b2,
         format: named ? "name" : "hex"
       });
     }
@@ -1825,28 +1825,28 @@
      */
     getLuminance() {
       const rgb = this.toRgb();
-      let R;
-      let G;
-      let B;
+      let R2;
+      let G2;
+      let B2;
       const RsRGB = rgb.r / 255;
       const GsRGB = rgb.g / 255;
       const BsRGB = rgb.b / 255;
       if (RsRGB <= 0.03928) {
-        R = RsRGB / 12.92;
+        R2 = RsRGB / 12.92;
       } else {
-        R = Math.pow((RsRGB + 0.055) / 1.055, 2.4);
+        R2 = Math.pow((RsRGB + 0.055) / 1.055, 2.4);
       }
       if (GsRGB <= 0.03928) {
-        G = GsRGB / 12.92;
+        G2 = GsRGB / 12.92;
       } else {
-        G = Math.pow((GsRGB + 0.055) / 1.055, 2.4);
+        G2 = Math.pow((GsRGB + 0.055) / 1.055, 2.4);
       }
       if (BsRGB <= 0.03928) {
-        B = BsRGB / 12.92;
+        B2 = BsRGB / 12.92;
       } else {
-        B = Math.pow((BsRGB + 0.055) / 1.055, 2.4);
+        B2 = Math.pow((BsRGB + 0.055) / 1.055, 2.4);
       }
-      return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+      return 0.2126 * R2 + 0.7152 * G2 + 0.0722 * B2;
     }
     /**
      * 获取当前颜色的透明度值。
@@ -1867,8 +1867,8 @@
      * @returns 一个布尔值，表示当前颜色是否为单色。
      */
     isMonochrome() {
-      const s = this.toHsl().s;
-      return s == 0;
+      const s2 = this.toHsl().s;
+      return s2 == 0;
     }
     /**
      * 将当前颜色转换为 HSV（色相、饱和度、亮度）颜色空间。
@@ -1884,10 +1884,10 @@
      */
     toHsvString() {
       const hsv = rgbToHsv(this.r, this.g, this.b);
-      const h = Math.round(hsv.h * 360);
-      const s = Math.round(hsv.s * 100);
-      const v = Math.round(hsv.v * 100);
-      return this.a == 1 ? "hsv(".concat(h, ", ").concat(s, "%, ").concat(v, "%)") : "hsva(".concat(h, ", ").concat(s, "%, ").concat(v, "%, ").concat(this.roundA, ")");
+      const h2 = Math.round(hsv.h * 360);
+      const s2 = Math.round(hsv.s * 100);
+      const v2 = Math.round(hsv.v * 100);
+      return this.a == 1 ? "hsv(".concat(h2, ", ").concat(s2, "%, ").concat(v2, "%)") : "hsva(".concat(h2, ", ").concat(s2, "%, ").concat(v2, "%, ").concat(this.roundA, ")");
     }
     /**
      * 将当前颜色对象转换为HSBA颜色空间,即Hue（色相）、Saturation（饱和度）、Brightness（亮度）和Alpha（透明度
@@ -1903,10 +1903,10 @@
      */
     toHsbString() {
       const hsb = this.toHsb();
-      const h = Math.round(hsb.h);
-      const s = Math.round(hsb.s * 100);
-      const b = Math.round(hsb.b * 100);
-      return this.a == 1 ? "hsb(".concat(h, ", ").concat(s, "%, ").concat(b, "%)") : "hsba(".concat(h, ", ").concat(s, "%, ").concat(b, "%, ").concat(this.roundA, ")");
+      const h2 = Math.round(hsb.h);
+      const s2 = Math.round(hsb.s * 100);
+      const b2 = Math.round(hsb.b * 100);
+      return this.a == 1 ? "hsb(".concat(h2, ", ").concat(s2, "%, ").concat(b2, "%)") : "hsba(".concat(h2, ", ").concat(s2, "%, ").concat(b2, "%, ").concat(this.roundA, ")");
     }
     /**
      * 将当前颜色转换为 HSL（色相、饱和度、明度）颜色空间。
@@ -1922,10 +1922,10 @@
      */
     toHslString() {
       const hsl = rgbToHsl(this.r, this.g, this.b);
-      const h = Math.round(hsl.h * 360);
-      const s = Math.round(hsl.s * 100);
-      const l = Math.round(hsl.l * 100);
-      return this.a == 1 ? "hsl(".concat(h, ", ").concat(s, "%, ").concat(l, "%)") : "hsla(".concat(h, ", ").concat(s, "%, ").concat(l, "%, ").concat(this.roundA, ")");
+      const h2 = Math.round(hsl.h * 360);
+      const s2 = Math.round(hsl.s * 100);
+      const l2 = Math.round(hsl.l * 100);
+      return this.a == 1 ? "hsl(".concat(h2, ", ").concat(s2, "%, ").concat(l2, "%)") : "hsla(".concat(h2, ", ").concat(s2, "%, ").concat(l2, "%, ").concat(this.roundA, ")");
     }
     /**
      * 将当前颜色转换为十六进制颜色表示。
@@ -1981,18 +1981,18 @@
      * @returns {string} 返回一个CSS风格的RGB或RGBA字符串，表示当前颜色对象的颜色值
      */
     toRgbString() {
-      const r = Math.round(this.r);
-      const g = Math.round(this.g);
-      const b = Math.round(this.b);
-      return this.a == 1 ? "rgb(".concat(r, ", ").concat(g, ", ").concat(b, ")") : "rgba(".concat(r, ", ").concat(g, ", ").concat(b, ", ").concat(this.roundA, ")");
+      const r2 = Math.round(this.r);
+      const g2 = Math.round(this.g);
+      const b2 = Math.round(this.b);
+      return this.a == 1 ? "rgb(".concat(r2, ", ").concat(g2, ", ").concat(b2, ")") : "rgba(".concat(r2, ", ").concat(g2, ", ").concat(b2, ", ").concat(this.roundA, ")");
     }
     /**
      * 将当前颜色转换为百分比表示的 RGB（红、绿、蓝）颜色空间的对象表示。
      * @returns 一个包含 `r`、`g`、`b` 和 `a` 属性的对象，表示当前颜色的百分比表示的 RGB 格式。
      */
     toPercentageRgb() {
-      const fmt = (x) => {
-        return "".concat(Math.round(bound01(x, 255) * 100), "%");
+      const fmt = (x2) => {
+        return "".concat(Math.round(bound01(x2, 255) * 100), "%");
       };
       return new RGBAString({
         r: fmt(this.r),
@@ -2005,8 +2005,8 @@
      * 将RGBA相对值插值为一个字符串，颜色值以百分比表示。
      */
     toPercentageRgbString() {
-      const rnd = (x) => {
-        return Math.round(bound01(x, 255) * 100);
+      const rnd = (x2) => {
+        return Math.round(bound01(x2, 255) * 100);
       };
       return this.a == 1 ? "rgb(".concat(rnd(this.r), "%, ").concat(rnd(this.g), "%, ").concat(rnd(this.b), "%)") : "rgba(".concat(rnd(this.r), "%, ").concat(rnd(this.g), "%, ").concat(rnd(this.b), "%, ").concat(this.roundA, ")");
     }
@@ -2192,12 +2192,12 @@
     mix(color = null, amount = 50) {
       const rgb1 = this.toRgb();
       const rgb2 = new TinyColor(color).toRgb();
-      const p = amount / 100;
+      const p2 = amount / 100;
       const rgba = new UTSJSONObject({
-        r: (rgb2.r - rgb1.r) * p + rgb1.r,
-        g: (rgb2.g - rgb1.g) * p + rgb1.g,
-        b: (rgb2.b - rgb1.b) * p + rgb1.b,
-        a: (rgb2.a - rgb1.a) * p + rgb1.a
+        r: (rgb2.r - rgb1.r) * p2 + rgb1.r,
+        g: (rgb2.g - rgb1.g) * p2 + rgb1.g,
+        b: (rgb2.b - rgb1.b) * p2 + rgb1.b,
+        a: (rgb2.a - rgb1.a) * p2 + rgb1.a
       });
       return new TinyColor(rgba, new LColorOptions({
         gradientType: null,
@@ -2246,15 +2246,15 @@
      */
     monochromatic(results = 6) {
       const hsv = this.toHsv();
-      const h = hsv.h;
-      const s = hsv.s;
-      let v = hsv.v;
+      const h2 = hsv.h;
+      const s2 = hsv.s;
+      let v2 = hsv.v;
       const res = [];
       const modification = 1 / results;
       let _results = results;
       while (_results > 0) {
-        res.push(new TinyColor(new UTSJSONObject({ h, s, v })));
-        v = (v + modification) % 1;
+        res.push(new TinyColor(new UTSJSONObject({ h: h2, s: s2, v: v2 })));
+        v2 = (v2 + modification) % 1;
         _results--;
       }
       return res;
@@ -2266,11 +2266,11 @@
      */
     splitcomplement() {
       const hsl = this.toHsl();
-      const h = hsl.h;
+      const h2 = hsl.h;
       return [
         this,
-        new TinyColor(new UTSJSONObject({ h: (h + 72) % 360, s: hsl.s, l: hsl.l })),
-        new TinyColor(new UTSJSONObject({ h: (h + 216) % 360, s: hsl.s, l: hsl.l }))
+        new TinyColor(new UTSJSONObject({ h: (h2 + 72) % 360, s: hsl.s, l: hsl.l })),
+        new TinyColor(new UTSJSONObject({ h: (h2 + 216) % 360, s: hsl.s, l: hsl.l }))
       ];
     }
     /**
@@ -2315,13 +2315,13 @@
      * @param n - 一个整数，表示要生成的色调数量。
      * @returns 一个包含当前颜色及其 n 色调颜色的 TinyColor 对象数组。
      */
-    polyad(n) {
+    polyad(n2) {
       const hsl = this.toHsl();
-      const h = hsl.h;
+      const h2 = hsl.h;
       const result = [this];
-      const increment = 360 / n;
-      for (let i = 1; i < n; i++) {
-        result.push(new TinyColor(new UTSJSONObject({ h: (h + i * increment) % 360, s: hsl.s, l: hsl.l })));
+      const increment = 360 / n2;
+      for (let i2 = 1; i2 < n2; i2++) {
+        result.push(new TinyColor(new UTSJSONObject({ h: (h2 + i2 * increment) % 360, s: hsl.s, l: hsl.l })));
       }
       return result;
     }
@@ -2413,9 +2413,9 @@
   }
   function getPointOnCircle(centerX, centerY, radius, angleDegrees) {
     const angleRadians = angleDegrees * Math.PI / 180;
-    const x = centerX + radius * Math.cos(angleRadians);
-    const y = centerY + radius * Math.sin(angleRadians);
-    return [x, y];
+    const x2 = centerX + radius * Math.cos(angleRadians);
+    const y2 = centerY + radius * Math.sin(angleRadians);
+    return [x2, y2];
   }
   function useLoading(element) {
     let isPlaying = false;
@@ -2470,8 +2470,8 @@
       const SPEED = 0.018 / 4;
       const ROTATE_INTERVAL = 0.09 / 4;
       const lineWidth = size.value / 10;
-      const x = canvasWidth.value / 2;
-      const y = canvasHeight.value / 2;
+      const x2 = canvasWidth.value / 2;
+      const y2 = canvasHeight.value / 2;
       const radius = size.value / 2 - lineWidth;
       try {
         drawFrame = () => {
@@ -2480,7 +2480,7 @@
           let ctx = context.value;
           ctx.reset();
           ctx.beginPath();
-          ctx.arc(x, y, radius, startAngle * PI + rotate, endAngle * PI + rotate);
+          ctx.arc(x2, y2, radius, startAngle * PI + rotate, endAngle * PI + rotate);
           ctx.lineWidth = lineWidth;
           ctx.strokeStyle = state.color;
           ctx.stroke();
@@ -2507,16 +2507,16 @@
     const drawSpinner = () => {
       const steps = 12;
       const lineWidth = size.value / 10;
-      const x = canvasWidth.value / 2;
-      const y = canvasHeight.value / 2;
+      const x2 = canvasWidth.value / 2;
+      const y2 = canvasHeight.value / 2;
       let step = 0;
       const length = size.value / 3.6 - lineWidth;
       const offset = size.value / 4;
       function generateColorGradient(hex, steps2) {
         const colors2 = [];
         const _color = tinyColor(hex);
-        for (let i = 1; i <= steps2; i++) {
-          _color.setAlpha(i / steps2);
+        for (let i2 = 1; i2 <= steps2; i2++) {
+          _color.setAlpha(i2 / steps2);
           colors2.push(_color.toRgbString());
         }
         return colors2;
@@ -2532,16 +2532,16 @@
           lastTime = Date.now();
           let ctx = context.value;
           ctx.reset();
-          for (let i = 0; i < steps; i++) {
+          for (let i2 = 0; i2 < steps; i2++) {
             const stepAngle = 360 / steps;
-            const angle = stepAngle * i;
-            const index = (steps + i - step) % steps;
+            const angle = stepAngle * i2;
+            const index = (steps + i2 - step) % steps;
             const radian = angle * Math.PI / 180;
             const cos = Math.cos(radian);
             const sin = Math.sin(radian);
             ctx.beginPath();
-            ctx.moveTo(x + offset * cos, y + offset * sin);
-            ctx.lineTo(x + (offset + length) * cos, y + (offset + length) * sin);
+            ctx.moveTo(x2 + offset * cos, y2 + offset * sin);
+            ctx.lineTo(x2 + (offset + length) * cos, y2 + (offset + length) * sin);
             ctx.lineWidth = lineWidth;
             ctx.lineCap = "round";
             ctx.strokeStyle = colors.value[index];
@@ -2743,7 +2743,7 @@
     },
     emits: ["change", "cancel", "pick", "confirm", "update:modelValue"],
     setup(__props, _a) {
-      var _b, _c, _d, _e;
+      var _b, _c, _d, _e2;
       var __expose = _a.expose, __emit = _a.emit;
       const emit = __emit;
       const props = __props;
@@ -2841,9 +2841,9 @@
         pickerValue.value = [...curValueArray.value];
         emit("pick", obj);
       };
-      const onCancel = (e) => {
+      const onCancel = (e2) => {
         updatePickerItems();
-        emit("cancel", e);
+        emit("cancel", e2);
       };
       const onConfirm = () => {
         const values = [...curValueArray.value];
@@ -2883,7 +2883,7 @@
       const loadingRef = vue.ref(null);
       const loadingAni = useLoading(loadingRef);
       loadingAni.type = "circular";
-      loadingAni.color = (_e = props.loadingColor) !== null && _e !== void 0 ? _e : "#3283ff";
+      loadingAni.color = (_e2 = props.loadingColor) !== null && _e2 !== void 0 ? _e2 : "#3283ff";
       loadingAni.ratio = unitConvert(props.loadingSize);
       vue.watchEffect(() => {
         if (props.loading) {
@@ -2956,12 +2956,12 @@
           }), [
             vue.renderSlot(_ctx.$slots, "default", new UTSJSONObject({}), () => {
               return [
-                (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(props.columns, (options = null, i) => {
+                (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(props.columns, (options = null, i2) => {
                   return vue.openBlock(), vue.createBlock(_component_l_picker_item, new UTSJSONObject({
                     options,
-                    key: i,
-                    column: i,
-                    value: vue.unref(pickerValue).length > i ? vue.unref(pickerValue)[i] : null
+                    key: i2,
+                    column: i2,
+                    value: vue.unref(pickerValue).length > i2 ? vue.unref(pickerValue)[i2] : null
                   }), null, 8, ["options", "column", "value"]);
                 }), 128))
               ];
@@ -2992,15 +2992,15 @@
   });
   const _style_0$G = { "l-picker": { "": { "position": "relative", "backgroundColor": "var(--l-picker-bg-color, #fff)", "borderTopLeftRadius": "var(--l-picker-border-radius, 12px)", "borderTopRightRadius": "var(--l-picker-border-radius, 12px)" } }, "l-picker__toolbar": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "height": "var(--l-picker-toolbar-height, 58px)", "flexDirection": "row", "position": "relative" } }, "l-picker__title": { "": { "position": "absolute", "left": "50%", "top": "50%", "transform": "translateX(-50%) translateY(-50%)", "textAlign": "center", "overflow": "hidden", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "color": "var(--l-picker-title-color, #000000E0)", "lineHeight": "var(--l-picker-title-line-height, 26px)", "fontWeight": "var(--l-picker-title-font-weight, 700)", "fontSize": "var(--l-picker-title-font-size, 18px)" } }, "l-picker__cancel": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginRight": "auto", "color": "var(--l-picker-cancel-color, #000000A6)" } }, "l-picker__confirm": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginLeft": "auto", "color": "var(--l-picker-confirm-color, #3283ff)" } }, "l-picker__main": { "": { "position": "relative", "display": "flex", "height": "var(--l-picker-group-height, 200px)", "flexDirection": "row", "zIndex": 2, "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8 } }, "l-picker__empty": { "": { "pointerEvents": "none", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0, "zIndex": 3 } }, "l-picker__loading": { "": { "zIndex": 3, "backgroundColor": "var(--l-picker-loading-mask-color, rgba(255, 255, 255, 0.9))", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0 } }, "l-picker__indicator": { "": { "position": "absolute", "backgroundColor": "var(--l-picker-indicator-bg-color, #0000000A)", "top": "50%", "left": "var(--l-picker-indicator-margin, 10px)", "right": "var(--l-picker-indicator-margin, 10px)", "height": "var(--l-picker-item-height, 50px)", "transform": "translateY(-50%)", "zIndex": -1, "borderTopLeftRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderTopRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomLeftRadius": "var(--l-picker-indicator-border-radius, 6px)" } } };
   const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["styles", [_style_0$G]]]);
-  function raf(fn = null) {
-    if (typeof fn == "UniAnimationFrameCallback") {
-      return requestAnimationFrame(fn);
+  function raf(fn2 = null) {
+    if (typeof fn2 == "UniAnimationFrameCallback") {
+      return requestAnimationFrame(fn2);
     } else {
-      return requestAnimationFrame(fn);
+      return requestAnimationFrame(fn2);
     }
   }
   function useTransition(options) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+    var _a, _b, _c, _d, _e2, _f, _g, _h, _j;
     const state = vue.ref(false);
     const display = vue.ref(false);
     const inited = vue.ref(false);
@@ -3009,7 +3009,7 @@
     const enterClass = (_b = options.enterClass) !== null && _b !== void 0 ? _b : "";
     const enterActiveClass = (_c = options.enterActiveClass) !== null && _c !== void 0 ? _c : "";
     const enterToClass = (_d = options.enterToClass) !== null && _d !== void 0 ? _d : "";
-    const leaveActiveClass = (_e = options.leaveActiveClass) !== null && _e !== void 0 ? _e : "";
+    const leaveActiveClass = (_e2 = options.leaveActiveClass) !== null && _e2 !== void 0 ? _e2 : "";
     const leaveToClass = (_f = options.leaveToClass) !== null && _f !== void 0 ? _f : "";
     const leaveClass = (_g = options.leaveClass) !== null && _g !== void 0 ? _g : "";
     const appear = (_h = options.appear) !== null && _h !== void 0 ? _h : false;
@@ -3141,9 +3141,9 @@
         return;
       name2.value = options.name();
     });
-    const toggle = (v) => {
-      state.value = v;
-      if (v) {
+    const toggle = (v2) => {
+      state.value = v2;
+      if (v2) {
         enter();
       } else {
         leave();
@@ -3829,7 +3829,7 @@
       }
       let wgsLat = tcLat;
       let wgsLng = tcLon;
-      for (let i = 0; i < 5; i++) {
+      for (let i2 = 0; i2 < 5; i2++) {
         const gcj02 = this.wgs84ToTencent(wgsLat, wgsLng);
         const deltaLat = tcLat - gcj02.lat;
         const deltaLng = tcLon - gcj02.lng;
@@ -3909,19 +3909,19 @@
       return lng >= 72.004 && lng <= 137.8347 && lat >= 0.8293 && lat <= 55.8271;
     }
     // 私有方法：纬度转换
-    static transformLat(x, y) {
-      let ret = -100 + 2 * x + 3 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x));
-      ret += (20 * Math.sin(6 * x * Math.PI) + 20 * Math.sin(2 * x * Math.PI)) * 2 / 3;
-      ret += (20 * Math.sin(y * Math.PI) + 40 * Math.sin(y / 3 * Math.PI)) * 2 / 3;
-      ret += (160 * Math.sin(y / 12 * Math.PI) + 320 * Math.sin(y * Math.PI / 30)) * 2 / 3;
+    static transformLat(x2, y2) {
+      let ret = -100 + 2 * x2 + 3 * y2 + 0.2 * y2 * y2 + 0.1 * x2 * y2 + 0.2 * Math.sqrt(Math.abs(x2));
+      ret += (20 * Math.sin(6 * x2 * Math.PI) + 20 * Math.sin(2 * x2 * Math.PI)) * 2 / 3;
+      ret += (20 * Math.sin(y2 * Math.PI) + 40 * Math.sin(y2 / 3 * Math.PI)) * 2 / 3;
+      ret += (160 * Math.sin(y2 / 12 * Math.PI) + 320 * Math.sin(y2 * Math.PI / 30)) * 2 / 3;
       return ret;
     }
     // 私有方法：经度转换
-    static transformLng(x, y) {
-      let ret = 300 + x + 2 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
-      ret += (20 * Math.sin(6 * x * Math.PI) + 20 * Math.sin(2 * x * Math.PI)) * 2 / 3;
-      ret += (20 * Math.sin(x * Math.PI) + 40 * Math.sin(x / 3 * Math.PI)) * 2 / 3;
-      ret += (150 * Math.sin(x / 12 * Math.PI) + 300 * Math.sin(x / 30 * Math.PI)) * 2 / 3;
+    static transformLng(x2, y2) {
+      let ret = 300 + x2 + 2 * y2 + 0.1 * x2 * x2 + 0.1 * x2 * y2 + 0.1 * Math.sqrt(Math.abs(x2));
+      ret += (20 * Math.sin(6 * x2 * Math.PI) + 20 * Math.sin(2 * x2 * Math.PI)) * 2 / 3;
+      ret += (20 * Math.sin(x2 * Math.PI) + 40 * Math.sin(x2 / 3 * Math.PI)) * 2 / 3;
+      ret += (150 * Math.sin(x2 / 12 * Math.PI) + 300 * Math.sin(x2 / 30 * Math.PI)) * 2 / 3;
       return ret;
     }
   }
@@ -4118,6 +4118,7 @@
   const initPush$1 = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "initPushByJs", keepAlive: false, params: [{ "name": "param", "type": "UTSSDKModulesJgJpushUInitPushParamsJSONObject" }], return: "" });
   const getRegistrationIdAsync = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "getRegistrationIdAsyncByJs", keepAlive: false, params: [{ "name": "callback", "type": "UTSCallback" }], return: "" });
   const getRegistrationId = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "getRegistrationIdByJs", keepAlive: false, params: [], return: "" });
+  const resetBadge = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "resetBadgeByJs", keepAlive: false, params: [], return: "" });
   class NormalizedPushEvent extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -4170,7 +4171,7 @@
     return PUSH_SESSION_KEY_PREFIX + provider;
   }
   function pushDebug(provider, message) {
-    uni.__log__("error", "at services/push.uts:80", "[PushManager][" + provider + "] " + message);
+    uni.__log__("error", "at services/push.uts:82", "[PushManager][" + provider + "] " + message);
   }
   function stringValue(value = null) {
     if (value == null)
@@ -4457,7 +4458,15 @@
     setLocalProviderForTesting(provider) {
       return null;
     }
+    clearBadge() {
+      try {
+        resetBadge();
+      } catch (error) {
+        pushDebug(this.provider, "清除 iOS 应用角标失败: " + error.toString());
+      }
+    }
     handlePushEvent(event) {
+      this.clearBadge();
       const messageId = pushMessageId(event.payload);
       if (messageId != "")
         uni.setStorageSync(pendingMessageIdKey(event.provider), messageId);
@@ -4546,6 +4555,9 @@
   }
   function refreshPushRegistrationId() {
     pushManager.refreshRegistrationId();
+  }
+  function clearPushBadge() {
+    pushManager.clearBadge();
   }
   function refreshPushClientId() {
     refreshPushRegistrationId();
@@ -4674,9 +4686,16 @@
       delete this.__props__;
     }
   }
-  const BASE_URL = "https://car.zdiot.cn:18443/api";
+  const BASE_URL = "https://gpsapp.zdiot.cn";
+  let isHandlingTokenExpired = false;
+  function resetTokenExpiredState() {
+    isHandlingTokenExpired = false;
+  }
   function handleTokenExpired() {
-    uni.__log__("log", "at api/http.uts:40", "检测到token过期，执行跳转登录页逻辑");
+    if (isHandlingTokenExpired)
+      return null;
+    isHandlingTokenExpired = true;
+    uni.__log__("log", "at api/http.uts:48", "检测到token过期，执行跳转登录页逻辑");
     uni.removeStorageSync("token");
     clearPushSessionState();
     showAppToast({
@@ -4685,14 +4704,14 @@
       duration: 2e3
     });
     setTimeout(() => {
-      uni.__log__("log", "at api/http.uts:55", "正在跳转到登录页...");
+      uni.__log__("log", "at api/http.uts:63", "正在跳转到登录页...");
       uni.redirectTo({
         url: "/pages/login/login",
         success: () => {
-          uni.__log__("log", "at api/http.uts:59", "跳转登录页成功");
+          uni.__log__("log", "at api/http.uts:67", "跳转登录页成功");
         },
         fail: (err) => {
-          uni.__log__("log", "at api/http.uts:62", "跳转登录页失败:", err);
+          uni.__log__("log", "at api/http.uts:70", "跳转登录页失败:", err);
           uni.reLaunch({
             url: "/pages/login/login"
           });
@@ -4717,7 +4736,7 @@
     if (config.showLoading != false) {
       uni.hideLoading();
     }
-    uni.__log__("log", "at api/http.uts:114", "请求错误详情:", error);
+    uni.__log__("log", "at api/http.uts:122", "请求错误详情:", error);
     if (error.statusCode != 0) {
       switch (error.statusCode) {
         case 401:
@@ -4890,9 +4909,7 @@
   const userinfo = "/sys/user/info";
   const addDeviceUrl = "/userDevice/add";
   const userDeviceList = "/userDevice/list";
-  const uniVerifyLoginUrl = "/authLogin/uniVerify";
-  const smsSendCodeUrl = "/authLogin/sms/send";
-  const smsLoginUrl = "/authLogin/sms/login";
+  const uniVerifyLoginUrl = "/auth/login";
   const changePSW = "/sys/user/password";
   const userMsgList = "/usermessage/listForUser";
   const msgState = "/usermessage/detail/";
@@ -4961,7 +4978,10 @@
             openId: { type: String, optional: false },
             accessToken: { type: String, optional: false },
             platform: { type: String, optional: false },
-            clientVersion: { type: String, optional: true }
+            clientVersion: { type: String, optional: true },
+            clientId: { type: String, optional: false },
+            grantType: { type: String, optional: false },
+            tenantId: { type: String, optional: false }
           };
         }
       };
@@ -4973,48 +4993,9 @@
       this.accessToken = this.__props__.accessToken;
       this.platform = this.__props__.platform;
       this.clientVersion = this.__props__.clientVersion;
-      delete this.__props__;
-    }
-  }
-  class SendSmsCodeRequest extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            mobile: { type: String, optional: false },
-            scene: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = SendSmsCodeRequest.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.mobile = this.__props__.mobile;
-      this.scene = this.__props__.scene;
-      delete this.__props__;
-    }
-  }
-  class SmsLoginRequest extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            mobile: { type: String, optional: false },
-            code: { type: String, optional: false },
-            platform: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = SmsLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.mobile = this.__props__.mobile;
-      this.code = this.__props__.code;
-      this.platform = this.__props__.platform;
+      this.clientId = this.__props__.clientId;
+      this.grantType = this.__props__.grantType;
+      this.tenantId = this.__props__.tenantId;
       delete this.__props__;
     }
   }
@@ -5025,7 +5006,7 @@
         get fields() {
           return {
             code: { type: Number, optional: false },
-            message: { type: String, optional: false },
+            msg: { type: String, optional: false },
             data: { type: "Unknown", optional: false }
           };
         }
@@ -5035,7 +5016,7 @@
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.code = this.__props__.code;
-      this.message = this.__props__.message;
+      this.msg = this.__props__.msg;
       this.data = this.__props__.data;
       delete this.__props__;
     }
@@ -5384,7 +5365,7 @@
       const response = asJSONObject(raw);
       return new DevicePositionResponse({
         code: getResponseCode(response),
-        message: getResponseMessage(response),
+        msg: getResponseMessage(response),
         data: getResponseDataArray(response)
       });
     });
@@ -5417,16 +5398,6 @@
   };
   const uniVerifyLogin = (data) => {
     return post(uniVerifyLoginUrl, data).then((raw = null) => {
-      return jsonDataResponse(raw);
-    });
-  };
-  const sendSmsLoginCode = (data) => {
-    return post(smsSendCodeUrl, data).then((raw = null) => {
-      return jsonDataResponse(raw);
-    });
-  };
-  const smsLogin = (data) => {
-    return post(smsLoginUrl, data).then((raw = null) => {
       return jsonDataResponse(raw);
     });
   };
@@ -5547,11 +5518,11 @@
     return value.toString().padStart(2, "0");
   }
   function formatTimes(timestamp) {
-    const d = new Date(timestamp);
-    return "".concat(d.getFullYear(), "-").concat(pad(d.getMonth() + 1), "-").concat(pad(d.getDate()), " ").concat(pad(d.getHours()), ":").concat(pad(d.getMinutes()), ":").concat(pad(d.getSeconds()));
+    const d2 = new Date(timestamp);
+    return "".concat(d2.getFullYear(), "-").concat(pad(d2.getMonth() + 1), "-").concat(pad(d2.getDate()), " ").concat(pad(d2.getHours()), ":").concat(pad(d2.getMinutes()), ":").concat(pad(d2.getSeconds()));
   }
   function parseLocalDateTime(timestamp) {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e2, _f;
     const match = timestamp.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/);
     if (match == null)
       return null;
@@ -5559,7 +5530,7 @@
     const month = parseInt((_b = match[2]) !== null && _b !== void 0 ? _b : "0");
     const day = parseInt((_c = match[3]) !== null && _c !== void 0 ? _c : "0");
     const hour = match[4] == null ? 0 : parseInt((_d = match[4]) !== null && _d !== void 0 ? _d : "0");
-    const minute = match[5] == null ? 0 : parseInt((_e = match[5]) !== null && _e !== void 0 ? _e : "0");
+    const minute = match[5] == null ? 0 : parseInt((_e2 = match[5]) !== null && _e2 !== void 0 ? _e2 : "0");
     const second = match[6] == null ? 0 : parseInt((_f = match[6]) !== null && _f !== void 0 ? _f : "0");
     const date = new Date(year, month - 1, day, hour, minute, second);
     if (date.getFullYear() != year || date.getMonth() != month - 1 || date.getDate() != day || date.getHours() != hour || date.getMinutes() != minute || date.getSeconds() != second) {
@@ -5833,11 +5804,11 @@
         const systemInfo = uni.getSystemInfoSync();
         statusBarHeight.value = systemInfo.statusBarHeight != null ? systemInfo.statusBarHeight : 20;
       };
-      const delay = (ms) => {
+      const delay = (ms2) => {
         return new Promise((resolve) => {
           setTimeout(() => {
             resolve();
-          }, ms);
+          }, ms2);
         });
       };
       const saveSelectedDevice = (device) => {
@@ -6012,6 +5983,10 @@
           try {
             const res = yield getDeviceDetail(deviceId);
             const detail = res.data;
+            if (res.code != 200 || detail == null) {
+              uni.__log__("error", "at pages/index/index.uvue:579", "加载设备详情失败:", res.msg);
+              return Promise.resolve(null);
+            }
             if (detail != null) {
               const deviceStatus = detail.getJSON("deviceStatus");
               deviceDetail2.value = {
@@ -6031,7 +6006,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:597", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:601", "加载设备详情失败", error);
           }
         });
       };
@@ -6082,29 +6057,21 @@
             const res = yield getTrackPos(data);
             if (requestId != trackRequestId)
               return Promise.resolve(null);
-            if (res.code == 401) {
-              showAppToast({
-                title: "登录过期，请重新登录",
-                icon: "none",
-                duration: 2e3
-              });
-              uni.removeStorageSync("token");
-              clearPushSessionState();
-              uni.reLaunch({
-                url: "/pages/index/index"
-              });
-              return Promise.resolve(null);
-            }
-            if (res.code != 0) {
-              uni.__log__("error", "at pages/index/index.uvue:671", "加载轨迹失败:", res.msg);
+            if (res.code != 200) {
+              uni.__log__("error", "at pages/index/index.uvue:661", "加载轨迹失败:", res.msg);
               clearTripData();
               return Promise.resolve(null);
             }
-            processTripData(res.data);
+            const trackData = res.data;
+            if (trackData == null) {
+              clearTripData();
+              return Promise.resolve(null);
+            }
+            processTripData(trackData);
           } catch (error) {
             if (requestId != trackRequestId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/index/index.uvue:679", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:674", "加载轨迹失败", error);
             clearTripData();
           }
         });
@@ -6121,8 +6088,8 @@
           try {
             const res = yield getDevicePos(data);
             const positions = res.data;
-            if (res.code != 0 || positions == null || positions.length == 0) {
-              uni.__log__("warn", "at pages/index/index.uvue:697", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
+            if (res.code != 200 || positions == null || positions.length == 0) {
+              uni.__log__("warn", "at pages/index/index.uvue:692", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
               positionState.value = "empty";
               return false;
             }
@@ -6132,7 +6099,7 @@
             const lng = position.getNumber("longitude", 0);
             const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
             if (!isValidCoordinate2) {
-              uni.__log__("error", "at pages/index/index.uvue:712", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              uni.__log__("error", "at pages/index/index.uvue:707", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
               positionState.value = "invalid";
               showAppToast({
                 title: "定位数据异常",
@@ -6147,10 +6114,10 @@
             yield delay(100);
             const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
             markers.value = [nextMarker];
-            uni.__log__("log", "at pages/index/index.uvue:737", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
+            uni.__log__("log", "at pages/index/index.uvue:732", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
             return true;
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:740", "加载设备位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:735", "加载设备位置失败", error);
             positionState.value = "failed";
             showAppToast({
               title: "定位失败，请重试",
@@ -6162,7 +6129,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:752", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:747", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -6175,7 +6142,7 @@
               icon: "none"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:765", "切换车辆失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:760", "切换车辆失败", error);
             showAppToast({
               title: "切换失败，请重试",
               icon: "none"
@@ -6185,17 +6152,17 @@
           }
         });
       };
-      const handlePickerConfirm = (e) => {
+      const handlePickerConfirm = (e2) => {
         showPicker.value = false;
-        const selectedValue = e.values.length > 0 ? e.values[0].toString() : "";
+        const selectedValue = e2.values.length > 0 ? e2.values[0].toString() : "";
         let selectedIndex = -1;
         if (selectedValue != "") {
           selectedIndex = deviceList.value.findIndex((device) => {
             return device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue;
           });
         }
-        if (selectedIndex < 0 && e.indexs.length > 0) {
-          const eventIndex = e.indexs[0];
+        if (selectedIndex < 0 && e2.indexs.length > 0) {
+          const eventIndex = e2.indexs[0];
           if (eventIndex >= 0 && eventIndex < deviceList.value.length) {
             selectedIndex = eventIndex;
           }
@@ -6215,7 +6182,7 @@
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:811", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:806", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -6245,10 +6212,23 @@
             const res = yield getUserDeviceList(new UTSJSONObject({
               pageSize: 1e3
             }));
-            const code = res.code;
-            const data = res.data;
-            const list = data.list;
-            if (code == 0 && list != null && list.length > 0) {
+            if (res.code != 200) {
+              showAppToast({
+                title: res.msg || "加载车辆列表失败",
+                icon: "none"
+              });
+              return Promise.resolve(null);
+            }
+            const pageData = res.data;
+            if (pageData == null) {
+              showAppToast({
+                title: "暂无车辆数据",
+                icon: "none"
+              });
+              return Promise.resolve(null);
+            }
+            const list = pageData.list;
+            if (list != null && list.length > 0) {
               userDeviceList2.value = list;
               deviceList.value = list.map((item) => {
                 const imei = item.getString("imei", "");
@@ -6293,7 +6273,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:904", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:913", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -6324,7 +6304,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:939", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:948", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -6351,7 +6331,7 @@
           try {
             yield loadDeviceList();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:968", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:977", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -6382,19 +6362,19 @@
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1000", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1009", "跳转轨迹详情失败:", err);
           }
         });
       };
       const toDeviceList = () => {
-        uni.__log__("log", "at pages/index/index.uvue:1007", "toDeviceList");
+        uni.__log__("log", "at pages/index/index.uvue:1016", "toDeviceList");
         if (!isLogin())
           return null;
         uni.navigateTo({
           url: "/pages/deviceList/deviceList"
         });
       };
-      const toDeviceDetail = (e = null) => {
+      const toDeviceDetail = (e2 = null) => {
         if (!isLogin())
           return null;
         if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
@@ -6415,7 +6395,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1035", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1044", "跳转添加设备失败:", err);
           }
         });
       };
@@ -6463,7 +6443,7 @@
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1123", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1132", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -6483,7 +6463,7 @@
       function unbindCurrentDevice() {
         return __awaiter(this, void 0, void 0, function* () {
           const result = yield delDevice(currentCarImei.value);
-          if (result.code == 0) {
+          if (result.code == 200) {
             showAppToast({
               title: "解绑成功",
               icon: "none"
@@ -6926,8 +6906,8 @@
         emit("capsuleClick", "menu");
       };
       const handleBack = () => {
-        const pages = getCurrentPages();
-        if (pages.length > 1) {
+        const pages2 = getCurrentPages();
+        if (pages2.length > 1) {
           uni.navigateBack();
         } else {
           uni.switchTab({ url: "/pages/index/index" });
@@ -7369,7 +7349,7 @@
         }
       }
       function vibrateAlert() {
-        for (let i = 0; i < 3; i++) {
+        for (let i2 = 0; i2 < 3; i2++) {
           uni.vibrateLong(new UTSJSONObject({}));
         }
       }
@@ -7380,8 +7360,10 @@
           isLoading.value = true;
           try {
             const res = yield getUserMsgList(new UTSJSONObject({ page: 1, pageSize: 50 }));
-            if (res.code != 0 || res.data.list == null)
+            const pageData = res.data;
+            if (res.code != 200 || pageData == null)
               return 0;
+            const latestList = pageData.list;
             const existingIds = /* @__PURE__ */ new Set();
             msgList.value.forEach((message) => {
               const messageId = message.getString("messageId", "");
@@ -7389,7 +7371,7 @@
                 existingIds.add(messageId);
             });
             const latestMessages = [];
-            res.data.list.forEach((message) => {
+            latestList.forEach((message) => {
               const messageId = message.getString("messageId", "");
               if (messageId != "" && !existingIds.has(messageId)) {
                 existingIds.add(messageId);
@@ -7407,7 +7389,7 @@
             }
             return latestMessages.length;
           } catch (error) {
-            uni.__log__("error", "at pages/message/message.uvue:154", "检查新消息失败:", error);
+            uni.__log__("error", "at pages/message/message.uvue:156", "检查新消息失败:", error);
             return 0;
           } finally {
             isLoading.value = false;
@@ -7430,10 +7412,10 @@
         if (checkTimer > 0) {
           stopNewMessageCheck();
         }
-        uni.__log__("log", "at pages/message/message.uvue:178", "启动定时消息检查");
+        uni.__log__("log", "at pages/message/message.uvue:180", "启动定时消息检查");
         checkTimer = setInterval(() => {
           if (isPageActive.value) {
-            uni.__log__("log", "at pages/message/message.uvue:182", "定时检查新消息...");
+            uni.__log__("log", "at pages/message/message.uvue:184", "定时检查新消息...");
             checkNewMessages();
           }
         }, 1e4);
@@ -7456,11 +7438,15 @@
               page: currPage.value,
               pageSize: pageSize.value
             }));
-            if (res.code != 0) {
+            if (res.code != 200) {
               loadStatus.value = "loadmore";
               return Promise.resolve(null);
             }
             const data = res.data;
+            if (data == null) {
+              loadStatus.value = "nomore";
+              return Promise.resolve(null);
+            }
             const totalPages = data.totalPage > 0 ? data.totalPage : 1;
             totalPage.value = totalPages;
             const newData = data.list;
@@ -7485,7 +7471,7 @@
             }
           } catch (error) {
             loadStatus.value = "loadmore";
-            uni.__log__("error", "at pages/message/message.uvue:230", "请求异常:", error);
+            uni.__log__("error", "at pages/message/message.uvue:236", "请求异常:", error);
           } finally {
             isLoading.value = false;
           }
@@ -7493,11 +7479,11 @@
       }
       function loadNewMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:238", "加载新消息");
+          uni.__log__("log", "at pages/message/message.uvue:244", "加载新消息");
           yield prependLatestMessages();
           hasNewMessages.value = false;
           newMessageCount.value = 0;
-          uni.__log__("log", "at pages/message/message.uvue:242", "新消息加载完成");
+          uni.__log__("log", "at pages/message/message.uvue:248", "新消息加载完成");
         });
       }
       vue.onLoad(() => {
@@ -7529,7 +7515,7 @@
             try {
               const messageId = item.getString("messageId", "");
               const res = yield setMsgState(messageId);
-              if (res.code == 0 || res.msg == "success") {
+              if (res.code == 200) {
                 const index = msgList.value.findIndex((message) => {
                   return message.getString("messageId", "") == messageId;
                 });
@@ -7539,7 +7525,7 @@
                 }
               }
             } catch (error) {
-              uni.__log__("error", "at pages/message/message.uvue:289", "更新状态失败:", error);
+              uni.__log__("error", "at pages/message/message.uvue:295", "更新状态失败:", error);
             }
           }
         });
@@ -7568,7 +7554,7 @@
       }
       vue.onShow(() => {
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:313", "页面显示 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:319", "页面显示 - 启动自动刷新");
           isPageActive.value = true;
           measureMessageScrollViewport();
           startNewMessageCheck();
@@ -7577,25 +7563,25 @@
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/message/message.uvue:325", "页面隐藏 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:331", "页面隐藏 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:327", "页面隐藏 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:333", "页面隐藏 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onUnload(() => {
-        uni.__log__("log", "at pages/message/message.uvue:335", "页面卸载 - 清理资源");
+        uni.__log__("log", "at pages/message/message.uvue:341", "页面卸载 - 清理资源");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:337", "页面卸载 - 清理资源");
+          uni.__log__("log", "at pages/message/message.uvue:343", "页面卸载 - 清理资源");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onActivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:344", "页面激活 - 启动自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:350", "页面激活 - 启动自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:346", "页面激活 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:352", "页面激活 - 启动自动刷新");
           isPageActive.value = true;
           startNewMessageCheck();
           void openPendingPushMessage();
@@ -7603,15 +7589,15 @@
         }
       });
       vue.onDeactivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:356", "页面停用 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:362", "页面停用 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:358", "页面停用 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:364", "页面停用 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       const onRefresherRefresh = () => {
-        uni.__log__("log", "at pages/message/message.uvue:366", "下拉刷新触发");
+        uni.__log__("log", "at pages/message/message.uvue:372", "下拉刷新触发");
         refresherTriggered.value = true;
         loadMsgList(true).then(() => {
           refresherTriggered.value = false;
@@ -7945,21 +7931,21 @@
       return 0;
     }
     function positionStyle() {
-      const x = getOffset(0);
-      const y = getOffset(1);
+      const x2 = getOffset(0);
+      const y2 = getOffset(1);
       const position = normalizePosition(props.position);
       const edge = 0;
       if (position == "left")
-        return "left:" + (edge + x) + "px;top:" + (edge + y) + "px;";
+        return "left:" + (edge + x2) + "px;top:" + (edge + y2) + "px;";
       if (position == "bottomLeft")
-        return "left:" + (edge + x) + "px;bottom:" + (edge - y) + "px;";
+        return "left:" + (edge + x2) + "px;bottom:" + (edge - y2) + "px;";
       if (position == "bottomRight")
-        return "right:" + (edge - x) + "px;bottom:" + (edge - y) + "px;";
+        return "right:" + (edge - x2) + "px;bottom:" + (edge - y2) + "px;";
       if (position == "top")
-        return "left:50%;top:" + (edge + y) + "px;transform:translateX(-50%);margin-left:" + x + "px;";
+        return "left:50%;top:" + (edge + y2) + "px;transform:translateX(-50%);margin-left:" + x2 + "px;";
       if (position == "bottom")
-        return "left:50%;bottom:" + (edge - y) + "px;transform:translateX(-50%);margin-left:" + x + "px;";
-      return "right:" + (edge - x) + "px;top:" + (edge + y) + "px;";
+        return "left:50%;bottom:" + (edge - y2) + "px;transform:translateX(-50%);margin-left:" + x2 + "px;";
+      return "right:" + (edge - x2) + "px;top:" + (edge + y2) + "px;";
     }
     function formatSize(value) {
       const text = value.toString();
@@ -8090,13 +8076,26 @@
       const loadData = () => {
         return __awaiter(this, void 0, void 0, function* () {
           const params = new UTSJSONObject({});
-          const res = yield getUserInfo();
-          userInfo.value = {
-            avatar: res.data.getString("avatar", "/static/avatar.png"),
-            nickname: res.data.getString("nickname", "")
-          };
-          const resCars = yield getUserDeviceList(params);
-          carsnumber.value = resCars.data.totalCount;
+          try {
+            const res = yield getUserInfo();
+            if (res.code == 200 && res.data != null) {
+              userInfo.value = {
+                avatar: res.data.getString("avatar", "/static/avatar.png"),
+                nickname: res.data.getString("nickname", "")
+              };
+            } else {
+              showAppToast({ title: res.msg || "获取用户信息失败", icon: "none" });
+            }
+            const resCars = yield getUserDeviceList(params);
+            if (resCars.code == 200 && resCars.data != null) {
+              carsnumber.value = resCars.data.totalCount;
+            } else {
+              showAppToast({ title: resCars.msg || "获取车辆数量失败", icon: "none" });
+            }
+          } catch (error) {
+            uni.__log__("error", "at pages/userCenter/userCenter.uvue:89", "加载用户中心数据失败:", error);
+            showAppToast({ title: "加载用户信息失败", icon: "none" });
+          }
         });
       };
       vue.onShow(() => {
@@ -8119,15 +8118,15 @@
           icon: "none"
         });
       };
-      const onMoveChange = (e) => {
-        const detail = e.getJSON("detail");
-        const x = detail != null ? detail.getNumber("x", 0) : 0;
-        const y = detail != null ? detail.getNumber("y", 0) : 0;
+      const onMoveChange = (e2) => {
+        const detail = e2.getJSON("detail");
+        const x2 = detail != null ? detail.getNumber("x", 0) : 0;
+        const y2 = detail != null ? detail.getNumber("y", 0) : 0;
         const maxX = windowWidth.value - buttonWidth;
         const maxY = windowHeight.value - buttonHeight;
-        if (x < 0 || x > maxX || y < 0 || y > maxY) {
-          moveX.value = Math.max(0, Math.min(maxX, x));
-          moveY.value = Math.max(0, Math.min(maxY, y));
+        if (x2 < 0 || x2 > maxX || y2 < 0 || y2 > maxY) {
+          moveX.value = Math.max(0, Math.min(maxX, x2));
+          moveY.value = Math.max(0, Math.min(maxY, y2));
         }
       };
       const userInfoDetail = () => {
@@ -8670,8 +8669,8 @@
     }
     function normalizeIdName(name2) {
       let result = "";
-      for (let i = 0; i < name2.length; i++) {
-        const char = name2.charAt(i);
+      for (let i2 = 0; i2 < name2.length; i2++) {
+        const char = name2.charAt(i2);
         const isNumber2 = char >= "0" && char <= "9";
         const isUpper = char >= "A" && char <= "Z";
         const isLower = char >= "a" && char <= "z";
@@ -8865,8 +8864,8 @@
       const value = valueText(modelValue).length > 0 ? modelValue : props.value;
       if (Array.isArray(value)) {
         const names2 = value;
-        for (let i = 0; i < names2.length; i++) {
-          if (valueText(names2[i]) == valueText(props.name))
+        for (let i2 = 0; i2 < names2.length; i2++) {
+          if (valueText(names2[i2]) == valueText(props.name))
             return true;
         }
         return false;
@@ -8946,9 +8945,9 @@
           nextList.push(props.name);
         if (!nextChecked && exists) {
           const filtered = [];
-          for (let i = 0; i < nextList.length; i++) {
-            if (valueText(nextList[i]) != valueText(props.name))
-              filtered.push(nextList[i]);
+          for (let i2 = 0; i2 < nextList.length; i2++) {
+            if (valueText(nextList[i2]) != valueText(props.name))
+              filtered.push(nextList[i2]);
           }
           return filtered;
         }
@@ -9589,8 +9588,8 @@
     function collectValues() {
       const values = new UTSJSONObject({});
       const list = activeFields();
-      for (let i = 0; i < list.length; i++) {
-        const item = list[i];
+      for (let i2 = 0; i2 < list.length; i2++) {
+        const item = list[i2];
         const name2 = item.getString("name", "");
         if (name2.length > 0)
           values[name2] = fieldValue(item);
@@ -9604,8 +9603,8 @@
     }
     function normalizeIdName(name2) {
       let result = "";
-      for (let i = 0; i < name2.length; i++) {
-        const char = name2.charAt(i);
+      for (let i2 = 0; i2 < name2.length; i2++) {
+        const char = name2.charAt(i2);
         const isNumber2 = char >= "0" && char <= "9";
         const isUpper = char >= "A" && char <= "Z";
         const isLower = char >= "a" && char <= "z";
@@ -9648,8 +9647,8 @@
     function validateFields(selectedKeys, silent) {
       const list = activeFields();
       const nextErrors = [];
-      for (let i = 0; i < list.length; i++) {
-        const item = list[i];
+      for (let i2 = 0; i2 < list.length; i2++) {
+        const item = list[i2];
         const errorMessage = checkField(item, selectedKeys);
         if (errorMessage.length > 0) {
           nextErrors.push(new UTSJSONObject({
@@ -9841,7 +9840,7 @@
       return "正在进行本机号码授权，请稍候";
     if (errCode == 40001 || errCode == 40002)
       return "网络异常，请检查移动网络后重试";
-    return "本机号码授权失败（错误码：" + errCode + "），请使用验证码登录";
+    return "本机号码授权失败（错误码：" + errCode + "），请稍后重试";
   }
   function getPreLoginErrorMessage(error) {
     const errCode = error.errCode;
@@ -9860,16 +9859,16 @@
       if (errMsg2.indexOf("-20102") >= 0)
         return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK";
       if (errMsg2.indexOf("-20201") >= 0)
-        return "未检测到可用 SIM 卡，请使用验证码登录";
+        return "未检测到可用 SIM 卡，暂无法使用本机号码一键登录";
       if (errMsg2.indexOf("-20202") >= 0)
         return "未开启蜂窝移动网络，请开启移动数据后重试";
       if (errMsg2.indexOf("-20203") >= 0)
-        return "当前运营商暂不支持一键登录，请使用验证码登录";
-      return "本机号码预取失败，请稍后重试或使用验证码登录";
+        return "当前运营商暂不支持本机号码一键登录";
+      return "本机号码预取失败，请稍后重试";
     }
     if (errCode == 40001 || errCode == 40002)
       return "网络异常，无法获取本机号码，请检查移动网络后重试";
-    return "本机号码预取失败（错误码：" + errCode + "），请使用验证码登录";
+    return "本机号码预取失败（错误码：" + errCode + "），请稍后重试";
   }
   function createPreLoginResult(ok, message) {
     return new UniVerifyPreLoginResult({ ok, message });
@@ -9936,17 +9935,20 @@
                 openId: result.openId,
                 accessToken: result.accessToken,
                 platform: getPlatform(),
-                clientVersion
+                clientVersion,
+                clientId: "428a8310cd442757ae699df5d894f051",
+                grantType: "univerify",
+                tenantId: "000000"
               })).then((response) => {
                 const loginData = response.data;
-                const token = loginData != null ? loginData.getString("token", "") : "";
-                if (response.code == 0 && token != "") {
+                const token = loginData != null ? loginData.getString("access_token", "") : "";
+                if (response.code == 200 && token != "") {
                   resolve(createResult(true, false, "", token));
                 } else {
-                  resolve(createResult(false, false, response.msg || "本机号码登录失败，请使用验证码登录", ""));
+                  resolve(createResult(false, false, response.msg || "本机号码登录失败，请稍后重试", ""));
                 }
               }).catch(() => {
-                resolve(createResult(false, false, "登录服务连接失败，请使用验证码登录", ""));
+                resolve(createResult(false, false, "登录服务连接失败，请检查网络后重试", ""));
               }).finally(() => {
                 closeLoginPage(uniVerifyManager);
                 requesting = false;
@@ -9960,7 +9962,7 @@
             }
           }));
         } catch (error) {
-          resolve(createResult(false, false, "当前设备不支持本机号码一键登录，请使用验证码登录", ""));
+          resolve(createResult(false, false, "当前设备不支持本机号码一键登录", ""));
           requesting = false;
         }
       }).catch(() => {
@@ -9969,7 +9971,7 @@
       });
     });
   }
-  class FormData extends UTS.UTSType {
+  let FormData$1 = class FormData2 extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
         kind: 2,
@@ -9981,14 +9983,14 @@
         }
       };
     }
-    constructor(options, metadata = FormData.get$UTSMetadata$(), isJSONParse = false) {
+    constructor(options, metadata = FormData2.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.username = this.__props__.username;
       this.password = this.__props__.password;
       delete this.__props__;
     }
-  }
+  };
   class SavedAccount extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -10019,14 +10021,8 @@
       const rememberPassword = vue.ref(false);
       const formValid = vue.ref(false);
       const loading = vue.ref(false);
-      const smsLoginMode = vue.ref(false);
-      const smsMobile = vue.ref("");
-      const smsCode = vue.ref("");
-      const smsCooldown = vue.ref(0);
-      const smsSending = vue.ref(false);
-      const smsSubmitting = vue.ref(false);
       const nativeLoginLoading = vue.ref(false);
-      const form = vue.ref(new FormData({
+      const form = vue.ref(new FormData$1({
         username: "",
         password: ""
       }));
@@ -10048,7 +10044,7 @@
           form.value.password = account.getString("password", "");
           rememberPassword.value = form.value.username != "" || form.value.password != "";
         } catch (error) {
-          uni.__log__("error", "at pages/login/login.uvue:177", "加载保存的账号密码失败:", error);
+          uni.__log__("error", "at pages/login/login.uvue:184", "加载保存的账号密码失败:", error);
         }
       }
       const isPswLogin = () => {
@@ -10085,7 +10081,7 @@
       const getSystemInfo = () => {
         const res = uni.getSystemInfoSync();
         deviceModel.value = res.deviceModel;
-        uni.__log__("log", "at pages/login/login.uvue:220", "设备型号:", deviceModel.value);
+        uni.__log__("log", "at pages/login/login.uvue:227", "设备型号:", deviceModel.value);
       };
       const validateForm = () => {
         if (form.value.username.length == 0) {
@@ -10106,6 +10102,7 @@
         if (savePassword)
           saveAccountPassword();
         uni.setStorageSync("token", token);
+        resetTokenExpiredState();
         markPushSessionAuthenticated();
         showAppToast({ title: "登录成功", icon: "success" });
         setTimeout(() => {
@@ -10117,78 +10114,6 @@
           return true;
         showAppToast({ title: "请先阅读并同意用户协议", icon: "error" });
         return false;
-      };
-      const openSmsLogin = () => {
-        smsLoginMode.value = true;
-      };
-      const closeSmsLogin = () => {
-        smsLoginMode.value = false;
-        smsCode.value = "";
-      };
-      const isValidMobile = () => {
-        if (!/^1[3-9]\\d{9}$/.test(smsMobile.value)) {
-          showAppToast({ title: "请输入正确的手机号", icon: "none" });
-          return false;
-        }
-        return true;
-      };
-      const startSmsCooldown = (seconds) => {
-        smsCooldown.value = seconds > 0 ? seconds : 60;
-        setInterval(() => {
-          smsCooldown.value -= 1;
-          if (smsCooldown.value <= 0)
-            smsCooldown.value = 0;
-        }, 1e3);
-      };
-      const sendSmsCode = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (smsCooldown.value > 0 || smsSending.value)
-            return Promise.resolve(null);
-          if (!ensureAgreementAccepted() || !isValidMobile())
-            return Promise.resolve(null);
-          try {
-            smsSending.value = true;
-            const response = yield sendSmsLoginCode(new SendSmsCodeRequest({ mobile: smsMobile.value, scene: "login" }));
-            if (response.code != 0) {
-              showAppToast({ title: response.msg || "验证码发送失败", icon: "none" });
-              return Promise.resolve(null);
-            }
-            const cooldownSeconds = response.data != null ? response.data.getNumber("cooldownSeconds", 60) : 60;
-            startSmsCooldown(cooldownSeconds);
-            showAppToast({ title: "验证码已发送", icon: "success" });
-          } catch (error) {
-            showAppToast({ title: "验证码发送失败，请检查网络", icon: "none" });
-          } finally {
-            smsSending.value = false;
-          }
-        });
-      };
-      const getAppPlatform = () => {
-        return "ios";
-      };
-      const submitSmsLogin = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (!ensureAgreementAccepted() || !isValidMobile() || smsCode.value == "" || smsSubmitting.value) {
-            if (smsCode.value == "")
-              showAppToast({ title: "请输入验证码", icon: "none" });
-            return Promise.resolve(null);
-          }
-          try {
-            smsSubmitting.value = true;
-            const response = yield smsLogin(new SmsLoginRequest({ mobile: smsMobile.value, code: smsCode.value, platform: getAppPlatform() }));
-            const token = response.data != null ? response.data.getString("token", "") : "";
-            if (response.code == 0 && token != "") {
-              smsCode.value = "";
-              completeLogin(token, false);
-            } else {
-              showAppToast({ title: response.msg || "验证码登录失败", icon: "none" });
-            }
-          } catch (error) {
-            showAppToast({ title: "验证码登录失败，请检查网络", icon: "none" });
-          } finally {
-            smsSubmitting.value = false;
-          }
-        });
       };
       const startUniVerifyLogin = () => {
         return __awaiter(this, void 0, void 0, function* () {
@@ -10203,7 +10128,7 @@
               if (appVersion != "")
                 clientVersion = appVersion;
             } catch (error) {
-              uni.__log__("warn", "at pages/login/login.uvue:345", "获取应用版本失败，使用默认版本号:", error);
+              uni.__log__("warn", "at pages/login/login.uvue:354", "获取应用版本失败，使用默认版本号:", error);
             }
             const result = yield loginByUniVerify(clientVersion);
             if (result.ok) {
@@ -10211,8 +10136,7 @@
               return Promise.resolve(null);
             }
             if (!result.cancelled) {
-              showAppToast({ title: result.message + "，可使用验证码登录", icon: "none" });
-              openSmsLogin();
+              showAppToast({ title: result.message, icon: "none" });
             }
           } finally {
             nativeLoginLoading.value = false;
@@ -10229,39 +10153,39 @@
             return Promise.resolve(null);
           }
           try {
-            uni.__log__("log", "at pages/login/login.uvue:462", "准备验证表单...");
+            uni.__log__("log", "at pages/login/login.uvue:470", "准备验证表单...");
             if (!validateForm())
               return Promise.resolve(null);
-            uni.__log__("log", "at pages/login/login.uvue:464", "✅ 表单验证通过");
+            uni.__log__("log", "at pages/login/login.uvue:472", "✅ 表单验证通过");
             const newFormData = new UTSJSONObject({
               username: form.value.username,
               password: form.value.password,
               from: deviceModel.value,
               type: "USER"
             });
-            uni.__log__("log", "at pages/login/login.uvue:473", "📤 请求参数:", newFormData);
+            uni.__log__("log", "at pages/login/login.uvue:481", "📤 请求参数:", newFormData);
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "登录中...",
               mask: true
             }));
-            uni.__log__("log", "at pages/login/login.uvue:483", "🚀 开始调用 login 接口...");
+            uni.__log__("log", "at pages/login/login.uvue:491", "🚀 开始调用 login 接口...");
             const res = yield login(newFormData);
-            uni.__log__("log", "at pages/login/login.uvue:485", "✅ 登录接口返回:", res);
+            uni.__log__("log", "at pages/login/login.uvue:493", "✅ 登录接口返回:", res);
             loading.value = false;
             uni.hideLoading();
             const loginData = res.data;
-            const token = loginData != null ? loginData.getString("token", "") : "";
+            const token = res.code == 200 && loginData != null ? loginData.getString("access_token", "") : "";
             if (token != "") {
               completeLogin(token, true);
             } else {
               showAppToast({
-                title: "登录失败，请重试",
+                title: res.msg || "登录失败，请重试",
                 icon: "error"
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/login/login.uvue:504", "❌ 登录失败:", error);
+            uni.__log__("error", "at pages/login/login.uvue:512", "❌ 登录失败:", error);
             loading.value = false;
             uni.hideLoading();
             if (error && error.message) {
@@ -10301,7 +10225,7 @@
         getSystemInfo();
         loadSavedAccount();
         prefetchUniVerify();
-        uni.__log__("log", "at pages/login/login.uvue:603", "pswLogin 初始值:", pswLogin.value);
+        uni.__log__("log", "at pages/login/login.uvue:611", "pswLogin 初始值:", pswLogin.value);
       });
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
@@ -10407,107 +10331,18 @@
                   _: 1
                 }, 8, ["modelValue"])
               ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 1 }), [
-                !smsLoginMode.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 0 }), [
-                  vue.createVNode(_component_i_button, new UTSJSONObject({
-                    type: "primary",
-                    onClick: startUniVerifyLogin,
-                    loading: nativeLoginLoading.value
-                  }), {
-                    default: vue.withCtx(() => {
-                      return [
-                        vue.createTextVNode("本机号码一键登录")
-                      ];
-                    }),
-                    _: 1
-                  }, 8, ["loading"]),
-                  vue.createElementVNode("view", new UTSJSONObject({
-                    class: "phone-login-switch",
-                    onClick: openSmsLogin
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "phone-way" }), "验证码登录")
-                  ])
-                ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 1 }), [
-                  vue.createVNode(_component_i_form, null, {
-                    default: vue.withCtx(() => {
-                      return [
-                        vue.createVNode(_component_i_form_item, new UTSJSONObject({
-                          class: "sms-mobile-item",
-                          label: "",
-                          labelDirection: "horizontal",
-                          labelWidth: "0"
-                        }), {
-                          default: vue.withCtx(() => {
-                            return [
-                              vue.createVNode(_component_i_input, new UTSJSONObject({
-                                modelValue: smsMobile.value,
-                                "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event = null) => {
-                                  return smsMobile.value = $event;
-                                }),
-                                placeholder: "请输入手机号",
-                                type: "number",
-                                clearable: ""
-                              }), null, 8, ["modelValue"])
-                            ];
-                          }),
-                          _: 1
-                        }),
-                        vue.createVNode(_component_i_form_item, new UTSJSONObject({
-                          class: "sms-code-item",
-                          label: "",
-                          labelDirection: "horizontal",
-                          labelWidth: "0"
-                        }), {
-                          default: vue.withCtx(() => {
-                            return [
-                              vue.createVNode(_component_i_input, new UTSJSONObject({
-                                class: "sms-code-input",
-                                modelValue: smsCode.value,
-                                "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event = null) => {
-                                  return smsCode.value = $event;
-                                }),
-                                placeholder: "请输入验证码",
-                                type: "number",
-                                clearable: ""
-                              }), {
-                                suffix: vue.withCtx(() => {
-                                  return [
-                                    vue.createElementVNode("view", new UTSJSONObject({
-                                      class: vue.normalizeClass(["sms-send-button", new UTSJSONObject({ "sms-send-button-disabled": smsCooldown.value > 0 || smsSending.value })]),
-                                      onClick: sendSmsCode
-                                    }), [
-                                      vue.createElementVNode("text", new UTSJSONObject({ class: "sms-send-button-text" }), vue.toDisplayString(smsCooldown.value > 0 ? smsCooldown.value + "秒后重试" : "获取验证码"), 1)
-                                    ], 2)
-                                  ];
-                                }),
-                                _: 1
-                              }, 8, ["modelValue"])
-                            ];
-                          }),
-                          _: 1
-                        }),
-                        vue.createVNode(_component_i_button, new UTSJSONObject({
-                          type: "primary",
-                          onClick: submitSmsLogin,
-                          loading: smsSubmitting.value
-                        }), {
-                          default: vue.withCtx(() => {
-                            return [
-                              vue.createTextVNode("手机号验证码登录")
-                            ];
-                          }),
-                          _: 1
-                        }, 8, ["loading"])
-                      ];
-                    }),
-                    _: 1
+                vue.createVNode(_component_i_button, new UTSJSONObject({
+                  type: "primary",
+                  onClick: startUniVerifyLogin,
+                  loading: nativeLoginLoading.value
+                }), {
+                  default: vue.withCtx(() => {
+                    return [
+                      vue.createTextVNode("本机号码一键登录")
+                    ];
                   }),
-                  vue.createElementVNode("view", new UTSJSONObject({
-                    class: "phone-login-switch",
-                    onClick: closeSmsLogin
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "phone-way" }), "一键登录")
-                  ])
-                ]))
+                  _: 1
+                }, 8, ["loading"])
               ])),
               vue.createElementVNode("view", new UTSJSONObject({ class: "documents" }), [
                 vue.createVNode(_component_i_checkbox, new UTSJSONObject({
@@ -10544,7 +10379,7 @@
       };
     }
   });
-  const _style_0$r = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "phone-login-switch": { ".container ": { "textAlign": "center", "marginTop": "28rpx" } }, "phone-way": { ".container .phone-login-switch ": { "fontSize": "25rpx", "color": "#8b8c8d" } }, "sms-mobile-item": { ".container ": { "marginBottom": "20rpx" } }, "sms-code-item": { ".container ": { "marginBottom": "32rpx" } }, "sms-code-input": { ".container ": { "width": "100%" } }, "sms-send-button": { ".container ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "20rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#007AFF", "color": "#ffffff", "fontSize": "24rpx", "whiteSpace": "nowrap" } }, "sms-send-button-disabled": { ".container ": { "backgroundColor": "#B8D7FF" } }, "sms-send-button-text": { ".container ": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
+  const _style_0$r = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
   const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["styles", [_style_0$r]]]);
   class PickerItem extends UTS.UTSType {
     static get$UTSMetadata$() {
@@ -11222,11 +11057,11 @@
         };
         return marker;
       };
-      const delay = (ms) => {
+      const delay = (ms2) => {
         return new Promise((resolve) => {
           setTimeout(() => {
             resolve();
-          }, ms);
+          }, ms2);
         });
       };
       const loadData = (data, retryCount) => {
@@ -11239,13 +11074,14 @@
               var e_1, _a;
               try {
                 const res = yield getDevicePos(data);
-                if (!res || !res.data || res.data.length == 0) {
-                  throw new Error("返回数据为空");
+                const positions = res.data;
+                if (res.code != 200 || positions == null || positions.length == 0) {
+                  throw new Error(res.msg || "返回数据为空");
                 }
                 let foundDevice = false;
                 try {
-                  for (var _b = __values(res.data), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var item = _c.value;
+                  for (var positions_1 = __values(positions), positions_1_1 = positions_1.next(); !positions_1_1.done; positions_1_1 = positions_1.next()) {
+                    var item = positions_1_1.value;
                     const itemImei = item.getString("imei", "");
                     if (itemImei != null && itemImei == imei.value) {
                       foundDevice = true;
@@ -11256,7 +11092,7 @@
                       const latitude = item.getNumber("latitude", 0);
                       const longitude = item.getNumber("longitude", 0);
                       if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:360", "位置信息缺失", item);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:361", "位置信息缺失", item);
                         showAppToast({
                           title: "位置信息缺失",
                           icon: "none"
@@ -11266,7 +11102,7 @@
                       const lat = parseFloat(latitude.toString());
                       const lng = parseFloat(longitude.toString());
                       if (isNaN(lat) || isNaN(lng)) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:373", "经纬度格式错误", latitude, longitude);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:374", "经纬度格式错误", latitude, longitude);
                         return false;
                       }
                       let convertedLat = lat;
@@ -11276,7 +11112,7 @@
                         convertedLat = coord.lat;
                         convertedLng = coord.lng;
                       } catch (transformError) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:385", "坐标转换失败:", transformError);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:386", "坐标转换失败:", transformError);
                       }
                       center.latitude = convertedLat;
                       center.longitude = convertedLng;
@@ -11302,7 +11138,7 @@
                       if (signalRssi.value != null) {
                         const signalExp = getSignalDetail(signalRssi.value).experience;
                         if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:428", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
+                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:429", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
                         }
                       }
                     }
@@ -11311,8 +11147,8 @@
                   e_1 = { error: e_1_1 };
                 } finally {
                   try {
-                    if (_c && !_c.done && (_a = _b.return))
-                      _a.call(_b);
+                    if (positions_1_1 && !positions_1_1.done && (_a = positions_1.return))
+                      _a.call(positions_1);
                   } finally {
                     if (e_1)
                       throw e_1.error;
@@ -11323,10 +11159,10 @@
                 }
                 return true;
               } catch (error) {
-                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:442", "第".concat(attempt, "次加载设备数据失败:"), error);
+                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:443", "第".concat(attempt, "次加载设备数据失败:"), error);
                 if (attempt < retry) {
                   const delayMs = Math.pow(2, attempt) * 1e3;
-                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:448", "等待".concat(delayMs / 1e3, "秒后重试..."));
+                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:449", "等待".concat(delayMs / 1e3, "秒后重试..."));
                   yield delay(delayMs);
                   return false;
                 } else {
@@ -11466,7 +11302,7 @@
               type
             }));
             uni.hideLoading();
-            if (res.code == 0) {
+            if (res.code == 200) {
               showAppToast({
                 title: operationType == 1 ? "恢复油电成功" : "断开油电成功",
                 icon: "success"
@@ -11480,7 +11316,7 @@
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:688", "操作失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:689", "操作失败:", error);
             showAppToast({
               title: "操作失败，请重试",
               icon: "none"
@@ -11512,7 +11348,7 @@
             const addr = yield getAddress(center.latitude, center.longitude);
             address.value = addr.result.formatted_address;
           } catch (error) {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:724", "获取地址信息失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:725", "获取地址信息失败:", error);
           }
         });
       };
@@ -11594,9 +11430,13 @@
         return __awaiter(this, void 0, void 0, function* () {
           if (deviceId.value !== null) {
             const res = yield getDeviceDetail(deviceId.value);
-            currentCarInfo.value = res.data;
+            if (res.code == 200 && res.data != null) {
+              currentCarInfo.value = res.data;
+            } else {
+              showAppToast({ title: res.msg || "获取设备详情失败", icon: "none" });
+            }
           } else {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:817", "设备id获取失败");
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:822", "设备id获取失败");
           }
         });
       };
@@ -11621,17 +11461,17 @@
         });
       });
       vue.onShow(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:851", "页面显示，检查自动刷新状态");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:856", "页面显示，检查自动刷新状态");
         if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
           setupAutoRefresh(currentTime.value);
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:860", "页面隐藏时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:865", "页面隐藏时停止自动刷新");
         stopAutoRefresh();
       });
       vue.onUnmounted(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:865", "页面卸载时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:870", "页面卸载时停止自动刷新");
         stopAutoRefresh();
       });
       return (_ctx = null, _cache = null) => {
@@ -12052,24 +11892,24 @@
       return style;
     }
     function transformStyle() {
-      const x = offsetX.value.toString();
-      const y = offsetY.value.toString();
+      const x2 = offsetX.value.toString();
+      const y2 = offsetY.value.toString();
       if (normalizedMode.value == "center") {
         const scale = props.zoom ? active.value ? "1" : "0.88" : "1";
-        return "opacity:" + (active.value ? "1" : "0") + ";transform:translate(-50%,-50%) translate(" + x + "px," + y + "px) scale(" + scale + ");";
+        return "opacity:" + (active.value ? "1" : "0") + ";transform:translate(-50%,-50%) translate(" + x2 + "px," + y2 + "px) scale(" + scale + ");";
       }
       if (normalizedMode.value == "bottom") {
         const prefix = shouldCoverCenter() ? "translateX(-50%) " : "";
-        return "transform:" + prefix + "translateY(" + (active.value ? y + "px" : "100%") + ");";
+        return "transform:" + prefix + "translateY(" + (active.value ? y2 + "px" : "100%") + ");";
       }
       if (normalizedMode.value == "top") {
         const prefix = shouldCoverCenter() ? "translateX(-50%) " : "";
-        return "transform:" + prefix + "translateY(" + (active.value ? y + "px" : "-100%") + ");";
+        return "transform:" + prefix + "translateY(" + (active.value ? y2 + "px" : "-100%") + ");";
       }
       if (normalizedMode.value == "left")
-        return "transform:translateX(" + (active.value ? x + "px" : "-100%") + ");";
+        return "transform:translateX(" + (active.value ? x2 + "px" : "-100%") + ");";
       if (normalizedMode.value == "right")
-        return "transform:translateX(" + (active.value ? x + "px" : "100%") + ");";
+        return "transform:translateX(" + (active.value ? x2 + "px" : "100%") + ");";
       return "";
     }
     const panelStyle = vue.computed(() => {
@@ -12707,7 +12547,7 @@
             uni.__log__("log", "at pages/addCar/addCar.uvue:242", "✅ 添加设备返回:", res);
             uni.hideLoading();
             loading.value = false;
-            if (res.code == 0) {
+            if (res.code == 200) {
               showAppToast({
                 title: "添加成功",
                 icon: "success"
@@ -13187,14 +13027,14 @@
   const MILLISECONDS_A_DAY = SECONDS_A_DAY * MILLISECONDS_A_SECOND;
   const MILLISECONDS_A_WEEK = SECONDS_A_WEEK * MILLISECONDS_A_SECOND;
   const MS = "millisecond";
-  const S = "second";
+  const S$1 = "second";
   const MIN = "minute";
-  const H = "hour";
-  const D = "day";
-  const W = "week";
-  const M = "month";
-  const Q = "quarter";
-  const Y = "year";
+  const H$1 = "hour";
+  const D$1 = "day";
+  const W$1 = "week";
+  const M$1 = "month";
+  const Q$1 = "quarter";
+  const Y$1 = "year";
   const DATE = "date";
   const FORMAT_DEFAULT = "YYYY-MM-DDTHH:mm:ssZ";
   const INVALID_DATE_STRING = "Invalid Date";
@@ -13216,40 +13056,40 @@
   function isNumber(value) {
     return ["Int8", "UInt8", "Int16", "UInt16", "Int32", "UInt32", "Int64", "UInt64", "Int", "UInt", "Float", "Float16", "Float32", "Float64", "Double", "number"].includes(typeof value);
   }
-  function prettyUnit(u) {
+  function prettyUnit(u2) {
     var _a;
     const special = /* @__PURE__ */ new Map([
-      ["M", M],
-      ["y", Y],
-      ["w", W],
-      ["d", D],
+      ["M", M$1],
+      ["y", Y$1],
+      ["w", W$1],
+      ["d", D$1],
       ["D", DATE],
-      ["h", H],
+      ["h", H$1],
       ["m", MIN],
-      ["s", S],
+      ["s", S$1],
       ["ms", MS],
-      ["Q", Q]
+      ["Q", Q$1]
     ]);
-    return (_a = special.get(u)) !== null && _a !== void 0 ? _a : "".concat(u).toLowerCase().replace(/s$/, "");
+    return (_a = special.get(u2)) !== null && _a !== void 0 ? _a : "".concat(u2).toLowerCase().replace(/s$/, "");
   }
-  function monthDiff(a, b) {
-    if (a.date() < b.date())
-      return -monthDiff(b, a);
-    const wholeMonthDiff = (b.year() - a.year()) * 12 + (b.month() - a.month());
-    const anchor = a.clone().add(wholeMonthDiff, M).valueOf();
-    const c = b.valueOf() - anchor < 0;
-    const anchor2 = a.clone().add(wholeMonthDiff + (c ? -1 : 1), M).valueOf();
-    const decimalMonthDiff = (b.valueOf() - anchor) / (c ? anchor - anchor2 : anchor2 - anchor);
+  function monthDiff(a2, b2) {
+    if (a2.date() < b2.date())
+      return -monthDiff(b2, a2);
+    const wholeMonthDiff = (b2.year() - a2.year()) * 12 + (b2.month() - a2.month());
+    const anchor = a2.clone().add(wholeMonthDiff, M$1).valueOf();
+    const c2 = b2.valueOf() - anchor < 0;
+    const anchor2 = a2.clone().add(wholeMonthDiff + (c2 ? -1 : 1), M$1).valueOf();
+    const decimalMonthDiff = (b2.valueOf() - anchor) / (c2 ? anchor - anchor2 : anchor2 - anchor);
     const result = wholeMonthDiff + decimalMonthDiff;
     const negatedResult = -result;
     const absResult = +negatedResult;
     const finalResult = !isNaN(absResult) ? absResult : 0;
     return finalResult;
   }
-  function absFloor(n) {
-    return n < 0 ? Math.max(Math.ceil(n), 0) : Math.floor(n);
+  function absFloor(n2) {
+    return n2 < 0 ? Math.max(Math.ceil(n2), 0) : Math.floor(n2);
   }
-  const en = {
+  const en$1 = {
     name: "en",
     /**
      * 星期名称数组。
@@ -13293,12 +13133,12 @@
      * @param {number} n - 要转换的数字。
      * @returns {string} 带有序数后缀的字符串。
      */
-    ordinal: (n, _) => {
-      const s = ["th", "st", "nd", "rd"];
-      const v = n % 100;
-      const i = (v - 20) % 10;
-      const k = i < s.length ? i : v < s.length ? v : 0;
-      return "[".concat(n).concat(s[k], "]");
+    ordinal: (n2, _2) => {
+      const s2 = ["th", "st", "nd", "rd"];
+      const v2 = n2 % 100;
+      const i2 = (v2 - 20) % 10;
+      const k2 = i2 < s2.length ? i2 : v2 < s2.length ? v2 : 0;
+      return "[".concat(n2).concat(s2[k2], "]");
     }
   };
   const locale = {
@@ -13369,7 +13209,7 @@
       y: "1 年",
       yy: "%d 年"
     },
-    meridiem: (hour, minute, _) => {
+    meridiem: (hour, minute, _2) => {
       const hm = hour * 100 + minute;
       if (hm < 600) {
         return "凌晨";
@@ -13390,7 +13230,7 @@
     lang: "en",
     locales: localesMap
   });
-  localeState.locales.set("en", en);
+  localeState.locales.set("en", en$1);
   localeState.locales.set("zh-cn", locale);
   class DayutsIntl {
     constructor() {
@@ -13404,7 +13244,7 @@
         localeState.lang = locale2;
       } else {
         let list = [];
-        localeState.locales.forEach(function(_, key) {
+        localeState.locales.forEach(function(_2, key) {
           list.push(key);
         });
         uni.__log__("warn", "at uni_modules/lime-dayuts/common/use.ts:46", '未知语言: "'.concat(locale2, '". 请使用以下已知语言之一:').concat(list.join(", ")));
@@ -13422,30 +13262,30 @@
   }
   const dayutsIntl = new DayutsIntl();
   function parseLocale(preset, object = null, isLocal = false) {
-    let l = null;
+    let l2 = null;
     if (preset == null)
       return dayutsIntl.locale;
     if (typeof preset == "string") {
       const presetLower = preset.toLowerCase();
       if (dayutsIntl.has(presetLower)) {
-        l = presetLower;
+        l2 = presetLower;
       }
       if (object != null) {
         dayutsIntl.set(presetLower, object);
-        l = presetLower;
+        l2 = presetLower;
       }
       const presetSplit = preset.split("-");
-      if (l == null && presetSplit.length > 1) {
+      if (l2 == null && presetSplit.length > 1) {
         return parseLocale(presetSplit[0]);
       }
     } else if (preset instanceof DayutsLocale) {
       dayutsIntl.set(preset.name, preset);
-      l = preset.name;
+      l2 = preset.name;
     }
-    if (!isLocal && l != null) {
-      dayutsIntl.locale = l;
+    if (!isLocal && l2 != null) {
+      dayutsIntl.locale = l2;
     }
-    return l !== null && l !== void 0 ? l : dayutsIntl.locale;
+    return l2 !== null && l2 !== void 0 ? l2 : dayutsIntl.locale;
   }
   function tryParseNumberAtIndex(digits, index) {
     if (index >= 0 && index < digits.length) {
@@ -13458,15 +13298,15 @@
     }
     return null;
   }
-  function createDateFromArray(d, offset = 0) {
-    var _a, _b, _c, _e, _f, _g, _h;
-    const year = (_a = tryParseNumberAtIndex(d, 1 - offset)) !== null && _a !== void 0 ? _a : (/* @__PURE__ */ new Date()).getFullYear();
-    const month = ((_b = tryParseNumberAtIndex(d, 2 - offset)) !== null && _b !== void 0 ? _b : 1) - 1;
-    const day = (_c = tryParseNumberAtIndex(d, 3 - offset)) !== null && _c !== void 0 ? _c : 1;
-    const hour = (_e = tryParseNumberAtIndex(d, 4 - offset)) !== null && _e !== void 0 ? _e : 0;
-    const minute = (_f = tryParseNumberAtIndex(d, 5 - offset)) !== null && _f !== void 0 ? _f : 0;
-    const second = (_g = tryParseNumberAtIndex(d, 6 - offset)) !== null && _g !== void 0 ? _g : 0;
-    const millisecond = ((_h = tryParseNumberAtIndex(d, 7 - offset)) !== null && _h !== void 0 ? _h : 0).toString().substring(0, 3);
+  function createDateFromArray(d2, offset = 0) {
+    var _a, _b, _c, _e2, _f, _g, _h;
+    const year = (_a = tryParseNumberAtIndex(d2, 1 - offset)) !== null && _a !== void 0 ? _a : (/* @__PURE__ */ new Date()).getFullYear();
+    const month = ((_b = tryParseNumberAtIndex(d2, 2 - offset)) !== null && _b !== void 0 ? _b : 1) - 1;
+    const day = (_c = tryParseNumberAtIndex(d2, 3 - offset)) !== null && _c !== void 0 ? _c : 1;
+    const hour = (_e2 = tryParseNumberAtIndex(d2, 4 - offset)) !== null && _e2 !== void 0 ? _e2 : 0;
+    const minute = (_f = tryParseNumberAtIndex(d2, 5 - offset)) !== null && _f !== void 0 ? _f : 0;
+    const second = (_g = tryParseNumberAtIndex(d2, 6 - offset)) !== null && _g !== void 0 ? _g : 0;
+    const millisecond = ((_h = tryParseNumberAtIndex(d2, 7 - offset)) !== null && _h !== void 0 ? _h : 0).toString().substring(0, 3);
     return new Date(year, month, day, hour, minute, second, parseInt(millisecond));
   }
   function parseDate(cfg) {
@@ -13477,10 +13317,10 @@
       return date;
     try {
       if (typeof date == "string" && !/Z$/i.test(date)) {
-        const d = date.match(REGEX_PARSE);
-        const isNull = d == null || Array.isArray(d) && d.length == 0;
+        const d2 = date.match(REGEX_PARSE);
+        const isNull = d2 == null || Array.isArray(d2) && d2.length == 0;
         if (!isNull) {
-          return createDateFromArray(d);
+          return createDateFromArray(d2);
         }
       }
       if (typeof date == "string")
@@ -13614,9 +13454,9 @@
       var _a;
       const isStartOf = startOf;
       const unit = prettyUnit(units);
-      const instanceFactory = (d, m) => {
-        const ins = dayuts(new Date(this.$y, m, d));
-        return isStartOf ? ins : ins.endOf(D);
+      const instanceFactory = (d2, m2) => {
+        const ins = dayuts(new Date(this.$y, m2, d2));
+        return isStartOf ? ins : ins.endOf(D$1);
       };
       const instanceFactorySet = (method, slice) => {
         const argumentStart = [0, 0, 0, 0];
@@ -13642,21 +13482,21 @@
       };
       const _b = this, $W = _b.$W, $M = _b.$M, $D = _b.$D;
       const utcPad = "set".concat(this.$u ? "UTC" : "");
-      if (unit == Y) {
+      if (unit == Y$1) {
         return isStartOf ? instanceFactory(1, 0) : instanceFactory(31, 11);
-      } else if (unit == M) {
+      } else if (unit == M$1) {
         return isStartOf ? instanceFactory(1, $M) : instanceFactory(0, $M + 1);
-      } else if (unit == W) {
+      } else if (unit == W$1) {
         const weekStart = (_a = this.$locale().weekStart) !== null && _a !== void 0 ? _a : 0;
         const gap = ($W < weekStart ? $W + 7 : $W) - weekStart;
         return instanceFactory(isStartOf ? $D - gap : $D + (6 - gap), $M);
-      } else if (unit == D || unit == DATE) {
+      } else if (unit == D$1 || unit == DATE) {
         return instanceFactorySet("".concat(utcPad, "Hours"), 0);
-      } else if (unit == H) {
+      } else if (unit == H$1) {
         return instanceFactorySet("".concat(utcPad, "Minutes"), 1);
       } else if (unit == MIN) {
         return instanceFactorySet("".concat(utcPad, "Seconds"), 2);
-      } else if (unit == S) {
+      } else if (unit == S$1) {
         return instanceFactorySet("".concat(utcPad, "Milliseconds"), 3);
       } else {
         return this.clone();
@@ -13680,25 +13520,25 @@
      */
     $set(units, int) {
       const unit = prettyUnit(units);
-      const arg = unit == D ? this.$D + (int - this.$W) : int;
+      const arg = unit == D$1 ? this.$D + (int - this.$W) : int;
       const setDateUnit = (date, unit2, arg2) => {
-        if (unit2 == D || unit2 == DATE) {
+        if (unit2 == D$1 || unit2 == DATE) {
           date.$d.setDate(arg2);
-        } else if (unit2 == M) {
+        } else if (unit2 == M$1) {
           date.$d.setMonth(arg2);
-        } else if (unit2 == Y) {
+        } else if (unit2 == Y$1) {
           date.$d.setFullYear(arg2);
-        } else if (unit2 == H) {
+        } else if (unit2 == H$1) {
           date.$d.setHours(arg2);
         } else if (unit2 == MIN) {
           date.$d.setMinutes(arg2);
-        } else if (unit2 == S) {
+        } else if (unit2 == S$1) {
           date.$d.setSeconds(arg2);
         } else if (unit2 == MS) {
           date.$d.setMilliseconds(arg2);
         }
       };
-      if (unit == M || unit == Y) {
+      if (unit == M$1 || unit == Y$1) {
         const date = this.clone().set(DATE, 1);
         setDateUnit(date, unit, arg);
         date.init();
@@ -13727,19 +13567,19 @@
      */
     get(units) {
       const unit = prettyUnit(units);
-      if (unit == D) {
+      if (unit == D$1) {
         return this.day();
       } else if (unit == DATE) {
         return this.date();
-      } else if (unit == M) {
+      } else if (unit == M$1) {
         return this.month();
-      } else if (unit == Y) {
+      } else if (unit == Y$1) {
         return this.year();
-      } else if (unit == H) {
+      } else if (unit == H$1) {
         return this.hour();
       } else if (unit == MIN) {
         return this.minute();
-      } else if (unit == S) {
+      } else if (unit == S$1) {
         return this.second();
       } else if (unit == MS) {
         return this.millisecond();
@@ -13749,17 +13589,17 @@
     year(input = null) {
       if (input == null)
         return this.$y;
-      return this.set(Y, input);
+      return this.set(Y$1, input);
     }
     month(input = null) {
       if (input == null)
         return this.$M;
-      return this.set(M, input);
+      return this.set(M$1, input);
     }
     day(input = null) {
       if (input == null)
         return this.$W;
-      return this.set(D, input);
+      return this.set(D$1, input);
     }
     date(input = null) {
       if (input == null)
@@ -13769,7 +13609,7 @@
     hour(input = null) {
       if (input == null)
         return this.$H;
-      return this.set(H, input);
+      return this.set(H$1, input);
     }
     minute(input = null) {
       if (input == null)
@@ -13779,7 +13619,7 @@
     second(input = null) {
       if (input == null)
         return this.$s;
-      return this.set(S, input);
+      return this.set(S$1, input);
     }
     millisecond(input = null) {
       if (input == null)
@@ -13795,26 +13635,26 @@
     add(number, units) {
       var _a;
       const unit = prettyUnit(units);
-      const instanceFactorySet = (n) => {
-        const d = dayuts(this);
-        return d.date(d.date() + Math.round(n * number));
+      const instanceFactorySet = (n2) => {
+        const d2 = dayuts(this);
+        return d2.date(d2.date() + Math.round(n2 * number));
       };
-      if (unit == M) {
-        return this.set(M, this.$M + number);
+      if (unit == M$1) {
+        return this.set(M$1, this.$M + number);
       }
-      if (unit == Y) {
-        return this.set(Y, this.$y + number);
+      if (unit == Y$1) {
+        return this.set(Y$1, this.$y + number);
       }
-      if (unit == D) {
+      if (unit == D$1) {
         return instanceFactorySet(1);
       }
-      if (unit == W) {
+      if (unit == W$1) {
         return instanceFactorySet(7);
       }
       const steps = /* @__PURE__ */ new Map([
         [MIN, MILLISECONDS_A_MINUTE],
-        [H, MILLISECONDS_A_HOUR],
-        [S, MILLISECONDS_A_SECOND]
+        [H$1, MILLISECONDS_A_HOUR],
+        [S$1, MILLISECONDS_A_SECOND]
       ]);
       const step = (_a = steps.get(unit)) !== null && _a !== void 0 ? _a : 1;
       const nextTimeStamp = this.$d.getTime() + number * step;
@@ -13853,9 +13693,9 @@
       const get$H = (num) => {
         return padStart(($H % 12 == 0 ? 12 : $H % 12).toString(), num, "0");
       };
-      const meridiemFunc = meridiem !== null && meridiem !== void 0 ? meridiem : (hour, _, isLowercase) => {
-        const m = hour < 12 ? "AM" : "PM";
-        return isLowercase ? m.toLowerCase() : m;
+      const meridiemFunc = meridiem !== null && meridiem !== void 0 ? meridiem : (hour, _2, isLowercase) => {
+        const m2 = hour < 12 ? "AM" : "PM";
+        return isLowercase ? m2.toLowerCase() : m2;
       };
       const matches = (match) => {
         if (match == "YY") {
@@ -13931,28 +13771,28 @@
       };
       let result;
       switch (unit) {
-        case Y:
+        case Y$1:
           result = getMonth() / 12;
           break;
-        case M:
+        case M$1:
           result = getMonth();
           break;
-        case Q:
+        case Q$1:
           result = getMonth() / 3;
           break;
-        case W:
+        case W$1:
           result = (diff - zoneDelta) / MILLISECONDS_A_WEEK;
           break;
-        case D:
+        case D$1:
           result = (diff - zoneDelta) / MILLISECONDS_A_DAY;
           break;
-        case H:
+        case H$1:
           result = diff / MILLISECONDS_A_HOUR;
           break;
         case MIN:
           result = diff / MILLISECONDS_A_MINUTE;
           break;
-        case S:
+        case S$1:
           result = diff / MILLISECONDS_A_SECOND;
           break;
         default:
@@ -14019,7 +13859,7 @@
      * @returns {number} 返回当前 `dayuts` 对象所在月份的天数。
      */
     daysInMonth() {
-      return this.endOf(M).$D;
+      return this.endOf(M$1).$D;
     }
     /**
      * 获取当前日期的区域设置对象。
@@ -14058,33 +13898,33 @@
       if (loc == null)
         return "";
       const T = [
-        { l: "s", r: 44, d: S },
+        { l: "s", r: 44, d: S$1 },
         { l: "m", r: 89 },
         { l: "mm", r: 44, d: MIN },
         { l: "h", r: 89 },
-        { l: "hh", r: 21, d: H },
+        { l: "hh", r: 21, d: H$1 },
         { l: "d", r: 35 },
-        { l: "dd", r: 25, d: D },
+        { l: "dd", r: 25, d: D$1 },
         { l: "M", r: 45 },
-        { l: "MM", r: 10, d: M },
+        { l: "MM", r: 10, d: M$1 },
         { l: "y", r: 17 },
-        { l: "yy", d: Y }
+        { l: "yy", d: Y$1 }
       ];
       const Tl = T.length;
       let result = 0;
       let out = "";
       let isFuture = false;
-      for (let i = 0; i < Tl; i += 1) {
-        let t = T[i];
-        if (t.d != null) {
-          result = isFrom ? dayuts(input).diff(instance, t.d, true) : instance.diff(input, t.d, true);
+      for (let i2 = 0; i2 < Tl; i2 += 1) {
+        let t2 = T[i2];
+        if (t2.d != null) {
+          result = isFrom ? dayuts(input).diff(instance, t2.d, true) : instance.diff(input, t2.d, true);
         }
         let abs = Math.round(Math.abs(result));
         isFuture = result > 0;
-        if (t.r == null || t.r != null && abs <= t.r) {
-          if (abs <= 1 && i > 0)
-            t = T[i - 1];
-          const format = loc[t.l];
+        if (t2.r == null || t2.r != null && abs <= t2.r) {
+          if (abs <= 1 && i2 > 0)
+            t2 = T[i2 - 1];
+          const format = loc[t2.l];
           if (typeof format == "string") {
             out = format.replace("%d", abs.toString());
           }
@@ -14263,10 +14103,10 @@
             return null;
           }
           const arr = [];
-          for (let i = lowerBound; i <= upperBound; i++) {
-            const value = i;
+          for (let i2 = lowerBound; i2 <= upperBound; i2++) {
+            const value = i2;
             arr.push({
-              label: props.renderLabel != null ? props.renderLabel(type, i.toString()) : "".concat(value).concat(props.showUnit ? UTS.mapGet(UNIT_MAP, type) : ""),
+              label: props.renderLabel != null ? props.renderLabel(type, i2.toString()) : "".concat(value).concat(props.showUnit ? UTS.mapGet(UNIT_MAP, type) : ""),
               value: type == "month" ? "".concat(value - 1) : value.toString()
             });
           }
@@ -14565,30 +14405,30 @@
         return normalizeDateTime(dateStr);
       }
       function calculateBearing(lat1, lng1, lat2, lng2) {
-        const degToRad = (d) => {
-          return d * Math.PI / 180;
+        const degToRad = (d2) => {
+          return d2 * Math.PI / 180;
         };
-        const radToDeg = (r) => {
-          return r * 180 / Math.PI;
+        const radToDeg = (r2) => {
+          return r2 * 180 / Math.PI;
         };
         const φ1 = degToRad(lat1);
         const φ2 = degToRad(lat2);
         const Δλ = degToRad(lng2 - lng1);
-        const y = Math.sin(Δλ) * Math.cos(φ2);
-        const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-        const θ = Math.atan2(y, x);
+        const y2 = Math.sin(Δλ) * Math.cos(φ2);
+        const x2 = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+        const θ = Math.atan2(y2, x2);
         return (radToDeg(θ) + 360) % 360;
       }
       function getDistance(lat1, lng1, lat2, lng2) {
-        const rad = (d) => {
-          return d * Math.PI / 180;
+        const rad = (d2) => {
+          return d2 * Math.PI / 180;
         };
         const radLat1 = rad(lat1);
         const radLat2 = rad(lat2);
-        const a = radLat1 - radLat2;
-        const b = rad(lng1) - rad(lng2);
-        const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
-        return s * 6378.137 * 1e3;
+        const a2 = radLat1 - radLat2;
+        const b2 = rad(lng1) - rad(lng2);
+        const s2 = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a2 / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b2 / 2), 2)));
+        return s2 * 6378.137 * 1e3;
       }
       function calculateTrackBounds() {
         if (trackPoints.value.length == 0)
@@ -14632,8 +14472,8 @@
       }
       function calculateTrackDistance() {
         totalDistance.value = 0;
-        for (let i = 1; i < trackPoints.value.length; i++) {
-          totalDistance.value += getDistance(trackPoints.value[i - 1].latitude, trackPoints.value[i - 1].longitude, trackPoints.value[i].latitude, trackPoints.value[i].longitude);
+        for (let i2 = 1; i2 < trackPoints.value.length; i2++) {
+          totalDistance.value += getDistance(trackPoints.value[i2 - 1].latitude, trackPoints.value[i2 - 1].longitude, trackPoints.value[i2].latitude, trackPoints.value[i2].longitude);
         }
       }
       function initDateTime() {
@@ -14830,8 +14670,8 @@
         const processedPoints = [];
         let lastRetainedLat = null;
         let lastRetainedLng = null;
-        for (let i = 0; i < positions.length; i++) {
-          const point = positions[i];
+        for (let i2 = 0; i2 < positions.length; i2++) {
+          const point = positions[i2];
           const deviceTimeStr = point.getString("deviceTime", "");
           const originalLat = point.getNumber("latitude", 0);
           const originalLng = point.getNumber("longitude", 0);
@@ -14855,9 +14695,9 @@
             speed: point.getNumber("speed", 0)
           }));
         }
-        for (let i = 1; i < processedPoints.length; i++) {
-          const previousPoint = processedPoints[i - 1];
-          const currentPoint = processedPoints[i];
+        for (let i2 = 1; i2 < processedPoints.length; i2++) {
+          const previousPoint = processedPoints[i2 - 1];
+          const currentPoint = processedPoints[i2];
           currentPoint.rotation = calculateBearing(previousPoint.latitude, previousPoint.longitude, currentPoint.latitude, currentPoint.longitude);
         }
         if (processedPoints.length > 1) {
@@ -14874,7 +14714,7 @@
       }
       const loadTrackPos = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          var _a, _b, _c;
+          var _a, _b;
           pausePlayback();
           const requestId = ++replaySessionId;
           clearTrackDisplay();
@@ -14892,7 +14732,17 @@
             const res = yield getTrackPos(data);
             if (requestId != replaySessionId)
               return Promise.resolve(null);
-            const positions = (_a = res.data) === null || _a === void 0 ? null : _a.getArray("positions");
+            if (res.code != 200) {
+              showAppToast({ title: res.msg || "轨迹加载失败", icon: "none" });
+              showCurrentPosition();
+              return Promise.resolve(null);
+            }
+            const trackData = res.data;
+            if (trackData == null) {
+              showCurrentPosition();
+              return Promise.resolve(null);
+            }
+            const positions = trackData.getArray("positions");
             if (positions != null && positions.length > 0) {
               processTrackData(positions);
               if (trackPoints.value.length == 0) {
@@ -14904,9 +14754,9 @@
           } catch (error) {
             if (requestId != replaySessionId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/playBack/playBack.uvue:676", "加载轨迹失败:", error);
+            uni.__log__("error", "at pages/playBack/playBack.uvue:687", "加载轨迹失败:", error);
             showAppToast({ title: "轨迹加载失败", icon: "none" });
-            if (!isNaN(parseFloat((_b = lat.value) !== null && _b !== void 0 ? _b : "")) && !isNaN(parseFloat((_c = lng.value) !== null && _c !== void 0 ? _c : ""))) {
+            if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
               showCurrentPosition();
             }
           } finally {
@@ -15009,16 +14859,16 @@
         applyPlaybackSpeed(event.detail.value);
       }
       vue.onLoad((option) => {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var _a, _b, _c, _d, _e2, _f, _g, _h;
         imei.value = (_a = option.imei) !== null && _a !== void 0 ? _a : null;
         carStatus.value = (_b = option.connectionStatus) !== null && _b !== void 0 ? _b : "";
         plateNo.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "";
         carType.value = (_d = option.carType) !== null && _d !== void 0 ? _d : "";
-        lat.value = (_e = option.lat) !== null && _e !== void 0 ? _e : null;
+        lat.value = (_e2 = option.lat) !== null && _e2 !== void 0 ? _e2 : null;
         lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
         sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
         eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
-        uni.__log__("log", "at pages/playBack/playBack.uvue:805", sTime.value, eTime.value);
+        uni.__log__("log", "at pages/playBack/playBack.uvue:816", sTime.value, eTime.value);
         const routeStartTime = resolveRouteDateTime(sTime.value);
         const routeEndTime = resolveRouteDateTime(eTime.value);
         if (routeStartTime != null && routeEndTime != null) {
@@ -15203,12 +15053,12 @@
       let selected = vue.ref(-1);
       let parentKey = vue.ref("action-sheet-1");
       vue.onLoad((options) => {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a, _b, _c, _d, _e2, _f, _g, _h, _j;
         const param = UTS.JSON.parseObject("".concat((_a = options["param"]) !== null && _a !== void 0 ? _a : "{}"));
         parentKey.value = (_b = param.getString("key")) !== null && _b !== void 0 ? _b : "action-sheet-1";
         description.value = (_c = param.getString("description")) !== null && _c !== void 0 ? _c : "";
         title.value = (_d = param.getString("title")) !== null && _d !== void 0 ? _d : "";
-        cancelText.value = (_e = param.getString("cancelText")) !== null && _e !== void 0 ? _e : "";
+        cancelText.value = (_e2 = param.getString("cancelText")) !== null && _e2 !== void 0 ? _e2 : "";
         align.value = (_f = param.getString("align")) !== null && _f !== void 0 ? _f : "center";
         bordered.value = (_g = param.getBoolean("bordered")) !== null && _g !== void 0 ? _g : false;
         closeable.value = (_h = param.getBoolean("closeable")) !== null && _h !== void 0 ? _h : true;
@@ -15219,19 +15069,19 @@
             return false;
           return /\.(jpe?g|png|gif|bmp|webp|tiff?)$/i.test(name2) || /^data:image\/(jpeg|png|gif|bmp|webp|tiff);base64,/.test(name2);
         };
-        actionItems.value = (_j = list === null || list === void 0 ? null : list.map((it, index) => {
+        actionItems.value = (_j = list === null || list === void 0 ? null : list.map((it2, index) => {
           var _a2, _b2, _c2;
           return {
-            label: (_a2 = it.getString("label")) !== null && _a2 !== void 0 ? _a2 : "",
-            color: it.getString("color"),
-            icon: it.getString("icon"),
-            iconColor: it.getString("iconColor"),
-            bgColor: it.getString("bgColor"),
-            fontSize: (_b2 = it.getString("fontSize")) !== null && _b2 !== void 0 ? _b2 : "32rpx",
-            disabled: (_c2 = it.getBoolean("disabled")) !== null && _c2 !== void 0 ? _c2 : false,
-            radius: it.getString("radius"),
+            label: (_a2 = it2.getString("label")) !== null && _a2 !== void 0 ? _a2 : "",
+            color: it2.getString("color"),
+            icon: it2.getString("icon"),
+            iconColor: it2.getString("iconColor"),
+            bgColor: it2.getString("bgColor"),
+            fontSize: (_b2 = it2.getString("fontSize")) !== null && _b2 !== void 0 ? _b2 : "32rpx",
+            disabled: (_c2 = it2.getBoolean("disabled")) !== null && _c2 !== void 0 ? _c2 : false,
+            radius: it2.getString("radius"),
             __index: index,
-            __isImage: isImage(it.getString("icon"))
+            __isImage: isImage(it2.getString("icon"))
           };
         })) !== null && _j !== void 0 ? _j : [];
         vue.nextTick(() => {
@@ -15245,8 +15095,8 @@
           return result;
         const list = [...actionItems.value];
         const rows = _rowCol.length;
-        for (let i = 0; i < rows; i++) {
-          let cols = _rowCol[i];
+        for (let i2 = 0; i2 < rows; i2++) {
+          let cols = _rowCol[i2];
           const row = [];
           while (cols > 0 && list.length > 0) {
             const item = UTS.arrayShift(list);
@@ -15589,65 +15439,66 @@
               deviceids: imei.value
             });
             const res = yield getDevicePos(data);
-            if ((res === null || res === void 0 ? null : res.code) == 0 && res.data && res.data.length > 0) {
-              let foundDevice = false;
-              res.data.forEach((item) => {
-                const itemImei = item.getString("imei", "");
-                if (itemImei == imei.value) {
-                  foundDevice = true;
-                  const latitude = item.getNumber("latitude", 0);
-                  const longitude = item.getNumber("longitude", 0);
-                  if (latitude == 0 || longitude == 0) {
-                    showAppToast({
-                      title: "位置信息缺失",
-                      icon: "none"
-                    });
-                    return null;
-                  }
-                  const direction = item.getNumber("direction", 0);
-                  const speed = item.getNumber("speed", 0);
-                  const positionUpdateTime = item.getString("positionUpdateTime", "定位时间未知");
-                  const status = item.getString("connectionStatus", "unknown");
-                  const convertedCoord = CoordTransform.wgs84ToTencentPrecise(latitude, longitude);
-                  currentPosition.latitude = convertedCoord.lat;
-                  currentPosition.longitude = convertedCoord.lng;
-                  hasValidPosition.value = true;
-                  targetPosition.latitude = convertedCoord.lat;
-                  targetPosition.longitude = convertedCoord.lng;
-                  center.latitude = convertedCoord.lat;
-                  center.longitude = convertedCoord.lng;
-                  lastDirection.value = direction;
-                  let initialRotation = lastDirection.value % 360;
-                  if (initialRotation < 0) {
-                    initialRotation += 360;
-                  }
-                  currentRotation.value = initialRotation;
-                  targetRotation.value = currentRotation.value;
-                  currentSpeed.value = speed;
-                  currentAddress.value = positionUpdateTime;
-                  connectionStatus.value = status;
-                  if (!markerInitialized.value) {
-                    const iconPath = getDeviceIcon(connectionStatus.value, carType.value);
-                    lastIconPath = iconPath;
-                    markers.value = [createVehicleMarker(iconPath)];
-                    markerInitialized.value = true;
-                  }
-                }
-              });
-              if (!foundDevice) {
-                showAppToast({
-                  title: "未找到车辆设备",
-                  icon: "none"
-                });
-              }
-            } else {
+            const positions = res.data;
+            if ((res === null || res === void 0 ? null : res.code) != 200 || positions == null || positions.length == 0) {
               showAppToast({
                 title: "获取位置失败",
                 icon: "none"
               });
+              return Promise.resolve(null);
+            }
+            let foundDevice = false;
+            positions.forEach((item) => {
+              const itemImei = item.getString("imei", "");
+              if (itemImei == imei.value) {
+                foundDevice = true;
+                const latitude = item.getNumber("latitude", 0);
+                const longitude = item.getNumber("longitude", 0);
+                if (latitude == 0 || longitude == 0) {
+                  showAppToast({
+                    title: "位置信息缺失",
+                    icon: "none"
+                  });
+                  return null;
+                }
+                const direction = item.getNumber("direction", 0);
+                const speed = item.getNumber("speed", 0);
+                const positionUpdateTime = item.getString("positionUpdateTime", "定位时间未知");
+                const status = item.getString("connectionStatus", "unknown");
+                const convertedCoord = CoordTransform.wgs84ToTencentPrecise(latitude, longitude);
+                currentPosition.latitude = convertedCoord.lat;
+                currentPosition.longitude = convertedCoord.lng;
+                hasValidPosition.value = true;
+                targetPosition.latitude = convertedCoord.lat;
+                targetPosition.longitude = convertedCoord.lng;
+                center.latitude = convertedCoord.lat;
+                center.longitude = convertedCoord.lng;
+                lastDirection.value = direction;
+                let initialRotation = lastDirection.value % 360;
+                if (initialRotation < 0) {
+                  initialRotation += 360;
+                }
+                currentRotation.value = initialRotation;
+                targetRotation.value = currentRotation.value;
+                currentSpeed.value = speed;
+                currentAddress.value = positionUpdateTime;
+                connectionStatus.value = status;
+                if (!markerInitialized.value) {
+                  const iconPath = getDeviceIcon(connectionStatus.value, carType.value);
+                  lastIconPath = iconPath;
+                  markers.value = [createVehicleMarker(iconPath)];
+                  markerInitialized.value = true;
+                }
+              }
+            });
+            if (!foundDevice) {
+              showAppToast({
+                title: "未找到车辆设备",
+                icon: "none"
+              });
             }
           } catch (err) {
-            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:244", "获取初始位置失败:", err);
+            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:245", "获取初始位置失败:", err);
             showAppToast({
               title: "网络请求失败",
               icon: "none"
@@ -15664,7 +15515,7 @@
         const marker = createVehicleMarker(iconPath);
         markers.value = [marker];
         markerInitialized.value = true;
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:265", "初始化标记点完成");
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:266", "初始化标记点完成");
       }
       function calculateMapRotation(direction) {
         let rotation = direction;
@@ -15682,22 +15533,22 @@
         return normalized;
       }
       vue.onLoad((option) => {
-        var _a, _b, _c, _d, _e;
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:286", "option", option);
+        var _a, _b, _c, _d, _e2;
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:287", "option", option);
         connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
         imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
         currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
         deptId.value = (_d = option.deptId) !== null && _d !== void 0 ? _d : "";
-        carType.value = (_e = option.carType) !== null && _e !== void 0 ? _e : "";
+        carType.value = (_e2 = option.carType) !== null && _e2 !== void 0 ? _e2 : "";
         loadInitialPosition();
       });
       const calculateDistance = (lat1, lng1, lat2, lng2) => {
-        const R = 6371e3;
+        const R2 = 6371e3;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLng = (lng2 - lng1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+        const a2 = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c2 = 2 * Math.atan2(Math.sqrt(a2), Math.sqrt(1 - a2));
+        return R2 * c2;
       };
       function calculateShortestRotation(from, to) {
         let diff = to - from;
@@ -15721,8 +15572,8 @@
           lastIconPath = newIconPath;
         }
       };
-      function copyPosition(p) {
-        return new CoordinatePoint({ latitude: p.latitude, longitude: p.longitude });
+      function copyPosition(p2) {
+        return new CoordinatePoint({ latitude: p2.latitude, longitude: p2.longitude });
       }
       function isSamePosition(first, second) {
         return first.latitude == second.latitude && first.longitude == second.longitude;
@@ -15863,9 +15714,10 @@
           isTrackRequestPending = true;
           try {
             const res = yield getDevicePos(new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value }));
-            if (!isTracking.value || sessionId != trackingSessionId || (res === null || res === void 0 ? null : res.code) != 0 || !res.data)
+            const positions = res.data;
+            if (!isTracking.value || sessionId != trackingSessionId || (res === null || res === void 0 ? null : res.code) != 200 || positions == null)
               return Promise.resolve(null);
-            const item = UTS.arrayFind(res.data, (value) => {
+            const item = UTS.arrayFind(positions, (value) => {
               return value.getString("imei", "") == imei.value;
             });
             if (item == null)
@@ -15904,7 +15756,7 @@
             pendingJumpTime = "";
             acceptLivePosition(item, position, positionTime, sessionId);
           } catch (error) {
-            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:483", "获取跟踪位置失败:", error);
+            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:485", "获取跟踪位置失败:", error);
           } finally {
             if (sessionId == trackingSessionId)
               isTrackRequestPending = false;
@@ -16548,9 +16400,9 @@
         });
         const groups = [];
         dateGroups.forEach((dateGroup) => {
-          dateGroup.trips.sort((a, b) => {
-            const timeA = parseLocalDateTime(a.getString("startTime", ""));
-            const timeB = parseLocalDateTime(b.getString("startTime", ""));
+          dateGroup.trips.sort((a2, b2) => {
+            const timeA = parseLocalDateTime(a2.getString("startTime", ""));
+            const timeB = parseLocalDateTime(b2.getString("startTime", ""));
             if (timeA == null)
               return timeB == null ? 0 : 1;
             if (timeB == null)
@@ -16563,9 +16415,9 @@
           });
           groups.push(new GroupType({ date: dateGroup.date, trips: dateGroup.trips, totalDistance }));
         });
-        return groups.sort((a, b) => {
-          const timeA = parseLocalDateTime(a.date);
-          const timeB = parseLocalDateTime(b.date);
+        return groups.sort((a2, b2) => {
+          const timeA = parseLocalDateTime(a2.date);
+          const timeB = parseLocalDateTime(b2.date);
           if (timeA == null)
             return timeB == null ? 0 : 1;
           if (timeB == null)
@@ -16632,13 +16484,17 @@
               withTrip: true
             });
             const res = yield getTrackPos(data);
-            uni.__log__("log", "at pages/mileageRecord/mileageRecord.uvue:202", "获取里程数据成功:", res);
+            if (res.code != 200) {
+              showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
+              return Promise.resolve(null);
+            }
+            uni.__log__("log", "at pages/mileageRecord/mileageRecord.uvue:206", "获取里程数据成功:", res);
             const trackData = res.data;
             if (trackData != null) {
               processTripData(trackData);
             }
-          } catch (e) {
-            uni.__log__("error", "at pages/mileageRecord/mileageRecord.uvue:208", "获取里程数据失败:", e);
+          } catch (e2) {
+            uni.__log__("error", "at pages/mileageRecord/mileageRecord.uvue:212", "获取里程数据失败:", e2);
             showAppToast({
               title: "数据加载失败",
               icon: "none"
@@ -16869,9 +16725,9 @@
       const carStopDetail = vue.ref([]);
       const sortedCarStopDetail = vue.computed(() => {
         const sorted = carStopDetail.value.slice();
-        sorted.sort((a, b) => {
-          const timeA = parseLocalDateTime(a.getString("endTime", ""));
-          const timeB = parseLocalDateTime(b.getString("endTime", ""));
+        sorted.sort((a2, b2) => {
+          const timeA = parseLocalDateTime(a2.getString("endTime", ""));
+          const timeB = parseLocalDateTime(b2.getString("endTime", ""));
           if (timeA == null)
             return timeB == null ? 0 : 1;
           if (timeB == null)
@@ -16903,18 +16759,29 @@
             withPos: false,
             withTrip: false
           });
-          const res = yield getTrackPos(data);
-          let stopsWithAddress = [];
-          const trackData = res.data;
-          const stops = (_a = trackData === null || trackData === void 0 ? null : trackData.getArray("stops")) !== null && _a !== void 0 ? _a : [];
-          stops.forEach((stop) => {
-            const convertedCoord = CoordTransform.wgs84ToTencent(stop.getNumber("latitude", 0), stop.getNumber("longitude", 0));
-            stop.set("latitude", convertedCoord.lat);
-            stop.set("longitude", convertedCoord.lng);
-            stopsWithAddress.push(stop);
-          });
-          carStopDetail.value = stopsWithAddress;
-          uni.hideLoading();
+          try {
+            const res = yield getTrackPos(data);
+            const trackData = res.data;
+            if (res.code != 200 || trackData == null) {
+              showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
+              carStopDetail.value = [];
+              return Promise.resolve(null);
+            }
+            const stopsWithAddress = [];
+            const stops = (_a = trackData.getArray("stops")) !== null && _a !== void 0 ? _a : [];
+            stops.forEach((stop) => {
+              const convertedCoord = CoordTransform.wgs84ToTencent(stop.getNumber("latitude", 0), stop.getNumber("longitude", 0));
+              stop.set("latitude", convertedCoord.lat);
+              stop.set("longitude", convertedCoord.lng);
+              stopsWithAddress.push(stop);
+            });
+            carStopDetail.value = stopsWithAddress;
+          } catch (error) {
+            uni.__log__("error", "at pages/stopRecord/stopRecord.uvue:131", "获取停车数据失败:", error);
+            showAppToast({ title: "数据加载失败", icon: "none" });
+          } finally {
+            uni.hideLoading();
+          }
         });
       };
       vue.onMounted(() => {
@@ -17139,8 +17006,8 @@
               createTime: createTime != null ? createTime : ""
             };
             uni.__log__("log", "at pages/userCenter/userInfo/userInfo.uvue:83", "用户信息:", userInfo.value);
-          } catch (e) {
-            uni.__log__("error", "at pages/userCenter/userInfo/userInfo.uvue:85", "解析用户信息失败:", e);
+          } catch (e2) {
+            uni.__log__("error", "at pages/userCenter/userInfo/userInfo.uvue:85", "解析用户信息失败:", e2);
           }
         }
       });
@@ -17152,7 +17019,7 @@
       const logoutBtn = () => {
         return __awaiter(this, void 0, void 0, function* () {
           const res = yield logout();
-          if (res.code == 0) {
+          if (res.code == 200) {
             uni.removeStorageSync("token");
             clearPushSessionState();
             uni.reLaunch({
@@ -17160,7 +17027,7 @@
             });
           } else {
             showAppToast({
-              title: "退出账户失败"
+              title: res.msg || "退出账户失败"
             });
           }
         });
@@ -17307,7 +17174,7 @@
               newPassword: formData.value.newPassword
             });
             const res = yield changePassWord(submitData);
-            if (res.msg == "success") {
+            if (res.code == 200) {
               uni.hideLoading();
               showAppToast({
                 title: "密码修改成功",
@@ -17347,8 +17214,8 @@
               mobile: mobile != null ? mobile : ""
             };
             uni.__log__("log", "at pages/userCenter/editPassword/editPassword.uvue:127", "用户信息:", userInfo.value);
-          } catch (e) {
-            uni.__log__("error", "at pages/userCenter/editPassword/editPassword.uvue:129", "解析用户信息失败:", e);
+          } catch (e2) {
+            uni.__log__("error", "at pages/userCenter/editPassword/editPassword.uvue:129", "解析用户信息失败:", e2);
           }
         }
       });
@@ -17500,10 +17367,21 @@
               pageSize: pageSize.value
             });
             const res = yield getUserDeviceList(data);
-            const code = res.code;
-            const list = res.data.list;
-            const pageCount = res.data.totalPage;
-            if (code == 0 && list != null) {
+            if (res.code != 200) {
+              showAppToast({
+                title: res.msg || "加载失败",
+                icon: "none"
+              });
+              return Promise.resolve(null);
+            }
+            const pageData = res.data;
+            if (pageData == null) {
+              hasMore.value = false;
+              return Promise.resolve(null);
+            }
+            const list = pageData.list;
+            const pageCount = pageData.totalPage;
+            if (list != null) {
               totalPage.value = pageCount;
               if (currPage.value == 1) {
                 carList.value = list;
@@ -17514,14 +17392,9 @@
               if (hasMore.value) {
                 currPage.value++;
               }
-            } else {
-              showAppToast({
-                title: res.msg || "加载失败",
-                icon: "none"
-              });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/userCenter/carList/carList.uvue:100", "加载车辆列表失败:", error);
+            uni.__log__("error", "at pages/userCenter/carList/carList.uvue:106", "加载车辆列表失败:", error);
             showAppToast({
               title: "加载失败，请重试",
               icon: "none"
@@ -17735,7 +17608,7 @@
           uni.showLoading(new UTSJSONObject({ title: "保存中...", mask: true }));
           try {
             const res = yield editDeviceInfo(payload);
-            if (res.code == 0) {
+            if (res.code == 200) {
               carInfo.value = payload;
               editInfo.value.plateNo = plateNo;
               isEditing.value = false;
@@ -17760,7 +17633,7 @@
           loadingDetail.value = true;
           try {
             const res = yield getDeviceDetail(deviceId.value);
-            if (res.code == 0 && res.data != null) {
+            if (res.code == 200 && res.data != null) {
               carInfo.value = res.data;
               detailLoaded.value = true;
             } else {
@@ -18555,7 +18428,12 @@
           try {
             const data = new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
             const res = yield getDevicePos(data);
-            res.data.forEach((item) => {
+            const positions = res.data;
+            if (res.code != 200 || positions == null) {
+              showAppToast({ title: res.msg || "获取车辆位置失败", icon: "none" });
+              return Promise.resolve(null);
+            }
+            positions.forEach((item) => {
               if (item.getString("imei", "") == imei.value) {
                 const deviceData = item;
                 const latitude = deviceData.getNumber("latitude", 0);
@@ -18599,7 +18477,7 @@
               }
             });
           } catch (err) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:366", "获取初始位置失败:", err);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:371", "获取初始位置失败:", err);
             showAppToast({
               title: "获取车辆位置失败",
               icon: "none"
@@ -18662,7 +18540,7 @@
           const lng = parseFloat(centerValues[1]);
           const radius = parseFloat(parts[1].trim());
           if (!isValidCoordinate2(lat, lng) || !isFinite(radius) || radius <= 0) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:437", "无效的圆形围栏数据:", circleStr);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:442", "无效的圆形围栏数据:", circleStr);
             return null;
           }
           const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
@@ -18672,7 +18550,7 @@
             radius
           };
         } catch (error) {
-          uni.__log__("error", "at pages/geofencing/geofencing.uvue:447", "解析圆形围栏失败:", error, "数据:", circleStr);
+          uni.__log__("error", "at pages/geofencing/geofencing.uvue:452", "解析圆形围栏失败:", error, "数据:", circleStr);
           return null;
         }
       }
@@ -18832,15 +18710,15 @@
         return __awaiter(this, void 0, void 0, function* () {
           try {
             const res = yield getGeofenceList();
-            if (res.code == 0) {
+            if (res.code == 200 && res.data != null) {
               fenceList.value = res.data;
             } else {
-              showAppToast({ title: "获取围栏列表失败", icon: "none" });
+              showAppToast({ title: res.msg || "获取围栏列表失败", icon: "none" });
               fenceList.value = [];
             }
             renderFencesOnMap();
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:643", "加载围栏列表失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:648", "加载围栏列表失败:", error);
             showAppToast({ title: "获取围栏列表失败", icon: "none" });
             fenceList.value = [];
             renderFencesOnMap();
@@ -18990,7 +18868,7 @@
         return __awaiter(this, void 0, void 0, function* () {
           try {
             const result = yield deleteGeofence(id);
-            if (result.code == 0) {
+            if (result.code == 200) {
               showAppToast({ title: "删除成功" });
               selectedFence.value = null;
               points.value = [];
@@ -19003,10 +18881,10 @@
               (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.$callMethod("close");
               yield loadGeofenceList();
             } else {
-              showAppToast({ title: "删除失败", icon: "none" });
+              showAppToast({ title: result.msg || "删除失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:851", "删除围栏失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:856", "删除围栏失败:", error);
             showAppToast({ title: "删除失败", icon: "none" });
           }
         });
@@ -19076,7 +18954,7 @@
               result = yield addGeofence(fenceData);
             }
             uni.hideLoading();
-            if (result.code == 0) {
+            if (result.code == 200) {
               showAppToast({ title: editingFence.value ? "更新成功" : "保存成功" });
               (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.$callMethod("close");
               const tempFence = editingFence.value;
@@ -19095,7 +18973,7 @@
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:962", "保存围栏失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:967", "保存围栏失败:", error);
             showAppToast({ title: "保存失败，请重试", icon: "none" });
           }
         });
@@ -19128,8 +19006,9 @@
               pageSize: page.pageSize,
               geoId: fenceId
             }));
-            if (res.code == 0) {
-              const dataList = res.data.list || [];
+            if (res.code == 200) {
+              const pageData = res.data;
+              const dataList = pageData != null ? pageData.list : [];
               if (page.pageNum == 1) {
                 boundDevices.value = dataList;
                 deviceList.value = dataList;
@@ -19160,8 +19039,9 @@
               pageNum: page.pageNum,
               pageSize: page.pageSize
             }));
-            if (res.code == 0) {
-              const dataList = res.data.list || [];
+            if (res.code == 200) {
+              const pageData = res.data;
+              const dataList = pageData != null ? pageData.list : [];
               if (page.pageNum == 1) {
                 deviceList.value = dataList;
               } else {
@@ -19195,7 +19075,7 @@
       };
       const switchTab = (tab) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1063", "switchTab", tab, currentFenceId.value);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1070", "switchTab", tab, currentFenceId.value);
           if (activeTab.value === tab)
             return Promise.resolve(null);
           activeTab.value = tab;
@@ -19203,7 +19083,7 @@
           deviceList.value = [];
           initPagination(tab);
           if (tab === "bind") {
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1075", "switchTab,bind:", currentFenceId.value);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1082", "switchTab,bind:", currentFenceId.value);
             yield loadBoundDevices(currentFenceId.value);
           } else {
             yield loadUnboundDevices();
@@ -19221,21 +19101,21 @@
       };
       const toggleDeviceBinding = (deviceImei, bound) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1095", "toggleDeviceBinding", deviceImei, bound);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1102", "toggleDeviceBinding", deviceImei, bound);
           loading.value = true;
           try {
             const params = new UTSJSONObject({
               geofenceId: currentFenceId.value,
               imeis: [deviceImei]
             });
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1102", "toggleDeviceBindingparams", params);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1109", "toggleDeviceBindingparams", params);
             let result = null;
             if (bound) {
               result = yield bindDevices(params);
             } else {
               result = yield unbindDevices(params);
             }
-            if (result.code == 0) {
+            if (result.code == 200) {
               showAppToast({ title: bound ? "绑定成功" : "解绑成功" });
               initPagination(activeTab.value);
               scrollTop.value = 0;
@@ -19248,7 +19128,7 @@
               showAppToast({ title: result.msg || "操作失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1125", "设备绑定操作失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1132", "设备绑定操作失败:", error);
             showAppToast({ title: "操作失败", icon: "none" });
           } finally {
             loading.value = false;
@@ -19308,10 +19188,10 @@
         var _a;
         (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.$callMethod("close");
         const fence = selectedFence.value;
-        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1196", "删除电子围栏", fence);
+        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1203", "删除电子围栏", fence);
         if (fence != null) {
           const fenceId = fence.getString("id", "");
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1200", "删除电子围栏ID", fenceId);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1207", "删除电子围栏ID", fenceId);
           if (fenceId !== "") {
             deleteFence(fenceId);
           } else {
@@ -19329,20 +19209,20 @@
         }
       }
       function calculateDistance(lat1, lng1, lat2, lng2) {
-        const R = 6371e3;
+        const R2 = 6371e3;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLng = (lng2 - lng1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+        const a2 = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c2 = 2 * Math.atan2(Math.sqrt(a2), Math.sqrt(1 - a2));
+        return R2 * c2;
       }
       function addNewPoint(lat, lng) {
         const point = { latitude: lat, longitude: lng };
         points.value.push(point);
         updateMapDisplay();
       }
-      const handleMapTap = (e) => {
-        const detail = e.detail;
+      const handleMapTap = (e2) => {
+        const detail = e2.detail;
         if (!isDrawing.value || detail == null || detail.latitude == null || detail.longitude == null)
           return null;
         const latitude = detail.latitude;
@@ -19920,10 +19800,10 @@
       const handleCameraInitDone = () => {
         uni.__log__("log", "at pages/scancode/scancode.uvue:62", "扫码摄像头初始化完成");
       };
-      const handleScan = (e) => {
+      const handleScan = (e2) => {
         if (hasFinished.value || !scanFunctionIsUseable.value)
           return null;
-        const scanResult = e.detail.result;
+        const scanResult = e2.detail.result;
         if (scanResult == null)
           return null;
         const result = scanResult;
@@ -19949,11 +19829,11 @@
         }
         uni.__log__("warn", "at pages/scancode/scancode.uvue:91", "摄像头停止但扫码页仍保持打开，等待用户返回或重试");
       };
-      const handleCameraError = (e) => {
+      const handleCameraError = (e2) => {
         if (hasFinished.value)
           return null;
         hasFinished.value = true;
-        uni.__log__("error", "at pages/scancode/scancode.uvue:97", "摄像头初始化失败:", e.detail);
+        uni.__log__("error", "at pages/scancode/scancode.uvue:97", "摄像头初始化失败:", e2.detail);
         showAppToast({
           title: "摄像头初始化失败，请检查相机权限",
           icon: "none",
@@ -20023,10 +19903,21 @@
               pageSize: pageSize.value
             });
             const res = yield getUserDeviceList(data);
-            const code = res.code;
-            const list = res.data.list;
-            const pageCount = res.data.totalPage;
-            if (code == 0 && list != null) {
+            if (res.code != 200) {
+              showAppToast({
+                title: res.msg || "加载失败",
+                icon: "none"
+              });
+              return Promise.resolve(null);
+            }
+            const pageData = res.data;
+            if (pageData == null) {
+              hasMore.value = false;
+              return Promise.resolve(null);
+            }
+            const list = pageData.list;
+            const pageCount = pageData.totalPage;
+            if (list != null) {
               totalPage.value = pageCount;
               if (currPage.value == 1) {
                 deviceList.value = list;
@@ -20037,14 +19928,9 @@
               if (hasMore.value) {
                 currPage.value++;
               }
-            } else {
-              showAppToast({
-                title: res.msg || "加载失败",
-                icon: "none"
-              });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:125", "加载车辆列表失败:", error);
+            uni.__log__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:131", "加载车辆列表失败:", error);
             showAppToast({
               title: "加载失败，请重试",
               icon: "none"
@@ -20068,7 +19954,7 @@
         if (simMerchant.toLowerCase() == "zddx") {
           iccid = iccid.substring(0, iccid.length - 1);
         }
-        uni.__log__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:156", iccid);
+        uni.__log__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:162", iccid);
         needRefresh.value = true;
         needRefresh.value = false;
         showAppToast({
@@ -20190,10 +20076,10 @@
       });
       const sortByCmdNameLengthAndAlphabet = (data) => {
         const sortedData = data.slice();
-        sortedData.sort((a, b) => {
+        sortedData.sort((a2, b2) => {
           var _a, _b;
-          const aName = (_a = a["cmdName"]) !== null && _a !== void 0 ? _a : "";
-          const bName = (_b = b["cmdName"]) !== null && _b !== void 0 ? _b : "";
+          const aName = (_a = a2["cmdName"]) !== null && _a !== void 0 ? _a : "";
+          const bName = (_b = b2["cmdName"]) !== null && _b !== void 0 ? _b : "";
           if (aName.length != bName.length)
             return aName.length - bName.length;
           if (aName == bName)
@@ -20289,7 +20175,7 @@
           try {
             loading.value = true;
             const response = yield getCmdAction();
-            if (response.code == 0) {
+            if (response.code == 200 && response.data != null) {
               commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
             } else {
               showAppToast({ title: response.msg != "" ? response.msg : "加载指令类型失败", icon: "none" });
@@ -20324,7 +20210,7 @@
           try {
             loading.value = true;
             const response = yield getCmdByMid(new UTSJSONObject({ imei: imei.value, cmdmId: typeId }));
-            if (response.code == 0) {
+            if (response.code == 200 && response.data != null) {
               commands.value = response.data;
             } else {
               showAppToast({ title: response.msg != "" ? response.msg : "加载指令列表失败", icon: "none" });
@@ -20385,7 +20271,7 @@
               cmdData: encodeURIComponent(cmdData),
               predictCmdId: command["predictCmdId"]
             }));
-            if (response.code == 0) {
+            if (response.code == 200) {
               showAppToast({ title: response.msg != "" ? response.msg : "指令发送成功", icon: "success" });
             } else {
               showAppToast({ title: response.msg != "" ? response.msg : "指令发送失败", icon: "none", duration: 3e3 });
@@ -20610,19 +20496,19 @@
           });
         }
       });
-      const handleLoad = (e = null) => {
-        uni.__log__("log", "at pages/webview/webview.uvue:81", "网页加载成功", e);
+      const handleLoad = (e2 = null) => {
+        uni.__log__("log", "at pages/webview/webview.uvue:81", "网页加载成功", e2);
         uni.hideLoading();
       };
-      const handleError = (e = null) => {
-        uni.__log__("error", "at pages/webview/webview.uvue:87", "网页加载失败", e);
+      const handleError = (e2 = null) => {
+        uni.__log__("error", "at pages/webview/webview.uvue:87", "网页加载失败", e2);
         showAppToast({
           title: "页面加载失败",
           icon: "none"
         });
       };
-      const handleMessage = (e) => {
-        const detail = e.getJSON("detail");
+      const handleMessage = (e2) => {
+        const detail = e2.getJSON("detail");
         uni.__log__("log", "at pages/webview/webview.uvue:97", "接收网页消息:", detail);
       };
       const goBack = () => {
@@ -20846,8 +20732,8 @@
         return originalDeviceList.value.length;
       });
       const onlineCount = vue.computed(() => {
-        return originalDeviceList.value.filter((d) => {
-          return d["connectionStatus"] == "online";
+        return originalDeviceList.value.filter((d2) => {
+          return d2["connectionStatus"] == "online";
         }).length;
       });
       const offlineCount = vue.computed(() => {
@@ -20908,7 +20794,7 @@
             if (from) {
               const params = new UTSJSONObject({ pageSize: 1e3 });
               const res = yield getUserDeviceList(params);
-              const list = res.code == 0 && res.data != null ? res.data.list : null;
+              const list = res.code == 200 && res.data != null ? res.data.list : null;
               if (list == null || !Array.isArray(list)) {
                 uni.__log__("warn", "at pages/deviceList/deviceList.uvue:147", "获取设备列表返回异常:", res);
                 originalDeviceList.value = [];
@@ -20932,7 +20818,7 @@
       const unbindDevice = (imei) => {
         return __awaiter(this, void 0, void 0, function* () {
           const res = yield delDevice(imei);
-          if (res.code == 0) {
+          if (res.code == 200) {
             showAppToast({
               title: "解绑成功",
               icon: "success"
@@ -20940,7 +20826,7 @@
             uni.setStorageSync("needRefreshHome", true);
           } else {
             showAppToast({
-              title: "解绑失败",
+              title: res.msg || "解绑失败",
               icon: "error"
             });
           }
@@ -21083,20 +20969,3230 @@
     onLaunch: function() {
       uni.__log__("log", "at App.uvue:76", "App onLaunch");
       initPush();
+      clearPushBadge();
     },
     onShow: function() {
-      uni.__log__("log", "at App.uvue:86", "App Show");
+      uni.__log__("log", "at App.uvue:87", "App Show");
+      clearPushBadge();
       refreshPushClientId();
     },
     onHide: function() {
-      uni.__log__("log", "at App.uvue:90", "App Hide");
+      uni.__log__("log", "at App.uvue:92", "App Hide");
+      clearPushBadge();
     },
     onExit: function() {
-      uni.__log__("log", "at App.uvue:111", "App Exit");
+      uni.__log__("log", "at App.uvue:114", "App Exit");
     }
   });
   const _style_0 = { "uni-row": { "": { "flexDirection": "row" } }, "uni-column": { "": { "flexDirection": "column" } } };
   const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+  const easycom = new UTSJSONObject({
+    autoscan: true,
+    custom: new UTSJSONObject({
+      "^uv-(.*)": "@climblee/uv-ui/components/uv-$1/uv-$1.vue"
+    })
+  });
+  const pages = [
+    new UTSJSONObject({
+      path: "pages/index/index",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "车联网"
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/message/message",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "消息"
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/userCenter/userCenter",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "我的"
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/login/login",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "登陆"
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/carInfoDetail/carInfoDetail",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "车辆详情"
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/addCar/addCar",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "添加车辆"
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/playBack/playBack",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "轨迹回放"
+      })
+    }),
+    new UTSJSONObject({
+      path: "uni_modules/lime-action-sheet/pages/index"
+    }),
+    new UTSJSONObject({
+      path: "pages/vehicleTracking/vehicleTracking",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "车辆跟踪"
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/mileageRecord/mileageRecord",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/stopRecord/stopRecord",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/userCenter/userInfo/userInfo",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/userCenter/editPassword/editPassword",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/userCenter/carList/carList",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/userCenter/carDetail/carDetail",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/geofencing/geofencing",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/scancode/scancode",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/userCenter/payDeviceList/payDeviceList",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/cmd/cmd",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/webview/webview",
+      style: new UTSJSONObject({
+        navigationBarTitleText: ""
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/deviceList/deviceList",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "设备列表"
+      })
+    })
+  ];
+  const tabBar = new UTSJSONObject({
+    color: "#2c2c2c",
+    selectedColor: "#d81e06",
+    borderStyle: "black",
+    backgroundColor: "#ffffff",
+    list: [
+      new UTSJSONObject({
+        pagePath: "pages/index/index",
+        iconPath: "/static/tabBar/home.png",
+        selectedIconPath: "/static/tabBar/home1.png",
+        text: "首页"
+      }),
+      new UTSJSONObject({
+        pagePath: "pages/message/message",
+        iconPath: "/static/tabBar/message.png",
+        selectedIconPath: "/static/tabBar/message1.png",
+        text: "消息"
+      }),
+      new UTSJSONObject({
+        pagePath: "pages/userCenter/userCenter",
+        iconPath: "/static/tabBar/userCenter.png",
+        selectedIconPath: "/static/tabBar/userCenter1.png",
+        text: "我的"
+      })
+    ]
+  });
+  const globalStyle = new UTSJSONObject({
+    navigationStyle: "custom",
+    navigationBarTextStyle: "black",
+    navigationBarTitleText: "车联网",
+    navigationBarBackgroundColor: "#F8F8F8",
+    backgroundColor: "#F8F8F8"
+  });
+  const uniIdRouter = new UTSJSONObject({});
+  const e = new UTSJSONObject({
+    easycom,
+    pages,
+    tabBar,
+    globalStyle,
+    uniIdRouter
+  });
+  var define_process_env_UNI_SECURE_NETWORK_CONFIG_default = [];
+  function t(e2) {
+    return e2 && e2.__esModule && Object.prototype.hasOwnProperty.call(e2, "default") ? e2.default : e2;
+  }
+  function n(e2, t2, n2) {
+    return e2(n2 = { path: t2, exports: {}, require: function(e3, t3) {
+      return function() {
+        throw new Error("Dynamic requires are not currently supported by @rollup/plugin-commonjs");
+      }(null == t3 && n2.path);
+    } }, n2.exports), n2.exports;
+  }
+  var s = n(function(e2, t2) {
+    var n2;
+    e2.exports = (n2 = n2 || function(e3, t3) {
+      var n3 = Object.create || /* @__PURE__ */ function() {
+        function e4() {
+        }
+        return function(t4) {
+          var n4;
+          return e4.prototype = t4, n4 = new e4(), e4.prototype = null, n4;
+        };
+      }(), s2 = {}, r2 = s2.lib = {}, i2 = r2.Base = { extend: function(e4) {
+        var t4 = n3(this);
+        return e4 && t4.mixIn(e4), t4.hasOwnProperty("init") && this.init !== t4.init || (t4.init = function() {
+          t4.$super.init.apply(this, arguments);
+        }), t4.init.prototype = t4, t4.$super = this, t4;
+      }, create: function() {
+        var e4 = this.extend();
+        return e4.init.apply(e4, arguments), e4;
+      }, init: function() {
+      }, mixIn: function(e4) {
+        for (var t4 in e4)
+          e4.hasOwnProperty(t4) && (this[t4] = e4[t4]);
+        e4.hasOwnProperty("toString") && (this.toString = e4.toString);
+      }, clone: function() {
+        return this.init.prototype.extend(this);
+      } }, o2 = r2.WordArray = i2.extend({ init: function(e4, n4) {
+        e4 = this.words = e4 || [], this.sigBytes = n4 != t3 ? n4 : 4 * e4.length;
+      }, toString: function(e4) {
+        return (e4 || c2).stringify(this);
+      }, concat: function(e4) {
+        var t4 = this.words, n4 = e4.words, s3 = this.sigBytes, r3 = e4.sigBytes;
+        if (this.clamp(), s3 % 4)
+          for (var i3 = 0; i3 < r3; i3++) {
+            var o3 = n4[i3 >>> 2] >>> 24 - i3 % 4 * 8 & 255;
+            t4[s3 + i3 >>> 2] |= o3 << 24 - (s3 + i3) % 4 * 8;
+          }
+        else
+          for (i3 = 0; i3 < r3; i3 += 4)
+            t4[s3 + i3 >>> 2] = n4[i3 >>> 2];
+        return this.sigBytes += r3, this;
+      }, clamp: function() {
+        var t4 = this.words, n4 = this.sigBytes;
+        t4[n4 >>> 2] &= 4294967295 << 32 - n4 % 4 * 8, t4.length = e3.ceil(n4 / 4);
+      }, clone: function() {
+        var e4 = i2.clone.call(this);
+        return e4.words = this.words.slice(0), e4;
+      }, random: function(t4) {
+        for (var n4, s3 = [], r3 = function(t5) {
+          t5 = t5;
+          var n5 = 987654321, s4 = 4294967295;
+          return function() {
+            var r4 = ((n5 = 36969 * (65535 & n5) + (n5 >> 16) & s4) << 16) + (t5 = 18e3 * (65535 & t5) + (t5 >> 16) & s4) & s4;
+            return r4 /= 4294967296, (r4 += 0.5) * (e3.random() > 0.5 ? 1 : -1);
+          };
+        }, i3 = 0; i3 < t4; i3 += 4) {
+          var a3 = r3(4294967296 * (n4 || e3.random()));
+          n4 = 987654071 * a3(), s3.push(4294967296 * a3() | 0);
+        }
+        return new o2.init(s3, t4);
+      } }), a2 = s2.enc = {}, c2 = a2.Hex = { stringify: function(e4) {
+        for (var t4 = e4.words, n4 = e4.sigBytes, s3 = [], r3 = 0; r3 < n4; r3++) {
+          var i3 = t4[r3 >>> 2] >>> 24 - r3 % 4 * 8 & 255;
+          s3.push((i3 >>> 4).toString(16)), s3.push((15 & i3).toString(16));
+        }
+        return s3.join("");
+      }, parse: function(e4) {
+        for (var t4 = e4.length, n4 = [], s3 = 0; s3 < t4; s3 += 2)
+          n4[s3 >>> 3] |= parseInt(e4.substr(s3, 2), 16) << 24 - s3 % 8 * 4;
+        return new o2.init(n4, t4 / 2);
+      } }, u2 = a2.Latin1 = { stringify: function(e4) {
+        for (var t4 = e4.words, n4 = e4.sigBytes, s3 = [], r3 = 0; r3 < n4; r3++) {
+          var i3 = t4[r3 >>> 2] >>> 24 - r3 % 4 * 8 & 255;
+          s3.push(String.fromCharCode(i3));
+        }
+        return s3.join("");
+      }, parse: function(e4) {
+        for (var t4 = e4.length, n4 = [], s3 = 0; s3 < t4; s3++)
+          n4[s3 >>> 2] |= (255 & e4.charCodeAt(s3)) << 24 - s3 % 4 * 8;
+        return new o2.init(n4, t4);
+      } }, h2 = a2.Utf8 = { stringify: function(e4) {
+        try {
+          return decodeURIComponent(escape(u2.stringify(e4)));
+        } catch (e5) {
+          throw new Error("Malformed UTF-8 data");
+        }
+      }, parse: function(e4) {
+        return u2.parse(unescape(encodeURIComponent(e4)));
+      } }, l2 = r2.BufferedBlockAlgorithm = i2.extend({ reset: function() {
+        this._data = new o2.init(), this._nDataBytes = 0;
+      }, _append: function(e4) {
+        "string" == typeof e4 && (e4 = h2.parse(e4)), this._data.concat(e4), this._nDataBytes += e4.sigBytes;
+      }, _process: function(t4) {
+        var n4 = this._data, s3 = n4.words, r3 = n4.sigBytes, i3 = this.blockSize, a3 = r3 / (4 * i3), c3 = (a3 = t4 ? e3.ceil(a3) : e3.max((0 | a3) - this._minBufferSize, 0)) * i3, u3 = e3.min(4 * c3, r3);
+        if (c3) {
+          for (var h3 = 0; h3 < c3; h3 += i3)
+            this._doProcessBlock(s3, h3);
+          var l3 = s3.splice(0, c3);
+          n4.sigBytes -= u3;
+        }
+        return new o2.init(l3, u3);
+      }, clone: function() {
+        var e4 = i2.clone.call(this);
+        return e4._data = this._data.clone(), e4;
+      }, _minBufferSize: 0 });
+      r2.Hasher = l2.extend({ cfg: i2.extend(), init: function(e4) {
+        this.cfg = this.cfg.extend(e4), this.reset();
+      }, reset: function() {
+        l2.reset.call(this), this._doReset();
+      }, update: function(e4) {
+        return this._append(e4), this._process(), this;
+      }, finalize: function(e4) {
+        return e4 && this._append(e4), this._doFinalize();
+      }, blockSize: 16, _createHelper: function(e4) {
+        return function(t4, n4) {
+          return new e4.init(n4).finalize(t4);
+        };
+      }, _createHmacHelper: function(e4) {
+        return function(t4, n4) {
+          return new d2.HMAC.init(e4, n4).finalize(t4);
+        };
+      } });
+      var d2 = s2.algo = {};
+      return s2;
+    }(Math), n2);
+  }), r = s, i = (n(function(e2, t2) {
+    var n2;
+    e2.exports = (n2 = r, function(e3) {
+      var t3 = n2, s2 = t3.lib, r2 = s2.WordArray, i2 = s2.Hasher, o2 = t3.algo, a2 = [];
+      !function() {
+        for (var t4 = 0; t4 < 64; t4++)
+          a2[t4] = 4294967296 * e3.abs(e3.sin(t4 + 1)) | 0;
+      }();
+      var c2 = o2.MD5 = i2.extend({ _doReset: function() {
+        this._hash = new r2.init([1732584193, 4023233417, 2562383102, 271733878]);
+      }, _doProcessBlock: function(e4, t4) {
+        for (var n3 = 0; n3 < 16; n3++) {
+          var s3 = t4 + n3, r3 = e4[s3];
+          e4[s3] = 16711935 & (r3 << 8 | r3 >>> 24) | 4278255360 & (r3 << 24 | r3 >>> 8);
+        }
+        var i3 = this._hash.words, o3 = e4[t4 + 0], c3 = e4[t4 + 1], p2 = e4[t4 + 2], f2 = e4[t4 + 3], g2 = e4[t4 + 4], m2 = e4[t4 + 5], y2 = e4[t4 + 6], _2 = e4[t4 + 7], w2 = e4[t4 + 8], v2 = e4[t4 + 9], I2 = e4[t4 + 10], S2 = e4[t4 + 11], b2 = e4[t4 + 12], k2 = e4[t4 + 13], A2 = e4[t4 + 14], T2 = e4[t4 + 15], C2 = i3[0], P2 = i3[1], O2 = i3[2], E2 = i3[3];
+        C2 = u2(C2, P2, O2, E2, o3, 7, a2[0]), E2 = u2(E2, C2, P2, O2, c3, 12, a2[1]), O2 = u2(O2, E2, C2, P2, p2, 17, a2[2]), P2 = u2(P2, O2, E2, C2, f2, 22, a2[3]), C2 = u2(C2, P2, O2, E2, g2, 7, a2[4]), E2 = u2(E2, C2, P2, O2, m2, 12, a2[5]), O2 = u2(O2, E2, C2, P2, y2, 17, a2[6]), P2 = u2(P2, O2, E2, C2, _2, 22, a2[7]), C2 = u2(C2, P2, O2, E2, w2, 7, a2[8]), E2 = u2(E2, C2, P2, O2, v2, 12, a2[9]), O2 = u2(O2, E2, C2, P2, I2, 17, a2[10]), P2 = u2(P2, O2, E2, C2, S2, 22, a2[11]), C2 = u2(C2, P2, O2, E2, b2, 7, a2[12]), E2 = u2(E2, C2, P2, O2, k2, 12, a2[13]), O2 = u2(O2, E2, C2, P2, A2, 17, a2[14]), C2 = h2(C2, P2 = u2(P2, O2, E2, C2, T2, 22, a2[15]), O2, E2, c3, 5, a2[16]), E2 = h2(E2, C2, P2, O2, y2, 9, a2[17]), O2 = h2(O2, E2, C2, P2, S2, 14, a2[18]), P2 = h2(P2, O2, E2, C2, o3, 20, a2[19]), C2 = h2(C2, P2, O2, E2, m2, 5, a2[20]), E2 = h2(E2, C2, P2, O2, I2, 9, a2[21]), O2 = h2(O2, E2, C2, P2, T2, 14, a2[22]), P2 = h2(P2, O2, E2, C2, g2, 20, a2[23]), C2 = h2(C2, P2, O2, E2, v2, 5, a2[24]), E2 = h2(E2, C2, P2, O2, A2, 9, a2[25]), O2 = h2(O2, E2, C2, P2, f2, 14, a2[26]), P2 = h2(P2, O2, E2, C2, w2, 20, a2[27]), C2 = h2(C2, P2, O2, E2, k2, 5, a2[28]), E2 = h2(E2, C2, P2, O2, p2, 9, a2[29]), O2 = h2(O2, E2, C2, P2, _2, 14, a2[30]), C2 = l2(C2, P2 = h2(P2, O2, E2, C2, b2, 20, a2[31]), O2, E2, m2, 4, a2[32]), E2 = l2(E2, C2, P2, O2, w2, 11, a2[33]), O2 = l2(O2, E2, C2, P2, S2, 16, a2[34]), P2 = l2(P2, O2, E2, C2, A2, 23, a2[35]), C2 = l2(C2, P2, O2, E2, c3, 4, a2[36]), E2 = l2(E2, C2, P2, O2, g2, 11, a2[37]), O2 = l2(O2, E2, C2, P2, _2, 16, a2[38]), P2 = l2(P2, O2, E2, C2, I2, 23, a2[39]), C2 = l2(C2, P2, O2, E2, k2, 4, a2[40]), E2 = l2(E2, C2, P2, O2, o3, 11, a2[41]), O2 = l2(O2, E2, C2, P2, f2, 16, a2[42]), P2 = l2(P2, O2, E2, C2, y2, 23, a2[43]), C2 = l2(C2, P2, O2, E2, v2, 4, a2[44]), E2 = l2(E2, C2, P2, O2, b2, 11, a2[45]), O2 = l2(O2, E2, C2, P2, T2, 16, a2[46]), C2 = d2(C2, P2 = l2(P2, O2, E2, C2, p2, 23, a2[47]), O2, E2, o3, 6, a2[48]), E2 = d2(E2, C2, P2, O2, _2, 10, a2[49]), O2 = d2(O2, E2, C2, P2, A2, 15, a2[50]), P2 = d2(P2, O2, E2, C2, m2, 21, a2[51]), C2 = d2(C2, P2, O2, E2, b2, 6, a2[52]), E2 = d2(E2, C2, P2, O2, f2, 10, a2[53]), O2 = d2(O2, E2, C2, P2, I2, 15, a2[54]), P2 = d2(P2, O2, E2, C2, c3, 21, a2[55]), C2 = d2(C2, P2, O2, E2, w2, 6, a2[56]), E2 = d2(E2, C2, P2, O2, T2, 10, a2[57]), O2 = d2(O2, E2, C2, P2, y2, 15, a2[58]), P2 = d2(P2, O2, E2, C2, k2, 21, a2[59]), C2 = d2(C2, P2, O2, E2, g2, 6, a2[60]), E2 = d2(E2, C2, P2, O2, S2, 10, a2[61]), O2 = d2(O2, E2, C2, P2, p2, 15, a2[62]), P2 = d2(P2, O2, E2, C2, v2, 21, a2[63]), i3[0] = i3[0] + C2 | 0, i3[1] = i3[1] + P2 | 0, i3[2] = i3[2] + O2 | 0, i3[3] = i3[3] + E2 | 0;
+      }, _doFinalize: function() {
+        var t4 = this._data, n3 = t4.words, s3 = 8 * this._nDataBytes, r3 = 8 * t4.sigBytes;
+        n3[r3 >>> 5] |= 128 << 24 - r3 % 32;
+        var i3 = e3.floor(s3 / 4294967296), o3 = s3;
+        n3[15 + (r3 + 64 >>> 9 << 4)] = 16711935 & (i3 << 8 | i3 >>> 24) | 4278255360 & (i3 << 24 | i3 >>> 8), n3[14 + (r3 + 64 >>> 9 << 4)] = 16711935 & (o3 << 8 | o3 >>> 24) | 4278255360 & (o3 << 24 | o3 >>> 8), t4.sigBytes = 4 * (n3.length + 1), this._process();
+        for (var a3 = this._hash, c3 = a3.words, u3 = 0; u3 < 4; u3++) {
+          var h3 = c3[u3];
+          c3[u3] = 16711935 & (h3 << 8 | h3 >>> 24) | 4278255360 & (h3 << 24 | h3 >>> 8);
+        }
+        return a3;
+      }, clone: function() {
+        var e4 = i2.clone.call(this);
+        return e4._hash = this._hash.clone(), e4;
+      } });
+      function u2(e4, t4, n3, s3, r3, i3, o3) {
+        var a3 = e4 + (t4 & n3 | ~t4 & s3) + r3 + o3;
+        return (a3 << i3 | a3 >>> 32 - i3) + t4;
+      }
+      function h2(e4, t4, n3, s3, r3, i3, o3) {
+        var a3 = e4 + (t4 & s3 | n3 & ~s3) + r3 + o3;
+        return (a3 << i3 | a3 >>> 32 - i3) + t4;
+      }
+      function l2(e4, t4, n3, s3, r3, i3, o3) {
+        var a3 = e4 + (t4 ^ n3 ^ s3) + r3 + o3;
+        return (a3 << i3 | a3 >>> 32 - i3) + t4;
+      }
+      function d2(e4, t4, n3, s3, r3, i3, o3) {
+        var a3 = e4 + (n3 ^ (t4 | ~s3)) + r3 + o3;
+        return (a3 << i3 | a3 >>> 32 - i3) + t4;
+      }
+      t3.MD5 = i2._createHelper(c2), t3.HmacMD5 = i2._createHmacHelper(c2);
+    }(Math), n2.MD5);
+  }), n(function(e2, t2) {
+    var n2;
+    e2.exports = (n2 = r, void function() {
+      var e3 = n2, t3 = e3.lib.Base, s2 = e3.enc.Utf8;
+      e3.algo.HMAC = t3.extend({ init: function(e4, t4) {
+        e4 = this._hasher = new e4.init(), "string" == typeof t4 && (t4 = s2.parse(t4));
+        var n3 = e4.blockSize, r2 = 4 * n3;
+        t4.sigBytes > r2 && (t4 = e4.finalize(t4)), t4.clamp();
+        for (var i2 = this._oKey = t4.clone(), o2 = this._iKey = t4.clone(), a2 = i2.words, c2 = o2.words, u2 = 0; u2 < n3; u2++)
+          a2[u2] ^= 1549556828, c2[u2] ^= 909522486;
+        i2.sigBytes = o2.sigBytes = r2, this.reset();
+      }, reset: function() {
+        var e4 = this._hasher;
+        e4.reset(), e4.update(this._iKey);
+      }, update: function(e4) {
+        return this._hasher.update(e4), this;
+      }, finalize: function(e4) {
+        var t4 = this._hasher, n3 = t4.finalize(e4);
+        return t4.reset(), t4.finalize(this._oKey.clone().concat(n3));
+      } });
+    }());
+  }), n(function(e2, t2) {
+    e2.exports = r.HmacMD5;
+  })), o = n(function(e2, t2) {
+    e2.exports = r.enc.Utf8;
+  }), a = n(function(e2, t2) {
+    var n2;
+    e2.exports = (n2 = r, function() {
+      var e3 = n2, t3 = e3.lib.WordArray;
+      function s2(e4, n3, s3) {
+        for (var r2 = [], i2 = 0, o2 = 0; o2 < n3; o2++)
+          if (o2 % 4) {
+            var a2 = s3[e4.charCodeAt(o2 - 1)] << o2 % 4 * 2, c2 = s3[e4.charCodeAt(o2)] >>> 6 - o2 % 4 * 2;
+            r2[i2 >>> 2] |= (a2 | c2) << 24 - i2 % 4 * 8, i2++;
+          }
+        return t3.create(r2, i2);
+      }
+      e3.enc.Base64 = { stringify: function(e4) {
+        var t4 = e4.words, n3 = e4.sigBytes, s3 = this._map;
+        e4.clamp();
+        for (var r2 = [], i2 = 0; i2 < n3; i2 += 3)
+          for (var o2 = (t4[i2 >>> 2] >>> 24 - i2 % 4 * 8 & 255) << 16 | (t4[i2 + 1 >>> 2] >>> 24 - (i2 + 1) % 4 * 8 & 255) << 8 | t4[i2 + 2 >>> 2] >>> 24 - (i2 + 2) % 4 * 8 & 255, a2 = 0; a2 < 4 && i2 + 0.75 * a2 < n3; a2++)
+            r2.push(s3.charAt(o2 >>> 6 * (3 - a2) & 63));
+        var c2 = s3.charAt(64);
+        if (c2)
+          for (; r2.length % 4; )
+            r2.push(c2);
+        return r2.join("");
+      }, parse: function(e4) {
+        var t4 = e4.length, n3 = this._map, r2 = this._reverseMap;
+        if (!r2) {
+          r2 = this._reverseMap = [];
+          for (var i2 = 0; i2 < n3.length; i2++)
+            r2[n3.charCodeAt(i2)] = i2;
+        }
+        var o2 = n3.charAt(64);
+        if (o2) {
+          var a2 = e4.indexOf(o2);
+          -1 !== a2 && (t4 = a2);
+        }
+        return s2(e4, t4, r2);
+      }, _map: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=" };
+    }(), n2.enc.Base64);
+  });
+  const c = "FUNCTION", u = "OBJECT", h = "CLIENT_DB", l = "pending", d = "fulfilled", p = "rejected";
+  function f(e2) {
+    return Object.prototype.toString.call(e2).slice(8, -1).toLowerCase();
+  }
+  function g(e2) {
+    return "object" === f(e2);
+  }
+  function m(e2) {
+    return "function" == typeof e2;
+  }
+  function y(e2) {
+    return function() {
+      try {
+        return e2.apply(e2, arguments);
+      } catch (e3) {
+        console.error(e3);
+      }
+    };
+  }
+  const _ = "REJECTED", w = "NOT_PENDING";
+  class v {
+    constructor({ createPromise: e2, retryRule: t2 = _ } = {}) {
+      this.createPromise = e2, this.status = null, this.promise = null, this.retryRule = t2;
+    }
+    get needRetry() {
+      if (!this.status)
+        return true;
+      switch (this.retryRule) {
+        case _:
+          return this.status === p;
+        case w:
+          return this.status !== l;
+      }
+    }
+    exec() {
+      return this.needRetry ? (this.status = l, this.promise = this.createPromise().then((e2) => (this.status = d, Promise.resolve(e2)), (e2) => (this.status = p, Promise.reject(e2))), this.promise) : this.promise;
+    }
+  }
+  function I(e2) {
+    return e2 && "string" == typeof e2 ? JSON.parse(e2) : e2;
+  }
+  const S = false, b = "app", k = I(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), A = b;
+  I("");
+  const C = I('[{"provider":"aliyun","spaceName":"zdiot-car","spaceId":"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff","clientSecret":"s9pFKgenncFnOUhRGOJpcw==","endpoint":"https://api.next.bspapp.com","failoverEndpoint":""}]') || [];
+  let O = "";
+  try {
+    O = "__UNI__662B0B4";
+  } catch (e2) {
+  }
+  let E, x = {};
+  function L(e2, t2 = {}) {
+    var n2, s2;
+    return n2 = x, s2 = e2, Object.prototype.hasOwnProperty.call(n2, s2) || (x[e2] = t2), x[e2];
+  }
+  function R() {
+    return E || (E = function() {
+      if ("undefined" != typeof globalThis)
+        return globalThis;
+      if ("undefined" != typeof self)
+        return self;
+      if ("undefined" != typeof window)
+        return window;
+      function e2() {
+        return this;
+      }
+      return void 0 !== e2() ? e2() : new Function("return this")();
+    }(), E);
+  }
+  x = uni._globalUniCloudObj ? uni._globalUniCloudObj : uni._globalUniCloudObj = {};
+  const U = ["invoke", "success", "fail", "complete"], N = L("_globalUniCloudInterceptor");
+  function D(e2, t2) {
+    N[e2] || (N[e2] = {}), g(t2) && Object.keys(t2).forEach((n2) => {
+      U.indexOf(n2) > -1 && function(e3, t3, n3) {
+        let s2 = N[e3][t3];
+        s2 || (s2 = N[e3][t3] = []), -1 === s2.indexOf(n3) && m(n3) && s2.push(n3);
+      }(e2, n2, t2[n2]);
+    });
+  }
+  function M(e2, t2) {
+    N[e2] || (N[e2] = {}), g(t2) ? Object.keys(t2).forEach((n2) => {
+      U.indexOf(n2) > -1 && function(e3, t3, n3) {
+        const s2 = N[e3][t3];
+        if (!s2)
+          return;
+        const r2 = s2.indexOf(n3);
+        r2 > -1 && s2.splice(r2, 1);
+      }(e2, n2, t2[n2]);
+    }) : delete N[e2];
+  }
+  function q(e2, t2) {
+    return e2 && 0 !== e2.length ? e2.reduce((e3, n2) => e3.then(() => n2(t2)), Promise.resolve()) : Promise.resolve();
+  }
+  function F(e2, t2) {
+    return N[e2] && N[e2][t2] || [];
+  }
+  function K(e2) {
+    D("callObject", e2);
+  }
+  const j = L("_globalUniCloudListener"), $ = "response", B = "needLogin", W = "refreshToken", H = "failover", J = "clientdb", z = "cloudfunction", V = "cloudobject";
+  function G(e2) {
+    return j[e2] || (j[e2] = []), j[e2];
+  }
+  function Q(e2, t2) {
+    const n2 = G(e2);
+    n2.includes(t2) || n2.push(t2);
+  }
+  function Y(e2, t2) {
+    const n2 = G(e2), s2 = n2.indexOf(t2);
+    -1 !== s2 && n2.splice(s2, 1);
+  }
+  function X(e2, t2) {
+    const n2 = G(e2);
+    for (let e3 = 0; e3 < n2.length; e3++) {
+      (0, n2[e3])(t2);
+    }
+  }
+  let Z, ee = false;
+  function te() {
+    return Z || (Z = new Promise((e2) => {
+      ee && e2(), function t2() {
+        if ("function" == typeof getCurrentPages) {
+          const t3 = getCurrentPages();
+          t3 && t3[0] && (ee = true, e2());
+        }
+        ee || setTimeout(() => {
+          t2();
+        }, 30);
+      }();
+    }), Z);
+  }
+  function ne(e2) {
+    const t2 = {};
+    for (const n2 in e2) {
+      const s2 = e2[n2];
+      m(s2) && (t2[n2] = y(s2));
+    }
+    return t2;
+  }
+  class se extends Error {
+    constructor(e2) {
+      const t2 = e2.message || e2.errMsg || "unknown system error";
+      super(t2), this.errMsg = t2, this.code = this.errCode = e2.code || e2.errCode || "SYSTEM_ERROR", this.errSubject = this.subject = e2.subject || e2.errSubject, this.cause = e2.cause, this.requestId = e2.requestId;
+    }
+    toJson(e2 = 0) {
+      if (!(e2 >= 10))
+        return e2++, { errCode: this.errCode, errMsg: this.errMsg, errSubject: this.errSubject, cause: this.cause && this.cause.toJson ? this.cause.toJson(e2) : this.cause };
+    }
+  }
+  var re = { request: (e2) => uni.request(e2), uploadFile: (e2) => uni.uploadFile(e2), setStorageSync: (e2, t2) => uni.setStorageSync(e2, t2), getStorageSync: (e2) => uni.getStorageSync(e2), removeStorageSync: (e2) => uni.removeStorageSync(e2), clearStorageSync: () => uni.clearStorageSync(), connectSocket: (e2) => uni.connectSocket(e2) };
+  function ie(e2) {
+    return e2 && ie(e2.__v_raw) || e2;
+  }
+  function oe() {
+    return { token: re.getStorageSync("uni_id_token") || re.getStorageSync("uniIdToken"), tokenExpired: re.getStorageSync("uni_id_token_expired") };
+  }
+  function ae({ token: e2, tokenExpired: t2 } = {}) {
+    e2 && re.setStorageSync("uni_id_token", e2), t2 && re.setStorageSync("uni_id_token_expired", t2);
+  }
+  let ce, ue;
+  function he() {
+    return ce || (ce = uni.getSystemInfoSync()), ce;
+  }
+  function le() {
+    let e2, t2;
+    try {
+      if (uni.getLaunchOptionsSync) {
+        if (uni.getLaunchOptionsSync.toString().indexOf("not yet implemented") > -1)
+          return;
+        const { scene: n2, channel: s2 } = uni.getLaunchOptionsSync();
+        e2 = s2, t2 = n2;
+      }
+    } catch (e3) {
+    }
+    return { channel: e2, scene: t2 };
+  }
+  let de = {};
+  function pe() {
+    const e2 = uni.getLocale && uni.getLocale() || "en";
+    if (ue)
+      return { ...de, ...ue, locale: e2, LOCALE: e2 };
+    const t2 = he(), { deviceId: n2, osName: s2, uniPlatform: r2, appId: i2 } = t2, o2 = ["appId", "appLanguage", "appName", "appVersion", "appVersionCode", "appWgtVersion", "browserName", "browserVersion", "deviceBrand", "deviceId", "deviceModel", "deviceType", "osName", "osVersion", "romName", "romVersion", "ua", "hostName", "hostVersion", "uniPlatform", "uniRuntimeVersion", "uniRuntimeVersionCode", "uniCompilerVersion", "uniCompilerVersionCode"];
+    for (const e3 in t2)
+      Object.hasOwnProperty.call(t2, e3) && -1 === o2.indexOf(e3) && delete t2[e3];
+    return ue = { PLATFORM: r2, OS: s2, APPID: i2, DEVICEID: n2, ...le(), ...t2 }, { ...de, ...ue, locale: e2, LOCALE: e2 };
+  }
+  var fe = { sign: function(e2, t2) {
+    let n2 = "";
+    return Object.keys(e2).sort().forEach(function(t3) {
+      e2[t3] && (n2 = n2 + "&" + t3 + "=" + e2[t3]);
+    }), n2 = n2.slice(1), i(n2, t2).toString();
+  }, wrappedRequest: function(e2, t2) {
+    return new Promise((n2, s2) => {
+      t2(Object.assign(e2, { complete(e3) {
+        e3 || (e3 = {});
+        const t3 = e3.data && e3.data.header && e3.data.header["x-serverless-request-id"] || e3.header && e3.header["request-id"];
+        if (!e3.statusCode || e3.statusCode >= 400) {
+          const n3 = e3.data && e3.data.error && e3.data.error.code || "SYS_ERR", r3 = e3.data && e3.data.error && e3.data.error.message || e3.errMsg || "request:fail";
+          return s2(new se({ code: n3, message: r3, requestId: t3 }));
+        }
+        const r2 = e3.data;
+        if (r2.error)
+          return s2(new se({ code: r2.error.code, message: r2.error.message, requestId: t3 }));
+        r2.result = r2.data, r2.requestId = t3, delete r2.data, n2(r2);
+      } }));
+    });
+  }, toBase64: function(e2) {
+    return a.stringify(o.parse(e2));
+  } };
+  var ge = class {
+    constructor(e2) {
+      ["spaceId", "clientSecret"].forEach((t2) => {
+        if (!Object.prototype.hasOwnProperty.call(e2, t2))
+          throw new Error("".concat(t2, " required"));
+      }), this.config = Object.assign({}, { endpoint: 0 === e2.spaceId.indexOf("mp-") ? "https://api.next.bspapp.com" : "https://api.bspapp.com" }, e2), this.config.provider = "aliyun", this.config.requestUrl = this.config.endpoint + "/client", this.config.envType = this.config.envType || "public", this.config.accessTokenKey = "access_token_" + this.config.spaceId, this.adapter = re, this._getAccessTokenPromiseHub = new v({ createPromise: () => this.requestAuth(this.setupRequest({ method: "serverless.auth.user.anonymousAuthorize", params: "{}" }, "auth")).then((e3) => {
+        if (!e3.result || !e3.result.accessToken)
+          throw new se({ code: "AUTH_FAILED", message: "获取accessToken失败" });
+        this.setAccessToken(e3.result.accessToken);
+      }), retryRule: w });
+    }
+    get hasAccessToken() {
+      return !!this.accessToken;
+    }
+    setAccessToken(e2) {
+      this.accessToken = e2;
+    }
+    requestWrapped(e2) {
+      return fe.wrappedRequest(e2, this.adapter.request);
+    }
+    requestAuth(e2) {
+      return this.requestWrapped(e2);
+    }
+    request(e2, t2) {
+      return Promise.resolve().then(() => this.hasAccessToken ? t2 ? this.requestWrapped(e2) : this.requestWrapped(e2).catch((t3) => new Promise((e3, n2) => {
+        !t3 || "GATEWAY_INVALID_TOKEN" !== t3.code && "InvalidParameter.InvalidToken" !== t3.code ? n2(t3) : e3();
+      }).then(() => this.getAccessToken()).then(() => {
+        const t4 = this.rebuildRequest(e2);
+        return this.request(t4, true);
+      })) : this.getAccessToken().then(() => {
+        const t3 = this.rebuildRequest(e2);
+        return this.request(t3, true);
+      }));
+    }
+    rebuildRequest(e2) {
+      const t2 = Object.assign({}, e2);
+      return t2.data.token = this.accessToken, t2.header["x-basement-token"] = this.accessToken, t2.header["x-serverless-sign"] = fe.sign(t2.data, this.config.clientSecret), t2;
+    }
+    setupRequest(e2, t2) {
+      const n2 = Object.assign({}, e2, { spaceId: this.config.spaceId, timestamp: Date.now() }), s2 = { "Content-Type": "application/json" };
+      return "auth" !== t2 && (n2.token = this.accessToken, s2["x-basement-token"] = this.accessToken), s2["x-serverless-sign"] = fe.sign(n2, this.config.clientSecret), { url: this.config.requestUrl, method: "POST", data: n2, dataType: "json", header: s2 };
+    }
+    getAccessToken() {
+      return this._getAccessTokenPromiseHub.exec();
+    }
+    async authorize() {
+      await this.getAccessToken();
+    }
+    callFunction(e2) {
+      const t2 = { method: "serverless.function.runtime.invoke", params: JSON.stringify({ functionTarget: e2.name, functionArgs: e2.data || {} }) };
+      return this.request({ ...this.setupRequest(t2), timeout: e2.timeout });
+    }
+    getOSSUploadOptionsFromPath(e2) {
+      const t2 = { method: "serverless.file.resource.generateProximalSign", params: JSON.stringify(e2) };
+      return this.request(this.setupRequest(t2));
+    }
+    uploadFileToOSS({ url: e2, formData: t2, name: n2, filePath: s2, fileType: r2, onUploadProgress: i2 }) {
+      return new Promise((o2, a2) => {
+        const c2 = this.adapter.uploadFile({ url: e2, formData: t2, name: n2, filePath: s2, fileType: r2, header: { "X-OSS-server-side-encrpytion": "AES256" }, success(e3) {
+          e3 && e3.statusCode < 400 ? o2(e3) : a2(new se({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
+        }, fail(e3) {
+          a2(new se({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
+        } });
+        "function" == typeof i2 && c2 && "function" == typeof c2.onProgressUpdate && c2.onProgressUpdate((e3) => {
+          i2({ loaded: e3.totalBytesSent, total: e3.totalBytesExpectedToSend });
+        });
+      });
+    }
+    reportOSSUpload(e2) {
+      const t2 = { method: "serverless.file.resource.report", params: JSON.stringify(e2) };
+      return this.request(this.setupRequest(t2));
+    }
+    async uploadFile({ filePath: e2, cloudPath: t2, fileType: n2 = "image", cloudPathAsRealPath: s2 = false, onUploadProgress: r2, config: i2 }) {
+      if ("string" !== f(t2))
+        throw new se({ code: "INVALID_PARAM", message: "cloudPath必须为字符串类型" });
+      if (!(t2 = t2.trim()))
+        throw new se({ code: "INVALID_PARAM", message: "cloudPath不可为空" });
+      if (/:\/\//.test(t2))
+        throw new se({ code: "INVALID_PARAM", message: "cloudPath不合法" });
+      const o2 = i2 && i2.envType || this.config.envType;
+      if (s2 && ("/" !== t2[0] && (t2 = "/" + t2), t2.indexOf("\\") > -1))
+        throw new se({ code: "INVALID_PARAM", message: "使用cloudPath作为路径时，cloudPath不可包含“\\”" });
+      const a2 = (await this.getOSSUploadOptionsFromPath({ env: o2, filename: s2 ? t2.split("/").pop() : t2, fileId: s2 ? t2 : void 0 })).result, c2 = "https://" + a2.cdnDomain + "/" + a2.ossPath, { securityToken: u2, accessKeyId: h2, signature: l2, host: d2, ossPath: p2, id: g2, policy: m2, ossCallbackUrl: y2 } = a2, _2 = { "Cache-Control": "max-age=2592000", "Content-Disposition": "attachment", OSSAccessKeyId: h2, Signature: l2, host: d2, id: g2, key: p2, policy: m2, success_action_status: 200 };
+      if (u2 && (_2["x-oss-security-token"] = u2), y2) {
+        const e3 = JSON.stringify({ callbackUrl: y2, callbackBody: JSON.stringify({ fileId: g2, spaceId: this.config.spaceId }), callbackBodyType: "application/json" });
+        _2.callback = fe.toBase64(e3);
+      }
+      const w2 = { url: "https://" + a2.host, formData: _2, fileName: "file", name: "file", filePath: e2, fileType: n2 };
+      if (await this.uploadFileToOSS(Object.assign({}, w2, { onUploadProgress: r2 })), y2)
+        return { success: true, filePath: e2, fileID: c2 };
+      if ((await this.reportOSSUpload({ id: g2 })).success)
+        return { success: true, filePath: e2, fileID: c2 };
+      throw new se({ code: "UPLOAD_FAILED", message: "文件上传失败" });
+    }
+    getTempFileURL({ fileList: e2 } = {}) {
+      return new Promise((t2, n2) => {
+        Array.isArray(e2) && 0 !== e2.length || n2(new se({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" })), this.getFileInfo({ fileList: e2 }).then((n3) => {
+          t2({ fileList: e2.map((e3, t3) => {
+            const s2 = n3.fileList[t3];
+            return { fileID: e3, tempFileURL: s2 && s2.url || e3 };
+          }) });
+        });
+      });
+    }
+    async getFileInfo({ fileList: e2 } = {}) {
+      if (!Array.isArray(e2) || 0 === e2.length)
+        throw new se({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
+      const t2 = { method: "serverless.file.resource.info", params: JSON.stringify({ id: e2.map((e3) => e3.split("?")[0]).join(",") }) };
+      return { fileList: (await this.request(this.setupRequest(t2))).result };
+    }
+  };
+  var me = { init(e2) {
+    const t2 = new ge(e2), n2 = { signInAnonymously: function() {
+      return t2.authorize();
+    }, getLoginState: function() {
+      return Promise.resolve(false);
+    } };
+    return t2.auth = function() {
+      return n2;
+    }, t2.customAuth = t2.auth, t2;
+  } };
+  const ye = "undefined" != typeof location && "http:" === location.protocol ? "http:" : "https:";
+  var _e;
+  !function(e2) {
+    e2.local = "local", e2.none = "none", e2.session = "session";
+  }(_e || (_e = {}));
+  var we = function() {
+  }, ve = n(function(e2, t2) {
+    var n2;
+    e2.exports = (n2 = r, function(e3) {
+      var t3 = n2, s2 = t3.lib, r2 = s2.WordArray, i2 = s2.Hasher, o2 = t3.algo, a2 = [], c2 = [];
+      !function() {
+        function t4(t5) {
+          for (var n4 = e3.sqrt(t5), s4 = 2; s4 <= n4; s4++)
+            if (!(t5 % s4))
+              return false;
+          return true;
+        }
+        function n3(e4) {
+          return 4294967296 * (e4 - (0 | e4)) | 0;
+        }
+        for (var s3 = 2, r3 = 0; r3 < 64; )
+          t4(s3) && (r3 < 8 && (a2[r3] = n3(e3.pow(s3, 0.5))), c2[r3] = n3(e3.pow(s3, 1 / 3)), r3++), s3++;
+      }();
+      var u2 = [], h2 = o2.SHA256 = i2.extend({ _doReset: function() {
+        this._hash = new r2.init(a2.slice(0));
+      }, _doProcessBlock: function(e4, t4) {
+        for (var n3 = this._hash.words, s3 = n3[0], r3 = n3[1], i3 = n3[2], o3 = n3[3], a3 = n3[4], h3 = n3[5], l2 = n3[6], d2 = n3[7], p2 = 0; p2 < 64; p2++) {
+          if (p2 < 16)
+            u2[p2] = 0 | e4[t4 + p2];
+          else {
+            var f2 = u2[p2 - 15], g2 = (f2 << 25 | f2 >>> 7) ^ (f2 << 14 | f2 >>> 18) ^ f2 >>> 3, m2 = u2[p2 - 2], y2 = (m2 << 15 | m2 >>> 17) ^ (m2 << 13 | m2 >>> 19) ^ m2 >>> 10;
+            u2[p2] = g2 + u2[p2 - 7] + y2 + u2[p2 - 16];
+          }
+          var _2 = s3 & r3 ^ s3 & i3 ^ r3 & i3, w2 = (s3 << 30 | s3 >>> 2) ^ (s3 << 19 | s3 >>> 13) ^ (s3 << 10 | s3 >>> 22), v2 = d2 + ((a3 << 26 | a3 >>> 6) ^ (a3 << 21 | a3 >>> 11) ^ (a3 << 7 | a3 >>> 25)) + (a3 & h3 ^ ~a3 & l2) + c2[p2] + u2[p2];
+          d2 = l2, l2 = h3, h3 = a3, a3 = o3 + v2 | 0, o3 = i3, i3 = r3, r3 = s3, s3 = v2 + (w2 + _2) | 0;
+        }
+        n3[0] = n3[0] + s3 | 0, n3[1] = n3[1] + r3 | 0, n3[2] = n3[2] + i3 | 0, n3[3] = n3[3] + o3 | 0, n3[4] = n3[4] + a3 | 0, n3[5] = n3[5] + h3 | 0, n3[6] = n3[6] + l2 | 0, n3[7] = n3[7] + d2 | 0;
+      }, _doFinalize: function() {
+        var t4 = this._data, n3 = t4.words, s3 = 8 * this._nDataBytes, r3 = 8 * t4.sigBytes;
+        return n3[r3 >>> 5] |= 128 << 24 - r3 % 32, n3[14 + (r3 + 64 >>> 9 << 4)] = e3.floor(s3 / 4294967296), n3[15 + (r3 + 64 >>> 9 << 4)] = s3, t4.sigBytes = 4 * n3.length, this._process(), this._hash;
+      }, clone: function() {
+        var e4 = i2.clone.call(this);
+        return e4._hash = this._hash.clone(), e4;
+      } });
+      t3.SHA256 = i2._createHelper(h2), t3.HmacSHA256 = i2._createHmacHelper(h2);
+    }(Math), n2.SHA256);
+  }), Ie = ve, Se = n(function(e2, t2) {
+    e2.exports = r.HmacSHA256;
+  });
+  const be = () => {
+    let e2;
+    if (!Promise) {
+      e2 = () => {
+      }, e2.promise = {};
+      const t3 = () => {
+        throw new se({ message: 'Your Node runtime does support ES6 Promises. Set "global.Promise" to your preferred implementation of promises.' });
+      };
+      return Object.defineProperty(e2.promise, "then", { get: t3 }), Object.defineProperty(e2.promise, "catch", { get: t3 }), e2;
+    }
+    const t2 = new Promise((t3, n2) => {
+      e2 = (e3, s2) => e3 ? n2(e3) : t3(s2);
+    });
+    return e2.promise = t2, e2;
+  };
+  function ke(e2) {
+    return void 0 === e2;
+  }
+  function Ae(e2) {
+    return "[object Null]" === Object.prototype.toString.call(e2);
+  }
+  function Te(e2 = "") {
+    return e2.replace(/([\s\S]+)\s+(请前往云开发AI小助手查看问题：.*)/, "$1");
+  }
+  function Ce(e2 = 32) {
+    const t2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", n2 = t2.length;
+    let s2 = "";
+    for (let r2 = 0; r2 < e2; r2++)
+      s2 += t2.charAt(Math.floor(Math.random() * n2));
+    return s2;
+  }
+  var Pe;
+  function Oe(e2) {
+    const t2 = (n2 = e2, "[object Array]" === Object.prototype.toString.call(n2) ? e2 : [e2]);
+    var n2;
+    for (const e3 of t2) {
+      const { isMatch: t3, genAdapter: n3, runtime: s2 } = e3;
+      if (t3())
+        return { adapter: n3(), runtime: s2 };
+    }
+  }
+  !function(e2) {
+    e2.WEB = "web", e2.WX_MP = "wx_mp";
+  }(Pe || (Pe = {}));
+  const Ee = { adapter: null, runtime: void 0 }, xe = ["anonymousUuidKey"];
+  class Le extends we {
+    constructor() {
+      super(), Ee.adapter.root.tcbObject || (Ee.adapter.root.tcbObject = {});
+    }
+    setItem(e2, t2) {
+      Ee.adapter.root.tcbObject[e2] = t2;
+    }
+    getItem(e2) {
+      return Ee.adapter.root.tcbObject[e2];
+    }
+    removeItem(e2) {
+      delete Ee.adapter.root.tcbObject[e2];
+    }
+    clear() {
+      delete Ee.adapter.root.tcbObject;
+    }
+  }
+  function Re(e2, t2) {
+    switch (e2) {
+      case "local":
+        return t2.localStorage || new Le();
+      case "none":
+        return new Le();
+      default:
+        return t2.sessionStorage || new Le();
+    }
+  }
+  class Ue {
+    constructor(e2) {
+      if (!this._storage) {
+        this._persistence = Ee.adapter.primaryStorage || e2.persistence, this._storage = Re(this._persistence, Ee.adapter);
+        const t2 = "access_token_".concat(e2.env), n2 = "access_token_expire_".concat(e2.env), s2 = "refresh_token_".concat(e2.env), r2 = "anonymous_uuid_".concat(e2.env), i2 = "login_type_".concat(e2.env), o2 = "device_id", a2 = "token_type_".concat(e2.env), c2 = "user_info_".concat(e2.env);
+        this.keys = { accessTokenKey: t2, accessTokenExpireKey: n2, refreshTokenKey: s2, anonymousUuidKey: r2, loginTypeKey: i2, userInfoKey: c2, deviceIdKey: o2, tokenTypeKey: a2 };
+      }
+    }
+    updatePersistence(e2) {
+      if (e2 === this._persistence)
+        return;
+      const t2 = "local" === this._persistence;
+      this._persistence = e2;
+      const n2 = Re(e2, Ee.adapter);
+      for (const e3 in this.keys) {
+        const s2 = this.keys[e3];
+        if (t2 && xe.includes(e3))
+          continue;
+        const r2 = this._storage.getItem(s2);
+        ke(r2) || Ae(r2) || (n2.setItem(s2, r2), this._storage.removeItem(s2));
+      }
+      this._storage = n2;
+    }
+    setStore(e2, t2, n2) {
+      if (!this._storage)
+        return;
+      const s2 = { version: n2 || "localCachev1", content: t2 }, r2 = JSON.stringify(s2);
+      try {
+        this._storage.setItem(e2, r2);
+      } catch (e3) {
+        throw e3;
+      }
+    }
+    getStore(e2, t2) {
+      try {
+        if (!this._storage)
+          return;
+      } catch (e3) {
+        return "";
+      }
+      t2 = t2 || "localCachev1";
+      const n2 = this._storage.getItem(e2);
+      if (!n2)
+        return "";
+      if (n2.indexOf(t2) >= 0) {
+        return JSON.parse(n2).content;
+      }
+      return "";
+    }
+    removeStore(e2) {
+      this._storage.removeItem(e2);
+    }
+  }
+  const Ne = {}, De = {};
+  function Me(e2) {
+    return Ne[e2];
+  }
+  class qe {
+    constructor(e2, t2) {
+      this.data = t2 || null, this.name = e2;
+    }
+  }
+  class Fe extends qe {
+    constructor(e2, t2) {
+      super("error", { error: e2, data: t2 }), this.error = e2;
+    }
+  }
+  const Ke = new class {
+    constructor() {
+      this._listeners = {};
+    }
+    on(e2, t2) {
+      return function(e3, t3, n2) {
+        n2[e3] = n2[e3] || [], n2[e3].push(t3);
+      }(e2, t2, this._listeners), this;
+    }
+    off(e2, t2) {
+      return function(e3, t3, n2) {
+        if (n2 && n2[e3]) {
+          const s2 = n2[e3].indexOf(t3);
+          -1 !== s2 && n2[e3].splice(s2, 1);
+        }
+      }(e2, t2, this._listeners), this;
+    }
+    fire(e2, t2) {
+      if (e2 instanceof Fe)
+        return console.error(e2.error), this;
+      const n2 = "string" == typeof e2 ? new qe(e2, t2 || {}) : e2;
+      const s2 = n2.name;
+      if (this._listens(s2)) {
+        n2.target = this;
+        const e3 = this._listeners[s2] ? [...this._listeners[s2]] : [];
+        for (const t3 of e3)
+          t3.call(this, n2);
+      }
+      return this;
+    }
+    _listens(e2) {
+      return this._listeners[e2] && this._listeners[e2].length > 0;
+    }
+  }();
+  function je(e2, t2) {
+    Ke.on(e2, t2);
+  }
+  function $e(e2, t2 = {}) {
+    Ke.fire(e2, t2);
+  }
+  function Be(e2, t2) {
+    Ke.off(e2, t2);
+  }
+  const We = "loginStateChanged", He = "loginStateExpire", Je = "loginTypeChanged", ze = "anonymousConverted", Ve = "refreshAccessToken";
+  var Ge;
+  !function(e2) {
+    e2.ANONYMOUS = "ANONYMOUS", e2.WECHAT = "WECHAT", e2.WECHAT_PUBLIC = "WECHAT-PUBLIC", e2.WECHAT_OPEN = "WECHAT-OPEN", e2.CUSTOM = "CUSTOM", e2.EMAIL = "EMAIL", e2.USERNAME = "USERNAME", e2.NULL = "NULL";
+  }(Ge || (Ge = {}));
+  class Qe {
+    constructor() {
+      this._fnPromiseMap = /* @__PURE__ */ new Map();
+    }
+    async run(e2, t2) {
+      let n2 = this._fnPromiseMap.get(e2);
+      return n2 || (n2 = new Promise(async (n3, s2) => {
+        try {
+          await this._runIdlePromise();
+          const s3 = t2();
+          n3(await s3);
+        } catch (e3) {
+          s2(e3);
+        } finally {
+          this._fnPromiseMap.delete(e2);
+        }
+      }), this._fnPromiseMap.set(e2, n2)), n2;
+    }
+    _runIdlePromise() {
+      return Promise.resolve();
+    }
+  }
+  class Ye {
+    constructor(e2) {
+      this._singlePromise = new Qe(), this._cache = Me(e2.env), this._baseURL = "https://".concat(e2.env, ".ap-shanghai.tcb-api.tencentcloudapi.com"), this._reqClass = new Ee.adapter.reqClass({ timeout: e2.timeout, timeoutMsg: "请求在".concat(e2.timeout / 1e3, "s内未完成，已中断"), restrictedMethods: ["post"] });
+    }
+    _getDeviceId() {
+      if (this._deviceID)
+        return this._deviceID;
+      const { deviceIdKey: e2 } = this._cache.keys;
+      let t2 = this._cache.getStore(e2);
+      return "string" == typeof t2 && t2.length >= 16 && t2.length <= 48 || (t2 = Ce(), this._cache.setStore(e2, t2)), this._deviceID = t2, t2;
+    }
+    async _request(e2, t2, n2 = {}) {
+      const s2 = { "x-request-id": Ce(), "x-device-id": this._getDeviceId() };
+      if (n2.withAccessToken) {
+        const { tokenTypeKey: e3 } = this._cache.keys, t3 = await this.getAccessToken(), n3 = this._cache.getStore(e3);
+        s2.authorization = "".concat(n3, " ").concat(t3);
+      }
+      return this._reqClass["get" === n2.method ? "get" : "post"]({ url: "".concat(this._baseURL).concat(e2), data: t2, headers: s2 });
+    }
+    async _fetchAccessToken() {
+      const { loginTypeKey: e2, accessTokenKey: t2, accessTokenExpireKey: n2, tokenTypeKey: s2 } = this._cache.keys, r2 = this._cache.getStore(e2);
+      if (r2 && r2 !== Ge.ANONYMOUS)
+        throw new se({ code: "INVALID_OPERATION", message: "非匿名登录不支持刷新 access token" });
+      const i2 = await this._singlePromise.run("fetchAccessToken", async () => (await this._request("/auth/v1/signin/anonymously", {}, { method: "post" })).data), { access_token: o2, expires_in: a2, token_type: c2 } = i2;
+      return this._cache.setStore(s2, c2), this._cache.setStore(t2, o2), this._cache.setStore(n2, Date.now() + 1e3 * a2), o2;
+    }
+    isAccessTokenExpired(e2, t2) {
+      let n2 = true;
+      return e2 && t2 && (n2 = t2 < Date.now()), n2;
+    }
+    async getAccessToken() {
+      const { accessTokenKey: e2, accessTokenExpireKey: t2 } = this._cache.keys, n2 = this._cache.getStore(e2), s2 = this._cache.getStore(t2);
+      return this.isAccessTokenExpired(n2, s2) ? this._fetchAccessToken() : n2;
+    }
+    async refreshAccessToken() {
+      const { accessTokenKey: e2, accessTokenExpireKey: t2, loginTypeKey: n2 } = this._cache.keys;
+      return this._cache.removeStore(e2), this._cache.removeStore(t2), this._cache.setStore(n2, Ge.ANONYMOUS), this.getAccessToken();
+    }
+    async getUserInfo() {
+      return this._singlePromise.run("getUserInfo", async () => (await this._request("/auth/v1/user/me", {}, { withAccessToken: true, method: "get" })).data);
+    }
+  }
+  const Xe = ["auth.getJwt", "auth.logout", "auth.signInWithTicket", "auth.signInAnonymously", "auth.signIn", "auth.fetchAccessTokenWithRefreshToken", "auth.signUpWithEmailAndPassword", "auth.activateEndUserMail", "auth.sendPasswordResetEmail", "auth.resetPasswordWithToken", "auth.isUsernameRegistered"], Ze = { "X-SDK-Version": "1.3.5" };
+  function et(e2, t2, n2) {
+    const s2 = e2[t2];
+    e2[t2] = function(t3) {
+      const r2 = {}, i2 = {};
+      n2.forEach((n3) => {
+        const { data: s3, headers: o3 } = n3.call(e2, t3);
+        Object.assign(r2, s3), Object.assign(i2, o3);
+      });
+      const o2 = t3.data;
+      return o2 && (() => {
+        var e3;
+        if (e3 = o2, "[object FormData]" !== Object.prototype.toString.call(e3))
+          t3.data = { ...o2, ...r2 };
+        else
+          for (const e4 in r2)
+            o2.append(e4, r2[e4]);
+      })(), t3.headers = { ...t3.headers || {}, ...i2 }, s2.call(e2, t3);
+    };
+  }
+  function tt() {
+    const e2 = Math.random().toString(16).slice(2);
+    return { data: { seqId: e2 }, headers: { ...Ze, "x-seqid": e2 } };
+  }
+  class nt {
+    constructor(e2 = {}) {
+      var t2;
+      this.config = e2, this._reqClass = new Ee.adapter.reqClass({ timeout: this.config.timeout, timeoutMsg: "请求在".concat(this.config.timeout / 1e3, "s内未完成，已中断"), restrictedMethods: ["post"] }), this._cache = Me(this.config.env), this._localCache = (t2 = this.config.env, De[t2]), this.oauth = new Ye(this.config), et(this._reqClass, "post", [tt]), et(this._reqClass, "upload", [tt]), et(this._reqClass, "download", [tt]);
+    }
+    async post(e2) {
+      return await this._reqClass.post(e2);
+    }
+    async upload(e2) {
+      return await this._reqClass.upload(e2);
+    }
+    async download(e2) {
+      return await this._reqClass.download(e2);
+    }
+    async refreshAccessToken() {
+      let e2, t2;
+      this._refreshAccessTokenPromise || (this._refreshAccessTokenPromise = this._refreshAccessToken());
+      try {
+        e2 = await this._refreshAccessTokenPromise;
+      } catch (e3) {
+        t2 = e3;
+      }
+      if (this._refreshAccessTokenPromise = null, this._shouldRefreshAccessTokenHook = null, t2)
+        throw t2;
+      return e2;
+    }
+    async _refreshAccessToken() {
+      const { accessTokenKey: e2, accessTokenExpireKey: t2, refreshTokenKey: n2, loginTypeKey: s2, anonymousUuidKey: r2 } = this._cache.keys;
+      this._cache.removeStore(e2), this._cache.removeStore(t2);
+      let i2 = this._cache.getStore(n2);
+      if (!i2)
+        throw new se({ message: "未登录CloudBase" });
+      const o2 = { refresh_token: i2 }, a2 = await this.request("auth.fetchAccessTokenWithRefreshToken", o2);
+      if (a2.data.code) {
+        const { code: e3 } = a2.data;
+        if ("SIGN_PARAM_INVALID" === e3 || "REFRESH_TOKEN_EXPIRED" === e3 || "INVALID_REFRESH_TOKEN" === e3) {
+          if (this._cache.getStore(s2) === Ge.ANONYMOUS && "INVALID_REFRESH_TOKEN" === e3) {
+            const e4 = this._cache.getStore(r2), t3 = this._cache.getStore(n2), s3 = await this.send("auth.signInAnonymously", { anonymous_uuid: e4, refresh_token: t3 });
+            return this.setRefreshToken(s3.refresh_token), this._refreshAccessToken();
+          }
+          $e(He), this._cache.removeStore(n2);
+        }
+        throw new se({ code: a2.data.code, message: "刷新access token失败：".concat(a2.data.code) });
+      }
+      if (a2.data.access_token)
+        return $e(Ve), this._cache.setStore(e2, a2.data.access_token), this._cache.setStore(t2, a2.data.access_token_expire + Date.now()), { accessToken: a2.data.access_token, accessTokenExpire: a2.data.access_token_expire };
+      a2.data.refresh_token && (this._cache.removeStore(n2), this._cache.setStore(n2, a2.data.refresh_token), this._refreshAccessToken());
+    }
+    async getAccessToken() {
+      const { accessTokenKey: e2, accessTokenExpireKey: t2, refreshTokenKey: n2 } = this._cache.keys;
+      if (!this._cache.getStore(n2))
+        throw new se({ message: "refresh token不存在，登录状态异常" });
+      let s2 = this._cache.getStore(e2), r2 = this._cache.getStore(t2), i2 = true;
+      return this._shouldRefreshAccessTokenHook && !await this._shouldRefreshAccessTokenHook(s2, r2) && (i2 = false), (!s2 || !r2 || r2 < Date.now()) && i2 ? this.refreshAccessToken() : { accessToken: s2, accessTokenExpire: r2 };
+    }
+    async request(e2, t2, n2) {
+      const s2 = "x-tcb-trace_".concat(this.config.env);
+      let r2 = "application/x-www-form-urlencoded";
+      const i2 = { action: e2, env: this.config.env, dataVersion: "2019-08-16", ...t2 };
+      let o2;
+      if (-1 === Xe.indexOf(e2) && (this._cache.keys, i2.access_token = await this.oauth.getAccessToken()), "storage.uploadFile" === e2) {
+        o2 = new FormData();
+        for (let e3 in o2)
+          o2.hasOwnProperty(e3) && void 0 !== o2[e3] && o2.append(e3, i2[e3]);
+        r2 = "multipart/form-data";
+      } else {
+        r2 = "application/json", o2 = {};
+        for (let e3 in i2)
+          void 0 !== i2[e3] && (o2[e3] = i2[e3]);
+      }
+      let a2 = { headers: { "content-type": r2 } };
+      n2 && n2.timeout && (a2.timeout = n2.timeout), n2 && n2.onUploadProgress && (a2.onUploadProgress = n2.onUploadProgress);
+      const c2 = this._localCache.getStore(s2);
+      c2 && (a2.headers["X-TCB-Trace"] = c2);
+      const { parse: u2, inQuery: h2, search: l2 } = t2;
+      let d2 = { env: this.config.env };
+      u2 && (d2.parse = true), h2 && (d2 = { ...h2, ...d2 });
+      let p2 = function(e3, t3, n3 = {}) {
+        const s3 = /\?/.test(t3);
+        let r3 = "";
+        for (let e4 in n3)
+          "" === r3 ? !s3 && (t3 += "?") : r3 += "&", r3 += "".concat(e4, "=").concat(encodeURIComponent(n3[e4]));
+        return /^http(s)?\:\/\//.test(t3 += r3) ? t3 : "".concat(e3).concat(t3);
+      }(ye, "//tcb-api.tencentcloudapi.com/web", d2);
+      l2 && (p2 += l2);
+      const f2 = await this.post({ url: p2, data: o2, ...a2 }), g2 = f2.header && f2.header["x-tcb-trace"];
+      if (g2 && this._localCache.setStore(s2, g2), 200 !== Number(f2.status) && 200 !== Number(f2.statusCode) || !f2.data)
+        throw new se({ code: "NETWORK_ERROR", message: "network request error" });
+      return f2;
+    }
+    async send(e2, t2 = {}, n2 = {}) {
+      const s2 = await this.request(e2, t2, { ...n2, onUploadProgress: t2.onUploadProgress });
+      if (("ACCESS_TOKEN_DISABLED" === s2.data.code || "ACCESS_TOKEN_EXPIRED" === s2.data.code) && -1 === Xe.indexOf(e2)) {
+        await this.oauth.refreshAccessToken();
+        const s3 = await this.request(e2, t2, { ...n2, onUploadProgress: t2.onUploadProgress });
+        if (s3.data.code)
+          throw new se({ code: s3.data.code, message: Te(s3.data.message) });
+        return s3.data;
+      }
+      if (s2.data.code)
+        throw new se({ code: s2.data.code, message: Te(s2.data.message) });
+      return s2.data;
+    }
+    setRefreshToken(e2) {
+      const { accessTokenKey: t2, accessTokenExpireKey: n2, refreshTokenKey: s2 } = this._cache.keys;
+      this._cache.removeStore(t2), this._cache.removeStore(n2), this._cache.setStore(s2, e2);
+    }
+  }
+  const st = {};
+  function rt(e2) {
+    return st[e2];
+  }
+  class it {
+    constructor(e2) {
+      this.config = e2, this._cache = Me(e2.env), this._request = rt(e2.env);
+    }
+    setRefreshToken(e2) {
+      const { accessTokenKey: t2, accessTokenExpireKey: n2, refreshTokenKey: s2 } = this._cache.keys;
+      this._cache.removeStore(t2), this._cache.removeStore(n2), this._cache.setStore(s2, e2);
+    }
+    setAccessToken(e2, t2) {
+      const { accessTokenKey: n2, accessTokenExpireKey: s2 } = this._cache.keys;
+      this._cache.setStore(n2, e2), this._cache.setStore(s2, t2);
+    }
+    async refreshUserInfo() {
+      const { data: e2 } = await this._request.send("auth.getUserInfo", {});
+      return this.setLocalUserInfo(e2), e2;
+    }
+    setLocalUserInfo(e2) {
+      const { userInfoKey: t2 } = this._cache.keys;
+      this._cache.setStore(t2, e2);
+    }
+  }
+  class ot {
+    constructor(e2) {
+      if (!e2)
+        throw new se({ code: "PARAM_ERROR", message: "envId is not defined" });
+      this._envId = e2, this._cache = Me(this._envId), this._request = rt(this._envId), this.setUserInfo();
+    }
+    linkWithTicket(e2) {
+      if ("string" != typeof e2)
+        throw new se({ code: "PARAM_ERROR", message: "ticket must be string" });
+      return this._request.send("auth.linkWithTicket", { ticket: e2 });
+    }
+    linkWithRedirect(e2) {
+      e2.signInWithRedirect();
+    }
+    updatePassword(e2, t2) {
+      return this._request.send("auth.updatePassword", { oldPassword: t2, newPassword: e2 });
+    }
+    updateEmail(e2) {
+      return this._request.send("auth.updateEmail", { newEmail: e2 });
+    }
+    updateUsername(e2) {
+      if ("string" != typeof e2)
+        throw new se({ code: "PARAM_ERROR", message: "username must be a string" });
+      return this._request.send("auth.updateUsername", { username: e2 });
+    }
+    async getLinkedUidList() {
+      const { data: e2 } = await this._request.send("auth.getLinkedUidList", {});
+      let t2 = false;
+      const { users: n2 } = e2;
+      return n2.forEach((e3) => {
+        e3.wxOpenId && e3.wxPublicId && (t2 = true);
+      }), { users: n2, hasPrimaryUid: t2 };
+    }
+    setPrimaryUid(e2) {
+      return this._request.send("auth.setPrimaryUid", { uid: e2 });
+    }
+    unlink(e2) {
+      return this._request.send("auth.unlink", { platform: e2 });
+    }
+    async update(e2) {
+      const { nickName: t2, gender: n2, avatarUrl: s2, province: r2, country: i2, city: o2 } = e2, { data: a2 } = await this._request.send("auth.updateUserInfo", { nickName: t2, gender: n2, avatarUrl: s2, province: r2, country: i2, city: o2 });
+      this.setLocalUserInfo(a2);
+    }
+    async refresh() {
+      const e2 = await this._request.oauth.getUserInfo();
+      return this.setLocalUserInfo(e2), e2;
+    }
+    setUserInfo() {
+      const { userInfoKey: e2 } = this._cache.keys, t2 = this._cache.getStore(e2);
+      ["uid", "loginType", "openid", "wxOpenId", "wxPublicId", "unionId", "qqMiniOpenId", "email", "hasPassword", "customUserId", "nickName", "gender", "avatarUrl"].forEach((e3) => {
+        this[e3] = t2[e3];
+      }), this.location = { country: t2.country, province: t2.province, city: t2.city };
+    }
+    setLocalUserInfo(e2) {
+      const { userInfoKey: t2 } = this._cache.keys;
+      this._cache.setStore(t2, e2), this.setUserInfo();
+    }
+  }
+  class at {
+    constructor(e2) {
+      if (!e2)
+        throw new se({ code: "PARAM_ERROR", message: "envId is not defined" });
+      this._cache = Me(e2);
+      const { refreshTokenKey: t2, accessTokenKey: n2, accessTokenExpireKey: s2 } = this._cache.keys, r2 = this._cache.getStore(t2), i2 = this._cache.getStore(n2), o2 = this._cache.getStore(s2);
+      this.credential = { refreshToken: r2, accessToken: i2, accessTokenExpire: o2 }, this.user = new ot(e2);
+    }
+    get isAnonymousAuth() {
+      return this.loginType === Ge.ANONYMOUS;
+    }
+    get isCustomAuth() {
+      return this.loginType === Ge.CUSTOM;
+    }
+    get isWeixinAuth() {
+      return this.loginType === Ge.WECHAT || this.loginType === Ge.WECHAT_OPEN || this.loginType === Ge.WECHAT_PUBLIC;
+    }
+    get loginType() {
+      return this._cache.getStore(this._cache.keys.loginTypeKey);
+    }
+  }
+  class ct extends it {
+    async signIn() {
+      this._cache.updatePersistence("local"), await this._request.oauth.getAccessToken(), $e(We), $e(Je, { env: this.config.env, loginType: Ge.ANONYMOUS, persistence: "local" });
+      const e2 = new at(this.config.env);
+      return await e2.user.refresh(), e2;
+    }
+    async linkAndRetrieveDataWithTicket(e2) {
+      const { anonymousUuidKey: t2, refreshTokenKey: n2 } = this._cache.keys, s2 = this._cache.getStore(t2), r2 = this._cache.getStore(n2), i2 = await this._request.send("auth.linkAndRetrieveDataWithTicket", { anonymous_uuid: s2, refresh_token: r2, ticket: e2 });
+      if (i2.refresh_token)
+        return this._clearAnonymousUUID(), this.setRefreshToken(i2.refresh_token), await this._request.refreshAccessToken(), $e(ze, { env: this.config.env }), $e(Je, { loginType: Ge.CUSTOM, persistence: "local" }), { credential: { refreshToken: i2.refresh_token } };
+      throw new se({ message: "匿名转化失败" });
+    }
+    _setAnonymousUUID(e2) {
+      const { anonymousUuidKey: t2, loginTypeKey: n2 } = this._cache.keys;
+      this._cache.removeStore(t2), this._cache.setStore(t2, e2), this._cache.setStore(n2, Ge.ANONYMOUS);
+    }
+    _clearAnonymousUUID() {
+      this._cache.removeStore(this._cache.keys.anonymousUuidKey);
+    }
+  }
+  class ut extends it {
+    async signIn(e2) {
+      if ("string" != typeof e2)
+        throw new se({ code: "PARAM_ERROR", message: "ticket must be a string" });
+      const { refreshTokenKey: t2 } = this._cache.keys, n2 = await this._request.send("auth.signInWithTicket", { ticket: e2, refresh_token: this._cache.getStore(t2) || "" });
+      if (n2.refresh_token)
+        return this.setRefreshToken(n2.refresh_token), await this._request.refreshAccessToken(), $e(We), $e(Je, { env: this.config.env, loginType: Ge.CUSTOM, persistence: this.config.persistence }), await this.refreshUserInfo(), new at(this.config.env);
+      throw new se({ message: "自定义登录失败" });
+    }
+  }
+  class ht extends it {
+    async signIn(e2, t2) {
+      if ("string" != typeof e2)
+        throw new se({ code: "PARAM_ERROR", message: "email must be a string" });
+      const { refreshTokenKey: n2 } = this._cache.keys, s2 = await this._request.send("auth.signIn", { loginType: "EMAIL", email: e2, password: t2, refresh_token: this._cache.getStore(n2) || "" }), { refresh_token: r2, access_token: i2, access_token_expire: o2 } = s2;
+      if (r2)
+        return this.setRefreshToken(r2), i2 && o2 ? this.setAccessToken(i2, o2) : await this._request.refreshAccessToken(), await this.refreshUserInfo(), $e(We), $e(Je, { env: this.config.env, loginType: Ge.EMAIL, persistence: this.config.persistence }), new at(this.config.env);
+      throw s2.code ? new se({ code: s2.code, message: "邮箱登录失败: ".concat(s2.message) }) : new se({ message: "邮箱登录失败" });
+    }
+    async activate(e2) {
+      return this._request.send("auth.activateEndUserMail", { token: e2 });
+    }
+    async resetPasswordWithToken(e2, t2) {
+      return this._request.send("auth.resetPasswordWithToken", { token: e2, newPassword: t2 });
+    }
+  }
+  class lt extends it {
+    async signIn(e2, t2) {
+      if ("string" != typeof e2)
+        throw new se({ code: "PARAM_ERROR", message: "username must be a string" });
+      "string" != typeof t2 && (t2 = "", console.warn("password is empty"));
+      const { refreshTokenKey: n2 } = this._cache.keys, s2 = await this._request.send("auth.signIn", { loginType: Ge.USERNAME, username: e2, password: t2, refresh_token: this._cache.getStore(n2) || "" }), { refresh_token: r2, access_token_expire: i2, access_token: o2 } = s2;
+      if (r2)
+        return this.setRefreshToken(r2), o2 && i2 ? this.setAccessToken(o2, i2) : await this._request.refreshAccessToken(), await this.refreshUserInfo(), $e(We), $e(Je, { env: this.config.env, loginType: Ge.USERNAME, persistence: this.config.persistence }), new at(this.config.env);
+      throw s2.code ? new se({ code: s2.code, message: "用户名密码登录失败: ".concat(s2.message) }) : new se({ message: "用户名密码登录失败" });
+    }
+  }
+  class dt {
+    constructor(e2) {
+      this.config = e2, this._cache = Me(e2.env), this._request = rt(e2.env), this._onAnonymousConverted = this._onAnonymousConverted.bind(this), this._onLoginTypeChanged = this._onLoginTypeChanged.bind(this), je(Je, this._onLoginTypeChanged);
+    }
+    get currentUser() {
+      const e2 = this.hasLoginState();
+      return e2 && e2.user || null;
+    }
+    get loginType() {
+      return this._cache.getStore(this._cache.keys.loginTypeKey);
+    }
+    anonymousAuthProvider() {
+      return new ct(this.config);
+    }
+    customAuthProvider() {
+      return new ut(this.config);
+    }
+    emailAuthProvider() {
+      return new ht(this.config);
+    }
+    usernameAuthProvider() {
+      return new lt(this.config);
+    }
+    async signInAnonymously() {
+      return new ct(this.config).signIn();
+    }
+    async signInWithEmailAndPassword(e2, t2) {
+      return new ht(this.config).signIn(e2, t2);
+    }
+    signInWithUsernameAndPassword(e2, t2) {
+      return new lt(this.config).signIn(e2, t2);
+    }
+    async linkAndRetrieveDataWithTicket(e2) {
+      this._anonymousAuthProvider || (this._anonymousAuthProvider = new ct(this.config)), je(ze, this._onAnonymousConverted);
+      return await this._anonymousAuthProvider.linkAndRetrieveDataWithTicket(e2);
+    }
+    async signOut() {
+      if (this.loginType === Ge.ANONYMOUS)
+        throw new se({ message: "匿名用户不支持登出操作" });
+      const { refreshTokenKey: e2, accessTokenKey: t2, accessTokenExpireKey: n2 } = this._cache.keys, s2 = this._cache.getStore(e2);
+      if (!s2)
+        return;
+      const r2 = await this._request.send("auth.logout", { refresh_token: s2 });
+      return this._cache.removeStore(e2), this._cache.removeStore(t2), this._cache.removeStore(n2), $e(We), $e(Je, { env: this.config.env, loginType: Ge.NULL, persistence: this.config.persistence }), r2;
+    }
+    async signUpWithEmailAndPassword(e2, t2) {
+      return this._request.send("auth.signUpWithEmailAndPassword", { email: e2, password: t2 });
+    }
+    async sendPasswordResetEmail(e2) {
+      return this._request.send("auth.sendPasswordResetEmail", { email: e2 });
+    }
+    onLoginStateChanged(e2) {
+      je(We, () => {
+        const t3 = this.hasLoginState();
+        e2.call(this, t3);
+      });
+      const t2 = this.hasLoginState();
+      e2.call(this, t2);
+    }
+    onLoginStateExpired(e2) {
+      je(He, e2.bind(this));
+    }
+    onAccessTokenRefreshed(e2) {
+      je(Ve, e2.bind(this));
+    }
+    onAnonymousConverted(e2) {
+      je(ze, e2.bind(this));
+    }
+    onLoginTypeChanged(e2) {
+      je(Je, () => {
+        const t2 = this.hasLoginState();
+        e2.call(this, t2);
+      });
+    }
+    async getAccessToken() {
+      return { accessToken: (await this._request.getAccessToken()).accessToken, env: this.config.env };
+    }
+    hasLoginState() {
+      const { accessTokenKey: e2, accessTokenExpireKey: t2 } = this._cache.keys, n2 = this._cache.getStore(e2), s2 = this._cache.getStore(t2);
+      return this._request.oauth.isAccessTokenExpired(n2, s2) ? null : new at(this.config.env);
+    }
+    async isUsernameRegistered(e2) {
+      if ("string" != typeof e2)
+        throw new se({ code: "PARAM_ERROR", message: "username must be a string" });
+      const { data: t2 } = await this._request.send("auth.isUsernameRegistered", { username: e2 });
+      return t2 && t2.isRegistered;
+    }
+    getLoginState() {
+      return Promise.resolve(this.hasLoginState());
+    }
+    async signInWithTicket(e2) {
+      return new ut(this.config).signIn(e2);
+    }
+    shouldRefreshAccessToken(e2) {
+      this._request._shouldRefreshAccessTokenHook = e2.bind(this);
+    }
+    getUserInfo() {
+      return this._request.send("auth.getUserInfo", {}).then((e2) => e2.code ? e2 : { ...e2.data, requestId: e2.seqId });
+    }
+    getAuthHeader() {
+      const { refreshTokenKey: e2, accessTokenKey: t2 } = this._cache.keys, n2 = this._cache.getStore(e2);
+      return { "x-cloudbase-credentials": this._cache.getStore(t2) + "/@@/" + n2 };
+    }
+    _onAnonymousConverted(e2) {
+      const { env: t2 } = e2.data;
+      t2 === this.config.env && this._cache.updatePersistence(this.config.persistence);
+    }
+    _onLoginTypeChanged(e2) {
+      const { loginType: t2, persistence: n2, env: s2 } = e2.data;
+      s2 === this.config.env && (this._cache.updatePersistence(n2), this._cache.setStore(this._cache.keys.loginTypeKey, t2));
+    }
+  }
+  const pt = function(e2, t2) {
+    t2 = t2 || be();
+    const n2 = rt(this.config.env), { cloudPath: s2, filePath: r2, onUploadProgress: i2, fileType: o2 = "image" } = e2;
+    return n2.send("storage.getUploadMetadata", { path: s2 }).then((e3) => {
+      const { data: { url: a2, authorization: c2, token: u2, fileId: h2, cosFileId: l2 }, requestId: d2 } = e3, p2 = { key: s2, signature: c2, "x-cos-meta-fileid": l2, success_action_status: "201", "x-cos-security-token": u2 };
+      n2.upload({ url: a2, data: p2, file: r2, name: s2, fileType: o2, onUploadProgress: i2 }).then((e4) => {
+        201 === e4.statusCode ? t2(null, { fileID: h2, requestId: d2 }) : t2(new se({ code: "STORAGE_REQUEST_FAIL", message: "STORAGE_REQUEST_FAIL: ".concat(e4.data) }));
+      }).catch((e4) => {
+        t2(e4);
+      });
+    }).catch((e3) => {
+      t2(e3);
+    }), t2.promise;
+  }, ft = function(e2, t2) {
+    t2 = t2 || be();
+    const n2 = rt(this.config.env), { cloudPath: s2 } = e2;
+    return n2.send("storage.getUploadMetadata", { path: s2 }).then((e3) => {
+      t2(null, e3);
+    }).catch((e3) => {
+      t2(e3);
+    }), t2.promise;
+  }, gt = function({ fileList: e2 }, t2) {
+    if (t2 = t2 || be(), !e2 || !Array.isArray(e2))
+      return { code: "INVALID_PARAM", message: "fileList必须是非空的数组" };
+    for (let t3 of e2)
+      if (!t3 || "string" != typeof t3)
+        return { code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" };
+    const n2 = { fileid_list: e2 };
+    return rt(this.config.env).send("storage.batchDeleteFile", n2).then((e3) => {
+      e3.code ? t2(null, e3) : t2(null, { fileList: e3.data.delete_list, requestId: e3.requestId });
+    }).catch((e3) => {
+      t2(e3);
+    }), t2.promise;
+  }, mt = function({ fileList: e2 }, t2) {
+    t2 = t2 || be(), e2 && Array.isArray(e2) || t2(null, { code: "INVALID_PARAM", message: "fileList必须是非空的数组" });
+    let n2 = [];
+    for (let s3 of e2)
+      "object" == typeof s3 ? (s3.hasOwnProperty("fileID") && s3.hasOwnProperty("maxAge") || t2(null, { code: "INVALID_PARAM", message: "fileList的元素必须是包含fileID和maxAge的对象" }), n2.push({ fileid: s3.fileID, max_age: s3.maxAge })) : "string" == typeof s3 ? n2.push({ fileid: s3 }) : t2(null, { code: "INVALID_PARAM", message: "fileList的元素必须是字符串" });
+    const s2 = { file_list: n2 };
+    return rt(this.config.env).send("storage.batchGetDownloadUrl", s2).then((e3) => {
+      e3.code ? t2(null, e3) : t2(null, { fileList: e3.data.download_list, requestId: e3.requestId });
+    }).catch((e3) => {
+      t2(e3);
+    }), t2.promise;
+  }, yt = async function({ fileID: e2 }, t2) {
+    const n2 = (await mt.call(this, { fileList: [{ fileID: e2, maxAge: 600 }] })).fileList[0];
+    if ("SUCCESS" !== n2.code)
+      return t2 ? t2(n2) : new Promise((e3) => {
+        e3(n2);
+      });
+    const s2 = rt(this.config.env);
+    let r2 = n2.download_url;
+    if (r2 = encodeURI(r2), !t2)
+      return s2.download({ url: r2 });
+    t2(await s2.download({ url: r2 }));
+  }, _t = function({ name: e2, data: t2, query: n2, parse: s2, search: r2, timeout: i2 }, o2) {
+    const a2 = o2 || be();
+    let c2;
+    try {
+      c2 = t2 ? JSON.stringify(t2) : "";
+    } catch (e3) {
+      return Promise.reject(e3);
+    }
+    if (!e2)
+      return Promise.reject(new se({ code: "PARAM_ERROR", message: "函数名不能为空" }));
+    const u2 = { inQuery: n2, parse: s2, search: r2, function_name: e2, request_data: c2 };
+    return rt(this.config.env).send("functions.invokeFunction", u2, { timeout: i2 }).then((e3) => {
+      if (e3.code)
+        a2(null, e3);
+      else {
+        let t3 = e3.data.response_data;
+        if (s2)
+          a2(null, { result: t3, requestId: e3.requestId });
+        else
+          try {
+            t3 = JSON.parse(e3.data.response_data), a2(null, { result: t3, requestId: e3.requestId });
+          } catch (e4) {
+            a2(new se({ message: "response data must be json" }));
+          }
+      }
+      return a2.promise;
+    }).catch((e3) => {
+      a2(e3);
+    }), a2.promise;
+  }, wt = { timeout: 15e3, persistence: "session" }, vt = {};
+  class It {
+    constructor(e2) {
+      this.config = e2 || this.config, this.authObj = void 0;
+    }
+    init(e2) {
+      switch (Ee.adapter || (this.requestClient = new Ee.adapter.reqClass({ timeout: e2.timeout || 5e3, timeoutMsg: "请求在".concat((e2.timeout || 5e3) / 1e3, "s内未完成，已中断") })), this.config = { ...wt, ...e2 }, true) {
+        case this.config.timeout > 6e5:
+          console.warn("timeout大于可配置上限[10分钟]，已重置为上限数值"), this.config.timeout = 6e5;
+          break;
+        case this.config.timeout < 100:
+          console.warn("timeout小于可配置下限[100ms]，已重置为下限数值"), this.config.timeout = 100;
+      }
+      return new It(this.config);
+    }
+    auth({ persistence: e2 } = {}) {
+      if (this.authObj)
+        return this.authObj;
+      const t2 = e2 || Ee.adapter.primaryStorage || wt.persistence;
+      var n2;
+      return t2 !== this.config.persistence && (this.config.persistence = t2), function(e3) {
+        const { env: t3 } = e3;
+        Ne[t3] = new Ue(e3), De[t3] = new Ue({ ...e3, persistence: "local" });
+      }(this.config), n2 = this.config, st[n2.env] = new nt(n2), this.authObj = new dt(this.config), this.authObj;
+    }
+    on(e2, t2) {
+      return je.apply(this, [e2, t2]);
+    }
+    off(e2, t2) {
+      return Be.apply(this, [e2, t2]);
+    }
+    callFunction(e2, t2) {
+      return _t.apply(this, [e2, t2]);
+    }
+    deleteFile(e2, t2) {
+      return gt.apply(this, [e2, t2]);
+    }
+    getTempFileURL(e2, t2) {
+      return mt.apply(this, [e2, t2]);
+    }
+    downloadFile(e2, t2) {
+      return yt.apply(this, [e2, t2]);
+    }
+    uploadFile(e2, t2) {
+      return pt.apply(this, [e2, t2]);
+    }
+    getUploadMetadata(e2, t2) {
+      return ft.apply(this, [e2, t2]);
+    }
+    registerExtension(e2) {
+      vt[e2.name] = e2;
+    }
+    async invokeExtension(e2, t2) {
+      const n2 = vt[e2];
+      if (!n2)
+        throw new se({ message: "扩展".concat(e2, " 必须先注册") });
+      return await n2.invoke(t2, this);
+    }
+    useAdapters(e2) {
+      const { adapter: t2, runtime: n2 } = Oe(e2) || {};
+      t2 && (Ee.adapter = t2), n2 && (Ee.runtime = n2);
+    }
+  }
+  var St = new It();
+  function bt(e2, t2, n2) {
+    void 0 === n2 && (n2 = {});
+    var s2 = /\?/.test(t2), r2 = "";
+    for (var i2 in n2)
+      "" === r2 ? !s2 && (t2 += "?") : r2 += "&", r2 += i2 + "=" + encodeURIComponent(n2[i2]);
+    return /^http(s)?:\/\//.test(t2 += r2) ? t2 : "" + e2 + t2;
+  }
+  class kt {
+    get(e2) {
+      const { url: t2, data: n2, headers: s2, timeout: r2 } = e2;
+      return new Promise((e3, i2) => {
+        re.request({ url: bt("https:", t2), data: n2, method: "GET", header: s2, timeout: r2, success(t3) {
+          e3(t3);
+        }, fail(e4) {
+          i2(e4);
+        } });
+      });
+    }
+    post(e2) {
+      const { url: t2, data: n2, headers: s2, timeout: r2 } = e2;
+      return new Promise((e3, i2) => {
+        re.request({ url: bt("https:", t2), data: n2, method: "POST", header: s2, timeout: r2, success(t3) {
+          e3(t3);
+        }, fail(e4) {
+          i2(e4);
+        } });
+      });
+    }
+    upload(e2) {
+      return new Promise((t2, n2) => {
+        const { url: s2, file: r2, data: i2, headers: o2, fileType: a2 } = e2, c2 = re.uploadFile({ url: bt("https:", s2), name: "file", formData: Object.assign({}, i2), filePath: r2, fileType: a2, header: o2, success(e3) {
+          const n3 = { statusCode: e3.statusCode, data: e3.data || {} };
+          200 === e3.statusCode && i2.success_action_status && (n3.statusCode = parseInt(i2.success_action_status, 10)), t2(n3);
+        }, fail(e3) {
+          n2(new Error(e3.errMsg || "uploadFile:fail"));
+        } });
+        "function" == typeof e2.onUploadProgress && c2 && "function" == typeof c2.onProgressUpdate && c2.onProgressUpdate((t3) => {
+          e2.onUploadProgress({ loaded: t3.totalBytesSent, total: t3.totalBytesExpectedToSend });
+        });
+      });
+    }
+  }
+  const At = { setItem(e2, t2) {
+    re.setStorageSync(e2, t2);
+  }, getItem: (e2) => re.getStorageSync(e2), removeItem(e2) {
+    re.removeStorageSync(e2);
+  }, clear() {
+    re.clearStorageSync();
+  } };
+  var Tt = { genAdapter: function() {
+    return { root: {}, reqClass: kt, localStorage: At, primaryStorage: "local" };
+  }, isMatch: function() {
+    return true;
+  }, runtime: "uni_app" };
+  St.useAdapters(Tt);
+  const Ct = St, Pt = Ct.init;
+  Ct.init = function(e2) {
+    e2.env = e2.spaceId;
+    const t2 = Pt.call(this, e2);
+    t2.config.provider = "tencent", t2.config.spaceId = e2.spaceId;
+    const n2 = t2.auth;
+    return t2.auth = function(e3) {
+      const t3 = n2.call(this, e3);
+      return ["linkAndRetrieveDataWithTicket", "signInAnonymously", "signOut", "getAccessToken", "getLoginState", "signInWithTicket", "getUserInfo"].forEach((e4) => {
+        var n3;
+        t3[e4] = (n3 = t3[e4], function(e5) {
+          e5 = e5 || {};
+          const { success: t4, fail: s2, complete: r2 } = ne(e5);
+          if (!(t4 || s2 || r2))
+            return n3.call(this, e5);
+          n3.call(this, e5).then((e6) => {
+            t4 && t4(e6), r2 && r2(e6);
+          }, (e6) => {
+            s2 && s2(e6), r2 && r2(e6);
+          });
+        }).bind(t3);
+      }), t3;
+    }, t2.customAuth = t2.auth, t2;
+  };
+  var Ot = Ct;
+  async function Et(e2, t2) {
+    const n2 = "http://".concat(e2, ":").concat(t2, "/system/ping");
+    try {
+      const e3 = await (s2 = { url: n2, timeout: 500 }, new Promise((e4, t3) => {
+        re.request({ ...s2, success(t4) {
+          e4(t4);
+        }, fail(e5) {
+          t3(e5);
+        } });
+      }));
+      return !(!e3.data || 0 !== e3.data.code);
+    } catch (e3) {
+      return false;
+    }
+    var s2;
+  }
+  async function xt(e2, t2) {
+    let n2;
+    for (let s2 = 0; s2 < e2.length; s2++) {
+      const r2 = e2[s2];
+      if (await Et(r2, t2)) {
+        n2 = r2;
+        break;
+      }
+    }
+    return { address: n2, port: t2 };
+  }
+  const Lt = { "serverless.file.resource.generateProximalSign": "storage/generate-proximal-sign", "serverless.file.resource.report": "storage/report", "serverless.file.resource.delete": "storage/delete", "serverless.file.resource.getTempFileURL": "storage/get-temp-file-url", "system/check-storage": "system/check-storage" };
+  var Rt = class {
+    constructor(e2) {
+      if (["spaceId", "clientSecret"].forEach((t2) => {
+        if (!Object.prototype.hasOwnProperty.call(e2, t2))
+          throw new Error("".concat(t2, " required"));
+      }), !e2.endpoint)
+        throw new Error("集群空间未配置ApiEndpoint，配置后需要重新关联服务空间后生效");
+      this.config = Object.assign({}, e2), this.config.provider = "dcloud", this.config.requestUrl = this.config.endpoint + "/client", this.config.envType = this.config.envType || "public", this.adapter = re;
+    }
+    async request(e2, t2 = true) {
+      return Promise.resolve().then(() => fe.wrappedRequest(this.setupRequest(e2), this.adapter.request));
+    }
+    async requestLocal(e2) {
+      const t2 = await this.setupLocalRequest({ method: "system/check-storage", platform: A, provider: this.config.provider, spaceId: this.config.spaceId });
+      return new Promise((e3) => {
+        this.adapter.request(Object.assign({}, t2, { success: (t3) => {
+          e3(t3);
+        }, fail: () => {
+          e3({ data: { code: "NETWORK_ERROR", message: "连接本地调试服务失败，请检查客户端是否和主机在同一局域网下，自动切换为已部署的云函数。" } });
+        } }));
+      }).then(({ data: e3 } = {}) => {
+        const { code: t3, message: n2 } = e3 || {};
+        return { code: 0 === t3 ? 0 : t3 || "SYS_ERR", message: n2 || "SYS_ERR" };
+      }).then(({ code: t3, message: n2 }) => 0 !== t3 ? (console.error(t3, n2), fe.wrappedRequest(this.setupRequest(e2), this.adapter.request)) : new Promise((t4, n3) => {
+        this.setupLocalRequest(e2).then((e3) => {
+          this.adapter.request(Object.assign(e3, { complete(e4) {
+            if (e4 || (e4 = {}), !e4.statusCode || e4.statusCode >= 400) {
+              const t5 = e4.data && e4.data.code || "SYS_ERR", s3 = e4.data && e4.data.message || "request:fail";
+              return n3(new se({ code: t5, message: s3 }));
+            }
+            const s2 = e4.data;
+            if (s2.error)
+              return n3(new se({ code: s2.error.code, message: s2.error.message }));
+            t4({ success: true, result: s2 });
+          } }));
+        });
+      }));
+    }
+    setupRequest(e2) {
+      const t2 = Object.assign({}, e2, { spaceId: this.config.spaceId, timestamp: Date.now() }), n2 = { "Content-Type": "application/json" };
+      n2["x-serverless-sign"] = fe.sign(t2, this.config.clientSecret);
+      const s2 = pe();
+      n2["x-client-info"] = encodeURIComponent(JSON.stringify(s2));
+      const { token: r2 } = oe();
+      return n2["x-client-token"] = r2, { url: this.config.requestUrl, method: "POST", data: t2, dataType: "json", header: JSON.parse(JSON.stringify(n2)) };
+    }
+    async setupLocalRequest(e2) {
+      const t2 = pe(), { token: n2 } = oe(), s2 = Object.assign({}, e2, { spaceId: this.config.spaceId, timestamp: Date.now(), clientInfo: t2, token: n2 }), { address: r2, servePort: i2 } = this.__dev__ && this.__dev__.debugInfo || {}, { address: o2 } = await xt(r2, i2);
+      return { url: "http://".concat(o2, ":").concat(i2, "/").concat(Lt[e2.method]), method: "POST", data: s2, dataType: "json", header: JSON.parse(JSON.stringify({ "Content-Type": "application/json" })) };
+    }
+    callFunction(e2) {
+      const t2 = { method: "serverless.function.runtime.invoke", params: JSON.stringify({ functionTarget: e2.name, functionArgs: e2.data || {} }) };
+      return this.request(t2, false);
+    }
+    getUploadFileOptions(e2) {
+      const t2 = { method: "serverless.file.resource.generateProximalSign", params: JSON.stringify(e2) };
+      return this.request(t2);
+    }
+    reportUploadFile(e2) {
+      const t2 = { method: "serverless.file.resource.report", params: JSON.stringify(e2) };
+      return this.request(t2);
+    }
+    uploadFile({ filePath: e2, cloudPath: t2, fileType: n2 = "image", onUploadProgress: s2 }) {
+      if (!t2)
+        throw new se({ code: "CLOUDPATH_REQUIRED", message: "cloudPath不可为空" });
+      let r2;
+      return this.getUploadFileOptions({ cloudPath: t2 }).then((t3) => {
+        const { url: i2, formData: o2, name: a2 } = t3.result;
+        return r2 = t3.result.fileUrl, new Promise((t4, r3) => {
+          const c2 = this.adapter.uploadFile({ url: i2, formData: o2, name: a2, filePath: e2, fileType: n2, success(e3) {
+            e3 && e3.statusCode < 400 ? t4(e3) : r3(new se({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
+          }, fail(e3) {
+            r3(new se({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
+          } });
+          "function" == typeof s2 && c2 && "function" == typeof c2.onProgressUpdate && c2.onProgressUpdate((e3) => {
+            s2({ loaded: e3.totalBytesSent, total: e3.totalBytesExpectedToSend });
+          });
+        });
+      }).then(() => this.reportUploadFile({ cloudPath: t2 })).then((t3) => new Promise((n3, s3) => {
+        t3.success ? n3({ success: true, filePath: e2, fileID: r2 }) : s3(new se({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
+      }));
+    }
+    deleteFile({ fileList: e2 }) {
+      const t2 = { method: "serverless.file.resource.delete", params: JSON.stringify({ fileList: e2 }) };
+      return this.request(t2).then((e3) => {
+        if (e3.success)
+          return e3.result;
+        throw new se({ code: "DELETE_FILE_FAILED", message: "删除文件失败" });
+      });
+    }
+    getTempFileURL({ fileList: e2, maxAge: t2 } = {}) {
+      if (!Array.isArray(e2) || 0 === e2.length)
+        throw new se({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
+      const n2 = { method: "serverless.file.resource.getTempFileURL", params: JSON.stringify({ fileList: e2, maxAge: t2 }) };
+      return this.request(n2).then((e3) => {
+        if (e3.success)
+          return { fileList: e3.result.fileList.map((e4) => ({ fileID: e4.fileID, tempFileURL: e4.tempFileURL })) };
+        throw new se({ code: "GET_TEMP_FILE_URL_FAILED", message: "获取临时文件链接失败" });
+      });
+    }
+  };
+  var Ut = { init(e2) {
+    const t2 = new Rt(e2), n2 = { signInAnonymously: function() {
+      return Promise.resolve();
+    }, getLoginState: function() {
+      return Promise.resolve(false);
+    } };
+    return t2.auth = function() {
+      return n2;
+    }, t2.customAuth = t2.auth, t2;
+  } }, Nt = n(function(e2, t2) {
+    e2.exports = r.enc.Hex;
+  });
+  function Dt() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(e2) {
+      var t2 = 16 * Math.random() | 0;
+      return ("x" === e2 ? t2 : 3 & t2 | 8).toString(16);
+    });
+  }
+  function Mt(e2) {
+    return "".concat(e2, ".api-hz.cloudbasefunction.cn");
+  }
+  function qt(e2 = "", t2 = {}) {
+    const { data: n2, functionName: s2, method: r2, headers: i2, signHeaderKeys: o2 = [], endpoint: a2, config: c2 } = t2, u2 = String(Date.now()), h2 = Dt(), l2 = Object.assign({}, i2, { "x-from-app-id": c2.spaceAppId, "x-from-env-id": c2.spaceId, "x-to-env-id": c2.spaceId, "x-from-instance-id": u2, "x-from-function-name": s2, "x-client-timestamp": u2, "x-alipay-source": "client", "x-request-id": h2, "x-alipay-callid": h2, "x-trace-id": h2 }), d2 = ["x-from-app-id", "x-from-env-id", "x-to-env-id", "x-from-instance-id", "x-from-function-name", "x-client-timestamp"].concat(o2), [p2 = "", f2 = ""] = e2.split("?") || [], g2 = function(e3) {
+      const t3 = e3.signedHeaders.join(";"), n3 = e3.signedHeaders.map((t4) => "".concat(t4.toLowerCase(), ":").concat(e3.headers[t4], "\n")).join(""), s3 = Ie(e3.body).toString(Nt), r3 = "".concat(e3.method.toUpperCase(), "\n").concat(e3.path, "\n").concat(e3.query, "\n").concat(n3, "\n").concat(t3, "\n").concat(s3, "\n"), i3 = Ie(r3).toString(Nt), o3 = "HMAC-SHA256\n".concat(e3.timestamp, "\n").concat(i3, "\n"), a3 = Se(o3, e3.secretKey).toString(Nt);
+      return "HMAC-SHA256 Credential=".concat(e3.secretId, ", SignedHeaders=").concat(t3, ", Signature=").concat(a3);
+    }({ path: p2, query: f2, method: r2, headers: l2, timestamp: u2, body: JSON.stringify(n2), secretId: c2.accessKey, secretKey: c2.secretKey, signedHeaders: d2.sort() });
+    return { url: "".concat(a2 || c2.endpoint).concat(e2), headers: Object.assign({}, l2, { Authorization: g2 }) };
+  }
+  function Ft({ url: e2, data: t2, method: n2 = "POST", headers: s2 = {}, timeout: r2 }) {
+    return new Promise((i2, o2) => {
+      re.request({ url: e2, method: n2, data: "object" == typeof t2 ? JSON.stringify(t2) : t2, header: s2, dataType: "json", timeout: r2, complete: (e3 = {}) => {
+        const t3 = s2["x-trace-id"] || "";
+        if (!e3.statusCode || e3.statusCode >= 400) {
+          const { message: n3, errMsg: s3, trace_id: r3 } = e3.data || {};
+          return o2(new se({ code: "SYS_ERR", message: n3 || s3 || "request:fail", requestId: r3 || t3 }));
+        }
+        i2({ status: e3.statusCode, data: e3.data, headers: e3.header, requestId: t3 });
+      } });
+    });
+  }
+  function Kt(e2, t2) {
+    const { path: n2, data: s2, method: r2 = "GET" } = e2, { url: i2, headers: o2 } = qt(n2, { functionName: "", data: s2, method: r2, headers: { "x-alipay-cloud-mode": "oss", "x-data-api-type": "oss", "x-expire-timestamp": String(Date.now() + 6e4) }, signHeaderKeys: ["x-data-api-type", "x-expire-timestamp"], config: t2, endpoint: "https://".concat(Mt(t2.spaceId)) });
+    return Ft({ url: i2, data: s2, method: r2, headers: o2 }).then((e3) => {
+      const t3 = e3.data || {};
+      if (!t3.success)
+        throw new se({ code: e3.errCode, message: e3.errMsg, requestId: e3.requestId });
+      return t3.data || {};
+    }).catch((e3) => {
+      throw new se({ code: e3.errCode, message: e3.errMsg, requestId: e3.requestId });
+    });
+  }
+  function jt(e2 = "") {
+    const t2 = e2.trim().replace(/^cloud:\/\//, ""), n2 = t2.indexOf("/");
+    if (n2 <= 0)
+      throw new se({ code: "INVALID_PARAM", message: "fileID不合法" });
+    const s2 = t2.substring(0, n2), r2 = t2.substring(n2 + 1);
+    return s2 !== this.config.spaceId && console.warn("file ".concat(e2, " does not belong to env ").concat(this.config.spaceId)), r2;
+  }
+  function $t(e2 = "") {
+    return "cloud://".concat(this.config.spaceId, "/").concat(e2.replace(/^\/+/, ""));
+  }
+  class Bt {
+    constructor(e2) {
+      this.config = e2;
+    }
+    signedURL(e2, t2 = {}) {
+      const n2 = "/ws/function/".concat(e2), s2 = this.config.wsEndpoint.replace(/^ws(s)?:\/\//, ""), r2 = Object.assign({}, t2, { accessKeyId: this.config.accessKey, signatureNonce: Dt(), timestamp: "" + Date.now() }), i2 = [n2, ["accessKeyId", "authorization", "signatureNonce", "timestamp"].sort().map(function(e3) {
+        return r2[e3] ? "".concat(e3, "=").concat(r2[e3]) : null;
+      }).filter(Boolean).join("&"), "host:".concat(s2)].join("\n"), o2 = ["HMAC-SHA256", Ie(i2).toString(Nt)].join("\n"), a2 = Se(o2, this.config.secretKey).toString(Nt), c2 = Object.keys(r2).map((e3) => "".concat(e3, "=").concat(encodeURIComponent(r2[e3]))).join("&");
+      return "".concat(this.config.wsEndpoint).concat(n2, "?").concat(c2, "&signature=").concat(a2);
+    }
+  }
+  class Wt {
+    constructor(e2) {
+      this.config = e2;
+    }
+    signedURL(e2, t2 = {}) {
+      const n2 = "/ws/sse/function/".concat(e2), s2 = this.config.endpoint.replace(/^http(s)?:\/\//, ""), r2 = Object.assign({}, t2, { accessKeyId: this.config.accessKey, signatureNonce: Dt(), timestamp: "" + Date.now() }), i2 = ["accessKeyId", "authorization", "signatureNonce", "timestamp"].sort().map(function(e3) {
+        return r2[e3] ? "".concat(e3, "=").concat(r2[e3]) : null;
+      }).filter(Boolean).join("&"), o2 = [n2.replace("/ws", ""), i2, "host:".concat(s2)].join("\n"), a2 = ["HMAC-SHA256", Ie(o2).toString(Nt)].join("\n"), c2 = Se(a2, this.config.secretKey).toString(Nt), u2 = Object.keys(r2).map((e3) => "".concat(e3, "=").concat(encodeURIComponent(r2[e3]))).join("&");
+      return "".concat(this.config.endpoint).concat(n2, "?").concat(u2, "&signature=").concat(c2);
+    }
+  }
+  var Ht = class {
+    constructor(e2) {
+      if (["spaceId", "spaceAppId", "accessKey", "secretKey"].forEach((t2) => {
+        if (!Object.prototype.hasOwnProperty.call(e2, t2))
+          throw new Error("".concat(t2, " required"));
+      }), e2.endpoint) {
+        if ("string" != typeof e2.endpoint)
+          throw new Error("endpoint must be string");
+        if (!/^https:\/\//.test(e2.endpoint))
+          throw new Error("endpoint must start with https://");
+        e2.endpoint = e2.endpoint.replace(/\/$/, "");
+      }
+      this.config = Object.assign({}, e2, { endpoint: e2.endpoint || "https://".concat(Mt(e2.spaceId)), wsEndpoint: e2.wsEndpoint || "wss://".concat(Mt(e2.spaceId)) }), this._websocket = new Bt(this.config), this._sse = new Wt(this.config);
+    }
+    callFunction(e2) {
+      return function(e3, t2) {
+        const { name: n2, data: s2, async: r2 = false, timeout: i2 } = e3, o2 = "POST", a2 = { "x-to-function-name": n2 };
+        r2 && (a2["x-function-invoke-type"] = "async");
+        const { url: c2, headers: u2 } = qt("/functions/invokeFunction", { functionName: n2, data: s2, method: o2, headers: a2, signHeaderKeys: ["x-to-function-name"], config: t2 });
+        return Ft({ url: c2, data: s2, method: o2, headers: u2, timeout: i2 }).then((e4) => {
+          let t3 = 0;
+          if (r2) {
+            const n3 = e4.data || {};
+            t3 = "200" === n3.errCode ? 0 : n3.errCode, e4.data = n3.data || {}, e4.errMsg = n3.errMsg;
+          }
+          if (0 !== t3)
+            throw new se({ code: t3, message: e4.errMsg, requestId: e4.requestId });
+          return { errCode: t3, success: 0 === t3, requestId: e4.requestId, result: e4.data };
+        }).catch((e4) => {
+          throw new se({ code: e4.errCode, message: e4.errMsg, requestId: e4.requestId });
+        });
+      }(e2, this.config);
+    }
+    uploadFileToOSS({ url: e2, filePath: t2, fileType: n2, formData: s2, onUploadProgress: r2 }) {
+      return new Promise((i2, o2) => {
+        const a2 = re.uploadFile({ url: e2, filePath: t2, fileType: n2, formData: s2, name: "file", success(e3) {
+          e3 && e3.statusCode < 400 ? i2(e3) : o2(new se({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
+        }, fail(e3) {
+          o2(new se({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
+        } });
+        "function" == typeof r2 && a2 && "function" == typeof a2.onProgressUpdate && a2.onProgressUpdate((e3) => {
+          r2({ loaded: e3.totalBytesSent, total: e3.totalBytesExpectedToSend });
+        });
+      });
+    }
+    async uploadFile({ filePath: e2, cloudPath: t2 = "", fileType: n2 = "image", onUploadProgress: s2 }) {
+      if ("string" !== f(t2))
+        throw new se({ code: "INVALID_PARAM", message: "cloudPath必须为字符串类型" });
+      if (!(t2 = t2.trim()))
+        throw new se({ code: "INVALID_PARAM", message: "cloudPath不可为空" });
+      if (/:\/\//.test(t2))
+        throw new se({ code: "INVALID_PARAM", message: "cloudPath不合法" });
+      const r2 = await Kt({ path: "/".concat(t2.replace(/^\//, ""), "?post_url") }, this.config), { file_id: i2, upload_url: o2, form_data: a2 } = r2, c2 = a2 && a2.reduce((e3, t3) => (e3[t3.key] = t3.value, e3), {});
+      return this.uploadFileToOSS({ url: o2, filePath: e2, fileType: n2, formData: c2, onUploadProgress: s2 }).then(() => ({ fileID: i2 }));
+    }
+    async getTempFileURL({ fileList: e2 }) {
+      return new Promise((t2, n2) => {
+        (!e2 || e2.length < 0) && t2({ code: "INVALID_PARAM", message: "fileList不能为空数组" }), e2.length > 50 && t2({ code: "INVALID_PARAM", message: "fileList数组长度不能超过50" });
+        const s2 = [];
+        for (const n3 of e2) {
+          let e3;
+          "string" !== f(n3) && t2({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
+          try {
+            e3 = jt.call(this, n3);
+          } catch (t3) {
+            console.warn(t3.errCode, t3.errMsg), e3 = n3;
+          }
+          s2.push({ file_id: e3, expire: 600 });
+        }
+        Kt({ path: "/?download_url", data: { file_list: s2 }, method: "POST" }, this.config).then((e3) => {
+          const { file_list: n3 = [] } = e3;
+          t2({ fileList: n3.map((e4) => ({ fileID: $t.call(this, e4.file_id), tempFileURL: e4.download_url })) });
+        }).catch((e3) => n2(e3));
+      });
+    }
+    async connectWebSocket(e2) {
+      const { name: t2, query: n2 } = e2;
+      return re.connectSocket({ url: this._websocket.signedURL(t2, n2), complete: () => {
+      } });
+    }
+    requestSSE(e2) {
+      const { name: t2, data: n2 } = e2;
+      return re.request({ method: "POST", url: this._sse.signedURL(t2), data: n2, header: { "content-type": "application/json" }, dataType: "json" });
+    }
+  };
+  var Jt = { init: (e2) => {
+    e2.provider = "alipay";
+    const t2 = new Ht(e2);
+    return t2.auth = function() {
+      return { signInAnonymously: function() {
+        return Promise.resolve();
+      }, getLoginState: function() {
+        return Promise.resolve(true);
+      } };
+    }, t2;
+  } };
+  function zt({ data: e2 }) {
+    let t2;
+    t2 = pe();
+    const n2 = JSON.parse(JSON.stringify(e2 || {}));
+    if (Object.assign(n2, { clientInfo: t2 }), !n2.uniIdToken) {
+      const { token: e3 } = oe();
+      e3 && (n2.uniIdToken = e3);
+    }
+    return n2;
+  }
+  const Vt = { enable: false, interval: 0, space: {} };
+  let Gt = null, Qt = 0, Yt = false;
+  function Xt() {
+    return Array.isArray(C) && C.length ? C[0] : {};
+  }
+  function Zt(e2) {
+    return "".concat(e2, "_").concat(Xt().spaceId || "default");
+  }
+  function en() {
+    if (Gt)
+      return Gt;
+    try {
+      const e2 = re.getStorageSync(Zt("UNICLOUD_FAILOVER_CONFIG"));
+      if (g(e2))
+        return Gt = e2, e2;
+    } catch (e2) {
+    }
+    return null;
+  }
+  function tn(e2) {
+    Qt = e2;
+    try {
+      re.setStorageSync(Zt("UNICLOUD_FAILOVER_LAST_REQUEST"), e2);
+    } catch (e3) {
+    }
+  }
+  function nn(e2) {
+    if (null === e2 || e2 < 0)
+      return false;
+    if (0 === e2)
+      return true;
+    const t2 = function() {
+      if (Qt)
+        return Qt;
+      try {
+        const e3 = re.getStorageSync(Zt("UNICLOUD_FAILOVER_LAST_REQUEST"));
+        if (e3 && "number" == typeof e3)
+          return Qt = e3, e3;
+      } catch (e3) {
+      }
+      return 0;
+    }();
+    if (!t2)
+      return true;
+    return Date.now() - t2 >= e2;
+  }
+  async function sn() {
+    const e2 = Xt(), { failoverEndpoint: t2 } = e2;
+    if (!t2)
+      return null;
+    if (Yt)
+      return en();
+    Yt = true;
+    try {
+      const e3 = "".concat(t2, "/.unicloud/failover-cfg.json"), n2 = await re.request({ url: e3, method: "GET", dataType: "json", timeout: 5e3 });
+      if (tn(Date.now()), 200 !== n2.statusCode || !g(n2.data))
+        return null;
+      const s2 = { ...Vt, ...n2.data }, { enable: r2 = false, interval: i2 = 0, space: o2 = {} } = s2, a2 = en(), c2 = a2 && a2.enable, u2 = function(e4, t3) {
+        if (!e4)
+          return t3.enable;
+        if (e4.enable !== t3.enable)
+          return true;
+        if (e4.interval !== t3.interval)
+          return true;
+        if (t3._lastModifiedAt && e4._lastModifiedAt !== t3._lastModifiedAt)
+          return true;
+        if (JSON.stringify(e4.space) !== JSON.stringify(t3.space))
+          return true;
+        return false;
+      }(a2, s2);
+      return function(e4) {
+        try {
+          Gt = e4, e4 && e4.enable ? re.setStorageSync(Zt("UNICLOUD_FAILOVER_CONFIG"), e4) : (re.removeStorageSync(Zt("UNICLOUD_FAILOVER_CONFIG")), re.removeStorageSync(Zt("UNICLOUD_FAILOVER_LAST_REQUEST")));
+        } catch (e5) {
+        }
+      }({ enable: r2, interval: i2, space: o2, _lastModifiedAt: n2.data._lastModifiedAt || Date.now() }), u2 && X(H, { isEnabled: r2, hasStatusChanged: c2 !== r2, failoverSpace: o2 }), s2;
+    } catch (e3) {
+      return en();
+    } finally {
+      Yt = false;
+    }
+  }
+  const on = [{ rule: /fc_function_not_found|FUNCTION_NOT_FOUND/, content: "，云函数[{functionName}]在云端不存在，请检查此云函数名称是否正确以及该云函数是否已上传到服务空间", mode: "append" }];
+  var an = /[\\^$.*+?()[\]{}|]/g, cn = RegExp(an.source);
+  function un(e2, t2, n2) {
+    return e2.replace(new RegExp((s2 = t2) && cn.test(s2) ? s2.replace(an, "\\$&") : s2, "g"), n2);
+    var s2;
+  }
+  const hn = "none", ln = "request", dn = "response", pn = "both", fn = { code: 2e4, message: "System error" }, gn = { code: 20101, message: "Invalid client" }, yn = { 10001: "Secure network is not supported on current playground or unimpsdk", 10003: "Config missing in current app. If the problem pesist, please contact DCloud.", 10009: "Encrypt payload failed", 10010: "Decrypt response failed" };
+  function _n(e2) {
+    return new se({ subject: e2.errSubject || "uni-secure-network", code: e2.errCode || e2.code || fn.code, message: e2.errMsg || e2.message || fn.message });
+  }
+  function wn(e2) {
+    const { errSubject: t2, subject: n2, errCode: s2, errMsg: r2, code: i2, message: o2, cause: a2 } = e2 || {};
+    return new se({ subject: t2 || n2 || "uni-secure-network", code: s2 || i2 || fn.code, message: r2 || o2, cause: a2 });
+  }
+  class vn {
+    constructor({ secretType: e2, uniCloudIns: t2 } = {}) {
+      this.clientType = "", this.secretType = e2 || hn, this.uniCloudIns = t2;
+      const { provider: n2, spaceId: s2 } = this.uniCloudIns.config;
+      var r2;
+      this.provider = n2, this.spaceId = s2, this.scopedGlobalCache = (r2 = this.uniCloudIns, L("_globalUniCloudSecureNetworkCache__{spaceId}".replace("{spaceId}", r2.config.spaceId)));
+    }
+    getSystemInfo() {
+      return this._systemInfo || (this._systemInfo = he()), this._systemInfo;
+    }
+    get appId() {
+      return this.getSystemInfo().appId;
+    }
+    get deviceId() {
+      return this.getSystemInfo().deviceId;
+    }
+    async encryptData(e2) {
+      return this.secretType === hn ? e2 : this.platformEncryptData(e2);
+    }
+    async decryptResult(e2) {
+      if (this.secretType === hn)
+        return e2;
+      const { errCode: t2, errMsg: n2, content: s2 } = e2 || {};
+      if (t2 || !s2) {
+        if (t2)
+          throw _n({ errCode: t2, errMsg: n2 });
+        if (!s2)
+          throw _n();
+        return e2;
+      }
+      return this.secretType === ln ? s2 : this.platformDecryptResult(e2);
+    }
+    wrapVerifyClientCallFunction(e2) {
+      const t2 = this;
+      return async function({ name: n2, data: s2 = {} } = {}) {
+        await t2.prepare(), (s2 = JSON.parse(JSON.stringify(s2)))._uniCloudOptions = await t2.platformGetSignOption();
+        let r2 = await e2({ name: n2, data: s2 });
+        return t2.isClientKeyNotFound(r2) && (await t2.prepare({ forceUpdate: true }), s2._uniCloudOptions = await t2.platformGetSignOption(), r2 = await e2({ name: n2, data: s2 })), r2;
+      };
+    }
+    wrapEncryptDataCallFunction(e2) {
+      const t2 = this;
+      return async function({ name: n2, data: s2 = {} } = {}) {
+        await t2.prepare();
+        const r2 = await t2.encryptData(s2);
+        let i2 = await e2({ name: n2, data: r2 });
+        if (t2.isClientKeyNotFound(i2)) {
+          await t2.prepare({ forceUpdate: true });
+          const r3 = await t2.encryptData(s2);
+          i2 = await e2({ name: n2, data: r3 });
+        }
+        return i2.result = await t2.decryptResult(i2.result), i2;
+      };
+    }
+  }
+  let ts, ns;
+  function is(e2) {
+    const t2 = ["hasClientKey", "encryptGetClientKeyPayload", "setClientKey", "encrypt", "decrypt"], n2 = {};
+    for (let s2 = 0; s2 < t2.length; s2++) {
+      const r2 = t2[s2];
+      n2[r2] = function(...t3) {
+        return new Promise((n3, s3) => {
+          "function" == typeof e2[r2] ? e2[r2]({ ...t3[0], success(e3) {
+            n3(e3);
+          }, fail(e3) {
+            s3(wn({ errCode: e3.errCode, errMsg: yn[e3.errCode] || e3.errMsg || e3.message }));
+          } }) : s3(wn({ message: "请检查manifest.json内是否开启安全网络模块，另外注意标准基座不支持安全网络模块" }));
+        });
+      };
+    }
+    return n2;
+  }
+  class os extends vn {
+    constructor(e2) {
+      super(e2), this.clientType = "app", this.appUtils = { ...is(uni.__getSecureNetworkManager()) }, this.systemInfo = ts || (ts = he());
+    }
+    async hasClientKey() {
+      return this._hasClientKey = await this.appUtils.hasClientKey({ provider: this.provider, spaceId: this.spaceId }), this._hasClientKey;
+    }
+    async getAppClientKey() {
+      const { data: e2, key: t2 } = await this.appUtils.encryptGetClientKeyPayload({ data: {} }), n2 = (await this.uniCloudIns.callFunction({ name: "DCloud-clientDB", data: { redirectTo: "encryption", action: "getAppClientKey", data: e2, key: t2 } })).result || {};
+      if (0 !== n2.errCode)
+        throw _n(n2);
+      const { clientKey: s2, key: r2 } = n2;
+      await this.appUtils.setClientKey({ provider: this.provider, spaceId: this.spaceId, clientKey: s2, key: r2 });
+    }
+    async ensureClientKey({ forceUpdate: e2 = false } = {}) {
+      if (true !== await this.hasClientKey() || e2)
+        return e2 && this.scopedGlobalCache.initPromise && this.scopedGlobalCache.initStatus === l || !e2 && this.scopedGlobalCache.initPromise && this.scopedGlobalCache.initStatus !== p || (this.scopedGlobalCache.initPromise = this.getAppClientKey(), this.scopedGlobalCache.initPromise.then((e3) => {
+          this.scopedGlobalCache.initStatus = d;
+        }).catch((e3) => {
+          throw this.scopedGlobalCache.initStatus = p, e3;
+        }), this.scopedGlobalCache.initStatus = l), this.scopedGlobalCache.initPromise;
+    }
+    async prepare({ forceUpdate: e2 = false } = {}) {
+      await this.ensureClientKey({ forceUpdate: e2 });
+    }
+    async platformGetSignOption() {
+      const { data: e2, key: t2 } = await this.appUtils.encrypt({ provider: this.provider, spaceId: this.spaceId, data: JSON.stringify({}) });
+      return { verifyClientSign: e2, encryptKeyId: t2 };
+    }
+    async platformEncryptData(e2) {
+      const { data: t2, key: n2 } = await this.appUtils.encrypt({ provider: this.provider, spaceId: this.spaceId, data: JSON.stringify(e2) }), s2 = { secretType: this.secretType, encryptKeyId: n2 };
+      return this.secretType === dn ? { content: e2, _uniCloudOptions: s2 } : { content: t2, _uniCloudOptions: s2 };
+    }
+    async platformDecryptResult(e2) {
+      const { content: t2, _uniCloudOptions: n2 = {} } = e2, s2 = n2.encryptKeyId, r2 = await this.appUtils.decrypt({ provider: this.provider, spaceId: this.spaceId, data: t2, key: s2 });
+      return JSON.parse(r2.data);
+    }
+    isClientKeyNotFound(e2 = {}) {
+      const t2 = e2.result || {};
+      return 70009 === t2.errCode && "uni-secure-network" === t2.errSubject;
+    }
+  }
+  function as({ secretType: e2 } = {}) {
+    return e2 === ln || e2 === dn || e2 === pn;
+  }
+  function cs({ name: e2, data: t2 = {} } = {}) {
+    return "DCloud-clientDB" === e2 && "encryption" === t2.redirectTo && "getAppClientKey" === t2.action;
+  }
+  function us({ provider: e2, spaceId: t2, functionName: n2 } = {}) {
+    const { appId: s2, uniPlatform: r2, osName: i2 } = he();
+    let o2 = r2;
+    "app" === r2 && (o2 = i2);
+    const a2 = function({ provider: e3, spaceId: t3 } = {}) {
+      const n3 = k;
+      if (!n3)
+        return {};
+      e3 = /* @__PURE__ */ function(e4) {
+        return "tencent" === e4 ? "tcb" : e4;
+      }(e3);
+      const s3 = n3.find((n4) => n4.provider === e3 && n4.spaceId === t3);
+      return s3 && s3.config;
+    }({ provider: e2, spaceId: t2 });
+    if (!a2 || !a2.accessControl || !a2.accessControl.enable)
+      return false;
+    const c2 = a2.accessControl.function || {}, u2 = Object.keys(c2);
+    if (0 === u2.length)
+      return true;
+    const h2 = function(e3, t3) {
+      let n3, s3, r3;
+      for (let i3 = 0; i3 < e3.length; i3++) {
+        const o3 = e3[i3];
+        o3 !== t3 ? "*" !== o3 ? o3.split(",").map((e4) => e4.trim()).indexOf(t3) > -1 && (s3 = o3) : r3 = o3 : n3 = o3;
+      }
+      return n3 || s3 || r3;
+    }(u2, n2);
+    if (!h2)
+      return false;
+    if ((c2[h2] || []).find((e3 = {}) => e3.appId === s2 && (e3.platform || "").toLowerCase() === o2.toLowerCase()))
+      return true;
+    throw console.error("此应用[appId: ".concat(s2, ", platform: ").concat(o2, "]不在云端配置的允许访问的应用列表内，参考：https://uniapp.dcloud.net.cn/uniCloud/secure-network.html#verify-client")), wn(gn);
+  }
+  function hs({ functionName: e2, result: t2, logPvd: n2 }) {
+  }
+  function ls(e2) {
+    const t2 = e2.callFunction, n2 = function(n3) {
+      const s2 = n3.name;
+      n3.data = zt.call(e2, { data: n3.data });
+      const r2 = { aliyun: "aliyun", tencent: "tcb", tcb: "tcb", alipay: "alipay", dcloud: "dcloud" }[this.config.provider], i2 = as(n3), o2 = cs(n3), a2 = i2 || o2;
+      return t2.call(this, n3).then((e3) => (e3.errCode = 0, !a2 && hs.call(this, { functionName: s2, result: e3, logPvd: r2 }), Promise.resolve(e3)), (e3) => (!a2 && hs.call(this, { functionName: s2, result: e3, logPvd: r2 }), e3 && e3.message && (e3.message = function({ message: e4 = "", extraInfo: t3 = {}, formatter: n4 = [] } = {}) {
+        for (let s3 = 0; s3 < n4.length; s3++) {
+          const { rule: r3, content: i3, mode: o3 } = n4[s3], a3 = e4.match(r3);
+          if (!a3)
+            continue;
+          let c2 = i3;
+          for (let e5 = 1; e5 < a3.length; e5++)
+            c2 = un(c2, "{$".concat(e5, "}"), a3[e5]);
+          for (const e5 in t3)
+            c2 = un(c2, "{".concat(e5, "}"), t3[e5]);
+          return "replace" === o3 ? c2 : e4 + c2;
+        }
+        return e4;
+      }({ message: "[".concat(n3.name, "]: ").concat(e3.message), formatter: on, extraInfo: { functionName: s2 } })), Promise.reject(e3)));
+    };
+    e2.callFunction = function(t3) {
+      const { provider: s2, spaceId: r2 } = e2.config, i2 = t3.name;
+      let o2, a2;
+      if (t3.data = t3.data || {}, o2 = n2, o2 = o2.bind(e2), cs(t3))
+        a2 = n2.call(e2, t3);
+      else if (as(t3)) {
+        a2 = new ns({ secretType: t3.secretType, uniCloudIns: e2 }).wrapEncryptDataCallFunction(n2.bind(e2))(t3);
+      } else if (us({ provider: s2, spaceId: r2, functionName: i2 })) {
+        a2 = new ns({ secretType: t3.secretType, uniCloudIns: e2 }).wrapVerifyClientCallFunction(n2.bind(e2))(t3);
+      } else
+        a2 = o2(t3);
+      return Object.defineProperty(a2, "result", { get: () => (console.warn("当前返回结果为Promise类型，不可直接访问其result属性，详情请参考：https://uniapp.dcloud.net.cn/uniCloud/faq?id=promise"), {}) }), a2.then((e3) => (e3.result = UTS.JSON.parse(JSON.stringify(e3.result)), e3));
+    };
+  }
+  ns = os;
+  const ds = Symbol("CLIENT_DB_INTERNAL");
+  function ps(e2, t2) {
+    return e2.then = "DoNotReturnProxyWithAFunctionNamedThen", e2._internalType = ds, e2.inspect = null, e2.__v_raw = void 0, new Proxy(e2, { get(e3, n2, s2) {
+      if ("_uniClient" === n2)
+        return null;
+      if ("symbol" == typeof n2)
+        return e3[n2];
+      if (n2 in e3 || "string" != typeof n2) {
+        const t3 = e3[n2];
+        return "function" == typeof t3 ? t3.bind(e3) : t3;
+      }
+      return t2.get(e3, n2, s2);
+    } });
+  }
+  function fs(e2) {
+    return { on: (t2, n2) => {
+      e2[t2] = e2[t2] || [], e2[t2].indexOf(n2) > -1 || e2[t2].push(n2);
+    }, off: (t2, n2) => {
+      e2[t2] = e2[t2] || [];
+      const s2 = e2[t2].indexOf(n2);
+      -1 !== s2 && e2[t2].splice(s2, 1);
+    } };
+  }
+  const gs = ["db.Geo", "db.command", "command.aggregate"];
+  function ms(e2, t2) {
+    return gs.indexOf("".concat(e2, ".").concat(t2)) > -1;
+  }
+  function ys(e2) {
+    switch (f(e2 = ie(e2))) {
+      case "array":
+        return e2.map((e3) => ys(e3));
+      case "object":
+        return e2._internalType === ds || Object.keys(e2).forEach((t2) => {
+          e2[t2] = ys(e2[t2]);
+        }), e2;
+      case "regexp":
+        return { $regexp: { source: e2.source, flags: e2.flags } };
+      case "date":
+        return { $date: e2.toISOString() };
+      default:
+        return e2;
+    }
+  }
+  function _s(e2) {
+    return e2 && e2.content && e2.content.$method;
+  }
+  class ws {
+    constructor(e2, t2, n2) {
+      this.content = e2, this.prevStage = t2 || null, this.udb = null, this._database = n2;
+    }
+    toJSON() {
+      let e2 = this;
+      const t2 = [e2.content];
+      for (; e2.prevStage; )
+        e2 = e2.prevStage, t2.push(e2.content);
+      return { $db: t2.reverse().map((e3) => ({ $method: e3.$method, $param: ys(e3.$param) })) };
+    }
+    toString() {
+      return JSON.stringify(this.toJSON());
+    }
+    getAction() {
+      const e2 = this.toJSON().$db.find((e3) => "action" === e3.$method);
+      return e2 && e2.$param && e2.$param[0];
+    }
+    getCommand() {
+      return { $db: this.toJSON().$db.filter((e2) => "action" !== e2.$method) };
+    }
+    get isAggregate() {
+      let e2 = this;
+      for (; e2; ) {
+        const t2 = _s(e2), n2 = _s(e2.prevStage);
+        if ("aggregate" === t2 && "collection" === n2 || "pipeline" === t2)
+          return true;
+        e2 = e2.prevStage;
+      }
+      return false;
+    }
+    get isCommand() {
+      let e2 = this;
+      for (; e2; ) {
+        if ("command" === _s(e2))
+          return true;
+        e2 = e2.prevStage;
+      }
+      return false;
+    }
+    get isAggregateCommand() {
+      let e2 = this;
+      for (; e2; ) {
+        const t2 = _s(e2), n2 = _s(e2.prevStage);
+        if ("aggregate" === t2 && "command" === n2)
+          return true;
+        e2 = e2.prevStage;
+      }
+      return false;
+    }
+    getNextStageFn(e2) {
+      const t2 = this;
+      return function() {
+        return vs({ $method: e2, $param: ys(Array.from(arguments)) }, t2, t2._database);
+      };
+    }
+    get count() {
+      return this.isAggregate ? this.getNextStageFn("count") : function() {
+        return this._send("count", Array.from(arguments));
+      };
+    }
+    get remove() {
+      return this.isCommand ? this.getNextStageFn("remove") : function() {
+        return this._send("remove", Array.from(arguments));
+      };
+    }
+    get() {
+      return this._send("get", Array.from(arguments));
+    }
+    get add() {
+      return this.isCommand ? this.getNextStageFn("add") : function() {
+        return this._send("add", Array.from(arguments));
+      };
+    }
+    update() {
+      return this._send("update", Array.from(arguments));
+    }
+    end() {
+      return this._send("end", Array.from(arguments));
+    }
+    get set() {
+      return this.isCommand ? this.getNextStageFn("set") : function() {
+        throw new Error("JQL禁止使用set方法");
+      };
+    }
+    _send(e2, t2) {
+      const n2 = this.getAction(), s2 = this.getCommand();
+      if (s2.$db.push({ $method: e2, $param: ys(t2) }), S)
+        ;
+      return this._database._callCloudFunction({ action: n2, command: s2 });
+    }
+  }
+  function vs(e2, t2, n2) {
+    return ps(new ws(e2, t2, n2), { get(e3, t3) {
+      let s2 = "db";
+      return e3 && e3.content && (s2 = e3.content.$method), ms(s2, t3) ? vs({ $method: t3 }, e3, n2) : function() {
+        return vs({ $method: t3, $param: ys(Array.from(arguments)) }, e3, n2);
+      };
+    } });
+  }
+  function Is({ path: e2, method: t2 }) {
+    return class {
+      constructor() {
+        this.param = Array.from(arguments);
+      }
+      toJSON() {
+        return { $newDb: [...e2.map((e3) => ({ $method: e3 })), { $method: t2, $param: this.param }] };
+      }
+      toString() {
+        return JSON.stringify(this.toJSON());
+      }
+    };
+  }
+  function Ss(e2, t2 = {}) {
+    return ps(new e2(t2), { get: (e3, t3) => ms("db", t3) ? vs({ $method: t3 }, null, e3) : function() {
+      return vs({ $method: t3, $param: ys(Array.from(arguments)) }, null, e3);
+    } });
+  }
+  class bs extends class {
+    constructor({ uniClient: e2 = {}, isJQL: t2 = false } = {}) {
+      this._uniClient = e2, this._authCallBacks = {}, this._dbCallBacks = {}, e2._isDefault && (this._dbCallBacks = L("_globalUniCloudDatabaseCallback")), t2 || (this.auth = fs(this._authCallBacks)), this._isJQL = t2, Object.assign(this, fs(this._dbCallBacks)), this.env = ps({}, { get: (e3, t3) => ({ $env: t3 }) }), this.Geo = ps({}, { get: (e3, t3) => Is({ path: ["Geo"], method: t3 }) }), this.serverDate = Is({ path: [], method: "serverDate" }), this.RegExp = Is({ path: [], method: "RegExp" });
+    }
+    getCloudEnv(e2) {
+      if ("string" != typeof e2 || !e2.trim())
+        throw new Error("getCloudEnv参数错误");
+      return { $env: e2.replace("$cloudEnv_", "") };
+    }
+    _callback(e2, t2) {
+      const n2 = this._dbCallBacks;
+      n2[e2] && n2[e2].forEach((e3) => {
+        e3(...t2);
+      });
+    }
+    _callbackAuth(e2, t2) {
+      const n2 = this._authCallBacks;
+      n2[e2] && n2[e2].forEach((e3) => {
+        e3(...t2);
+      });
+    }
+    multiSend() {
+      const e2 = Array.from(arguments), t2 = e2.map((e3) => {
+        const t3 = e3.getAction(), n2 = e3.getCommand();
+        if ("getTemp" !== n2.$db[n2.$db.length - 1].$method)
+          throw new Error("multiSend只支持子命令内使用getTemp");
+        return { action: t3, command: n2 };
+      });
+      return this._callCloudFunction({ multiCommand: t2, queryList: e2 });
+    }
+    startTransaction() {
+      throw new Error("JQL 事务仅支持在云端使用");
+    }
+    commit() {
+      throw new Error("JQL 事务仅支持在云端使用");
+    }
+    rollback() {
+      throw new Error("JQL 事务仅支持在云端使用");
+    }
+  } {
+    _parseResult(e2) {
+      return this._isJQL ? e2.result : e2;
+    }
+    _callCloudFunction({ action: e2, command: t2, multiCommand: n2, queryList: s2 }) {
+      function r2(e3, t3) {
+        if (n2 && s2)
+          for (let n3 = 0; n3 < s2.length; n3++) {
+            const r3 = s2[n3];
+            r3.udb && "function" == typeof r3.udb.setResult && (t3 ? r3.udb.setResult(t3) : r3.udb.setResult(e3.result.dataList[n3]));
+          }
+      }
+      const i2 = this, o2 = this._isJQL ? "databaseForJQL" : "database";
+      function a2(e3) {
+        return i2._callback("error", [e3]), q(F(o2, "fail"), e3).then(() => q(F(o2, "complete"), e3)).then(() => (r2(null, e3), X($, { type: J, content: e3 }), Promise.reject(e3)));
+      }
+      const c2 = q(F(o2, "invoke")), u2 = this._uniClient;
+      return c2.then(() => u2.callFunction({ name: "DCloud-clientDB", type: h, data: { action: e2, command: t2, multiCommand: n2 } })).then((e3) => {
+        const { code: t3, message: n3, token: s3, tokenExpired: c3, systemInfo: u3 = [] } = e3.result;
+        if (u3)
+          for (let e4 = 0; e4 < u3.length; e4++) {
+            const { level: t4, message: n4, detail: s4 } = u3[e4], r3 = console["warn" === t4 ? "error" : t4] || console.log;
+            let i3 = "[System Info]" + n4;
+            s4 && (i3 = "".concat(i3, "\n详细信息：").concat(s4)), r3(i3);
+          }
+        if (t3) {
+          return a2(new se({ code: t3, message: n3, requestId: e3.requestId }));
+        }
+        e3.result.errCode = e3.result.errCode || e3.result.code, e3.result.errMsg = e3.result.errMsg || e3.result.message, s3 && c3 && (ae({ token: s3, tokenExpired: c3 }), this._callbackAuth("refreshToken", [{ token: s3, tokenExpired: c3 }]), this._callback("refreshToken", [{ token: s3, tokenExpired: c3 }]), X(W, { token: s3, tokenExpired: c3 }));
+        const h2 = [{ prop: "affectedDocs", tips: "affectedDocs不再推荐使用，请使用inserted/deleted/updated/data.length替代" }, { prop: "code", tips: "code不再推荐使用，请使用errCode替代" }, { prop: "message", tips: "message不再推荐使用，请使用errMsg替代" }];
+        for (let t4 = 0; t4 < h2.length; t4++) {
+          const { prop: n4, tips: s4 } = h2[t4];
+          if (n4 in e3.result) {
+            const t5 = e3.result[n4];
+            Object.defineProperty(e3.result, n4, { get: () => (console.warn(s4), t5) });
+          }
+        }
+        return function(e4) {
+          return q(F(o2, "success"), e4).then(() => q(F(o2, "complete"), e4)).then(() => {
+            r2(e4, null);
+            const t4 = i2._parseResult(e4);
+            return X($, { type: J, content: t4 }), Promise.resolve(t4);
+          });
+        }(e3);
+      }, (e3) => {
+        /fc_function_not_found|FUNCTION_NOT_FOUND/g.test(e3.message) && console.warn("clientDB未初始化，请在web控制台保存一次schema以开启clientDB");
+        return a2(new se({ code: e3.code || "SYSTEM_ERROR", message: e3.message, requestId: e3.requestId }));
+      });
+    }
+  }
+  const ks = "token无效，跳转登录页面", As = "token过期，跳转登录页面", Ts = { TOKEN_INVALID_TOKEN_EXPIRED: As, TOKEN_INVALID_INVALID_CLIENTID: ks, TOKEN_INVALID: ks, TOKEN_INVALID_WRONG_TOKEN: ks, TOKEN_INVALID_ANONYMOUS_USER: ks }, Cs = { "uni-id-token-expired": As, "uni-id-check-token-failed": ks, "uni-id-token-not-exist": ks, "uni-id-check-device-feature-failed": ks }, Ps = { ...Ts, ...Cs, default: "用户未登录或登录状态过期，自动跳转登录页面" };
+  function Os(e2, t2) {
+    let n2 = "";
+    return n2 = e2 ? "".concat(e2, "/").concat(t2) : t2, n2.replace(/^\//, "");
+  }
+  function Es(e2 = [], t2 = "") {
+    const n2 = [], s2 = [];
+    return e2.forEach((e3) => {
+      true === e3.needLogin ? n2.push(Os(t2, e3.path)) : false === e3.needLogin && s2.push(Os(t2, e3.path));
+    }), { needLoginPage: n2, notNeedLoginPage: s2 };
+  }
+  function xs(e2) {
+    return e2.split("?")[0].replace(/^\//, "");
+  }
+  function Ls() {
+    return function(e2) {
+      let t2 = e2 && e2.route;
+      return t2 ? ("/" !== t2.charAt(0) && (t2 = "/" + t2), t2) : "";
+    }(function() {
+      const e2 = getCurrentPages();
+      return e2[e2.length - 1];
+    }());
+  }
+  function Rs() {
+    return xs(Ls());
+  }
+  function Us(e2 = "", t2 = {}) {
+    if (!e2)
+      return false;
+    if (!(t2 && t2.list && t2.list.length))
+      return false;
+    const n2 = t2.list, s2 = xs(e2);
+    return n2.some((e3) => e3.pagePath === s2);
+  }
+  const Ns = !!e.uniIdRouter;
+  const { loginPage: Ds, routerNeedLogin: Ms, resToLogin: qs, needLoginPage: Fs, notNeedLoginPage: Ks, loginPageInTabBar: js } = function({ pages: t2 = [], subPackages: n2 = [], uniIdRouter: s2 = {}, tabBar: r2 = {} } = e) {
+    const { loginPage: i2, needLogin: o2 = [], resToLogin: a2 = true } = s2, { needLoginPage: c2, notNeedLoginPage: u2 } = Es(t2), { needLoginPage: h2, notNeedLoginPage: l2 } = function(e2 = []) {
+      const t3 = [], n3 = [];
+      return e2.forEach((e3) => {
+        const { root: s3, pages: r3 = [] } = e3, { needLoginPage: i3, notNeedLoginPage: o3 } = Es(r3, s3);
+        t3.push(...i3), n3.push(...o3);
+      }), { needLoginPage: t3, notNeedLoginPage: n3 };
+    }(n2);
+    return { loginPage: i2, routerNeedLogin: o2, resToLogin: a2, needLoginPage: [...c2, ...h2], notNeedLoginPage: [...u2, ...l2], loginPageInTabBar: Us(i2, r2) };
+  }();
+  if (Fs.indexOf(Ds) > -1)
+    throw new Error("Login page [".concat(Ds, '] should not be "needLogin", please check your pages.json'));
+  function $s(e2) {
+    const t2 = Rs();
+    if ("/" === e2.charAt(0))
+      return e2;
+    const [n2, s2] = e2.split("?"), r2 = n2.replace(/^\//, "").split("/"), i2 = t2.split("/");
+    i2.pop();
+    for (let e3 = 0; e3 < r2.length; e3++) {
+      const t3 = r2[e3];
+      ".." === t3 ? i2.pop() : "." !== t3 && i2.push(t3);
+    }
+    return "" === i2[0] && i2.shift(), "/" + i2.join("/") + (s2 ? "?" + s2 : "");
+  }
+  function Bs(e2, t2) {
+    return new RegExp(t2).test(e2);
+  }
+  function Ws({ redirect: e2 }) {
+    const t2 = xs(e2), n2 = xs(Ds);
+    return Rs() !== n2 && t2 !== n2;
+  }
+  function Hs({ api: e2, redirect: t2 } = {}) {
+    if (!t2 || !Ws({ redirect: t2 }))
+      return;
+    const n2 = function(e3, t3) {
+      return "/" !== e3.charAt(0) && (e3 = "/" + e3), t3 ? e3.indexOf("?") > -1 ? e3 + "&uniIdRedirectUrl=".concat(encodeURIComponent(t3)) : e3 + "?uniIdRedirectUrl=".concat(encodeURIComponent(t3)) : e3;
+    }(Ds, t2);
+    js ? "navigateTo" !== e2 && "redirectTo" !== e2 || (e2 = "switchTab") : "switchTab" === e2 && (e2 = "navigateTo");
+    const s2 = { navigateTo: uni.navigateTo, redirectTo: uni.redirectTo, switchTab: uni.switchTab, reLaunch: uni.reLaunch };
+    setTimeout(() => {
+      s2[e2]({ url: n2 });
+    }, 0);
+  }
+  function Js({ url: e2 } = {}) {
+    const t2 = { abortLoginPageJump: false, autoToLoginPage: false }, n2 = function() {
+      const { token: e3, tokenExpired: t3 } = oe();
+      let n3;
+      if (e3) {
+        if (t3 < Date.now()) {
+          const e4 = "uni-id-token-expired";
+          n3 = { errCode: e4, errMsg: Ps[e4] };
+        }
+      } else {
+        const e4 = "uni-id-check-token-failed";
+        n3 = { errCode: e4, errMsg: Ps[e4] };
+      }
+      return n3;
+    }();
+    if (function(e3) {
+      const t3 = xs($s(e3));
+      return !(Ks.indexOf(t3) > -1) && (Fs.indexOf(t3) > -1 || Ms.some((n3) => Bs(t3, n3) || Bs(e3, n3)));
+    }(e2) && n2) {
+      n2.uniIdRedirectUrl = e2;
+      if (G(B).length > 0)
+        return setTimeout(() => {
+          X(B, n2);
+        }, 0), t2.abortLoginPageJump = true, t2;
+      t2.autoToLoginPage = true;
+    }
+    return t2;
+  }
+  function zs() {
+    const e2 = Ls(), { abortLoginPageJump: t2, autoToLoginPage: n2 } = Js({ url: e2 });
+    t2 || n2 && Hs({ api: "redirectTo", redirect: e2 });
+  }
+  function Vs() {
+    zs();
+    const e2 = ["navigateTo", "redirectTo", "reLaunch", "switchTab"];
+    for (let t2 = 0; t2 < e2.length; t2++) {
+      const n2 = e2[t2];
+      uni.addInterceptor(n2, { invoke(e3) {
+        const { abortLoginPageJump: t3, autoToLoginPage: s2 } = Js({ url: e3.url });
+        return t3 ? e3 : s2 ? (Hs({ api: n2, redirect: $s(e3.url) }), false) : e3;
+      } });
+    }
+  }
+  function Gs() {
+    this.onResponse((e2) => {
+      const { type: t2, content: n2 } = e2;
+      let s2 = false;
+      switch (t2) {
+        case "cloudobject":
+          s2 = function(e3) {
+            if ("object" != typeof e3)
+              return false;
+            const { errCode: t3 } = e3 || {};
+            return t3 in Ps;
+          }(n2);
+          break;
+        case "clientdb":
+          s2 = function(e3) {
+            if ("object" != typeof e3)
+              return false;
+            const { errCode: t3 } = e3 || {};
+            return t3 in Ts;
+          }(n2);
+      }
+      s2 && function(e3 = {}) {
+        const t3 = G(B);
+        te().then(() => {
+          const n3 = Ls();
+          if (n3 && Ws({ redirect: n3 }))
+            return t3.length > 0 ? X(B, Object.assign({ uniIdRedirectUrl: n3 }, e3)) : void (Ds && Hs({ api: "navigateTo", redirect: n3 }));
+        });
+      }(n2);
+    });
+  }
+  function Qs(e2) {
+    e2.onNeedLogin = function(e3) {
+      Q(B, e3);
+    }, e2.offNeedLogin = function(e3) {
+      Y(B, e3);
+    }, Ns && (L("_globalUniCloudStatus").needLoginInit || (L("_globalUniCloudStatus").needLoginInit = true, te().then(() => {
+      Vs.call(e2);
+    }), qs && Gs.call(e2)));
+  }
+  function Ys(e2) {
+    e2.onFailover = function(e3) {
+      Q(H, e3);
+    }, e2.offFailover = function(e3) {
+      Y(H, e3);
+    }, e2.refreshFailoverConfig = function() {
+      return e2.config, tn(0), sn();
+    }, e2.clearFailoverConfig = function() {
+      !function() {
+        Gt = null, Qt = 0;
+        try {
+          re.removeStorageSync(Zt("UNICLOUD_FAILOVER_CONFIG")), re.removeStorageSync(Zt("UNICLOUD_FAILOVER_LAST_REQUEST"));
+        } catch (e3) {
+        }
+      }();
+    };
+  }
+  function Xs(e2) {
+    !function(e3) {
+      e3.onResponse = function(e4) {
+        Q($, e4);
+      }, e3.offResponse = function(e4) {
+        Y($, e4);
+      };
+    }(e2), Qs(e2), function(e3) {
+      e3.onRefreshToken = function(e4) {
+        Q(W, e4);
+      }, e3.offRefreshToken = function(e4) {
+        Y(W, e4);
+      };
+    }(e2), Ys(e2);
+  }
+  const Zs = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", er = /^(?:[A-Za-z\d+/]{4})*?(?:[A-Za-z\d+/]{2}(?:==)?|[A-Za-z\d+/]{3}=?)?$/;
+  function tr(e2) {
+    return decodeURIComponent(function(e3) {
+      if (e3 = String(e3).replace(/[\t\n\f\r ]+/g, ""), !er.test(e3))
+        throw new Error("Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.");
+      var t2;
+      e3 += "==".slice(2 - (3 & e3.length));
+      for (var n2, s2, r2 = "", i2 = 0; i2 < e3.length; )
+        t2 = Zs.indexOf(e3.charAt(i2++)) << 18 | Zs.indexOf(e3.charAt(i2++)) << 12 | (n2 = Zs.indexOf(e3.charAt(i2++))) << 6 | (s2 = Zs.indexOf(e3.charAt(i2++))), r2 += 64 === n2 ? String.fromCharCode(t2 >> 16 & 255) : 64 === s2 ? String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255) : String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255, 255 & t2);
+      return r2;
+    }(e2).split("").map(function(e3) {
+      return "%" + ("00" + e3.charCodeAt(0).toString(16)).slice(-2);
+    }).join(""));
+  }
+  function nr() {
+    const e2 = oe().token || "", t2 = e2.split(".");
+    if (!e2 || 3 !== t2.length)
+      return { uid: null, role: [], permission: [], tokenExpired: 0 };
+    let n2;
+    try {
+      n2 = JSON.parse(tr(t2[1]));
+    } catch (e3) {
+      throw new Error("获取当前用户信息出错，详细错误信息为：" + e3.message);
+    }
+    return n2.tokenExpired = 1e3 * n2.exp, delete n2.exp, delete n2.iat, n2;
+  }
+  var sr = n(function(e2, t2) {
+    Object.defineProperty(t2, "__esModule", { value: true });
+    const n2 = "chooseAndUploadFile:ok", s2 = "chooseAndUploadFile:fail";
+    function r2(e3, t3) {
+      return e3.tempFiles.forEach((e4, n3) => {
+        e4.name || (e4.name = e4.path.substring(e4.path.lastIndexOf("/") + 1)), t3 && (e4.fileType = t3), e4.cloudPath = Date.now() + "_" + n3 + e4.name.substring(e4.name.lastIndexOf("."));
+      }), e3.tempFilePaths || (e3.tempFilePaths = e3.tempFiles.map((e4) => e4.path)), e3;
+    }
+    function i2(e3, t3, { onChooseFile: s3, onUploadProgress: r3 }) {
+      return t3.then((e4) => {
+        if (s3) {
+          const t4 = s3(e4);
+          if (void 0 !== t4)
+            return Promise.resolve(t4).then((t5) => void 0 === t5 ? e4 : t5);
+        }
+        return e4;
+      }).then((t4) => false === t4 ? { errMsg: n2, tempFilePaths: [], tempFiles: [] } : function(e4, t5, s4 = 5, r4) {
+        (t5 = Object.assign({}, t5)).errMsg = n2;
+        const i3 = t5.tempFiles, o2 = i3.length;
+        let a2 = 0;
+        return new Promise((n3) => {
+          for (; a2 < s4; )
+            c2();
+          function c2() {
+            const s5 = a2++;
+            if (s5 >= o2)
+              return void (!i3.find((e5) => !e5.url && !e5.errMsg) && n3(t5));
+            const u2 = i3[s5];
+            e4.uploadFile({ provider: u2.provider, filePath: u2.path, cloudPath: u2.cloudPath, fileType: u2.fileType, cloudPathAsRealPath: u2.cloudPathAsRealPath, onUploadProgress(e5) {
+              e5.index = s5, e5.tempFile = u2, e5.tempFilePath = u2.path, r4 && r4(e5);
+            } }).then((e5) => {
+              u2.url = e5.fileID, s5 < o2 && c2();
+            }).catch((e5) => {
+              u2.errMsg = e5.errMsg || e5.message, s5 < o2 && c2();
+            });
+          }
+        });
+      }(e3, t4, 5, r3));
+    }
+    t2.initChooseAndUploadFile = function(e3) {
+      return function(t3 = { type: "all" }) {
+        return "image" === t3.type ? i2(e3, function(e4) {
+          const { count: t4, sizeType: n3, sourceType: i3 = ["album", "camera"], extension: o2 } = e4;
+          return new Promise((e5, a2) => {
+            uni.chooseImage({ count: t4, sizeType: n3, sourceType: i3, extension: o2, success(t5) {
+              e5(r2(t5, "image"));
+            }, fail(e6) {
+              a2({ errMsg: e6.errMsg.replace("chooseImage:fail", s2) });
+            } });
+          });
+        }(t3), t3) : "video" === t3.type ? i2(e3, function(e4) {
+          const { camera: t4, compressed: n3, maxDuration: i3, sourceType: o2 = ["album", "camera"], extension: a2 } = e4;
+          return new Promise((e5, c2) => {
+            uni.chooseVideo({ camera: t4, compressed: n3, maxDuration: i3, sourceType: o2, extension: a2, success(t5) {
+              const { tempFilePath: n4, duration: s3, size: i4, height: o3, width: a3 } = t5;
+              e5(r2({ errMsg: "chooseVideo:ok", tempFilePaths: [n4], tempFiles: [{ name: t5.tempFile && t5.tempFile.name || "", path: n4, size: i4, type: t5.tempFile && t5.tempFile.type || "", width: a3, height: o3, duration: s3, fileType: "video", cloudPath: "" }] }, "video"));
+            }, fail(e6) {
+              c2({ errMsg: e6.errMsg.replace("chooseVideo:fail", s2) });
+            } });
+          });
+        }(t3), t3) : i2(e3, function(e4) {
+          const { count: t4, extension: n3 } = e4;
+          return new Promise((e5, i3) => {
+            let o2 = uni.chooseFile;
+            if ("undefined" != typeof wx && "function" == typeof wx.chooseMessageFile && (o2 = wx.chooseMessageFile), "function" != typeof o2)
+              return i3({ errMsg: s2 + " 请指定 type 类型，该平台仅支持选择 image 或 video。" });
+            o2({ type: "all", count: t4, extension: n3, success(t5) {
+              e5(r2(t5));
+            }, fail(e6) {
+              i3({ errMsg: e6.errMsg.replace("chooseFile:fail", s2) });
+            } });
+          });
+        }(t3), t3);
+      };
+    };
+  }), rr = t(sr);
+  const ir = "manual";
+  function or(e2) {
+    return { props: { localdata: { type: Array, default: () => [] }, options: { type: [Object, Array], default: () => ({}) }, spaceInfo: { type: Object, default: () => ({}) }, collection: { type: [String, Array], default: "" }, action: { type: String, default: "" }, field: { type: String, default: "" }, orderby: { type: String, default: "" }, where: { type: [String, Object], default: "" }, pageData: { type: String, default: "add" }, pageCurrent: { type: Number, default: 1 }, pageSize: { type: Number, default: 20 }, getcount: { type: [Boolean, String], default: false }, gettree: { type: [Boolean, String], default: false }, gettreepath: { type: [Boolean, String], default: false }, startwith: { type: String, default: "" }, limitlevel: { type: Number, default: 10 }, groupby: { type: String, default: "" }, groupField: { type: String, default: "" }, distinct: { type: [Boolean, String], default: false }, foreignKey: { type: String, default: "" }, loadtime: { type: String, default: "auto" }, manual: { type: Boolean, default: false } }, data: () => ({ mixinDatacomLoading: false, mixinDatacomHasMore: false, mixinDatacomResData: [], mixinDatacomErrorMessage: "", mixinDatacomPage: {}, mixinDatacomError: null }), created() {
+      this.mixinDatacomPage = { current: this.pageCurrent, size: this.pageSize, count: 0 }, this.$watch(() => {
+        var e3 = [];
+        return ["pageCurrent", "pageSize", "localdata", "collection", "action", "field", "orderby", "where", "getont", "getcount", "gettree", "groupby", "groupField", "distinct"].forEach((t2) => {
+          e3.push(this[t2]);
+        }), e3;
+      }, (e3, t2) => {
+        if (this.loadtime === ir)
+          return;
+        let n2 = false;
+        const s2 = [];
+        for (let r2 = 2; r2 < e3.length; r2++)
+          e3[r2] !== t2[r2] && (s2.push(e3[r2]), n2 = true);
+        e3[0] !== t2[0] && (this.mixinDatacomPage.current = this.pageCurrent), this.mixinDatacomPage.size = this.pageSize, this.onMixinDatacomPropsChange(n2, s2);
+      });
+    }, methods: { onMixinDatacomPropsChange(e3, t2) {
+    }, mixinDatacomEasyGet({ getone: e3 = false, success: t2, fail: n2 } = {}) {
+      this.mixinDatacomLoading || (this.mixinDatacomLoading = true, this.mixinDatacomErrorMessage = "", this.mixinDatacomError = null, this.mixinDatacomGet().then((n3) => {
+        this.mixinDatacomLoading = false;
+        const { data: s2, count: r2 } = n3.result;
+        this.getcount && (this.mixinDatacomPage.count = r2), this.mixinDatacomHasMore = s2.length < this.pageSize;
+        const i2 = e3 ? s2.length ? s2[0] : void 0 : s2;
+        this.mixinDatacomResData = i2, t2 && t2(i2);
+      }).catch((e4) => {
+        this.mixinDatacomLoading = false, this.mixinDatacomErrorMessage = e4, this.mixinDatacomError = e4, n2 && n2(e4);
+      }));
+    }, mixinDatacomGet(t2 = {}) {
+      let n2;
+      t2 = t2 || {}, n2 = "undefined" != typeof __uniX && __uniX ? e2.databaseForJQL(this.spaceInfo) : e2.database(this.spaceInfo);
+      const s2 = t2.action || this.action;
+      s2 && (n2 = n2.action(s2));
+      const r2 = t2.collection || this.collection;
+      n2 = Array.isArray(r2) ? n2.collection(...r2) : n2.collection(r2);
+      const i2 = t2.where || this.where;
+      i2 && Object.keys(i2).length && (n2 = n2.where(i2));
+      const o2 = t2.field || this.field;
+      o2 && (n2 = n2.field(o2));
+      const a2 = t2.foreignKey || this.foreignKey;
+      a2 && (n2 = n2.foreignKey(a2));
+      const c2 = t2.groupby || this.groupby;
+      c2 && (n2 = n2.groupBy(c2));
+      const u2 = t2.groupField || this.groupField;
+      u2 && (n2 = n2.groupField(u2));
+      true === (void 0 !== t2.distinct ? t2.distinct : this.distinct) && (n2 = n2.distinct());
+      const h2 = t2.orderby || this.orderby;
+      h2 && (n2 = n2.orderBy(h2));
+      const l2 = void 0 !== t2.pageCurrent ? t2.pageCurrent : this.mixinDatacomPage.current, d2 = void 0 !== t2.pageSize ? t2.pageSize : this.mixinDatacomPage.size, p2 = void 0 !== t2.getcount ? t2.getcount : this.getcount, f2 = void 0 !== t2.gettree ? t2.gettree : this.gettree, g2 = void 0 !== t2.gettreepath ? t2.gettreepath : this.gettreepath, m2 = { getCount: p2 }, y2 = { limitLevel: void 0 !== t2.limitlevel ? t2.limitlevel : this.limitlevel, startWith: void 0 !== t2.startwith ? t2.startwith : this.startwith };
+      return f2 && (m2.getTree = y2), g2 && (m2.getTreePath = y2), n2 = n2.skip(d2 * (l2 - 1)).limit(d2).get(m2), n2;
+    } } };
+  }
+  function ar(e2) {
+    return function(t2, n2 = {}) {
+      n2 = function(e3, t3 = {}) {
+        return e3.customUI = t3.customUI || e3.customUI, e3.parseSystemError = t3.parseSystemError || e3.parseSystemError, Object.assign(e3.loadingOptions, t3.loadingOptions), Object.assign(e3.errorOptions, t3.errorOptions), "object" == typeof t3.secretMethods && (e3.secretMethods = t3.secretMethods), e3;
+      }({ customUI: false, loadingOptions: { title: "加载中...", mask: true }, errorOptions: { type: "modal", retry: false } }, n2);
+      const { customUI: s2, loadingOptions: r2, errorOptions: i2, parseSystemError: o2 } = n2, a2 = !s2;
+      return new Proxy({}, { get(s3, c2) {
+        switch (c2) {
+          case "toString":
+            return "[object UniCloudObject]";
+          case "toJSON":
+            return {};
+        }
+        return function({ fn: e3, interceptorName: t3, getCallbackArgs: n3 } = {}) {
+          return async function(...s4) {
+            const r3 = n3 ? n3({ params: s4 }) : {};
+            let i3, o3;
+            try {
+              return await q(F(t3, "invoke"), { ...r3 }), i3 = await e3(...s4), await q(F(t3, "success"), { ...r3, result: i3 }), i3;
+            } catch (e4) {
+              throw o3 = e4, await q(F(t3, "fail"), { ...r3, error: o3 }), o3;
+            } finally {
+              await q(F(t3, "complete"), o3 ? { ...r3, error: o3 } : { ...r3, result: i3 });
+            }
+          };
+        }({ fn: async function s4(...h2) {
+          let l2;
+          a2 && uni.showLoading({ title: r2.title, mask: r2.mask });
+          const d2 = { name: t2, type: u, data: { method: c2, params: h2 } };
+          "object" == typeof n2.secretMethods && function(e3, t3) {
+            const n3 = t3.data.method, s5 = e3.secretMethods || {}, r3 = s5[n3] || s5["*"];
+            r3 && (t3.secretType = r3);
+          }(n2, d2);
+          let p2 = false;
+          try {
+            l2 = await e2.callFunction(d2);
+          } catch (e3) {
+            p2 = true, l2 = { result: new se(e3) };
+          }
+          const { errSubject: f2, errCode: g2, errMsg: m2, newToken: y2 } = l2.result || {};
+          if (a2 && uni.hideLoading(), y2 && y2.token && y2.tokenExpired && (ae(y2), X(W, { ...y2 })), g2) {
+            let e3 = m2;
+            if (p2 && o2) {
+              e3 = (await o2({ objectName: t2, methodName: c2, params: h2, errSubject: f2, errCode: g2, errMsg: m2 })).errMsg || m2;
+            }
+            if (a2)
+              if ("toast" === i2.type)
+                uni.showToast({ title: e3, icon: "none" });
+              else {
+                if ("modal" !== i2.type)
+                  throw new Error("Invalid errorOptions.type: ".concat(i2.type));
+                {
+                  const { confirm: t3 } = await async function({ title: e4, content: t4, showCancel: n4, cancelText: s5, confirmText: r3 } = {}) {
+                    return new Promise((i3, o3) => {
+                      uni.showModal({ title: e4, content: t4, showCancel: n4, cancelText: s5, confirmText: r3, success(e5) {
+                        i3(e5);
+                      }, fail() {
+                        i3({ confirm: false, cancel: true });
+                      } });
+                    });
+                  }({ title: "提示", content: e3, showCancel: i2.retry, cancelText: "取消", confirmText: i2.retry ? "重试" : "确定" });
+                  if (i2.retry && t3)
+                    return s4(...h2);
+                }
+              }
+            const n3 = new se({ subject: f2, code: g2, message: m2, requestId: l2.requestId });
+            throw n3.detail = l2.result, X($, { type: V, content: n3 }), n3;
+          }
+          return X($, { type: V, content: l2.result }), l2.result;
+        }, interceptorName: "callObject", getCallbackArgs: function({ params: e3 } = {}) {
+          return { objectName: t2, methodName: c2, params: e3 };
+        } });
+      } });
+    };
+  }
+  function cr(e2) {
+    return L("_globalUniCloudSecureNetworkCache__{spaceId}".replace("{spaceId}", e2.config.spaceId));
+  }
+  async function ur({ openid: e2, callLoginByWeixin: t2 = false } = {}) {
+    cr(this);
+    throw new Error("[SecureNetwork] API `initSecureNetworkByWeixin` is not supported on platform `".concat(A, "`"));
+  }
+  async function hr(e2) {
+    const t2 = cr(this);
+    return t2.initPromise || (t2.initPromise = ur.call(this, e2).then((e3) => e3).catch((e3) => {
+      throw delete t2.initPromise, e3;
+    })), t2.initPromise;
+  }
+  function lr(e2) {
+    return function({ openid: t2, callLoginByWeixin: n2 = false } = {}) {
+      return hr.call(e2, { openid: t2, callLoginByWeixin: n2 });
+    };
+  }
+  function dr(e2) {
+    !function(e3) {
+      de = e3;
+    }(e2);
+  }
+  function pr(e2) {
+    const n2 = { getAppBaseInfo: uni.getSystemInfo, getPushClientId: uni.getPushClientId };
+    return function(s2) {
+      return new Promise((r2, i2) => {
+        n2[e2]({ ...s2, success(e3) {
+          r2(e3);
+        }, fail(e3) {
+          i2(e3);
+        } });
+      });
+    };
+  }
+  class fr extends class {
+    constructor() {
+      this._callback = {};
+    }
+    addListener(e2, t2) {
+      this._callback[e2] || (this._callback[e2] = []), this._callback[e2].push(t2);
+    }
+    on(e2, t2) {
+      return this.addListener(e2, t2);
+    }
+    removeListener(e2, t2) {
+      if (!t2)
+        throw new Error('The "listener" argument must be of type function. Received undefined');
+      const n2 = this._callback[e2];
+      if (!n2)
+        return;
+      const s2 = function(e3, t3) {
+        for (let n3 = e3.length - 1; n3 >= 0; n3--)
+          if (e3[n3] === t3)
+            return n3;
+        return -1;
+      }(n2, t2);
+      n2.splice(s2, 1);
+    }
+    off(e2, t2) {
+      return this.removeListener(e2, t2);
+    }
+    removeAllListener(e2) {
+      delete this._callback[e2];
+    }
+    emit(e2, ...t2) {
+      const n2 = this._callback[e2];
+      if (n2)
+        for (let e3 = 0; e3 < n2.length; e3++)
+          n2[e3](...t2);
+    }
+  } {
+    constructor() {
+      super(), this._uniPushMessageCallback = this._receivePushMessage.bind(this), this._currentMessageId = -1, this._payloadQueue = [];
+    }
+    init() {
+      return Promise.all([pr("getAppBaseInfo")(), pr("getPushClientId")()]).then(([{ appId: e2 } = {}, { cid: t2 } = {}] = []) => {
+        if (!e2)
+          throw new Error("Invalid appId, please check the manifest.json file");
+        if (!t2)
+          throw new Error("Invalid push client id");
+        this._appId = e2, this._pushClientId = t2, this._seqId = Date.now() + "-" + Math.floor(9e5 * Math.random() + 1e5), this.emit("open"), this._initMessageListener();
+      }, (e2) => {
+        throw this.emit("error", e2), this.close(), e2;
+      });
+    }
+    async open() {
+      return this.init();
+    }
+    _isUniCloudSSE(e2) {
+      if ("receive" !== e2.type)
+        return false;
+      const t2 = e2 && e2.data && e2.data.payload;
+      return !(!t2 || "UNI_CLOUD_SSE" !== t2.channel || t2.seqId !== this._seqId);
+    }
+    _receivePushMessage(e2) {
+      if (!this._isUniCloudSSE(e2))
+        return;
+      const t2 = e2 && e2.data && e2.data.payload, { action: n2, messageId: s2, message: r2 } = t2;
+      this._payloadQueue.push({ action: n2, messageId: s2, message: r2 }), this._consumMessage();
+    }
+    _consumMessage() {
+      for (; ; ) {
+        const e2 = this._payloadQueue.find((e3) => e3.messageId === this._currentMessageId + 1);
+        if (!e2)
+          break;
+        this._currentMessageId++, this._parseMessagePayload(e2);
+      }
+    }
+    _parseMessagePayload(e2) {
+      const { action: t2, messageId: n2, message: s2 } = e2;
+      "end" === t2 ? this._end({ messageId: n2, message: s2 }) : "message" === t2 && this._appendMessage({ messageId: n2, message: s2 });
+    }
+    _appendMessage({ messageId: e2, message: t2 } = {}) {
+      this.emit("message", t2);
+    }
+    _end({ messageId: e2, message: t2 } = {}) {
+      this.emit("end", t2), this.close();
+    }
+    _initMessageListener() {
+      uni.onPushMessage(this._uniPushMessageCallback);
+    }
+    _destroy() {
+      uni.offPushMessage(this._uniPushMessageCallback);
+    }
+    toJSON() {
+      return { appId: this._appId, pushClientId: this._pushClientId, seqId: this._seqId };
+    }
+    close() {
+      this._destroy(), this.emit("close");
+    }
+  }
+  function mr(e2) {
+    e2._initPromiseHub || (e2._initPromiseHub = new v({ createPromise: function() {
+      let t2 = Promise.resolve();
+      var n2;
+      n2 = 1, t2 = new Promise((e3) => {
+        setTimeout(() => {
+          e3();
+        }, n2);
+      });
+      const s2 = e2.auth();
+      return t2.then(() => s2.getLoginState()).then((e3) => e3 ? Promise.resolve() : s2.signInAnonymously());
+    } }));
+  }
+  const yr = { tcb: Ot, tencent: Ot, aliyun: me, private: Ut, dcloud: Ut, alipay: Jt };
+  let _r = new class {
+    init(e2) {
+      let t2 = {};
+      const n2 = yr[e2.provider];
+      if (!n2)
+        throw new Error("未提供正确的provider参数");
+      t2 = n2.init(e2), mr(t2), ls(t2), function(e3) {
+        const t3 = e3.uploadFile;
+        e3.uploadFile = function(e4) {
+          return t3.call(this, e4);
+        };
+      }(t2), function(e3) {
+        e3.database = function(t3) {
+          if (t3 && Object.keys(t3).length > 0)
+            return e3.init(t3).database();
+          if (this._database)
+            return this._database;
+          const n3 = Ss(bs, { uniClient: e3 });
+          return this._database = n3, n3;
+        }, e3.databaseForJQL = function(t3) {
+          if (t3 && Object.keys(t3).length > 0)
+            return e3.init(t3).databaseForJQL();
+          if (this._databaseForJQL)
+            return this._databaseForJQL;
+          const n3 = Ss(bs, { uniClient: e3, isJQL: true });
+          return this._databaseForJQL = n3, n3;
+        };
+      }(t2), function(e3) {
+        e3.getCurrentUserInfo = nr, e3.chooseAndUploadFile = rr.initChooseAndUploadFile(e3), Object.assign(e3, { get mixinDatacom() {
+          return or(e3);
+        } }), e3.SSEChannel = fr, e3.initSecureNetworkByWeixin = lr(e3), e3.setCustomClientInfo = dr, e3.importObject = ar(e3);
+      }(t2);
+      return ["callFunction", "uploadFile", "deleteFile", "getTempFileURL", "downloadFile", "chooseAndUploadFile"].forEach((e3) => {
+        if (!t2[e3])
+          return;
+        const n3 = t2[e3];
+        t2[e3] = function() {
+          return n3.apply(t2, Array.from(arguments));
+        }, t2[e3] = (/* @__PURE__ */ function(e4, t3) {
+          return function(n4) {
+            let s2 = false;
+            if ("callFunction" === t3) {
+              const e5 = n4 && n4.type || c;
+              s2 = e5 !== c;
+            }
+            const r2 = "callFunction" === t3 && !s2, i2 = this._initPromiseHub.exec();
+            n4 = n4 || {};
+            const { success: o2, fail: a2, complete: u2 } = ne(n4), h2 = i2.then(() => s2 ? Promise.resolve() : q(F(t3, "invoke"), n4)).then(() => e4.call(this, n4)).then((e5) => s2 ? Promise.resolve(e5) : q(F(t3, "success"), e5).then(() => q(F(t3, "complete"), e5)).then(() => (r2 && X($, { type: z, content: e5 }), Promise.resolve(e5))), (e5) => s2 ? Promise.reject(e5) : q(F(t3, "fail"), e5).then(() => q(F(t3, "complete"), e5)).then(() => (X($, { type: z, content: e5 }), Promise.reject(e5))));
+            if (!(o2 || a2 || u2))
+              return h2;
+            h2.then((e5) => {
+              o2 && o2(e5), u2 && u2(e5), r2 && X($, { type: z, content: e5 });
+            }, (e5) => {
+              a2 && a2(e5), u2 && u2(e5), r2 && X($, { type: z, content: e5 });
+            });
+          };
+        }(t2[e3], e3)).bind(t2);
+      }), t2.init = this.init, t2;
+    }
+  }();
+  (() => {
+    const e2 = Array.isArray(C) ? C.length : 0, t2 = function() {
+      const e3 = Xt(), t3 = en();
+      return t3 && t3.enable && g(t3.space) ? t3.space : e3;
+    }();
+    if (1 === e2)
+      _r = _r.init(t2), _r._isDefault = true;
+    else {
+      const t3 = ["database", "getCurrentUserInfo", "importObject"];
+      let n2;
+      n2 = e2 > 0 ? "应用有多个服务空间，请通过uniCloud.init方法指定要使用的服务空间" : "应用未关联服务空间，请在uniCloud目录右键关联服务空间", [...["auth", "callFunction", "uploadFile", "deleteFile", "getTempFileURL", "downloadFile"], ...t3].forEach((e3) => {
+        _r[e3] = function() {
+          if (console.error(n2), -1 === t3.indexOf(e3))
+            return Promise.reject(new se({ code: "SYS_ERR", message: n2 }));
+          console.error(n2);
+        };
+      });
+    }
+    if (Object.assign(_r, { get mixinDatacom() {
+      return or(_r);
+    } }), Xs(_r), _r.addInterceptor = D, _r.removeInterceptor = M, _r.interceptObject = K, uni.__uniCloud = _r, "app" === A) {
+      const e3 = R();
+      e3.uniCloud = _r, e3.UniCloudError = se;
+    }
+    !function() {
+      const { failoverEndpoint: e3 } = Xt();
+      if (!e3)
+        return;
+      sn().catch((e4) => {
+        console.error("请求故障切换配置失败：", e4);
+      });
+      const t3 = { fail() {
+        const e4 = en();
+        nn(e4 && e4.interval || 0) && sn().catch((e5) => {
+          console.error("请求故障切换配置失败：", e5);
+        });
+      } };
+      D("callFunction", t3), D("database", t3), D("uploadFile", t3);
+    }();
+  })();
   enableStyleIsolation();
   const __global__ = typeof globalThis === "undefined" ? Function("return this")() : globalThis;
   __global__.__uniX = true;

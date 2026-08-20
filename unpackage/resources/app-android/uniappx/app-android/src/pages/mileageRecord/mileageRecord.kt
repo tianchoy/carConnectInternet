@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -164,6 +165,15 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                         try {
                             val data: UTSJSONObject = _uO("imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
                             val res = await(getTrackPos(data))
+                            if (res.code != 200) {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "数据加载失败"
+                                }
+                                , icon = "none"))
+                                return@w1
+                            }
                             console.log("获取里程数据成功:", res)
                             val trackData = res.data
                             if (trackData != null) {

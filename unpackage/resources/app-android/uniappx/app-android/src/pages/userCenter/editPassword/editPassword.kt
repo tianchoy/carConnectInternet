@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -36,7 +37,7 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                             uni_showLoading(ShowLoadingOptions(title = "提交中...", mask = true))
                             val submitData: UTSJSONObject = _uO("password" to formData.value["password"], "newPassword" to formData.value["newPassword"])
                             val res = await(changePassWord(submitData))
-                            if (res.msg == "success") {
+                            if (res.code == 200) {
                                 uni_hideLoading(null)
                                 showAppToast(ShowToastOptions(title = "密码修改成功", icon = "success", duration = 2000))
                                 setTimeout(fun(){

@@ -20,12 +20,17 @@ const LEGACY_PUSH_SESSION_KEY = 'push_session_key';
 const PUSH_REGISTRATION_ID_MAX_RETRY_COUNT = 5;
 const PUSH_REGISTRATION_ID_RETRY_DELAY = 3000;
 const PUSH_REGISTRATION_ID_REQUEST_TIMEOUT = 18000;
-// Keep UniPush as the production default. The override is deliberately local-storage
-// based so test builds can switch provider without changing normal user-facing flows.
-const DEFAULT_PUSH_PROVIDER: PushProviderName = 'unipush';
-const ENABLE_LOCAL_PROVIDER_SWITCH = true;
+// UniPush is the active provider on both Android and iOS. JPush remains in the
+// project for later diagnostics, but its RegistrationID is not a UniPush CID.
+const DEFAULT_PUSH_PROVIDER: PushProviderName = 'jpush';
+const ENABLE_LOCAL_PROVIDER_SWITCH = false;
+// Release/TestFlight/App Store packages must use APNs production. Development-signed
+// packages can set a local override to false before launch when testing the sandbox.
+const JPUSH_IOS_PRODUCTION_OVERRIDE_KEY = 'push_jpush_ios_production_override';
+const DEFAULT_JPUSH_IOS_IS_PRODUCTION = true;
 import AndroidLog from 'android.util.Log';
-import { init as initAndroidJPush, setEventCallBack as setJPushEventCallBack, getRegistrationId as getAndroidJPushRegistrationId } from '@/uni_modules/jg-jpush-u';
+import { init as initAndroidJPush, setEventCallBack as setJPushEventCallBack, getRegistrationId as getAndroidJPushRegistrationId, setBadgeNumber as setAndroidJPushBadgeNumber } from '@/uni_modules/jg-jpush-u';
+import { init as initHuaweiJPushVendor } from '@/uni_modules/jg-jpush-u-huawei';
 const JPUSH_APP_KEY = 'a53c28d734057573f67e16f7';
 const JPUSH_CHANNEL = 'developer-default';
 function registrationIdKey(provider: PushProviderName): string {
@@ -42,7 +47,7 @@ function sessionKey(provider: PushProviderName): string {
 }
 function pushDebug(provider: PushProviderName, message: string): void {
     AndroidLog.e('PushManager', '[' + provider + '] ' + message);
-    __f__('error', 'at services/push.uts:72', '[PushManager][' + provider + '] ' + message);
+    __f__('error', 'at services/push.uts:82', '[PushManager][' + provider + '] ' + message);
 }
 function stringValue(value: any): string {
     if (value == null)
@@ -100,12 +105,16 @@ function pushMessageId(payload: any): string {
         id = nestedPayloadValue(payload, 'id');
     return id;
 }
+function jpushIosIsProduction(): boolean {
+    const override = storageString(JPUSH_IOS_PRODUCTION_OVERRIDE_KEY);
+    if (override == 'false')
+        return false;
+    if (override == 'true')
+        return true;
+    return DEFAULT_JPUSH_IOS_IS_PRODUCTION;
+}
 function selectedPushProvider(): PushProviderName {
-    if (!ENABLE_LOCAL_PROVIDER_SWITCH)
-        return DEFAULT_PUSH_PROVIDER;
-    const override = storageString(PUSH_LOCAL_PROVIDER_OVERRIDE_KEY);
-    return override == 'jpush' ? 'jpush' : DEFAULT_PUSH_PROVIDER;
-    // return 'jpush'
+    return DEFAULT_PUSH_PROVIDER;
 }
 function migrateLegacyStorage(provider: PushProviderName): void {
     // Older versions only had UniPush state. Keep it intact until UniPush is selected,
@@ -176,6 +185,7 @@ class UniPushAdapter implements PushAdapter {
                         onFailure('CID 为空');
                         return;
                     }
+                    pushDebug(this.provider, 'UniPush CID: ' + registrationId);
                     onSuccess(registrationId);
                 },
                 fail: (error: any) => {
@@ -219,6 +229,8 @@ class JPushAdapter implements PushAdapter {
                     }
                 }
             } as EventCallBackParams);
+            // Load Huawei's JPush vendor channel before the JPush core SDK initializes.
+            initHuaweiJPushVendor();
             // An empty value keeps using the AppKey configured in AndroidManifest.xml.
             initAndroidJPush('');
             onRegistrationAvailable();
@@ -257,6 +269,7 @@ class PushManager {
             return;
         }
         this.provider = selectedProvider;
+        pushDebug(this.provider, '已选择推送 provider: ' + this.provider);
         migrateLegacyStorage(this.provider);
         uni.setStorageSync(PUSH_PROVIDER_KEY, this.provider);
         this.adapter = this.provider == 'jpush' ? new JPushAdapter() : new UniPushAdapter();
@@ -327,7 +340,16 @@ class PushManager {
         uni.setStorageSync(PUSH_LOCAL_PROVIDER_OVERRIDE_KEY, provider);
         pushDebug(provider, '本地测试 provider 已设置；请完全重启应用后生效');
     }
+    clearBadge(): void {
+        try {
+            setAndroidJPushBadgeNumber(0);
+        }
+        catch (error: any) {
+            pushDebug(this.provider, '清除 Android 应用角标失败: ' + error.toString());
+        }
+    }
     private handlePushEvent(event: NormalizedPushEvent): void {
+        this.clearBadge();
         const messageId = pushMessageId(event.payload);
         if (messageId != '')
             uni.setStorageSync(pendingMessageIdKey(event.provider), messageId);
@@ -370,7 +392,7 @@ class PushManager {
         }
         this.registrationRetryCount = 0;
         uni.setStorageSync(registrationIdKey(this.provider), registrationId);
-        const registrationIdLabel = this.provider == 'unipush' ? 'UniPush CID' : 'JPush RegistrationID';
+        const registrationIdLabel = this.provider == 'unipush' ? 'UniPush CID 已就绪' : 'JPush RegistrationID 已就绪';
         pushDebug(this.provider, registrationIdLabel + ': ' + registrationId);
     }
     private requestUniPushRegistrationId(adapter: UniPushAdapter): void {
@@ -417,6 +439,9 @@ export function initPush(): void {
 export function refreshPushRegistrationId(): void {
     pushManager.refreshRegistrationId();
 }
+export function clearPushBadge(): void {
+    pushManager.clearBadge();
+}
 export function refreshPushClientId(): void {
     refreshPushRegistrationId();
 }
@@ -440,8 +465,8 @@ export function getCachedPushRegistrationId(): string {
 export function getCachedPushClientId(): string {
     return getCachedPushRegistrationId();
 }
-// Development-only hook. Set this before launching/relaunching the app to test the
-// installed JPush SDK; normal builds keep UniPush unless this value is explicitly set.
+// Development-only hook. This does not switch the active iOS JPush provider;
+// Android provider switching remains disabled in normal builds.
 export function setLocalPushProviderForTesting(provider: PushProviderName): void {
     pushManager.setLocalProviderForTesting(provider);
 }

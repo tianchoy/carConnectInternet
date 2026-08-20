@@ -13,15 +13,16 @@ import { showAppToast } from '../../utils/toast.uts';
 import { showAppModal } from '../../utils/modal.uts';
 import { ref, onMounted } from 'vue';
 import { markPushSessionAuthenticated } from '../../services/push.uts';
+import { resetTokenExpiredState } from '../../api/http.uts';
 import { login, PostWechatlogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts';
 import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts';
 type FormData = {
-    __$originalPosition?: UTSSourceMapPosition<"FormData", "pages/login/login.uvue", 143, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"FormData", "pages/login/login.uvue", 144, 7>;
     username: string;
     password: string;
 };
 type SavedAccount = {
-    __$originalPosition?: UTSSourceMapPosition<"SavedAccount", "pages/login/login.uvue", 147, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"SavedAccount", "pages/login/login.uvue", 148, 7>;
     username: string;
     password: string;
 };
@@ -61,13 +62,13 @@ const __sfc__ = defineComponent({
                 const rawAccount = uni.getStorageSync('savedEnterpriseAccount');
                 if (rawAccount == null || rawAccount == '')
                     return;
-                const account = typeof rawAccount == 'string' ? UTSAndroid.consoleDebugError(JSON.parse(rawAccount as string), " at pages/login/login.uvue:172") as UTSJSONObject : rawAccount as UTSJSONObject;
+                const account = typeof rawAccount == 'string' ? UTSAndroid.consoleDebugError(JSON.parse(rawAccount as string), " at pages/login/login.uvue:173") as UTSJSONObject : rawAccount as UTSJSONObject;
                 form.value.username = account.getString('username', '');
                 form.value.password = account.getString('password', '');
                 rememberPassword.value = form.value.username != '' || form.value.password != '';
             }
             catch (error: any) {
-                console.error('加载保存的账号密码失败:', error, " at pages/login/login.uvue:177");
+                console.error('加载保存的账号密码失败:', error, " at pages/login/login.uvue:178");
             }
         }
         const isPswLogin = (): void => {
@@ -105,7 +106,7 @@ const __sfc__ = defineComponent({
         const getSystemInfo = (): void => {
             const res = uni.getSystemInfoSync();
             deviceModel.value = res.deviceModel;
-            console.log('设备型号:', deviceModel.value, " at pages/login/login.uvue:220");
+            console.log('设备型号:', deviceModel.value, " at pages/login/login.uvue:221");
         };
         // ===== 表单验证 =====
         const validateForm = (): boolean => {
@@ -128,6 +129,7 @@ const __sfc__ = defineComponent({
             if (savePassword)
                 saveAccountPassword();
             uni.setStorageSync('token', token);
+            resetTokenExpiredState();
             markPushSessionAuthenticated();
             showAppToast({ title: '登录成功', icon: 'success' } as ShowToastOptions);
             setTimeout(() => {
@@ -170,11 +172,11 @@ const __sfc__ = defineComponent({
             try {
                 smsSending.value = true;
                 const response = await sendSmsLoginCode({ mobile: smsMobile.value, scene: 'login' } as SendSmsCodeRequest);
-                if (response.code != 0) {
+                if (response.code != 200) {
                     showAppToast({ title: response.msg != "" ? response.msg : '验证码发送失败', icon: 'none' } as ShowToastOptions);
                     return;
                 }
-                const cooldownSeconds = response.data != null ? response.data.getNumber('cooldownSeconds', 60) : 60;
+                const cooldownSeconds = response.data != null ? response.data!.getNumber('cooldownSeconds', 60) : 60;
                 startSmsCooldown(cooldownSeconds);
                 showAppToast({ title: '验证码已发送', icon: 'success' } as ShowToastOptions);
             }
@@ -198,8 +200,8 @@ const __sfc__ = defineComponent({
             try {
                 smsSubmitting.value = true;
                 const response = await smsLogin({ mobile: smsMobile.value, code: smsCode.value, platform: getAppPlatform() } as SmsLoginRequest);
-                const token = response.data != null ? response.data.getString('token', '') : '';
-                if (response.code == 0 && token != '') {
+                const token = response.data != null ? response.data!.getString('token', '') : '';
+                if (response.code == 200 && token != '') {
                     smsCode.value = '';
                     completeLogin(token, false);
                 }
@@ -226,7 +228,7 @@ const __sfc__ = defineComponent({
                         clientVersion = appVersion;
                 }
                 catch (error: any) {
-                    console.warn('获取应用版本失败，使用默认版本号:', error, " at pages/login/login.uvue:345");
+                    console.warn('获取应用版本失败，使用默认版本号:', error, " at pages/login/login.uvue:347");
                 }
                 const result = await loginByUniVerify(clientVersion);
                 if (result.ok) {
@@ -265,18 +267,18 @@ const __sfc__ = defineComponent({
             }
             try {
                 // 表单验证
-                console.log('准备验证表单...', " at pages/login/login.uvue:462");
+                console.log('准备验证表单...', " at pages/login/login.uvue:464");
                 if (!validateForm())
                     return;
-                console.log('✅ 表单验证通过', " at pages/login/login.uvue:464");
+                console.log('✅ 表单验证通过', " at pages/login/login.uvue:466");
                 // 构建请求参数
-                const newFormData = { __$originalPosition: new UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 467, 10),
+                const newFormData = { __$originalPosition: new UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 469, 10),
                     username: form.value.username,
                     password: form.value.password,
                     from: deviceModel.value,
                     type: "USER"
                 } as UTSJSONObject;
-                console.log('📤 请求参数:', newFormData, " at pages/login/login.uvue:473");
+                console.log('📤 请求参数:', newFormData, " at pages/login/login.uvue:475");
                 // 显示加载状态
                 loading.value = true;
                 uni.showLoading({
@@ -284,27 +286,27 @@ const __sfc__ = defineComponent({
                     mask: true
                 });
                 // 调用登录接口
-                console.log('🚀 开始调用 login 接口...', " at pages/login/login.uvue:483");
+                console.log('🚀 开始调用 login 接口...', " at pages/login/login.uvue:485");
                 const res = await login(newFormData);
-                console.log('✅ 登录接口返回:', res, " at pages/login/login.uvue:485");
+                console.log('✅ 登录接口返回:', res, " at pages/login/login.uvue:487");
                 // 隐藏加载状态
                 loading.value = false;
                 uni.hideLoading();
                 // 处理登录成功
                 const loginData = res.data;
-                const token = loginData != null ? loginData.getString('token', '') : '';
+                const token = res.code == 200 && loginData != null ? loginData.getString('token', '') : '';
                 if (token != '') {
                     completeLogin(token, true);
                 }
                 else {
                     showAppToast({
-                        title: '登录失败，请重试',
+                        title: res.msg != "" ? res.msg : '登录失败，请重试',
                         icon: 'error'
                     } as ShowToastOptions);
                 }
             }
             catch (error: any) {
-                console.error('❌ 登录失败:', error, " at pages/login/login.uvue:504");
+                console.error('❌ 登录失败:', error, " at pages/login/login.uvue:506");
                 loading.value = false;
                 uni.hideLoading();
                 // 判断是验证错误还是接口错误
@@ -395,7 +397,7 @@ const __sfc__ = defineComponent({
             getSystemInfo();
             loadSavedAccount();
             prefetchUniVerify();
-            console.log('pswLogin 初始值:', pswLogin.value, " at pages/login/login.uvue:603");
+            console.log('pswLogin 初始值:', pswLogin.value, " at pages/login/login.uvue:605");
         });
         return (): any | null => {
             const _component_custom_navBar = resolveEasyComponent("custom-navBar", _easycom_custom_navBar);

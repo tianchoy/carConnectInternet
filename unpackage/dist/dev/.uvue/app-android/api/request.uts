@@ -10,10 +10,10 @@ const addDeviceUrl = '/userDevice/add';
 const userDeviceList = '/userDevice/list';
 const wechatLogin = '/authLogin';
 // 后端待实现的示例接口：Uni Verify 服务端换号并签发业务 token 后可按正式约定替换。
-const uniVerifyLoginUrl = '/authLogin/uniVerify';
+const uniVerifyLoginUrl = '/auth/login';
 // 后端待实现的示例接口：短信验证码发送与登录。
-const smsSendCodeUrl = '/authLogin/sms/send';
-const smsLoginUrl = '/authLogin/sms/login';
+const smsSendCodeUrl = '/auth/sms/send';
+const smsLoginUrl = '/auth/sms/login';
 const changePSW = '/sys/user/password';
 const userMsgList = '/usermessage/listForUser';
 const msgState = '/usermessage/detail/';

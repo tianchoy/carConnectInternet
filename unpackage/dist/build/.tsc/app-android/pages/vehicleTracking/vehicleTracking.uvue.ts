@@ -147,9 +147,16 @@ const imei = ref<string>('')
 			}
 
 			const res = await getDevicePos(data)
-			if (res?.code == 0 && res.data && res.data.length > 0) {
-				let foundDevice = false
-				res.data.forEach((item : UTSJSONObject) => {
+			const positions = res.data
+			if (res?.code != 200 || positions == null || positions.length == 0) {
+				showAppToast({
+					title: '获取位置失败',
+					icon: 'none'
+				})
+				return
+			}
+			let foundDevice = false
+			positions.forEach((item : UTSJSONObject) => {
 					const itemImei = item.getString('imei', '')
 					if (itemImei == imei.value) {
 						foundDevice = true
@@ -210,12 +217,6 @@ const imei = ref<string>('')
 						icon: 'none'
 					})
 				}
-			} else {
-				showAppToast({
-					title: '获取位置失败',
-					icon: 'none'
-				})
-			}
 
 		} catch (err) {
 			console.error('获取初始位置失败:', err)
@@ -430,8 +431,9 @@ const imei = ref<string>('')
 		isTrackRequestPending = true
 		try {
 			const res = await getDevicePos({ deptId: deptId.value, deviceids: imei.value })
-			if (!isTracking.value || sessionId != trackingSessionId || res?.code != 0 || !res.data) return
-			const item = res.data.find((value : UTSJSONObject) => value.getString('imei', '') == imei.value)
+			const positions = res.data
+			if (!isTracking.value || sessionId != trackingSessionId || res?.code != 200 || positions == null) return
+			const item = positions.find((value : UTSJSONObject) => value.getString('imei', '') == imei.value)
 			if (item == null) return
 			const rawLat = item.getNumber('latitude', 0), rawLng = item.getNumber('longitude', 0)
 			if (rawLat == 0 || rawLng == 0 || !isFinite(rawLat) || !isFinite(rawLng)) return

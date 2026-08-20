@@ -79,13 +79,13 @@ const _sfc_main = common_vendor.defineComponent({
     checkForUpdates();
   },
   onShow: function() {
-    common_vendor.index.__f__("log", "at App.uvue:86", "App Show");
+    common_vendor.index.__f__("log", "at App.uvue:87", "App Show");
   },
   onHide: function() {
-    common_vendor.index.__f__("log", "at App.uvue:90", "App Hide");
+    common_vendor.index.__f__("log", "at App.uvue:92", "App Hide");
   },
   onExit: function() {
-    common_vendor.index.__f__("log", "at App.uvue:111", "App Exit");
+    common_vendor.index.__f__("log", "at App.uvue:114", "App Exit");
   }
 });
 function createApp() {

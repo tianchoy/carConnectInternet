@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -16,7 +17,6 @@ import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.hideTabBar as uni_hideTabBar
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
-import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
@@ -320,10 +320,14 @@ open class GenPagesIndexIndex : BasePage {
                 return Marker(id = id, latitude = lat, longitude = lng, iconPath = getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value), width = 30, height = 30, anchor = Anchor(x = 0.5, y = 0.5), callout = callout)
             }
             val loadDeviceDetail = fun(deviceId: String): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
+                return wrapUTSPromise(suspend w1@{
                         try {
                             val res = await(getDeviceDetail(deviceId))
                             val detail = res.data
+                            if (res.code != 200 || detail == null) {
+                                console.error("加载设备详情失败:", res.msg)
+                                return@w1
+                            }
                             if (detail != null) {
                                 val deviceStatus = detail.getJSON("deviceStatus")
                                 deviceDetail.value = DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = deviceStatus?.getNumber("batteryPercent", 0) ?: 0, voltage = deviceStatus?.getNumber("voltage", 0) ?: 0, signalStrength = deviceStatus?.getNumber("signalStrength", 0) ?: 0), connectionStatus = detail.getString("connectionStatus", "offline"), lastUpdateTime = detail.getString("lastUpdateTime", ""))
@@ -381,19 +385,17 @@ open class GenPagesIndexIndex : BasePage {
                             if (requestId != trackRequestId) {
                                 return@w1
                             }
-                            if (res.code == 401) {
-                                showAppToast(ShowToastOptions(title = "登录过期，请重新登录", icon = "none", duration = 2000))
-                                uni_removeStorageSync("token")
-                                clearPushSessionState()
-                                uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))
-                                return@w1
-                            }
-                            if (res.code != 0) {
+                            if (res.code != 200) {
                                 console.error("加载轨迹失败:", res.msg)
                                 clearTripData()
                                 return@w1
                             }
-                            processTripData(res.data)
+                            val trackData = res.data
+                            if (trackData == null) {
+                                clearTripData()
+                                return@w1
+                            }
+                            processTripData(trackData)
                         }
                          catch (error: Throwable) {
                             if (requestId != trackRequestId) {
@@ -421,7 +423,7 @@ open class GenPagesIndexIndex : BasePage {
                         try {
                             val res = await(getDevicePos(data))
                             val positions = res.data
-                            if (res.code != 0 || positions == null || positions.length == 0) {
+                            if (res.code != 200 || positions == null || positions.length == 0) {
                                 console.warn("获取设备位置失败:", data.getString("deviceId", ""), res.code)
                                 positionState.value = "empty"
                                 return@w1 false
@@ -561,13 +563,25 @@ open class GenPagesIndexIndex : BasePage {
                 loadDeviceData(selectedDevice)
             }
             val loadDeviceList = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
+                return wrapUTSPromise(suspend w1@{
                         try {
                             val res = await(getUserDeviceList(_uO("pageSize" to 1000)))
-                            val code = res.code
-                            val data = res.data
-                            val list = data.list
-                            if (code == 0 && list != null && list.length > 0) {
+                            if (res.code != 200) {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "加载车辆列表失败"
+                                }
+                                , icon = "none"))
+                                return@w1
+                            }
+                            val pageData = res.data
+                            if (pageData == null) {
+                                showAppToast(ShowToastOptions(title = "暂无车辆数据", icon = "none"))
+                                return@w1
+                            }
+                            val list: UTSArray<UTSJSONObject> = pageData.list
+                            if (list != null && list.length > 0) {
                                 userDeviceList.value = list
                                 deviceList.value = list.map(fun(item: UTSJSONObject): Device {
                                     val imei = item.getString("imei", "")
@@ -794,7 +808,7 @@ open class GenPagesIndexIndex : BasePage {
             fun gen_unbindCurrentDevice_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         val result = await(delDevice(currentCarImei.value))
-                        if (result.code == 0) {
+                        if (result.code == 200) {
                             showAppToast(ShowToastOptions(title = "解绑成功", icon = "none"))
                             clearSavedSelectedDevice()
                             clearSavedSelectedDeviceIndex()

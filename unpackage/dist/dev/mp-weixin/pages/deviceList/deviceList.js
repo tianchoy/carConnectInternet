@@ -133,7 +133,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (from) {
             const params = new common_vendor.UTSJSONObject({ pageSize: 1e3 });
             const res = yield api_request.getUserDeviceList(params);
-            const list = res.code == 0 && res.data != null ? res.data.list : null;
+            const list = res.code == 200 && res.data != null ? res.data.list : null;
             if (list == null || !Array.isArray(list)) {
               common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:147", "获取设备列表返回异常:", res);
               originalDeviceList.value = [];
@@ -157,7 +157,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const unbindDevice = (imei) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.delDevice(imei);
-        if (res.code == 0) {
+        if (res.code == 200) {
           utils_toast.showAppToast({
             title: "解绑成功",
             icon: "success"
@@ -165,7 +165,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           common_vendor.index.setStorageSync("needRefreshHome", true);
         } else {
           utils_toast.showAppToast({
-            title: "解绑失败",
+            title: res.msg || "解绑失败",
             icon: "error"
           });
         }

@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -434,7 +435,22 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            val positions = res.data?.getArray<UTSJSONObject>("positions")
+                            if (res.code != 200) {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "轨迹加载失败"
+                                }
+                                , icon = "none"))
+                                showCurrentPosition()
+                                return@w1
+                            }
+                            val trackData = res.data
+                            if (trackData == null) {
+                                showCurrentPosition()
+                                return@w1
+                            }
+                            val positions = trackData.getArray<UTSJSONObject>("positions")
                             if (positions != null && positions.length > 0) {
                                 processTrackData(positions)
                                 if (trackPoints.value.length == 0) {

@@ -8,6 +8,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -25,6 +26,7 @@ import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import uts.sdk.modules.jgJpushU.init as initAndroidJPush
 import uts.sdk.modules.jgJpushU.setEventCallBack as setJPushEventCallBack
 import uts.sdk.modules.jgJpushU.getRegistrationId as getAndroidJPushRegistrationId
+import uts.sdk.modules.jgJpushU.setBadgeNumber as setAndroidJPushBadgeNumber
 import uts.sdk.modules.jgJpushUHuawei.init as initHuaweiJPushVendor
 import io.dcloud.uniapp.extapi.onPushMessage as uni_onPushMessage
 import uts.sdk.modules.externalMapNavigation.openExternalMap
@@ -398,7 +400,16 @@ open class PushManager {
         uni_setStorageSync(PUSH_LOCAL_PROVIDER_OVERRIDE_KEY, provider)
         pushDebug(provider, "本地测试 provider 已设置；请完全重启应用后生效")
     }
+    open fun clearBadge(): Unit {
+        try {
+            setAndroidJPushBadgeNumber(0)
+        }
+         catch (error: Throwable) {
+            pushDebug(this.provider, "清除 Android 应用角标失败: " + error.toString())
+        }
+    }
     private fun handlePushEvent(event: NormalizedPushEvent): Unit {
+        this.clearBadge()
         val messageId = pushMessageId(event.payload)
         if (messageId != "") {
             uni_setStorageSync(pendingMessageIdKey(event.provider), messageId)
@@ -501,6 +512,9 @@ fun initPush(): Unit {
 }
 fun refreshPushRegistrationId(): Unit {
     pushManager.refreshRegistrationId()
+}
+fun clearPushBadge(): Unit {
+    pushManager.clearBadge()
 }
 fun refreshPushClientId(): Unit {
     refreshPushRegistrationId()
@@ -621,6 +635,7 @@ open class GenApp : BaseApp {
             console.log("App onLaunch")
             checkForUpdates()
             initPush()
+            clearPushBadge()
             ensureNotificationPermission(fun(status){
                 console.log("[NotificationPermission] " + status)
             }
@@ -629,11 +644,13 @@ open class GenApp : BaseApp {
         , __ins)
         onAppShow(fun(_: OnShowOptions) {
             console.log("App Show")
+            clearPushBadge()
             refreshPushClientId()
         }
         , __ins)
         onAppHide(fun() {
             console.log("App Hide")
+            clearPushBadge()
         }
         , __ins)
         onLastPageBackPress(fun() {
@@ -3935,8 +3952,16 @@ open class HttpError (
     open var message: String,
     open var data: Any? = null,
 ) : UTSObject()
-val BASE_URL = "https://car.zdiot.cn:18443/api"
+val BASE_URL = "https://gpsapp.zdiot.cn"
+var isHandlingTokenExpired = false
+fun resetTokenExpiredState(): Unit {
+    isHandlingTokenExpired = false
+}
 fun handleTokenExpired(): Unit {
+    if (isHandlingTokenExpired) {
+        return
+    }
+    isHandlingTokenExpired = true
     console.log("检测到token过期，执行跳转登录页逻辑")
     uni_removeStorageSync("token")
     clearPushSessionState()
@@ -4096,9 +4121,7 @@ val trackPos = "/gps/trackPos?"
 val userinfo = "/sys/user/info"
 val addDeviceUrl = "/userDevice/add"
 val userDeviceList = "/userDevice/list"
-val uniVerifyLoginUrl = "/authLogin/uniVerify"
-val smsSendCodeUrl = "/authLogin/sms/send"
-val smsLoginUrl = "/authLogin/sms/login"
+val uniVerifyLoginUrl = "/auth/login"
 val changePSW = "/sys/user/password"
 val userMsgList = "/usermessage/listForUser"
 val msgState = "/usermessage/detail/"
@@ -4138,26 +4161,18 @@ open class UniVerifyLoginRequest (
     @JsonNotNull
     open var platform: String,
     open var clientVersion: String? = null,
-) : UTSObject()
-open class SendSmsCodeRequest (
     @JsonNotNull
-    open var mobile: String,
+    open var clientId: String,
     @JsonNotNull
-    open var scene: String,
-) : UTSObject()
-open class SmsLoginRequest (
+    open var grantType: String,
     @JsonNotNull
-    open var mobile: String,
-    @JsonNotNull
-    open var code: String,
-    @JsonNotNull
-    open var platform: String,
+    open var tenantId: String,
 ) : UTSObject()
 open class DevicePositionResponse (
     @JsonNotNull
     open var code: Number,
     @JsonNotNull
-    open var message: String,
+    open var msg: String,
     @JsonNotNull
     open var data: UTSArray<UTSJSONObject>,
 ) : UTSObject()
@@ -4315,7 +4330,7 @@ val sendCommand = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
 val getDevicePos = fun(data: UTSJSONObject): UTSPromise<DevicePositionResponse> {
     return get(devicePos, data).then(fun(raw: Any): DevicePositionResponse {
         val response = asJSONObject(raw)
-        return DevicePositionResponse(code = getResponseCode(response), message = getResponseMessage(response), data = getResponseDataArray(response))
+        return DevicePositionResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
     }
     )
 }
@@ -4352,18 +4367,6 @@ val getUserDeviceList = fun(data: UTSJSONObject): UTSPromise<UserDeviceListRespo
 }
 val uniVerifyLogin = fun(data: UniVerifyLoginRequest): UTSPromise<JsonDataResponse> {
     return post(uniVerifyLoginUrl, data).then(fun(raw: Any): JsonDataResponse {
-        return jsonDataResponse(raw)
-    }
-    )
-}
-val sendSmsLoginCode = fun(data: SendSmsCodeRequest): UTSPromise<JsonDataResponse> {
-    return post(smsSendCodeUrl, data).then(fun(raw: Any): JsonDataResponse {
-        return jsonDataResponse(raw)
-    }
-    )
-}
-val smsLogin = fun(data: SmsLoginRequest): UTSPromise<JsonDataResponse> {
-    return post(smsLoginUrl, data).then(fun(raw: Any): JsonDataResponse {
         return jsonDataResponse(raw)
     }
     )
@@ -5133,7 +5136,7 @@ fun getErrorMessage(error: UniVerifyManagerLoginFail): String {
     if (errCode == 40001 || errCode == 40002) {
         return "网络异常，请检查移动网络后重试"
     }
-    return "本机号码授权失败（错误码：" + errCode + "），请使用验证码登录"
+    return "本机号码授权失败（错误码：" + errCode + "），请稍后重试"
 }
 fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
     val errCode = error.errCode
@@ -5165,20 +5168,20 @@ fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
             return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK"
         }
         if (errMsg.indexOf("-20201") >= 0) {
-            return "未检测到可用 SIM 卡，请使用验证码登录"
+            return "未检测到可用 SIM 卡，暂无法使用本机号码一键登录"
         }
         if (errMsg.indexOf("-20202") >= 0) {
             return "未开启蜂窝移动网络，请开启移动数据后重试"
         }
         if (errMsg.indexOf("-20203") >= 0) {
-            return "当前运营商暂不支持一键登录，请使用验证码登录"
+            return "当前运营商暂不支持本机号码一键登录"
         }
-        return "本机号码预取失败，请稍后重试或使用验证码登录"
+        return "本机号码预取失败，请稍后重试"
     }
     if (errCode == 40001 || errCode == 40002) {
         return "网络异常，无法获取本机号码，请检查移动网络后重试"
     }
-    return "本机号码预取失败（错误码：" + errCode + "），请使用验证码登录"
+    return "本机号码预取失败（错误码：" + errCode + "），请稍后重试"
 }
 fun createPreLoginResult(ok: Boolean, message: String): UniVerifyPreLoginResult {
     return UniVerifyPreLoginResult(ok = ok, message = message)
@@ -5238,26 +5241,26 @@ fun loginByUniVerify(clientVersion: String): UTSPromise<UniVerifyResult> {
             try {
                 uniVerifyManager = getManager()
                 uniVerifyManager.login(UniVerifyManagerLoginOptions(uniVerifyStyle = UniVerifyManagerLoginStyle(fullScreen = false, loginBtnText = "本机号码一键登录"), success = fun(result: UniVerifyManagerLoginSuccess){
-                    uniVerifyLogin(UniVerifyLoginRequest(openId = result.openId, accessToken = result.accessToken, platform = getPlatform(), clientVersion = clientVersion)).then(fun(response){
+                    uniVerifyLogin(UniVerifyLoginRequest(openId = result.openId, accessToken = result.accessToken, platform = getPlatform(), clientVersion = clientVersion, clientId = "428a8310cd442757ae699df5d894f051", grantType = "univerify", tenantId = "000000")).then(fun(response){
                         val loginData = response.data
                         val token = if (loginData != null) {
-                            loginData.getString("token", "")
+                            loginData.getString("access_token", "")
                         } else {
                             ""
                         }
-                        if (response.code == 0 && token != "") {
+                        if (response.code == 200 && token != "") {
                             resolve(createResult(true, false, "", token))
                         } else {
                             resolve(createResult(false, false, if (response.msg != "") {
                                 response.msg
                             } else {
-                                "本机号码登录失败，请使用验证码登录"
+                                "本机号码登录失败，请稍后重试"
                             }
                             , ""))
                         }
                     }
                     ).`catch`(fun(){
-                        resolve(createResult(false, false, "登录服务连接失败，请使用验证码登录", ""))
+                        resolve(createResult(false, false, "登录服务连接失败，请检查网络后重试", ""))
                     }
                     ).`finally`(fun(){
                         closeLoginPage(uniVerifyManager)
@@ -5274,7 +5277,7 @@ fun loginByUniVerify(clientVersion: String): UTSPromise<UniVerifyResult> {
                 ))
             }
              catch (error: Throwable) {
-                resolve(createResult(false, false, "当前设备不支持本机号码一键登录，请使用验证码登录", ""))
+                resolve(createResult(false, false, "当前设备不支持本机号码一键登录", ""))
                 requesting = false
             }
         }
@@ -9182,6 +9185,14 @@ fun defineAppConfig() {
     __uniConfig.conditionUrl = ""
     __uniConfig.uniIdRouter = _uM()
     __uniConfig.ready = true
+}
+open class UniCloudConfig : io.dcloud.unicloud.InternalUniCloudConfig {
+    override var isDev: Boolean = false
+    override var spaceList: String = "[{\"provider\":\"aliyun\",\"spaceName\":\"zdiot-car\",\"spaceId\":\"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff\",\"clientSecret\":\"s9pFKgenncFnOUhRGOJpcw==\",\"endpoint\":\"https://api.next.bspapp.com\",\"failoverEndpoint\":\"\"}]"
+    override var debuggerInfo: String? = null
+    override var secureNetworkEnable: Boolean = false
+    override var secureNetworkConfig: String? = "[]"
+    constructor() : super() {}
 }
 open class GenUniApp : UniAppImpl() {
     open val vm: GenApp?

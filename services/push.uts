@@ -39,7 +39,8 @@ import AndroidLog from 'android.util.Log'
 import {
 	init as initAndroidJPush,
 	setEventCallBack as setJPushEventCallBack,
-	getRegistrationId as getAndroidJPushRegistrationId
+	getRegistrationId as getAndroidJPushRegistrationId,
+	setBadgeNumber as setAndroidJPushBadgeNumber
 } from '@/uni_modules/jg-jpush-u'
 import {
 	init as initHuaweiJPushVendor
@@ -50,7 +51,8 @@ import {
 	initPush as initIosJPush,
 	setEventCallBack as setJPushEventCallBack,
 	getRegistrationId as getIosJPushRegistrationId,
-	getRegistrationIdAsync as getIosJPushRegistrationIdAsync
+	getRegistrationIdAsync as getIosJPushRegistrationIdAsync,
+	resetBadge as resetIosJPushBadge
 } from '@/uni_modules/jg-jpush-u'
 // #endif
 
@@ -413,7 +415,25 @@ class PushManager {
 		pushDebug(provider, '本地测试 provider 已设置；请完全重启应用后生效')
 	}
 
+	clearBadge(): void {
+		// #ifdef APP-IOS
+		try {
+			resetIosJPushBadge()
+		} catch (error) {
+			pushDebug(this.provider, '清除 iOS 应用角标失败: ' + error.toString())
+		}
+		// #endif
+		// #ifdef APP-ANDROID
+		try {
+			setAndroidJPushBadgeNumber(0)
+		} catch (error) {
+			pushDebug(this.provider, '清除 Android 应用角标失败: ' + error.toString())
+		}
+		// #endif
+	}
+
 	private handlePushEvent(event: NormalizedPushEvent): void {
+		this.clearBadge()
 		const messageId = pushMessageId(event.payload)
 		if (messageId != '') uni.setStorageSync(pendingMessageIdKey(event.provider), messageId)
 		if (event.kind == 'received' || event.kind == 'clicked' || event.kind == 'custom') {
@@ -507,6 +527,12 @@ export function initPush(): void {
 export function refreshPushRegistrationId(): void {
 	// #ifdef APP-ANDROID || APP-IOS
 	pushManager.refreshRegistrationId()
+	// #endif
+}
+
+export function clearPushBadge(): void {
+	// #ifdef APP-ANDROID || APP-IOS
+	pushManager.clearBadge()
 	// #endif
 }
 

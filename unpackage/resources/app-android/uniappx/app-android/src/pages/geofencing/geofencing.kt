@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -92,12 +93,22 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             )
             val loadInitialPosition = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
+                return wrapUTSPromise(suspend w1@{
                         uni_showLoading(ShowLoadingOptions(title = "获取车辆位置中..."))
                         try {
                             val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
-                            res.data.forEach(fun(item){
+                            val positions = res.data
+                            if (res.code != 200 || positions == null) {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "获取车辆位置失败"
+                                }
+                                , icon = "none"))
+                                return@w1
+                            }
+                            positions.forEach(fun(item){
                                 if (item.getString("imei", "") == imei.value) {
                                     val deviceData = item
                                     val latitude = deviceData.getNumber("latitude", 0)
@@ -400,10 +411,15 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return wrapUTSPromise(suspend {
                         try {
                             val res = await(getGeofenceList())
-                            if (res.code == 0) {
+                            if (res.code == 200 && res.data != null) {
                                 fenceList.value = res.data
                             } else {
-                                showAppToast(ShowToastOptions(title = "获取围栏列表失败", icon = "none"))
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "获取围栏列表失败"
+                                }
+                                , icon = "none"))
                                 fenceList.value = _uA()
                             }
                             renderFencesOnMap()
@@ -577,7 +593,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return wrapUTSPromise(suspend {
                         try {
                             val result = await(deleteGeofence(id))
-                            if (result.code == 0) {
+                            if (result.code == 200) {
                                 showAppToast(ShowToastOptions(title = "删除成功"))
                                 selectedFence.value = null
                                 points.value = _uA()
@@ -590,7 +606,12 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 showFenceModal.value?.`$callMethod`("close")
                                 await(loadGeofenceList())
                             } else {
-                                showAppToast(ShowToastOptions(title = "删除失败", icon = "none"))
+                                showAppToast(ShowToastOptions(title = if (result.msg != "") {
+                                    result.msg
+                                } else {
+                                    "删除失败"
+                                }
+                                , icon = "none"))
                             }
                         }
                          catch (error: Throwable) {
@@ -656,7 +677,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 result = await(addGeofence(fenceData))
                             }
                             uni_hideLoading(null)
-                            if (result.code == 0) {
+                            if (result.code == 200) {
                                 showAppToast(ShowToastOptions(title = if (isTruthy(editingFence.value)) {
                                     "更新成功"
                                 } else {
@@ -717,9 +738,10 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         page.loadingMore = true
                         try {
                             val res = await(getBoundDevices(_uO("pageNum" to page.pageNum, "pageSize" to page.pageSize, "geoId" to fenceId)))
-                            if (res.code == 0) {
-                                val dataList = if (res.data.list != null) {
-                                    res.data.list
+                            if (res.code == 200) {
+                                val pageData = res.data
+                                val dataList: UTSArray<UTSJSONObject> = if (pageData != null) {
+                                    pageData.list
                                 } else {
                                     _uA()
                                 }
@@ -755,9 +777,10 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         page.loadingMore = true
                         try {
                             val res = await(getUnboundDevices(_uO("pageNum" to page.pageNum, "pageSize" to page.pageSize)))
-                            if (res.code == 0) {
-                                val dataList = if (res.data.list != null) {
-                                    res.data.list
+                            if (res.code == 200) {
+                                val pageData = res.data
+                                val dataList: UTSArray<UTSJSONObject> = if (pageData != null) {
+                                    pageData.list
                                 } else {
                                     _uA()
                                 }
@@ -842,7 +865,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             } else {
                                 result = await(unbindDevices(params))
                             }
-                            if (result.code == 0) {
+                            if (result.code == 200) {
                                 showAppToast(ShowToastOptions(title = if (bound) {
                                     "绑定成功"
                                 } else {

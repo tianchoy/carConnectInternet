@@ -1,6 +1,6 @@
 import { URL } from 'Foundation'
 import { UIApplication } from 'UIKit'
-import { ExternalMapNavigationParams, ExternalMapNavigationResult, IOSMapProvider } from '../interface.uts'
+import { ExternalMapNavigationParams, ExternalMapNavigationResult } from '../interface.uts'
 
 const TENCENT_MAP_PROVIDER_ID = 'qqmap'
 const AMAP_PROVIDER_ID = 'iosamap'
@@ -63,20 +63,19 @@ function destinationName(params: ExternalMapNavigationParams): string {
 	return params.name != '' ? params.name : '车辆位置'
 }
 
-function provider(id: string, name: string, scheme: string): IOSMapProvider | null {
-	return canOpen(scheme) ? { id: id, name: name } : null
+function canOpenProvider(providerId: string): boolean {
+	if (providerId == TENCENT_MAP_PROVIDER_ID) return canOpen('qqmap://')
+	if (providerId == AMAP_PROVIDER_ID) return canOpen('iosamap://')
+	if (providerId == BAIDU_MAP_PROVIDER_ID) return canOpen('baidumap://')
+	return false
 }
 
-export function getAvailableIOSMapProviders(): IOSMapProvider[] {
-	const providers: IOSMapProvider[] = []
-	const tencent = provider(TENCENT_MAP_PROVIDER_ID, '腾讯地图', 'qqmap://')
-	const amap = provider(AMAP_PROVIDER_ID, '高德地图', 'iosamap://')
-	const baidu = provider(BAIDU_MAP_PROVIDER_ID, '百度地图', 'baidumap://')
-
-	if (tencent != null) providers.push(tencent)
-	if (amap != null) providers.push(amap)
-	if (baidu != null) providers.push(baidu)
-	return providers
+export function getAvailableIOSMapProviderIds(): string[] {
+	const providerIds: string[] = []
+	if (canOpenProvider(TENCENT_MAP_PROVIDER_ID)) providerIds.push(TENCENT_MAP_PROVIDER_ID)
+	if (canOpenProvider(AMAP_PROVIDER_ID)) providerIds.push(AMAP_PROVIDER_ID)
+	if (canOpenProvider(BAIDU_MAP_PROVIDER_ID)) providerIds.push(BAIDU_MAP_PROVIDER_ID)
+	return providerIds
 }
 
 function buildTencentURL(params: ExternalMapNavigationParams): string {
@@ -139,11 +138,11 @@ export function openExternalMap(params: ExternalMapNavigationParams): ExternalMa
 		return openSelectedProvider(params, params.providerId)
 	}
 
-	const providers = getAvailableIOSMapProviders()
-	if (providers.length == 1) {
-		return openSelectedProvider(params, providers[0].id)
+	const providerIds = getAvailableIOSMapProviderIds()
+	if (providerIds.length == 1) {
+		return openSelectedProvider(params, providerIds[0])
 	}
-	if (providers.length > 1) {
+	if (providerIds.length > 1) {
 		return result('selection_required')
 	}
 

@@ -123,66 +123,66 @@ const __sfc__ = defineComponent({
                     deviceids: imei.value
                 } as UTSJSONObject;
                 const res = await getDevicePos(data);
-                if (res?.code == 0 && res.data != null && res.data.length > 0) {
-                    let foundDevice = false;
-                    res.data.forEach((item: UTSJSONObject) => {
-                        const itemImei = item.getString('imei', '');
-                        if (itemImei == imei.value) {
-                            foundDevice = true;
-                            const latitude = item.getNumber('latitude', 0);
-                            const longitude = item.getNumber('longitude', 0);
-                            if (latitude == 0 || longitude == 0) {
-                                showAppToast({
-                                    title: '位置信息缺失',
-                                    icon: 'none'
-                                } as ShowToastOptions);
-                                return;
-                            }
-                            const direction = item.getNumber('direction', 0);
-                            const speed = item.getNumber('speed', 0);
-                            const positionUpdateTime = item.getString('positionUpdateTime', '定位时间未知');
-                            const status = item.getString('connectionStatus', 'unknown');
-                            // 转换坐标到腾讯地图坐标系
-                            const convertedCoord = CoordTransform.wgs84ToTencentPrecise(latitude, longitude);
-                            // 设置初始位置
-                            currentPosition.latitude = convertedCoord.lat;
-                            currentPosition.longitude = convertedCoord.lng;
-                            hasValidPosition.value = true;
-                            targetPosition.latitude = convertedCoord.lat;
-                            targetPosition.longitude = convertedCoord.lng;
-                            center["latitude"] = convertedCoord.lat;
-                            center["longitude"] = convertedCoord.lng;
-                            // 记录初始方向
-                            lastDirection.value = direction;
-                            let initialRotation = lastDirection.value % 360;
-                            if (initialRotation < 0) {
-                                initialRotation += 360;
-                            }
-                            currentRotation.value = initialRotation;
-                            targetRotation.value = currentRotation.value;
-                            // 立即更新速度信息
-                            currentSpeed.value = speed;
-                            currentAddress.value = positionUpdateTime;
-                            connectionStatus.value = status;
-                            // 设置初始标记点
-                            if (!markerInitialized.value) {
-                                const iconPath = getDeviceIcon(connectionStatus.value, carType.value);
-                                lastIconPath = iconPath;
-                                markers.value = [createVehicleMarker(iconPath)];
-                                markerInitialized.value = true;
-                            }
-                        }
-                    });
-                    if (!foundDevice) {
-                        showAppToast({
-                            title: '未找到车辆设备',
-                            icon: 'none'
-                        } as ShowToastOptions);
-                    }
-                }
-                else {
+                const positions = res.data;
+                if (res?.code != 200 || positions == null || positions.length == 0) {
                     showAppToast({
                         title: '获取位置失败',
+                        icon: 'none'
+                    } as ShowToastOptions);
+                    return;
+                }
+                let foundDevice = false;
+                positions.forEach((item: UTSJSONObject) => {
+                    const itemImei = item.getString('imei', '');
+                    if (itemImei == imei.value) {
+                        foundDevice = true;
+                        const latitude = item.getNumber('latitude', 0);
+                        const longitude = item.getNumber('longitude', 0);
+                        if (latitude == 0 || longitude == 0) {
+                            showAppToast({
+                                title: '位置信息缺失',
+                                icon: 'none'
+                            } as ShowToastOptions);
+                            return;
+                        }
+                        const direction = item.getNumber('direction', 0);
+                        const speed = item.getNumber('speed', 0);
+                        const positionUpdateTime = item.getString('positionUpdateTime', '定位时间未知');
+                        const status = item.getString('connectionStatus', 'unknown');
+                        // 转换坐标到腾讯地图坐标系
+                        const convertedCoord = CoordTransform.wgs84ToTencentPrecise(latitude, longitude);
+                        // 设置初始位置
+                        currentPosition.latitude = convertedCoord.lat;
+                        currentPosition.longitude = convertedCoord.lng;
+                        hasValidPosition.value = true;
+                        targetPosition.latitude = convertedCoord.lat;
+                        targetPosition.longitude = convertedCoord.lng;
+                        center["latitude"] = convertedCoord.lat;
+                        center["longitude"] = convertedCoord.lng;
+                        // 记录初始方向
+                        lastDirection.value = direction;
+                        let initialRotation = lastDirection.value % 360;
+                        if (initialRotation < 0) {
+                            initialRotation += 360;
+                        }
+                        currentRotation.value = initialRotation;
+                        targetRotation.value = currentRotation.value;
+                        // 立即更新速度信息
+                        currentSpeed.value = speed;
+                        currentAddress.value = positionUpdateTime;
+                        connectionStatus.value = status;
+                        // 设置初始标记点
+                        if (!markerInitialized.value) {
+                            const iconPath = getDeviceIcon(connectionStatus.value, carType.value);
+                            lastIconPath = iconPath;
+                            markers.value = [createVehicleMarker(iconPath)];
+                            markerInitialized.value = true;
+                        }
+                    }
+                });
+                if (!foundDevice) {
+                    showAppToast({
+                        title: '未找到车辆设备',
                         icon: 'none'
                     } as ShowToastOptions);
                 }
@@ -421,9 +421,10 @@ const __sfc__ = defineComponent({
             isTrackRequestPending = true;
             try {
                 const res = await getDevicePos({ deptId: deptId.value, deviceids: imei.value });
-                if (!isTracking.value || sessionId != trackingSessionId || res?.code != 0 || !(res.data != null))
+                const positions = res.data;
+                if (!isTracking.value || sessionId != trackingSessionId || res?.code != 200 || positions == null)
                     return;
-                const item = res.data.find((value: UTSJSONObject): boolean => value.getString('imei', '') == imei.value);
+                const item = positions.find((value: UTSJSONObject): boolean => value.getString('imei', '') == imei.value);
                 if (item == null)
                     return;
                 const rawLat = item.getNumber('latitude', 0), rawLng = item.getNumber('longitude', 0);

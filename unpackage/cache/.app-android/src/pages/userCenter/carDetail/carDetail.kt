@@ -95,7 +95,7 @@ open class GenPagesUserCenterCarDetailCarDetail : BasePage {
                         uni_showLoading(ShowLoadingOptions(title = "保存中...", mask = true))
                         try {
                             val res = await(editDeviceInfo(payload))
-                            if (res.code == 0) {
+                            if (res.code == 200) {
                                 carInfo.value = payload
                                 editInfo.value.plateNo = plateNo
                                 isEditing.value = false
@@ -128,8 +128,8 @@ open class GenPagesUserCenterCarDetailCarDetail : BasePage {
                         loadingDetail.value = true
                         try {
                             val res = await(getDeviceDetail(deviceId.value))
-                            if (res.code == 0 && res.data != null) {
-                                carInfo.value = res.data
+                            if (res.code == 200 && res.data != null) {
+                                carInfo.value = res.data!!
                                 detailLoaded.value = true
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {

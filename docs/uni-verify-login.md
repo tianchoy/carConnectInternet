@@ -1,11 +1,13 @@
-# Uni Verify 与短信登录接入说明
+# Uni Verify 一键登录接入说明
+
+> Android / iOS 的短信验证码登录功能目前已注释停用；仅保留本机号码一键登录。相关短信接口和页面代码保留在源码注释中，恢复前不得作为可用登录方式对外说明。
 
 ## 平台行为
 
 | 平台 | 个人用户登录 | 兜底 |
 | --- | --- | --- |
 | 微信小程序 | 保持现有微信 `getPhoneNumber` + `/authLogin` | 保持现状 |
-| Android / iOS | `uni.getUniVerifyManager()` 标准授权页本机号码一键登录 | 手机号验证码登录 |
+| Android / iOS | `uni.getUniVerifyManager()` 标准授权页本机号码一键登录 | 提示用户检查设备、SIM 卡、移动网络或稍后重试 |
 
 企业账号密码登录继续使用既有 `/sys/login`，不受本次改动影响。
 
@@ -52,14 +54,14 @@ Android 离线工程必须以最终 release APK/AAB 的证书指纹为准：用 
 - `platform` 仅为 `android` 或 `ios`，用于审计和服务端处理，不可作为身份凭证。
 - 客户端不会存储或打印完整 `accessToken`。
 
-成功响应（`data.token` 必填）：
+成功响应（`data.access_token` 必填）：
 
 ```json
 {
   "code": 0,
   "msg": "登录成功",
   "data": {
-    "token": "业务登录token",
+    "access_token": "业务登录 token",
     "refreshToken": "可选",
     "expiresIn": 7200,
     "userInfo": {
@@ -82,7 +84,11 @@ Android 离线工程必须以最终 release APK/AAB 的证书指纹为准：用 
 
 服务端必须使用 Uni Verify 服务端能力通过 `openId` / `accessToken` 换取手机号，再按手机号查找个人用户；不存在时自动注册个人用户，校验账号状态后返回现有业务 token。
 
-### 2. 发送短信验证码
+## 已停用的短信登录接口
+
+以下短信验证码接口及其页面入口当前均已注释停用，仅保留历史契约供后续恢复功能时参考，Android/iOS 客户端不会调用它们。
+
+### 历史接口：发送短信验证码
 
 `POST /authLogin/sms/send`
 
@@ -105,7 +111,7 @@ Android 离线工程必须以最终 release APK/AAB 的证书指纹为准：用 
 }
 ```
 
-### 3. 短信验证码登录
+### 历史接口：短信验证码登录
 
 `POST /authLogin/sms/login`
 
@@ -117,7 +123,7 @@ Android 离线工程必须以最终 release APK/AAB 的证书指纹为准：用 
 }
 ```
 
-成功响应与 Uni Verify 登录成功响应一致，且必须返回 `data.token`。
+成功响应与 Uni Verify 登录成功响应一致，且必须返回 `data.access_token`。
 
 服务端应实现短信发送与校验频控、验证码过期和一次性使用、异常审计、HTTPS、认证凭据/手机号日志脱敏。首次验证成功但无对应个人用户时自动注册后登录。
 
@@ -126,7 +132,7 @@ Android 离线工程必须以最终 release APK/AAB 的证书指纹为准：用 
 1. 微信小程序仍将 `{ code, encryptedData, iv }` 提交到 `/authLogin`。
 2. 企业账号密码仍将原字段提交到 `/sys/login`。
 3. Android / iOS 真机、受支持运营商 SIM 卡下，可打开标准授权页并在服务端换号后进入首页。
-4. 用户取消、无 SIM、运营商不支持、网络失败、后端拒绝时，页面不残留加载状态，且可使用短信登录。
-5. 短信号码格式错误不能发码；倒计时禁止重发；错误/过期验证码有提示；登录成功保存既有 `token` 并进入首页。
+4. 用户取消、无 SIM、运营商不支持、网络失败或后端拒绝时，页面不残留加载状态，并提示用户检查设备、SIM 卡或移动网络后重试。
+5. Android / iOS 个人用户登录页不展示短信号码、验证码、发码、验证码登录或登录方式切换入口；登录成功读取 `data.access_token`、保存既有本地 `token` 并进入首页。
 
 官方 API 参考：[uni.getUniVerifyManager()](https://doc.dcloud.net.cn/uni-app-x/api/get-univerify-manager.html)。

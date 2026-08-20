@@ -1,6 +1,6 @@
 {
   "id": "__UNI__662B0B4",
-  "name": "车载GPS",
+  "name": "中导物联",
   "description": "",
   "version": {
     "name": "1.0.0",
@@ -41,6 +41,12 @@
           "meizu": {},
           "honor": {}
         }
+      },
+      "icons": {
+        "hdpi": "/Users/xyhc/Downloads/logo/432.png",
+        "xxxhdpi": "/Users/xyhc/Downloads/logo/432.png",
+        "xxhdpi": "/Users/xyhc/Downloads/logo/432.png",
+        "xhdpi": "/Users/xyhc/Downloads/logo/432.png"
       }
     }
   }

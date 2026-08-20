@@ -162,8 +162,13 @@ const imei = ref<string | null>(null)
 		try {
 			const data = { deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
+			const positions = res.data
+			if (res.code != 200 || positions == null) {
+				showAppToast({ title: res.msg || '获取车辆位置失败', icon: 'none' })
+				return
+			}
 
-			res.data.forEach(item => {
+			positions.forEach(item => {
 				if (item.getString('imei', '') == imei.value) {
 					const deviceData = item
 					const latitude = deviceData.getNumber('latitude', 0)
@@ -488,10 +493,10 @@ const imei = ref<string | null>(null)
 	const loadGeofenceList = async () => {
 		try {
 			const res = await getGeofenceList()
-			if (res.code == 0) {
+			if (res.code == 200 && res.data != null) {
 				fenceList.value = res.data;
 			} else {
-				showAppToast({ title: '获取围栏列表失败', icon: 'none' })
+				showAppToast({ title: res.msg || '获取围栏列表失败', icon: 'none' })
 				fenceList.value = []; // 失败时也清空列表
 			}
 			// 无论数据是否为空，都重新渲染
@@ -681,7 +686,7 @@ const imei = ref<string | null>(null)
 	async function deleteFenceById(id : string) : Promise<void> {
 		try {
 			const result = await deleteGeofence(id)
-			if (result.code == 0) {
+			if (result.code == 200) {
 				showAppToast({ title: '删除成功' })
 				selectedFence.value = null
 				points.value = []
@@ -694,7 +699,7 @@ const imei = ref<string | null>(null)
 				showFenceModal.value?.$callMethod('close')
 				await loadGeofenceList()
 			} else {
-				showAppToast({ title: '删除失败', icon: 'none' })
+				showAppToast({ title: result.msg || '删除失败', icon: 'none' })
 			}
 		} catch (error) {
 			console.error('删除围栏失败:', error)
@@ -783,7 +788,7 @@ const imei = ref<string | null>(null)
 
 			uni.hideLoading()
 
-			if (result.code == 0) {
+			if (result.code == 200) {
 				showAppToast({ title: editingFence.value ? '更新成功' : '保存成功' })
 				editDialogPopup.value?.$callMethod('close')
 
@@ -843,8 +848,9 @@ const imei = ref<string | null>(null)
 				geoId: fenceId
 			})
 
-			if (res.code == 0) {
-				const dataList = res.data.list || []
+			if (res.code == 200) {
+				const pageData = res.data
+				const dataList : Array<UTSJSONObject> = pageData != null ? pageData.list : []
 				if (page.pageNum == 1) {
 					boundDevices.value = dataList
 					deviceList.value = dataList
@@ -874,8 +880,9 @@ const imei = ref<string | null>(null)
 				pageSize: page.pageSize
 			})
 
-			if (res.code == 0) {
-				const dataList = res.data.list || []
+			if (res.code == 200) {
+				const pageData = res.data
+				const dataList : Array<UTSJSONObject> = pageData != null ? pageData.list : []
 				if (page.pageNum == 1) {
 					deviceList.value = dataList
 				} else {
@@ -956,7 +963,7 @@ const imei = ref<string | null>(null)
 				result = await unbindDevices(params)
 			}
 
-			if (result.code == 0) {
+			if (result.code == 200) {
 				showAppToast({ title: bound ? '绑定成功' : '解绑成功' })
 				// 刷新当前标签页数据，重置分页
 				initPagination(activeTab.value)

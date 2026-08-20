@@ -662,7 +662,18 @@ import { showAppToast } from '../../utils/toast.uts'
 			const res = await getTrackPos(data)
 			if (requestId != replaySessionId) return
 
-			const positions = res.data?.getArray<UTSJSONObject>('positions')
+			if (res.code != 200) {
+				showAppToast({ title: res.msg || '轨迹加载失败', icon: 'none' })
+				showCurrentPosition()
+				return
+			}
+
+			const trackData = res.data
+			if (trackData == null) {
+				showCurrentPosition()
+				return
+			}
+			const positions = trackData.getArray<UTSJSONObject>('positions')
 			if (positions != null && positions.length > 0) {
 				processTrackData(positions)
 				if (trackPoints.value.length == 0) {

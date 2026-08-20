@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -182,7 +183,7 @@ open class GenPagesCmdCmd : BasePage {
                         try {
                             loading.value = true
                             val response = await(getCmdAction())
-                            if (response.code == 0) {
+                            if (response.code == 200 && response.data != null) {
                                 commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data)
                             } else {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
@@ -226,7 +227,7 @@ open class GenPagesCmdCmd : BasePage {
                         try {
                             loading.value = true
                             val response = await(getCmdByMid(_uO("imei" to imei.value, "cmdmId" to typeId)))
-                            if (response.code == 0) {
+                            if (response.code == 200 && response.data != null) {
                                 commands.value = response.data
                             } else {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
@@ -302,7 +303,7 @@ open class GenPagesCmdCmd : BasePage {
                         try {
                             sending.value = true
                             val response = await(sendCmd(_uO("imei" to imei.value, "type" to ((command["cmdCode"] as String?) ?: ""), "password" to null, "cmdData" to encodeURIComponent(cmdData), "predictCmdId" to command["predictCmdId"])))
-                            if (response.code == 0) {
+                            if (response.code == 200) {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
                                 } else {

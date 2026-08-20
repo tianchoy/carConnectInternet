@@ -144,13 +144,17 @@ const carStatus = ref('在线')
 				withTrip: true,
 			};
 			const res = await getTrackPos(data);
-			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:202");
+			if (res.code != 200) {
+				showAppToast({ title: res.msg || '数据加载失败', icon: 'none' });
+				return;
+			}
+			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:206");
 			const trackData = res.data
 			if (trackData != null) {
 				processTripData(trackData)
 			}
 		} catch (e) {
-			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:208");
+			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:212");
 			showAppToast({
 				title: '数据加载失败',
 				icon: 'none',

@@ -64,8 +64,10 @@
 				<!-- #endif -->
 
 				<!-- #ifdef APP-ANDROID || APP-IOS -->
+				<i-button type="primary" @click="startUniVerifyLogin" :loading="nativeLoginLoading">本机号码一键登录</i-button>
+				<!--
+				短信验证码登录功能暂时停用：
 				<view v-if="!smsLoginMode">
-					<i-button type="primary" @click="startUniVerifyLogin" :loading="nativeLoginLoading">本机号码一键登录</i-button>
 					<view class="phone-login-switch" @click="openSmsLogin">
 						<text class="phone-way">验证码登录</text>
 					</view>
@@ -92,6 +94,7 @@
 					</i-form>
 					<view class="phone-login-switch" @click="closeSmsLogin"><text class="phone-way">一键登录</text></view>
 				</view>
+				-->
 				<!-- #endif -->
 			</view>
 
@@ -121,7 +124,10 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { ref, onMounted } from 'vue'
 	import { markPushSessionAuthenticated } from '../../services/push.uts'
-	import { login, PostWechatlogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
+	import { resetTokenExpiredState } from '../../api/http.uts'
+	import { login, PostWechatlogin } from '../../api/request.uts'
+	// 短信验证码登录功能暂时停用：
+	// import { sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 	// #ifdef APP-ANDROID || APP-IOS
 	import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
 	// #endif
@@ -131,12 +137,13 @@ import { showAppToast } from '../../utils/toast.uts'
 	const rememberPassword = ref(false)
 	const formValid = ref(false)
 	const loading = ref(false)
-	const smsLoginMode = ref(false)
-	const smsMobile = ref('')
-	const smsCode = ref('')
-	const smsCooldown = ref(0)
-	const smsSending = ref(false)
-	const smsSubmitting = ref(false)
+	// 短信验证码登录功能暂时停用：
+	// const smsLoginMode = ref(false)
+	// const smsMobile = ref('')
+	// const smsCode = ref('')
+	// const smsCooldown = ref(0)
+	// const smsSending = ref(false)
+	// const smsSubmitting = ref(false)
 	const nativeLoginLoading = ref(false)
 
 	// ===== 表单数据 =====
@@ -242,6 +249,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 		if (savePassword) saveAccountPassword()
 		uni.setStorageSync('token', token)
+		resetTokenExpiredState()
 		markPushSessionAuthenticated()
 		showAppToast({ title: '登录成功', icon: 'success' })
 		setTimeout(() => {
@@ -255,83 +263,84 @@ import { showAppToast } from '../../utils/toast.uts'
 		return false
 	}
 
-	const openSmsLogin = (): void => {
-		smsLoginMode.value = true
-	}
-
-	const closeSmsLogin = (): void => {
-		smsLoginMode.value = false
-		smsCode.value = ''
-	}
-
-	const isValidMobile = (): boolean => {
-		if (!/^1[3-9]\\d{9}$/.test(smsMobile.value)) {
-			showAppToast({ title: '请输入正确的手机号', icon: 'none' })
-			return false
-		}
-		return true
-	}
-
-	const startSmsCooldown = (seconds: number): void => {
-		smsCooldown.value = seconds > 0 ? seconds : 60
-		const timer = setInterval(() => {
-			smsCooldown.value -= 1
-			if (smsCooldown.value <= 0) smsCooldown.value = 0
-		}, 1000)
-	}
-
-	const sendSmsCode = async (): Promise<void> => {
-		if (smsCooldown.value > 0 || smsSending.value) return
-		if (!ensureAgreementAccepted() || !isValidMobile()) return
-		try {
-			smsSending.value = true
-			const response = await sendSmsLoginCode({ mobile: smsMobile.value, scene: 'login' })
-			if (response.code != 0) {
-				showAppToast({ title: response.msg || '验证码发送失败', icon: 'none' })
-				return
-			}
-			const cooldownSeconds = response.data != null ? response.data.getNumber('cooldownSeconds', 60) : 60
-			startSmsCooldown(cooldownSeconds)
-			showAppToast({ title: '验证码已发送', icon: 'success' })
-		} catch (error) {
-			showAppToast({ title: '验证码发送失败，请检查网络', icon: 'none' })
-		} finally {
-			smsSending.value = false
-		}
-	}
-
-	const getAppPlatform = (): string => {
-		// #ifdef APP-ANDROID
-		return 'android'
-		// #endif
-		// #ifdef APP-IOS
-		return 'ios'
-		// #endif
-		return ''
-	}
-
-	const submitSmsLogin = async (): Promise<void> => {
-		if (!ensureAgreementAccepted() || !isValidMobile() || smsCode.value == '' || smsSubmitting.value) {
-			if (smsCode.value == '') showAppToast({ title: '请输入验证码', icon: 'none' })
-			return
-		}
-		try {
-			smsSubmitting.value = true
-			const response = await smsLogin({ mobile: smsMobile.value, code: smsCode.value, platform: getAppPlatform() })
-			const token = response.data != null ? response.data.getString('token', '') : ''
-			if (response.code == 0 && token != '') {
-				smsCode.value = ''
-				completeLogin(token, false)
-			} else {
-				showAppToast({ title: response.msg || '验证码登录失败', icon: 'none' })
-			}
-		} catch (error) {
-			showAppToast({ title: '验证码登录失败，请检查网络', icon: 'none' })
-		} finally {
-			smsSubmitting.value = false
-		}
-	}
-
+	/*
+	 * 短信验证码登录功能暂时停用。
+	 *
+	 * const openSmsLogin = (): void => {
+	 * 	smsLoginMode.value = true
+	 * }
+	 *
+	 * const closeSmsLogin = (): void => {
+	 * 	smsLoginMode.value = false
+	 * 	smsCode.value = ''
+	 * }
+	 *
+	 * const isValidMobile = (): boolean => {
+	 * 	if (!/^1[3-9]\\d{9}$/.test(smsMobile.value)) {
+	 * 		showAppToast({ title: '请输入正确的手机号', icon: 'none' })
+	 * 		return false
+	 * 	}
+	 * 	return true
+	 * }
+	 *
+	 * const startSmsCooldown = (seconds: number): void => {
+	 * 	smsCooldown.value = seconds > 0 ? seconds : 60
+	 * 	const timer = setInterval(() => {
+	 * 		smsCooldown.value -= 1
+	 * 		if (smsCooldown.value <= 0) smsCooldown.value = 0
+	 * 	}, 1000)
+	 * }
+	 *
+	 * const sendSmsCode = async (): Promise<void> => {
+	 * 	if (smsCooldown.value > 0 || smsSending.value) return
+	 * 	if (!ensureAgreementAccepted() || !isValidMobile()) return
+	 * 	try {
+	 * 		smsSending.value = true
+	 * 		const response = await sendSmsLoginCode({ mobile: smsMobile.value, scene: 'login' })
+	 * 		if (response.code != 200) {
+	 * 			showAppToast({ title: response.msg || '验证码发送失败', icon: 'none' })
+	 * 			return
+	 * 		}
+	 * 		const cooldownSeconds = response.data != null ? response.data.getNumber('cooldownSeconds', 60) : 60
+	 * 		startSmsCooldown(cooldownSeconds)
+	 * 		showAppToast({ title: '验证码已发送', icon: 'success' })
+	 * 	} catch (error) {
+	 * 		showAppToast({ title: '验证码发送失败，请检查网络', icon: 'none' })
+	 * 	} finally {
+	 * 		smsSending.value = false
+	 * 	}
+	 * }
+	 *
+	 * const getAppPlatform = (): string => {
+	 * 	// APP-ANDROID
+	 * 	return 'android'
+	 * 	// APP-IOS
+	 * 	return 'ios'
+	 * 	return ''
+	 * }
+	 *
+	 * const submitSmsLogin = async (): Promise<void> => {
+	 * 	if (!ensureAgreementAccepted() || !isValidMobile() || smsCode.value == '' || smsSubmitting.value) {
+	 * 		if (smsCode.value == '') showAppToast({ title: '请输入验证码', icon: 'none' })
+	 * 		return
+	 * 	}
+	 * 	try {
+	 * 		smsSubmitting.value = true
+	 * 		const response = await smsLogin({ mobile: smsMobile.value, code: smsCode.value, platform: getAppPlatform() })
+	 * 		const token = response.data != null ? response.data.getString('access_token', '') : ''
+	 * 		if (response.code == 200 && token != '') {
+	 * 			smsCode.value = ''
+	 * 			completeLogin(token, false)
+	 * 		} else {
+	 * 			showAppToast({ title: response.msg || '验证码登录失败', icon: 'none' })
+	 * 		}
+	 * 	} catch (error) {
+	 * 		showAppToast({ title: '验证码登录失败，请检查网络', icon: 'none' })
+	 * 	} finally {
+	 * 		smsSubmitting.value = false
+	 * 	}
+	 * }
+	 */
 	const startUniVerifyLogin = async (): Promise<void> => {
 		// #ifdef APP-ANDROID || APP-IOS
 		if (!ensureAgreementAccepted() || nativeLoginLoading.value) return
@@ -350,8 +359,7 @@ import { showAppToast } from '../../utils/toast.uts'
 				return
 			}
 			if (!result.cancelled) {
-				showAppToast({ title: result.message + '，可使用验证码登录', icon: 'none' })
-				openSmsLogin()
+				showAppToast({ title: result.message, icon: 'none' })
 			}
 		} finally {
 			nativeLoginLoading.value = false
@@ -415,7 +423,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			})
 			const loginData = res.data
 
-			if (loginData == null) {
+			if (res.code != 200 || loginData == null) {
 				showAppToast({
 					title: res.msg || '登录失败',
 					icon: 'none'
@@ -423,7 +431,7 @@ import { showAppToast } from '../../utils/toast.uts'
 				return
 			}
 
-			const token = loginData.getString('token', '')
+			const token = loginData.getString('access_token', '')
 			if (token == '') {
 				showAppToast({
 					title: '登录失败: 未获取到token',
@@ -490,12 +498,12 @@ import { showAppToast } from '../../utils/toast.uts'
 
 			// 处理登录成功
 			const loginData = res.data
-			const token = loginData != null ? loginData.getString('token', '') : ''
+			const token = res.code == 200 && loginData != null ? loginData.getString('access_token', '') : ''
 			if (token != '') {
 				completeLogin(token, true)
 			} else {
 				showAppToast({
-					title: '登录失败，请重试',
+					title: res.msg || '登录失败，请重试',
 					icon: 'error'
 				})
 			}
@@ -703,6 +711,9 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 
 
+		/*
+		 * 短信验证码登录功能暂时停用。
+		 *
 		.phone-login-switch {
 			text-align: center;
 			margin-top: 28rpx;
@@ -746,6 +757,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			font-size: 24rpx;
 			line-height: 56rpx;
 		}
+		*/
 
 		:deep(.i-form-item){
 			padding: 12px 0;

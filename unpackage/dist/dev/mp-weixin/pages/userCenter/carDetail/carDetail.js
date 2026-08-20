@@ -160,7 +160,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "保存中...", mask: true }));
         try {
           const res = yield api_request.editDeviceInfo(payload);
-          if (res.code == 0) {
+          if (res.code == 200) {
             carInfo.value = payload;
             editInfo.value.plateNo = plateNo;
             isEditing.value = false;
@@ -185,7 +185,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         loadingDetail.value = true;
         try {
           const res = yield api_request.getDeviceDetail(deviceId.value);
-          if (res.code == 0 && res.data != null) {
+          if (res.code == 200 && res.data != null) {
             carInfo.value = res.data;
             detailLoaded.value = true;
           } else {

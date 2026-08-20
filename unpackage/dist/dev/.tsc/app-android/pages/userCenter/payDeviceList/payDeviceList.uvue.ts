@@ -50,12 +50,23 @@ const deviceList = ref<Array<UTSJSONObject>>([])
 				pageSize: pageSize.value
 			}
 			const res = await getUserDeviceList(data)
+			if (res.code != 200) {
+				showAppToast({
+					title: res.msg || '加载失败',
+					icon: 'none'
+				})
+				return
+			}
 
-			const code = res.code
-			const list = res.data.list
-			const pageCount = res.data.totalPage
+			const pageData = res.data
+			if (pageData == null) {
+				hasMore.value = false
+				return
+			}
+			const list : Array<UTSJSONObject> = pageData.list
+			const pageCount = pageData.totalPage
 
-			if (code == 0 && list != null) {
+			if (list != null) {
 				// 保存总页数
 				totalPage.value = pageCount
 
@@ -74,14 +85,9 @@ const deviceList = ref<Array<UTSJSONObject>>([])
 					currPage.value++
 				}
 
-			} else {
-				showAppToast({
-					title: res.msg || '加载失败',
-					icon: 'none'
-				})
 			}
 		} catch (error) {
-			console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:125")
+			console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:131")
 			showAppToast({
 				title: '加载失败，请重试',
 				icon: 'none'
@@ -112,7 +118,7 @@ const deviceList = ref<Array<UTSJSONObject>>([])
 		}
 		// iccid = iccid.substring(0,iccid.length-1)
 
-		console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:156")
+		console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:162")
 		// 设置需要刷新的标志
 		needRefresh.value = true
 

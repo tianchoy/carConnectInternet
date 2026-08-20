@@ -147,9 +147,16 @@ const imei = ref<string>('')
 			}
 
 			const res = await getDevicePos(data)
-			if (res?.code == 0 && res.data && res.data.length > 0) {
-				let foundDevice = false
-				res.data.forEach((item : UTSJSONObject) => {
+			const positions = res.data
+			if (res?.code != 200 || positions == null || positions.length == 0) {
+				showAppToast({
+					title: '获取位置失败',
+					icon: 'none'
+				})
+				return
+			}
+			let foundDevice = false
+			positions.forEach((item : UTSJSONObject) => {
 					const itemImei = item.getString('imei', '')
 					if (itemImei == imei.value) {
 						foundDevice = true
@@ -210,15 +217,9 @@ const imei = ref<string>('')
 						icon: 'none'
 					})
 				}
-			} else {
-				showAppToast({
-					title: '获取位置失败',
-					icon: 'none'
-				})
-			}
 
 		} catch (err) {
-			console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:244")
+			console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:245")
 			showAppToast({
 				title: '网络请求失败',
 				icon: 'none'
@@ -239,7 +240,7 @@ const imei = ref<string>('')
 
 		markers.value = [marker]
 		markerInitialized.value = true
-		console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:265")
+		console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:266")
 	}
 
 	// 计算地图上的旋转角度
@@ -260,7 +261,7 @@ const imei = ref<string>('')
 	}
 
 	onLoad((option) => {
-		console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:286")
+		console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:287")
 		connectionStatus.value = option.connectionStatus ?? ''
 		imei.value = option.imei ?? ''
 		currentCar.value = option.plateNo ?? '未知车辆'
@@ -430,8 +431,9 @@ const imei = ref<string>('')
 		isTrackRequestPending = true
 		try {
 			const res = await getDevicePos({ deptId: deptId.value, deviceids: imei.value })
-			if (!isTracking.value || sessionId != trackingSessionId || res?.code != 0 || !res.data) return
-			const item = res.data.find((value : UTSJSONObject) => value.getString('imei', '') == imei.value)
+			const positions = res.data
+			if (!isTracking.value || sessionId != trackingSessionId || res?.code != 200 || positions == null) return
+			const item = positions.find((value : UTSJSONObject) => value.getString('imei', '') == imei.value)
 			if (item == null) return
 			const rawLat = item.getNumber('latitude', 0), rawLng = item.getNumber('longitude', 0)
 			if (rawLat == 0 || rawLng == 0 || !isFinite(rawLat) || !isFinite(rawLng)) return
@@ -457,7 +459,7 @@ const imei = ref<string>('')
 			}
 			pendingJumpPosition = null; pendingJumpTime = ''
 			acceptLivePosition(item, position, positionTime, sessionId)
-		} catch (error) { console.error('获取跟踪位置失败:', error, " at pages/vehicleTracking/vehicleTracking.uvue:483") } finally { if (sessionId == trackingSessionId) isTrackRequestPending = false }
+		} catch (error) { console.error('获取跟踪位置失败:', error, " at pages/vehicleTracking/vehicleTracking.uvue:485") } finally { if (sessionId == trackingSessionId) isTrackRequestPending = false }
 	}
 
 	function stopTracking(showToast : boolean = true) : void {

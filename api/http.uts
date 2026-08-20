@@ -32,11 +32,19 @@ type RequestFailure = {
     data?: any
 }
 
-const BASE_URL = 'https://car.zdiot.cn:18443/api'
-// const BASE_URL = 'http://45.207.216.51:8085/api'
+// const BASE_URL = 'https://car.zdiot.cn:18443/api'
+const BASE_URL = 'https://gpsapp.zdiot.cn'
 
 // 处理token过期的函数
+let isHandlingTokenExpired = false
+
+export function resetTokenExpiredState(): void {
+    isHandlingTokenExpired = false
+}
+
 function handleTokenExpired(): void {
+    if (isHandlingTokenExpired) return
+    isHandlingTokenExpired = true
     console.log('检测到token过期，执行跳转登录页逻辑')
     
     // 清除本地token

@@ -148,7 +148,12 @@ const __sfc__ = defineComponent({
             try {
                 const data = { deptId: deptId.value, deviceids: imei.value } as UTSJSONObject;
                 const res = await getDevicePos(data);
-                res.data.forEach(item => {
+                const positions = res.data;
+                if (res.code != 200 || positions == null) {
+                    showAppToast({ title: res.msg != "" ? res.msg : '获取车辆位置失败', icon: 'none' } as ShowToastOptions);
+                    return;
+                }
+                positions.forEach(item => {
                     if (item.getString('imei', '') == imei.value) {
                         const deviceData = item;
                         const latitude = deviceData.getNumber('latitude', 0);
@@ -463,11 +468,11 @@ const __sfc__ = defineComponent({
         const loadGeofenceList = async (): Promise<void> => {
             try {
                 const res = await getGeofenceList();
-                if (res.code == 0) {
+                if (res.code == 200 && res.data != null) {
                     fenceList.value = res.data;
                 }
                 else {
-                    showAppToast({ title: '获取围栏列表失败', icon: 'none' } as ShowToastOptions);
+                    showAppToast({ title: res.msg != "" ? res.msg : '获取围栏列表失败', icon: 'none' } as ShowToastOptions);
                     fenceList.value = []; // 失败时也清空列表
                 }
                 // 无论数据是否为空，都重新渲染
@@ -643,7 +648,7 @@ const __sfc__ = defineComponent({
         async function deleteFenceById(id: string): Promise<void> {
             try {
                 const result = await deleteGeofence(id);
-                if (result.code == 0) {
+                if (result.code == 200) {
                     showAppToast({ title: '删除成功' } as ShowToastOptions);
                     selectedFence.value = null;
                     points.value = [];
@@ -657,7 +662,7 @@ const __sfc__ = defineComponent({
                     await loadGeofenceList();
                 }
                 else {
-                    showAppToast({ title: '删除失败', icon: 'none' } as ShowToastOptions);
+                    showAppToast({ title: result.msg != "" ? result.msg : '删除失败', icon: 'none' } as ShowToastOptions);
                 }
             }
             catch (error: any) {
@@ -742,7 +747,7 @@ const __sfc__ = defineComponent({
                     result = await addGeofence(fenceData);
                 }
                 uni.hideLoading();
-                if (result.code == 0) {
+                if (result.code == 200) {
                     showAppToast({ title: isTruthy(editingFence.value) ? '更新成功' : '保存成功' } as ShowToastOptions);
                     editDialogPopup.value?.$callMethod('close');
                     // 重置状态
@@ -798,8 +803,9 @@ const __sfc__ = defineComponent({
                     pageSize: page.pageSize,
                     geoId: fenceId
                 });
-                if (res.code == 0) {
-                    const dataList = res.data.list != null ? res.data.list : [];
+                if (res.code == 200) {
+                    const pageData = res.data;
+                    const dataList: Array<UTSJSONObject> = pageData != null ? pageData.list : [];
                     if (page.pageNum == 1) {
                         boundDevices.value = dataList;
                         deviceList.value = dataList;
@@ -832,8 +838,9 @@ const __sfc__ = defineComponent({
                     pageNum: page.pageNum,
                     pageSize: page.pageSize
                 });
-                if (res.code == 0) {
-                    const dataList = res.data.list != null ? res.data.list : [];
+                if (res.code == 200) {
+                    const pageData = res.data;
+                    const dataList: Array<UTSJSONObject> = pageData != null ? pageData.list : [];
                     if (page.pageNum == 1) {
                         deviceList.value = dataList;
                     }
@@ -914,7 +921,7 @@ const __sfc__ = defineComponent({
                 else {
                     result = await unbindDevices(params);
                 }
-                if (result.code == 0) {
+                if (result.code == 200) {
                     showAppToast({ title: bound ? '绑定成功' : '解绑成功' } as ShowToastOptions);
                     // 刷新当前标签页数据，重置分页
                     initPagination(activeTab.value);

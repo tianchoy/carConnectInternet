@@ -72,7 +72,9 @@ const _cache = __ins.renderCache;
 		isLoading.value = true
 		try {
 			const res = await getUserMsgList({ page: 1, pageSize: 50 })
-			if (res.code != 0 || res.data.list == null) return 0
+			const pageData = res.data
+			if (res.code != 200 || pageData == null) return 0
+			const latestList : Array<UTSJSONObject> = pageData.list
 
 			const existingIds = new Set<string>()
 			msgList.value.forEach((message : UTSJSONObject) : void => {
@@ -81,7 +83,7 @@ const _cache = __ins.renderCache;
 			})
 
 			const latestMessages : Array<UTSJSONObject> = []
-			res.data.list.forEach((message : UTSJSONObject) : void => {
+			latestList.forEach((message : UTSJSONObject) : void => {
 				const messageId = message.getString('messageId', '')
 				if (messageId != '' && !existingIds.has(messageId)) {
 					existingIds.add(messageId)
@@ -150,11 +152,15 @@ const _cache = __ins.renderCache;
 				page: currPage.value,
 				pageSize: pageSize.value
 			})
-			if (res.code != 0) {
+			if (res.code != 200) {
 				loadStatus.value = 'loadmore'
 				return
 			}
 			const data = res.data
+			if (data == null) {
+				loadStatus.value = 'nomore'
+				return
+			}
 			const totalPages = data.totalPage > 0 ? data.totalPage : 1
 			totalPage.value = totalPages
 			const newData : Array<UTSJSONObject> = data.list
@@ -226,7 +232,7 @@ const _cache = __ins.renderCache;
 			try {
 				const messageId = item.getString('messageId', '')
 				const res = await setMsgState(messageId)
-				if (res.code == 0 || res.msg == 'success') {
+				if (res.code == 200) {
 					const index = msgList.value.findIndex((message : UTSJSONObject) : boolean => message.getString('messageId', '') == messageId)
 					if (index != -1) {
 						msgList.value[index].set('status', 0)

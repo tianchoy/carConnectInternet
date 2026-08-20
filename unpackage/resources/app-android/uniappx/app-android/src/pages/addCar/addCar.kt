@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -133,7 +134,7 @@ open class GenPagesAddCarAddCar : BasePage {
                             console.log("✅ 添加设备返回:", res)
                             uni_hideLoading(null)
                             loading.value = false
-                            if (res.code == 0) {
+                            if (res.code == 200) {
                                 showAppToast(ShowToastOptions(title = "添加成功", icon = "success"))
                                 uni_setStorageSync("needRefreshHome", true)
                                 refreshDeviceList()

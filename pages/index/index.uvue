@@ -575,6 +575,10 @@ const loadDeviceDetail = async (deviceId: string) => {
     try {
         const res = await getDeviceDetail(deviceId)
         const detail = res.data
+        if (res.code != 200 || detail == null) {
+            console.error('加载设备详情失败:', res.msg)
+            return
+        }
         if (detail != null) {
             const deviceStatus = detail.getJSON('deviceStatus')
             deviceDetail.value = {
@@ -653,27 +657,18 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
         const res = await getTrackPos(data)
         if (requestId != trackRequestId) return
 
-        if (res.code == 401) {
-            showAppToast({
-                title: '登录过期，请重新登录',
-                icon: 'none',
-                duration: 2000
-            })
-            uni.removeStorageSync('token')
-            clearPushSessionState()
-            uni.reLaunch({
-                url: '/pages/index/index'
-            })
-            return
-        }
-
-        if (res.code != 0) {
+        if (res.code != 200) {
             console.error('加载轨迹失败:', res.msg)
             clearTripData()
             return
         }
 
-        processTripData(res.data)
+        const trackData = res.data
+        if (trackData == null) {
+            clearTripData()
+            return
+        }
+        processTripData(trackData)
     } catch (error) {
         if (requestId != trackRequestId) return
         console.error('加载轨迹失败', error)
@@ -693,7 +688,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
     try {
         const res = await getDevicePos(data)
         const positions = res.data
-        if (res.code != 0 || positions == null || positions.length == 0) {
+        if (res.code != 200 || positions == null || positions.length == 0) {
             console.warn('获取设备位置失败:', data.getString('deviceId', ''), res.code)
             positionState.value = 'empty'
             return false
@@ -843,10 +838,24 @@ const loadDeviceList = async () => {
         const res = await getUserDeviceList({
             pageSize: 1000
         })
-        const code = res.code
-        const data = res.data
-        const list = data.list
-        if (code == 0 && list != null && list.length > 0) {
+        if (res.code != 200) {
+            showAppToast({
+                title: res.msg || '加载车辆列表失败',
+                icon: 'none'
+            })
+            return
+        }
+
+        const pageData = res.data
+        if (pageData == null) {
+            showAppToast({
+                title: '暂无车辆数据',
+                icon: 'none'
+            })
+            return
+        }
+        const list : Array<UTSJSONObject> = pageData.list
+        if (list != null && list.length > 0) {
             userDeviceList.value = list
             deviceList.value = list.map((item: UTSJSONObject): Device => {
                 const imei = item.getString('imei', '')
@@ -1143,7 +1152,7 @@ const gotoLogin = () => {
 
 async function unbindCurrentDevice() : Promise<void> {
     const result = await delDevice(currentCarImei.value)
-    if (result.code == 0) {
+    if (result.code == 200) {
         showAppToast({
             title: '解绑成功',
             icon: 'none'
@@ -1182,7 +1191,7 @@ const handleExit = () => {
         success: async (res) => {
             if (res.confirm) {
                 const res = await logout()
-                if(res.code == 0){
+                if(res.code == 200){
                     clearSavedSelectedDevice()
                     clearSavedSelectedDeviceIndex()
                     uni.removeStorageSync('token')
@@ -1192,7 +1201,7 @@ const handleExit = () => {
                     })
                 }else{
                     showAppToast({
-                        title:'退出账户失败'
+                        title: res.msg || '退出账户失败'
                     })
                 }
             }

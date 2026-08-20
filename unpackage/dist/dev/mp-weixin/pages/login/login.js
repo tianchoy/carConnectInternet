@@ -5,6 +5,7 @@ const api_request = require("../../api/request.js");
 const utils_toast = require("../../utils/toast.js");
 const utils_modal = require("../../utils/modal.js");
 require("../../services/push.js");
+const api_http = require("../../api/http.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
@@ -152,7 +153,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         form.value.password = account.getString("password", "");
         rememberPassword.value = form.value.username != "" || form.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.uvue:177", "加载保存的账号密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/login/login.uvue:178", "加载保存的账号密码失败:", error);
       }
     }
     const isPswLogin = () => {
@@ -189,7 +190,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
       deviceModel.value = res.deviceModel;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:220", "设备型号:", deviceModel.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:221", "设备型号:", deviceModel.value);
     };
     const validateForm = () => {
       if (form.value.username.length == 0) {
@@ -210,6 +211,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (savePassword)
         saveAccountPassword();
       common_vendor.index.setStorageSync("token", token);
+      api_http.resetTokenExpiredState();
       utils_toast.showAppToast({ title: "登录成功", icon: "success" });
       setTimeout(() => {
         common_vendor.index.reLaunch({ url: "/pages/index/index" });
@@ -262,7 +264,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             iv: e.detail.iv
           }));
           const loginData = res.data;
-          if (loginData == null) {
+          if (res.code != 200 || loginData == null) {
             utils_toast.showAppToast({
               title: res.msg || "登录失败",
               icon: "none"
@@ -279,7 +281,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           completeLogin(token, false);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:437", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:439", "微信登录失败:", error);
           utils_toast.showAppToast({
             title: "微信登录失败",
             icon: "none"
@@ -299,39 +301,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         }
         try {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:462", "准备验证表单...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:464", "准备验证表单...");
           if (!validateForm())
             return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:464", "✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:466", "✅ 表单验证通过");
           const newFormData = new common_vendor.UTSJSONObject({
             username: form.value.username,
             password: form.value.password,
             from: deviceModel.value,
             type: "USER"
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:473", "📤 请求参数:", newFormData);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:475", "📤 请求参数:", newFormData);
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "登录中...",
             mask: true
           }));
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:483", "🚀 开始调用 login 接口...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:485", "🚀 开始调用 login 接口...");
           const res = yield api_request.login(newFormData);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:485", "✅ 登录接口返回:", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:487", "✅ 登录接口返回:", res);
           loading.value = false;
           common_vendor.index.hideLoading();
           const loginData = res.data;
-          const token = loginData != null ? loginData.getString("token", "") : "";
+          const token = res.code == 200 && loginData != null ? loginData.getString("token", "") : "";
           if (token != "") {
             completeLogin(token, true);
           } else {
             utils_toast.showAppToast({
-              title: "登录失败，请重试",
+              title: res.msg || "登录失败，请重试",
               icon: "error"
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:504", "❌ 登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:506", "❌ 登录失败:", error);
           loading.value = false;
           common_vendor.index.hideLoading();
           if (error && error.message) {
@@ -370,7 +372,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onMounted(() => {
       getSystemInfo();
       loadSavedAccount();
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:603", "pswLogin 初始值:", pswLogin.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:605", "pswLogin 初始值:", pswLogin.value);
     });
     return (_ctx, _cache) => {
       "raw js";

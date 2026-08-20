@@ -611,7 +611,18 @@ const center = reactive({
 			const res = await getTrackPos(data)
 			if (requestId != replaySessionId) return
 
-			const positions = res.data?.getArray<UTSJSONObject>('positions')
+			if (res.code != 200) {
+				showAppToast({ title: res.msg || '轨迹加载失败', icon: 'none' })
+				showCurrentPosition()
+				return
+			}
+
+			const trackData = res.data
+			if (trackData == null) {
+				showCurrentPosition()
+				return
+			}
+			const positions = trackData.getArray<UTSJSONObject>('positions')
 			if (positions != null && positions.length > 0) {
 				processTrackData(positions)
 				if (trackPoints.value.length == 0) {
@@ -622,7 +633,7 @@ const center = reactive({
 			}
 		} catch (error) {
 			if (requestId != replaySessionId) return
-			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:676")
+			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:687")
 			showAppToast({ title: '轨迹加载失败', icon: 'none' })
 			if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
 				showCurrentPosition()
@@ -751,7 +762,7 @@ const center = reactive({
 		lng.value = option.lng ?? null
 		sTime.value = option.startTime ?? ''
 		eTime.value = option.endTime ?? ''
-		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:805")
+		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:816")
 		const routeStartTime = resolveRouteDateTime(sTime.value)
 		const routeEndTime = resolveRouteDateTime(eTime.value)
 		if (routeStartTime != null && routeEndTime != null) {

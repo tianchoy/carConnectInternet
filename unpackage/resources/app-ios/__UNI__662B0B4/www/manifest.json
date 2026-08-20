@@ -28,20 +28,31 @@
             "key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
           }
         },
+        "uni-network": {},
         "uni-storage": {},
-        "uni-location": {},
+        "uni-websocket": {},
+        "uni-getAppBaseInfo": {},
+        "uni-getDeviceInfo": {},
         "uni-getSystemInfo": {},
+        "uni-base64ToArrayBuffer": {},
+        "uni-arrayBufferToBase64": {},
+        "uni-secure-network": {},
+        "uni-media": {},
         "uni-showLoading": {},
+        "uni-prompt": {},
+        "uni-oauth": {},
         "uni-vibrate": {},
         "uni-dialogPage": {},
         "uni-event": {},
-        "uni-getAppBaseInfo": {},
-        "uni-network": {},
-        "uni-prompt": {},
+        "uni-location": {},
         "uni-openLocation": {},
+        "uni-cloud-client": {},
         "uni-map-tencent": {},
         "uni-camera": {},
         "uni-web-view": {}
+      },
+      "icons": {
+        "appstore": "/Users/xyhc/Downloads/logo/1024.png"
       }
     }
   }

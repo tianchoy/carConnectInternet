@@ -235,7 +235,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:242", "✅ 添加设备返回:", res);
           common_vendor.index.hideLoading();
           loading.value = false;
-          if (res.code == 0) {
+          if (res.code == 200) {
             utils_toast.showAppToast({
               title: "添加成功",
               icon: "success"

@@ -43,10 +43,23 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                         try {
                             val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 89, 10), "page" to currPage.value, "pageSize" to pageSize.value)
                             val res = await(getUserDeviceList(data))
-                            val code = res.code
-                            val list = res.data.list
-                            val pageCount = res.data.totalPage
-                            if (code == 0 && list != null) {
+                            if (res.code != 200) {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "加载失败"
+                                }
+                                , icon = "none"))
+                                return@w1
+                            }
+                            val pageData = res.data
+                            if (pageData == null) {
+                                hasMore.value = false
+                                return@w1
+                            }
+                            val list: UTSArray<UTSJSONObject> = pageData.list
+                            val pageCount = pageData.totalPage
+                            if (list != null) {
                                 totalPage.value = pageCount
                                 if (currPage.value == 1) {
                                     deviceList.value = list
@@ -57,17 +70,10 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                                 if (hasMore.value) {
                                     currPage.value++
                                 }
-                            } else {
-                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
-                                    res.msg
-                                } else {
-                                    "加载失败"
-                                }
-                                , icon = "none"))
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败:", error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:125")
+                            console.error("加载车辆列表失败:", error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:131")
                             showAppToast(ShowToastOptions(title = "加载失败，请重试", icon = "none"))
                         }
                          finally {
@@ -92,7 +98,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                 if (simMerchant.toLowerCase() == "zddx") {
                     iccid = iccid.substring(0, iccid.length - 1)
                 }
-                console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:156")
+                console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:162")
                 needRefresh.value = true
                 needRefresh.value = false
                 showAppToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none"))

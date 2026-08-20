@@ -52,8 +52,15 @@
         "uni-event": {},
         "uni-dialogPage": {},
         "uni-network": {},
+        "uni-cloud-client": {},
         "uni-map-tencent": {},
         "uni-web-view": {}
+      },
+      "icons": {
+        "hdpi": "/Users/xyhc/Downloads/logo/432.png",
+        "xxxhdpi": "/Users/xyhc/Downloads/logo/432.png",
+        "xxhdpi": "/Users/xyhc/Downloads/logo/432.png",
+        "xhdpi": "/Users/xyhc/Downloads/logo/432.png"
       }
     }
   }

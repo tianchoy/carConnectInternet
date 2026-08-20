@@ -43,10 +43,21 @@ const __sfc__ = defineComponent({
                     pageSize: pageSize.value
                 } as UTSJSONObject;
                 const res = await getUserDeviceList(data);
-                const code = res.code;
-                const list = res.data.list;
-                const pageCount = res.data.totalPage;
-                if (code == 0 && list != null) {
+                if (res.code != 200) {
+                    showAppToast({
+                        title: res.msg != "" ? res.msg : '加载失败',
+                        icon: 'none'
+                    } as ShowToastOptions);
+                    return;
+                }
+                const pageData = res.data;
+                if (pageData == null) {
+                    hasMore.value = false;
+                    return;
+                }
+                const list: Array<UTSJSONObject> = pageData.list;
+                const pageCount = pageData.totalPage;
+                if (list != null) {
                     // 保存总页数
                     totalPage.value = pageCount;
                     // 如果是第一页，直接赋值
@@ -62,12 +73,6 @@ const __sfc__ = defineComponent({
                     if (hasMore.value) {
                         currPage.value++;
                     }
-                }
-                else {
-                    showAppToast({
-                        title: res.msg != "" ? res.msg : '加载失败',
-                        icon: 'none'
-                    } as ShowToastOptions);
                 }
             }
             catch (error: any) {

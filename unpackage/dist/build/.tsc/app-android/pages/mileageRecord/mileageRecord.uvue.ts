@@ -144,6 +144,10 @@ const carStatus = ref('在线')
 				withTrip: true,
 			};
 			const res = await getTrackPos(data);
+			if (res.code != 200) {
+				showAppToast({ title: res.msg || '数据加载失败', icon: 'none' });
+				return;
+			}
 			console.log('获取里程数据成功:', res);
 			const trackData = res.data
 			if (trackData != null) {

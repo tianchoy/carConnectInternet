@@ -91,7 +91,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             newPassword: formData.value.newPassword
           });
           const res = yield api_request.changePassWord(submitData);
-          if (res.msg == "success") {
+          if (res.code == 200) {
             common_vendor.index.hideLoading();
             utils_toast.showAppToast({
               title: "密码修改成功",

@@ -10,8 +10,3 @@ export type ExternalMapNavigationParams = {
 export type ExternalMapNavigationResult = {
 	code: string
 }
-
-export type IOSMapProvider = {
-	id: string
-	name: string
-}

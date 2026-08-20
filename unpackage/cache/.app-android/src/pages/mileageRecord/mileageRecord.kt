@@ -165,14 +165,23 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                         try {
                             val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 192, 10), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
                             val res = await(getTrackPos(data))
-                            console.log("获取里程数据成功:", res, " at pages/mileageRecord/mileageRecord.uvue:202")
+                            if (res.code != 200) {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "数据加载失败"
+                                }
+                                , icon = "none"))
+                                return@w1
+                            }
+                            console.log("获取里程数据成功:", res, " at pages/mileageRecord/mileageRecord.uvue:206")
                             val trackData = res.data
                             if (trackData != null) {
                                 processTripData(trackData)
                             }
                         }
                          catch (e: Throwable) {
-                            console.error("获取里程数据失败:", e, " at pages/mileageRecord/mileageRecord.uvue:208")
+                            console.error("获取里程数据失败:", e, " at pages/mileageRecord/mileageRecord.uvue:212")
                             showAppToast(ShowToastOptions(title = "数据加载失败", icon = "none"))
                         }
                          finally {

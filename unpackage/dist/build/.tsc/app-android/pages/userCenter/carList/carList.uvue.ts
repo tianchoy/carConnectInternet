@@ -49,12 +49,23 @@ const carList = ref<Array<UTSJSONObject>>([])
 				pageSize: pageSize.value
 			} as UTSJSONObject
 			const res = await getUserDeviceList(data)
+			if (res.code != 200) {
+				showAppToast({
+					title: res.msg || '加载失败',
+					icon: 'none'
+				})
+				return
+			}
 
-			const code = res.code
-			const list = res.data.list
-			const pageCount = res.data.totalPage
+			const pageData = res.data
+			if (pageData == null) {
+				hasMore.value = false
+				return
+			}
+			const list : Array<UTSJSONObject> = pageData.list
+			const pageCount = pageData.totalPage
 
-			if (code == 0 && list != null) {
+			if (list != null) {
 				// 保存总页数
 				totalPage.value = pageCount
 
@@ -72,11 +83,6 @@ const carList = ref<Array<UTSJSONObject>>([])
 				if (hasMore.value) {
 					currPage.value++
 				}
-			} else {
-				showAppToast({
-					title: res.msg || '加载失败',
-					icon: 'none'
-				})
 			}
 		} catch (error) {
 			console.error('加载车辆列表失败:', error)

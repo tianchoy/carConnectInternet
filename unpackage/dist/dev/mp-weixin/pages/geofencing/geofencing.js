@@ -290,7 +290,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const data = new common_vendor.UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
           const res = yield api_request.getDevicePos(data);
-          res.data.forEach((item) => {
+          const positions = res.data;
+          if (res.code != 200 || positions == null) {
+            utils_toast.showAppToast({ title: res.msg || "获取车辆位置失败", icon: "none" });
+            return Promise.resolve(null);
+          }
+          positions.forEach((item) => {
             if (item.getString("imei", "") == imei.value) {
               const deviceData = item;
               const latitude = deviceData.getNumber("latitude", 0);
@@ -334,7 +339,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           });
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:366", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:371", "获取初始位置失败:", err);
           utils_toast.showAppToast({
             title: "获取车辆位置失败",
             icon: "none"
@@ -397,7 +402,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const lng = parseFloat(centerValues[1]);
         const radius = parseFloat(parts[1].trim());
         if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:437", "无效的圆形围栏数据:", circleStr);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:442", "无效的圆形围栏数据:", circleStr);
           return null;
         }
         const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
@@ -407,7 +412,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           radius
         };
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:447", "解析圆形围栏失败:", error, "数据:", circleStr);
+        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:452", "解析圆形围栏失败:", error, "数据:", circleStr);
         return null;
       }
     }
@@ -567,15 +572,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
           const res = yield api_request.getGeofenceList();
-          if (res.code == 0) {
+          if (res.code == 200 && res.data != null) {
             fenceList.value = res.data;
           } else {
-            utils_toast.showAppToast({ title: "获取围栏列表失败", icon: "none" });
+            utils_toast.showAppToast({ title: res.msg || "获取围栏列表失败", icon: "none" });
             fenceList.value = [];
           }
           renderFencesOnMap();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:643", "加载围栏列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:648", "加载围栏列表失败:", error);
           utils_toast.showAppToast({ title: "获取围栏列表失败", icon: "none" });
           fenceList.value = [];
           renderFencesOnMap();
@@ -725,7 +730,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
           const result = yield api_request.deleteGeofence(id);
-          if (result.code == 0) {
+          if (result.code == 200) {
             utils_toast.showAppToast({ title: "删除成功" });
             selectedFence.value = null;
             points.value = [];
@@ -738,10 +743,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.$callMethod("close");
             yield loadGeofenceList();
           } else {
-            utils_toast.showAppToast({ title: "删除失败", icon: "none" });
+            utils_toast.showAppToast({ title: result.msg || "删除失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:851", "删除围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:856", "删除围栏失败:", error);
           utils_toast.showAppToast({ title: "删除失败", icon: "none" });
         }
       });
@@ -811,7 +816,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             result = yield api_request.addGeofence(fenceData);
           }
           common_vendor.index.hideLoading();
-          if (result.code == 0) {
+          if (result.code == 200) {
             utils_toast.showAppToast({ title: editingFence.value ? "更新成功" : "保存成功" });
             (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.$callMethod("close");
             const tempFence = editingFence.value;
@@ -830,7 +835,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:962", "保存围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:967", "保存围栏失败:", error);
           utils_toast.showAppToast({ title: "保存失败，请重试", icon: "none" });
         }
       });
@@ -863,8 +868,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pageSize: page.pageSize,
             geoId: fenceId
           }));
-          if (res.code == 0) {
-            const dataList = res.data.list || [];
+          if (res.code == 200) {
+            const pageData = res.data;
+            const dataList = pageData != null ? pageData.list : [];
             if (page.pageNum == 1) {
               boundDevices.value = dataList;
               deviceList.value = dataList;
@@ -895,8 +901,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pageNum: page.pageNum,
             pageSize: page.pageSize
           }));
-          if (res.code == 0) {
-            const dataList = res.data.list || [];
+          if (res.code == 200) {
+            const pageData = res.data;
+            const dataList = pageData != null ? pageData.list : [];
             if (page.pageNum == 1) {
               deviceList.value = dataList;
             } else {
@@ -930,7 +937,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const switchTab = (tab) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1063", "switchTab", tab, currentFenceId.value);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1070", "switchTab", tab, currentFenceId.value);
         if (activeTab.value === tab)
           return Promise.resolve(null);
         activeTab.value = tab;
@@ -938,7 +945,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         deviceList.value = [];
         initPagination(tab);
         if (tab === "bind") {
-          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1075", "switchTab,bind:", currentFenceId.value);
+          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1082", "switchTab,bind:", currentFenceId.value);
           yield loadBoundDevices(currentFenceId.value);
         } else {
           yield loadUnboundDevices();
@@ -956,21 +963,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const toggleDeviceBinding = (deviceImei, bound) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1095", "toggleDeviceBinding", deviceImei, bound);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1102", "toggleDeviceBinding", deviceImei, bound);
         loading.value = true;
         try {
           const params = new common_vendor.UTSJSONObject({
             geofenceId: currentFenceId.value,
             imeis: [deviceImei]
           });
-          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1102", "toggleDeviceBindingparams", params);
+          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1109", "toggleDeviceBindingparams", params);
           let result = null;
           if (bound) {
             result = yield api_request.bindDevices(params);
           } else {
             result = yield api_request.unbindDevices(params);
           }
-          if (result.code == 0) {
+          if (result.code == 200) {
             utils_toast.showAppToast({ title: bound ? "绑定成功" : "解绑成功" });
             initPagination(activeTab.value);
             scrollTop.value = 0;
@@ -983,7 +990,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: result.msg || "操作失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:1125", "设备绑定操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:1132", "设备绑定操作失败:", error);
           utils_toast.showAppToast({ title: "操作失败", icon: "none" });
         } finally {
           loading.value = false;
@@ -1043,10 +1050,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.$callMethod("close");
       const fence = selectedFence.value;
-      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1196", "删除电子围栏", fence);
+      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1203", "删除电子围栏", fence);
       if (fence != null) {
         const fenceId = fence.getString("id", "");
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1200", "删除电子围栏ID", fenceId);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1207", "删除电子围栏ID", fenceId);
         if (fenceId !== "") {
           deleteFence(fenceId);
         } else {

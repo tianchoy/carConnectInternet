@@ -627,17 +627,15 @@ export function setBadgeNumber(curNum : Int) : void {
 export function resetBadge() : void {
 	log("resetBadge")
 	JPUSHService.resetBadge()
-	// 同时调用系统接口重置角标
+	// Always reset the visible launcher icon badge. iOS 16+ also needs the
+	// notification-center badge count cleared to keep both system states aligned.
+	UIApplication.shared.applicationIconBadgeNumber = 0
 	if (UTSiOS.available("iOS 16.0, *")) {
-		// iOS 16 及以上使用 UNUserNotificationCenter
 		UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler = (error : NSError | null) => {
 			if (error != null) {
 				log("resetBadge setBadgeCount error:", error)
 			}
 		})
-	} else {
-		// iOS 16 以下使用 UIApplication
-		UIApplication.shared.applicationIconBadgeNumber = 0
 	}
 }
 

@@ -32,14 +32,27 @@ const userInfo = ref({
 	// 加载数据
 	const loadData = async () => {
 		const params = { __$originalPosition: new UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 70, 9), } as UTSJSONObject
-		const res = await getUserInfo()
-		userInfo.value = {
-			avatar: res.data.getString('avatar', '/static/avatar.png'),
-			nickname: res.data.getString('nickname', '')
-		}
+		try {
+			const res = await getUserInfo()
+			if (res.code == 200 && res.data != null) {
+				userInfo.value = {
+					avatar: res.data.getString('avatar', '/static/avatar.png'),
+					nickname: res.data.getString('nickname', '')
+				}
+			} else {
+				showAppToast({ title: res.msg || '获取用户信息失败', icon: 'none' })
+			}
 
-		const resCars = await getUserDeviceList(params)
-		carsnumber.value = resCars.data.totalCount
+			const resCars = await getUserDeviceList(params)
+			if (resCars.code == 200 && resCars.data != null) {
+				carsnumber.value = resCars.data.totalCount
+			} else {
+				showAppToast({ title: resCars.msg || '获取车辆数量失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('加载用户中心数据失败:', error, " at pages/userCenter/userCenter.uvue:89")
+			showAppToast({ title: '加载用户信息失败', icon: 'none' })
+		}
 	}
 
 	onShow(() => {
@@ -107,7 +120,7 @@ const userInfo = ref({
 	const userInfoDetail = () => {
 		if (Login.value) {
 			uni.navigateTo({
-				url: '/pages/userCenter/userInfo/userInfo?userInfo=' + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:146")
+				url: '/pages/userCenter/userInfo/userInfo?userInfo=' + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:159")
 			})
 		} else {
 			uni.navigateTo({
@@ -149,7 +162,7 @@ const userInfo = ref({
 		if (Login.value) {
 			// 跳转到网页容器页面
 			uni.navigateTo({
-				url: '/pages/webview/webview?url=' + UTSAndroid.consoleDebugError(encodeURIComponent('https://shop.zdiot.cn/'), " at pages/userCenter/userCenter.uvue:188")
+				url: '/pages/webview/webview?url=' + UTSAndroid.consoleDebugError(encodeURIComponent('https://shop.zdiot.cn/'), " at pages/userCenter/userCenter.uvue:201")
 			})
 		} else {
 			showAppToast({

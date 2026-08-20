@@ -77,7 +77,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const logoutBtn = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.logout();
-        if (res.code == 0) {
+        if (res.code == 200) {
           common_vendor.index.removeStorageSync("token");
           services_push.clearPushSessionState();
           common_vendor.index.reLaunch({
@@ -85,7 +85,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         } else {
           utils_toast.showAppToast({
-            title: "退出账户失败"
+            title: res.msg || "退出账户失败"
           });
         }
       });

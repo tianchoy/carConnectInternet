@@ -39,11 +39,13 @@ import AndroidLog from 'android.util.Log'
 import {
 	init as initAndroidJPush,
 	setEventCallBack as setJPushEventCallBack,
-	getRegistrationId as getAndroidJPushRegistrationId
+	getRegistrationId as getAndroidJPushRegistrationId,
+	setBadgeNumber as setAndroidJPushBadgeNumber
 } from '@/uni_modules/jg-jpush-u'
 import {
 	init as initHuaweiJPushVendor
 } from '@/uni_modules/jg-jpush-u-huawei'
+
 
 
 
@@ -413,7 +415,25 @@ class PushManager {
 		pushDebug(provider, '本地测试 provider 已设置；请完全重启应用后生效')
 	}
 
+	clearBadge(): void {
+
+
+
+
+
+
+
+
+		try {
+			setAndroidJPushBadgeNumber(0)
+		} catch (error) {
+			pushDebug(this.provider, '清除 Android 应用角标失败: ' + error.toString())
+		}
+
+	}
+
 	private handlePushEvent(event: NormalizedPushEvent): void {
+		this.clearBadge()
 		const messageId = pushMessageId(event.payload)
 		if (messageId != '') uni.setStorageSync(pendingMessageIdKey(event.provider), messageId)
 		if (event.kind == 'received' || event.kind == 'clicked' || event.kind == 'custom') {
@@ -507,6 +527,12 @@ export function initPush(): void {
 export function refreshPushRegistrationId(): void {
 
 	pushManager.refreshRegistrationId()
+
+}
+
+export function clearPushBadge(): void {
+
+	pushManager.clearBadge()
 
 }
 

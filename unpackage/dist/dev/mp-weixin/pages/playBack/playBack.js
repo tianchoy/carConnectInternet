@@ -523,7 +523,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     const loadTrackPos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c;
+        var _a, _b;
         pausePlayback();
         const requestId = ++replaySessionId;
         clearTrackDisplay();
@@ -541,7 +541,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_request.getTrackPos(data);
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          const positions = (_a = res.data) === null || _a === void 0 ? null : _a.getArray("positions");
+          if (res.code != 200) {
+            utils_toast.showAppToast({ title: res.msg || "轨迹加载失败", icon: "none" });
+            showCurrentPosition();
+            return Promise.resolve(null);
+          }
+          const trackData = res.data;
+          if (trackData == null) {
+            showCurrentPosition();
+            return Promise.resolve(null);
+          }
+          const positions = trackData.getArray("positions");
           if (positions != null && positions.length > 0) {
             processTrackData(positions);
             if (trackPoints.value.length == 0) {
@@ -553,9 +563,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:676", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:687", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
-          if (!isNaN(parseFloat((_b = lat.value) !== null && _b !== void 0 ? _b : "")) && !isNaN(parseFloat((_c = lng.value) !== null && _c !== void 0 ? _c : ""))) {
+          if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
           }
         } finally {
@@ -667,7 +677,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
       sTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
       eTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:805", sTime.value, eTime.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:816", sTime.value, eTime.value);
       const routeStartTime = resolveRouteDateTime(sTime.value);
       const routeEndTime = resolveRouteDateTime(eTime.value);
       if (routeStartTime != null && routeEndTime != null) {

@@ -11,10 +11,10 @@ const addDeviceUrl = '/userDevice/add'
 const userDeviceList = '/userDevice/list'
 const wechatLogin = '/authLogin'
 // 后端待实现的示例接口：Uni Verify 服务端换号并签发业务 token 后可按正式约定替换。
-const uniVerifyLoginUrl = '/authLogin/uniVerify'
-// 后端待实现的示例接口：短信验证码发送与登录。
-const smsSendCodeUrl = '/authLogin/sms/send'
-const smsLoginUrl = '/authLogin/sms/login'
+const uniVerifyLoginUrl = '/auth/login'
+// 短信验证码登录功能暂时停用：
+// const smsSendCodeUrl = '/auth/sms/send'
+// const smsLoginUrl = '/auth/sms/login'
 const changePSW = '/sys/user/password'
 const userMsgList = '/usermessage/listForUser'
 const msgState = '/usermessage/detail/'
@@ -38,10 +38,11 @@ const cmdRecordByIdUrl = '/command/recordById?id='
 
 export type BasicResponse = { code: number, msg: string }
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
-export type UniVerifyLoginRequest = { openId: string, accessToken: string, platform: string, clientVersion?: string }
-export type SendSmsCodeRequest = { mobile: string, scene: string }
-export type SmsLoginRequest = { mobile: string, code: string, platform: string }
-export type DevicePositionResponse = { code: number, message: string, data: Array<UTSJSONObject> }
+export type UniVerifyLoginRequest = { openId: string, accessToken: string, platform: string, clientVersion?: string, clientId: string, grantType: string, tenantId: string }
+// 短信验证码登录功能暂时停用：
+// export type SendSmsCodeRequest = { mobile: string, scene: string }
+// export type SmsLoginRequest = { mobile: string, code: string, platform: string }
+export type DevicePositionResponse = { code: number, msg: string, data: Array<UTSJSONObject> }
 export type TrackPosResponse = { code: number, msg: string, data: UTSJSONObject }
 export type UserInfoResponse = { code: number, msg: string, data: UTSJSONObject }
 export type UserDeviceListData = { list: Array<UTSJSONObject>, totalPage: number, totalCount: number }
@@ -136,7 +137,7 @@ export const getDevicePos = (data: UTSJSONObject): Promise<DevicePositionRespons
     const response = asJSONObject(raw)
     return {
         code: getResponseCode(response),
-        message: getResponseMessage(response),
+        msg: getResponseMessage(response),
         data: getResponseDataArray(response)
     }
 })
@@ -161,10 +162,9 @@ export const PostWechatlogin = (data: UTSJSONObject): Promise<JsonDataResponse> 
 
 // 后端待实现的示例接口：服务端必须使用 openId/accessToken 换取手机号，前端不可上传手机号作为一键登录凭据。
 export const uniVerifyLogin = (data: UniVerifyLoginRequest): Promise<JsonDataResponse> => post(uniVerifyLoginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
-// 后端待实现的示例接口：发送登录短信验证码。
-export const sendSmsLoginCode = (data: SendSmsCodeRequest): Promise<JsonDataResponse> => post(smsSendCodeUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
-// 后端待实现的示例接口：校验验证码后返回与其他登录方式相同的 data.token。
-export const smsLogin = (data: SmsLoginRequest): Promise<JsonDataResponse> => post(smsLoginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+// 短信验证码登录功能暂时停用：
+// export const sendSmsLoginCode = (data: SendSmsCodeRequest): Promise<JsonDataResponse> => post(smsSendCodeUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+// export const smsLogin = (data: SmsLoginRequest): Promise<JsonDataResponse> => post(smsLoginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 export const changePassWord = (data: UTSJSONObject): Promise<ChangePasswordResponse> => put(changePSW, data).then((raw: any): ChangePasswordResponse => { return changePasswordResponse(raw) })
 export const getUserMsgList = (data?: UTSJSONObject): Promise<MessageResponse> => (data != null ? get(userMsgList, data) : get(userMsgList)).then((raw: any): MessageResponse => {
     return messagePageResponse(raw)

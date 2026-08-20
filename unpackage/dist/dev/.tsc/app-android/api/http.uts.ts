@@ -32,12 +32,20 @@ type RequestFailure = {
     data?: any
 }
 
-const BASE_URL = 'https://car.zdiot.cn:18443/api'
-// const BASE_URL = 'http://192.168.3.7:8085/api'
+// const BASE_URL = 'https://car.zdiot.cn:18443/api'
+const BASE_URL = 'https://gpsapp.zdiot.cn'
 
 // 处理token过期的函数
+let isHandlingTokenExpired = false
+
+export function resetTokenExpiredState(): void {
+    isHandlingTokenExpired = false
+}
+
 function handleTokenExpired(): void {
-    __f__('log','at api/http.uts:40','检测到token过期，执行跳转登录页逻辑')
+    if (isHandlingTokenExpired) return
+    isHandlingTokenExpired = true
+    __f__('log','at api/http.uts:48','检测到token过期，执行跳转登录页逻辑')
     
     // 清除本地token
     uni.removeStorageSync('token')
@@ -52,14 +60,14 @@ function handleTokenExpired(): void {
     
     // 使用定时器确保Toast显示完成后再跳转
     setTimeout(() => {
-        __f__('log','at api/http.uts:55','正在跳转到登录页...')
+        __f__('log','at api/http.uts:63','正在跳转到登录页...')
         uni.redirectTo({
             url: '/pages/login/login',
             success: () => {
-                __f__('log','at api/http.uts:59','跳转登录页成功')
+                __f__('log','at api/http.uts:67','跳转登录页成功')
             },
             fail: (err) => {
-                __f__('log','at api/http.uts:62','跳转登录页失败:', err)
+                __f__('log','at api/http.uts:70','跳转登录页失败:', err)
                 // 如果跳转失败，尝试使用 reLaunch
                 uni.reLaunch({
                     url: '/pages/login/login'
@@ -111,7 +119,7 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
         uni.hideLoading()
     }
     
-    __f__('log','at api/http.uts:114','请求错误详情:', error)
+    __f__('log','at api/http.uts:122','请求错误详情:', error)
     
     // 处理错误状态码
     if (error.statusCode != 0) {

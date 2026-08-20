@@ -131,7 +131,7 @@ const mapScale = ref(4)
 			if (from) {
 				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 143, 11),  pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
-				const list = (res.code == 0 && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
+				const list = (res.code == 200 && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
 				if (list == null || !Array.isArray(list)) {
 					console.warn('获取设备列表返回异常:', res, " at pages/deviceList/deviceList.uvue:147")
 					originalDeviceList.value = []
@@ -153,7 +153,7 @@ const mapScale = ref(4)
 		// 解绑设备
 	const unbindDevice = async (imei : string) => {
 		const res = await delDevice(imei)
-		if (res.code == 0) {
+		if (res.code == 200) {
 			showAppToast({
 				title: '解绑成功',
 				icon: 'success'
@@ -161,7 +161,7 @@ const mapScale = ref(4)
 			uni.setStorageSync('needRefreshHome', true)
 		} else {
 			showAppToast({
-				title: '解绑失败',
+				title: res.msg || '解绑失败',
 				icon: 'error'
 			})
 		}

@@ -49,7 +49,7 @@ function sessionKey(provider) {
   return PUSH_SESSION_KEY_PREFIX + provider;
 }
 function pushDebug(provider, message) {
-  common_vendor.index.__f__("error", "at services/push.uts:77", "[PushManager][" + provider + "] " + message);
+  common_vendor.index.__f__("error", "at services/push.uts:82", "[PushManager][" + provider + "] " + message);
 }
 function stringValue(value = null) {
   if (value == null)
@@ -250,7 +250,10 @@ class PushManager {
   setLocalProviderForTesting(provider) {
     return null;
   }
+  clearBadge() {
+  }
   handlePushEvent(event) {
+    this.clearBadge();
     const messageId = pushMessageId(event.payload);
     if (messageId != "")
       common_vendor.index.setStorageSync(pendingMessageIdKey(event.provider), messageId);

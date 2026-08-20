@@ -67,12 +67,17 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
             val logoutBtn = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         val res = await(logout())
-                        if (res.code == 0) {
+                        if (res.code == 200) {
                             uni_removeStorageSync("token")
                             clearPushSessionState()
                             uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
                         } else {
-                            showAppToast(ShowToastOptions(title = "退出账户失败"))
+                            showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                res.msg
+                            } else {
+                                "退出账户失败"
+                            }
+                            ))
                         }
                 })
             }

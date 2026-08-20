@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const utils_openLocation = require("../../utils/openLocation.js");
+const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 const utils_formateTime = require("../../utils/formateTime.js");
 require("../../utils/getAdress.js");
@@ -71,18 +72,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           withPos: false,
           withTrip: false
         });
-        const res = yield api_request.getTrackPos(data);
-        let stopsWithAddress = [];
-        const trackData = res.data;
-        const stops = (_a = trackData === null || trackData === void 0 ? null : trackData.getArray("stops")) !== null && _a !== void 0 ? _a : [];
-        stops.forEach((stop) => {
-          const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(stop.getNumber("latitude", 0), stop.getNumber("longitude", 0));
-          stop.set("latitude", convertedCoord.lat);
-          stop.set("longitude", convertedCoord.lng);
-          stopsWithAddress.push(stop);
-        });
-        carStopDetail.value = stopsWithAddress;
-        common_vendor.index.hideLoading();
+        try {
+          const res = yield api_request.getTrackPos(data);
+          const trackData = res.data;
+          if (res.code != 200 || trackData == null) {
+            utils_toast.showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
+            carStopDetail.value = [];
+            return Promise.resolve(null);
+          }
+          const stopsWithAddress = [];
+          const stops = (_a = trackData.getArray("stops")) !== null && _a !== void 0 ? _a : [];
+          stops.forEach((stop) => {
+            const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(stop.getNumber("latitude", 0), stop.getNumber("longitude", 0));
+            stop.set("latitude", convertedCoord.lat);
+            stop.set("longitude", convertedCoord.lng);
+            stopsWithAddress.push(stop);
+          });
+          carStopDetail.value = stopsWithAddress;
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:131", "获取停车数据失败:", error);
+          utils_toast.showAppToast({ title: "数据加载失败", icon: "none" });
+        } finally {
+          common_vendor.index.hideLoading();
+        }
       });
     };
     common_vendor.onMounted(() => {

@@ -137,7 +137,7 @@ const _cache = __ins.renderCache;
 		uni.showLoading({ title: '保存中...', mask: true })
 		try {
 			const res = await editDeviceInfo(payload)
-			if (res.code == 0) {
+			if (res.code == 200) {
 				carInfo.value = payload
 				editInfo.value.plateNo = plateNo
 				isEditing.value = false
@@ -160,7 +160,7 @@ const _cache = __ins.renderCache;
 		loadingDetail.value = true
 		try {
 			const res = await getDeviceDetail(deviceId.value)
-			if (res.code == 0 && res.data != null) {
+			if (res.code == 200 && res.data != null) {
 				carInfo.value = res.data
 				detailLoaded.value = true
 			} else {

@@ -2,6 +2,7 @@
     "version" : "1.0",
     "configurations" : [
         {
+            "customPlaygroundType" : "device",
             "playground" : "standard",
             "type" : "uni-app:app-ios"
         },
@@ -17,6 +18,19 @@
             "customPlaygroundType" : "device",
             "playground" : "standard",
             "type" : "uni-app:app-android"
+        },
+        {
+            "app" : {
+                "launchtype" : "remote"
+            },
+            "default" : {
+                "launchtype" : "local"
+            },
+            "mp-weixin" : {
+                "launchtype" : "remote"
+            },
+            "provider" : "aliyun",
+            "type" : "uniCloud"
         }
     ]
 }

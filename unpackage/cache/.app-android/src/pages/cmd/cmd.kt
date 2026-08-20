@@ -183,8 +183,8 @@ open class GenPagesCmdCmd : BasePage {
                         try {
                             loading.value = true
                             val response = await(getCmdAction())
-                            if (response.code == 0) {
-                                commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data)
+                            if (response.code == 200 && response.data != null) {
+                                commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data!!)
                             } else {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
@@ -227,8 +227,8 @@ open class GenPagesCmdCmd : BasePage {
                         try {
                             loading.value = true
                             val response = await(getCmdByMid(_uO("imei" to imei.value, "cmdmId" to typeId)))
-                            if (response.code == 0) {
-                                commands.value = response.data
+                            if (response.code == 200 && response.data != null) {
+                                commands.value = response.data!!
                             } else {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
@@ -303,7 +303,7 @@ open class GenPagesCmdCmd : BasePage {
                         try {
                             sending.value = true
                             val response = await(sendCmd(_uO("imei" to imei.value, "type" to ((command["cmdCode"] as String?) ?: ""), "password" to null, "cmdData" to UTSAndroid.consoleDebugError(encodeURIComponent(cmdData), " at pages/cmd/cmd.uvue:285"), "predictCmdId" to command["predictCmdId"])))
-                            if (response.code == 0) {
+                            if (response.code == 200) {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
                                 } else {

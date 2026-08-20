@@ -210,7 +210,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 			uni.hideLoading()
 			loading.value = false
 
-			if (res.code == 0) {
+			if (res.code == 200) {
 				showAppToast({
 					title: '添加成功',
 					icon: 'success'

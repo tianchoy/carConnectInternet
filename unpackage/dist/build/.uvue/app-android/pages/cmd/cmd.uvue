@@ -126,7 +126,7 @@ const __sfc__ = defineComponent({
             try {
                 loading.value = true;
                 const response = await getCmdAction();
-                if (response.code == 0) {
+                if (response.code == 200 && response.data != null) {
                     commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
                 }
                 else {
@@ -161,7 +161,7 @@ const __sfc__ = defineComponent({
             try {
                 loading.value = true;
                 const response = await getCmdByMid({ imei: imei.value, cmdmId: typeId } as UTSJSONObject);
-                if (response.code == 0) {
+                if (response.code == 200 && response.data != null) {
                     commands.value = response.data;
                 }
                 else {
@@ -224,7 +224,7 @@ const __sfc__ = defineComponent({
                     cmdData: encodeURIComponent(cmdData),
                     predictCmdId: command['predictCmdId']
                 } as UTSJSONObject);
-                if (response.code == 0) {
+                if (response.code == 200) {
                     showAppToast({ title: response.msg != '' ? response.msg : '指令发送成功', icon: 'success' } as ShowToastOptions);
                 }
                 else {

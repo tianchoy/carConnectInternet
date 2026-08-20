@@ -78,63 +78,65 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             }
             val createVehicleMarker = ::gen_createVehicleMarker_fn
             fun gen_loadInitialPosition_fn(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
+                return wrapUTSPromise(suspend w1@{
                         try {
                             val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 167, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
-                            if (res?.code == 0 && res.data != null && res.data.length > 0) {
-                                var foundDevice = false
-                                res.data.forEach(fun(item: UTSJSONObject){
-                                    val itemImei = item.getString("imei", "")
-                                    if (itemImei == imei.value) {
-                                        foundDevice = true
-                                        val latitude = item.getNumber("latitude", 0)
-                                        val longitude = item.getNumber("longitude", 0)
-                                        if (latitude == 0 || longitude == 0) {
-                                            showAppToast(ShowToastOptions(title = "位置信息缺失", icon = "none"))
-                                            return
-                                        }
-                                        val direction = item.getNumber("direction", 0)
-                                        val speed = item.getNumber("speed", 0)
-                                        val positionUpdateTime = item.getString("positionUpdateTime", "定位时间未知")
-                                        val status = item.getString("connectionStatus", "unknown")
-                                        val convertedCoord = CoordTransform.wgs84ToTencentPrecise(latitude, longitude)
-                                        currentPosition.latitude = convertedCoord.lat
-                                        currentPosition.longitude = convertedCoord.lng
-                                        hasValidPosition.value = true
-                                        targetPosition.latitude = convertedCoord.lat
-                                        targetPosition.longitude = convertedCoord.lng
-                                        center["latitude"] = convertedCoord.lat
-                                        center["longitude"] = convertedCoord.lng
-                                        lastDirection.value = direction
-                                        var initialRotation = lastDirection.value % 360
-                                        if (initialRotation < 0) {
-                                            initialRotation += 360
-                                        }
-                                        currentRotation.value = initialRotation
-                                        targetRotation.value = currentRotation.value
-                                        currentSpeed.value = speed
-                                        currentAddress.value = positionUpdateTime
-                                        connectionStatus.value = status
-                                        if (!markerInitialized.value) {
-                                            val iconPath = getDeviceIcon(connectionStatus.value, carType.value)
-                                            lastIconPath = iconPath
-                                            markers.value = _uA(
-                                                createVehicleMarker(iconPath)
-                                            )
-                                            markerInitialized.value = true
-                                        }
-                                    }
-                                })
-                                if (!foundDevice) {
-                                    showAppToast(ShowToastOptions(title = "未找到车辆设备", icon = "none"))
-                                }
-                            } else {
+                            val positions = res.data
+                            if (res?.code != 200 || positions == null || positions.length == 0) {
                                 showAppToast(ShowToastOptions(title = "获取位置失败", icon = "none"))
+                                return@w1
+                            }
+                            var foundDevice = false
+                            positions.forEach(fun(item: UTSJSONObject){
+                                val itemImei = item.getString("imei", "")
+                                if (itemImei == imei.value) {
+                                    foundDevice = true
+                                    val latitude = item.getNumber("latitude", 0)
+                                    val longitude = item.getNumber("longitude", 0)
+                                    if (latitude == 0 || longitude == 0) {
+                                        showAppToast(ShowToastOptions(title = "位置信息缺失", icon = "none"))
+                                        return
+                                    }
+                                    val direction = item.getNumber("direction", 0)
+                                    val speed = item.getNumber("speed", 0)
+                                    val positionUpdateTime = item.getString("positionUpdateTime", "定位时间未知")
+                                    val status = item.getString("connectionStatus", "unknown")
+                                    val convertedCoord = CoordTransform.wgs84ToTencentPrecise(latitude, longitude)
+                                    currentPosition.latitude = convertedCoord.lat
+                                    currentPosition.longitude = convertedCoord.lng
+                                    hasValidPosition.value = true
+                                    targetPosition.latitude = convertedCoord.lat
+                                    targetPosition.longitude = convertedCoord.lng
+                                    center["latitude"] = convertedCoord.lat
+                                    center["longitude"] = convertedCoord.lng
+                                    lastDirection.value = direction
+                                    var initialRotation = lastDirection.value % 360
+                                    if (initialRotation < 0) {
+                                        initialRotation += 360
+                                    }
+                                    currentRotation.value = initialRotation
+                                    targetRotation.value = currentRotation.value
+                                    currentSpeed.value = speed
+                                    currentAddress.value = positionUpdateTime
+                                    connectionStatus.value = status
+                                    if (!markerInitialized.value) {
+                                        val iconPath = getDeviceIcon(connectionStatus.value, carType.value)
+                                        lastIconPath = iconPath
+                                        markers.value = _uA(
+                                            createVehicleMarker(iconPath)
+                                        )
+                                        markerInitialized.value = true
+                                    }
+                                }
+                            }
+                            )
+                            if (!foundDevice) {
+                                showAppToast(ShowToastOptions(title = "未找到车辆设备", icon = "none"))
                             }
                         }
                          catch (err: Throwable) {
-                            console.error("获取初始位置失败:", err, " at pages/vehicleTracking/vehicleTracking.uvue:244")
+                            console.error("获取初始位置失败:", err, " at pages/vehicleTracking/vehicleTracking.uvue:245")
                             showAppToast(ShowToastOptions(title = "网络请求失败", icon = "none"))
                         }
                 })
@@ -151,7 +153,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                     marker
                 )
                 markerInitialized.value = true
-                console.log("初始化标记点完成", " at pages/vehicleTracking/vehicleTracking.uvue:265")
+                console.log("初始化标记点完成", " at pages/vehicleTracking/vehicleTracking.uvue:266")
             }
             val initMarker = ::gen_initMarker_fn
             fun gen_calculateMapRotation_fn(direction: Number): Number {
@@ -174,7 +176,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             }
             val normalizeRotation = ::gen_normalizeRotation_fn
             onLoad(fun(option){
-                console.log("option", option, " at pages/vehicleTracking/vehicleTracking.uvue:286")
+                console.log("option", option, " at pages/vehicleTracking/vehicleTracking.uvue:287")
                 connectionStatus.value = option["connectionStatus"] ?: ""
                 imei.value = option["imei"] ?: ""
                 currentCar.value = option["plateNo"] ?: "未知车辆"
@@ -415,10 +417,11 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                         isTrackRequestPending = true
                         try {
                             val res = await(getDevicePos(_uO("deptId" to deptId.value, "deviceids" to imei.value)))
-                            if (!isTracking.value || sessionId != trackingSessionId || res?.code != 0 || !(res.data != null)) {
+                            val positions = res.data
+                            if (!isTracking.value || sessionId != trackingSessionId || res?.code != 200 || positions == null) {
                                 return@w1
                             }
-                            val item = res.data.find(fun(value: UTSJSONObject): Boolean {
+                            val item = positions.find(fun(value: UTSJSONObject): Boolean {
                                 return value.getString("imei", "") == imei.value
                             }
                             )
@@ -469,7 +472,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                             acceptLivePosition(item, position, positionTime, sessionId)
                         }
                          catch (error: Throwable) {
-                            console.error("获取跟踪位置失败:", error, " at pages/vehicleTracking/vehicleTracking.uvue:483")
+                            console.error("获取跟踪位置失败:", error, " at pages/vehicleTracking/vehicleTracking.uvue:485")
                         }
                          finally {
                             if (sessionId == trackingSessionId) {

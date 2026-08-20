@@ -1,4 +1,4 @@
-import { initPush, refreshPushClientId } from './services/push.uts';
+import { initPush, refreshPushClientId, clearPushBadge } from './services/push.uts';
 import { ensureNotificationPermission } from './utils/cameraPermission.uts';
 let firstBackTime = 0;
 // 添加热更新相关变量
@@ -12,16 +12,19 @@ const __sfc__ = defineApp({
         console.log('App onLaunch');
         checkForUpdates();
         initPush();
+        clearPushBadge();
         ensureNotificationPermission((status) => {
             console.log('[NotificationPermission] ' + status);
         });
     },
     onShow: function () {
         console.log('App Show');
+        clearPushBadge();
         refreshPushClientId();
     },
     onHide: function () {
         console.log('App Hide');
+        clearPushBadge();
     },
     onLastPageBackPress: function () {
         console.log('App LastPageBackPress');

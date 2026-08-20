@@ -239,14 +239,15 @@ const deptId = ref<string | null>('')
 				const res = await getDevicePos(data);
 
 				// 检查返回结果是否有效
-				if (!res || !res.data || res.data.length == 0) {
-					throw new Error('返回数据为空');
+				const positions = res.data
+				if (res.code != 200 || positions == null || positions.length == 0) {
+					throw new Error(res.msg || '返回数据为空');
 				}
 
 				let foundDevice = false;
 
 				// 使用 for...of 替代 forEach，确保 await 生效
-				for (const item of res.data) {
+				for (const item of positions) {
 					const itemImei = item.getString('imei', '');
 					if (itemImei != null && itemImei == imei.value) {
 						foundDevice = true;
@@ -260,7 +261,7 @@ const deptId = ref<string | null>('')
 						const latitude = item.getNumber('latitude', 0);
 						const longitude = item.getNumber('longitude', 0);
 						if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
-							console.error('位置信息缺失', item, " at pages/carInfoDetail/carInfoDetail.uvue:360");
+							console.error('位置信息缺失', item, " at pages/carInfoDetail/carInfoDetail.uvue:361");
 							showAppToast({
 								title: '位置信息缺失',
 								icon: 'none'
@@ -273,7 +274,7 @@ const deptId = ref<string | null>('')
 						const lng = parseFloat(longitude.toString());
 
 						if (isNaN(lat) || isNaN(lng)) {
-							console.error('经纬度格式错误', latitude, longitude, " at pages/carInfoDetail/carInfoDetail.uvue:373");
+							console.error('经纬度格式错误', latitude, longitude, " at pages/carInfoDetail/carInfoDetail.uvue:374");
 							return false;
 						}
 
@@ -285,7 +286,7 @@ const deptId = ref<string | null>('')
 							convertedLat = coord.lat;
 							convertedLng = coord.lng;
 						} catch (transformError) {
-							console.error('坐标转换失败:', transformError, " at pages/carInfoDetail/carInfoDetail.uvue:385");
+							console.error('坐标转换失败:', transformError, " at pages/carInfoDetail/carInfoDetail.uvue:386");
 						}
 
 						center.latitude = convertedLat;
@@ -328,7 +329,7 @@ const deptId = ref<string | null>('')
 						if (signalRssi.value != null) {
 							const signalExp = getSignalDetail(signalRssi.value).experience;
 							if (signalExp === '差' || signalExp === '非常差' || signalExp === '无信号') {
-								console.warn(`设备 ${imei.value} 信号较弱: ${signalRssi.value}dBm`, " at pages/carInfoDetail/carInfoDetail.uvue:428");
+								console.warn(`设备 ${imei.value} 信号较弱: ${signalRssi.value}dBm`, " at pages/carInfoDetail/carInfoDetail.uvue:429");
 							}
 						}
 					}
@@ -342,13 +343,13 @@ const deptId = ref<string | null>('')
 				return true; // 成功标志
 
 			} catch (error) {
-				console.error(`第${attempt}次加载设备数据失败:`, error, " at pages/carInfoDetail/carInfoDetail.uvue:442");
+				console.error(`第${attempt}次加载设备数据失败:`, error, " at pages/carInfoDetail/carInfoDetail.uvue:443");
 
 				// 如果不是最后一次重试，则继续重试
 				if (attempt < retry) {
 					// 等待一段时间后重试（指数退避）
 					const delayMs = Math.pow(2, attempt) * 1000; // 2^attempt 秒
-					console.log(`等待${delayMs / 1000}秒后重试...`, " at pages/carInfoDetail/carInfoDetail.uvue:448");
+					console.log(`等待${delayMs / 1000}秒后重试...`, " at pages/carInfoDetail/carInfoDetail.uvue:449");
 
 					await delay(delayMs);
 
@@ -410,7 +411,7 @@ const deptId = ref<string | null>('')
 				});
 			}
 		} catch (error) {
-			console.error('手动刷新失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:510");
+			console.error('手动刷新失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:511");
 			showAppToast({
 				title: '刷新失败',
 				icon: 'none'
@@ -570,7 +571,7 @@ const deptId = ref<string | null>('')
 			uni.hideLoading()
 
 			// 根据响应处理结果
-			if (res.code == 0) {
+			if (res.code == 200) {
 				showAppToast({
 					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
 					icon: 'success'
@@ -588,7 +589,7 @@ const deptId = ref<string | null>('')
 			// 隐藏加载中
 			uni.hideLoading()
 
-			console.error('操作失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:688")
+			console.error('操作失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:689")
 			showAppToast({
 				title: '操作失败，请重试',
 				icon: 'none'
@@ -624,7 +625,7 @@ const deptId = ref<string | null>('')
 			const addr = await getAddress(center.latitude, center.longitude);
 			address.value = addr.result.formatted_address;
 		} catch (error) {
-			console.error('获取地址信息失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:724");
+			console.error('获取地址信息失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:725");
 		}
 	}
 
@@ -715,9 +716,13 @@ const deptId = ref<string | null>('')
 	const loadDeviceDetail = async () => {
 		if (deviceId.value !== null) {
 			const res = await getDeviceDetail(deviceId.value)
-			currentCarInfo.value = res.data
+			if (res.code == 200 && res.data != null) {
+				currentCarInfo.value = res.data
+			} else {
+				showAppToast({ title: res.msg || '获取设备详情失败', icon: 'none' })
+			}
 		} else {
-			console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:817")
+			console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:822")
 		}
 	}
 
@@ -729,7 +734,7 @@ const deptId = ref<string | null>('')
 		userType.value = storedUserType ?? '';
 
 		loadDeviceDetail().then(() => {
-			const data: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 829, 10),
+			const data: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 834, 10),
 				deptId: deptId.value,
 				deviceids: imei.value
 			};
@@ -751,7 +756,7 @@ const deptId = ref<string | null>('')
 
 
 	onShow(() => {
-		console.log('页面显示，检查自动刷新状态', " at pages/carInfoDetail/carInfoDetail.uvue:851")
+		console.log('页面显示，检查自动刷新状态', " at pages/carInfoDetail/carInfoDetail.uvue:856")
 		// 如果设备在线且没有在刷新，重新启动自动刷新
 		if (datainfo.value.connectionStatus == 'online' && !isRefreshing.value) {
 			setupAutoRefresh(currentTime.value)
@@ -760,12 +765,12 @@ const deptId = ref<string | null>('')
 
 	// 新增页面隐藏时的处理
 	onHide(() => {
-		console.log('页面隐藏时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:860")
+		console.log('页面隐藏时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:865")
 		stopAutoRefresh()
 	})
 
 	onUnmounted(() => {
-		console.log('页面卸载时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:865")
+		console.log('页面卸载时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:870")
 		stopAutoRefresh()
 	})
 

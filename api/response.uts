@@ -1,3 +1,9 @@
+export class BackendResponse<T = any> {
+    code: number = -1
+    msg: string = ''
+    data: T | null = null
+}
+
 export function asJSONObject(value: any): UTSJSONObject {
     if (value == null) {
         return new UTSJSONObject()

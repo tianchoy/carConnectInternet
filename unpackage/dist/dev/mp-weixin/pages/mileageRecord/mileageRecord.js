@@ -187,13 +187,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             withTrip: true
           });
           const res = yield api_request.getTrackPos(data);
-          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:202", "获取里程数据成功:", res);
+          if (res.code != 200) {
+            utils_toast.showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
+            return Promise.resolve(null);
+          }
+          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:206", "获取里程数据成功:", res);
           const trackData = res.data;
           if (trackData != null) {
             processTripData(trackData);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:208", "获取里程数据失败:", e);
+          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:212", "获取里程数据失败:", e);
           utils_toast.showAppToast({
             title: "数据加载失败",
             icon: "none"

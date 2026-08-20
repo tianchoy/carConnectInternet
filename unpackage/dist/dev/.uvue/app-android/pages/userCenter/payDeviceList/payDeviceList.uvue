@@ -44,10 +44,21 @@ const __sfc__ = defineComponent({
                     pageSize: pageSize.value
                 } as UTSJSONObject;
                 const res = await getUserDeviceList(data);
-                const code = res.code;
-                const list = res.data.list;
-                const pageCount = res.data.totalPage;
-                if (code == 0 && list != null) {
+                if (res.code != 200) {
+                    showAppToast({
+                        title: res.msg != "" ? res.msg : '加载失败',
+                        icon: 'none'
+                    } as ShowToastOptions);
+                    return;
+                }
+                const pageData = res.data;
+                if (pageData == null) {
+                    hasMore.value = false;
+                    return;
+                }
+                const list: Array<UTSJSONObject> = pageData.list;
+                const pageCount = pageData.totalPage;
+                if (list != null) {
                     // 保存总页数
                     totalPage.value = pageCount;
                     // 如果是第一页，直接赋值
@@ -64,15 +75,9 @@ const __sfc__ = defineComponent({
                         currPage.value++;
                     }
                 }
-                else {
-                    showAppToast({
-                        title: res.msg != "" ? res.msg : '加载失败',
-                        icon: 'none'
-                    } as ShowToastOptions);
-                }
             }
             catch (error: any) {
-                console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:125");
+                console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:131");
                 showAppToast({
                     title: '加载失败，请重试',
                     icon: 'none'
@@ -99,7 +104,7 @@ const __sfc__ = defineComponent({
                 iccid = iccid.substring(0, iccid.length - 1); //电信卡
             }
             // iccid = iccid.substring(0,iccid.length-1)
-            console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:156");
+            console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:162");
             // 设置需要刷新的标志
             needRefresh.value = true;
             needRefresh.value = false;

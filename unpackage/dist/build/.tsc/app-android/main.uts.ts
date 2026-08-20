@@ -80,3 +80,12 @@ function defineAppConfig(){
   
   __uniConfig.ready = true
 }
+
+export class UniCloudConfig extends io.dcloud.unicloud.InternalUniCloudConfig {
+    override isDev : boolean = false
+    override spaceList : string = "[{\"provider\":\"aliyun\",\"spaceName\":\"zdiot-car\",\"spaceId\":\"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff\",\"clientSecret\":\"s9pFKgenncFnOUhRGOJpcw==\",\"endpoint\":\"https://api.next.bspapp.com\",\"failoverEndpoint\":\"\"}]"
+    override debuggerInfo ?: string = null
+    override secureNetworkEnable : boolean = false
+    override secureNetworkConfig ?: string = "[]"
+    constructor() { super() }
+}

@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -135,7 +136,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             if (from) {
                                 val params: UTSJSONObject = _uO("pageSize" to 1000)
                                 val res = await(getUserDeviceList(params))
-                                val list = if (res.code == 0 && res.data != null) {
+                                val list = if (res.code == 200 && res.data != null) {
                                     res.data.list
                                 } else {
                                     null
@@ -166,11 +167,16 @@ open class GenPagesDeviceListDeviceList : BasePage {
             val unbindDevice = fun(imei: String): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         val res = await(delDevice(imei))
-                        if (res.code == 0) {
+                        if (res.code == 200) {
                             showAppToast(ShowToastOptions(title = "解绑成功", icon = "success"))
                             uni_setStorageSync("needRefreshHome", true)
                         } else {
-                            showAppToast(ShowToastOptions(title = "解绑失败", icon = "error"))
+                            showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                res.msg
+                            } else {
+                                "解绑失败"
+                            }
+                            , icon = "error"))
                         }
                         await(loadUserDeviceList(_uA(), true))
                 })

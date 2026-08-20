@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -160,11 +161,17 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                             return wrapUTSPromise(suspend w2@{
                                     try {
                                         val res = await(getDevicePos(data))
-                                        if (!(res != null) || !(res.data != null) || res.data.length == 0) {
-                                            throw UTSError("返回数据为空")
+                                        val positions = res.data
+                                        if (res.code != 200 || positions == null || positions.length == 0) {
+                                            throw UTSError(if (res.msg != "") {
+                                                res.msg
+                                            } else {
+                                                "返回数据为空"
+                                            }
+                                            )
                                         }
                                         var foundDevice = false
-                                        for(item in resolveUTSValueIterator(res.data)){
+                                        for(item in resolveUTSValueIterator(positions)){
                                             val itemImei = item.getString("imei", "")
                                             if (itemImei != null && itemImei == imei.value) {
                                                 foundDevice = true
@@ -338,7 +345,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                 "1111"
                             ), "predictCmdId" to predictCmdId, "type" to type)))
                             uni_hideLoading(null)
-                            if (res.code == 0) {
+                            if (res.code == 200) {
                                 showAppToast(ShowToastOptions(title = if (operationType == 1) {
                                     "恢复油电成功"
                                 } else {
@@ -449,7 +456,15 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 return wrapUTSPromise(suspend {
                         if (deviceId.value != null) {
                             val res = await(getDeviceDetail(deviceId.value!!))
-                            currentCarInfo.value = res.data
+                            if (res.code == 200 && res.data != null) {
+                                currentCarInfo.value = res.data
+                            } else {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "获取设备详情失败"
+                                }, icon = "none"))
+                            }
                         } else {
                             console.error("设备id获取失败")
                         }

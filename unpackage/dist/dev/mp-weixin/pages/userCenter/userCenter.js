@@ -35,13 +35,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const params = new common_vendor.UTSJSONObject({});
-        const res = yield api_request.getUserInfo();
-        userInfo.value = {
-          avatar: res.data.getString("avatar", "/static/avatar.png"),
-          nickname: res.data.getString("nickname", "")
-        };
-        const resCars = yield api_request.getUserDeviceList(params);
-        carsnumber.value = resCars.data.totalCount;
+        try {
+          const res = yield api_request.getUserInfo();
+          if (res.code == 200 && res.data != null) {
+            userInfo.value = {
+              avatar: res.data.getString("avatar", "/static/avatar.png"),
+              nickname: res.data.getString("nickname", "")
+            };
+          } else {
+            utils_toast.showAppToast({ title: res.msg || "获取用户信息失败", icon: "none" });
+          }
+          const resCars = yield api_request.getUserDeviceList(params);
+          if (resCars.code == 200 && resCars.data != null) {
+            carsnumber.value = resCars.data.totalCount;
+          } else {
+            utils_toast.showAppToast({ title: resCars.msg || "获取车辆数量失败", icon: "none" });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/userCenter/userCenter.uvue:89", "加载用户中心数据失败:", error);
+          utils_toast.showAppToast({ title: "加载用户信息失败", icon: "none" });
+        }
       });
     };
     common_vendor.onShow(() => {
@@ -66,7 +79,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
         corpId: "ww686122ec6a4db85a",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:114", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:127", res);
         }
       }));
     };

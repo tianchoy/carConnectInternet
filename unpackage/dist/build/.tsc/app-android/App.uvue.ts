@@ -1,5 +1,5 @@
 
-	import { initPush, refreshPushClientId } from './services/push.uts'
+	import { initPush, refreshPushClientId, clearPushBadge } from './services/push.uts'
 	import { ensureNotificationPermission } from './utils/cameraPermission.uts'
 
 	let firstBackTime = 0
@@ -76,6 +76,7 @@
 			console.log('App onLaunch')
 			checkForUpdates()
 			initPush()
+			clearPushBadge()
 
 			ensureNotificationPermission((status) => {
 				console.log('[NotificationPermission] ' + status)
@@ -84,10 +85,12 @@
 		},
 		onShow: function () {
 			console.log('App Show')
+			clearPushBadge()
 			refreshPushClientId()
 		},
 		onHide: function () {
 			console.log('App Hide')
+			clearPushBadge()
 		},
 
 		onLastPageBackPress: function () {

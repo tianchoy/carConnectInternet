@@ -66,7 +66,7 @@ const userInfo = ref<UserInfo>({
 
 			const res = await changePassWord(submitData)
 
-			if(res.msg == 'success'){
+			if(res.code == 200){
 				uni.hideLoading();
 				showAppToast({
 					title: '密码修改成功',

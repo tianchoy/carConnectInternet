@@ -44,10 +44,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pageSize: pageSize.value
           });
           const res = yield api_request.getUserDeviceList(data);
-          const code = res.code;
-          const list = res.data.list;
-          const pageCount = res.data.totalPage;
-          if (code == 0 && list != null) {
+          if (res.code != 200) {
+            utils_toast.showAppToast({
+              title: res.msg || "加载失败",
+              icon: "none"
+            });
+            return Promise.resolve(null);
+          }
+          const pageData = res.data;
+          if (pageData == null) {
+            hasMore.value = false;
+            return Promise.resolve(null);
+          }
+          const list = pageData.list;
+          const pageCount = pageData.totalPage;
+          if (list != null) {
             totalPage.value = pageCount;
             if (currPage.value == 1) {
               carList.value = list;
@@ -58,14 +69,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             if (hasMore.value) {
               currPage.value++;
             }
-          } else {
-            utils_toast.showAppToast({
-              title: res.msg || "加载失败",
-              icon: "none"
-            });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/userCenter/carList/carList.uvue:100", "加载车辆列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/userCenter/carList/carList.uvue:106", "加载车辆列表失败:", error);
           utils_toast.showAppToast({
             title: "加载失败，请重试",
             icon: "none"

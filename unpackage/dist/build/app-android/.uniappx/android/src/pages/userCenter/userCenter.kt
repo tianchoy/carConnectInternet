@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -35,10 +36,34 @@ open class GenPagesUserCenterUserCenter : BasePage {
             val loadData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         val params: UTSJSONObject = _uO()
-                        val res = await(getUserInfo())
-                        userInfo.value = _uO("avatar" to res.data.getString("avatar", "/static/avatar.png"), "nickname" to res.data.getString("nickname", ""))
-                        val resCars = await(getUserDeviceList(params))
-                        carsnumber.value = resCars.data.totalCount
+                        try {
+                            val res = await(getUserInfo())
+                            if (res.code == 200 && res.data != null) {
+                                userInfo.value = _uO("avatar" to res.data.getString("avatar", "/static/avatar.png"), "nickname" to res.data.getString("nickname", ""))
+                            } else {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "获取用户信息失败"
+                                }
+                                , icon = "none"))
+                            }
+                            val resCars = await(getUserDeviceList(params))
+                            if (resCars.code == 200 && resCars.data != null) {
+                                carsnumber.value = resCars.data.totalCount
+                            } else {
+                                showAppToast(ShowToastOptions(title = if (resCars.msg != "") {
+                                    resCars.msg
+                                } else {
+                                    "获取车辆数量失败"
+                                }
+                                , icon = "none"))
+                            }
+                        }
+                         catch (error: Throwable) {
+                            console.error("加载用户中心数据失败:", error)
+                            showAppToast(ShowToastOptions(title = "加载用户信息失败", icon = "none"))
+                        }
                 })
             }
             onShow(fun(){

@@ -32,14 +32,27 @@ const userInfo = ref({
 	// 加载数据
 	const loadData = async () => {
 		const params = {} as UTSJSONObject
-		const res = await getUserInfo()
-		userInfo.value = {
-			avatar: res.data.getString('avatar', '/static/avatar.png'),
-			nickname: res.data.getString('nickname', '')
-		}
+		try {
+			const res = await getUserInfo()
+			if (res.code == 200 && res.data != null) {
+				userInfo.value = {
+					avatar: res.data.getString('avatar', '/static/avatar.png'),
+					nickname: res.data.getString('nickname', '')
+				}
+			} else {
+				showAppToast({ title: res.msg || '获取用户信息失败', icon: 'none' })
+			}
 
-		const resCars = await getUserDeviceList(params)
-		carsnumber.value = resCars.data.totalCount
+			const resCars = await getUserDeviceList(params)
+			if (resCars.code == 200 && resCars.data != null) {
+				carsnumber.value = resCars.data.totalCount
+			} else {
+				showAppToast({ title: resCars.msg || '获取车辆数量失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('加载用户中心数据失败:', error)
+			showAppToast({ title: '加载用户信息失败', icon: 'none' })
+		}
 	}
 
 	onShow(() => {

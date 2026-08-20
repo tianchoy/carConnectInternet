@@ -1,4 +1,4 @@
-import { initPush, refreshPushClientId } from './services/push.uts';
+import { initPush, refreshPushClientId, clearPushBadge } from './services/push.uts';
 import { ensureNotificationPermission } from './utils/cameraPermission.uts';
 let firstBackTime = 0;
 // 添加热更新相关变量
@@ -12,19 +12,22 @@ const __sfc__ = defineApp({
         console.log('App onLaunch', " at App.uvue:76");
         checkForUpdates();
         initPush();
+        clearPushBadge();
         ensureNotificationPermission((status) => {
-            console.log('[NotificationPermission] ' + status, " at App.uvue:81");
+            console.log('[NotificationPermission] ' + status, " at App.uvue:82");
         });
     },
     onShow: function () {
-        console.log('App Show', " at App.uvue:86");
+        console.log('App Show', " at App.uvue:87");
+        clearPushBadge();
         refreshPushClientId();
     },
     onHide: function () {
-        console.log('App Hide', " at App.uvue:90");
+        console.log('App Hide', " at App.uvue:92");
+        clearPushBadge();
     },
     onLastPageBackPress: function () {
-        console.log('App LastPageBackPress', " at App.uvue:94");
+        console.log('App LastPageBackPress', " at App.uvue:97");
         if (firstBackTime == 0) {
             uni.showToast({
                 title: '再按一次退出应用',
@@ -41,7 +44,7 @@ const __sfc__ = defineApp({
         }
     },
     onExit: function () {
-        console.log('App Exit', " at App.uvue:111");
+        console.log('App Exit', " at App.uvue:114");
     }
 });
 export default __sfc__;

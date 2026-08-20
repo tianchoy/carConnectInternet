@@ -435,7 +435,22 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            val positions = res.data?.getArray<UTSJSONObject>("positions")
+                            if (res.code != 200) {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "轨迹加载失败"
+                                }
+                                , icon = "none"))
+                                showCurrentPosition()
+                                return@w1
+                            }
+                            val trackData = res.data
+                            if (trackData == null) {
+                                showCurrentPosition()
+                                return@w1
+                            }
+                            val positions = trackData.getArray<UTSJSONObject>("positions")
                             if (positions != null && positions.length > 0) {
                                 processTrackData(positions)
                                 if (trackPoints.value.length == 0) {
@@ -449,7 +464,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:676")
+                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:687")
                             showAppToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
                             if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
                                 showCurrentPosition()
@@ -577,7 +592,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 lng.value = option["lng"] ?: null
                 sTime.value = option["startTime"] ?: ""
                 eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:805")
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:816")
                 val routeStartTime = resolveRouteDateTime(sTime.value)
                 val routeEndTime = resolveRouteDateTime(eTime.value)
                 if (routeStartTime != null && routeEndTime != null) {

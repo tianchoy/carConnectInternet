@@ -138,7 +138,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           loading.value = true;
           const response = yield api_request.getCmdAction();
-          if (response.code == 0) {
+          if (response.code == 200 && response.data != null) {
             commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
           } else {
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令类型失败", icon: "none" });
@@ -173,7 +173,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           loading.value = true;
           const response = yield api_request.getCmdByMid(new common_vendor.UTSJSONObject({ imei: imei.value, cmdmId: typeId }));
-          if (response.code == 0) {
+          if (response.code == 200 && response.data != null) {
             commands.value = response.data;
           } else {
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令列表失败", icon: "none" });
@@ -234,7 +234,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             cmdData: encodeURIComponent(cmdData),
             predictCmdId: command["predictCmdId"]
           }));
-          if (response.code == 0) {
+          if (response.code == 200) {
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令发送成功", icon: "success" });
           } else {
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令发送失败", icon: "none", duration: 3e3 });

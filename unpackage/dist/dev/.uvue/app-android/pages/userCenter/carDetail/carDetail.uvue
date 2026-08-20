@@ -125,7 +125,7 @@ const __sfc__ = defineComponent({
             uni.showLoading({ title: '保存中...', mask: true });
             try {
                 const res = await editDeviceInfo(payload);
-                if (res.code == 0) {
+                if (res.code == 200) {
                     carInfo.value = payload;
                     editInfo.value.plateNo = plateNo;
                     isEditing.value = false;
@@ -151,8 +151,8 @@ const __sfc__ = defineComponent({
             loadingDetail.value = true;
             try {
                 const res = await getDeviceDetail(deviceId.value);
-                if (res.code == 0 && res.data != null) {
-                    carInfo.value = res.data;
+                if (res.code == 200 && res.data != null) {
+                    carInfo.value = res.data!;
                     detailLoaded.value = true;
                 }
                 else {

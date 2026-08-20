@@ -6,6 +6,7 @@ import io.dcloud.uniapp.framework.*
 import io.dcloud.uniapp.runtime.*
 import io.dcloud.uniapp.vue.*
 import io.dcloud.uniapp.vue.shared.*
+import io.dcloud.unicloud.*
 import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
@@ -60,22 +61,40 @@ open class GenPagesStopRecordStopRecord : BasePage {
                 startTime.value = formatTimes(now.getTime() - 86400000)
             }
             val loadStopData = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
+                return wrapUTSPromise(suspend w1@{
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
                         val data: UTSJSONObject = _uO("imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
-                        val res = await(getTrackPos(data))
-                        var stopsWithAddress: UTSArray<StopRecord> = _uA()
-                        val trackData = res.data
-                        val stops = trackData?.getArray<UTSJSONObject>("stops") ?: _uA()
-                        stops.forEach(fun(stop: UTSJSONObject): Unit {
-                            val convertedCoord = CoordTransform.wgs84ToTencent(stop.getNumber("latitude", 0), stop.getNumber("longitude", 0))
-                            stop.set("latitude", convertedCoord.lat)
-                            stop.set("longitude", convertedCoord.lng)
-                            stopsWithAddress.push(stop)
+                        try {
+                            val res = await(getTrackPos(data))
+                            val trackData = res.data
+                            if (res.code != 200 || trackData == null) {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "数据加载失败"
+                                }
+                                , icon = "none"))
+                                carStopDetail.value = _uA()
+                                return@w1
+                            }
+                            val stopsWithAddress: UTSArray<StopRecord> = _uA()
+                            val stops = trackData.getArray<UTSJSONObject>("stops") ?: _uA()
+                            stops.forEach(fun(stop: UTSJSONObject): Unit {
+                                val convertedCoord = CoordTransform.wgs84ToTencent(stop.getNumber("latitude", 0), stop.getNumber("longitude", 0))
+                                stop.set("latitude", convertedCoord.lat)
+                                stop.set("longitude", convertedCoord.lng)
+                                stopsWithAddress.push(stop)
+                            }
+                            )
+                            carStopDetail.value = stopsWithAddress
                         }
-                        )
-                        carStopDetail.value = stopsWithAddress
-                        uni_hideLoading(null)
+                         catch (error: Throwable) {
+                            console.error("获取停车数据失败:", error)
+                            showAppToast(ShowToastOptions(title = "数据加载失败", icon = "none"))
+                        }
+                         finally {
+                            uni_hideLoading(null)
+                        }
                 })
             }
             onMounted(fun(){

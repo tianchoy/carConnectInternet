@@ -119,9 +119,16 @@ class RequestFailure extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-const BASE_URL = "http://45.207.216.51:8085/api";
+const BASE_URL = "https://gpsapp.zdiot.cn";
+let isHandlingTokenExpired = false;
+function resetTokenExpiredState() {
+  isHandlingTokenExpired = false;
+}
 function handleTokenExpired() {
-  common_vendor.index.__f__("log", "at api/http.uts:40", "检测到token过期，执行跳转登录页逻辑");
+  if (isHandlingTokenExpired)
+    return null;
+  isHandlingTokenExpired = true;
+  common_vendor.index.__f__("log", "at api/http.uts:48", "检测到token过期，执行跳转登录页逻辑");
   common_vendor.index.removeStorageSync("token");
   services_push.clearPushSessionState();
   utils_toast.showAppToast({
@@ -130,14 +137,14 @@ function handleTokenExpired() {
     duration: 2e3
   });
   setTimeout(() => {
-    common_vendor.index.__f__("log", "at api/http.uts:55", "正在跳转到登录页...");
+    common_vendor.index.__f__("log", "at api/http.uts:63", "正在跳转到登录页...");
     common_vendor.index.redirectTo({
       url: "/pages/login/login",
       success: () => {
-        common_vendor.index.__f__("log", "at api/http.uts:59", "跳转登录页成功");
+        common_vendor.index.__f__("log", "at api/http.uts:67", "跳转登录页成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at api/http.uts:62", "跳转登录页失败:", err);
+        common_vendor.index.__f__("log", "at api/http.uts:70", "跳转登录页失败:", err);
         common_vendor.index.reLaunch({
           url: "/pages/login/login"
         });
@@ -162,7 +169,7 @@ function errorHandler(error, config) {
   if (config.showLoading != false) {
     common_vendor.index.hideLoading();
   }
-  common_vendor.index.__f__("log", "at api/http.uts:114", "请求错误详情:", error);
+  common_vendor.index.__f__("log", "at api/http.uts:122", "请求错误详情:", error);
   if (error.statusCode != 0) {
     switch (error.statusCode) {
       case 401:
@@ -312,4 +319,5 @@ exports.get = get;
 exports.post = post;
 exports.put = put;
 exports.remove = remove;
+exports.resetTokenExpiredState = resetTokenExpiredState;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map
