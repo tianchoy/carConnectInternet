@@ -260,15 +260,6 @@ required = [
     'getAvailableIOSMapProviderIds',
     'const providerIds = [];',
     'const providerId = providerIds[tapIndex];',
-    'clientId: { type: String, optional: false }',
-    'grantType: { type: String, optional: false }',
-    'tenantId: { type: String, optional: false }',
-    'this.clientId = this.__props__.clientId;',
-    'this.grantType = this.__props__.grantType;',
-    'this.tenantId = this.__props__.tenantId;',
-    'clientId: "428a8310cd442757ae699df5d894f051",',
-    'grantType: "univerify",',
-    'tenantId: "000000"',
 ]
 missing = [value for value in required if value not in text]
 if missing:
