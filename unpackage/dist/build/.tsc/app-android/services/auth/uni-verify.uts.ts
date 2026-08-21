@@ -131,15 +131,15 @@ export function loginByUniVerify(clientVersion: string): Promise<UniVerifyResult
 						loginBtnText: '本机号码一键登录'
 					},
 					success: (result: UniVerifyManagerLoginSuccess) => {
-						uniVerifyLogin({
-							openId: result.openId,
-							accessToken: result.accessToken,
-							platform: getPlatform(),
-							clientVersion: clientVersion,
-							clientId: "428a8310cd442757ae699df5d894f051",
-							grantType: "univerify",
-							tenantId: "000000",
-						}).then((response) => {
+						const requestData = new UTSJSONObject()
+						requestData.set('openId', result.openId)
+						requestData.set('accessToken', result.accessToken)
+						requestData.set('platform', getPlatform())
+						requestData.set('clientVersion', clientVersion)
+						requestData.set('clientId', '428a8310cd442757ae699df5d894f051')
+						requestData.set('grantType', 'univerify')
+						requestData.set('tenantId', '000000')
+						uniVerifyLogin(requestData).then((response) => {
 							const loginData = response.data
 							const token = loginData != null ? loginData.getString('access_token', '') : ''
 							if (response.code == 200 && token != '') {

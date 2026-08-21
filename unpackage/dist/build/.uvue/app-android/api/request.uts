@@ -43,15 +43,7 @@ export type JsonDataResponse = {
     msg: string;
     data: UTSJSONObject;
 };
-export type UniVerifyLoginRequest = {
-    openId: string;
-    accessToken: string;
-    platform: string;
-    clientVersion?: string;
-    clientId: string;
-    grantType: string;
-    tenantId: string;
-};
+export type UniVerifyLoginRequest = UTSJSONObject;
 // 短信验证码登录功能暂时停用：
 // export type SendSmsCodeRequest = { mobile: string, scene: string }
 // export type SmsLoginRequest = { mobile: string, code: string, platform: string }

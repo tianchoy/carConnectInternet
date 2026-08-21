@@ -4695,7 +4695,7 @@
     if (isHandlingTokenExpired)
       return null;
     isHandlingTokenExpired = true;
-    uni.__log__("log", "at api/http.uts:48", "检测到token过期，执行跳转登录页逻辑");
+    uni.__log__("log", "at api/http.uts:51", "检测到token过期，执行跳转登录页逻辑");
     uni.removeStorageSync("token");
     clearPushSessionState();
     showAppToast({
@@ -4704,14 +4704,14 @@
       duration: 2e3
     });
     setTimeout(() => {
-      uni.__log__("log", "at api/http.uts:63", "正在跳转到登录页...");
+      uni.__log__("log", "at api/http.uts:66", "正在跳转到登录页...");
       uni.redirectTo({
         url: "/pages/login/login",
         success: () => {
-          uni.__log__("log", "at api/http.uts:67", "跳转登录页成功");
+          uni.__log__("log", "at api/http.uts:70", "跳转登录页成功");
         },
         fail: (err) => {
-          uni.__log__("log", "at api/http.uts:70", "跳转登录页失败:", err);
+          uni.__log__("log", "at api/http.uts:73", "跳转登录页失败:", err);
           uni.reLaunch({
             url: "/pages/login/login"
           });
@@ -4732,11 +4732,15 @@
   function responseInterceptor(response, config) {
     return response.data;
   }
+  function logHttpError(error) {
+    const detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (error.data != null ? error.data.toString() : "");
+    uni.__log__("error", "at api/http.uts:123", "[HttpRequest] " + detail);
+  }
   function errorHandler(error, config) {
     if (config.showLoading != false) {
       uni.hideLoading();
     }
-    uni.__log__("log", "at api/http.uts:122", "请求错误详情:", error);
+    logHttpError(error);
     if (error.statusCode != 0) {
       switch (error.statusCode) {
         case 401:
@@ -4966,36 +4970,6 @@
       this.code = this.__props__.code;
       this.msg = this.__props__.msg;
       this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class UniVerifyLoginRequest extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            openId: { type: String, optional: false },
-            accessToken: { type: String, optional: false },
-            platform: { type: String, optional: false },
-            clientVersion: { type: String, optional: true },
-            clientId: { type: String, optional: false },
-            grantType: { type: String, optional: false },
-            tenantId: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = UniVerifyLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.openId = this.__props__.openId;
-      this.accessToken = this.__props__.accessToken;
-      this.platform = this.__props__.platform;
-      this.clientVersion = this.__props__.clientVersion;
-      this.clientId = this.__props__.clientId;
-      this.grantType = this.__props__.grantType;
-      this.tenantId = this.__props__.tenantId;
       delete this.__props__;
     }
   }
@@ -9931,15 +9905,15 @@
               loginBtnText: "本机号码一键登录"
             }),
             success: (result) => {
-              uniVerifyLogin(new UniVerifyLoginRequest({
-                openId: result.openId,
-                accessToken: result.accessToken,
-                platform: getPlatform(),
-                clientVersion,
-                clientId: "428a8310cd442757ae699df5d894f051",
-                grantType: "univerify",
-                tenantId: "000000"
-              })).then((response) => {
+              const requestData = new UTSJSONObject();
+              requestData.set("openId", result.openId);
+              requestData.set("accessToken", result.accessToken);
+              requestData.set("platform", getPlatform());
+              requestData.set("clientVersion", clientVersion);
+              requestData.set("clientId", "428a8310cd442757ae699df5d894f051");
+              requestData.set("grantType", "univerify");
+              requestData.set("tenantId", "000000");
+              uniVerifyLogin(requestData).then((response) => {
                 const loginData = response.data;
                 const token = loginData != null ? loginData.getString("access_token", "") : "";
                 if (response.code == 200 && token != "") {

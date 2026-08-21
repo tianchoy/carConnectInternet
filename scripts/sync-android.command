@@ -7,8 +7,6 @@ PROJECT_ROOT="${SCRIPT_DIR:h}"
 ANDROID_PROJECT_ROOT="${ANDROID_PROJECT_ROOT:-${PROJECT_ROOT:h}/car}"
 APP_ID="${APP_ID:-__UNI__662B0B4}"
 JPUSH_PLUGIN_NAME="jg-jpush-u"
-HBUILDERX_APP_ROOT="${HBUILDERX_APP_ROOT:-/Applications/HBuilderX-Alpha.app}"
-HBUILDERX_UNICLOUD_RUNTIME_JAR="${HBUILDERX_UNICLOUD_RUNTIME_JAR:-${HBUILDERX_APP_ROOT}/Contents/HBuilderX/plugins/uniapp-runextension/lib2/uniExtAPI-release.jar}"
 DRY_RUN=false
 
 usage() {
@@ -20,9 +18,6 @@ usage() {
 环境变量：
   ANDROID_PROJECT_ROOT  Android 工程根目录（默认：${PROJECT_ROOT:h}/car）
   APP_ID                UniApp X App ID（默认：__UNI__662B0B4）
-  HBUILDERX_APP_ROOT     HBuilderX 应用目录（默认：/Applications/HBuilderX-Alpha.app）
-  HBUILDERX_UNICLOUD_RUNTIME_JAR
-                        UniCloud 运行时 JAR 路径（默认：由 HBUILDERX_APP_ROOT 推导）
 
 --dry-run, -n  仅显示将要同步的变更，不写入文件。
 EOF
@@ -58,8 +53,6 @@ while (( $# > 0 )); do
 done
 
 command -v rsync >/dev/null 2>&1 || fail "未找到 rsync 命令"
-command -v jar >/dev/null 2>&1 || fail "未找到 JDK jar 命令"
-command -v unzip >/dev/null 2>&1 || fail "未找到 unzip 命令"
 
 RESOURCE_ROOT="${PROJECT_ROOT}/unpackage/resources/app-android"
 SOURCE_APP_ROOT="${RESOURCE_ROOT}/${APP_ID}"
@@ -67,7 +60,6 @@ SOURCE_GENERATED_ROOT="${RESOURCE_ROOT}/uniappx/app-android/src"
 SOURCE_RESOURCE_PLUGINS_ROOT="${RESOURCE_ROOT}/uni_modules"
 SOURCE_JPUSH_CACHE_ROOT="${PROJECT_ROOT}/unpackage/cache/uts_standard_android/app-android/uts/uni_modules/${JPUSH_PLUGIN_NAME}"
 SOURCE_LOCAL_MAVEN_ROOT="${PROJECT_ROOT}/android-offline-maven"
-SOURCE_UNICLOUD_COMPATIBILITY_SOURCE="${PROJECT_ROOT}/nativeResources/android/io/dcloud/unicloud/InternalUniCloudConfig.kt"
 
 ANDROID_MAIN_ROOT="${ANDROID_PROJECT_ROOT}/uniappx/src/main"
 TARGET_APP_ROOT="${ANDROID_MAIN_ROOT}/assets/apps/${APP_ID}"
@@ -75,9 +67,6 @@ TARGET_JAVA_ROOT="${ANDROID_MAIN_ROOT}/java"
 TARGET_UNI_MODULES_ROOT="${TARGET_JAVA_ROOT}/uni_modules"
 TARGET_JPUSH_PLUGIN_ROOT="${TARGET_UNI_MODULES_ROOT}/${JPUSH_PLUGIN_NAME}"
 TARGET_LOCAL_MAVEN_ROOT="${ANDROID_PROJECT_ROOT}/local-maven"
-TARGET_UNICLOUD_LIBS_ROOT="${ANDROID_PROJECT_ROOT}/uniappx/libs"
-TARGET_UNICLOUD_RUNTIME_AAR="${TARGET_UNICLOUD_LIBS_ROOT}/uni-cloud-client-release.aar"
-TARGET_UNICLOUD_COMPATIBILITY_SOURCE="${TARGET_JAVA_ROOT}/io/dcloud/unicloud/InternalUniCloudConfig.kt"
 
 require_dir "${SOURCE_APP_ROOT}" "HBuilderX 生成的 Android 应用资源目录"
 require_path "${SOURCE_APP_ROOT}/www/manifest.json" "HBuilderX 生成的 Android Web manifest"
@@ -92,8 +81,6 @@ require_path "${SOURCE_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jpush/6.2.0/jpush-6.2.0.
 require_path "${SOURCE_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jpush/6.2.0/jpush-6.2.0.pom" "离线 JPush POM"
 require_path "${SOURCE_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jcore/5.5.0/jcore-5.5.0.aar" "离线 JCore AAR"
 require_path "${SOURCE_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jcore/5.5.0/jcore-5.5.0.pom" "离线 JCore POM"
-require_path "${HBUILDERX_UNICLOUD_RUNTIME_JAR}" "HBuilderX UniCloud 运行时 JAR"
-require_path "${SOURCE_UNICLOUD_COMPATIBILITY_SOURCE}" "UniCloud 兼容类型别名源码"
 
 require_dir "${ANDROID_PROJECT_ROOT}" "Android 工程根目录"
 require_dir "${ANDROID_MAIN_ROOT}/assets/apps" "Android assets/apps 目录"
@@ -116,67 +103,6 @@ sync_dir() {
   local target="$2"
   shift 2
   rsync "${RSYNC_OPTIONS[@]}" "$@" "${source}/" "${target}/"
-}
-
-sync_unicloud_runtime() {
-  local staging_root
-  local classes_jar
-  local aar_staging_dir
-  local aar_staging_path
-
-  print -- "  UniCloud 运行时：${HBUILDERX_UNICLOUD_RUNTIME_JAR}"
-  if [[ "${DRY_RUN}" == true ]]; then
-    print -- "  将生成：${TARGET_UNICLOUD_RUNTIME_AAR}"
-    print -- "  将同步：${TARGET_UNICLOUD_COMPATIBILITY_SOURCE}"
-    return
-  fi
-
-  staging_root="$(mktemp -d)"
-  classes_jar="${staging_root}/classes.jar"
-  aar_staging_dir="${staging_root}/aar"
-  aar_staging_path="${staging_root}/uni-cloud-client-release.aar"
-
-  mkdir -p "${aar_staging_dir}"
-  (
-    cd "${staging_root}"
-    jar xf "${HBUILDERX_UNICLOUD_RUNTIME_JAR}" io/dcloud/unicloud uts/sdk/modules/DCloudUniCloudClient
-    jar cf "${classes_jar}" io/dcloud/unicloud uts/sdk/modules/DCloudUniCloudClient
-  )
-  printf '<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.dcloud.unicloud" />\n' > "${aar_staging_dir}/AndroidManifest.xml"
-  mv "${classes_jar}" "${aar_staging_dir}/classes.jar"
-  (
-    cd "${aar_staging_dir}"
-    jar cf "${aar_staging_path}" AndroidManifest.xml classes.jar
-  )
-  jar tf "${aar_staging_path}" | grep -Fxq 'classes.jar' || \
-    fail "生成的 UniCloud AAR 缺少 classes.jar"
-  jar tf "${aar_staging_dir}/classes.jar" | grep -Fxq 'uts/sdk/modules/DCloudUniCloudClient/InternalUniCloudConfig.class' || \
-    fail "生成的 UniCloud AAR 缺少 InternalUniCloudConfig"
-
-  mkdir -p "${TARGET_UNICLOUD_LIBS_ROOT}" "${TARGET_UNICLOUD_COMPATIBILITY_SOURCE:h}"
-  mv "${aar_staging_path}" "${TARGET_UNICLOUD_RUNTIME_AAR}"
-  rsync "${INDEX_RSYNC_OPTIONS[@]}" \
-    "${SOURCE_UNICLOUD_COMPATIBILITY_SOURCE}" "${TARGET_UNICLOUD_COMPATIBILITY_SOURCE}"
-  rm -rf "${staging_root}"
-}
-
-validate_unicloud_runtime() {
-  local staging_root
-  local classes_jar
-
-  require_path "${TARGET_UNICLOUD_RUNTIME_AAR}" "同步后的 UniCloud 运行时 AAR"
-  require_path "${TARGET_UNICLOUD_COMPATIBILITY_SOURCE}" "同步后的 UniCloud 兼容类型别名源码"
-  jar tf "${TARGET_UNICLOUD_RUNTIME_AAR}" | grep -Fxq 'classes.jar' || \
-    fail "同步后的 UniCloud AAR 缺少 classes.jar"
-  staging_root="$(mktemp -d)"
-  classes_jar="${staging_root}/classes.jar"
-  unzip -p "${TARGET_UNICLOUD_RUNTIME_AAR}" classes.jar > "${classes_jar}"
-  jar tf "${classes_jar}" | grep -Fxq 'uts/sdk/modules/DCloudUniCloudClient/InternalUniCloudConfig.class' || \
-    fail "同步后的 UniCloud AAR 缺少 InternalUniCloudConfig"
-  rm -rf "${staging_root}"
-  grep -Fq 'typealias InternalUniCloudConfig = uts.sdk.modules.DCloudUniCloudClient.InternalUniCloudConfig' \
-    "${TARGET_UNICLOUD_COMPATIBILITY_SOURCE}" || \
-    fail "同步后的 UniCloud 兼容类型别名不正确"
 }
 
 sync_generated_modules() {
@@ -287,45 +213,41 @@ if [[ "${DRY_RUN}" == false ]]; then
     "${TARGET_LOCAL_MAVEN_ROOT}"
 fi
 
-print -- "[1/8] 同步 Android 应用资源：${APP_ID}"
+print -- "[1/7] 同步 Android 应用资源：${APP_ID}"
 sync_dir "${SOURCE_APP_ROOT}" "${TARGET_APP_ROOT}"
 
-print -- "[2/8] 同步离线 JPush/JCore Maven 仓库"
+print -- "[2/7] 同步离线 JPush/JCore Maven 仓库"
 sync_dir "${SOURCE_LOCAL_MAVEN_ROOT}" "${TARGET_LOCAL_MAVEN_ROOT}"
 
-print -- "[3/8] 同步生成的 index.kt、components 和 pages"
+print -- "[3/7] 同步生成的 index.kt、components 和 pages"
 rsync "${INDEX_RSYNC_OPTIONS[@]}" \
   "${SOURCE_GENERATED_ROOT}/index.kt" "${TARGET_JAVA_ROOT}/index.kt"
 sync_dir "${SOURCE_GENERATED_ROOT}/components" "${TARGET_JAVA_ROOT}/components"
 sync_dir "${SOURCE_GENERATED_ROOT}/pages" "${TARGET_JAVA_ROOT}/pages"
 
-print -- "[4/8] 同步生成的 uni_modules"
+print -- "[4/7] 同步生成的 uni_modules"
 sync_generated_modules
 
-print -- "[5/8] 同步 HBuilderX 导出的 Android 插件及 Kotlin 源码"
+print -- "[5/7] 同步 HBuilderX 导出的 Android 插件及 Kotlin 源码"
 sync_exported_plugins
 
-print -- "[6/8] 同步 ${JPUSH_PLUGIN_NAME} 生成的 Android Kotlin 模块"
+print -- "[6/7] 同步 ${JPUSH_PLUGIN_NAME} 生成的 Android Kotlin 模块"
 sync_dir "${SOURCE_JPUSH_CACHE_ROOT}" "${TARGET_JPUSH_PLUGIN_ROOT}"
 
-print -- "[7/8] 生成并同步 UniCloud 离线运行时"
-sync_unicloud_runtime
-
 if [[ "${DRY_RUN}" == false ]]; then
-  print -- "[8/8] 校验同步结果"
+  print -- "[7/7] 校验同步结果"
   require_path "${TARGET_APP_ROOT}/www/manifest.json" "同步后的 Android Web manifest"
   require_path "${TARGET_JAVA_ROOT}/index.kt" "同步后的 Android index.kt"
   validate_exported_plugins
   validate_external_map_plugin
   require_path "${TARGET_JPUSH_PLUGIN_ROOT}/index.kt" "同步后的 JPush Kotlin 源码"
   require_path "${TARGET_JPUSH_PLUGIN_ROOT}/manifest.json" "同步后的 JPush 模块 manifest"
-  validate_unicloud_runtime
   require_path "${TARGET_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jpush/6.2.0/jpush-6.2.0.aar" "同步后的离线 JPush AAR"
   require_path "${TARGET_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jpush/6.2.0/jpush-6.2.0.pom" "同步后的离线 JPush POM"
   require_path "${TARGET_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jcore/5.5.0/jcore-5.5.0.aar" "同步后的离线 JCore AAR"
   require_path "${TARGET_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jcore/5.5.0/jcore-5.5.0.pom" "同步后的离线 JCore POM"
 else
-  print -- "[8/8] 预演完成：未执行同步后文件校验。"
+  print -- "[7/7] 预演完成：未执行同步后文件校验。"
 fi
 
 print -- "完成：${ANDROID_PROJECT_ROOT}"

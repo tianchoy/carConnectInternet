@@ -1,5 +1,6 @@
 import { clearPushSessionState } from '../services/push.uts';
 import { showAppToast } from '../utils/toast.uts';
+import AndroidLog from 'android.util.Log';
 // 定义类型
 type RequestOptions = {
     url?: string;
@@ -88,13 +89,18 @@ function requestInterceptor(config: RequestOptions): RequestOptions {
 function responseInterceptor(response: RequestSuccess<any>, config: RequestOptions): any {
     return response.data!;
 }
+function logHttpError(error: HttpError): void {
+    const detail = 'statusCode=' + error.statusCode + ', message=' + error.message + ', data=' + (error.data != null ? error.data.toString() : '');
+    AndroidLog.e('HttpRequest', detail);
+    console.error('[HttpRequest] ' + detail);
+}
 // 错误处理
 function errorHandler(error: HttpError, config: RequestOptions): void {
     // 隐藏加载中
     if (config.showLoading != false) {
         uni.hideLoading();
     }
-    console.log('请求错误详情:', error);
+    logHttpError(error);
     // 处理错误状态码
     if (error.statusCode != 0) {
         switch (error.statusCode) {

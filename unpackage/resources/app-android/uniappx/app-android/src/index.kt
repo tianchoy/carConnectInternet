@@ -3992,11 +3992,21 @@ fun requestInterceptor(config: RequestOptions__1): RequestOptions__1 {
 fun responseInterceptor(response: RequestSuccess<Any>, config: RequestOptions__1): Any {
     return response.data!!
 }
+fun logHttpError(error: HttpError): Unit {
+    val detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (if (error.data != null) {
+        error.data.toString()
+    } else {
+        ""
+    }
+    )
+    AndroidLog.e("HttpRequest", detail)
+    console.error("[HttpRequest] " + detail)
+}
 fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
     if (config.showLoading != false) {
         uni_hideLoading(null)
     }
-    console.log("请求错误详情:", error)
+    logHttpError(error)
     if (error.statusCode != 0) {
         when (error.statusCode) {
             401 -> 
@@ -4153,21 +4163,7 @@ open class JsonDataResponse (
     @JsonNotNull
     open var data: UTSJSONObject,
 ) : UTSObject()
-open class UniVerifyLoginRequest (
-    @JsonNotNull
-    open var openId: String,
-    @JsonNotNull
-    open var accessToken: String,
-    @JsonNotNull
-    open var platform: String,
-    open var clientVersion: String? = null,
-    @JsonNotNull
-    open var clientId: String,
-    @JsonNotNull
-    open var grantType: String,
-    @JsonNotNull
-    open var tenantId: String,
-) : UTSObject()
+typealias UniVerifyLoginRequest = UTSJSONObject
 open class DevicePositionResponse (
     @JsonNotNull
     open var code: Number,
@@ -5241,7 +5237,15 @@ fun loginByUniVerify(clientVersion: String): UTSPromise<UniVerifyResult> {
             try {
                 uniVerifyManager = getManager()
                 uniVerifyManager.login(UniVerifyManagerLoginOptions(uniVerifyStyle = UniVerifyManagerLoginStyle(fullScreen = false, loginBtnText = "本机号码一键登录"), success = fun(result: UniVerifyManagerLoginSuccess){
-                    uniVerifyLogin(UniVerifyLoginRequest(openId = result.openId, accessToken = result.accessToken, platform = getPlatform(), clientVersion = clientVersion, clientId = "428a8310cd442757ae699df5d894f051", grantType = "univerify", tenantId = "000000")).then(fun(response){
+                    val requestData = UTSJSONObject()
+                    requestData.set("openId", result.openId)
+                    requestData.set("accessToken", result.accessToken)
+                    requestData.set("platform", getPlatform())
+                    requestData.set("clientVersion", clientVersion)
+                    requestData.set("clientId", "428a8310cd442757ae699df5d894f051")
+                    requestData.set("grantType", "univerify")
+                    requestData.set("tenantId", "000000")
+                    uniVerifyLogin(requestData).then(fun(response){
                         val loginData = response.data
                         val token = if (loginData != null) {
                             loginData.getString("access_token", "")
