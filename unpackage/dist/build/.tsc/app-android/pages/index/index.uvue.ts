@@ -813,9 +813,21 @@ function isLogin() : boolean {
     return true
 }
 
+function isCarSelected() : boolean {
+    if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
+        showAppToast({
+            title: '请先选择车辆',
+            icon: 'none'
+        })
+        return false
+    }
+    return true
+}
+
 // 跳转轨迹详情
 const toRecordDetail = () => {
     if (!isLogin()) return
+    if (!isCarSelected()) return
     uni.navigateTo({
         url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude,
         fail: (err) => {
@@ -826,7 +838,6 @@ const toRecordDetail = () => {
 
 // 跳转全部设备
 const toDeviceList = () => {
-    console.log('toDeviceList')
     if (!isLogin()) return
     uni.navigateTo({
         url: '/pages/deviceList/deviceList',
@@ -836,13 +847,7 @@ const toDeviceList = () => {
 // 跳转设备详情
 const toDeviceDetail = (e: any) => {
     if (!isLogin()) return
-    if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
-        showAppToast({
-            title: '请先选择车辆',
-            icon: 'none'
-        })
-        return
-    }
+    if (!isCarSelected()) return
     uni.navigateTo({
         url: `/pages/carInfoDetail/carInfoDetail?imei=${currentCarImei.value}&deptId=${currentCarDeptId.value}&deviceId=${currentCarDeviceId.value}`,
     })
@@ -887,6 +892,7 @@ const toFindCar = () => {
 // 跳转围栏
 const toFence = () => {
     if (!isLogin()) return
+    if (!isCarSelected()) return
     uni.navigateTo({
         url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarName.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
     })
@@ -917,6 +923,7 @@ const contactCustomerService = () => {
 const needRefresh = ref(false)
 const toPay = (iccid : string,simMerchant : string) => {
     if (!isLogin()) return
+    if (!isCarSelected()) return
     if(simMerchant.toLowerCase() == 'zddx'){
         iccid = iccid.substring(0,iccid.length-1)
     }
@@ -984,6 +991,7 @@ async function unbindCurrentDevice() : Promise<void> {
 // 解绑设备
 const unbindDevice = () : void => {
     if (!isLogin()) return
+    if (!isCarSelected()) return
     showAppModal({
         title: '解绑车辆',
         content: '确定解绑当前车辆吗？',

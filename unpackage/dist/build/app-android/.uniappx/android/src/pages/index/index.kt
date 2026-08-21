@@ -715,8 +715,19 @@ open class GenPagesIndexIndex : BasePage {
                 return true
             }
             val isLogin = ::gen_isLogin_fn
+            fun gen_isCarSelected_fn(): Boolean {
+                if (!(currentCarImei.value != "") || !(currentCarDeptId.value != "") || !(currentCarDeviceId.value != "")) {
+                    showAppToast(ShowToastOptions(title = "请先选择车辆", icon = "none"))
+                    return false
+                }
+                return true
+            }
+            val isCarSelected = ::gen_isCarSelected_fn
             val toRecordDetail = fun(){
                 if (!isLogin()) {
+                    return
+                }
+                if (!isCarSelected()) {
                     return
                 }
                 uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude, fail = fun(err){
@@ -727,7 +738,6 @@ open class GenPagesIndexIndex : BasePage {
                 ))
             }
             val toDeviceList = fun(){
-                console.log("toDeviceList")
                 if (!isLogin()) {
                     return
                 }
@@ -737,8 +747,7 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isLogin()) {
                     return
                 }
-                if (!(currentCarImei.value != "") || !(currentCarDeptId.value != "") || !(currentCarDeviceId.value != "")) {
-                    showAppToast(ShowToastOptions(title = "请先选择车辆", icon = "none"))
+                if (!isCarSelected()) {
                     return
                 }
                 uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?imei=" + currentCarImei.value + "&deptId=" + currentCarDeptId.value + "&deviceId=" + currentCarDeviceId.value))
@@ -779,6 +788,9 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isLogin()) {
                     return
                 }
+                if (!isCarSelected()) {
+                    return
+                }
                 uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarName.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value))
             }
             val contactCustomerService = fun(){
@@ -788,6 +800,9 @@ open class GenPagesIndexIndex : BasePage {
             val toPay = fun(reassignedIccid: String, simMerchant: String){
                 var iccid = reassignedIccid
                 if (!isLogin()) {
+                    return
+                }
+                if (!isCarSelected()) {
                     return
                 }
                 if (simMerchant.toLowerCase() == "zddx") {
@@ -821,6 +836,9 @@ open class GenPagesIndexIndex : BasePage {
             val unbindCurrentDevice = ::gen_unbindCurrentDevice_fn
             val unbindDevice = fun(): Unit {
                 if (!isLogin()) {
+                    return
+                }
+                if (!isCarSelected()) {
                     return
                 }
                 showAppModal(AppModalOptions(title = "解绑车辆", content = "确定解绑当前车辆吗？", success = fun(res: AppModalSuccess): Unit {

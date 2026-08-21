@@ -6329,19 +6329,30 @@
         }
         return true;
       }
+      function isCarSelected() {
+        if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
+          showAppToast({
+            title: "请先选择车辆",
+            icon: "none"
+          });
+          return false;
+        }
+        return true;
+      }
       const toRecordDetail = () => {
         if (!isLogin())
+          return null;
+        if (!isCarSelected())
           return null;
         uni.navigateTo({
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1009", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1021", "跳转轨迹详情失败:", err);
           }
         });
       };
       const toDeviceList = () => {
-        uni.__log__("log", "at pages/index/index.uvue:1016", "toDeviceList");
         if (!isLogin())
           return null;
         uni.navigateTo({
@@ -6351,13 +6362,8 @@
       const toDeviceDetail = (e2 = null) => {
         if (!isLogin())
           return null;
-        if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
-          showAppToast({
-            title: "请先选择车辆",
-            icon: "none"
-          });
+        if (!isCarSelected())
           return null;
-        }
         uni.navigateTo({
           url: "/pages/carInfoDetail/carInfoDetail?imei=".concat(currentCarImei.value, "&deptId=").concat(currentCarDeptId.value, "&deviceId=").concat(currentCarDeviceId.value)
         });
@@ -6369,7 +6375,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1044", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1049", "跳转添加设备失败:", err);
           }
         });
       };
@@ -6399,6 +6405,8 @@
       const toFence = () => {
         if (!isLogin())
           return null;
+        if (!isCarSelected())
+          return null;
         uni.navigateTo({
           url: "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarName.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value
         });
@@ -6413,11 +6421,13 @@
       const toPay = (iccid, simMerchant) => {
         if (!isLogin())
           return null;
+        if (!isCarSelected())
+          return null;
         if (simMerchant.toLowerCase() == "zddx") {
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1132", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1139", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -6455,6 +6465,8 @@
       }
       const unbindDevice = () => {
         if (!isLogin())
+          return null;
+        if (!isCarSelected())
           return null;
         showAppModal(new UTSJSONObject({
           title: "解绑车辆",

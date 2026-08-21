@@ -760,9 +760,21 @@ const __sfc__ = defineComponent({
             }
             return true;
         }
+        function isCarSelected(): boolean {
+            if (!(currentCarImei.value != "") || !(currentCarDeptId.value != "") || !(currentCarDeviceId.value != "")) {
+                showAppToast({
+                    title: '请先选择车辆',
+                    icon: 'none'
+                } as ShowToastOptions);
+                return false;
+            }
+            return true;
+        }
         // 跳转轨迹详情
         const toRecordDetail = () => {
             if (!isLogin())
+                return;
+            if (!isCarSelected())
                 return;
             uni.navigateTo({
                 url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude,
@@ -774,7 +786,6 @@ const __sfc__ = defineComponent({
         };
         // 跳转全部设备
         const toDeviceList = () => {
-            console.log('toDeviceList');
             if (!isLogin())
                 return;
             uni.navigateTo({
@@ -785,13 +796,8 @@ const __sfc__ = defineComponent({
         const toDeviceDetail = (e: any) => {
             if (!isLogin())
                 return;
-            if (!(currentCarImei.value != "") || !(currentCarDeptId.value != "") || !(currentCarDeviceId.value != "")) {
-                showAppToast({
-                    title: '请先选择车辆',
-                    icon: 'none'
-                } as ShowToastOptions);
+            if (!isCarSelected())
                 return;
-            }
             uni.navigateTo({
                 url: `/pages/carInfoDetail/carInfoDetail?imei=${currentCarImei.value}&deptId=${currentCarDeptId.value}&deviceId=${currentCarDeviceId.value}`,
             });
@@ -837,6 +843,8 @@ const __sfc__ = defineComponent({
         const toFence = () => {
             if (!isLogin())
                 return;
+            if (!isCarSelected())
+                return;
             uni.navigateTo({
                 url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarName.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
             });
@@ -852,6 +860,8 @@ const __sfc__ = defineComponent({
         const needRefresh = ref(false);
         const toPay = (iccid: string, simMerchant: string) => {
             if (!isLogin())
+                return;
+            if (!isCarSelected())
                 return;
             if (simMerchant.toLowerCase() == 'zddx') {
                 iccid = iccid.substring(0, iccid.length - 1);
@@ -896,6 +906,8 @@ const __sfc__ = defineComponent({
         // 解绑设备
         const unbindDevice = (): void => {
             if (!isLogin())
+                return;
+            if (!isCarSelected())
                 return;
             showAppModal({
                 title: '解绑车辆',
