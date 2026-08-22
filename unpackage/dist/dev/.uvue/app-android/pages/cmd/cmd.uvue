@@ -127,7 +127,7 @@ const __sfc__ = defineComponent({
                 loading.value = true;
                 const response = await getCmdAction();
                 if (response.code == 200 && response.data != null) {
-                    commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data!);
+                    commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
                 }
                 else {
                     showAppToast({ title: response.msg != '' ? response.msg : '加载指令类型失败', icon: 'none' } as ShowToastOptions);
@@ -162,7 +162,7 @@ const __sfc__ = defineComponent({
                 loading.value = true;
                 const response = await getCmdByMid({ imei: imei.value, cmdmId: typeId } as UTSJSONObject);
                 if (response.code == 200 && response.data != null) {
-                    commands.value = response.data!;
+                    commands.value = response.data;
                 }
                 else {
                     showAppToast({ title: response.msg != '' ? response.msg : '加载指令列表失败', icon: 'none' } as ShowToastOptions);

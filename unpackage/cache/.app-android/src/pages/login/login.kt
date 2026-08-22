@@ -33,12 +33,6 @@ open class GenPagesLoginLogin : BasePage {
             val rememberPassword = ref(false)
             val formValid = ref(false)
             val loading = ref(false)
-            val smsLoginMode = ref(false)
-            val smsMobile = ref("")
-            val smsCode = ref("")
-            val smsCooldown = ref(0)
-            val smsSending = ref(false)
-            val smsSubmitting = ref(false)
             val nativeLoginLoading = ref(false)
             val form = ref<FormData>(FormData(username = "", password = ""))
             val deviceModel = ref("")
@@ -53,7 +47,7 @@ open class GenPagesLoginLogin : BasePage {
                         return
                     }
                     val account = if (UTSAndroid.`typeof`(rawAccount) == "string") {
-                        UTSAndroid.consoleDebugError(JSON.parse(rawAccount as String), " at pages/login/login.uvue:173") as UTSJSONObject
+                        UTSAndroid.consoleDebugError(JSON.parse(rawAccount as String), " at pages/login/login.uvue:179") as UTSJSONObject
                     } else {
                         rawAccount as UTSJSONObject
                     }
@@ -62,7 +56,7 @@ open class GenPagesLoginLogin : BasePage {
                     rememberPassword.value = form.value.username != "" || form.value.password != ""
                 }
                  catch (error: Throwable) {
-                    console.error("加载保存的账号密码失败:", error, " at pages/login/login.uvue:178")
+                    console.error("加载保存的账号密码失败:", error, " at pages/login/login.uvue:184")
                 }
             }
             val loadSavedAccount = ::gen_loadSavedAccount_fn
@@ -98,7 +92,7 @@ open class GenPagesLoginLogin : BasePage {
             val getSystemInfo = fun(): Unit {
                 val res = uni_getSystemInfoSync()
                 deviceModel.value = res.deviceModel
-                console.log("设备型号:", deviceModel.value, " at pages/login/login.uvue:221")
+                console.log("设备型号:", deviceModel.value, " at pages/login/login.uvue:227")
             }
             val validateForm = fun(): Boolean {
                 if (form.value.username.length == 0) {
@@ -135,109 +129,6 @@ open class GenPagesLoginLogin : BasePage {
                 showAppToast(ShowToastOptions(title = "请先阅读并同意用户协议", icon = "error"))
                 return false
             }
-            val openSmsLogin = fun(): Unit {
-                smsLoginMode.value = true
-            }
-            val closeSmsLogin = fun(): Unit {
-                smsLoginMode.value = false
-                smsCode.value = ""
-            }
-            val isValidMobile = fun(): Boolean {
-                if (!UTSRegExp("^1[3-9]\\\\d{9}\$", "").test(smsMobile.value)) {
-                    showAppToast(ShowToastOptions(title = "请输入正确的手机号", icon = "none"))
-                    return false
-                }
-                return true
-            }
-            val startSmsCooldown = fun(seconds: Number): Unit {
-                smsCooldown.value = if (seconds > 0) {
-                    seconds
-                } else {
-                    60
-                }
-                val timer = setInterval(fun(){
-                    smsCooldown.value -= 1
-                    if (smsCooldown.value <= 0) {
-                        smsCooldown.value = 0
-                    }
-                }
-                , 1000)
-            }
-            val sendSmsCode = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend w1@{
-                        if (smsCooldown.value > 0 || smsSending.value) {
-                            return@w1
-                        }
-                        if (!ensureAgreementAccepted() || !isValidMobile()) {
-                            return@w1
-                        }
-                        try {
-                            smsSending.value = true
-                            val response = await(sendSmsLoginCode(SendSmsCodeRequest(mobile = smsMobile.value, scene = "login")))
-                            if (response.code != 200) {
-                                showAppToast(ShowToastOptions(title = if (response.msg != "") {
-                                    response.msg
-                                } else {
-                                    "验证码发送失败"
-                                }
-                                , icon = "none"))
-                                return@w1
-                            }
-                            val cooldownSeconds = if (response.data != null) {
-                                response.data!!.getNumber("cooldownSeconds", 60)
-                            } else {
-                                60
-                            }
-                            startSmsCooldown(cooldownSeconds)
-                            showAppToast(ShowToastOptions(title = "验证码已发送", icon = "success"))
-                        }
-                         catch (error: Throwable) {
-                            showAppToast(ShowToastOptions(title = "验证码发送失败，请检查网络", icon = "none"))
-                        }
-                         finally {
-                            smsSending.value = false
-                        }
-                })
-            }
-            val getAppPlatform = fun(): String {
-                return "android"
-            }
-            val submitSmsLogin = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend w1@{
-                        if (!ensureAgreementAccepted() || !isValidMobile() || smsCode.value == "" || smsSubmitting.value) {
-                            if (smsCode.value == "") {
-                                showAppToast(ShowToastOptions(title = "请输入验证码", icon = "none"))
-                            }
-                            return@w1
-                        }
-                        try {
-                            smsSubmitting.value = true
-                            val response = await(smsLogin(SmsLoginRequest(mobile = smsMobile.value, code = smsCode.value, platform = getAppPlatform())))
-                            val token = if (response.data != null) {
-                                response.data!!.getString("token", "")
-                            } else {
-                                ""
-                            }
-                            if (response.code == 200 && token != "") {
-                                smsCode.value = ""
-                                completeLogin(token, false)
-                            } else {
-                                showAppToast(ShowToastOptions(title = if (response.msg != "") {
-                                    response.msg
-                                } else {
-                                    "验证码登录失败"
-                                }
-                                , icon = "none"))
-                            }
-                        }
-                         catch (error: Throwable) {
-                            showAppToast(ShowToastOptions(title = "验证码登录失败，请检查网络", icon = "none"))
-                        }
-                         finally {
-                            smsSubmitting.value = false
-                        }
-                })
-            }
             val startUniVerifyLogin = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         if (!ensureAgreementAccepted() || nativeLoginLoading.value) {
@@ -253,7 +144,7 @@ open class GenPagesLoginLogin : BasePage {
                                 }
                             }
                              catch (error: Throwable) {
-                                console.warn("获取应用版本失败，使用默认版本号:", error, " at pages/login/login.uvue:347")
+                                console.warn("获取应用版本失败，使用默认版本号:", error, " at pages/login/login.uvue:354")
                             }
                             val result = await(loginByUniVerify(clientVersion))
                             if (result.ok) {
@@ -261,8 +152,7 @@ open class GenPagesLoginLogin : BasePage {
                                 return@w1
                             }
                             if (!result.cancelled) {
-                                showAppToast(ShowToastOptions(title = result.message + "，可使用验证码登录", icon = "none"))
-                                openSmsLogin()
+                                showAppToast(ShowToastOptions(title = result.message, icon = "none"))
                             }
                         }
                          finally {
@@ -277,23 +167,23 @@ open class GenPagesLoginLogin : BasePage {
                             return@w1
                         }
                         try {
-                            console.log("准备验证表单...", " at pages/login/login.uvue:464")
+                            console.log("准备验证表单...", " at pages/login/login.uvue:470")
                             if (!validateForm()) {
                                 return@w1
                             }
-                            console.log("✅ 表单验证通过", " at pages/login/login.uvue:466")
-                            val newFormData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 469, 10), "username" to form.value.username, "password" to form.value.password, "from" to deviceModel.value, "type" to "USER")
-                            console.log("📤 请求参数:", newFormData, " at pages/login/login.uvue:475")
+                            console.log("✅ 表单验证通过", " at pages/login/login.uvue:472")
+                            val newFormData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 475, 10), "username" to form.value.username, "password" to form.value.password, "from" to deviceModel.value, "type" to "USER")
+                            console.log("📤 请求参数:", newFormData, " at pages/login/login.uvue:481")
                             loading.value = true
                             uni_showLoading(ShowLoadingOptions(title = "登录中...", mask = true))
-                            console.log("🚀 开始调用 login 接口...", " at pages/login/login.uvue:485")
+                            console.log("🚀 开始调用 login 接口...", " at pages/login/login.uvue:491")
                             val res = await(login(newFormData))
-                            console.log("✅ 登录接口返回:", res, " at pages/login/login.uvue:487")
+                            console.log("✅ 登录接口返回:", res, " at pages/login/login.uvue:493")
                             loading.value = false
                             uni_hideLoading(null)
                             val loginData = res.data
                             val token = if (res.code == 200 && loginData != null) {
-                                loginData.getString("token", "")
+                                loginData.getString("access_token", "")
                             } else {
                                 ""
                             }
@@ -309,7 +199,7 @@ open class GenPagesLoginLogin : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("❌ 登录失败:", error, " at pages/login/login.uvue:506")
+                            console.error("❌ 登录失败:", error, " at pages/login/login.uvue:512")
                             loading.value = false
                             uni_hideLoading(null)
                             if (isTruthy(error) && isTruthy(error.message)) {
@@ -335,7 +225,7 @@ open class GenPagesLoginLogin : BasePage {
                 getSystemInfo()
                 loadSavedAccount()
                 prefetchUniVerify()
-                console.log("pswLogin 初始值:", pswLogin.value, " at pages/login/login.uvue:605")
+                console.log("pswLogin 初始值:", pswLogin.value, " at pages/login/login.uvue:611")
             }
             )
             return fun(): Any? {
@@ -398,78 +288,14 @@ open class GenPagesLoginLogin : BasePage {
                                 ))
                             } else {
                                 _cE("view", _uM("key" to 1), _uA(
-                                    if (isTrue(!smsLoginMode.value)) {
-                                        _cE("view", _uM("key" to 0), _uA(
-                                            _cV(_component_i_button, _uM("type" to "primary", "onClick" to startUniVerifyLogin, "loading" to nativeLoginLoading.value), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                                return _uA(
-                                                    "本机号码一键登录"
-                                                )
-                                            }), "_" to 1), 8, _uA(
-                                                "loading"
-                                            )),
-                                            _cE("view", _uM("class" to "phone-login-switch", "onClick" to openSmsLogin), _uA(
-                                                _cE("text", _uM("class" to "phone-way"), "验证码登录")
-                                            ))
-                                        ))
-                                    } else {
-                                        _cE("view", _uM("key" to 1), _uA(
-                                            _cV(_component_i_form, null, _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                                return _uA(
-                                                    _cV(_component_i_form_item, _uM("class" to "sms-mobile-item", "label" to "", "labelDirection" to "horizontal", "labelWidth" to "0"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                                        return _uA(
-                                                            _cV(_component_i_input, _uM("modelValue" to smsMobile.value, "onUpdate:modelValue" to fun(`$event`: String){
-                                                                smsMobile.value = `$event`
-                                                            }
-                                                            , "placeholder" to "请输入手机号", "type" to "number", "clearable" to ""), null, 8, _uA(
-                                                                "modelValue",
-                                                                "onUpdate:modelValue"
-                                                            ))
-                                                        )
-                                                    }
-                                                    ), "_" to 1)),
-                                                    _cV(_component_i_form_item, _uM("class" to "sms-code-item", "label" to "", "labelDirection" to "horizontal", "labelWidth" to "0"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                                        return _uA(
-                                                            _cV(_component_i_input, _uM("class" to "sms-code-input", "modelValue" to smsCode.value, "onUpdate:modelValue" to fun(`$event`: String){
-                                                                smsCode.value = `$event`
-                                                            }
-                                                            , "placeholder" to "请输入验证码", "type" to "number", "clearable" to ""), _uM("suffix" to withSlotCtx(fun(): UTSArray<Any> {
-                                                                return _uA(
-                                                                    _cE("view", _uM("class" to _nC(_uA(
-                                                                        "sms-send-button",
-                                                                        _uM("sms-send-button-disabled" to (smsCooldown.value > 0 || smsSending.value))
-                                                                    )), "onClick" to sendSmsCode), _uA(
-                                                                        _cE("text", _uM("class" to "sms-send-button-text"), _tD(if (smsCooldown.value > 0) {
-                                                                            smsCooldown.value + "秒后重试"
-                                                                        } else {
-                                                                            "获取验证码"
-                                                                        }
-                                                                        ), 1)
-                                                                    ), 2)
-                                                                )
-                                                            }
-                                                            ), "_" to 1), 8, _uA(
-                                                                "modelValue",
-                                                                "onUpdate:modelValue"
-                                                            ))
-                                                        )
-                                                    }
-                                                    ), "_" to 1)),
-                                                    _cV(_component_i_button, _uM("type" to "primary", "onClick" to submitSmsLogin, "loading" to smsSubmitting.value), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                                        return _uA(
-                                                            "手机号验证码登录"
-                                                        )
-                                                    }
-                                                    ), "_" to 1), 8, _uA(
-                                                        "loading"
-                                                    ))
-                                                )
-                                            }
-                                            ), "_" to 1)),
-                                            _cE("view", _uM("class" to "phone-login-switch", "onClick" to closeSmsLogin), _uA(
-                                                _cE("text", _uM("class" to "phone-way"), "一键登录")
-                                            ))
-                                        ))
+                                    _cV(_component_i_button, _uM("type" to "primary", "onClick" to startUniVerifyLogin, "loading" to nativeLoginLoading.value), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                        return _uA(
+                                            "本机号码一键登录"
+                                        )
                                     }
+                                    ), "_" to 1), 8, _uA(
+                                        "loading"
+                                    ))
                                 ))
                             }
                             ,
@@ -507,7 +333,7 @@ open class GenPagesLoginLogin : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#ffffff")), "banner" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "height" to "20%")), "banner-image" to _uM(".container .banner " to _uM("width" to "180rpx", "height" to "180rpx")), "title" to _uM(".container .banner " to _uM("fontSize" to "40rpx", "fontWeight" to "bold", "color" to "#333333")), "content" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "70rpx", "paddingBottom" to "20rpx", "paddingLeft" to "70rpx")), "other-login" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "30rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "documents" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "marginTop" to "40rpx")), "doc-info-box" to _uM(".container .content .documents " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "whiteSpace" to "nowrap")), "doc-link" to _uM(".container .content .documents .doc-info-box " to _uM("color" to "#007AFF", "fontSize" to "28rpx")), "doc-text" to _uM(".container .content .documents .doc-info-box " to _uM("fontSize" to "28rpx")), "remember-password" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "20rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "i-checkbox" to _uM(".container .content .remember-password " to _uM("display" to "flex", "alignItems" to "center")), "other-way" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "25rpx", "marginTop" to "40rpx", "color" to "#999999")), "noLogin" to _uM(".container .other-way " to _uM("borderRightWidth" to "1rpx", "borderRightStyle" to "solid", "borderRightColor" to "#999999", "paddingRight" to "50rpx")), "BLogin" to _uM(".container .other-way " to _uM("paddingLeft" to "50rpx")), "wechat-login-btn" to _uM(".container " to _uM("!color" to "#ffffff")), "phone-login-switch" to _uM(".container " to _uM("textAlign" to "center", "marginTop" to "28rpx")), "phone-way" to _uM(".container .phone-login-switch " to _uM("fontSize" to "25rpx", "color" to "#8b8c8d")), "sms-mobile-item" to _uM(".container " to _uM("marginBottom" to "20rpx")), "sms-code-item" to _uM(".container " to _uM("marginBottom" to "32rpx")), "sms-code-input" to _uM(".container " to _uM("width" to "100%")), "sms-send-button" to _uM(".container " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "height" to "56rpx", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "20rpx", "borderTopLeftRadius" to "28rpx", "borderTopRightRadius" to "28rpx", "borderBottomRightRadius" to "28rpx", "borderBottomLeftRadius" to "28rpx", "backgroundColor" to "#007AFF", "color" to "#ffffff", "fontSize" to "24rpx", "whiteSpace" to "nowrap")), "sms-send-button-disabled" to _uM(".container " to _uM("backgroundColor" to "#B8D7FF")), "sms-send-button-text" to _uM(".container " to _uM("color" to "#ffffff", "fontSize" to "24rpx", "lineHeight" to "56rpx")), "i-form-item" to _uM(".container " to _uM("paddingTop" to 12, "paddingRight" to 0, "paddingBottom" to 12, "paddingLeft" to 0)))
+                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#ffffff")), "banner" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "height" to "20%")), "banner-image" to _uM(".container .banner " to _uM("width" to "180rpx", "height" to "180rpx")), "title" to _uM(".container .banner " to _uM("fontSize" to "40rpx", "fontWeight" to "bold", "color" to "#333333")), "content" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "70rpx", "paddingBottom" to "20rpx", "paddingLeft" to "70rpx")), "other-login" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "30rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "documents" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "marginTop" to "40rpx")), "doc-info-box" to _uM(".container .content .documents " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "whiteSpace" to "nowrap")), "doc-link" to _uM(".container .content .documents .doc-info-box " to _uM("color" to "#007AFF", "fontSize" to "28rpx")), "doc-text" to _uM(".container .content .documents .doc-info-box " to _uM("fontSize" to "28rpx")), "remember-password" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "20rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "i-checkbox" to _uM(".container .content .remember-password " to _uM("display" to "flex", "alignItems" to "center")), "other-way" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "25rpx", "marginTop" to "40rpx", "color" to "#999999")), "noLogin" to _uM(".container .other-way " to _uM("borderRightWidth" to "1rpx", "borderRightStyle" to "solid", "borderRightColor" to "#999999", "paddingRight" to "50rpx")), "BLogin" to _uM(".container .other-way " to _uM("paddingLeft" to "50rpx")), "wechat-login-btn" to _uM(".container " to _uM("!color" to "#ffffff")), "i-form-item" to _uM(".container " to _uM("paddingTop" to 12, "paddingRight" to 0, "paddingBottom" to 12, "paddingLeft" to 0)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

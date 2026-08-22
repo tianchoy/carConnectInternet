@@ -12,7 +12,8 @@ class RequestOptions extends common_vendor.UTS.UTSType {
           method: { type: "Unknown", optional: true },
           data: { type: "Any", optional: true },
           header: { type: "Unknown", optional: true },
-          showLoading: { type: Boolean, optional: true }
+          showLoading: { type: Boolean, optional: true },
+          showError: { type: Boolean, optional: true }
         };
       },
       name: "RequestOptions"
@@ -26,6 +27,7 @@ class RequestOptions extends common_vendor.UTS.UTSType {
     this.data = this.__props__.data;
     this.header = this.__props__.header;
     this.showLoading = this.__props__.showLoading;
+    this.showError = this.__props__.showError;
     delete this.__props__;
   }
 }
@@ -120,6 +122,7 @@ class RequestFailure extends common_vendor.UTS.UTSType {
   }
 }
 const BASE_URL = "https://gpsapp.zdiot.cn";
+const CLIENT_ID = "428a8310cd442757ae699df5d894f051";
 let isHandlingTokenExpired = false;
 function resetTokenExpiredState() {
   isHandlingTokenExpired = false;
@@ -128,7 +131,7 @@ function handleTokenExpired() {
   if (isHandlingTokenExpired)
     return null;
   isHandlingTokenExpired = true;
-  common_vendor.index.__f__("log", "at api/http.uts:48", "检测到token过期，执行跳转登录页逻辑");
+  common_vendor.index.__f__("log", "at api/http.uts:53", "检测到token过期，执行跳转登录页逻辑");
   common_vendor.index.removeStorageSync("token");
   services_push.clearPushSessionState();
   utils_toast.showAppToast({
@@ -137,14 +140,14 @@ function handleTokenExpired() {
     duration: 2e3
   });
   setTimeout(() => {
-    common_vendor.index.__f__("log", "at api/http.uts:63", "正在跳转到登录页...");
+    common_vendor.index.__f__("log", "at api/http.uts:68", "正在跳转到登录页...");
     common_vendor.index.redirectTo({
       url: "/pages/login/login",
       success: () => {
-        common_vendor.index.__f__("log", "at api/http.uts:67", "跳转登录页成功");
+        common_vendor.index.__f__("log", "at api/http.uts:72", "跳转登录页成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at api/http.uts:70", "跳转登录页失败:", err);
+        common_vendor.index.__f__("log", "at api/http.uts:75", "跳转登录页失败:", err);
         common_vendor.index.reLaunch({
           url: "/pages/login/login"
         });
@@ -154,27 +157,34 @@ function handleTokenExpired() {
 }
 function requestInterceptor(config) {
   const token = common_vendor.index.getStorageSync("token");
-  if (token != null && token.toString().length > 0) {
-    if (config.header == null) {
-      config.header = new common_vendor.UTSJSONObject({});
-    }
-    config.header["token"] = token.toString();
+  const authorization = "Bearer " + (token != null ? token.toString() : "");
+  if (config.header == null) {
+    config.header = new common_vendor.UTSJSONObject({});
   }
+  config.header["Authorization"] = authorization;
+  config.header["clientId"] = CLIENT_ID;
   return config;
 }
 function responseInterceptor(response, config) {
   return response.data;
 }
+function logHttpError(error) {
+  const detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (error.data != null ? error.data.toString() : "");
+  common_vendor.index.__f__("error", "at api/http.uts:127", "[HttpRequest] " + detail);
+}
 function errorHandler(error, config) {
   if (config.showLoading != false) {
     common_vendor.index.hideLoading();
   }
-  common_vendor.index.__f__("log", "at api/http.uts:122", "请求错误详情:", error);
+  logHttpError(error);
+  if (config.showError == false)
+    return null;
+  if (error.statusCode == 401) {
+    handleTokenExpired();
+    return null;
+  }
   if (error.statusCode != 0) {
     switch (error.statusCode) {
-      case 401:
-        handleTokenExpired();
-        break;
       case 403:
         utils_toast.showAppToast({
           title: "没有权限访问",
@@ -214,7 +224,8 @@ function request(options) {
       method: options.method != null ? options.method : "GET",
       data: options.data != null ? options.data : new common_vendor.UTSJSONObject({}),
       header: options.header != null ? options.header : new common_vendor.UTSJSONObject(),
-      showLoading: options.showLoading != false
+      showLoading: options.showLoading != false,
+      showError: options.showError != false
     }
     // 处理完整URL
   );
@@ -260,14 +271,16 @@ function get(url, data = new common_vendor.UTSJSONObject({}), options = new Requ
   method: null,
   data: null,
   header: null,
-  showLoading: null
+  showLoading: null,
+  showError: null
 })) {
   return request(new common_vendor.UTSJSONObject({
     url,
     method: "GET",
     data,
     header: options.header,
-    showLoading: options.showLoading
+    showLoading: options.showLoading,
+    showError: options.showError
   }));
 }
 function post(url, data = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
@@ -275,14 +288,16 @@ function post(url, data = new common_vendor.UTSJSONObject({}), options = new Req
   method: null,
   data: null,
   header: null,
-  showLoading: null
+  showLoading: null,
+  showError: null
 })) {
   return request(new common_vendor.UTSJSONObject({
     url,
     method: "POST",
     data,
     header: options.header,
-    showLoading: options.showLoading
+    showLoading: options.showLoading,
+    showError: options.showError
   }));
 }
 function put(url, data = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
@@ -290,14 +305,16 @@ function put(url, data = new common_vendor.UTSJSONObject({}), options = new Requ
   method: null,
   data: null,
   header: null,
-  showLoading: null
+  showLoading: null,
+  showError: null
 })) {
   return request(new common_vendor.UTSJSONObject({
     url,
     method: "PUT",
     data,
     header: options.header,
-    showLoading: options.showLoading
+    showLoading: options.showLoading,
+    showError: options.showError
   }));
 }
 function remove(url, data = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
@@ -305,14 +322,16 @@ function remove(url, data = new common_vendor.UTSJSONObject({}), options = new R
   method: null,
   data: null,
   header: null,
-  showLoading: null
+  showLoading: null,
+  showError: null
 })) {
   return request(new common_vendor.UTSJSONObject({
     url,
     method: "DELETE",
     data,
     header: options.header,
-    showLoading: options.showLoading
+    showLoading: options.showLoading,
+    showError: options.showError
   }));
 }
 exports.get = get;

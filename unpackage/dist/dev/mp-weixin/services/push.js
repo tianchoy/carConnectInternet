@@ -23,6 +23,8 @@ class NormalizedPushEvent extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+const pushRegistrationIdReadyListeners = [];
+const pushSessionAuthenticatedListeners = [];
 const PUSH_PROVIDER_KEY = "push_provider";
 const PUSH_PENDING_MESSAGE_ID_KEY_PREFIX = "push.pending_message_id.";
 const PUSH_MESSAGE_STALE_KEY_PREFIX = "push.message_stale.";
@@ -49,7 +51,25 @@ function sessionKey(provider) {
   return PUSH_SESSION_KEY_PREFIX + provider;
 }
 function pushDebug(provider, message) {
-  common_vendor.index.__f__("error", "at services/push.uts:82", "[PushManager][" + provider + "] " + message);
+  common_vendor.index.__f__("error", "at services/push.uts:88", "[PushManager][" + provider + "] " + message);
+}
+function notifyPushRegistrationIdReady(registrationId) {
+  for (let index = 0; index < pushRegistrationIdReadyListeners.length; index++) {
+    try {
+      pushRegistrationIdReadyListeners[index](registrationId);
+    } catch (error) {
+      common_vendor.index.__f__("error", "at services/push.uts:96", "[PushManager] RegistrationID 就绪监听执行失败:", error);
+    }
+  }
+}
+function notifyPushSessionAuthenticated(registrationId) {
+  for (let index = 0; index < pushSessionAuthenticatedListeners.length; index++) {
+    try {
+      pushSessionAuthenticatedListeners[index](registrationId);
+    } catch (error) {
+      common_vendor.index.__f__("error", "at services/push.uts:106", "[PushManager] 已认证会话监听执行失败:", error);
+    }
+  }
 }
 function stringValue(value = null) {
   if (value == null)
@@ -224,7 +244,9 @@ class PushManager {
     if (!this.initialized)
       this.init();
     common_vendor.index.setStorageSync(sessionKey(this.provider), "authenticated");
+    const cachedRegistrationId = this.getCachedRegistrationId();
     this.refreshRegistrationId();
+    notifyPushSessionAuthenticated(cachedRegistrationId);
   }
   clearSessionState() {
     common_vendor.index.removeStorageSync(sessionKey(this.provider));
@@ -297,7 +319,8 @@ class PushManager {
     this.registrationRetryCount = 0;
     common_vendor.index.setStorageSync(registrationIdKey(this.provider), registrationId);
     const registrationIdLabel = this.provider == "unipush" ? "UniPush CID 已就绪" : "JPush RegistrationID 已就绪";
-    pushDebug(this.provider, registrationIdLabel + ": " + registrationId);
+    pushDebug(this.provider, registrationIdLabel);
+    notifyPushRegistrationIdReady(registrationId);
   }
   requestUniPushRegistrationId(adapter) {
     this.registrationRequesting = true;
@@ -346,7 +369,15 @@ function consumePendingMessageId() {
 function consumePushStaleFlag() {
   return pushManager.consumeStaleFlag();
 }
+function onPushRegistrationIdReady(listener) {
+  pushRegistrationIdReadyListeners.push(listener);
+}
+function onPushSessionAuthenticated(listener) {
+  pushSessionAuthenticatedListeners.push(listener);
+}
 exports.clearPushSessionState = clearPushSessionState;
 exports.consumePendingMessageId = consumePendingMessageId;
 exports.consumePushStaleFlag = consumePushStaleFlag;
+exports.onPushRegistrationIdReady = onPushRegistrationIdReady;
+exports.onPushSessionAuthenticated = onPushSessionAuthenticated;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/services/push.js.map

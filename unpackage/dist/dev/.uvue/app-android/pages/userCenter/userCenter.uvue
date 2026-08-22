@@ -31,8 +31,8 @@ const __sfc__ = defineComponent({
                 const res = await getUserInfo();
                 if (res.code == 200 && res.data != null) {
                     userInfo.value = {
-                        avatar: res.data!.getString('avatar', '/static/avatar.png'),
-                        nickname: res.data!.getString('nickname', '')
+                        avatar: res.data.getString('avatar', '/static/avatar.png'),
+                        nickname: res.data.getString('nickname', '')
                     };
                 }
                 else {
@@ -40,7 +40,7 @@ const __sfc__ = defineComponent({
                 }
                 const resCars = await getUserDeviceList(params);
                 if (resCars.code == 200 && resCars.data != null) {
-                    carsnumber.value = resCars.data!.totalCount;
+                    carsnumber.value = resCars.data.totalCount;
                 }
                 else {
                     showAppToast({ title: resCars.msg != "" ? resCars.msg : '获取车辆数量失败', icon: 'none' } as ShowToastOptions);

@@ -98,6 +98,14 @@ missing = [value for value in required if value not in swift]
 if missing:
     raise SystemExit('HBuilderX 生成的 JPush Swift 缺少预期实现：' + ', '.join(missing))
 
+registration_call = 'JPUSHService.register(forRemoteNotificationConfig:'
+if swift.count(registration_call) != 1:
+    raise SystemExit('HBuilderX 生成的 JPush Swift 必须只在运行时初始化中注册一次远程通知。')
+if 'delegate: JGPushTool' in swift:
+    raise SystemExit('HBuilderX 生成的 JPush Swift 不得在应用启动 Hook 中注册远程通知。')
+if 'JGPushModule setup started' not in swift or 'JGPushModule notification registration started' not in swift:
+    raise SystemExit('HBuilderX 生成的 JPush Swift 缺少预期的单次初始化生命周期实现。')
+
 for target in target_configs:
     runtime = json.loads(target.read_text(encoding='utf-8'))
     hooks = runtime.get('hooksClasses')

@@ -126,14 +126,10 @@ export class JGPushIOSPlugin implements UTSiOSHookProxy {
 			return true
 		}
 
-		log("JGPushIOSPlugin applicationDidFinishLaunchingWithOptions")
-		// 保存启动选项供后续使用
+		log("JGPushIOSPlugin captured launch options")
+		// JPush is configured and requests notification permission only after the
+		// UniApp runtime starts and a root view controller is available.
 		JGPushTool.launchOptions = launchOptions
-
-		// 注册方法在DidFinishLaunching方法写一遍，否则点击通知冷启动app不会走系统的通知点击回调反复。
-		const entity = JPUSHRegisterEntity()
-		entity.types = 0
-		JPUSHService.register(forRemoteNotificationConfig = entity, delegate = JGPushTool)
 
 		return true
 	}
@@ -148,7 +144,7 @@ export class JGPushIOSPlugin implements UTSiOSHookProxy {
 			return
 		}
 
-		log("JGPushIOSPlugin didRegisterForRemoteNotifications")
+		log("JGPushIOSPlugin received APNs device token")
 		JGPushTool.registerDeviceToken(deviceToken)
 	}
 
@@ -156,14 +152,14 @@ export class JGPushIOSPlugin implements UTSiOSHookProxy {
 	 * 远程通知注册失败时的回调
 	 */
 	didFailToRegisterForRemoteNotifications(error : NSError | null) {
-		log("JGPushIOSPlugin didFailToRegisterForRemoteNotifications", error)
+		log("JGPushIOSPlugin APNs registration failed")
 	}
 
 	/**
 	 * 收到远程通知时的回调
 	 */
 	didReceiveRemoteNotification(userInfo : Map<AnyHashable, any> | null) {
-		log("JGPushIOSPlugin didReceiveRemoteNotification", userInfo)
+		log("JGPushIOSPlugin received remote notification")
 	}
 }
 
@@ -173,12 +169,18 @@ export class JGPushIOSPlugin implements UTSiOSHookProxy {
 class JGPushModule implements JPUSHRegisterDelegate {
 
 	launchOptions : Map<UIApplication.LaunchOptionsKey, any> | null = null
+	private initialized : boolean = false
 
 	/**
 	 * 初始化极光推送
 	 */
 	initPush(param : InitPushParams) {
-		log("JGPushModule initPush", param)
+		if (this.initialized) {
+			log("JGPushModule initialization already completed")
+			return
+		}
+		this.initialized = true
+		log("JGPushModule setup started")
 
 		const method = Selector("didReceiveCustomMessage:")
 		NotificationCenter.default.addObserver(this, selector = method, name = NSNotification.Name.jpfNetworkDidReceiveMessage, object = null)
@@ -191,19 +193,18 @@ class JGPushModule implements JPUSHRegisterDelegate {
 		const method2 = Selector("networkDidClose:")
 		NotificationCenter.default.addObserver(this, selector = method2, name = NSNotification.Name.jpfNetworkDidClose, object = null)
 
-		// 初始化极光推送服务
 		JPUSHService.setup(withOption = this.launchOptions, appKey = param.appkey, channel = param.channel, apsForProduction = param.isProduction, advertisingIdentifier = param.advertisingId)
+		log("JGPushModule setup completed")
 
-		// 创建推送注册实体
 		const entity = JPUSHRegisterEntity()
 		const types = new JPAuthorizationOptions(rawValue = (JPAuthorizationOptions.alert.rawValue |
 			JPAuthorizationOptions.sound.rawValue |
 			JPAuthorizationOptions.badge.rawValue))
 		entity.types = Int(types.rawValue)
-		// 注册远程通知配置
+		log("JGPushModule notification registration started")
 		JPUSHService.register(forRemoteNotificationConfig = entity, delegate = this)
 
-		log("极光推送SDK初始化完成")
+		log("JGPushModule initialization completed")
 	}
 
 	/**
@@ -222,7 +223,7 @@ class JGPushModule implements JPUSHRegisterDelegate {
 	 * 收到自定义消息回调
 	 */
 	@objc didReceiveCustomMessage(notification : Notification) {
-		log("JGPushModule didReceiveCustomMessage", notification)
+		log("JGPushModule received custom message")
 		const userInfo = notification.userInfo
 
 		if (userInfo !== null) {
@@ -237,7 +238,7 @@ class JGPushModule implements JPUSHRegisterDelegate {
 	 * 网络连接成功回调
 	 */
 	@objc networkDidLogin(notification : Notification) {
-		log("JGPushModule networkDidLogin", notification)
+		log("JGPushModule network connected")
 
 		eventCallbackManager.triggerEvent("onConnected", "true")
 	}
@@ -246,7 +247,7 @@ class JGPushModule implements JPUSHRegisterDelegate {
 	 * 网络连接关闭回调
 	 */
 	@objc networkDidClose(notification : Notification) {
-		log("JGPushModule networkDidClose", notification)
+		log("JGPushModule network disconnected")
 
 		eventCallbackManager.triggerEvent("onConnected", "false")
 	}
@@ -329,8 +330,8 @@ export function setEventCallBack(param : EventCallBackParams) : void {
 // MARK: - 极光推送API方法
 
 export function initPush(param : InitPushParams) : void {
-	log("initPush", param);
-	JGPushTool.initPush(param);
+	log("initPush")
+	JGPushTool.initPush(param)
 }
 
 /**
@@ -380,7 +381,8 @@ export function getRegistrationIdAsync(callback : (result : RegistrationIdResult
 			code: Number(resCode),
 			registrationId: registrationId === null ? "" : registrationId!
 		}
-		log("getRegistrationIdAsync completion", result)
+		log(registrationId === null || registrationId == "" ? "JPush RegistrationID callback returned empty ID" : "JPush RegistrationID callback completed")
+		if (resCode != 0) log("JPush RegistrationID callback error code", Number(resCode))
 		callback(result)
 	})
 }

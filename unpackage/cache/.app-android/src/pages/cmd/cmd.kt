@@ -184,7 +184,7 @@ open class GenPagesCmdCmd : BasePage {
                             loading.value = true
                             val response = await(getCmdAction())
                             if (response.code == 200 && response.data != null) {
-                                commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data!!)
+                                commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data)
                             } else {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
@@ -228,7 +228,7 @@ open class GenPagesCmdCmd : BasePage {
                             loading.value = true
                             val response = await(getCmdByMid(_uO("imei" to imei.value, "cmdmId" to typeId)))
                             if (response.code == 200 && response.data != null) {
-                                commands.value = response.data!!
+                                commands.value = response.data
                             } else {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg

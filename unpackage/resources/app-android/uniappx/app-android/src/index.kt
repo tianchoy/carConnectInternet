@@ -19,8 +19,10 @@ import android.util.Log as AndroidLog
 import uts.sdk.modules.jgJpushU.EventCallBackParams
 import uts.sdk.modules.externalMapNavigation.ExternalMapNavigationParams
 import io.dcloud.uniapp.extapi.exit as uni_exit
+import io.dcloud.uniapp.extapi.getAppBaseInfo as uni_getAppBaseInfo
 import io.dcloud.uniapp.extapi.getPushClientId as uni_getPushClientId
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
+import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.getUniVerifyManager as uni_getUniVerifyManager
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import uts.sdk.modules.jgJpushU.init as initAndroidJPush
@@ -54,6 +56,10 @@ open class NormalizedPushEvent (
     @JsonNotNull
     open var payload: Any,
 ) : UTSObject()
+typealias PushRegistrationIdReadyListener = (registrationId: String) -> Unit
+typealias PushSessionAuthenticatedListener = (registrationId: String) -> Unit
+val pushRegistrationIdReadyListeners: UTSArray<PushRegistrationIdReadyListener> = _uA()
+val pushSessionAuthenticatedListeners: UTSArray<PushSessionAuthenticatedListener> = _uA()
 val PUSH_PROVIDER_KEY = "push_provider"
 val PUSH_LOCAL_PROVIDER_OVERRIDE_KEY = "push_local_provider_override"
 val PUSH_PENDING_MESSAGE_ID_KEY_PREFIX = "push.pending_message_id."
@@ -84,6 +90,34 @@ fun sessionKey(provider: PushProviderName): String {
 fun pushDebug(provider: PushProviderName, message: String): Unit {
     AndroidLog.e("PushManager", "[" + provider + "] " + message)
     console.error("[PushManager][" + provider + "] " + message)
+}
+fun notifyPushRegistrationIdReady(registrationId: String): Unit {
+    run {
+        var index: Number = 0
+        while(index < pushRegistrationIdReadyListeners.length){
+            try {
+                pushRegistrationIdReadyListeners[index](registrationId)
+            }
+             catch (error: Throwable) {
+                console.error("[PushManager] RegistrationID 就绪监听执行失败:", error)
+            }
+            index++
+        }
+    }
+}
+fun notifyPushSessionAuthenticated(registrationId: String): Unit {
+    run {
+        var index: Number = 0
+        while(index < pushSessionAuthenticatedListeners.length){
+            try {
+                pushSessionAuthenticatedListeners[index](registrationId)
+            }
+             catch (error: Throwable) {
+                console.error("[PushManager] 已认证会话监听执行失败:", error)
+            }
+            index++
+        }
+    }
 }
 fun stringValue(value: Any): String {
     if (value == null) {
@@ -238,7 +272,7 @@ open class UniPushAdapter : PushAdapter {
                     onFailure("CID 为空")
                     return
                 }
-                pushDebug(this.provider, "UniPush CID: " + registrationId)
+                pushDebug(this.provider, "UniPush CID 已就绪")
                 onSuccess(registrationId)
             }
             , fail = fun(error: Any){
@@ -367,7 +401,9 @@ open class PushManager {
             this.init()
         }
         uni_setStorageSync(sessionKey(this.provider), "authenticated")
+        val cachedRegistrationId = this.getCachedRegistrationId()
         this.refreshRegistrationId()
+        notifyPushSessionAuthenticated(cachedRegistrationId)
     }
     open fun clearSessionState(): Unit {
         uni_removeStorageSync(sessionKey(this.provider))
@@ -460,7 +496,8 @@ open class PushManager {
         } else {
             "JPush RegistrationID 已就绪"
         }
-        pushDebug(this.provider, registrationIdLabel + ": " + registrationId)
+        pushDebug(this.provider, registrationIdLabel)
+        notifyPushRegistrationIdReady(registrationId)
     }
     private fun requestUniPushRegistrationId(adapter: UniPushAdapter): Unit {
         this.registrationRequesting = true
@@ -530,6 +567,697 @@ fun consumePendingMessageId(): String {
 }
 fun consumePushStaleFlag(): Boolean {
     return pushManager.consumeStaleFlag()
+}
+fun onPushRegistrationIdReady(listener: PushRegistrationIdReadyListener): Unit {
+    pushRegistrationIdReadyListeners.push(listener)
+}
+fun onPushSessionAuthenticated(listener: PushSessionAuthenticatedListener): Unit {
+    pushSessionAuthenticatedListeners.push(listener)
+}
+fun showAppToast(options: ShowToastOptions): Unit {
+    uni_showToast(options)
+}
+open class RequestOptions__1 (
+    open var url: String? = null,
+    open var method: String? = null,
+    open var data: Any? = null,
+    open var header: UTSJSONObject? = null,
+    open var showLoading: Boolean? = null,
+    open var showError: Boolean? = null,
+) : UTSObject()
+open class HttpError (
+    @JsonNotNull
+    open var statusCode: Number,
+    @JsonNotNull
+    open var message: String,
+    open var data: Any? = null,
+) : UTSObject()
+val BASE_URL = "https://gpsapp.zdiot.cn"
+val CLIENT_ID = "428a8310cd442757ae699df5d894f051"
+var isHandlingTokenExpired = false
+fun resetTokenExpiredState(): Unit {
+    isHandlingTokenExpired = false
+}
+fun handleTokenExpired(): Unit {
+    if (isHandlingTokenExpired) {
+        return
+    }
+    isHandlingTokenExpired = true
+    console.log("检测到token过期，执行跳转登录页逻辑")
+    uni_removeStorageSync("token")
+    clearPushSessionState()
+    showAppToast(ShowToastOptions(title = "登录已过期，请重新登录", icon = "none", duration = 2000))
+    setTimeout(fun(){
+        console.log("正在跳转到登录页...")
+        uni_redirectTo(RedirectToOptions(url = "/pages/login/login", success = fun(_){
+            console.log("跳转登录页成功")
+        }
+        , fail = fun(err){
+            console.log("跳转登录页失败:", err)
+            uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
+        }
+        ))
+    }
+    , 500)
+}
+fun requestInterceptor(config: RequestOptions__1): RequestOptions__1 {
+    val token = uni_getStorageSync("token")
+    val authorization = "Bearer " + (if (token != null) {
+        token.toString()
+    } else {
+        ""
+    }
+    )
+    if (config.header == null) {
+        config.header = UTSJSONObject()
+    }
+    config.header!!.set("Authorization", authorization)
+    config.header!!.set("clientId", CLIENT_ID)
+    return config
+}
+fun responseInterceptor(response: RequestSuccess<Any>, config: RequestOptions__1): Any {
+    return response.data!!
+}
+fun logHttpError(error: HttpError): Unit {
+    val detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (if (error.data != null) {
+        error.data.toString()
+    } else {
+        ""
+    }
+    )
+    AndroidLog.e("HttpRequest", detail)
+    console.error("[HttpRequest] " + detail)
+}
+fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
+    if (config.showLoading != false) {
+        uni_hideLoading(null)
+    }
+    logHttpError(error)
+    if (config.showError == false) {
+        return
+    }
+    if (error.statusCode == 401) {
+        handleTokenExpired()
+        return
+    }
+    if (error.statusCode != 0) {
+        when (error.statusCode) {
+            403 -> 
+                showAppToast(ShowToastOptions(title = "没有权限访问", icon = "none"))
+            404 -> 
+                showAppToast(ShowToastOptions(title = "请求资源不存在", icon = "none"))
+            500 -> 
+                showAppToast(ShowToastOptions(title = "服务器错误", icon = "none"))
+            else -> 
+                showAppToast(ShowToastOptions(title = if (error.message != null) {
+                    error.message
+                } else {
+                    "请求错误: " + error.statusCode
+                }, icon = "none"))
+        }
+    } else {
+        showAppToast(ShowToastOptions(title = "网络错误，请检查网络连接", icon = "none"))
+    }
+}
+fun request(options: RequestOptions__1): UTSPromise<Any> {
+    val requestUrl = if (options.url != null) {
+        options.url!!
+    } else {
+        ""
+    }
+    val config = RequestOptions__1(url = requestUrl, method = if (options.method != null) {
+        options.method
+    } else {
+        "GET"
+    }
+    , data = if (options.data != null) {
+        options.data
+    } else {
+        _uO()
+    }
+    , header = if (options.header != null) {
+        options.header
+    } else {
+        UTSJSONObject()
+    }
+    , showLoading = options.showLoading != false, showError = options.showError != false)
+    if (!config.url!!.startsWith("http")) {
+        config.url = BASE_URL + config.url!!
+    }
+    val processedConfig = requestInterceptor(config)
+    return UTSPromise<Any>(fun(resolve, reject){
+        uni_request<Any>(RequestOptions(url = processedConfig.url!!, method = processedConfig.method, data = processedConfig.data, header = processedConfig.header, success = fun(res: RequestSuccess<Any>){
+            val statusCode = res.statusCode
+            if (statusCode == 200) {
+                val data = responseInterceptor(res, processedConfig)
+                resolve(data)
+            } else {
+                val httpError = HttpError(statusCode = statusCode, message = "请求失败: " + statusCode, data = res.data)
+                errorHandler(httpError, processedConfig)
+                reject(httpError)
+            }
+        }
+        , fail = fun(error: RequestFail){
+            val httpError = HttpError(statusCode = 0, message = if (error.errMsg != null) {
+                error.errMsg
+            } else {
+                "网络请求失败"
+            }
+            , data = error)
+            errorHandler(httpError, processedConfig)
+            reject(httpError)
+        }
+        ))
+    }
+    )
+}
+fun get(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
+    return request(RequestOptions__1(url = url, method = "GET", data = data, header = options.header, showLoading = options.showLoading, showError = options.showError))
+}
+fun post(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
+    return request(RequestOptions__1(url = url, method = "POST", data = data, header = options.header, showLoading = options.showLoading, showError = options.showError))
+}
+fun postSilently(url: String, data: Any): UTSPromise<Any> {
+    return request(RequestOptions__1(url = url, method = "POST", data = data, showLoading = false, showError = false))
+}
+fun put(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
+    return request(RequestOptions__1(url = url, method = "PUT", data = data, header = options.header, showLoading = options.showLoading, showError = options.showError))
+}
+fun remove(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
+    return request(RequestOptions__1(url = url, method = "DELETE", data = data, header = options.header, showLoading = options.showLoading, showError = options.showError))
+}
+fun asJSONObject(value: Any): UTSJSONObject {
+    if (value == null) {
+        return UTSJSONObject()
+    }
+    return value as UTSJSONObject
+}
+fun getResponseCode(response: UTSJSONObject): Number {
+    return response.getNumber("code", -1)
+}
+fun getResponseMessage(response: UTSJSONObject): String {
+    val msg = response.getString("msg", "")
+    return if (msg != "") {
+        msg
+    } else {
+        response.getString("message", "")
+    }
+}
+fun getResponseDataObject(response: UTSJSONObject): UTSJSONObject {
+    val data = response.getJSON("data")
+    return if (data != null) {
+        data
+    } else {
+        UTSJSONObject()
+    }
+}
+fun getResponseDataArray(response: UTSJSONObject): UTSArray<UTSJSONObject> {
+    val data = response.getArray<UTSJSONObject>("data")
+    return if (data != null) {
+        data
+    } else {
+        _uA()
+    }
+}
+val loginUrl = "/sys/login"
+val devicePos = "/gps/lastPosition?deptId="
+val trackPos = "/gps/trackPos?"
+val userinfo = "/sys/user/info"
+val addDeviceUrl = "/userDevice/add"
+val userDeviceList = "/userDevice/list"
+val uniVerifyLoginUrl = "/auth/login"
+val changePSW = "/sys/user/password"
+val userMsgList = "/usermessage/listForUser"
+val msgState = "/usermessage/detail/"
+val updateDevice = "/device/update"
+val deviceDetail = "/device/info/"
+val logoutUrl = "/sys/logout"
+val sendcmd = "/command/sendCmd"
+val getGeofence = "/geofence"
+val deleteGeo = "/geofence/"
+val unbindDeviceList = "/device/unbindGeofenceList"
+val bindDeviceList = "/device/bindGeofenceList"
+val bindGeofence = "/geofence/bind"
+val unbindGeofence = "/geofence/unbind"
+val deleteDevice = "/userDevice/del"
+val cmdActionUrl = "/command/cmdAction"
+val cmdByMidUrl = "/command/cmdByMid"
+val cmdSendUrl = "/command/sendCmd"
+val pushBindUrl = "/app/push/bind"
+open class BasicResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+) : UTSObject()
+open class PushDeviceBindRequest (
+    @JsonNotNull
+    open var registrationId: String,
+    @JsonNotNull
+    open var platform: String,
+    @JsonNotNull
+    open var deviceName: String,
+    @JsonNotNull
+    open var appVersion: String,
+) : UTSObject()
+open class JsonDataResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
+) : UTSObject()
+typealias UniVerifyLoginRequest = UTSJSONObject
+open class DevicePositionResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSArray<UTSJSONObject>,
+) : UTSObject()
+open class TrackPosResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
+) : UTSObject()
+open class UserInfoResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
+) : UTSObject()
+open class UserDeviceListData (
+    @JsonNotNull
+    open var list: UTSArray<UTSJSONObject>,
+    @JsonNotNull
+    open var totalPage: Number,
+    @JsonNotNull
+    open var totalCount: Number,
+) : UTSObject()
+open class UserDeviceListResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UserDeviceListData,
+) : UTSObject()
+open class DeviceDetailResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
+) : UTSObject()
+open class GeofenceResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSArray<UTSJSONObject>,
+) : UTSObject()
+open class DevicePageData (
+    @JsonNotNull
+    open var list: UTSArray<UTSJSONObject>,
+    @JsonNotNull
+    open var totalPage: Number,
+    @JsonNotNull
+    open var totalCount: Number,
+) : UTSObject()
+open class DevicePageResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: DevicePageData,
+) : UTSObject()
+open class CommandListResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSArray<UTSJSONObject>,
+) : UTSObject()
+open class SendCmdResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: String,
+) : UTSObject()
+open class ChangePasswordResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+) : UTSObject()
+open class MessageResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UserDeviceListData,
+) : UTSObject()
+fun basicResponse(raw: Any): BasicResponse {
+    val response = asJSONObject(raw)
+    return BasicResponse(code = getResponseCode(response), msg = getResponseMessage(response))
+}
+fun jsonDataResponse(raw: Any): JsonDataResponse {
+    val response = asJSONObject(raw)
+    return JsonDataResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataObject(response))
+}
+fun devicePageResponse(raw: Any): DevicePageResponse {
+    val response = asJSONObject(raw)
+    val data = getResponseDataObject(response)
+    val list = data.getArray<UTSJSONObject>("list")
+    return DevicePageResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = DevicePageData(list = if (list != null) {
+        list
+    } else {
+        _uA()
+    }
+    , totalPage = data.getNumber("totalPage", 0), totalCount = data.getNumber("totalCount", 0)))
+}
+fun userDevicePageResponse(raw: Any): UserDeviceListResponse {
+    val page = devicePageResponse(raw)
+    return UserDeviceListResponse(code = page.code, msg = page.msg, data = UserDeviceListData(list = page.data.list, totalPage = page.data.totalPage, totalCount = page.data.totalCount))
+}
+fun messagePageResponse(raw: Any): MessageResponse {
+    val page = devicePageResponse(raw)
+    return MessageResponse(code = page.code, msg = page.msg, data = UserDeviceListData(list = page.data.list, totalPage = page.data.totalPage, totalCount = page.data.totalCount))
+}
+fun userInfoResponse(raw: Any): UserInfoResponse {
+    val response = jsonDataResponse(raw)
+    return UserInfoResponse(code = response.code, msg = response.msg, data = response.data)
+}
+fun deviceDetailResponse(raw: Any): DeviceDetailResponse {
+    val response = jsonDataResponse(raw)
+    return DeviceDetailResponse(code = response.code, msg = response.msg, data = response.data)
+}
+fun changePasswordResponse(raw: Any): ChangePasswordResponse {
+    val response = basicResponse(raw)
+    return ChangePasswordResponse(code = response.code, msg = response.msg)
+}
+val login = fun(data: UTSJSONObject): UTSPromise<JsonDataResponse> {
+    return post(loginUrl, data).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
+    }
+    )
+}
+val logout = fun(): UTSPromise<BasicResponse> {
+    return post(logoutUrl).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val sendCommand = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return post(sendcmd, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getDevicePos = fun(data: UTSJSONObject): UTSPromise<DevicePositionResponse> {
+    return get(devicePos, data).then(fun(raw: Any): DevicePositionResponse {
+        val response = asJSONObject(raw)
+        return DevicePositionResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
+    }
+    )
+}
+val getTrackPos = fun(data: UTSJSONObject): UTSPromise<TrackPosResponse> {
+    return get(trackPos, data).then(fun(raw: Any): TrackPosResponse {
+        val response = asJSONObject(raw)
+        return TrackPosResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataObject(response))
+    }
+    )
+}
+val getUserInfo = fun(): UTSPromise<UserInfoResponse> {
+    return get(userinfo).then(fun(raw: Any): UserInfoResponse {
+        return userInfoResponse(raw)
+    }
+    )
+}
+val addDevice = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return post(addDeviceUrl, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val delDevice = fun(imei: String): UTSPromise<BasicResponse> {
+    return post(deleteDevice, _uO("imei" to imei)).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getUserDeviceList = fun(data: UTSJSONObject): UTSPromise<UserDeviceListResponse> {
+    return post(userDeviceList, data).then(fun(raw: Any): UserDeviceListResponse {
+        return userDevicePageResponse(raw)
+    }
+    )
+}
+val uniVerifyLogin = fun(data: UniVerifyLoginRequest): UTSPromise<JsonDataResponse> {
+    return post(uniVerifyLoginUrl, data).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
+    }
+    )
+}
+val changePassWord = fun(data: UTSJSONObject): UTSPromise<ChangePasswordResponse> {
+    return put(changePSW, data).then(fun(raw: Any): ChangePasswordResponse {
+        return changePasswordResponse(raw)
+    }
+    )
+}
+val getUserMsgList = fun(data: UTSJSONObject?): UTSPromise<MessageResponse> {
+    return (if (data != null) {
+        get(userMsgList, data)
+    } else {
+        get(userMsgList)
+    }
+    ).then(fun(raw: Any): MessageResponse {
+        return messagePageResponse(raw)
+    }
+    )
+}
+val setMsgState = fun(msgId: String): UTSPromise<BasicResponse> {
+    return get("" + msgState + msgId).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val editDeviceInfo = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return put(updateDevice, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getDeviceDetail = fun(deviceId: String): UTSPromise<DeviceDetailResponse> {
+    return get("" + deviceDetail + deviceId).then(fun(raw: Any): DeviceDetailResponse {
+        return deviceDetailResponse(raw)
+    }
+    )
+}
+val getGeofenceList = fun(): UTSPromise<GeofenceResponse> {
+    return get(getGeofence).then(fun(raw: Any): GeofenceResponse {
+        val response = asJSONObject(raw)
+        return GeofenceResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
+    }
+    )
+}
+val addGeofence = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return post(getGeofence, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val updateGeofence = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return put(getGeofence, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val deleteGeofence = fun(id: String): UTSPromise<BasicResponse> {
+    return remove("" + deleteGeo + id).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getUnboundDevices = fun(params: UTSJSONObject): UTSPromise<DevicePageResponse> {
+    return get(unbindDeviceList, params).then(fun(raw: Any): DevicePageResponse {
+        return devicePageResponse(raw)
+    }
+    )
+}
+val getBoundDevices = fun(params: UTSJSONObject): UTSPromise<DevicePageResponse> {
+    return get(bindDeviceList, params).then(fun(raw: Any): DevicePageResponse {
+        return devicePageResponse(raw)
+    }
+    )
+}
+val bindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return post(bindGeofence, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val unbindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return remove(unbindGeofence, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getCmdAction = fun(): UTSPromise<CommandListResponse> {
+    return get(cmdActionUrl).then(fun(raw: Any): CommandListResponse {
+        val response = asJSONObject(raw)
+        return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
+    }
+    )
+}
+val getCmdByMid = fun(data: UTSJSONObject): UTSPromise<CommandListResponse> {
+    return get(cmdByMidUrl, data).then(fun(raw: Any): CommandListResponse {
+        val response = asJSONObject(raw)
+        return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
+    }
+    )
+}
+val sendCmd = fun(data: UTSJSONObject): UTSPromise<SendCmdResponse> {
+    return post(cmdSendUrl, data).then(fun(raw: Any): SendCmdResponse {
+        val response = asJSONObject(raw)
+        return SendCmdResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = response.getString("data", ""))
+    }
+    )
+}
+val bindPushDevice = fun(data: PushDeviceBindRequest): UTSPromise<BasicResponse> {
+    val requestData = UTSJSONObject()
+    requestData.set("registrationId", data.registrationId)
+    requestData.set("platform", data.platform)
+    requestData.set("deviceName", data.deviceName)
+    requestData.set("appVersion", data.appVersion)
+    return postSilently(pushBindUrl, requestData).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+var initialized = false
+var binding = false
+var bindingSessionKey = ""
+var pendingRegistrationId = ""
+var boundSessionKey = ""
+fun pushBindingDebug(message: String): Unit {
+    AndroidLog.i("PushBinding", message)
+    console.log("[PushBinding] " + message)
+}
+fun pushBindingWarn(message: String): Unit {
+    AndroidLog.w("PushBinding", message)
+    console.warn("[PushBinding] " + message)
+}
+fun getPushBindPlatform(): String {
+    return "android"
+}
+fun getDeviceName(): String {
+    try {
+        val systemInfo = uni_getSystemInfoSync()
+        return systemInfo.deviceModel ?: ""
+    }
+     catch (error: Throwable) {
+        pushBindingWarn("获取设备型号失败")
+        return ""
+    }
+}
+fun getAppVersion(): String {
+    try {
+        return uni_getAppBaseInfo(null).appVersion ?: ""
+    }
+     catch (error: Throwable) {
+        pushBindingWarn("获取应用版本失败")
+        return ""
+    }
+}
+fun getLoginToken(): String {
+    val value = uni_getStorageSync("token")
+    return if (value == null) {
+        ""
+    } else {
+        value.toString()
+    }
+}
+fun bindRegistrationId(registrationId: String): Unit {
+    if (registrationId == "") {
+        return
+    }
+    val token = getLoginToken()
+    if (token == "") {
+        pushBindingDebug("RegistrationID 已就绪，等待用户登录")
+        return
+    }
+    val platform = getPushBindPlatform()
+    if (platform == "") {
+        return
+    }
+    val sessionKey = token + ":" + registrationId
+    if (binding) {
+        if (bindingSessionKey != sessionKey) {
+            pendingRegistrationId = registrationId
+        }
+        return
+    }
+    if (boundSessionKey == sessionKey) {
+        return
+    }
+    binding = true
+    bindingSessionKey = sessionKey
+    val data = PushDeviceBindRequest(registrationId = registrationId, platform = platform, deviceName = getDeviceName(), appVersion = getAppVersion())
+    pushBindingDebug("开始绑定推送设备，platform=" + platform)
+    bindPushDevice(data).then(fun(response){
+        if (response.code == 200) {
+            boundSessionKey = sessionKey
+            pushBindingDebug("推送设备绑定成功，platform=" + platform)
+            return
+        }
+        pushBindingWarn("推送设备绑定失败，稍后将重试。code=" + response.code + ", msg=" + response.msg)
+    }
+    ).`catch`(fun(){
+        pushBindingWarn("推送设备绑定请求失败，稍后将重试。")
+    }
+    ).`finally`(fun(){
+        binding = false
+        bindingSessionKey = ""
+        val nextRegistrationId = pendingRegistrationId
+        pendingRegistrationId = ""
+        if (nextRegistrationId != "") {
+            bindRegistrationId(nextRegistrationId)
+        }
+    }
+    )
+}
+fun initPushBinding(): Unit {
+    if (initialized) {
+        return
+    }
+    initialized = true
+    onPushRegistrationIdReady(fun(registrationId: String): Unit {
+        bindRegistrationId(registrationId)
+    }
+    )
+    onPushSessionAuthenticated(fun(registrationId: String): Unit {
+        if (registrationId == "") {
+            pushBindingDebug("用户已登录，但尚无缓存 RegistrationID")
+            return
+        }
+        pushBindingDebug("用户已登录，使用缓存 RegistrationID 绑定推送设备")
+        bindRegistrationId(registrationId)
+    }
+    )
 }
 typealias CameraPermissionStatus = String
 typealias NotificationPermissionStatus = CameraPermissionStatus
@@ -634,6 +1362,7 @@ open class GenApp : BaseApp {
         onLaunch(fun(_: OnLaunchOptions) {
             console.log("App onLaunch")
             checkForUpdates()
+            initPushBinding()
             initPush()
             clearPushBadge()
             ensureNotificationPermission(fun(status){
@@ -691,9 +1420,6 @@ val GenAppClass = CreateVueAppComponent(GenApp::class.java, fun(): VueComponentO
     return GenApp(instance)
 }
 )
-fun showAppToast(options: ShowToastOptions): Unit {
-    uni_showToast(options)
-}
 open class Coordinate (
     @JsonNotNull
     open var lat: Number,
@@ -3938,540 +4664,6 @@ val default__4 = "/static/msg.png"
 val default__5 = "/static/pay.png"
 val default__6 = "/static/online.png"
 val default__7 = "/static/del.png"
-open class RequestOptions__1 (
-    open var url: String? = null,
-    open var method: String? = null,
-    open var data: Any? = null,
-    open var header: UTSJSONObject? = null,
-    open var showLoading: Boolean? = null,
-) : UTSObject()
-open class HttpError (
-    @JsonNotNull
-    open var statusCode: Number,
-    @JsonNotNull
-    open var message: String,
-    open var data: Any? = null,
-) : UTSObject()
-val BASE_URL = "https://gpsapp.zdiot.cn"
-var isHandlingTokenExpired = false
-fun resetTokenExpiredState(): Unit {
-    isHandlingTokenExpired = false
-}
-fun handleTokenExpired(): Unit {
-    if (isHandlingTokenExpired) {
-        return
-    }
-    isHandlingTokenExpired = true
-    console.log("检测到token过期，执行跳转登录页逻辑")
-    uni_removeStorageSync("token")
-    clearPushSessionState()
-    showAppToast(ShowToastOptions(title = "登录已过期，请重新登录", icon = "none", duration = 2000))
-    setTimeout(fun(){
-        console.log("正在跳转到登录页...")
-        uni_redirectTo(RedirectToOptions(url = "/pages/login/login", success = fun(_){
-            console.log("跳转登录页成功")
-        }
-        , fail = fun(err){
-            console.log("跳转登录页失败:", err)
-            uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
-        }
-        ))
-    }
-    , 500)
-}
-fun requestInterceptor(config: RequestOptions__1): RequestOptions__1 {
-    val token = uni_getStorageSync("token")
-    if (token != null && token.toString().length > 0) {
-        if (config.header == null) {
-            config.header = UTSJSONObject()
-        }
-        config.header!!.set("token", token.toString())
-    }
-    return config
-}
-fun responseInterceptor(response: RequestSuccess<Any>, config: RequestOptions__1): Any {
-    return response.data!!
-}
-fun logHttpError(error: HttpError): Unit {
-    val detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (if (error.data != null) {
-        error.data.toString()
-    } else {
-        ""
-    }
-    )
-    AndroidLog.e("HttpRequest", detail)
-    console.error("[HttpRequest] " + detail)
-}
-fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
-    if (config.showLoading != false) {
-        uni_hideLoading(null)
-    }
-    logHttpError(error)
-    if (error.statusCode != 0) {
-        when (error.statusCode) {
-            401 -> 
-                handleTokenExpired()
-            403 -> 
-                showAppToast(ShowToastOptions(title = "没有权限访问", icon = "none"))
-            404 -> 
-                showAppToast(ShowToastOptions(title = "请求资源不存在", icon = "none"))
-            500 -> 
-                showAppToast(ShowToastOptions(title = "服务器错误", icon = "none"))
-            else -> 
-                showAppToast(ShowToastOptions(title = if (error.message != null) {
-                    error.message
-                } else {
-                    "请求错误: " + error.statusCode
-                }, icon = "none"))
-        }
-    } else {
-        showAppToast(ShowToastOptions(title = "网络错误，请检查网络连接", icon = "none"))
-    }
-}
-fun request(options: RequestOptions__1): UTSPromise<Any> {
-    val requestUrl = if (options.url != null) {
-        options.url!!
-    } else {
-        ""
-    }
-    val config = RequestOptions__1(url = requestUrl, method = if (options.method != null) {
-        options.method
-    } else {
-        "GET"
-    }
-    , data = if (options.data != null) {
-        options.data
-    } else {
-        _uO()
-    }
-    , header = if (options.header != null) {
-        options.header
-    } else {
-        UTSJSONObject()
-    }
-    , showLoading = options.showLoading != false)
-    if (!config.url!!.startsWith("http")) {
-        config.url = BASE_URL + config.url!!
-    }
-    val processedConfig = requestInterceptor(config)
-    return UTSPromise<Any>(fun(resolve, reject){
-        uni_request<Any>(RequestOptions(url = processedConfig.url!!, method = processedConfig.method, data = processedConfig.data, header = processedConfig.header, success = fun(res: RequestSuccess<Any>){
-            val statusCode = res.statusCode
-            if (statusCode == 200) {
-                val data = responseInterceptor(res, processedConfig)
-                resolve(data)
-            } else {
-                val httpError = HttpError(statusCode = statusCode, message = "请求失败: " + statusCode, data = res.data)
-                errorHandler(httpError, processedConfig)
-                reject(httpError)
-            }
-        }
-        , fail = fun(error: RequestFail){
-            val httpError = HttpError(statusCode = 0, message = if (error.errMsg != null) {
-                error.errMsg
-            } else {
-                "网络请求失败"
-            }
-            , data = error)
-            errorHandler(httpError, processedConfig)
-            reject(httpError)
-        }
-        ))
-    }
-    )
-}
-fun get(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
-    return request(RequestOptions__1(url = url, method = "GET", data = data, header = options.header, showLoading = options.showLoading))
-}
-fun post(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
-    return request(RequestOptions__1(url = url, method = "POST", data = data, header = options.header, showLoading = options.showLoading))
-}
-fun put(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
-    return request(RequestOptions__1(url = url, method = "PUT", data = data, header = options.header, showLoading = options.showLoading))
-}
-fun remove(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
-    return request(RequestOptions__1(url = url, method = "DELETE", data = data, header = options.header, showLoading = options.showLoading))
-}
-fun asJSONObject(value: Any): UTSJSONObject {
-    if (value == null) {
-        return UTSJSONObject()
-    }
-    return value as UTSJSONObject
-}
-fun getResponseCode(response: UTSJSONObject): Number {
-    return response.getNumber("code", -1)
-}
-fun getResponseMessage(response: UTSJSONObject): String {
-    val msg = response.getString("msg", "")
-    return if (msg != "") {
-        msg
-    } else {
-        response.getString("message", "")
-    }
-}
-fun getResponseDataObject(response: UTSJSONObject): UTSJSONObject {
-    val data = response.getJSON("data")
-    return if (data != null) {
-        data
-    } else {
-        UTSJSONObject()
-    }
-}
-fun getResponseDataArray(response: UTSJSONObject): UTSArray<UTSJSONObject> {
-    val data = response.getArray<UTSJSONObject>("data")
-    return if (data != null) {
-        data
-    } else {
-        _uA()
-    }
-}
-val loginUrl = "/sys/login"
-val devicePos = "/gps/lastPosition?deptId="
-val trackPos = "/gps/trackPos?"
-val userinfo = "/sys/user/info"
-val addDeviceUrl = "/userDevice/add"
-val userDeviceList = "/userDevice/list"
-val uniVerifyLoginUrl = "/auth/login"
-val changePSW = "/sys/user/password"
-val userMsgList = "/usermessage/listForUser"
-val msgState = "/usermessage/detail/"
-val updateDevice = "/device/update"
-val deviceDetail = "/device/info/"
-val logoutUrl = "/sys/logout"
-val sendcmd = "/command/sendCmd"
-val getGeofence = "/geofence"
-val deleteGeo = "/geofence/"
-val unbindDeviceList = "/device/unbindGeofenceList"
-val bindDeviceList = "/device/bindGeofenceList"
-val bindGeofence = "/geofence/bind"
-val unbindGeofence = "/geofence/unbind"
-val deleteDevice = "/userDevice/del"
-val cmdActionUrl = "/command/cmdAction"
-val cmdByMidUrl = "/command/cmdByMid"
-val cmdSendUrl = "/command/sendCmd"
-open class BasicResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-) : UTSObject()
-open class JsonDataResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: UTSJSONObject,
-) : UTSObject()
-typealias UniVerifyLoginRequest = UTSJSONObject
-open class DevicePositionResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: UTSArray<UTSJSONObject>,
-) : UTSObject()
-open class TrackPosResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: UTSJSONObject,
-) : UTSObject()
-open class UserInfoResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: UTSJSONObject,
-) : UTSObject()
-open class UserDeviceListData (
-    @JsonNotNull
-    open var list: UTSArray<UTSJSONObject>,
-    @JsonNotNull
-    open var totalPage: Number,
-    @JsonNotNull
-    open var totalCount: Number,
-) : UTSObject()
-open class UserDeviceListResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: UserDeviceListData,
-) : UTSObject()
-open class DeviceDetailResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: UTSJSONObject,
-) : UTSObject()
-open class GeofenceResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: UTSArray<UTSJSONObject>,
-) : UTSObject()
-open class DevicePageData (
-    @JsonNotNull
-    open var list: UTSArray<UTSJSONObject>,
-    @JsonNotNull
-    open var totalPage: Number,
-    @JsonNotNull
-    open var totalCount: Number,
-) : UTSObject()
-open class DevicePageResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: DevicePageData,
-) : UTSObject()
-open class CommandListResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: UTSArray<UTSJSONObject>,
-) : UTSObject()
-open class SendCmdResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: String,
-) : UTSObject()
-open class ChangePasswordResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-) : UTSObject()
-open class MessageResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: UserDeviceListData,
-) : UTSObject()
-fun basicResponse(raw: Any): BasicResponse {
-    val response = asJSONObject(raw)
-    return BasicResponse(code = getResponseCode(response), msg = getResponseMessage(response))
-}
-fun jsonDataResponse(raw: Any): JsonDataResponse {
-    val response = asJSONObject(raw)
-    return JsonDataResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataObject(response))
-}
-fun devicePageResponse(raw: Any): DevicePageResponse {
-    val response = asJSONObject(raw)
-    val data = getResponseDataObject(response)
-    val list = data.getArray<UTSJSONObject>("list")
-    return DevicePageResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = DevicePageData(list = if (list != null) {
-        list
-    } else {
-        _uA()
-    }
-    , totalPage = data.getNumber("totalPage", 0), totalCount = data.getNumber("totalCount", 0)))
-}
-fun userDevicePageResponse(raw: Any): UserDeviceListResponse {
-    val page = devicePageResponse(raw)
-    return UserDeviceListResponse(code = page.code, msg = page.msg, data = UserDeviceListData(list = page.data.list, totalPage = page.data.totalPage, totalCount = page.data.totalCount))
-}
-fun messagePageResponse(raw: Any): MessageResponse {
-    val page = devicePageResponse(raw)
-    return MessageResponse(code = page.code, msg = page.msg, data = UserDeviceListData(list = page.data.list, totalPage = page.data.totalPage, totalCount = page.data.totalCount))
-}
-fun userInfoResponse(raw: Any): UserInfoResponse {
-    val response = jsonDataResponse(raw)
-    return UserInfoResponse(code = response.code, msg = response.msg, data = response.data)
-}
-fun deviceDetailResponse(raw: Any): DeviceDetailResponse {
-    val response = jsonDataResponse(raw)
-    return DeviceDetailResponse(code = response.code, msg = response.msg, data = response.data)
-}
-fun changePasswordResponse(raw: Any): ChangePasswordResponse {
-    val response = basicResponse(raw)
-    return ChangePasswordResponse(code = response.code, msg = response.msg)
-}
-val login = fun(data: UTSJSONObject): UTSPromise<JsonDataResponse> {
-    return post(loginUrl, data).then(fun(raw: Any): JsonDataResponse {
-        return jsonDataResponse(raw)
-    }
-    )
-}
-val logout = fun(): UTSPromise<BasicResponse> {
-    return post(logoutUrl).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val sendCommand = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return post(sendcmd, data).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val getDevicePos = fun(data: UTSJSONObject): UTSPromise<DevicePositionResponse> {
-    return get(devicePos, data).then(fun(raw: Any): DevicePositionResponse {
-        val response = asJSONObject(raw)
-        return DevicePositionResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
-    }
-    )
-}
-val getTrackPos = fun(data: UTSJSONObject): UTSPromise<TrackPosResponse> {
-    return get(trackPos, data).then(fun(raw: Any): TrackPosResponse {
-        val response = asJSONObject(raw)
-        return TrackPosResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataObject(response))
-    }
-    )
-}
-val getUserInfo = fun(): UTSPromise<UserInfoResponse> {
-    return get(userinfo).then(fun(raw: Any): UserInfoResponse {
-        return userInfoResponse(raw)
-    }
-    )
-}
-val addDevice = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return post(addDeviceUrl, data).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val delDevice = fun(imei: String): UTSPromise<BasicResponse> {
-    return post(deleteDevice, _uO("imei" to imei)).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val getUserDeviceList = fun(data: UTSJSONObject): UTSPromise<UserDeviceListResponse> {
-    return post(userDeviceList, data).then(fun(raw: Any): UserDeviceListResponse {
-        return userDevicePageResponse(raw)
-    }
-    )
-}
-val uniVerifyLogin = fun(data: UniVerifyLoginRequest): UTSPromise<JsonDataResponse> {
-    return post(uniVerifyLoginUrl, data).then(fun(raw: Any): JsonDataResponse {
-        return jsonDataResponse(raw)
-    }
-    )
-}
-val changePassWord = fun(data: UTSJSONObject): UTSPromise<ChangePasswordResponse> {
-    return put(changePSW, data).then(fun(raw: Any): ChangePasswordResponse {
-        return changePasswordResponse(raw)
-    }
-    )
-}
-val getUserMsgList = fun(data: UTSJSONObject?): UTSPromise<MessageResponse> {
-    return (if (data != null) {
-        get(userMsgList, data)
-    } else {
-        get(userMsgList)
-    }
-    ).then(fun(raw: Any): MessageResponse {
-        return messagePageResponse(raw)
-    }
-    )
-}
-val setMsgState = fun(msgId: String): UTSPromise<BasicResponse> {
-    return get("" + msgState + msgId).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val editDeviceInfo = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return put(updateDevice, data).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val getDeviceDetail = fun(deviceId: String): UTSPromise<DeviceDetailResponse> {
-    return get("" + deviceDetail + deviceId).then(fun(raw: Any): DeviceDetailResponse {
-        return deviceDetailResponse(raw)
-    }
-    )
-}
-val getGeofenceList = fun(): UTSPromise<GeofenceResponse> {
-    return get(getGeofence).then(fun(raw: Any): GeofenceResponse {
-        val response = asJSONObject(raw)
-        return GeofenceResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
-    }
-    )
-}
-val addGeofence = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return post(getGeofence, data).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val updateGeofence = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return put(getGeofence, data).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val deleteGeofence = fun(id: String): UTSPromise<BasicResponse> {
-    return remove("" + deleteGeo + id).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val getUnboundDevices = fun(params: UTSJSONObject): UTSPromise<DevicePageResponse> {
-    return get(unbindDeviceList, params).then(fun(raw: Any): DevicePageResponse {
-        return devicePageResponse(raw)
-    }
-    )
-}
-val getBoundDevices = fun(params: UTSJSONObject): UTSPromise<DevicePageResponse> {
-    return get(bindDeviceList, params).then(fun(raw: Any): DevicePageResponse {
-        return devicePageResponse(raw)
-    }
-    )
-}
-val bindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return post(bindGeofence, data).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val unbindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return remove(unbindGeofence, data).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
-    }
-    )
-}
-val getCmdAction = fun(): UTSPromise<CommandListResponse> {
-    return get(cmdActionUrl).then(fun(raw: Any): CommandListResponse {
-        val response = asJSONObject(raw)
-        return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
-    }
-    )
-}
-val getCmdByMid = fun(data: UTSJSONObject): UTSPromise<CommandListResponse> {
-    return get(cmdByMidUrl, data).then(fun(raw: Any): CommandListResponse {
-        val response = asJSONObject(raw)
-        return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
-    }
-    )
-}
-val sendCmd = fun(data: UTSJSONObject): UTSPromise<SendCmdResponse> {
-    return post(cmdSendUrl, data).then(fun(raw: Any): SendCmdResponse {
-        val response = asJSONObject(raw)
-        return SendCmdResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = response.getString("data", ""))
-    }
-    )
-}
 open class TodayTimeRange (
     @JsonNotNull
     open var nowTime: Number,

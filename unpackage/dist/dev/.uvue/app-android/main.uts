@@ -79,7 +79,7 @@ function defineAppConfig() {
 export class UniCloudConfig extends io.dcloud.unicloud.InternalUniCloudConfig {
     override isDev: boolean = true;
     override spaceList: string = "[{\"provider\":\"aliyun\",\"spaceName\":\"zdiot-car\",\"spaceId\":\"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff\",\"clientSecret\":\"s9pFKgenncFnOUhRGOJpcw==\",\"endpoint\":\"https://api.next.bspapp.com\",\"failoverEndpoint\":\"\"}]";
-    override debuggerInfo?: string = "{\"address\":[\"127.0.0.1\",\"192.168.1.180\"],\"servePort\":7001,\"debugPort\":9000,\"initialLaunchType\":\"remote\",\"skipFiles\":[\"<node_internals>/**\",\"/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js\"]}";
+    override debuggerInfo?: string = "{\"address\":[\"127.0.0.1\",\"192.168.1.180\"],\"servePort\":7002,\"debugPort\":9001,\"initialLaunchType\":\"remote\",\"skipFiles\":[\"<node_internals>/**\",\"/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js\"]}";
     override secureNetworkEnable: boolean = false;
     override secureNetworkConfig?: string = "[]";
     constructor() { super(); }

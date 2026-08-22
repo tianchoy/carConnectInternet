@@ -127,7 +127,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.180"
     val port: String = "8090"
-    val id: String = "app-android_nthYqA"
+    val id: String = "app-android_lSp-g4"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -4173,7 +4173,7 @@ open class RequestOptions__1 (
     open var showLoading: Boolean? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("RequestOptions", "api/http.uts", 4, 6)
+        return UTSSourceMapPosition("RequestOptions", "api/http.uts", 5, 6)
     }
 }
 open class HttpError (
@@ -4184,7 +4184,7 @@ open class HttpError (
     open var data: Any? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("HttpError", "api/http.uts", 16, 6)
+        return UTSSourceMapPosition("HttpError", "api/http.uts", 17, 6)
     }
 }
 val BASE_URL = "https://gpsapp.zdiot.cn"
@@ -4197,17 +4197,17 @@ fun handleTokenExpired(): Unit {
         return
     }
     isHandlingTokenExpired = true
-    console.log("检测到token过期，执行跳转登录页逻辑", " at api/http.uts:48")
+    console.log("检测到token过期，执行跳转登录页逻辑", " at api/http.uts:51")
     uni_removeStorageSync("token")
     clearPushSessionState()
     showAppToast(ShowToastOptions(title = "登录已过期，请重新登录", icon = "none", duration = 2000))
     setTimeout(fun(){
-        console.log("正在跳转到登录页...", " at api/http.uts:63")
+        console.log("正在跳转到登录页...", " at api/http.uts:66")
         uni_redirectTo(RedirectToOptions(url = "/pages/login/login", success = fun(_){
-            console.log("跳转登录页成功", " at api/http.uts:67")
+            console.log("跳转登录页成功", " at api/http.uts:70")
         }
         , fail = fun(err){
-            console.log("跳转登录页失败:", err, " at api/http.uts:70")
+            console.log("跳转登录页失败:", err, " at api/http.uts:73")
             uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
         }
         ))
@@ -4227,11 +4227,21 @@ fun requestInterceptor(config: RequestOptions__1): RequestOptions__1 {
 fun responseInterceptor(response: RequestSuccess<Any>, config: RequestOptions__1): Any {
     return response.data!!
 }
+fun logHttpError(error: HttpError): Unit {
+    val detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (if (error.data != null) {
+        error.data.toString()
+    } else {
+        ""
+    }
+    )
+    AndroidLog.e("HttpRequest", detail)
+    console.error("[HttpRequest] " + detail, " at api/http.uts:123")
+}
 fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
     if (config.showLoading != false) {
         uni_hideLoading(null)
     }
-    console.log("请求错误详情:", error, " at api/http.uts:122")
+    logHttpError(error)
     if (error.statusCode != 0) {
         when (error.statusCode) {
             401 -> 
@@ -4357,8 +4367,6 @@ val userinfo = "/sys/user/info"
 val addDeviceUrl = "/userDevice/add"
 val userDeviceList = "/userDevice/list"
 val uniVerifyLoginUrl = "/auth/login"
-val smsSendCodeUrl = "/auth/sms/send"
-val smsLoginUrl = "/auth/sms/login"
 val changePSW = "/sys/user/password"
 val userMsgList = "/usermessage/listForUser"
 val msgState = "/usermessage/detail/"
@@ -4398,51 +4406,17 @@ open class JsonDataResponse (
         return UTSSourceMapPosition("JsonDataResponse", "api/request.uts", 41, 13)
     }
 }
-open class UniVerifyLoginRequest (
-    @JsonNotNull
-    open var openId: String,
-    @JsonNotNull
-    open var accessToken: String,
-    @JsonNotNull
-    open var platform: String,
-    open var clientVersion: String? = null,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniVerifyLoginRequest", "api/request.uts", 46, 13)
-    }
-}
-open class SendSmsCodeRequest (
-    @JsonNotNull
-    open var mobile: String,
-    @JsonNotNull
-    open var scene: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SendSmsCodeRequest", "api/request.uts", 52, 13)
-    }
-}
-open class SmsLoginRequest (
-    @JsonNotNull
-    open var mobile: String,
-    @JsonNotNull
-    open var code: String,
-    @JsonNotNull
-    open var platform: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SmsLoginRequest", "api/request.uts", 56, 13)
-    }
-}
+typealias UniVerifyLoginRequest = UTSJSONObject
 open class DevicePositionResponse (
     @JsonNotNull
     open var code: Number,
     @JsonNotNull
-    open var message: String,
+    open var msg: String,
     @JsonNotNull
     open var data: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DevicePositionResponse", "api/request.uts", 61, 13)
+        return UTSSourceMapPosition("DevicePositionResponse", "api/request.uts", 50, 13)
     }
 }
 open class TrackPosResponse (
@@ -4454,7 +4428,7 @@ open class TrackPosResponse (
     open var data: UTSJSONObject,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TrackPosResponse", "api/request.uts", 66, 13)
+        return UTSSourceMapPosition("TrackPosResponse", "api/request.uts", 55, 13)
     }
 }
 open class UserInfoResponse (
@@ -4466,7 +4440,7 @@ open class UserInfoResponse (
     open var data: UTSJSONObject,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserInfoResponse", "api/request.uts", 71, 13)
+        return UTSSourceMapPosition("UserInfoResponse", "api/request.uts", 60, 13)
     }
 }
 open class UserDeviceListData (
@@ -4478,7 +4452,7 @@ open class UserDeviceListData (
     open var totalCount: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserDeviceListData", "api/request.uts", 76, 13)
+        return UTSSourceMapPosition("UserDeviceListData", "api/request.uts", 65, 13)
     }
 }
 open class UserDeviceListResponse (
@@ -4490,7 +4464,7 @@ open class UserDeviceListResponse (
     open var data: UserDeviceListData,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserDeviceListResponse", "api/request.uts", 81, 13)
+        return UTSSourceMapPosition("UserDeviceListResponse", "api/request.uts", 70, 13)
     }
 }
 open class DeviceDetailResponse (
@@ -4502,7 +4476,7 @@ open class DeviceDetailResponse (
     open var data: UTSJSONObject,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailResponse", "api/request.uts", 86, 13)
+        return UTSSourceMapPosition("DeviceDetailResponse", "api/request.uts", 75, 13)
     }
 }
 open class GeofenceResponse (
@@ -4514,7 +4488,7 @@ open class GeofenceResponse (
     open var data: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("GeofenceResponse", "api/request.uts", 91, 13)
+        return UTSSourceMapPosition("GeofenceResponse", "api/request.uts", 80, 13)
     }
 }
 open class DevicePageData (
@@ -4526,7 +4500,7 @@ open class DevicePageData (
     open var totalCount: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DevicePageData", "api/request.uts", 96, 13)
+        return UTSSourceMapPosition("DevicePageData", "api/request.uts", 85, 13)
     }
 }
 open class DevicePageResponse (
@@ -4538,7 +4512,7 @@ open class DevicePageResponse (
     open var data: DevicePageData,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DevicePageResponse", "api/request.uts", 101, 13)
+        return UTSSourceMapPosition("DevicePageResponse", "api/request.uts", 90, 13)
     }
 }
 open class CommandListResponse (
@@ -4550,7 +4524,7 @@ open class CommandListResponse (
     open var data: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CommandListResponse", "api/request.uts", 106, 13)
+        return UTSSourceMapPosition("CommandListResponse", "api/request.uts", 95, 13)
     }
 }
 open class SendCmdResponse (
@@ -4562,7 +4536,7 @@ open class SendCmdResponse (
     open var data: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SendCmdResponse", "api/request.uts", 111, 13)
+        return UTSSourceMapPosition("SendCmdResponse", "api/request.uts", 100, 13)
     }
 }
 open class ChangePasswordResponse (
@@ -4572,7 +4546,7 @@ open class ChangePasswordResponse (
     open var msg: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ChangePasswordResponse", "api/request.uts", 116, 13)
+        return UTSSourceMapPosition("ChangePasswordResponse", "api/request.uts", 105, 13)
     }
 }
 open class MessageResponse (
@@ -4584,7 +4558,7 @@ open class MessageResponse (
     open var data: UserDeviceListData,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MessageResponse", "api/request.uts", 120, 13)
+        return UTSSourceMapPosition("MessageResponse", "api/request.uts", 109, 13)
     }
 }
 fun basicResponse(raw: Any): BasicResponse {
@@ -4647,7 +4621,7 @@ val sendCommand = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
 val getDevicePos = fun(data: UTSJSONObject): UTSPromise<DevicePositionResponse> {
     return get(devicePos, data).then(fun(raw: Any): DevicePositionResponse {
         val response = asJSONObject(raw)
-        return DevicePositionResponse(code = getResponseCode(response), message = getResponseMessage(response), data = getResponseDataArray(response))
+        return DevicePositionResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
     }
     )
 }
@@ -4684,18 +4658,6 @@ val getUserDeviceList = fun(data: UTSJSONObject): UTSPromise<UserDeviceListRespo
 }
 val uniVerifyLogin = fun(data: UniVerifyLoginRequest): UTSPromise<JsonDataResponse> {
     return post(uniVerifyLoginUrl, data).then(fun(raw: Any): JsonDataResponse {
-        return jsonDataResponse(raw)
-    }
-    )
-}
-val sendSmsLoginCode = fun(data: SendSmsCodeRequest): UTSPromise<JsonDataResponse> {
-    return post(smsSendCodeUrl, data).then(fun(raw: Any): JsonDataResponse {
-        return jsonDataResponse(raw)
-    }
-    )
-}
-val smsLogin = fun(data: SmsLoginRequest): UTSPromise<JsonDataResponse> {
-    return post(smsLoginUrl, data).then(fun(raw: Any): JsonDataResponse {
         return jsonDataResponse(raw)
     }
     )
@@ -4936,7 +4898,7 @@ open class Device (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 224, 6)
+        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 225, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5120,7 +5082,7 @@ open class MapCenter (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 241, 6)
+        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 242, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5175,7 +5137,7 @@ open class DeviceStatus (
     open var signalStrength: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 284, 6)
+        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 292, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5241,7 +5203,7 @@ open class DeviceDetailState (
     open var lastUpdateTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 290, 6)
+        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 298, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5325,7 +5287,7 @@ open class SavedDevice (
     open var longitude: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 385, 6)
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 414, 6)
     }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
@@ -5445,7 +5407,7 @@ open class UniVerifyPreLoginResult (
     open var message: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniVerifyPreLoginResult", "services/auth/uni-verify.uts", 3, 13)
+        return UTSSourceMapPosition("UniVerifyPreLoginResult", "services/auth/uni-verify.uts", 2, 13)
     }
 }
 open class UniVerifyResult (
@@ -5459,7 +5421,7 @@ open class UniVerifyResult (
     open var token: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniVerifyResult", "services/auth/uni-verify.uts", 7, 13)
+        return UTSSourceMapPosition("UniVerifyResult", "services/auth/uni-verify.uts", 6, 13)
     }
 }
 @JvmField
@@ -5493,7 +5455,7 @@ fun getErrorMessage(error: UniVerifyManagerLoginFail): String {
     if (errCode == 40001 || errCode == 40002) {
         return "网络异常，请检查移动网络后重试"
     }
-    return "本机号码授权失败（错误码：" + errCode + "），请使用验证码登录"
+    return "本机号码授权失败（错误码：" + errCode + "），请稍后重试"
 }
 fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
     val errCode = error.errCode
@@ -5525,20 +5487,20 @@ fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
             return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK"
         }
         if (errMsg.indexOf("-20201") >= 0) {
-            return "未检测到可用 SIM 卡，请使用验证码登录"
+            return "未检测到可用 SIM 卡，暂无法使用本机号码一键登录"
         }
         if (errMsg.indexOf("-20202") >= 0) {
             return "未开启蜂窝移动网络，请开启移动数据后重试"
         }
         if (errMsg.indexOf("-20203") >= 0) {
-            return "当前运营商暂不支持一键登录，请使用验证码登录"
+            return "当前运营商暂不支持本机号码一键登录"
         }
-        return "本机号码预取失败，请稍后重试或使用验证码登录"
+        return "本机号码预取失败，请稍后重试"
     }
     if (errCode == 40001 || errCode == 40002) {
         return "网络异常，无法获取本机号码，请检查移动网络后重试"
     }
-    return "本机号码预取失败（错误码：" + errCode + "），请使用验证码登录"
+    return "本机号码预取失败（错误码：" + errCode + "），请稍后重试"
 }
 fun createPreLoginResult(ok: Boolean, message: String): UniVerifyPreLoginResult {
     return UniVerifyPreLoginResult(ok = ok, message = message)
@@ -5598,26 +5560,34 @@ fun loginByUniVerify(clientVersion: String): UTSPromise<UniVerifyResult> {
             try {
                 uniVerifyManager = getManager()
                 uniVerifyManager.login(UniVerifyManagerLoginOptions(uniVerifyStyle = UniVerifyManagerLoginStyle(fullScreen = false, loginBtnText = "本机号码一键登录"), success = fun(result: UniVerifyManagerLoginSuccess){
-                    uniVerifyLogin(UniVerifyLoginRequest(openId = result.openId, accessToken = result.accessToken, platform = getPlatform(), clientVersion = clientVersion)).then(fun(response){
+                    val requestData = UTSJSONObject(UTSSourceMapPosition("requestData", "services/auth/uni-verify.uts", 130, 31))
+                    requestData.set("openId", result.openId)
+                    requestData.set("accessToken", result.accessToken)
+                    requestData.set("platform", getPlatform())
+                    requestData.set("clientVersion", clientVersion)
+                    requestData.set("clientId", "428a8310cd442757ae699df5d894f051")
+                    requestData.set("grantType", "univerify")
+                    requestData.set("tenantId", "000000")
+                    uniVerifyLogin(requestData).then(fun(response){
                         val loginData = response.data
                         val token = if (loginData != null) {
-                            loginData.getString("token", "")
+                            loginData.getString("access_token", "")
                         } else {
                             ""
                         }
-                        if (response.code == 0 && token != "") {
+                        if (response.code == 200 && token != "") {
                             resolve(createResult(true, false, "", token))
                         } else {
                             resolve(createResult(false, false, if (response.msg != "") {
                                 response.msg
                             } else {
-                                "本机号码登录失败，请使用验证码登录"
+                                "本机号码登录失败，请稍后重试"
                             }
                             , ""))
                         }
                     }
                     ).`catch`(fun(){
-                        resolve(createResult(false, false, "登录服务连接失败，请使用验证码登录", ""))
+                        resolve(createResult(false, false, "登录服务连接失败，请检查网络后重试", ""))
                     }
                     ).`finally`(fun(){
                         closeLoginPage(uniVerifyManager)
@@ -5634,7 +5604,7 @@ fun loginByUniVerify(clientVersion: String): UTSPromise<UniVerifyResult> {
                 ))
             }
              catch (error: Throwable) {
-                resolve(createResult(false, false, "当前设备不支持本机号码一键登录，请使用验证码登录", ""))
+                resolve(createResult(false, false, "当前设备不支持本机号码一键登录", ""))
                 requesting = false
             }
         }
@@ -5653,7 +5623,7 @@ open class FormData (
     open var password: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 144, 7)
+        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 150, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return FormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5705,7 +5675,7 @@ open class SavedAccount (
     open var password: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 148, 7)
+        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 154, 7)
     }
 }
 val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
@@ -9640,7 +9610,7 @@ open class UniCloudConfig : io.dcloud.unicloud.InternalUniCloudConfig, IUTSSourc
     }
     override var isDev: Boolean = true
     override var spaceList: String = "[{\"provider\":\"aliyun\",\"spaceName\":\"zdiot-car\",\"spaceId\":\"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff\",\"clientSecret\":\"s9pFKgenncFnOUhRGOJpcw==\",\"endpoint\":\"https://api.next.bspapp.com\",\"failoverEndpoint\":\"\"}]"
-    override var debuggerInfo: String? = "{\"address\":[\"127.0.0.1\",\"192.168.1.180\"],\"servePort\":7001,\"debugPort\":9000,\"initialLaunchType\":\"remote\",\"skipFiles\":[\"<node_internals>/**\",\"/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js\"]}"
+    override var debuggerInfo: String? = "{\"address\":[\"127.0.0.1\",\"192.168.1.180\"],\"servePort\":7002,\"debugPort\":9001,\"initialLaunchType\":\"remote\",\"skipFiles\":[\"<node_internals>/**\",\"/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js\"]}"
     override var secureNetworkEnable: Boolean = false
     override var secureNetworkConfig: String? = "[]"
     constructor() : super() {}

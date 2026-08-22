@@ -11,16 +11,18 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { ref, onMounted } from 'vue'
 	import { markPushSessionAuthenticated } from '../../services/push.uts'
 	import { resetTokenExpiredState } from '../../api/http.uts'
-	import { login, PostWechatlogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
+	import { login, PostWechatlogin } from '../../api/request.uts'
+	// 短信验证码登录功能暂时停用：
+	// import { sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 
 	import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
 
 
-	type FormData = { __$originalPosition?: UTSSourceMapPosition<"FormData", "pages/login/login.uvue", 144, 7>;
+	type FormData = { __$originalPosition?: UTSSourceMapPosition<"FormData", "pages/login/login.uvue", 150, 7>;
 		username: string
 		password: string
 	}
-	type SavedAccount = { __$originalPosition?: UTSSourceMapPosition<"SavedAccount", "pages/login/login.uvue", 148, 7>;
+	type SavedAccount = { __$originalPosition?: UTSSourceMapPosition<"SavedAccount", "pages/login/login.uvue", 154, 7>;
 		username: string
 		password: string
 	}
@@ -38,12 +40,13 @@ const docState = ref(false)
 	const rememberPassword = ref(false)
 	const formValid = ref(false)
 	const loading = ref(false)
-	const smsLoginMode = ref(false)
-	const smsMobile = ref('')
-	const smsCode = ref('')
-	const smsCooldown = ref(0)
-	const smsSending = ref(false)
-	const smsSubmitting = ref(false)
+	// 短信验证码登录功能暂时停用：
+	// const smsLoginMode = ref(false)
+	// const smsMobile = ref('')
+	// const smsCode = ref('')
+	// const smsCooldown = ref(0)
+	// const smsSending = ref(false)
+	// const smsSubmitting = ref(false)
 	const nativeLoginLoading = ref(false)
 
 	// ===== 表单数据 =====
@@ -67,12 +70,12 @@ const docState = ref(false)
 		try {
 			const rawAccount = uni.getStorageSync('savedEnterpriseAccount')
 			if (rawAccount == null || rawAccount == '') return
-			const account = typeof rawAccount == 'string' ? UTSAndroid.consoleDebugError(JSON.parse(rawAccount), " at pages/login/login.uvue:173") as UTSJSONObject : rawAccount as UTSJSONObject
+			const account = typeof rawAccount == 'string' ? UTSAndroid.consoleDebugError(JSON.parse(rawAccount), " at pages/login/login.uvue:179") as UTSJSONObject : rawAccount as UTSJSONObject
 			form.value.username = account.getString('username', '')
 			form.value.password = account.getString('password', '')
 			rememberPassword.value = form.value.username != '' || form.value.password != ''
 		} catch (error) {
-			console.error('加载保存的账号密码失败:', error, " at pages/login/login.uvue:178")
+			console.error('加载保存的账号密码失败:', error, " at pages/login/login.uvue:184")
 		}
 	}
 
@@ -115,7 +118,7 @@ const docState = ref(false)
 	const getSystemInfo = () : void => {
 		const res = uni.getSystemInfoSync()
 		deviceModel.value = res.deviceModel
-		console.log('设备型号:', deviceModel.value, " at pages/login/login.uvue:221")
+		console.log('设备型号:', deviceModel.value, " at pages/login/login.uvue:227")
 	}
 
 	// ===== 表单验证 =====
@@ -154,83 +157,84 @@ const docState = ref(false)
 		return false
 	}
 
-	const openSmsLogin = (): void => {
-		smsLoginMode.value = true
-	}
-
-	const closeSmsLogin = (): void => {
-		smsLoginMode.value = false
-		smsCode.value = ''
-	}
-
-	const isValidMobile = (): boolean => {
-		if (!/^1[3-9]\\d{9}$/.test(smsMobile.value)) {
-			showAppToast({ title: '请输入正确的手机号', icon: 'none' })
-			return false
-		}
-		return true
-	}
-
-	const startSmsCooldown = (seconds: number): void => {
-		smsCooldown.value = seconds > 0 ? seconds : 60
-		const timer = setInterval(() => {
-			smsCooldown.value -= 1
-			if (smsCooldown.value <= 0) smsCooldown.value = 0
-		}, 1000)
-	}
-
-	const sendSmsCode = async (): Promise<void> => {
-		if (smsCooldown.value > 0 || smsSending.value) return
-		if (!ensureAgreementAccepted() || !isValidMobile()) return
-		try {
-			smsSending.value = true
-			const response = await sendSmsLoginCode({ mobile: smsMobile.value, scene: 'login' })
-			if (response.code != 200) {
-				showAppToast({ title: response.msg || '验证码发送失败', icon: 'none' })
-				return
-			}
-			const cooldownSeconds = response.data != null ? response.data.getNumber('cooldownSeconds', 60) : 60
-			startSmsCooldown(cooldownSeconds)
-			showAppToast({ title: '验证码已发送', icon: 'success' })
-		} catch (error) {
-			showAppToast({ title: '验证码发送失败，请检查网络', icon: 'none' })
-		} finally {
-			smsSending.value = false
-		}
-	}
-
-	const getAppPlatform = (): string => {
-
-		return 'android'
-
-
-
-
-		return ''
-	}
-
-	const submitSmsLogin = async (): Promise<void> => {
-		if (!ensureAgreementAccepted() || !isValidMobile() || smsCode.value == '' || smsSubmitting.value) {
-			if (smsCode.value == '') showAppToast({ title: '请输入验证码', icon: 'none' })
-			return
-		}
-		try {
-			smsSubmitting.value = true
-			const response = await smsLogin({ mobile: smsMobile.value, code: smsCode.value, platform: getAppPlatform() })
-			const token = response.data != null ? response.data.getString('token', '') : ''
-			if (response.code == 200 && token != '') {
-				smsCode.value = ''
-				completeLogin(token, false)
-			} else {
-				showAppToast({ title: response.msg || '验证码登录失败', icon: 'none' })
-			}
-		} catch (error) {
-			showAppToast({ title: '验证码登录失败，请检查网络', icon: 'none' })
-		} finally {
-			smsSubmitting.value = false
-		}
-	}
-
+	/*
+	 * 短信验证码登录功能暂时停用。
+	 *
+	 * const openSmsLogin = (): void => {
+	 * 	smsLoginMode.value = true
+	 * }
+	 *
+	 * const closeSmsLogin = (): void => {
+	 * 	smsLoginMode.value = false
+	 * 	smsCode.value = ''
+	 * }
+	 *
+	 * const isValidMobile = (): boolean => {
+	 * 	if (!/^1[3-9]\\d{9}$/.test(smsMobile.value)) {
+	 * 		showAppToast({ title: '请输入正确的手机号', icon: 'none' })
+	 * 		return false
+	 * 	}
+	 * 	return true
+	 * }
+	 *
+	 * const startSmsCooldown = (seconds: number): void => {
+	 * 	smsCooldown.value = seconds > 0 ? seconds : 60
+	 * 	const timer = setInterval(() => {
+	 * 		smsCooldown.value -= 1
+	 * 		if (smsCooldown.value <= 0) smsCooldown.value = 0
+	 * 	}, 1000)
+	 * }
+	 *
+	 * const sendSmsCode = async (): Promise<void> => {
+	 * 	if (smsCooldown.value > 0 || smsSending.value) return
+	 * 	if (!ensureAgreementAccepted() || !isValidMobile()) return
+	 * 	try {
+	 * 		smsSending.value = true
+	 * 		const response = await sendSmsLoginCode({ mobile: smsMobile.value, scene: 'login' })
+	 * 		if (response.code != 200) {
+	 * 			showAppToast({ title: response.msg || '验证码发送失败', icon: 'none' })
+	 * 			return
+	 * 		}
+	 * 		const cooldownSeconds = response.data != null ? response.data.getNumber('cooldownSeconds', 60) : 60
+	 * 		startSmsCooldown(cooldownSeconds)
+	 * 		showAppToast({ title: '验证码已发送', icon: 'success' })
+	 * 	} catch (error) {
+	 * 		showAppToast({ title: '验证码发送失败，请检查网络', icon: 'none' })
+	 * 	} finally {
+	 * 		smsSending.value = false
+	 * 	}
+	 * }
+	 *
+	 * const getAppPlatform = (): string => {
+	 * 	// APP-ANDROID
+	 * 	return 'android'
+	 * 	// APP-IOS
+	 * 	return 'ios'
+	 * 	return ''
+	 * }
+	 *
+	 * const submitSmsLogin = async (): Promise<void> => {
+	 * 	if (!ensureAgreementAccepted() || !isValidMobile() || smsCode.value == '' || smsSubmitting.value) {
+	 * 		if (smsCode.value == '') showAppToast({ title: '请输入验证码', icon: 'none' })
+	 * 		return
+	 * 	}
+	 * 	try {
+	 * 		smsSubmitting.value = true
+	 * 		const response = await smsLogin({ mobile: smsMobile.value, code: smsCode.value, platform: getAppPlatform() })
+	 * 		const token = response.data != null ? response.data.getString('access_token', '') : ''
+	 * 		if (response.code == 200 && token != '') {
+	 * 			smsCode.value = ''
+	 * 			completeLogin(token, false)
+	 * 		} else {
+	 * 			showAppToast({ title: response.msg || '验证码登录失败', icon: 'none' })
+	 * 		}
+	 * 	} catch (error) {
+	 * 		showAppToast({ title: '验证码登录失败，请检查网络', icon: 'none' })
+	 * 	} finally {
+	 * 		smsSubmitting.value = false
+	 * 	}
+	 * }
+	 */
 	const startUniVerifyLogin = async (): Promise<void> => {
 
 		if (!ensureAgreementAccepted() || nativeLoginLoading.value) return
@@ -241,7 +245,7 @@ const docState = ref(false)
 				const appVersion = uni.getAppBaseInfo().appVersion ?? ''
 				if (appVersion != '') clientVersion = appVersion
 			} catch (error) {
-				console.warn('获取应用版本失败，使用默认版本号:', error, " at pages/login/login.uvue:347")
+				console.warn('获取应用版本失败，使用默认版本号:', error, " at pages/login/login.uvue:354")
 			}
 			const result = await loginByUniVerify(clientVersion)
 			if (result.ok) {
@@ -249,8 +253,7 @@ const docState = ref(false)
 				return
 			}
 			if (!result.cancelled) {
-				showAppToast({ title: result.message + '，可使用验证码登录', icon: 'none' })
-				openSmsLogin()
+				showAppToast({ title: result.message, icon: 'none' })
 			}
 		} finally {
 			nativeLoginLoading.value = false
@@ -358,18 +361,18 @@ const docState = ref(false)
 
 		try {
 			// 表单验证
-			console.log('准备验证表单...', " at pages/login/login.uvue:464")
+			console.log('准备验证表单...', " at pages/login/login.uvue:470")
 			if (!validateForm()) return
-			console.log('✅ 表单验证通过', " at pages/login/login.uvue:466")
+			console.log('✅ 表单验证通过', " at pages/login/login.uvue:472")
 
 			// 构建请求参数
-			const newFormData = {__$originalPosition: new UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 469, 10),
+			const newFormData = {__$originalPosition: new UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 475, 10),
 				username: form.value.username,
 				password: form.value.password,
 				from: deviceModel.value,
 				type: "USER"
 			}
-			console.log('📤 请求参数:', newFormData, " at pages/login/login.uvue:475")
+			console.log('📤 请求参数:', newFormData, " at pages/login/login.uvue:481")
 
 			// 显示加载状态
 			loading.value = true
@@ -379,9 +382,9 @@ const docState = ref(false)
 			})
 
 			// 调用登录接口
-			console.log('🚀 开始调用 login 接口...', " at pages/login/login.uvue:485")
+			console.log('🚀 开始调用 login 接口...', " at pages/login/login.uvue:491")
 			const res = await login(newFormData)
-			console.log('✅ 登录接口返回:', res, " at pages/login/login.uvue:487")
+			console.log('✅ 登录接口返回:', res, " at pages/login/login.uvue:493")
 
 			// 隐藏加载状态
 			loading.value = false
@@ -389,7 +392,7 @@ const docState = ref(false)
 
 			// 处理登录成功
 			const loginData = res.data
-			const token = res.code == 200 && loginData != null ? loginData.getString('token', '') : ''
+			const token = res.code == 200 && loginData != null ? loginData.getString('access_token', '') : ''
 			if (token != '') {
 				completeLogin(token, true)
 			} else {
@@ -400,7 +403,7 @@ const docState = ref(false)
 			}
 
 		} catch (error: any) {
-			console.error('❌ 登录失败:', error, " at pages/login/login.uvue:506")
+			console.error('❌ 登录失败:', error, " at pages/login/login.uvue:512")
 			loading.value = false
 			uni.hideLoading()
 
@@ -499,7 +502,7 @@ const docState = ref(false)
 
 		prefetchUniVerify()
 
-		console.log('pswLogin 初始值:', pswLogin.value, " at pages/login/login.uvue:605")
+		console.log('pswLogin 初始值:', pswLogin.value, " at pages/login/login.uvue:611")
 	})
 
 
@@ -599,89 +602,14 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
               }), 8 /* PROPS */, ["modelValue"])
             ])
           : _cE("view", _uM({ key: 1 }), [
-              isTrue(!smsLoginMode.value)
-                ? _cE("view", _uM({ key: 0 }), [
-                    _cV(_component_i_button, _uM({
-                      type: "primary",
-                      onClick: startUniVerifyLogin,
-                      loading: nativeLoginLoading.value
-                    }), _uM({
-                      default: withSlotCtx((): any[] => ["本机号码一键登录"]),
-                      _: 1 /* STABLE */
-                    }), 8 /* PROPS */, ["loading"]),
-                    _cE("view", _uM({
-                      class: "phone-login-switch",
-                      onClick: openSmsLogin
-                    }), [
-                      _cE("text", _uM({ class: "phone-way" }), "验证码登录")
-                    ])
-                  ])
-                : _cE("view", _uM({ key: 1 }), [
-                    _cV(_component_i_form, null, _uM({
-                      default: withSlotCtx((): any[] => [
-                        _cV(_component_i_form_item, _uM({
-                          class: "sms-mobile-item",
-                          label: "",
-                          labelDirection: "horizontal",
-                          labelWidth: "0"
-                        }), _uM({
-                          default: withSlotCtx((): any[] => [
-                            _cV(_component_i_input, _uM({
-                              modelValue: smsMobile.value,
-                              "onUpdate:modelValue": $event => {(smsMobile).value = $event},
-                              placeholder: "请输入手机号",
-                              type: "number",
-                              clearable: ""
-                            }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                          ]),
-                          _: 1 /* STABLE */
-                        })),
-                        _cV(_component_i_form_item, _uM({
-                          class: "sms-code-item",
-                          label: "",
-                          labelDirection: "horizontal",
-                          labelWidth: "0"
-                        }), _uM({
-                          default: withSlotCtx((): any[] => [
-                            _cV(_component_i_input, _uM({
-                              class: "sms-code-input",
-                              modelValue: smsCode.value,
-                              "onUpdate:modelValue": $event => {(smsCode).value = $event},
-                              placeholder: "请输入验证码",
-                              type: "number",
-                              clearable: ""
-                            }), _uM({
-                              suffix: withSlotCtx((): any[] => [
-                                _cE("view", _uM({
-                                  class: _nC(["sms-send-button", _uM({ 'sms-send-button-disabled': smsCooldown.value > 0 || smsSending.value })]),
-                                  onClick: sendSmsCode
-                                }), [
-                                  _cE("text", _uM({ class: "sms-send-button-text" }), _tD(smsCooldown.value > 0 ? smsCooldown.value + '秒后重试' : '获取验证码'), 1 /* TEXT */)
-                                ], 2 /* CLASS */)
-                              ]),
-                              _: 1 /* STABLE */
-                            }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                          ]),
-                          _: 1 /* STABLE */
-                        })),
-                        _cV(_component_i_button, _uM({
-                          type: "primary",
-                          onClick: submitSmsLogin,
-                          loading: smsSubmitting.value
-                        }), _uM({
-                          default: withSlotCtx((): any[] => ["手机号验证码登录"]),
-                          _: 1 /* STABLE */
-                        }), 8 /* PROPS */, ["loading"])
-                      ]),
-                      _: 1 /* STABLE */
-                    })),
-                    _cE("view", _uM({
-                      class: "phone-login-switch",
-                      onClick: closeSmsLogin
-                    }), [
-                      _cE("text", _uM({ class: "phone-way" }), "一键登录")
-                    ])
-                  ])
+              _cV(_component_i_button, _uM({
+                type: "primary",
+                onClick: startUniVerifyLogin,
+                loading: nativeLoginLoading.value
+              }), _uM({
+                default: withSlotCtx((): any[] => ["本机号码一键登录"]),
+                _: 1 /* STABLE */
+              }), 8 /* PROPS */, ["loading"])
             ]),
         _cE("view", _uM({ class: "documents" }), [
           _cV(_component_i_checkbox, _uM({
@@ -721,4 +649,4 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
 
 })
 export default __sfc__
-const GenPagesLoginLoginStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#ffffff"]]))], ["banner", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["height", "20%"]])]])], ["banner-image", _uM([[".container .banner ", _uM([["width", "180rpx"], ["height", "180rpx"]])]])], ["title", _uM([[".container .banner ", _uM([["fontSize", "40rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["content", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "70rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "70rpx"]])]])], ["other-login", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "30rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["documents", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["marginTop", "40rpx"]])]])], ["doc-info-box", _uM([[".container .content .documents ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["whiteSpace", "nowrap"]])]])], ["doc-link", _uM([[".container .content .documents .doc-info-box ", _uM([["color", "#007AFF"], ["fontSize", "28rpx"]])]])], ["doc-text", _uM([[".container .content .documents .doc-info-box ", _uM([["fontSize", "28rpx"]])]])], ["remember-password", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["i-checkbox", _uM([[".container .content .remember-password ", _uM([["display", "flex"], ["alignItems", "center"]])]])], ["other-way", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "25rpx"], ["marginTop", "40rpx"], ["color", "#999999"]])]])], ["noLogin", _uM([[".container .other-way ", _uM([["borderRightWidth", "1rpx"], ["borderRightStyle", "solid"], ["borderRightColor", "#999999"], ["paddingRight", "50rpx"]])]])], ["BLogin", _uM([[".container .other-way ", _uM([["paddingLeft", "50rpx"]])]])], ["wechat-login-btn", _uM([[".container ", _uM([["!color", "#ffffff"]])]])], ["phone-login-switch", _uM([[".container ", _uM([["textAlign", "center"], ["marginTop", "28rpx"]])]])], ["phone-way", _uM([[".container .phone-login-switch ", _uM([["fontSize", "25rpx"], ["color", "#8b8c8d"]])]])], ["sms-mobile-item", _uM([[".container ", _uM([["marginBottom", "20rpx"]])]])], ["sms-code-item", _uM([[".container ", _uM([["marginBottom", "32rpx"]])]])], ["sms-code-input", _uM([[".container ", _uM([["width", "100%"]])]])], ["sms-send-button", _uM([[".container ", _uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["height", "56rpx"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "28rpx"], ["borderTopRightRadius", "28rpx"], ["borderBottomRightRadius", "28rpx"], ["borderBottomLeftRadius", "28rpx"], ["backgroundColor", "#007AFF"], ["color", "#ffffff"], ["fontSize", "24rpx"], ["whiteSpace", "nowrap"]])]])], ["sms-send-button-disabled", _uM([[".container ", _uM([["backgroundColor", "#B8D7FF"]])]])], ["sms-send-button-text", _uM([[".container ", _uM([["color", "#ffffff"], ["fontSize", "24rpx"], ["lineHeight", "56rpx"]])]])], ["i-form-item", _uM([[".container ", _uM([["paddingTop", 12], ["paddingRight", 0], ["paddingBottom", 12], ["paddingLeft", 0]])]])]])]
+const GenPagesLoginLoginStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#ffffff"]]))], ["banner", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["height", "20%"]])]])], ["banner-image", _uM([[".container .banner ", _uM([["width", "180rpx"], ["height", "180rpx"]])]])], ["title", _uM([[".container .banner ", _uM([["fontSize", "40rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["content", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "70rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "70rpx"]])]])], ["other-login", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "30rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["documents", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["marginTop", "40rpx"]])]])], ["doc-info-box", _uM([[".container .content .documents ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["whiteSpace", "nowrap"]])]])], ["doc-link", _uM([[".container .content .documents .doc-info-box ", _uM([["color", "#007AFF"], ["fontSize", "28rpx"]])]])], ["doc-text", _uM([[".container .content .documents .doc-info-box ", _uM([["fontSize", "28rpx"]])]])], ["remember-password", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["i-checkbox", _uM([[".container .content .remember-password ", _uM([["display", "flex"], ["alignItems", "center"]])]])], ["other-way", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "25rpx"], ["marginTop", "40rpx"], ["color", "#999999"]])]])], ["noLogin", _uM([[".container .other-way ", _uM([["borderRightWidth", "1rpx"], ["borderRightStyle", "solid"], ["borderRightColor", "#999999"], ["paddingRight", "50rpx"]])]])], ["BLogin", _uM([[".container .other-way ", _uM([["paddingLeft", "50rpx"]])]])], ["wechat-login-btn", _uM([[".container ", _uM([["!color", "#ffffff"]])]])], ["i-form-item", _uM([[".container ", _uM([["paddingTop", 12], ["paddingRight", 0], ["paddingBottom", 12], ["paddingLeft", 0]])]])]])]

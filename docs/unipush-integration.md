@@ -48,9 +48,9 @@ JPush Android AppKey 和 channel 继续通过 [nativeResources/android/manifestP
 - Android 会先加载华为厂商插件，再初始化 JPush 核心 SDK；
 - RegistrationID 为空时每 3 秒重试，最多 5 次；
 - RegistrationID、待处理 `messageId`、消息刷新标记和登录会话状态按 provider 维度缓存；
-- 当前前端只缓存 RegistrationID，尚未调用任何后端绑定、更新或解绑接口。
+- RegistrationID 就绪后，若存在有效业务登录 token，前端会异步调用后端设备绑定接口；如果 Android 的 RegistrationID 早于登录获得，登录成功会立即使用已缓存的 RegistrationID 补发绑定。请求不阻塞登录或页面跳转，失败后可在下一次 RegistrationID 刷新时重试；
 
-RegistrationID 属于设备推送标识，仅应在受控开发或联调日志中使用。
+RegistrationID 属于设备推送标识，生产 logcat 不输出其具体值；仅在受控开发或联调环境中通过安全渠道核验。
 
 ### 3.2 收到推送后的行为
 
@@ -72,10 +72,10 @@ JPush 事件沿用现有业务处理：
 
 ## 4. 已存在的消息接口
 
-当前前端 API 基地址是 `https://car.zdiot.cn:18443/api`，受保护请求使用：
+当前前端 API 基地址以 [api/http.uts](../api/http.uts) 中的 `BASE_URL` 为准（当前为 `https://gpsapp.zdiot.cn`）。既有受保护请求使用：
 
 ```http
-token: <业务登录 token>
+Authorization: Bearer <业务登录 token>
 ```
 
 ### 4.1 用户消息列表
@@ -95,16 +95,35 @@ token: <业务登录 token>
 
 ## 5. 后端绑定与发送约定
 
-当前仓库未发现绑定、更新或解绑接口，因此客户端不会假设某个 URL。后端接口确认后，推荐的幂等绑定数据为：
+### 5.1 设备绑定
+
+前端在 JPush `RegistrationID` 就绪且用户已登录后，异步调用以下接口：
+
+```http
+POST /app/push/bind
+Authorization: Bearer <业务登录 token>
+clientId: 428a8310cd442757ae699df5d894f051
+Content-Type: application/json
+```
+
+请求体：
 
 ```json
 {
-  "provider": "jpush",
   "registrationId": "<jpush-registration-id>",
   "platform": "android",
-  "appVersion": "1.0.0"
+  "deviceName": "Xiaomi 14",
+  "appVersion": "1.2.0"
 }
 ```
+
+- `Authorization` 使用 `Bearer <APP 登录 token>`，`clientId` 必须为 `428a8310cd442757ae699df5d894f051`；后端从 token 解析用户 ID，前端不传 `userId`；
+- `platform` 仅为 `android` 或 `ios`；
+- 同一 token 与 RegistrationID 在当前运行期内只会成功绑定一次；不同登录会话到来时会在当前请求完成后继续处理，避免登录/前台刷新产生重复请求；
+- 绑定失败不会阻塞登录、跳转或提示用户，后续 RegistrationID 刷新时可以再次提交；日志只记录绑定生命周期、平台和安全的业务响应信息，不记录 token 或 RegistrationID；
+- 前端不调用 JPush 原生 `setAlias`，也不调用解绑接口。若 RegistrationID 已归属其他账号，由后端按接口约定转移到当前登录用户，并负责设置/补偿 JPush alias。
+
+### 5.2 服务端发送
 
 服务端应先创建用户消息记录并生成业务 `messageId`，再查询有效 JPush RegistrationID 绑定，通过 JPush 发送，并将相同的 `messageId` 写入 payload。华为通道由 JPush 后台选择和投递，后端不应拿 RegistrationID 直接调用 Huawei Push Kit。
 

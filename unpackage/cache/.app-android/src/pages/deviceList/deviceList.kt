@@ -137,7 +137,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                                 val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 143, 11), "pageSize" to 1000)
                                 val res = await(getUserDeviceList(params))
                                 val list = if (res.code == 200 && res.data != null) {
-                                    res.data!!.list
+                                    res.data.list
                                 } else {
                                     null
                                 }

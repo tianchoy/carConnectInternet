@@ -4141,6 +4141,8 @@
       delete this.__props__;
     }
   }
+  const pushRegistrationIdReadyListeners = [];
+  const pushSessionAuthenticatedListeners = [];
   const PUSH_PROVIDER_KEY = "push_provider";
   const PUSH_PENDING_MESSAGE_ID_KEY_PREFIX = "push.pending_message_id.";
   const PUSH_MESSAGE_STALE_KEY_PREFIX = "push.message_stale.";
@@ -4171,7 +4173,25 @@
     return PUSH_SESSION_KEY_PREFIX + provider;
   }
   function pushDebug(provider, message) {
-    uni.__log__("error", "at services/push.uts:82", "[PushManager][" + provider + "] " + message);
+    uni.__log__("error", "at services/push.uts:88", "[PushManager][" + provider + "] " + message);
+  }
+  function notifyPushRegistrationIdReady(registrationId) {
+    for (let index = 0; index < pushRegistrationIdReadyListeners.length; index++) {
+      try {
+        pushRegistrationIdReadyListeners[index](registrationId);
+      } catch (error) {
+        uni.__log__("error", "at services/push.uts:96", "[PushManager] RegistrationID 就绪监听执行失败:", error);
+      }
+    }
+  }
+  function notifyPushSessionAuthenticated(registrationId) {
+    for (let index = 0; index < pushSessionAuthenticatedListeners.length; index++) {
+      try {
+        pushSessionAuthenticatedListeners[index](registrationId);
+      } catch (error) {
+        uni.__log__("error", "at services/push.uts:106", "[PushManager] 已认证会话监听执行失败:", error);
+      }
+    }
   }
   function stringValue(value = null) {
     if (value == null)
@@ -4299,7 +4319,7 @@
               onFailure("CID 为空");
               return null;
             }
-            pushDebug(this.provider, "UniPush CID: " + registrationId);
+            pushDebug(this.provider, "UniPush CID 已就绪");
             onSuccess(registrationId);
           },
           fail: (error = null) => {
@@ -4432,7 +4452,9 @@
       if (!this.initialized)
         this.init();
       uni.setStorageSync(sessionKey(this.provider), "authenticated");
+      const cachedRegistrationId = this.getCachedRegistrationId();
       this.refreshRegistrationId();
+      notifyPushSessionAuthenticated(cachedRegistrationId);
     }
     clearSessionState() {
       uni.removeStorageSync(sessionKey(this.provider));
@@ -4510,7 +4532,8 @@
       this.registrationRetryCount = 0;
       uni.setStorageSync(registrationIdKey(this.provider), registrationId);
       const registrationIdLabel = this.provider == "unipush" ? "UniPush CID 已就绪" : "JPush RegistrationID 已就绪";
-      pushDebug(this.provider, registrationIdLabel + ": " + registrationId);
+      pushDebug(this.provider, registrationIdLabel);
+      notifyPushRegistrationIdReady(registrationId);
     }
     requestUniPushRegistrationId(adapter) {
       this.registrationRequesting = true;
@@ -4574,6 +4597,12 @@
   function consumePushStaleFlag() {
     return pushManager.consumeStaleFlag();
   }
+  function onPushRegistrationIdReady(listener) {
+    pushRegistrationIdReadyListeners.push(listener);
+  }
+  function onPushSessionAuthenticated(listener) {
+    pushSessionAuthenticatedListeners.push(listener);
+  }
   class RequestOptions extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -4584,7 +4613,8 @@
             method: { type: "Unknown", optional: true },
             data: { type: "Any", optional: true },
             header: { type: "Unknown", optional: true },
-            showLoading: { type: Boolean, optional: true }
+            showLoading: { type: Boolean, optional: true },
+            showError: { type: Boolean, optional: true }
           };
         }
       };
@@ -4597,6 +4627,7 @@
       this.data = this.__props__.data;
       this.header = this.__props__.header;
       this.showLoading = this.__props__.showLoading;
+      this.showError = this.__props__.showError;
       delete this.__props__;
     }
   }
@@ -4687,6 +4718,7 @@
     }
   }
   const BASE_URL = "https://gpsapp.zdiot.cn";
+  const CLIENT_ID = "428a8310cd442757ae699df5d894f051";
   let isHandlingTokenExpired = false;
   function resetTokenExpiredState() {
     isHandlingTokenExpired = false;
@@ -4695,7 +4727,7 @@
     if (isHandlingTokenExpired)
       return null;
     isHandlingTokenExpired = true;
-    uni.__log__("log", "at api/http.uts:51", "检测到token过期，执行跳转登录页逻辑");
+    uni.__log__("log", "at api/http.uts:53", "检测到token过期，执行跳转登录页逻辑");
     uni.removeStorageSync("token");
     clearPushSessionState();
     showAppToast({
@@ -4704,14 +4736,14 @@
       duration: 2e3
     });
     setTimeout(() => {
-      uni.__log__("log", "at api/http.uts:66", "正在跳转到登录页...");
+      uni.__log__("log", "at api/http.uts:68", "正在跳转到登录页...");
       uni.redirectTo({
         url: "/pages/login/login",
         success: () => {
-          uni.__log__("log", "at api/http.uts:70", "跳转登录页成功");
+          uni.__log__("log", "at api/http.uts:72", "跳转登录页成功");
         },
         fail: (err) => {
-          uni.__log__("log", "at api/http.uts:73", "跳转登录页失败:", err);
+          uni.__log__("log", "at api/http.uts:75", "跳转登录页失败:", err);
           uni.reLaunch({
             url: "/pages/login/login"
           });
@@ -4721,12 +4753,12 @@
   }
   function requestInterceptor(config) {
     const token = uni.getStorageSync("token");
-    if (token != null && token.toString().length > 0) {
-      if (config.header == null) {
-        config.header = new UTSJSONObject();
-      }
-      config.header.set("token", token.toString());
+    const authorization = "Bearer " + (token != null ? token.toString() : "");
+    if (config.header == null) {
+      config.header = new UTSJSONObject();
     }
+    config.header.set("Authorization", authorization);
+    config.header.set("clientId", CLIENT_ID);
     return config;
   }
   function responseInterceptor(response, config) {
@@ -4734,18 +4766,21 @@
   }
   function logHttpError(error) {
     const detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (error.data != null ? error.data.toString() : "");
-    uni.__log__("error", "at api/http.uts:123", "[HttpRequest] " + detail);
+    uni.__log__("error", "at api/http.uts:127", "[HttpRequest] " + detail);
   }
   function errorHandler(error, config) {
     if (config.showLoading != false) {
       uni.hideLoading();
     }
     logHttpError(error);
+    if (config.showError == false)
+      return null;
+    if (error.statusCode == 401) {
+      handleTokenExpired();
+      return null;
+    }
     if (error.statusCode != 0) {
       switch (error.statusCode) {
-        case 401:
-          handleTokenExpired();
-          break;
         case 403:
           showAppToast({
             title: "没有权限访问",
@@ -4785,7 +4820,8 @@
         method: options.method != null ? options.method : "GET",
         data: options.data != null ? options.data : new UTSJSONObject({}),
         header: options.header != null ? options.header : new UTSJSONObject(),
-        showLoading: options.showLoading != false
+        showLoading: options.showLoading != false,
+        showError: options.showError != false
       }
       // 处理完整URL
     );
@@ -4831,14 +4867,16 @@
     method: null,
     data: null,
     header: null,
-    showLoading: null
+    showLoading: null,
+    showError: null
   })) {
     return request(new UTSJSONObject({
       url,
       method: "GET",
       data,
       header: options.header,
-      showLoading: options.showLoading
+      showLoading: options.showLoading,
+      showError: options.showError
     }));
   }
   function post(url, data = new UTSJSONObject({}), options = new RequestOptions({
@@ -4846,14 +4884,25 @@
     method: null,
     data: null,
     header: null,
-    showLoading: null
+    showLoading: null,
+    showError: null
   })) {
     return request(new UTSJSONObject({
       url,
       method: "POST",
       data,
       header: options.header,
-      showLoading: options.showLoading
+      showLoading: options.showLoading,
+      showError: options.showError
+    }));
+  }
+  function postSilently(url, data = null) {
+    return request(new UTSJSONObject({
+      url,
+      method: "POST",
+      data,
+      showLoading: false,
+      showError: false
     }));
   }
   function put(url, data = new UTSJSONObject({}), options = new RequestOptions({
@@ -4861,14 +4910,16 @@
     method: null,
     data: null,
     header: null,
-    showLoading: null
+    showLoading: null,
+    showError: null
   })) {
     return request(new UTSJSONObject({
       url,
       method: "PUT",
       data,
       header: options.header,
-      showLoading: options.showLoading
+      showLoading: options.showLoading,
+      showError: options.showError
     }));
   }
   function remove(url, data = new UTSJSONObject({}), options = new RequestOptions({
@@ -4876,14 +4927,16 @@
     method: null,
     data: null,
     header: null,
-    showLoading: null
+    showLoading: null,
+    showError: null
   })) {
     return request(new UTSJSONObject({
       url,
       method: "DELETE",
       data,
       header: options.header,
-      showLoading: options.showLoading
+      showLoading: options.showLoading,
+      showError: options.showError
     }));
   }
   function asJSONObject(value = null) {
@@ -4931,6 +4984,7 @@
   const cmdActionUrl = "/command/cmdAction";
   const cmdByMidUrl = "/command/cmdByMid";
   const cmdSendUrl = "/command/sendCmd";
+  const pushBindUrl = "/app/push/bind";
   class BasicResponse extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -4948,6 +5002,30 @@
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.code = this.__props__.code;
       this.msg = this.__props__.msg;
+      delete this.__props__;
+    }
+  }
+  class PushDeviceBindRequest extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            registrationId: { type: String, optional: false },
+            platform: { type: String, optional: false },
+            deviceName: { type: String, optional: false },
+            appVersion: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = PushDeviceBindRequest.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.registrationId = this.__props__.registrationId;
+      this.platform = this.__props__.platform;
+      this.deviceName = this.__props__.deviceName;
+      this.appVersion = this.__props__.appVersion;
       delete this.__props__;
     }
   }
@@ -5459,6 +5537,16 @@
       return new SendCmdResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString("data", "") });
     });
   };
+  const bindPushDevice = (data) => {
+    const requestData = new UTSJSONObject();
+    requestData.set("registrationId", data.registrationId);
+    requestData.set("platform", data.platform);
+    requestData.set("deviceName", data.deviceName);
+    requestData.set("appVersion", data.appVersion);
+    return postSilently(pushBindUrl, requestData).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
   class TodayTimeRange extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -5698,6 +5786,7 @@
       delete this.__props__;
     }
   }
+  const userLocationMarkerId = 1;
   const _sfc_main$D = /* @__PURE__ */ vue.defineComponent({
     __name: "index",
     setup(__props) {
@@ -5705,6 +5794,12 @@
         latitude: 39.90469,
         longitude: 116.40717
       }));
+      const userLocation = vue.reactive(new MapCenter$1({
+        latitude: 0,
+        longitude: 0
+      }));
+      const hasUserLocation = vue.ref(false);
+      const hasDevice = vue.ref(false);
       const userDeviceList2 = vue.ref([]);
       const positionState = vue.ref("loading");
       const positionMessage = vue.computed(() => {
@@ -5802,9 +5897,9 @@
             longitude: device.longitude
           });
           uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:379", "保存选中设备成功:", deviceInfo);
+          uni.__log__("log", "at pages/index/index.uvue:382", "保存选中设备成功:", deviceInfo);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:381", "保存选中设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:384", "保存选中设备失败:", error);
         }
       };
       const decodeSavedDevice = (raw = null) => {
@@ -5850,23 +5945,23 @@
             return null;
           return decodeSavedDevice(rawDevice);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:441", "获取保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:444", "获取保存设备失败:", error);
         }
         return null;
       };
       const clearSavedSelectedDevice = () => {
         try {
           uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:450", "清除保存设备成功");
+          uni.__log__("log", "at pages/index/index.uvue:453", "清除保存设备成功");
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:452", "清除保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:455", "清除保存设备失败:", error);
         }
       };
       const saveSelectedDeviceIndex = (index) => {
         try {
           uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:461", "保存选中设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:464", "保存选中设备索引失败:", error);
         }
       };
       const getSavedSelectedDeviceIndex = () => {
@@ -5877,7 +5972,7 @@
             return isNaN(index) || index < 0 ? null : index;
           }
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:474", "获取保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:477", "获取保存设备索引失败:", error);
         }
         return null;
       };
@@ -5885,7 +5980,7 @@
         try {
           uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:484", "清除保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:487", "清除保存设备索引失败:", error);
         }
       };
       const findDeviceIndex = (imei, deviceId) => {
@@ -5944,13 +6039,44 @@
           id,
           latitude: lat,
           longitude: lng,
-          iconPath: getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value),
+          iconPath: type == "user" ? "/static/current-location.png" : getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value),
           width: 30,
           height: 30,
           anchor: { x: 0.5, y: 0.5 },
           callout
         };
       };
+      function centerOnUserLocation() {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (!hasUserLocation.value)
+            return Promise.resolve(null);
+          center.latitude = userLocation.latitude;
+          center.longitude = userLocation.longitude;
+          markers.value = [];
+          yield delay(100);
+          if (hasDevice.value)
+            return Promise.resolve(null);
+          const nextMarker = createMarker(userLocationMarkerId, userLocation.latitude, userLocation.longitude, "user", "当前位置");
+          markers.value = [nextMarker];
+        });
+      }
+      function getUserLocation() {
+        uni.getLocation(new UTSJSONObject({
+          type: "gcj02",
+          success: (res) => {
+            uni.__log__("log", "at pages/index/index.uvue:602", "用户当前位置:", res);
+            userLocation.latitude = res.latitude;
+            userLocation.longitude = res.longitude;
+            hasUserLocation.value = true;
+            if (!hasDevice.value) {
+              centerOnUserLocation();
+            }
+          },
+          fail: (err) => {
+            uni.__log__("error", "at pages/index/index.uvue:611", "获取用户当前位置失败:", err.errMsg, err);
+          }
+        }));
+      }
       const loadDeviceDetail = (deviceId) => {
         return __awaiter(this, void 0, void 0, function* () {
           var _a, _b, _c;
@@ -5958,7 +6084,7 @@
             const res = yield getDeviceDetail(deviceId);
             const detail = res.data;
             if (res.code != 200 || detail == null) {
-              uni.__log__("error", "at pages/index/index.uvue:579", "加载设备详情失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:622", "加载设备详情失败:", res.msg);
               return Promise.resolve(null);
             }
             if (detail != null) {
@@ -5980,7 +6106,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:601", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:644", "加载设备详情失败", error);
           }
         });
       };
@@ -6032,7 +6158,7 @@
             if (requestId != trackRequestId)
               return Promise.resolve(null);
             if (res.code != 200) {
-              uni.__log__("error", "at pages/index/index.uvue:661", "加载轨迹失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:704", "加载轨迹失败:", res.msg);
               clearTripData();
               return Promise.resolve(null);
             }
@@ -6045,7 +6171,7 @@
           } catch (error) {
             if (requestId != trackRequestId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/index/index.uvue:674", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:717", "加载轨迹失败", error);
             clearTripData();
           }
         });
@@ -6063,7 +6189,7 @@
             const res = yield getDevicePos(data);
             const positions = res.data;
             if (res.code != 200 || positions == null || positions.length == 0) {
-              uni.__log__("warn", "at pages/index/index.uvue:692", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
+              uni.__log__("warn", "at pages/index/index.uvue:735", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
               positionState.value = "empty";
               return false;
             }
@@ -6073,7 +6199,7 @@
             const lng = position.getNumber("longitude", 0);
             const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
             if (!isValidCoordinate2) {
-              uni.__log__("error", "at pages/index/index.uvue:707", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              uni.__log__("error", "at pages/index/index.uvue:750", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
               positionState.value = "invalid";
               showAppToast({
                 title: "定位数据异常",
@@ -6088,10 +6214,10 @@
             yield delay(100);
             const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
             markers.value = [nextMarker];
-            uni.__log__("log", "at pages/index/index.uvue:732", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
+            uni.__log__("log", "at pages/index/index.uvue:775", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
             return true;
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:735", "加载设备位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:778", "加载设备位置失败", error);
             positionState.value = "failed";
             showAppToast({
               title: "定位失败，请重试",
@@ -6103,7 +6229,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:747", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:790", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -6116,7 +6242,7 @@
               icon: "none"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:760", "切换车辆失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:803", "切换车辆失败", error);
             showAppToast({
               title: "切换失败，请重试",
               icon: "none"
@@ -6156,7 +6282,7 @@
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:806", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:849", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -6182,6 +6308,8 @@
       };
       const loadDeviceList = () => {
         return __awaiter(this, void 0, void 0, function* () {
+          hasDevice.value = false;
+          getUserLocation();
           try {
             const res = yield getUserDeviceList(new UTSJSONObject({
               pageSize: 1e3
@@ -6195,6 +6323,11 @@
             }
             const pageData = res.data;
             if (pageData == null) {
+              markers.value = [];
+              positionState.value = "empty";
+              if (hasUserLocation.value) {
+                yield centerOnUserLocation();
+              }
               showAppToast({
                 title: "暂无车辆数据",
                 icon: "none"
@@ -6203,6 +6336,8 @@
             }
             const list = pageData.list;
             if (list != null && list.length > 0) {
+              hasDevice.value = true;
+              markers.value = [];
               userDeviceList2.value = list;
               deviceList.value = list.map((item) => {
                 const imei = item.getString("imei", "");
@@ -6247,7 +6382,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:913", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:965", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -6272,13 +6407,18 @@
                 yield loadTrackPos(createTrackRequestData(device.imei != "" ? device.imei : device.value));
               }
             } else {
+              markers.value = [];
+              positionState.value = "empty";
+              if (hasUserLocation.value) {
+                yield centerOnUserLocation();
+              }
               showAppToast({
                 title: "暂无车辆数据",
                 icon: "none"
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:948", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1006", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -6291,6 +6431,10 @@
       });
       const refreshLocation = () => {
         return __awaiter(this, void 0, void 0, function* () {
+          if (!hasDevice.value) {
+            yield centerOnUserLocation();
+            return Promise.resolve(null);
+          }
           if (!currentCarDeviceId.value) {
             showAppToast({
               title: "请先选择车辆",
@@ -6305,7 +6449,7 @@
           try {
             yield loadDeviceList();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:977", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1040", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -6348,7 +6492,7 @@
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1021", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1084", "跳转轨迹详情失败:", err);
           }
         });
       };
@@ -6375,7 +6519,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1049", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1112", "跳转添加设备失败:", err);
           }
         });
       };
@@ -6427,7 +6571,7 @@
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1139", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1202", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -6629,18 +6773,7 @@
                       "enable-building": true,
                       "enable-3D": false,
                       markers: markers.value
-                    }), null, 8, ["latitude", "longitude", "scale", "markers"])) : vue.createCommentVNode("", true),
-                    positionState.value != "available" ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                      key: 1,
-                      class: "map-status"
-                    }), [
-                      vue.createElementVNode("text", new UTSJSONObject({ class: "map-status-text" }), vue.toDisplayString(positionMessage.value), 1),
-                      positionState.value != "loading" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                        key: 0,
-                        class: "map-status-retry",
-                        onClick: refreshLocation
-                      }), "重新获取")) : vue.createCommentVNode("", true)
-                    ])) : vue.createCommentVNode("", true)
+                    }), null, 8, ["latitude", "longitude", "scale", "markers"])) : vue.createCommentVNode("", true)
                   ])
                 ]),
                 vue.createElementVNode("view", new UTSJSONObject({ class: "mile-record" }), [
@@ -20951,23 +21084,123 @@
   __definePage("pages/cmd/cmd", PagesCmdCmd);
   __definePage("pages/webview/webview", PagesWebviewWebview);
   __definePage("pages/deviceList/deviceList", PagesDeviceListDeviceList);
+  let initialized = false;
+  let binding = false;
+  let bindingSessionKey = "";
+  let pendingRegistrationId = "";
+  let boundSessionKey = "";
+  function pushBindingDebug(message) {
+    uni.__log__("log", "at services/push-binding.uts:17", "[PushBinding] " + message);
+  }
+  function pushBindingWarn(message) {
+    uni.__log__("warn", "at services/push-binding.uts:24", "[PushBinding] " + message);
+  }
+  function getPushBindPlatform() {
+    return "ios";
+  }
+  function getDeviceName() {
+    var _a;
+    try {
+      const systemInfo = uni.getSystemInfoSync();
+      return (_a = systemInfo.deviceModel) !== null && _a !== void 0 ? _a : "";
+    } catch (error) {
+      pushBindingWarn("获取设备型号失败");
+      return "";
+    }
+  }
+  function getAppVersion() {
+    var _a;
+    try {
+      return (_a = uni.getAppBaseInfo().appVersion) !== null && _a !== void 0 ? _a : "";
+    } catch (error) {
+      pushBindingWarn("获取应用版本失败");
+      return "";
+    }
+  }
+  function getLoginToken() {
+    const value = uni.getStorageSync("token");
+    return value == null ? "" : value.toString();
+  }
+  function bindRegistrationId(registrationId) {
+    if (registrationId == "")
+      return null;
+    const token = getLoginToken();
+    if (token == "") {
+      pushBindingDebug("RegistrationID 已就绪，等待用户登录");
+      return null;
+    }
+    const platform = getPushBindPlatform();
+    if (platform == "")
+      return null;
+    const sessionKey2 = token + ":" + registrationId;
+    if (binding) {
+      if (bindingSessionKey != sessionKey2)
+        pendingRegistrationId = registrationId;
+      return null;
+    }
+    if (boundSessionKey == sessionKey2)
+      return null;
+    binding = true;
+    bindingSessionKey = sessionKey2;
+    const data = new PushDeviceBindRequest({
+      registrationId,
+      platform,
+      deviceName: getDeviceName(),
+      appVersion: getAppVersion()
+    });
+    pushBindingDebug("开始绑定推送设备，platform=" + platform);
+    bindPushDevice(data).then((response) => {
+      if (response.code == 200) {
+        boundSessionKey = sessionKey2;
+        pushBindingDebug("推送设备绑定成功，platform=" + platform);
+        return null;
+      }
+      pushBindingWarn("推送设备绑定失败，稍后将重试。code=" + response.code + ", msg=" + response.msg);
+    }).catch(() => {
+      pushBindingWarn("推送设备绑定请求失败，稍后将重试。");
+    }).finally(() => {
+      binding = false;
+      bindingSessionKey = "";
+      const nextRegistrationId = pendingRegistrationId;
+      pendingRegistrationId = "";
+      if (nextRegistrationId != "")
+        bindRegistrationId(nextRegistrationId);
+    });
+  }
+  function initPushBinding() {
+    if (initialized)
+      return null;
+    initialized = true;
+    onPushRegistrationIdReady((registrationId) => {
+      bindRegistrationId(registrationId);
+    });
+    onPushSessionAuthenticated((registrationId) => {
+      if (registrationId == "") {
+        pushBindingDebug("用户已登录，但尚无缓存 RegistrationID");
+        return null;
+      }
+      pushBindingDebug("用户已登录，使用缓存 RegistrationID 绑定推送设备");
+      bindRegistrationId(registrationId);
+    });
+  }
   const _sfc_main = vue.defineComponent({
     onLaunch: function() {
-      uni.__log__("log", "at App.uvue:76", "App onLaunch");
+      uni.__log__("log", "at App.uvue:77", "App onLaunch");
+      initPushBinding();
       initPush();
       clearPushBadge();
     },
     onShow: function() {
-      uni.__log__("log", "at App.uvue:87", "App Show");
+      uni.__log__("log", "at App.uvue:89", "App Show");
       clearPushBadge();
       refreshPushClientId();
     },
     onHide: function() {
-      uni.__log__("log", "at App.uvue:92", "App Hide");
+      uni.__log__("log", "at App.uvue:94", "App Hide");
       clearPushBadge();
     },
     onExit: function() {
-      uni.__log__("log", "at App.uvue:114", "App Exit");
+      uni.__log__("log", "at App.uvue:116", "App Exit");
     }
   });
   const _style_0 = { "uni-row": { "": { "flexDirection": "row" } }, "uni-column": { "": { "flexDirection": "column" } } };

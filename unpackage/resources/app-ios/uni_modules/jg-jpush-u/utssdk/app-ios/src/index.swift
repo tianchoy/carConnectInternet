@@ -193,11 +193,8 @@ public class JGPushIOSPlugin : NSObject, UTSiOSHookProxy {
             log("JGPush iOS APNs hook disabled; UniPush owns notification handling")
             return true
         }
-        log("JGPushIOSPlugin applicationDidFinishLaunchingWithOptions")
+        log("JGPushIOSPlugin captured launch options")
         JGPushTool.launchOptions = launchOptions
-        var entity = JPUSHRegisterEntity()
-        entity.types = 0
-        JPUSHService.register(forRemoteNotificationConfig: entity, delegate: JGPushTool)
         return true
     }
     public func didRegisterForRemoteNotifications(_ deviceToken: Data?) {
@@ -205,22 +202,28 @@ public class JGPushIOSPlugin : NSObject, UTSiOSHookProxy {
             log("JGPush iOS APNs token hook disabled; UniPush owns notification handling")
             return
         }
-        log("JGPushIOSPlugin didRegisterForRemoteNotifications")
+        log("JGPushIOSPlugin received APNs device token")
         JGPushTool.registerDeviceToken(deviceToken)
     }
     public func didFailToRegisterForRemoteNotifications(_ error: Error?) {
-        log("JGPushIOSPlugin didFailToRegisterForRemoteNotifications", error)
+        log("JGPushIOSPlugin APNs registration failed")
     }
     public func didReceiveRemoteNotification(_ userInfo: Map<AnyHashable, Any>?) {
-        log("JGPushIOSPlugin didReceiveRemoteNotification", userInfo)
+        log("JGPushIOSPlugin received remote notification")
     }
 }
 @objc(UTSSDKModulesJgJpushUJGPushModule)
 @objcMembers
 public class JGPushModule : NSObject, JPUSHRegisterDelegate {
     public var launchOptions: Map<UIApplication.LaunchOptionsKey, Any>? = nil
+    private var initialized: Bool = false
     public func initPush(_ param: InitPushParams) {
-        log("JGPushModule initPush", param)
+        if (self.initialized) {
+            log("JGPushModule initialization already completed")
+            return
+        }
+        self.initialized = true
+        log("JGPushModule setup started")
         var method = Selector("didReceiveCustomMessage:")
         NotificationCenter.default.addObserver(self, selector: method, name: NSNotification.Name.jpfNetworkDidReceiveMessage, object: nil)
         var method1 = Selector("networkDidLogin:")
@@ -228,11 +231,13 @@ public class JGPushModule : NSObject, JPUSHRegisterDelegate {
         var method2 = Selector("networkDidClose:")
         NotificationCenter.default.addObserver(self, selector: method2, name: NSNotification.Name.jpfNetworkDidClose, object: nil)
         JPUSHService.setup(withOption: self.launchOptions, appKey: param.appkey, channel: param.channel, apsForProduction: param.isProduction, advertisingIdentifier: param.advertisingId)
+        log("JGPushModule setup completed")
         var entity = JPUSHRegisterEntity()
         var types = JPAuthorizationOptions(rawValue: (JPAuthorizationOptions.alert.rawValue | JPAuthorizationOptions.sound.rawValue | JPAuthorizationOptions.badge.rawValue))
         entity.types = Int(types.rawValue)
+        log("JGPushModule notification registration started")
         JPUSHService.register(forRemoteNotificationConfig: entity, delegate: self)
-        log("极光推送SDK初始化完成")
+        log("JGPushModule initialization completed")
     }
     public func registerDeviceToken(_ token: Data?) {
         log("JGPushModule registerDeviceToken")
@@ -244,7 +249,7 @@ public class JGPushModule : NSObject, JPUSHRegisterDelegate {
     }
     @objc
     public func didReceiveCustomMessage(_ notification: Notification) {
-        log("JGPushModule didReceiveCustomMessage", notification)
+        log("JGPushModule received custom message")
         var userInfo = notification.userInfo
         if (userInfo != nil) {
             var jsonString = JSON.stringify(userInfo! as! Dictionary<String, Any>)
@@ -255,12 +260,12 @@ public class JGPushModule : NSObject, JPUSHRegisterDelegate {
     }
     @objc
     public func networkDidLogin(_ notification: Notification) {
-        log("JGPushModule networkDidLogin", notification)
+        log("JGPushModule network connected")
         eventCallbackManager.triggerEvent("onConnected", "true")
     }
     @objc
     public func networkDidClose(_ notification: Notification) {
-        log("JGPushModule networkDidClose", notification)
+        log("JGPushModule network disconnected")
         eventCallbackManager.triggerEvent("onConnected", "false")
     }
     public func jpushNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (_ code: Int) -> Void) -> Void {
@@ -303,7 +308,7 @@ public func setEventCallBack(_ param: EventCallBackParams) -> Void {
     eventCallbackManager.setEventCallBack(param)
 }
 public func initPush(_ param: InitPushParams) -> Void {
-    log("initPush", param)
+    log("initPush")
     JGPushTool.initPush(param)
 }
 public func setDebug(_ debug: Bool) -> Void {
@@ -338,7 +343,10 @@ public func getRegistrationIdAsync(_ callback: @escaping (_ result: Registration
         "code": NSNumber(resCode),
         "registrationId": registrationId == nil ? "" : registrationId!
     ]))
-    log("getRegistrationIdAsync completion", result)
+    log(registrationId == nil || registrationId == "" ? "JPush RegistrationID callback returned empty ID" : "JPush RegistrationID callback completed")
+    if (resCode != 0) {
+        log("JPush RegistrationID callback error code", NSNumber(resCode))
+    }
     callback(result)
     })
 }

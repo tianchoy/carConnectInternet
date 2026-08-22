@@ -2,6 +2,7 @@
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
 require("./services/push.js");
+const services_pushBinding = require("./services/push-binding.js");
 if (!Math) {
   "./pages/index/index.js";
   "./pages/message/message.js";
@@ -31,16 +32,16 @@ function checkForUpdates() {
     updateManager = common_vendor.index.getUpdateManager();
     if (updateManager) {
       updateManager.onCheckForUpdate((res = null) => {
-        common_vendor.index.__f__("log", "at App.uvue:19", "检查更新结果:", res);
+        common_vendor.index.__f__("log", "at App.uvue:20", "检查更新结果:", res);
         if (res.hasUpdate) {
-          common_vendor.index.__f__("log", "at App.uvue:22", "发现新版本，正在后台下载...");
+          common_vendor.index.__f__("log", "at App.uvue:23", "发现新版本，正在后台下载...");
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "下载新版本中"
           }));
         }
       });
       updateManager.onUpdateReady(() => {
-        common_vendor.index.__f__("log", "at App.uvue:31", "新版本下载完成");
+        common_vendor.index.__f__("log", "at App.uvue:32", "新版本下载完成");
         common_vendor.index.hideLoading();
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新提示",
@@ -55,7 +56,7 @@ function checkForUpdates() {
         }));
       });
       updateManager.onUpdateFailed(() => {
-        common_vendor.index.__f__("error", "at App.uvue:51", "新版本下载失败");
+        common_vendor.index.__f__("error", "at App.uvue:52", "新版本下载失败");
         common_vendor.index.hideLoading();
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新失败",
@@ -75,17 +76,18 @@ function checkForUpdates() {
 }
 const _sfc_main = common_vendor.defineComponent({
   onLaunch: function() {
-    common_vendor.index.__f__("log", "at App.uvue:76", "App onLaunch");
+    common_vendor.index.__f__("log", "at App.uvue:77", "App onLaunch");
     checkForUpdates();
+    services_pushBinding.initPushBinding();
   },
   onShow: function() {
-    common_vendor.index.__f__("log", "at App.uvue:87", "App Show");
+    common_vendor.index.__f__("log", "at App.uvue:89", "App Show");
   },
   onHide: function() {
-    common_vendor.index.__f__("log", "at App.uvue:92", "App Hide");
+    common_vendor.index.__f__("log", "at App.uvue:94", "App Hide");
   },
   onExit: function() {
-    common_vendor.index.__f__("log", "at App.uvue:114", "App Exit");
+    common_vendor.index.__f__("log", "at App.uvue:116", "App Exit");
   }
 });
 function createApp() {

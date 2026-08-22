@@ -412,7 +412,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         try {
                             val res = await(getGeofenceList())
                             if (res.code == 200 && res.data != null) {
-                                fenceList.value = res.data!!
+                                fenceList.value = res.data
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg

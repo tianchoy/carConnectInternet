@@ -92,6 +92,12 @@ const center = reactive<MapCenter>({
     latitude: 39.90469,
     longitude: 116.40717
 })
+const userLocation = reactive<MapCenter>({
+    latitude: 0,
+    longitude: 0
+})
+const hasUserLocation = ref(false)
+const hasDevice = ref(false)
 
 const userDeviceList = ref<Array<UTSJSONObject>>([])
 const positionState = ref<PositionState>('loading')
@@ -150,6 +156,7 @@ const safeDeviceDetail = computed<DeviceDetailState>(() => {
         lastUpdateTime: detail.lastUpdateTime
     }
 })
+
 
 // 处理车辆列表显示 - 返回 picker 选项
 const pickerColumns = computed<PickerColumn[]>(() => {
@@ -375,12 +382,52 @@ const createMarker = (id: number, lat: number, lng: number, type: string, title?
         id: id,
         latitude: lat,
         longitude: lng,
-        iconPath: getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value),
+        iconPath: type == 'user' ? '/static/current-location.png' : getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value),
         width: 30,
         height: 30,
         anchor: { x: 0.5, y: 0.5 },
         callout: callout
     }
+}
+
+// 获取用户当前位置
+const userLocationMarkerId = 1
+
+async function centerOnUserLocation() {
+    if (!hasUserLocation.value) return
+    center.latitude = userLocation.latitude
+    center.longitude = userLocation.longitude
+    markers.value = []
+
+    await delay(100)
+    if (hasDevice.value) return
+
+    const nextMarker = createMarker(
+        userLocationMarkerId,
+        userLocation.latitude,
+        userLocation.longitude,
+        'user',
+        '当前位置'
+    )
+    markers.value = [nextMarker]
+}
+
+function getUserLocation() {
+    uni.getLocation({
+        type: 'gcj02',
+        success: (res) => {
+            console.log('用户当前位置:', res)
+            userLocation.latitude = res.latitude
+            userLocation.longitude = res.longitude
+            hasUserLocation.value = true
+            if (!hasDevice.value) {
+                centerOnUserLocation()
+            }
+        },
+        fail: (err) => {
+            console.error('获取用户当前位置失败:', err.errMsg, err)
+        }
+    })
 }
 
 // 加载车辆详情
@@ -647,6 +694,8 @@ const handlePickerConfirm = (e: PickerConfirmEvent) => {
 
 // 加载车辆列表
 const loadDeviceList = async () => {
+    hasDevice.value = false
+    getUserLocation()
     try {
         const res = await getUserDeviceList({
             pageSize: 1000
@@ -661,6 +710,11 @@ const loadDeviceList = async () => {
 
         const pageData = res.data
         if (pageData == null) {
+            markers.value = []
+            positionState.value = 'empty'
+            if (hasUserLocation.value) {
+                await centerOnUserLocation()
+            }
             showAppToast({
                 title: '暂无车辆数据',
                 icon: 'none'
@@ -669,6 +723,8 @@ const loadDeviceList = async () => {
         }
         const list : Array<UTSJSONObject> = pageData.list
         if (list != null && list.length > 0) {
+            hasDevice.value = true
+            markers.value = []
             userDeviceList.value = list
             deviceList.value = list.map((item: UTSJSONObject): Device => {
                 const imei = item.getString('imei', '')
@@ -752,6 +808,12 @@ const loadDeviceList = async () => {
                 await loadTrackPos(createTrackRequestData(device.imei != '' ? device.imei : device.value))
             }
         } else {
+            markers.value = []
+            positionState.value = 'empty'
+            if (hasUserLocation.value) {
+                await centerOnUserLocation()
+            }
+
             showAppToast({
                 title: '暂无车辆数据',
                 icon: 'none'
@@ -773,6 +835,11 @@ const totalTrips = computed(() => {
 
 // 刷新位置
 const refreshLocation = async () => {
+    if (!hasDevice.value) {
+        await centerOnUserLocation()
+        return
+    }
+
     if (!currentCarDeviceId.value) {
         showAppToast({
             title: '请先选择车辆',
@@ -1212,21 +1279,6 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                     "enable-3D": false,
                     markers: markers.value
                   }), null, 8 /* PROPS */, ["latitude", "longitude", "scale", "style", "markers"])
-                : _cC("v-if", true),
-              positionState.value != 'available'
-                ? _cE("view", _uM({
-                    key: 1,
-                    class: "map-status"
-                  }), [
-                    _cE("text", _uM({ class: "map-status-text" }), _tD(positionMessage.value), 1 /* TEXT */),
-                    positionState.value != 'loading'
-                      ? _cE("text", _uM({
-                          key: 0,
-                          class: "map-status-retry",
-                          onClick: refreshLocation
-                        }), "重新获取")
-                      : _cC("v-if", true)
-                  ])
                 : _cC("v-if", true)
             ])
           ]),

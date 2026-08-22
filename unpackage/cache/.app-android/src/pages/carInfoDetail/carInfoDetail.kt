@@ -457,7 +457,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                         if (deviceId.value != null) {
                             val res = await(getDeviceDetail(deviceId.value!!))
                             if (res.code == 200 && res.data != null) {
-                                currentCarInfo.value = res.data!!
+                                currentCarInfo.value = res.data
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg

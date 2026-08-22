@@ -39,7 +39,7 @@ open class GenPagesUserCenterUserCenter : BasePage {
                         try {
                             val res = await(getUserInfo())
                             if (res.code == 200 && res.data != null) {
-                                userInfo.value = _uO("avatar" to res.data!!.getString("avatar", "/static/avatar.png"), "nickname" to res.data!!.getString("nickname", ""))
+                                userInfo.value = _uO("avatar" to res.data.getString("avatar", "/static/avatar.png"), "nickname" to res.data.getString("nickname", ""))
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
@@ -50,7 +50,7 @@ open class GenPagesUserCenterUserCenter : BasePage {
                             }
                             val resCars = await(getUserDeviceList(params))
                             if (resCars.code == 200 && resCars.data != null) {
-                                carsnumber.value = resCars.data!!.totalCount
+                                carsnumber.value = resCars.data.totalCount
                             } else {
                                 showAppToast(ShowToastOptions(title = if (resCars.msg != "") {
                                     resCars.msg

@@ -663,7 +663,7 @@ const __sfc__ = defineComponent({
             if (deviceId.value != null) {
                 const res = await getDeviceDetail(deviceId.value!);
                 if (res.code == 200 && res.data != null) {
-                    currentCarInfo.value = res.data!;
+                    currentCarInfo.value = res.data;
                 }
                 else {
                     showAppToast({ title: res.msg != "" ? res.msg : '获取设备详情失败', icon: 'none' } as ShowToastOptions);

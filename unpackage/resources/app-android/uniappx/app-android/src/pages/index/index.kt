@@ -12,6 +12,7 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
+import io.dcloud.uniapp.extapi.getLocation as uni_getLocation
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
@@ -30,6 +31,9 @@ open class GenPagesIndexIndex : BasePage {
             val _ctx = __ins.proxy as GenPagesIndexIndex
             val _cache = __ins.renderCache
             val center = reactive<MapCenter>(MapCenter(latitude = 39.90469, longitude = 116.40717))
+            val userLocation = reactive<MapCenter>(MapCenter(latitude = 0, longitude = 0))
+            val hasUserLocation = ref(false)
+            val hasDevice = ref(false)
             val userDeviceList = ref(_uA<UTSJSONObject>())
             val positionState = ref<PositionState>("loading")
             val positionMessage = computed<String>(fun(): String {
@@ -317,8 +321,49 @@ open class GenPagesIndexIndex : BasePage {
                     "#CCCCCC"
                 }
                 , padding = 4, fontSize = 12, display = "ALWAYS")
-                return Marker(id = id, latitude = lat, longitude = lng, iconPath = getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value), width = 30, height = 30, anchor = Anchor(x = 0.5, y = 0.5), callout = callout)
+                return Marker(id = id, latitude = lat, longitude = lng, iconPath = if (type == "user") {
+                    "/static/current-location.png"
+                } else {
+                    getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value)
+                }
+                , width = 30, height = 30, anchor = Anchor(x = 0.5, y = 0.5), callout = callout)
             }
+            val userLocationMarkerId: Number = 1
+            fun gen_centerOnUserLocation_fn(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        if (!hasUserLocation.value) {
+                            return@w1
+                        }
+                        center.latitude = userLocation.latitude
+                        center.longitude = userLocation.longitude
+                        markers.value = _uA()
+                        await(delay(100))
+                        if (hasDevice.value) {
+                            return@w1
+                        }
+                        val nextMarker = createMarker(userLocationMarkerId, userLocation.latitude, userLocation.longitude, "user", "当前位置")
+                        markers.value = _uA(
+                            nextMarker
+                        )
+                })
+            }
+            val centerOnUserLocation = ::gen_centerOnUserLocation_fn
+            fun gen_getUserLocation_fn() {
+                uni_getLocation(GetLocationOptions(type = "gcj02", success = fun(res){
+                    console.log("用户当前位置:", res)
+                    userLocation.latitude = res.latitude
+                    userLocation.longitude = res.longitude
+                    hasUserLocation.value = true
+                    if (!hasDevice.value) {
+                        centerOnUserLocation()
+                    }
+                }
+                , fail = fun(err){
+                    console.error("获取用户当前位置失败:", err.errMsg, err)
+                }
+                ))
+            }
+            val getUserLocation = ::gen_getUserLocation_fn
             val loadDeviceDetail = fun(deviceId: String): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         try {
@@ -564,6 +609,8 @@ open class GenPagesIndexIndex : BasePage {
             }
             val loadDeviceList = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
+                        hasDevice.value = false
+                        getUserLocation()
                         try {
                             val res = await(getUserDeviceList(_uO("pageSize" to 1000)))
                             if (res.code != 200) {
@@ -577,11 +624,18 @@ open class GenPagesIndexIndex : BasePage {
                             }
                             val pageData = res.data
                             if (pageData == null) {
+                                markers.value = _uA()
+                                positionState.value = "empty"
+                                if (hasUserLocation.value) {
+                                    await(centerOnUserLocation())
+                                }
                                 showAppToast(ShowToastOptions(title = "暂无车辆数据", icon = "none"))
                                 return@w1
                             }
                             val list: UTSArray<UTSJSONObject> = pageData.list
                             if (list != null && list.length > 0) {
+                                hasDevice.value = true
+                                markers.value = _uA()
                                 userDeviceList.value = list
                                 deviceList.value = list.map(fun(item: UTSJSONObject): Device {
                                     val imei = item.getString("imei", "")
@@ -670,6 +724,11 @@ open class GenPagesIndexIndex : BasePage {
                                     )))
                                 }
                             } else {
+                                markers.value = _uA()
+                                positionState.value = "empty"
+                                if (hasUserLocation.value) {
+                                    await(centerOnUserLocation())
+                                }
                                 showAppToast(ShowToastOptions(title = "暂无车辆数据", icon = "none"))
                             }
                         }
@@ -685,6 +744,10 @@ open class GenPagesIndexIndex : BasePage {
             )
             val refreshLocation = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
+                        if (!hasDevice.value) {
+                            await(centerOnUserLocation())
+                            return@w1
+                        }
                         if (!(currentCarDeviceId.value != "")) {
                             showAppToast(ShowToastOptions(title = "请先选择车辆", icon = "none"))
                             return@w1
@@ -979,19 +1042,6 @@ open class GenPagesIndexIndex : BasePage {
                                                 "scale",
                                                 "style",
                                                 "markers"
-                                            ))
-                                        } else {
-                                            _cC("v-if", true)
-                                        }
-                                        ,
-                                        if (positionState.value != "available") {
-                                            _cE("view", _uM("key" to 1, "class" to "map-status"), _uA(
-                                                _cE("text", _uM("class" to "map-status-text"), _tD(positionMessage.value), 1),
-                                                if (positionState.value != "loading") {
-                                                    _cE("text", _uM("key" to 0, "class" to "map-status-retry", "onClick" to refreshLocation), "重新获取")
-                                                } else {
-                                                    _cC("v-if", true)
-                                                }
                                             ))
                                         } else {
                                             _cC("v-if", true)

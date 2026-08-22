@@ -129,7 +129,7 @@ open class GenPagesUserCenterCarDetailCarDetail : BasePage {
                         try {
                             val res = await(getDeviceDetail(deviceId.value))
                             if (res.code == 200 && res.data != null) {
-                                carInfo.value = res.data!!
+                                carInfo.value = res.data
                                 detailLoaded.value = true
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {

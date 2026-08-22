@@ -1,5 +1,6 @@
 
 	import { initPush, refreshPushClientId, clearPushBadge } from './services/push.uts'
+	import { initPushBinding } from './services/push-binding.uts'
 	import { ensureNotificationPermission } from './utils/cameraPermission.uts'
 
 	let firstBackTime = 0
@@ -75,6 +76,7 @@
 		onLaunch: function () {
 			console.log('App onLaunch')
 			checkForUpdates()
+			initPushBinding()
 			initPush()
 			clearPushBadge()
 

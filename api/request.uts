@@ -1,4 +1,4 @@
-import { get, post, put, remove } from "./http";
+import { get, post, postSilently, put, remove } from "./http";
 import { asJSONObject, getResponseCode, getResponseDataArray, getResponseDataObject, getResponseMessage } from "./response";
 
 const loginUrl = '/sys/login'
@@ -35,8 +35,15 @@ const cmdActionUrl = '/command/cmdAction'
 const cmdByMidUrl = '/command/cmdByMid'
 const cmdSendUrl = '/command/sendCmd'
 const cmdRecordByIdUrl = '/command/recordById?id='
+const pushBindUrl = '/app/push/bind'
 
 export type BasicResponse = { code: number, msg: string }
+export type PushDeviceBindRequest = {
+    registrationId: string
+    platform: string
+    deviceName: string
+    appVersion: string
+}
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
 export type UniVerifyLoginRequest = UTSJSONObject
 // 短信验证码登录功能暂时停用：
@@ -201,3 +208,11 @@ export const sendCmd = (data: UTSJSONObject): Promise<SendCmdResponse> => post(c
     return { code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString('data', '') }
 })
 export const getCmdRecordById = (id: string): Promise<JsonDataResponse> => get(`${cmdRecordByIdUrl}${id}`).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const bindPushDevice = (data: PushDeviceBindRequest): Promise<BasicResponse> => {
+    const requestData = new UTSJSONObject()
+    requestData.set('registrationId', data.registrationId)
+    requestData.set('platform', data.platform)
+    requestData.set('deviceName', data.deviceName)
+    requestData.set('appVersion', data.appVersion)
+    return postSilently(pushBindUrl, requestData).then((raw: any): BasicResponse => { return basicResponse(raw) })
+}
