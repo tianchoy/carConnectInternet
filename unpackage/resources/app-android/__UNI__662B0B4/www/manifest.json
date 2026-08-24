@@ -61,6 +61,13 @@
         "xxxhdpi": "/Users/xyhc/Downloads/logo/432.png",
         "xxhdpi": "/Users/xyhc/Downloads/logo/432.png",
         "xhdpi": "/Users/xyhc/Downloads/logo/432.png"
+      },
+      "splashScreens": {
+        "default": {
+          "xhdpi": "/Users/xyhc/Downloads/logo/横版.png",
+          "xxhdpi": "/Users/xyhc/Downloads/logo/横版.png",
+          "xxxhdpi": "/Users/xyhc/Downloads/logo/横版.png"
+        }
       }
     }
   }
