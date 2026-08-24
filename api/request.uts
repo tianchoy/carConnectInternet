@@ -12,9 +12,10 @@ const userDeviceList = '/userDevice/list'
 const wechatLogin = '/authLogin'
 // 后端待实现的示例接口：Uni Verify 服务端换号并签发业务 token 后可按正式约定替换。
 const uniVerifyLoginUrl = '/auth/login'
-// 短信验证码登录功能暂时停用：
-// const smsSendCodeUrl = '/auth/sms/send'
-// const smsLoginUrl = '/auth/sms/login'
+const smsSendCodeUrl = '/resource/sms/code'
+const smsLoginUrl = '/auth/login'
+const smsClientId = '428a8310cd442757ae699df5d894f051'
+const defaultTenantId = '000000'
 const changePSW = '/sys/user/password'
 const userMsgList = '/usermessage/listForUser'
 const msgState = '/usermessage/detail/'
@@ -36,6 +37,7 @@ const cmdByMidUrl = '/command/cmdByMid'
 const cmdSendUrl = '/command/sendCmd'
 const cmdRecordByIdUrl = '/command/recordById?id='
 const pushBindUrl = '/app/push/bind'
+const pushUnbindUrl = '/app/push/unbind'
 
 export type BasicResponse = { code: number, msg: string }
 export type PushDeviceBindRequest = {
@@ -46,9 +48,8 @@ export type PushDeviceBindRequest = {
 }
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
 export type UniVerifyLoginRequest = UTSJSONObject
-// 短信验证码登录功能暂时停用：
-// export type SendSmsCodeRequest = { mobile: string, scene: string }
-// export type SmsLoginRequest = { mobile: string, code: string, platform: string }
+export type SendSmsCodeRequest = { phonenumber: string, tenantId?: string }
+export type SmsLoginRequest = { phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
 export type DevicePositionResponse = { code: number, msg: string, data: Array<UTSJSONObject> }
 export type TrackPosResponse = { code: number, msg: string, data: UTSJSONObject }
 export type UserInfoResponse = { code: number, msg: string, data: UTSJSONObject }
@@ -169,9 +170,19 @@ export const PostWechatlogin = (data: UTSJSONObject): Promise<JsonDataResponse> 
 
 // 后端待实现的示例接口：服务端必须使用 openId/accessToken 换取手机号，前端不可上传手机号作为一键登录凭据。
 export const uniVerifyLogin = (data: UniVerifyLoginRequest): Promise<JsonDataResponse> => post(uniVerifyLoginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
-// 短信验证码登录功能暂时停用：
-// export const sendSmsLoginCode = (data: SendSmsCodeRequest): Promise<JsonDataResponse> => post(smsSendCodeUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
-// export const smsLogin = (data: SmsLoginRequest): Promise<JsonDataResponse> => post(smsLoginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const sendSmsLoginCode = (data: SendSmsCodeRequest): Promise<BasicResponse> => get(smsSendCodeUrl, {
+    phonenumber: data.phonenumber,
+    tenantId: data.tenantId != null ? data.tenantId : defaultTenantId
+} as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const smsLogin = (data: SmsLoginRequest): Promise<JsonDataResponse> => {
+    const requestData = new UTSJSONObject()
+    requestData.set('clientId', data.clientId != null ? data.clientId : smsClientId)
+    requestData.set('grantType', 'sms')
+    requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
+    requestData.set('phonenumber', data.phonenumber)
+    requestData.set('smsCode', data.smsCode)
+    return post(smsLoginUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+}
 export const changePassWord = (data: UTSJSONObject): Promise<ChangePasswordResponse> => put(changePSW, data).then((raw: any): ChangePasswordResponse => { return changePasswordResponse(raw) })
 export const getUserMsgList = (data?: UTSJSONObject): Promise<MessageResponse> => (data != null ? get(userMsgList, data) : get(userMsgList)).then((raw: any): MessageResponse => {
     return messagePageResponse(raw)
@@ -208,6 +219,7 @@ export const sendCmd = (data: UTSJSONObject): Promise<SendCmdResponse> => post(c
     return { code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString('data', '') }
 })
 export const getCmdRecordById = (id: string): Promise<JsonDataResponse> => get(`${cmdRecordByIdUrl}${id}`).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const unbindPushDevice = (registrationId: string): Promise<BasicResponse> => postSilently(pushUnbindUrl + '?registrationId=' + encodeURIComponent(registrationId), new UTSJSONObject()).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const bindPushDevice = (data: PushDeviceBindRequest): Promise<BasicResponse> => {
     const requestData = new UTSJSONObject()
     requestData.set('registrationId', data.registrationId)

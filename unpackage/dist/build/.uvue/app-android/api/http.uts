@@ -37,7 +37,7 @@ let isHandlingTokenExpired = false;
 export function resetTokenExpiredState(): void {
     isHandlingTokenExpired = false;
 }
-function handleTokenExpired(): void {
+export function handleTokenExpired(): void {
     if (isHandlingTokenExpired)
         return;
     isHandlingTokenExpired = true;

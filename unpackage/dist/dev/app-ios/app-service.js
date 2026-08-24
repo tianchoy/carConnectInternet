@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.1.180";
     const port = "8090";
-    const id = "app-ios_NaHZ8U";
+    const id = "app-ios_4t1jNV";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -4449,6 +4449,8 @@
       delete this.__props__;
     }
   }
+  const pushRegistrationIdReadyListeners = [];
+  const pushSessionAuthenticatedListeners = [];
   const PUSH_PROVIDER_KEY = "push_provider";
   const PUSH_PENDING_MESSAGE_ID_KEY_PREFIX = "push.pending_message_id.";
   const PUSH_MESSAGE_STALE_KEY_PREFIX = "push.message_stale.";
@@ -4479,7 +4481,25 @@
     return PUSH_SESSION_KEY_PREFIX + provider;
   }
   function pushDebug(provider, message) {
-    uni.__log__("error", "at services/push.uts:82", "[PushManager][" + provider + "] " + message);
+    uni.__log__("error", "at services/push.uts:88", "[PushManager][" + provider + "] " + message);
+  }
+  function notifyPushRegistrationIdReady(registrationId) {
+    for (let index = 0; index < pushRegistrationIdReadyListeners.length; index++) {
+      try {
+        pushRegistrationIdReadyListeners[index](registrationId);
+      } catch (error) {
+        uni.__log__("error", "at services/push.uts:96", "[PushManager] RegistrationID 就绪监听执行失败:", error);
+      }
+    }
+  }
+  function notifyPushSessionAuthenticated(registrationId) {
+    for (let index = 0; index < pushSessionAuthenticatedListeners.length; index++) {
+      try {
+        pushSessionAuthenticatedListeners[index](registrationId);
+      } catch (error) {
+        uni.__log__("error", "at services/push.uts:106", "[PushManager] 已认证会话监听执行失败:", error);
+      }
+    }
   }
   function stringValue(value = null) {
     if (value == null)
@@ -4607,7 +4627,7 @@
               onFailure("CID 为空");
               return null;
             }
-            pushDebug(this.provider, "UniPush CID: " + registrationId);
+            pushDebug(this.provider, "UniPush CID 已就绪");
             onSuccess(registrationId);
           },
           fail: (error = null) => {
@@ -4740,7 +4760,9 @@
       if (!this.initialized)
         this.init();
       uni.setStorageSync(sessionKey(this.provider), "authenticated");
+      const cachedRegistrationId = this.getCachedRegistrationId();
       this.refreshRegistrationId();
+      notifyPushSessionAuthenticated(cachedRegistrationId);
     }
     clearSessionState() {
       uni.removeStorageSync(sessionKey(this.provider));
@@ -4818,7 +4840,8 @@
       this.registrationRetryCount = 0;
       uni.setStorageSync(registrationIdKey(this.provider), registrationId);
       const registrationIdLabel = this.provider == "unipush" ? "UniPush CID 已就绪" : "JPush RegistrationID 已就绪";
-      pushDebug(this.provider, registrationIdLabel + ": " + registrationId);
+      pushDebug(this.provider, registrationIdLabel);
+      notifyPushRegistrationIdReady(registrationId);
     }
     requestUniPushRegistrationId(adapter) {
       this.registrationRequesting = true;
@@ -4882,33 +4905,14 @@
   function consumePushStaleFlag() {
     return pushManager.consumeStaleFlag();
   }
-  class BackendResponse {
-    constructor() {
-      this.code = -1;
-      this.msg = "";
-      this.data = null;
-    }
+  function getCachedPushRegistrationId() {
+    return pushManager.getCachedRegistrationId();
   }
-  function asJSONObject(value = null) {
-    if (value == null) {
-      return new UTSJSONObject();
-    }
-    return value;
+  function onPushRegistrationIdReady(listener) {
+    pushRegistrationIdReadyListeners.push(listener);
   }
-  function getResponseCode(response) {
-    return response.getNumber("code", -1);
-  }
-  function getResponseMessage(response) {
-    const msg = response.getString("msg", "");
-    return msg != "" ? msg : response.getString("message", "");
-  }
-  function getResponseDataObject(response) {
-    const data = response.getJSON("data");
-    return data != null ? data : new UTSJSONObject();
-  }
-  function getResponseDataArray(response) {
-    const data = response.getArray("data");
-    return data != null ? data : [];
+  function onPushSessionAuthenticated(listener) {
+    pushSessionAuthenticatedListeners.push(listener);
   }
   class RequestOptions extends UTS.UTSType {
     static get$UTSMetadata$() {
@@ -4921,7 +4925,7 @@
             data: { type: "Any", optional: true },
             header: { type: "Unknown", optional: true },
             showLoading: { type: Boolean, optional: true },
-            skipAuth: { type: Boolean, optional: true }
+            showError: { type: Boolean, optional: true }
           };
         },
         name: "RequestOptions"
@@ -4935,7 +4939,7 @@
       this.data = this.__props__.data;
       this.header = this.__props__.header;
       this.showLoading = this.__props__.showLoading;
-      this.skipAuth = this.__props__.skipAuth;
+      this.showError = this.__props__.showError;
       delete this.__props__;
     }
   }
@@ -5030,6 +5034,7 @@
     }
   }
   const BASE_URL = "https://gpsapp.zdiot.cn";
+  const CLIENT_ID = "428a8310cd442757ae699df5d894f051";
   let isHandlingTokenExpired = false;
   function resetTokenExpiredState() {
     isHandlingTokenExpired = false;
@@ -5038,7 +5043,7 @@
     if (isHandlingTokenExpired)
       return null;
     isHandlingTokenExpired = true;
-    uni.__log__("log", "at api/http.uts:51", "检测到token过期，执行跳转登录页逻辑");
+    uni.__log__("log", "at api/http.uts:53", "检测到token过期，执行跳转登录页逻辑");
     uni.removeStorageSync("token");
     clearPushSessionState();
     showAppToast({
@@ -5047,14 +5052,14 @@
       duration: 2e3
     });
     setTimeout(() => {
-      uni.__log__("log", "at api/http.uts:66", "正在跳转到登录页...");
+      uni.__log__("log", "at api/http.uts:68", "正在跳转到登录页...");
       uni.redirectTo({
         url: "/pages/login/login",
         success: () => {
-          uni.__log__("log", "at api/http.uts:70", "跳转登录页成功");
+          uni.__log__("log", "at api/http.uts:72", "跳转登录页成功");
         },
         fail: (err) => {
-          uni.__log__("log", "at api/http.uts:73", "跳转登录页失败:", err);
+          uni.__log__("log", "at api/http.uts:75", "跳转登录页失败:", err);
           uni.reLaunch({
             url: "/pages/login/login"
           });
@@ -5063,61 +5068,35 @@
     }, 500);
   }
   function requestInterceptor(config) {
-    if (config.skipAuth == true)
-      return config;
     const token = uni.getStorageSync("token");
-    if (token != null && token.toString().length > 0) {
-      if (config.header == null) {
-        config.header = new UTSJSONObject();
-      }
-      config.header.set("token", token.toString());
+    const authorization = "Bearer " + (token != null ? token.toString() : "");
+    if (config.header == null) {
+      config.header = new UTSJSONObject();
     }
+    config.header.set("Authorization", authorization);
+    config.header.set("clientId", CLIENT_ID);
     return config;
   }
   function responseInterceptor(response, config) {
     return response.data;
   }
-  function createBusinessError(data = null) {
-    const response = asJSONObject(data);
-    const code = getResponseCode(response);
-    const message = getResponseMessage(response);
-    return new HttpError({
-      statusCode: code,
-      message: message != "" ? message : "请求失败: ".concat(code),
-      data
-    });
+  function logHttpError(error) {
+    const detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (error.data != null ? error.data.toString() : "");
+    uni.__log__("error", "at api/http.uts:127", "[HttpRequest] " + detail);
   }
-  function isBusinessEnvelope(data = null) {
-    return getResponseCode(asJSONObject(data)) != -1;
-  }
-  function handleBusinessResponse(data = null, config) {
-    if (config.skipAuth != true && getResponseCode(asJSONObject(data)) == 401) {
-      handleTokenExpired();
-    }
-  }
-  function errorHandler(error, config = null) {
-    if (config != null && config.showLoading != false) {
+  function errorHandler(error, config) {
+    if (config.showLoading != false) {
       uni.hideLoading();
     }
-    uni.__log__("log", "at api/http.uts:148", "请求错误详情:", error);
+    logHttpError(error);
+    if (config.showError == false)
+      return null;
+    if (error.statusCode == 401) {
+      handleTokenExpired();
+      return null;
+    }
     if (error.statusCode != 0) {
       switch (error.statusCode) {
-        case 400:
-          showAppToast({
-            title: error.message != "" ? error.message : "请求参数错误",
-            icon: "none"
-          });
-          break;
-        case 401:
-          if (config == null || config.skipAuth != true) {
-            handleTokenExpired();
-          } else {
-            showAppToast({
-              title: error.message != "" ? error.message : "登录验证失败",
-              icon: "none"
-            });
-          }
-          break;
         case 403:
           showAppToast({
             title: "没有权限访问",
@@ -5130,21 +5109,15 @@
             icon: "none"
           });
           break;
-        case 405:
-          showAppToast({
-            title: "请求方法错误",
-            icon: "none"
-          });
-          break;
         case 500:
           showAppToast({
-            title: error.message != "" ? error.message : "服务器错误",
+            title: "服务器错误",
             icon: "none"
           });
           break;
         default:
           showAppToast({
-            title: error.message != "" ? error.message : "请求错误: ".concat(error.statusCode),
+            title: error.message != null ? error.message : "请求错误: ".concat(error.statusCode),
             icon: "none"
           });
       }
@@ -5164,7 +5137,7 @@
         data: options.data != null ? options.data : new UTSJSONObject({}),
         header: options.header != null ? options.header : new UTSJSONObject(),
         showLoading: options.showLoading != false,
-        skipAuth: options.skipAuth == true
+        showError: options.showError != false
       }
       // 处理完整URL
     );
@@ -5182,23 +5155,16 @@
           const statusCode = res.statusCode;
           if (statusCode == 200) {
             const data = responseInterceptor(res);
-            if (isBusinessEnvelope(data)) {
-              handleBusinessResponse(data, processedConfig);
-              resolve(data);
-              return null;
-            }
-            const httpError_1 = createBusinessError(data);
-            errorHandler(httpError_1, processedConfig);
-            reject(httpError_1);
-            return null;
+            resolve(data);
+          } else {
+            const httpError = new HttpError({
+              statusCode,
+              message: "请求失败: ".concat(statusCode),
+              data: res.data
+            });
+            errorHandler(httpError, processedConfig);
+            reject(httpError);
           }
-          const httpError = new HttpError({
-            statusCode,
-            message: "请求失败: ".concat(statusCode),
-            data: res.data
-          });
-          errorHandler(httpError, processedConfig);
-          reject(httpError);
         },
         fail: (error) => {
           const httpError = new HttpError({
@@ -5212,57 +5178,103 @@
       });
     });
   }
-  function get(url, data = new UTSJSONObject({}), options = new UTSJSONObject()) {
-    const requestOptions = new UTSJSONObject();
-    requestOptions.set("url", url);
-    requestOptions.set("method", "GET");
-    requestOptions.set("data", data);
-    if (options != null && options.header != null)
-      requestOptions.set("header", options.header);
-    if (options != null && options.showLoading != null)
-      requestOptions.set("showLoading", options.showLoading);
-    if (options != null && options.skipAuth != null)
-      requestOptions.set("skipAuth", options.skipAuth);
-    return request(requestOptions);
+  function get(url, data = new UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null,
+    showError: null
+  })) {
+    return request(new UTSJSONObject({
+      url,
+      method: "GET",
+      data,
+      header: options.header,
+      showLoading: options.showLoading,
+      showError: options.showError
+    }));
   }
-  function post(url, data = new UTSJSONObject({}), options = new UTSJSONObject()) {
-    const requestOptions = new UTSJSONObject();
-    requestOptions.set("url", url);
-    requestOptions.set("method", "POST");
-    requestOptions.set("data", data);
-    if (options != null && options.header != null)
-      requestOptions.set("header", options.header);
-    if (options != null && options.showLoading != null)
-      requestOptions.set("showLoading", options.showLoading);
-    if (options != null && options.skipAuth != null)
-      requestOptions.set("skipAuth", options.skipAuth);
-    return request(requestOptions);
+  function post(url, data = new UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null,
+    showError: null
+  })) {
+    return request(new UTSJSONObject({
+      url,
+      method: "POST",
+      data,
+      header: options.header,
+      showLoading: options.showLoading,
+      showError: options.showError
+    }));
   }
-  function put(url, data = new UTSJSONObject({}), options = new UTSJSONObject()) {
-    const requestOptions = new UTSJSONObject();
-    requestOptions.set("url", url);
-    requestOptions.set("method", "PUT");
-    requestOptions.set("data", data);
-    if (options != null && options.header != null)
-      requestOptions.set("header", options.header);
-    if (options != null && options.showLoading != null)
-      requestOptions.set("showLoading", options.showLoading);
-    if (options != null && options.skipAuth != null)
-      requestOptions.set("skipAuth", options.skipAuth);
-    return request(requestOptions);
+  function postSilently(url, data = null) {
+    return request(new UTSJSONObject({
+      url,
+      method: "POST",
+      data,
+      showLoading: false,
+      showError: false
+    }));
   }
-  function remove(url, data = new UTSJSONObject({}), options = new UTSJSONObject()) {
-    const requestOptions = new UTSJSONObject();
-    requestOptions.set("url", url);
-    requestOptions.set("method", "DELETE");
-    requestOptions.set("data", data);
-    if (options != null && options.header != null)
-      requestOptions.set("header", options.header);
-    if (options != null && options.showLoading != null)
-      requestOptions.set("showLoading", options.showLoading);
-    if (options != null && options.skipAuth != null)
-      requestOptions.set("skipAuth", options.skipAuth);
-    return request(requestOptions);
+  function put(url, data = new UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null,
+    showError: null
+  })) {
+    return request(new UTSJSONObject({
+      url,
+      method: "PUT",
+      data,
+      header: options.header,
+      showLoading: options.showLoading,
+      showError: options.showError
+    }));
+  }
+  function remove(url, data = new UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null,
+    showError: null
+  })) {
+    return request(new UTSJSONObject({
+      url,
+      method: "DELETE",
+      data,
+      header: options.header,
+      showLoading: options.showLoading,
+      showError: options.showError
+    }));
+  }
+  function asJSONObject(value = null) {
+    if (value == null) {
+      return new UTSJSONObject();
+    }
+    return value;
+  }
+  function getResponseCode(response) {
+    return response.getNumber("code", -1);
+  }
+  function getResponseMessage(response) {
+    const msg = response.getString("msg", "");
+    return msg != "" ? msg : response.getString("message", "");
+  }
+  function getResponseDataObject(response) {
+    const data = response.getJSON("data");
+    return data != null ? data : new UTSJSONObject();
+  }
+  function getResponseDataArray(response) {
+    const data = response.getArray("data");
+    return data != null ? data : [];
   }
   const loginUrl = "/sys/login";
   const devicePos = "/gps/lastPosition?deptId=";
@@ -5271,8 +5283,10 @@
   const addDeviceUrl = "/userDevice/add";
   const userDeviceList = "/userDevice/list";
   const uniVerifyLoginUrl = "/auth/login";
-  const smsSendCodeUrl = "/authLogin/sms/send";
-  const smsLoginUrl = "/authLogin/sms/login";
+  const smsSendCodeUrl = "/resource/sms/code";
+  const smsLoginUrl = "/auth/login";
+  const smsClientId = "428a8310cd442757ae699df5d894f051";
+  const defaultTenantId = "000000";
   const changePSW = "/sys/user/password";
   const userMsgList = "/usermessage/listForUser";
   const msgState = "/usermessage/detail/";
@@ -5290,38 +5304,74 @@
   const cmdActionUrl = "/command/cmdAction";
   const cmdByMidUrl = "/command/cmdByMid";
   const cmdSendUrl = "/command/sendCmd";
-  const anonymousRequestOptions = new UTSJSONObject({
-    showLoading: false,
-    skipAuth: true
-  });
-  class UniVerifyLoginRequest extends UTS.UTSType {
+  const pushBindUrl = "/app/push/bind";
+  const pushUnbindUrl = "/app/push/unbind";
+  class BasicResponse extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
         kind: 2,
         get fields() {
           return {
-            openId: { type: String, optional: false },
-            accessToken: { type: String, optional: false },
-            platform: { type: String, optional: false },
-            clientVersion: { type: String, optional: true },
-            clientId: { type: String, optional: false },
-            grantType: { type: String, optional: false },
-            tenantId: { type: String, optional: false }
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false }
           };
         },
-        name: "UniVerifyLoginRequest"
+        name: "BasicResponse"
       };
     }
-    constructor(options, metadata = UniVerifyLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+    constructor(options, metadata = BasicResponse.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.openId = this.__props__.openId;
-      this.accessToken = this.__props__.accessToken;
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      delete this.__props__;
+    }
+  }
+  class PushDeviceBindRequest extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            registrationId: { type: String, optional: false },
+            platform: { type: String, optional: false },
+            deviceName: { type: String, optional: false },
+            appVersion: { type: String, optional: false }
+          };
+        },
+        name: "PushDeviceBindRequest"
+      };
+    }
+    constructor(options, metadata = PushDeviceBindRequest.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.registrationId = this.__props__.registrationId;
       this.platform = this.__props__.platform;
-      this.clientVersion = this.__props__.clientVersion;
-      this.clientId = this.__props__.clientId;
-      this.grantType = this.__props__.grantType;
-      this.tenantId = this.__props__.tenantId;
+      this.deviceName = this.__props__.deviceName;
+      this.appVersion = this.__props__.appVersion;
+      delete this.__props__;
+    }
+  }
+  class JsonDataResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        },
+        name: "JsonDataResponse"
+      };
+    }
+    constructor(options, metadata = JsonDataResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
       delete this.__props__;
     }
   }
@@ -5331,8 +5381,8 @@
         kind: 2,
         get fields() {
           return {
-            mobile: { type: String, optional: false },
-            scene: { type: String, optional: false }
+            phonenumber: { type: String, optional: false },
+            tenantId: { type: String, optional: true }
           };
         },
         name: "SendSmsCodeRequest"
@@ -5341,8 +5391,8 @@
     constructor(options, metadata = SendSmsCodeRequest.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.mobile = this.__props__.mobile;
-      this.scene = this.__props__.scene;
+      this.phonenumber = this.__props__.phonenumber;
+      this.tenantId = this.__props__.tenantId;
       delete this.__props__;
     }
   }
@@ -5352,9 +5402,10 @@
         kind: 2,
         get fields() {
           return {
-            mobile: { type: String, optional: false },
-            code: { type: String, optional: false },
-            platform: { type: String, optional: false }
+            phonenumber: { type: String, optional: false },
+            smsCode: { type: String, optional: false },
+            clientId: { type: String, optional: true },
+            tenantId: { type: String, optional: true }
           };
         },
         name: "SmsLoginRequest"
@@ -5363,9 +5414,79 @@
     constructor(options, metadata = SmsLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.mobile = this.__props__.mobile;
+      this.phonenumber = this.__props__.phonenumber;
+      this.smsCode = this.__props__.smsCode;
+      this.clientId = this.__props__.clientId;
+      this.tenantId = this.__props__.tenantId;
+      delete this.__props__;
+    }
+  }
+  class DevicePositionResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        },
+        name: "DevicePositionResponse"
+      };
+    }
+    constructor(options, metadata = DevicePositionResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.code = this.__props__.code;
-      this.platform = this.__props__.platform;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class TrackPosResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        },
+        name: "TrackPosResponse"
+      };
+    }
+    constructor(options, metadata = TrackPosResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class UserInfoResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        },
+        name: "UserInfoResponse"
+      };
+    }
+    constructor(options, metadata = UserInfoResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
       delete this.__props__;
     }
   }
@@ -5392,6 +5513,75 @@
       delete this.__props__;
     }
   };
+  class UserDeviceListResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: UserDeviceListData$1, optional: false }
+          };
+        },
+        name: "UserDeviceListResponse"
+      };
+    }
+    constructor(options, metadata = UserDeviceListResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class DeviceDetailResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        },
+        name: "DeviceDetailResponse"
+      };
+    }
+    constructor(options, metadata = DeviceDetailResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class GeofenceResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        },
+        name: "GeofenceResponse"
+      };
+    }
+    constructor(options, metadata = GeofenceResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
   class DevicePageData extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -5415,87 +5605,188 @@
       delete this.__props__;
     }
   }
+  class DevicePageResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: DevicePageData, optional: false }
+          };
+        },
+        name: "DevicePageResponse"
+      };
+    }
+    constructor(options, metadata = DevicePageResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class CommandListResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        },
+        name: "CommandListResponse"
+      };
+    }
+    constructor(options, metadata = CommandListResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class SendCmdResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: String, optional: false }
+          };
+        },
+        name: "SendCmdResponse"
+      };
+    }
+    constructor(options, metadata = SendCmdResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class ChangePasswordResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false }
+          };
+        },
+        name: "ChangePasswordResponse"
+      };
+    }
+    constructor(options, metadata = ChangePasswordResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      delete this.__props__;
+    }
+  }
+  let MessageResponse$1 = class MessageResponse2 extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: UserDeviceListData$1, optional: false }
+          };
+        },
+        name: "MessageResponse"
+      };
+    }
+    constructor(options, metadata = MessageResponse2.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  };
   function basicResponse(raw = null) {
     const response = asJSONObject(raw);
-    const result = new BackendResponse();
-    result.code = getResponseCode(response);
-    result.msg = getResponseMessage(response);
-    result.data = response.getAny("data");
-    return result;
+    return new BasicResponse({ code: getResponseCode(response), msg: getResponseMessage(response) });
   }
   function jsonDataResponse(raw = null) {
     const response = asJSONObject(raw);
-    const result = new BackendResponse();
-    result.code = getResponseCode(response);
-    result.msg = getResponseMessage(response);
-    result.data = getResponseDataObject(response);
-    return result;
+    return new JsonDataResponse({
+      code: getResponseCode(response),
+      msg: getResponseMessage(response),
+      data: getResponseDataObject(response)
+    });
   }
   function devicePageResponse(raw = null) {
     const response = asJSONObject(raw);
     const data = getResponseDataObject(response);
     const list = data.getArray("list");
-    const pageData = new DevicePageData({
-      list: list != null ? list : [],
-      totalPage: data.getNumber("totalPage", 0),
-      totalCount: data.getNumber("totalCount", 0)
+    return new DevicePageResponse({
+      code: getResponseCode(response),
+      msg: getResponseMessage(response),
+      data: new DevicePageData({
+        list: list != null ? list : [],
+        totalPage: data.getNumber("totalPage", 0),
+        totalCount: data.getNumber("totalCount", 0)
+      })
     });
-    const result = new BackendResponse();
-    result.code = getResponseCode(response);
-    result.msg = getResponseMessage(response);
-    result.data = pageData;
-    return result;
   }
   function userDevicePageResponse(raw = null) {
     const page = devicePageResponse(raw);
-    const result = new BackendResponse();
-    result.code = page.code;
-    result.msg = page.msg;
-    const devicePageData = page.data;
-    if (devicePageData == null) {
-      return result;
-    }
-    const pageData = new UserDeviceListData$1({
-      list: devicePageData.list,
-      totalPage: devicePageData.totalPage,
-      totalCount: devicePageData.totalCount
+    return new UserDeviceListResponse({
+      code: page.code,
+      msg: page.msg,
+      data: new UserDeviceListData$1({
+        list: page.data.list,
+        totalPage: page.data.totalPage,
+        totalCount: page.data.totalCount
+      })
     });
-    result.data = pageData;
-    return result;
   }
   function messagePageResponse(raw = null) {
     const page = devicePageResponse(raw);
-    const result = new BackendResponse();
-    result.code = page.code;
-    result.msg = page.msg;
-    const devicePageData = page.data;
-    if (devicePageData == null) {
-      return result;
-    }
-    const pageData = new UserDeviceListData$1({
-      list: devicePageData.list,
-      totalPage: devicePageData.totalPage,
-      totalCount: devicePageData.totalCount
+    return new MessageResponse$1({
+      code: page.code,
+      msg: page.msg,
+      data: new UserDeviceListData$1({
+        list: page.data.list,
+        totalPage: page.data.totalPage,
+        totalCount: page.data.totalCount
+      })
     });
-    result.data = pageData;
-    return result;
   }
   function userInfoResponse(raw = null) {
-    return jsonDataResponse(raw);
+    const response = jsonDataResponse(raw);
+    return new UserInfoResponse({ code: response.code, msg: response.msg, data: response.data });
   }
   function deviceDetailResponse(raw = null) {
-    return jsonDataResponse(raw);
+    const response = jsonDataResponse(raw);
+    return new DeviceDetailResponse({ code: response.code, msg: response.msg, data: response.data });
   }
   function changePasswordResponse(raw = null) {
-    return basicResponse(raw);
+    const response = basicResponse(raw);
+    return new ChangePasswordResponse({ code: response.code, msg: response.msg });
   }
   const login = (data) => {
-    return post(loginUrl, data, anonymousRequestOptions).then((raw = null) => {
+    return post(loginUrl, data).then((raw = null) => {
       return jsonDataResponse(raw);
     });
   };
   const logout = () => {
-    return post(logoutUrl, new UTSJSONObject({})).then((raw = null) => {
+    return post(logoutUrl).then((raw = null) => {
       return basicResponse(raw);
     });
   };
@@ -5507,20 +5798,21 @@
   const getDevicePos = (data) => {
     return get(devicePos, data).then((raw = null) => {
       const response = asJSONObject(raw);
-      const result = new BackendResponse();
-      result.code = getResponseCode(response);
-      result.msg = getResponseMessage(response);
-      result.data = getResponseDataArray(response);
-      return result;
+      return new DevicePositionResponse({
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: getResponseDataArray(response)
+      });
     });
   };
   const getTrackPos = (data) => {
     return get(trackPos, data).then((raw = null) => {
-      return jsonDataResponse(raw);
+      const response = asJSONObject(raw);
+      return new TrackPosResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataObject(response) });
     });
   };
   const getUserInfo = () => {
-    return get(userinfo, new UTSJSONObject({})).then((raw = null) => {
+    return get(userinfo).then((raw = null) => {
       return userInfoResponse(raw);
     });
   };
@@ -5540,17 +5832,26 @@
     });
   };
   const uniVerifyLogin = (data) => {
-    return post(uniVerifyLoginUrl, data, anonymousRequestOptions).then((raw = null) => {
+    return post(uniVerifyLoginUrl, data).then((raw = null) => {
       return jsonDataResponse(raw);
     });
   };
   const sendSmsLoginCode = (data) => {
-    return post(smsSendCodeUrl, data, anonymousRequestOptions).then((raw = null) => {
-      return jsonDataResponse(raw);
+    return get(smsSendCodeUrl, new UTSJSONObject({
+      phonenumber: data.phonenumber,
+      tenantId: data.tenantId != null ? data.tenantId : defaultTenantId
+    })).then((raw = null) => {
+      return basicResponse(raw);
     });
   };
   const smsLogin = (data) => {
-    return post(smsLoginUrl, data, anonymousRequestOptions).then((raw = null) => {
+    const requestData = new UTSJSONObject();
+    requestData.set("clientId", data.clientId != null ? data.clientId : smsClientId);
+    requestData.set("grantType", "sms");
+    requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
+    requestData.set("phonenumber", data.phonenumber);
+    requestData.set("smsCode", data.smsCode);
+    return post(smsLoginUrl, requestData).then((raw = null) => {
       return jsonDataResponse(raw);
     });
   };
@@ -5560,12 +5861,12 @@
     });
   };
   const getUserMsgList = (data = null) => {
-    return (data != null ? get(userMsgList, data) : get(userMsgList, new UTSJSONObject({}))).then((raw = null) => {
+    return (data != null ? get(userMsgList, data) : get(userMsgList)).then((raw = null) => {
       return messagePageResponse(raw);
     });
   };
   const setMsgState = (msgId) => {
-    return get("".concat(msgState).concat(msgId), new UTSJSONObject({})).then((raw = null) => {
+    return get("".concat(msgState).concat(msgId)).then((raw = null) => {
       return basicResponse(raw);
     });
   };
@@ -5575,18 +5876,14 @@
     });
   };
   const getDeviceDetail = (deviceId) => {
-    return get("".concat(deviceDetail).concat(deviceId), new UTSJSONObject({})).then((raw = null) => {
+    return get("".concat(deviceDetail).concat(deviceId)).then((raw = null) => {
       return deviceDetailResponse(raw);
     });
   };
   const getGeofenceList = () => {
-    return get(getGeofence, new UTSJSONObject({})).then((raw = null) => {
+    return get(getGeofence).then((raw = null) => {
       const response = asJSONObject(raw);
-      const result = new BackendResponse();
-      result.code = getResponseCode(response);
-      result.msg = getResponseMessage(response);
-      result.data = getResponseDataArray(response);
-      return result;
+      return new GeofenceResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) });
     });
   };
   const addGeofence = (data) => {
@@ -5600,7 +5897,7 @@
     });
   };
   const deleteGeofence = (id) => {
-    return remove("".concat(deleteGeo).concat(id), new UTSJSONObject({})).then((raw = null) => {
+    return remove("".concat(deleteGeo).concat(id)).then((raw = null) => {
       return basicResponse(raw);
     });
   };
@@ -5625,35 +5922,162 @@
     });
   };
   const getCmdAction = () => {
-    return get(cmdActionUrl, new UTSJSONObject({})).then((raw = null) => {
+    return get(cmdActionUrl).then((raw = null) => {
       const response = asJSONObject(raw);
-      const result = new BackendResponse();
-      result.code = getResponseCode(response);
-      result.msg = getResponseMessage(response);
-      result.data = getResponseDataArray(response);
-      return result;
+      return new CommandListResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) });
     });
   };
   const getCmdByMid = (data) => {
     return get(cmdByMidUrl, data).then((raw = null) => {
       const response = asJSONObject(raw);
-      const result = new BackendResponse();
-      result.code = getResponseCode(response);
-      result.msg = getResponseMessage(response);
-      result.data = getResponseDataArray(response);
-      return result;
+      return new CommandListResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) });
     });
   };
   const sendCmd = (data) => {
     return post(cmdSendUrl, data).then((raw = null) => {
       const response = asJSONObject(raw);
-      const result = new BackendResponse();
-      result.code = getResponseCode(response);
-      result.msg = getResponseMessage(response);
-      result.data = response.getString("data", "");
-      return result;
+      return new SendCmdResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString("data", "") });
     });
   };
+  const unbindPushDevice = (registrationId) => {
+    return postSilently(pushUnbindUrl + "?registrationId=" + encodeURIComponent(registrationId), new UTSJSONObject()).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const bindPushDevice = (data) => {
+    const requestData = new UTSJSONObject();
+    requestData.set("registrationId", data.registrationId);
+    requestData.set("platform", data.platform);
+    requestData.set("deviceName", data.deviceName);
+    requestData.set("appVersion", data.appVersion);
+    return postSilently(pushBindUrl, requestData).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  let initialized = false;
+  let binding = false;
+  let bindingSessionKey = "";
+  let pendingRegistrationId = "";
+  let boundSessionKey = "";
+  function pushBindingDebug(message) {
+    uni.__log__("log", "at services/push-binding.uts:18", "[PushBinding] " + message);
+  }
+  function pushBindingWarn(message) {
+    uni.__log__("warn", "at services/push-binding.uts:25", "[PushBinding] " + message);
+  }
+  function getPushBindPlatform() {
+    return "ios";
+  }
+  function getDeviceName() {
+    var _a;
+    try {
+      const systemInfo = uni.getSystemInfoSync();
+      return (_a = systemInfo.deviceModel) !== null && _a !== void 0 ? _a : "";
+    } catch (error) {
+      pushBindingWarn("获取设备型号失败");
+      return "";
+    }
+  }
+  function getAppVersion() {
+    var _a;
+    try {
+      return (_a = uni.getAppBaseInfo().appVersion) !== null && _a !== void 0 ? _a : "";
+    } catch (error) {
+      pushBindingWarn("获取应用版本失败");
+      return "";
+    }
+  }
+  function getLoginToken() {
+    const value = uni.getStorageSync("token");
+    return value == null ? "" : value.toString();
+  }
+  function bindRegistrationId(registrationId) {
+    if (registrationId == "")
+      return null;
+    const token = getLoginToken();
+    if (token == "") {
+      pushBindingDebug("RegistrationID 已就绪，等待用户登录");
+      return null;
+    }
+    const platform = getPushBindPlatform();
+    if (platform == "")
+      return null;
+    const sessionKey2 = token + ":" + registrationId;
+    if (binding) {
+      if (bindingSessionKey != sessionKey2)
+        pendingRegistrationId = registrationId;
+      return null;
+    }
+    if (boundSessionKey == sessionKey2)
+      return null;
+    binding = true;
+    bindingSessionKey = sessionKey2;
+    const data = new PushDeviceBindRequest({
+      registrationId,
+      platform,
+      deviceName: getDeviceName(),
+      appVersion: getAppVersion()
+    });
+    pushBindingDebug("开始绑定推送设备，platform=" + platform);
+    bindPushDevice(data).then((response) => {
+      if (response.code == 200) {
+        boundSessionKey = sessionKey2;
+        pushBindingDebug("推送设备绑定成功，platform=" + platform);
+        return null;
+      }
+      if (response.code == 500) {
+        pushBindingWarn("推送设备绑定返回 500，登录状态已失效，跳转登录页。msg=" + response.msg);
+        handleTokenExpired();
+        return null;
+      }
+      pushBindingWarn("推送设备绑定失败，稍后将重试。code=" + response.code + ", msg=" + response.msg);
+    }).catch(() => {
+      pushBindingWarn("推送设备绑定请求失败，稍后将重试。");
+    }).finally(() => {
+      binding = false;
+      bindingSessionKey = "";
+      const nextRegistrationId = pendingRegistrationId;
+      pendingRegistrationId = "";
+      if (nextRegistrationId != "")
+        bindRegistrationId(nextRegistrationId);
+    });
+  }
+  function unbindPushDeviceOnLogout() {
+    return __awaiter(this, void 0, void 0, function* () {
+      const registrationId = getCachedPushRegistrationId();
+      if (registrationId == "") {
+        pushBindingDebug("退出登录时无缓存 RegistrationID，跳过推送设备解绑");
+        return Promise.resolve(null);
+      }
+      try {
+        pushBindingDebug("退出登录时解绑推送设备");
+        const response = yield unbindPushDevice(registrationId);
+        if (response.code == 200) {
+          pushBindingDebug("推送设备解绑成功");
+          return Promise.resolve(null);
+        }
+        pushBindingWarn("推送设备解绑失败，但仍继续退出登录。code=" + response.code + ", msg=" + response.msg);
+      } catch (error) {
+        pushBindingWarn("推送设备解绑请求失败，但仍继续退出登录。");
+      }
+    });
+  }
+  function initPushBinding() {
+    if (initialized)
+      return null;
+    initialized = true;
+    onPushRegistrationIdReady((registrationId) => {
+      bindRegistrationId(registrationId);
+    });
+    onPushSessionAuthenticated((registrationId) => {
+      if (registrationId == "") {
+        pushBindingDebug("用户已登录，但尚无缓存 RegistrationID");
+        return null;
+      }
+      pushBindingDebug("用户已登录，使用缓存 RegistrationID 绑定推送设备");
+      bindRegistrationId(registrationId);
+    });
+  }
   class TodayTimeRange extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -5900,6 +6324,7 @@
       delete this.__props__;
     }
   }
+  const userLocationMarkerId = 1;
   const _sfc_main$D = /* @__PURE__ */ vue.defineComponent({
     __name: "index",
     setup(__props, _a) {
@@ -5909,6 +6334,12 @@
         latitude: 39.90469,
         longitude: 116.40717
       }));
+      const userLocation = vue.reactive(new MapCenter$1({
+        latitude: 0,
+        longitude: 0
+      }));
+      const hasUserLocation = vue.ref(false);
+      const hasDevice = vue.ref(false);
       const userDeviceList2 = vue.ref([]);
       const positionState = vue.ref("loading");
       const positionMessage = vue.computed(() => {
@@ -6006,9 +6437,9 @@
             longitude: device.longitude
           });
           uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:379", "保存选中设备成功:", deviceInfo);
+          uni.__log__("log", "at pages/index/index.uvue:383", "保存选中设备成功:", deviceInfo);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:381", "保存选中设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:385", "保存选中设备失败:", error);
         }
       };
       const decodeSavedDevice = (raw = null) => {
@@ -6054,23 +6485,23 @@
             return null;
           return decodeSavedDevice(rawDevice);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:441", "获取保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:445", "获取保存设备失败:", error);
         }
         return null;
       };
       const clearSavedSelectedDevice = () => {
         try {
           uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:450", "清除保存设备成功");
+          uni.__log__("log", "at pages/index/index.uvue:454", "清除保存设备成功");
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:452", "清除保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:456", "清除保存设备失败:", error);
         }
       };
       const saveSelectedDeviceIndex = (index) => {
         try {
           uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:461", "保存选中设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:465", "保存选中设备索引失败:", error);
         }
       };
       const getSavedSelectedDeviceIndex = () => {
@@ -6081,7 +6512,7 @@
             return isNaN(index) || index < 0 ? null : index;
           }
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:474", "获取保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:478", "获取保存设备索引失败:", error);
         }
         return null;
       };
@@ -6089,7 +6520,7 @@
         try {
           uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:484", "清除保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:488", "清除保存设备索引失败:", error);
         }
       };
       const setCurrentCarFromSavedDevice = (savedDevice = null) => {
@@ -6162,13 +6593,44 @@
           id,
           latitude: lat,
           longitude: lng,
-          iconPath: getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value),
+          iconPath: type == "user" ? "/static/current-location.png" : getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value),
           width: 30,
           height: 30,
           anchor: { x: 0.5, y: 0.5 },
           callout
         };
       };
+      function centerOnUserLocation() {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (!hasUserLocation.value)
+            return Promise.resolve(null);
+          center.latitude = userLocation.latitude;
+          center.longitude = userLocation.longitude;
+          markers.value = [];
+          yield delay(100);
+          if (hasDevice.value)
+            return Promise.resolve(null);
+          const nextMarker = createMarker(userLocationMarkerId, userLocation.latitude, userLocation.longitude, "user", "当前位置");
+          markers.value = [nextMarker];
+        });
+      }
+      function getUserLocation() {
+        uni.getLocation(new UTSJSONObject({
+          type: "gcj02",
+          success: (res) => {
+            uni.__log__("log", "at pages/index/index.uvue:603", "用户当前位置:", res);
+            userLocation.latitude = res.latitude;
+            userLocation.longitude = res.longitude;
+            hasUserLocation.value = true;
+            if (!hasDevice.value) {
+              centerOnUserLocation();
+            }
+          },
+          fail: (err) => {
+            uni.__log__("error", "at pages/index/index.uvue:612", "获取用户当前位置失败:", err.errMsg, err);
+          }
+        }));
+      }
       const loadDeviceDetail = (deviceId) => {
         return __awaiter(this, void 0, void 0, function* () {
           var _a2, _b, _c;
@@ -6176,7 +6638,7 @@
             const res = yield getDeviceDetail(deviceId);
             const detail = res.data;
             if (res.code != 200 || detail == null) {
-              uni.__log__("error", "at pages/index/index.uvue:579", "加载设备详情失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:623", "加载设备详情失败:", res.msg);
               return Promise.resolve(null);
             }
             if (detail != null) {
@@ -6198,7 +6660,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:601", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:645", "加载设备详情失败", error);
           }
         });
       };
@@ -6250,7 +6712,7 @@
             if (requestId != trackRequestId)
               return Promise.resolve(null);
             if (res.code != 200) {
-              uni.__log__("error", "at pages/index/index.uvue:661", "加载轨迹失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:705", "加载轨迹失败:", res.msg);
               clearTripData();
               return Promise.resolve(null);
             }
@@ -6263,7 +6725,7 @@
           } catch (error) {
             if (requestId != trackRequestId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/index/index.uvue:674", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:718", "加载轨迹失败", error);
             clearTripData();
           }
         });
@@ -6281,7 +6743,7 @@
             const res = yield getDevicePos(data);
             const positions = res.data;
             if (res.code != 200 || positions == null || positions.length == 0) {
-              uni.__log__("warn", "at pages/index/index.uvue:692", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
+              uni.__log__("warn", "at pages/index/index.uvue:736", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
               positionState.value = "empty";
               return false;
             }
@@ -6291,7 +6753,7 @@
             const lng = position.getNumber("longitude", 0);
             const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
             if (!isValidCoordinate2) {
-              uni.__log__("error", "at pages/index/index.uvue:707", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              uni.__log__("error", "at pages/index/index.uvue:751", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
               positionState.value = "invalid";
               showAppToast({
                 title: "定位数据异常",
@@ -6306,10 +6768,10 @@
             yield delay(100);
             const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
             markers.value = [nextMarker];
-            uni.__log__("log", "at pages/index/index.uvue:732", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
+            uni.__log__("log", "at pages/index/index.uvue:776", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
             return true;
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:735", "加载设备位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:779", "加载设备位置失败", error);
             positionState.value = "failed";
             showAppToast({
               title: "定位失败，请重试",
@@ -6321,7 +6783,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:747", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:791", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -6334,7 +6796,7 @@
               icon: "none"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:760", "切换车辆失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:804", "切换车辆失败", error);
             showAppToast({
               title: "切换失败，请重试",
               icon: "none"
@@ -6374,7 +6836,7 @@
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:806", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:850", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -6400,6 +6862,8 @@
       };
       const loadDeviceList = () => {
         return __awaiter(this, void 0, void 0, function* () {
+          hasDevice.value = false;
+          getUserLocation();
           try {
             const res = yield getUserDeviceList(new UTSJSONObject({
               pageSize: 1e3
@@ -6413,6 +6877,11 @@
             }
             const pageData = res.data;
             if (pageData == null) {
+              markers.value = [];
+              positionState.value = "empty";
+              if (hasUserLocation.value) {
+                yield centerOnUserLocation();
+              }
               showAppToast({
                 title: "暂无车辆数据",
                 icon: "none"
@@ -6421,6 +6890,8 @@
             }
             const list = pageData.list;
             if (list != null && list.length > 0) {
+              hasDevice.value = true;
+              markers.value = [];
               userDeviceList2.value = list;
               deviceList.value = list.map((item) => {
                 const imei = item.getString("imei", "");
@@ -6465,7 +6936,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:913", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:966", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -6490,13 +6961,18 @@
                 yield loadTrackPos(createTrackRequestData(device.imei != "" ? device.imei : device.value));
               }
             } else {
+              markers.value = [];
+              positionState.value = "empty";
+              if (hasUserLocation.value) {
+                yield centerOnUserLocation();
+              }
               showAppToast({
                 title: "暂无车辆数据",
                 icon: "none"
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:948", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1007", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -6509,6 +6985,10 @@
       });
       const refreshLocation = () => {
         return __awaiter(this, void 0, void 0, function* () {
+          if (!hasDevice.value) {
+            yield centerOnUserLocation();
+            return Promise.resolve(null);
+          }
           if (!currentCarDeviceId.value) {
             showAppToast({
               title: "请先选择车辆",
@@ -6523,7 +7003,7 @@
           try {
             yield loadDeviceList();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:977", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1041", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -6547,19 +7027,30 @@
         }
         return true;
       }
+      function isCarSelected() {
+        if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
+          showAppToast({
+            title: "请先选择车辆",
+            icon: "none"
+          });
+          return false;
+        }
+        return true;
+      }
       const toRecordDetail = () => {
         if (!isLogin())
+          return null;
+        if (!isCarSelected())
           return null;
         uni.navigateTo({
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1009", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1085", "跳转轨迹详情失败:", err);
           }
         });
       };
       const toDeviceList = () => {
-        uni.__log__("log", "at pages/index/index.uvue:1016", "toDeviceList");
         if (!isLogin())
           return null;
         uni.navigateTo({
@@ -6569,13 +7060,8 @@
       const toDeviceDetail = (e2 = null) => {
         if (!isLogin())
           return null;
-        if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
-          showAppToast({
-            title: "请先选择车辆",
-            icon: "none"
-          });
+        if (!isCarSelected())
           return null;
-        }
         uni.navigateTo({
           url: "/pages/carInfoDetail/carInfoDetail?imei=".concat(currentCarImei.value, "&deptId=").concat(currentCarDeptId.value, "&deviceId=").concat(currentCarDeviceId.value)
         });
@@ -6587,7 +7073,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1044", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1113", "跳转添加设备失败:", err);
           }
         });
       };
@@ -6617,6 +7103,8 @@
       const toFence = () => {
         if (!isLogin())
           return null;
+        if (!isCarSelected())
+          return null;
         uni.navigateTo({
           url: "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarName.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value
         });
@@ -6631,11 +7119,13 @@
       const toPay = (iccid, simMerchant) => {
         if (!isLogin())
           return null;
+        if (!isCarSelected())
+          return null;
         if (simMerchant.toLowerCase() == "zddx") {
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1132", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1203", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -6674,6 +7164,8 @@
       const unbindDevice = () => {
         if (!isLogin())
           return null;
+        if (!isCarSelected())
+          return null;
         showAppModal(new UTSJSONObject({
           title: "解绑车辆",
           content: "确定解绑当前车辆吗？",
@@ -6693,6 +7185,7 @@
           success: (res) => {
             return __awaiter(this, void 0, void 0, function* () {
               if (res.confirm) {
+                yield unbindPushDeviceOnLogout();
                 const res_1 = yield logout();
                 if (res_1.code == 200) {
                   clearSavedSelectedDevice();
@@ -6736,11 +7229,11 @@
           loadDeviceList();
         }
       });
-      const __returned__ = { center, userDeviceList: userDeviceList2, positionState, positionMessage, mapScale, isMapReady, statusBarHeight, menuButtonInfo, navBarHeight, deviceList, showPicker, pickerValues, currentCarImei, currentCarDeptId, currentCarDeviceId, currentCarIccId, currentCarName, currentCarSimMerchant, currentCarConnectionStatus, currentCarCarType, currentCarPlateNo, deviceDetail: deviceDetail2, markers, lastUpdateTime, SELECTED_DEVICE_STORAGE_KEY, SELECTED_DEVICE_INDEX_STORAGE_KEY, safeDeviceDetail, pickerColumns, closePicker, initDimensions, delay, saveSelectedDevice, decodeSavedDevice, getSavedSelectedDevice, clearSavedSelectedDevice, saveSelectedDeviceIndex, getSavedSelectedDeviceIndex, clearSavedSelectedDeviceIndex, setCurrentCarFromSavedDevice, findDeviceIndex, handlePicker, createMarker, loadDeviceDetail, trackPosInfo, tripData, totalMileage, averageSpeed, get trackRequestId() {
+      const __returned__ = { center, userLocation, hasUserLocation, hasDevice, userDeviceList: userDeviceList2, positionState, positionMessage, mapScale, isMapReady, statusBarHeight, menuButtonInfo, navBarHeight, deviceList, showPicker, pickerValues, currentCarImei, currentCarDeptId, currentCarDeviceId, currentCarIccId, currentCarName, currentCarSimMerchant, currentCarConnectionStatus, currentCarCarType, currentCarPlateNo, deviceDetail: deviceDetail2, markers, lastUpdateTime, SELECTED_DEVICE_STORAGE_KEY, SELECTED_DEVICE_INDEX_STORAGE_KEY, safeDeviceDetail, pickerColumns, closePicker, initDimensions, delay, saveSelectedDevice, decodeSavedDevice, getSavedSelectedDevice, clearSavedSelectedDevice, saveSelectedDeviceIndex, getSavedSelectedDeviceIndex, clearSavedSelectedDeviceIndex, setCurrentCarFromSavedDevice, findDeviceIndex, handlePicker, createMarker, userLocationMarkerId, centerOnUserLocation, getUserLocation, loadDeviceDetail, trackPosInfo, tripData, totalMileage, averageSpeed, get trackRequestId() {
         return trackRequestId;
       }, set trackRequestId(v2) {
         trackRequestId = v2;
-      }, clearTripData, processTripData, createTrackRequestData, loadTrackPos, devicePosInfo, devicePositionUpdateTime, loadDevicePos, loadDeviceData, handlePickerConfirm, loadDeviceList, totalTrips, refreshLocation, checkToken, isLogin, toRecordDetail, toDeviceList, toDeviceDetail, toAdd, toMsgCenter, toFindCar, toFence, contactCustomerService, needRefresh, toPay, gotoLogin, unbindCurrentDevice, unbindDevice, handleExit, handleReload };
+      }, clearTripData, processTripData, createTrackRequestData, loadTrackPos, devicePosInfo, devicePositionUpdateTime, loadDevicePos, loadDeviceData, handlePickerConfirm, loadDeviceList, totalTrips, refreshLocation, checkToken, isLogin, isCarSelected, toRecordDetail, toDeviceList, toDeviceDetail, toAdd, toMsgCenter, toFindCar, toFence, contactCustomerService, needRefresh, toPay, gotoLogin, unbindCurrentDevice, unbindDevice, handleExit, handleReload };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -6921,24 +7414,7 @@
                     "enable-building": true,
                     "enable-3D": false,
                     markers: $setup.markers
-                  }, null, 8, ["latitude", "longitude", "scale", "markers"])) : vue.createCommentVNode("v-if", true),
-                  $setup.positionState != "available" ? (vue.openBlock(), vue.createElementBlock("view", {
-                    key: 1,
-                    class: "map-status"
-                  }, [
-                    vue.createElementVNode(
-                      "text",
-                      { class: "map-status-text" },
-                      vue.toDisplayString($setup.positionMessage),
-                      1
-                      /* TEXT */
-                    ),
-                    $setup.positionState != "loading" ? (vue.openBlock(), vue.createElementBlock("text", {
-                      key: 0,
-                      class: "map-status-retry",
-                      onClick: $setup.refreshLocation
-                    }, "重新获取")) : vue.createCommentVNode("v-if", true)
-                  ])) : vue.createCommentVNode("v-if", true)
+                  }, null, 8, ["latitude", "longitude", "scale", "markers"])) : vue.createCommentVNode("v-if", true)
                 ])
               ]),
               vue.createElementVNode("view", { class: "mile-record" }, [
@@ -10505,19 +10981,8 @@
   let manager = null;
   let preLoginReady = false;
   let requesting = false;
-  let uniVerifyTraceSequence = 0;
   function getPlatform() {
     return "ios";
-  }
-  function createTraceId() {
-    uniVerifyTraceSequence += 1;
-    return "uni-verify-" + getPlatform() + "-" + uniVerifyTraceSequence;
-  }
-  function logProviderFailure(stage, traceId, errCode, errMsg2, cause = "") {
-    uni.__log__("error", "at services/auth/uni-verify.uts:39", "Uni Verify 失败:", "traceId=" + traceId, "stage=" + stage, "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + errMsg2, "cause=" + cause);
-  }
-  function logCredentialDebug(traceId, clientVersion, openId, accessToken) {
-    uni.__log__("log", "at services/auth/uni-verify.uts:44", "Uni Verify 凭据调试（仅临时联调）:", "traceId=" + traceId, "platform=" + getPlatform(), "clientVersion=" + clientVersion, "endpoint=/auth/login", "openId=" + openId, "accessToken=" + accessToken);
   }
   function getManager() {
     if (manager == null) {
@@ -10525,44 +10990,53 @@
     }
     return manager;
   }
-  function getProviderErrorMessage(errCode, errMsg2, stage) {
+  function getErrorMessage(error) {
+    const errCode = error.errCode;
+    uni.__log__("error", "at services/auth/uni-verify.uts:38", "Uni Verify 授权失败:", errCode, error.errMsg);
     if (errCode == 30001)
-      return stage == "预取号" ? "本机号码预取已取消" : "已取消本机号码授权";
+      return "已取消本机号码授权";
+    if (errCode == 30004 || errCode == 30005 || errCode == 30006)
+      return "运营商认证失败，请检查 SIM 卡、移动网络后重试";
     if (errCode == 30007)
       return "本机号码授权已过期，请重试";
     if (errCode == 30008)
       return "正在进行本机号码授权，请稍候";
+    if (errCode == 40001 || errCode == 40002)
+      return "网络异常，请检查移动网络后重试";
+    return "本机号码授权失败（错误码：" + errCode + "），请稍后重试";
+  }
+  function getPreLoginErrorMessage(error) {
+    const errCode = error.errCode;
+    const errMsg2 = error.errMsg || "";
+    const cause = error.cause || "";
+    uni.__log__("error", "at services/auth/uni-verify.uts:51", "Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + errMsg2, "cause=" + cause);
+    if (errCode == 30005)
+      return "本机号码预取失败，请检查本地包签名与 Uni Verify 配置，或确认 SIM 卡和移动数据可用";
     if (errCode == 1e3 || errCode == 1001 || errCode == 1002)
       return "一键登录服务未正确配置，请检查应用签名与 Uni Verify 控制台配置";
     if (errCode == 1004)
       return "一键登录服务已禁用，请检查 Uni Verify 服务状态";
-    if (errMsg2.indexOf("-20102") >= 0)
-      return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的应用";
-    if (errMsg2.indexOf("-20201") >= 0)
-      return "未检测到可用 SIM 卡，请使用验证码登录";
-    if (errMsg2.indexOf("-20202") >= 0)
-      return "未开启蜂窝移动网络，请开启移动数据后重试";
-    if (errMsg2.indexOf("-20203") >= 0)
-      return "当前运营商暂不支持一键登录，请使用验证码登录";
+    if (errCode == 30001)
+      return "本机号码预取已取消";
+    if (errCode == 30004) {
+      if (errMsg2.indexOf("-20102") >= 0)
+        return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK";
+      if (errMsg2.indexOf("-20201") >= 0)
+        return "未检测到可用 SIM 卡，暂无法使用本机号码一键登录";
+      if (errMsg2.indexOf("-20202") >= 0)
+        return "未开启蜂窝移动网络，请开启移动数据后重试";
+      if (errMsg2.indexOf("-20203") >= 0)
+        return "当前运营商暂不支持本机号码一键登录";
+      return "本机号码预取失败，请稍后重试";
+    }
     if (errCode == 40001 || errCode == 40002)
       return "网络异常，无法获取本机号码，请检查移动网络后重试";
-    return "本机号码" + stage + "失败（错误码：" + errCode + "），请使用验证码登录";
-  }
-  function getErrorMessage(error, traceId) {
-    const errMsg2 = error.errMsg || "";
-    logProviderFailure("授权", traceId, error.errCode, errMsg2);
-    return getProviderErrorMessage(error.errCode, errMsg2, "授权");
-  }
-  function getPreLoginErrorMessage(error, traceId) {
-    const errMsg2 = error.errMsg || "";
-    const cause = error.cause != null ? error.cause.toString() : "";
-    logProviderFailure("预取号", traceId, error.errCode, errMsg2, cause);
-    return getProviderErrorMessage(error.errCode, errMsg2, "预取号");
+    return "本机号码预取失败（错误码：" + errCode + "），请稍后重试";
   }
   function createPreLoginResult(ok, message) {
     return new UniVerifyPreLoginResult({ ok, message });
   }
-  function ensurePreLogin(traceId) {
+  function ensurePreLogin() {
     return new Promise((resolve) => {
       try {
         const uniVerifyManager = getManager();
@@ -10578,18 +11052,18 @@
           },
           fail: (error) => {
             preLoginReady = false;
-            resolve(createPreLoginResult(false, getPreLoginErrorMessage(error, traceId)));
+            resolve(createPreLoginResult(false, getPreLoginErrorMessage(error)));
           }
         }));
       } catch (error) {
         preLoginReady = false;
-        uni.__log__("error", "at services/auth/uni-verify.uts:106", "Uni Verify 管理器初始化失败:", error);
+        uni.__log__("error", "at services/auth/uni-verify.uts:92", "Uni Verify 管理器初始化失败:", error);
         resolve(createPreLoginResult(false, "一键登录初始化失败，请确认 uni-verify 模块、应用签名与控制台配置"));
       }
     });
   }
   function prefetchUniVerify() {
-    ensurePreLogin(createTraceId());
+    ensurePreLogin();
   }
   function createResult(ok, cancelled, message, token) {
     return new UniVerifyResult({ ok, cancelled, message, token });
@@ -10604,9 +11078,8 @@
         resolve(createResult(false, false, "正在进行本机号码授权，请稍候", ""));
         return null;
       }
-      const traceId = createTraceId();
       requesting = true;
-      ensurePreLogin(traceId).then((preLoginResult) => {
+      ensurePreLogin().then((preLoginResult) => {
         if (!preLoginResult.ok) {
           requesting = false;
           resolve(createResult(false, false, preLoginResult.message, ""));
@@ -10621,37 +11094,24 @@
               loginBtnText: "本机号码一键登录"
             }),
             success: (result) => {
-              const openId = result.openId || "";
-              const accessToken = result.accessToken || "";
-              logCredentialDebug(traceId, clientVersion, openId, accessToken);
-              if (openId == "" || accessToken == "") {
-                uni.__log__("error", "at services/auth/uni-verify.uts:154", "Uni Verify 凭据无效:", "traceId=" + traceId, "platform=" + getPlatform(), "openIdEmpty=" + (openId == ""), "accessTokenEmpty=" + (accessToken == ""));
-                preLoginReady = false;
-                closeLoginPage(uniVerifyManager);
-                requesting = false;
-                resolve(createResult(false, false, "本机号码授权凭据为空，请使用验证码登录", ""));
-                return null;
-              }
-              uniVerifyLogin(new UniVerifyLoginRequest({
-                openId,
-                accessToken,
-                platform: getPlatform(),
-                clientVersion,
-                clientId: "428a8310cd442757ae699df5d894f051",
-                grantType: "univerify",
-                tenantId: "000000"
-              })).then((response) => {
-                uni.__log__("log", "at services/auth/uni-verify.uts:171", "Uni Verify 服务端登录结果:", "traceId=" + traceId, "code=" + response.code, "msg=" + response.msg);
+              const requestData = new UTSJSONObject();
+              requestData.set("openId", result.openId);
+              requestData.set("accessToken", result.accessToken);
+              requestData.set("platform", getPlatform());
+              requestData.set("clientVersion", clientVersion);
+              requestData.set("clientId", "428a8310cd442757ae699df5d894f051");
+              requestData.set("grantType", "univerify");
+              requestData.set("tenantId", "000000");
+              uniVerifyLogin(requestData).then((response) => {
                 const loginData = response.data;
-                const token = loginData != null ? loginData.getString("token", "") : "";
+                const token = loginData != null ? loginData.getString("access_token", "") : "";
                 if (response.code == 200 && token != "") {
                   resolve(createResult(true, false, "", token));
                 } else {
-                  resolve(createResult(false, false, response.msg || "本机号码登录失败，请使用验证码登录", ""));
+                  resolve(createResult(false, false, response.msg || "本机号码登录失败，请稍后重试", ""));
                 }
-              }).catch((error = null) => {
-                uni.__log__("error", "at services/auth/uni-verify.uts:180", "Uni Verify 服务端登录异常:", "traceId=" + traceId, error);
-                resolve(createResult(false, false, "登录服务连接失败，请使用验证码登录", ""));
+              }).catch(() => {
+                resolve(createResult(false, false, "登录服务连接失败，请检查网络后重试", ""));
               }).finally(() => {
                 closeLoginPage(uniVerifyManager);
                 requesting = false;
@@ -10659,21 +11119,18 @@
             },
             fail: (error) => {
               preLoginReady = false;
-              resolve(createResult(false, error.errCode == 30001, getErrorMessage(error, traceId), ""));
+              resolve(createResult(false, error.errCode == 30001, getErrorMessage(error), ""));
               closeLoginPage(uniVerifyManager);
               requesting = false;
             }
           }));
         } catch (error) {
-          uni.__log__("error", "at services/auth/uni-verify.uts:195", "Uni Verify 授权页初始化失败:", "traceId=" + traceId, error);
-          resolve(createResult(false, false, "当前设备无法打开本机号码授权，请使用验证码登录", ""));
+          resolve(createResult(false, false, "当前设备不支持本机号码一键登录", ""));
           requesting = false;
         }
-      }).catch((error = null) => {
-        uni.__log__("error", "at services/auth/uni-verify.uts:200", "Uni Verify 预取号异常:", "traceId=" + traceId, error);
-        preLoginReady = false;
+      }).catch(() => {
         requesting = false;
-        resolve(createResult(false, false, "一键登录预取号异常，请使用验证码登录", ""));
+        resolve(createResult(false, false, "一键登录预取号异常，请检查 SIM 卡、移动网络及服务配置", ""));
       });
     });
   }
@@ -10737,6 +11194,7 @@
       const smsCooldown = vue.ref(0);
       const smsSending = vue.ref(false);
       const smsSubmitting = vue.ref(false);
+      let smsCooldownTimer = null;
       const nativeLoginLoading = vue.ref(false);
       const form = vue.ref(new FormData$1({
         username: "",
@@ -10760,7 +11218,7 @@
           form.value.password = account.getString("password", "");
           rememberPassword.value = form.value.username != "" || form.value.password != "";
         } catch (error) {
-          uni.__log__("error", "at pages/login/login.uvue:178", "加载保存的账号密码失败:", error);
+          uni.__log__("error", "at pages/login/login.uvue:179", "加载保存的账号密码失败:", error);
         }
       }
       const isPswLogin = () => {
@@ -10797,7 +11255,7 @@
       const getSystemInfo = () => {
         const res = uni.getSystemInfoSync();
         deviceModel.value = res.deviceModel;
-        uni.__log__("log", "at pages/login/login.uvue:221", "设备型号:", deviceModel.value);
+        uni.__log__("log", "at pages/login/login.uvue:222", "设备型号:", deviceModel.value);
       };
       const validateForm = () => {
         if (form.value.username.length == 0) {
@@ -10834,9 +11292,18 @@
       const openSmsLogin = () => {
         smsLoginMode.value = true;
       };
+      const stopSmsCooldown = () => {
+        const timer = smsCooldownTimer;
+        if (timer != null) {
+          clearInterval(timer);
+          smsCooldownTimer = null;
+        }
+      };
       const closeSmsLogin = () => {
         smsLoginMode.value = false;
         smsCode.value = "";
+        stopSmsCooldown();
+        smsCooldown.value = 0;
       };
       const isValidMobile = () => {
         if (!/^1[3-9]\\d{9}$/.test(smsMobile.value)) {
@@ -10845,12 +11312,22 @@
         }
         return true;
       };
-      const startSmsCooldown = (seconds) => {
-        smsCooldown.value = seconds > 0 ? seconds : 60;
-        setInterval(() => {
+      const isValidSmsCode = () => {
+        if (!/^\\d{4}$/.test(smsCode.value)) {
+          showAppToast({ title: "请输入4位验证码", icon: "none" });
+          return false;
+        }
+        return true;
+      };
+      const startSmsCooldown = () => {
+        stopSmsCooldown();
+        smsCooldown.value = 60;
+        smsCooldownTimer = setInterval(() => {
           smsCooldown.value -= 1;
-          if (smsCooldown.value <= 0)
+          if (smsCooldown.value <= 0) {
             smsCooldown.value = 0;
+            stopSmsCooldown();
+          }
         }, 1e3);
       };
       const sendSmsCode = () => {
@@ -10861,13 +11338,15 @@
             return Promise.resolve(null);
           try {
             smsSending.value = true;
-            const response = yield sendSmsLoginCode(new SendSmsCodeRequest({ mobile: smsMobile.value, scene: "login" }));
+            const response = yield sendSmsLoginCode(new SendSmsCodeRequest({
+              tenantId: null,
+              phonenumber: smsMobile.value
+            }));
             if (response.code != 200) {
               showAppToast({ title: response.msg || "验证码发送失败", icon: "none" });
               return Promise.resolve(null);
             }
-            const cooldownSeconds = response.data != null ? response.data.getNumber("cooldownSeconds", 60) : 60;
-            startSmsCooldown(cooldownSeconds);
+            startSmsCooldown();
             showAppToast({ title: "验证码已发送", icon: "success" });
           } catch (error) {
             showAppToast({ title: "验证码发送失败，请检查网络", icon: "none" });
@@ -10876,20 +11355,21 @@
           }
         });
       };
-      const getAppPlatform = () => {
-        return "ios";
-      };
       const submitSmsLogin = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          if (!ensureAgreementAccepted() || !isValidMobile() || smsCode.value == "" || smsSubmitting.value) {
-            if (smsCode.value == "")
-              showAppToast({ title: "请输入验证码", icon: "none" });
+          if (smsSubmitting.value)
             return Promise.resolve(null);
-          }
+          if (!ensureAgreementAccepted() || !isValidMobile() || !isValidSmsCode())
+            return Promise.resolve(null);
           try {
             smsSubmitting.value = true;
-            const response = yield smsLogin(new SmsLoginRequest({ mobile: smsMobile.value, code: smsCode.value, platform: getAppPlatform() }));
-            const token = response.data != null ? response.data.getString("token", "") : "";
+            const response = yield smsLogin(new SmsLoginRequest({
+              clientId: null,
+              tenantId: null,
+              phonenumber: smsMobile.value,
+              smsCode: smsCode.value
+            }));
+            const token = response.data != null ? response.data.getString("access_token", "") : "";
             if (response.code == 200 && token != "") {
               smsCode.value = "";
               completeLogin(token, false);
@@ -10916,7 +11396,7 @@
               if (appVersion != "")
                 clientVersion = appVersion;
             } catch (error) {
-              uni.__log__("warn", "at pages/login/login.uvue:347", "获取应用版本失败，使用默认版本号:", error);
+              uni.__log__("warn", "at pages/login/login.uvue:357", "获取应用版本失败，使用默认版本号:", error);
             }
             const result = yield loginByUniVerify(clientVersion);
             if (result.ok) {
@@ -10924,8 +11404,7 @@
               return Promise.resolve(null);
             }
             if (!result.cancelled) {
-              showAppToast({ title: result.message + "，可使用验证码登录", icon: "none" });
-              openSmsLogin();
+              showAppToast({ title: result.message, icon: "none" });
             }
           } finally {
             nativeLoginLoading.value = false;
@@ -10955,29 +11434,29 @@
             return Promise.resolve(null);
           }
           try {
-            uni.__log__("log", "at pages/login/login.uvue:464", "准备验证表单...");
+            uni.__log__("log", "at pages/login/login.uvue:473", "准备验证表单...");
             if (!validateForm())
               return Promise.resolve(null);
-            uni.__log__("log", "at pages/login/login.uvue:466", "✅ 表单验证通过");
+            uni.__log__("log", "at pages/login/login.uvue:475", "✅ 表单验证通过");
             const newFormData = new UTSJSONObject({
               username: form.value.username,
               password: form.value.password,
               from: deviceModel.value,
               type: "USER"
             });
-            uni.__log__("log", "at pages/login/login.uvue:475", "📤 请求参数:", newFormData);
+            uni.__log__("log", "at pages/login/login.uvue:484", "📤 请求参数:", newFormData);
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "登录中...",
               mask: true
             }));
-            uni.__log__("log", "at pages/login/login.uvue:485", "🚀 开始调用 login 接口...");
+            uni.__log__("log", "at pages/login/login.uvue:494", "🚀 开始调用 login 接口...");
             const res = yield login(newFormData);
-            uni.__log__("log", "at pages/login/login.uvue:487", "✅ 登录接口返回:", res);
+            uni.__log__("log", "at pages/login/login.uvue:496", "✅ 登录接口返回:", res);
             loading.value = false;
             uni.hideLoading();
             const loginData = res.data;
-            const token = res.code == 200 && loginData != null ? loginData.getString("token", "") : "";
+            const token = res.code == 200 && loginData != null ? loginData.getString("access_token", "") : "";
             if (token != "") {
               completeLogin(token, true);
             } else {
@@ -10987,7 +11466,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/login/login.uvue:506", "❌ 登录失败:", error);
+            uni.__log__("error", "at pages/login/login.uvue:515", "❌ 登录失败:", error);
             loading.value = false;
             uni.hideLoading();
             if (error && error.message) {
@@ -11027,9 +11506,16 @@
         getSystemInfo();
         loadSavedAccount();
         prefetchUniVerify();
-        uni.__log__("log", "at pages/login/login.uvue:605", "pswLogin 初始值:", pswLogin.value);
+        uni.__log__("log", "at pages/login/login.uvue:614", "pswLogin 初始值:", pswLogin.value);
       });
-      const __returned__ = { docState, pswLogin, rememberPassword, formValid, loading, smsLoginMode, smsMobile, smsCode, smsCooldown, smsSending, smsSubmitting, nativeLoginLoading, form, deviceModel, pswrules, updateFormValid, loadSavedAccount, isPswLogin, toggleRememberPassword, saveAccountPassword, filterNonLatin, isDocState, getSystemInfo, validateForm, completeLogin, ensureAgreementAccepted, openSmsLogin, closeSmsLogin, isValidMobile, startSmsCooldown, sendSmsCode, getAppPlatform, submitSmsLogin, startUniVerifyLogin, loginBt, handleGetPhoneNumber, submit, userAgreement, privacyPolicy, gotoIndex, gotoAgreement, gotoPrivacy };
+      vue.onUnmounted(() => {
+        stopSmsCooldown();
+      });
+      const __returned__ = { docState, pswLogin, rememberPassword, formValid, loading, smsLoginMode, smsMobile, smsCode, smsCooldown, smsSending, smsSubmitting, get smsCooldownTimer() {
+        return smsCooldownTimer;
+      }, set smsCooldownTimer(v2 = null) {
+        smsCooldownTimer = v2;
+      }, nativeLoginLoading, form, deviceModel, pswrules, updateFormValid, loadSavedAccount, isPswLogin, toggleRememberPassword, saveAccountPassword, filterNonLatin, isDocState, getSystemInfo, validateForm, completeLogin, ensureAgreementAccepted, openSmsLogin, stopSmsCooldown, closeSmsLogin, isValidMobile, isValidSmsCode, startSmsCooldown, sendSmsCode, submitSmsLogin, startUniVerifyLogin, loginBt, handleGetPhoneNumber, submit, userAgreement, privacyPolicy, gotoIndex, gotoAgreement, gotoPrivacy };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -11185,8 +11671,9 @@
                           class: "sms-code-input",
                           modelValue: $setup.smsCode,
                           "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.smsCode = $event),
-                          placeholder: "请输入验证码",
+                          placeholder: "请输入4位验证码",
                           type: "number",
+                          maxlength: "4",
                           clearable: ""
                         }, {
                           suffix: vue.withCtx(() => [
@@ -11235,7 +11722,7 @@
                   class: "phone-login-switch",
                   onClick: $setup.closeSmsLogin
                 }, [
-                  vue.createElementVNode("text", { class: "phone-way" }, "一键登录")
+                  vue.createElementVNode("text", { class: "phone-way" }, "返回一键登录")
                 ])
               ]))
             ])),
@@ -18640,9 +19127,9 @@
               type: type != null ? type : 0,
               createTime: createTime != null ? createTime : ""
             };
-            uni.__log__("log", "at pages/userCenter/userInfo/userInfo.uvue:83", "用户信息:", userInfo.value);
+            uni.__log__("log", "at pages/userCenter/userInfo/userInfo.uvue:84", "用户信息:", userInfo.value);
           } catch (e2) {
-            uni.__log__("error", "at pages/userCenter/userInfo/userInfo.uvue:85", "解析用户信息失败:", e2);
+            uni.__log__("error", "at pages/userCenter/userInfo/userInfo.uvue:86", "解析用户信息失败:", e2);
           }
         }
       });
@@ -18653,6 +19140,7 @@
       };
       const logoutBtn = () => {
         return __awaiter(this, void 0, void 0, function* () {
+          yield unbindPushDeviceOnLogout();
           const res = yield logout();
           if (res.code == 200) {
             uni.removeStorageSync("token");
@@ -23098,21 +23586,22 @@
   __definePage("pages/deviceList/deviceList", PagesDeviceListDeviceList);
   const _sfc_main = vue.defineComponent({
     onLaunch: function() {
-      uni.__log__("log", "at App.uvue:76", "App onLaunch");
+      uni.__log__("log", "at App.uvue:77", "App onLaunch");
+      initPushBinding();
       initPush();
       clearPushBadge();
     },
     onShow: function() {
-      uni.__log__("log", "at App.uvue:87", "App Show");
+      uni.__log__("log", "at App.uvue:89", "App Show");
       clearPushBadge();
       refreshPushClientId();
     },
     onHide: function() {
-      uni.__log__("log", "at App.uvue:92", "App Hide");
+      uni.__log__("log", "at App.uvue:94", "App Hide");
       clearPushBadge();
     },
     onExit: function() {
-      uni.__log__("log", "at App.uvue:114", "App Exit");
+      uni.__log__("log", "at App.uvue:116", "App Exit");
     }
   });
   const _style_0 = { "uni-row": { "": { "flexDirection": "row" } }, "uni-column": { "": { "flexDirection": "column" } } };

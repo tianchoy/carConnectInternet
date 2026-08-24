@@ -3,8 +3,9 @@ import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { showAppToast } from '../../../utils/toast.uts'
 	import { clearPushSessionState } from '../../../services/push.uts'
+	import { unbindPushDeviceOnLogout } from '../../../services/push-binding.uts'
 	import {logout} from '../../../api/request.uts'
-	type UserInfo = { __$originalPosition?: UTSSourceMapPosition<"UserInfo", "pages/userCenter/userInfo/userInfo.uvue", 56, 7>;
+	type UserInfo = { __$originalPosition?: UTSSourceMapPosition<"UserInfo", "pages/userCenter/userInfo/userInfo.uvue", 57, 7>;
 		id : string,
 		mobile : string,
 		type: number,
@@ -28,7 +29,7 @@ const userInfo = ref<UserInfo>({
 	onLoad((options) => {
 		if (options.userInfo != null) {
 			try {
-				const parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options.userInfo as string), " at pages/userCenter/userInfo/userInfo.uvue:72") as string), " at pages/userCenter/userInfo/userInfo.uvue:72") as UTSJSONObject
+				const parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options.userInfo as string), " at pages/userCenter/userInfo/userInfo.uvue:73") as string), " at pages/userCenter/userInfo/userInfo.uvue:73") as UTSJSONObject
 				const userId = parsedInfo.getString("userId")
 				const mobile = parsedInfo.getString("mobile")
 				const type = parsedInfo.getNumber("type")
@@ -39,9 +40,9 @@ const userInfo = ref<UserInfo>({
 					type: type != null ? type : 0,
 					createTime: createTime != null ? createTime : ""
 				}
-				console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:83")
+				console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:84")
 			} catch (e) {
-				console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:85")
+				console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:86")
 			}
 		}
 	})
@@ -54,6 +55,7 @@ const userInfo = ref<UserInfo>({
 
 	// 退出登录方法
 	const logoutBtn = async () => {
+		await unbindPushDeviceOnLogout()
 		const res = await logout()
 		if(res.code == 200){
 			uni.removeStorageSync('token')

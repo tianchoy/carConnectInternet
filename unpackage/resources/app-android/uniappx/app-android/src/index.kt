@@ -568,6 +568,9 @@ fun consumePendingMessageId(): String {
 fun consumePushStaleFlag(): Boolean {
     return pushManager.consumeStaleFlag()
 }
+fun getCachedPushRegistrationId(): String {
+    return pushManager.getCachedRegistrationId()
+}
 fun onPushRegistrationIdReady(listener: PushRegistrationIdReadyListener): Unit {
     pushRegistrationIdReadyListeners.push(listener)
 }
@@ -786,6 +789,10 @@ val userinfo = "/sys/user/info"
 val addDeviceUrl = "/userDevice/add"
 val userDeviceList = "/userDevice/list"
 val uniVerifyLoginUrl = "/auth/login"
+val smsSendCodeUrl = "/resource/sms/code"
+val smsLoginUrl = "/auth/login"
+val smsClientId = "428a8310cd442757ae699df5d894f051"
+val defaultTenantId = "000000"
 val changePSW = "/sys/user/password"
 val userMsgList = "/usermessage/listForUser"
 val msgState = "/usermessage/detail/"
@@ -804,6 +811,7 @@ val cmdActionUrl = "/command/cmdAction"
 val cmdByMidUrl = "/command/cmdByMid"
 val cmdSendUrl = "/command/sendCmd"
 val pushBindUrl = "/app/push/bind"
+val pushUnbindUrl = "/app/push/unbind"
 open class BasicResponse (
     @JsonNotNull
     open var code: Number,
@@ -829,6 +837,19 @@ open class JsonDataResponse (
     open var data: UTSJSONObject,
 ) : UTSObject()
 typealias UniVerifyLoginRequest = UTSJSONObject
+open class SendSmsCodeRequest (
+    @JsonNotNull
+    open var phonenumber: String,
+    open var tenantId: String? = null,
+) : UTSObject()
+open class SmsLoginRequest (
+    @JsonNotNull
+    open var phonenumber: String,
+    @JsonNotNull
+    open var smsCode: String,
+    open var clientId: String? = null,
+    open var tenantId: String? = null,
+) : UTSObject()
 open class DevicePositionResponse (
     @JsonNotNull
     open var code: Number,
@@ -1032,6 +1053,39 @@ val uniVerifyLogin = fun(data: UniVerifyLoginRequest): UTSPromise<JsonDataRespon
     }
     )
 }
+val sendSmsLoginCode = fun(data: SendSmsCodeRequest): UTSPromise<BasicResponse> {
+    return get(smsSendCodeUrl, _uO("phonenumber" to data.phonenumber, "tenantId" to if (data.tenantId != null) {
+        data.tenantId
+    } else {
+        defaultTenantId
+    }
+    )).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val smsLogin = fun(data: SmsLoginRequest): UTSPromise<JsonDataResponse> {
+    val requestData = UTSJSONObject()
+    requestData.set("clientId", if (data.clientId != null) {
+        data.clientId
+    } else {
+        smsClientId
+    }
+    )
+    requestData.set("grantType", "sms")
+    requestData.set("tenantId", if (data.tenantId != null) {
+        data.tenantId
+    } else {
+        defaultTenantId
+    }
+    )
+    requestData.set("phonenumber", data.phonenumber)
+    requestData.set("smsCode", data.smsCode)
+    return post(smsLoginUrl, requestData).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
+    }
+    )
+}
 val changePassWord = fun(data: UTSJSONObject): UTSPromise<ChangePasswordResponse> {
     return put(changePSW, data).then(fun(raw: Any): ChangePasswordResponse {
         return changePasswordResponse(raw)
@@ -1137,6 +1191,12 @@ val sendCmd = fun(data: UTSJSONObject): UTSPromise<SendCmdResponse> {
     }
     )
 }
+val unbindPushDevice = fun(registrationId: String): UTSPromise<BasicResponse> {
+    return postSilently(pushUnbindUrl + "?registrationId=" + encodeURIComponent(registrationId), UTSJSONObject()).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
 val bindPushDevice = fun(data: PushDeviceBindRequest): UTSPromise<BasicResponse> {
     val requestData = UTSJSONObject()
     requestData.set("registrationId", data.registrationId)
@@ -1224,6 +1284,11 @@ fun bindRegistrationId(registrationId: String): Unit {
             pushBindingDebug("推送设备绑定成功，platform=" + platform)
             return
         }
+        if (response.code == 500) {
+            pushBindingWarn("推送设备绑定返回 500，登录状态已失效，跳转登录页。msg=" + response.msg)
+            handleTokenExpired()
+            return
+        }
         pushBindingWarn("推送设备绑定失败，稍后将重试。code=" + response.code + ", msg=" + response.msg)
     }
     ).`catch`(fun(){
@@ -1239,6 +1304,27 @@ fun bindRegistrationId(registrationId: String): Unit {
         }
     }
     )
+}
+fun unbindPushDeviceOnLogout(): UTSPromise<Unit> {
+    return wrapUTSPromise(suspend w@{
+            val registrationId = getCachedPushRegistrationId()
+            if (registrationId == "") {
+                pushBindingDebug("退出登录时无缓存 RegistrationID，跳过推送设备解绑")
+                return@w
+            }
+            try {
+                pushBindingDebug("退出登录时解绑推送设备")
+                val response = await(unbindPushDevice(registrationId))
+                if (response.code == 200) {
+                    pushBindingDebug("推送设备解绑成功")
+                    return@w
+                }
+                pushBindingWarn("推送设备解绑失败，但仍继续退出登录。code=" + response.code + ", msg=" + response.msg)
+            }
+             catch (error: Throwable) {
+                pushBindingWarn("推送设备解绑请求失败，但仍继续退出登录。")
+            }
+    })
 }
 fun initPushBinding(): Unit {
     if (initialized) {

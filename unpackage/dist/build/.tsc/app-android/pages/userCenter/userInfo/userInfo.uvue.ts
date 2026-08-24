@@ -3,6 +3,7 @@ import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { showAppToast } from '../../../utils/toast.uts'
 	import { clearPushSessionState } from '../../../services/push.uts'
+	import { unbindPushDeviceOnLogout } from '../../../services/push-binding.uts'
 	import {logout} from '../../../api/request.uts'
 	type UserInfo = {
 		id : string,
@@ -54,6 +55,7 @@ const userInfo = ref<UserInfo>({
 
 	// 退出登录方法
 	const logoutBtn = async () => {
+		await unbindPushDeviceOnLogout()
 		const res = await logout()
 		if(res.code == 200){
 			uni.removeStorageSync('token')

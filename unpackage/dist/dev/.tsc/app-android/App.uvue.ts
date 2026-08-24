@@ -1,5 +1,6 @@
 
 	import { initPush, refreshPushClientId, clearPushBadge } from './services/push.uts'
+	import { initPushBinding } from './services/push-binding.uts'
 	import { ensureNotificationPermission } from './utils/cameraPermission.uts'
 
 	let firstBackTime = 0
@@ -73,28 +74,29 @@
 	
 	const __sfc__ = defineApp({
 		onLaunch: function () {
-			console.log('App onLaunch', " at App.uvue:76")
+			console.log('App onLaunch', " at App.uvue:77")
 			checkForUpdates()
+			initPushBinding()
 			initPush()
 			clearPushBadge()
 
 			ensureNotificationPermission((status) => {
-				console.log('[NotificationPermission] ' + status, " at App.uvue:82")
+				console.log('[NotificationPermission] ' + status, " at App.uvue:84")
 			})
 
 		},
 		onShow: function () {
-			console.log('App Show', " at App.uvue:87")
+			console.log('App Show', " at App.uvue:89")
 			clearPushBadge()
 			refreshPushClientId()
 		},
 		onHide: function () {
-			console.log('App Hide', " at App.uvue:92")
+			console.log('App Hide', " at App.uvue:94")
 			clearPushBadge()
 		},
 
 		onLastPageBackPress: function () {
-			console.log('App LastPageBackPress', " at App.uvue:97")
+			console.log('App LastPageBackPress', " at App.uvue:99")
 			if (firstBackTime == 0) {
 				uni.showToast({
 					title: '再按一次退出应用',
@@ -111,7 +113,7 @@
 		},
 
 		onExit: function () {
-			console.log('App Exit', " at App.uvue:114")
+			console.log('App Exit', " at App.uvue:116")
 		}
 	})
 

@@ -27,7 +27,7 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
             onLoad(fun(options){
                 if (options["userInfo"] != null) {
                     try {
-                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/userInfo/userInfo.uvue:72") as String), " at pages/userCenter/userInfo/userInfo.uvue:72") as UTSJSONObject
+                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/userInfo/userInfo.uvue:73") as String), " at pages/userCenter/userInfo/userInfo.uvue:73") as UTSJSONObject
                         val userId = parsedInfo.getString("userId")
                         val mobile = parsedInfo.getString("mobile")
                         val type = parsedInfo.getNumber("type")
@@ -53,10 +53,10 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
                             ""
                         }
                         )
-                        console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:83")
+                        console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:84")
                     }
                      catch (e: Throwable) {
-                        console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:85")
+                        console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:86")
                     }
                 }
             }
@@ -66,6 +66,7 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
             }
             val logoutBtn = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
+                        await(unbindPushDeviceOnLogout())
                         val res = await(logout())
                         if (res.code == 200) {
                             uni_removeStorageSync("token")

@@ -1,5 +1,6 @@
-import { bindPushDevice, type PushDeviceBindRequest } from '../api/request.uts'
-import { onPushRegistrationIdReady, onPushSessionAuthenticated } from './push.uts'
+import { bindPushDevice, unbindPushDevice, type PushDeviceBindRequest } from '../api/request.uts'
+import { handleTokenExpired } from '../api/http.uts'
+import { getCachedPushRegistrationId, onPushRegistrationIdReady, onPushSessionAuthenticated } from './push.uts'
 
 import AndroidLog from 'android.util.Log'
 
@@ -90,6 +91,11 @@ function bindRegistrationId(registrationId: string): void {
 			pushBindingDebug('推送设备绑定成功，platform=' + platform)
 			return
 		}
+		if (response.code == 500) {
+			pushBindingWarn('推送设备绑定返回 500，登录状态已失效，跳转登录页。msg=' + response.msg)
+			handleTokenExpired()
+			return
+		}
 		pushBindingWarn('推送设备绑定失败，稍后将重试。code=' + response.code + ', msg=' + response.msg)
 	}).catch(() => {
 		pushBindingWarn('推送设备绑定请求失败，稍后将重试。')
@@ -100,6 +106,25 @@ function bindRegistrationId(registrationId: string): void {
 		pendingRegistrationId = ''
 		if (nextRegistrationId != '') bindRegistrationId(nextRegistrationId)
 	})
+}
+
+export async function unbindPushDeviceOnLogout(): Promise<void> {
+	const registrationId = getCachedPushRegistrationId()
+	if (registrationId == '') {
+		pushBindingDebug('退出登录时无缓存 RegistrationID，跳过推送设备解绑')
+		return
+	}
+	try {
+		pushBindingDebug('退出登录时解绑推送设备')
+		const response = await unbindPushDevice(registrationId)
+		if (response.code == 200) {
+			pushBindingDebug('推送设备解绑成功')
+			return
+		}
+		pushBindingWarn('推送设备解绑失败，但仍继续退出登录。code=' + response.code + ', msg=' + response.msg)
+	} catch (error) {
+		pushBindingWarn('推送设备解绑请求失败，但仍继续退出登录。')
+	}
 }
 
 export function initPushBinding(): void {

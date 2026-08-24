@@ -47,7 +47,7 @@ export function resetTokenExpiredState(): void {
     isHandlingTokenExpired = false
 }
 
-function handleTokenExpired(): void {
+export function handleTokenExpired(): void {
     if (isHandlingTokenExpired) return
     isHandlingTokenExpired = true
     console.log('检测到token过期，执行跳转登录页逻辑')

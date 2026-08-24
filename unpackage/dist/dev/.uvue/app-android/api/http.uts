@@ -8,6 +8,7 @@ type RequestOptions = {
     data?: any;
     header?: UTSJSONObject | null;
     showLoading?: boolean;
+    showError?: boolean;
 };
 type HttpResponse<T = any> = {
     code: number;
@@ -30,16 +31,17 @@ type RequestFailure = {
 };
 // const BASE_URL = 'https://car.zdiot.cn:18443/api'
 const BASE_URL = 'https://gpsapp.zdiot.cn';
+const CLIENT_ID = '428a8310cd442757ae699df5d894f051';
 // 处理token过期的函数
 let isHandlingTokenExpired = false;
 export function resetTokenExpiredState(): void {
     isHandlingTokenExpired = false;
 }
-function handleTokenExpired(): void {
+export function handleTokenExpired(): void {
     if (isHandlingTokenExpired)
         return;
     isHandlingTokenExpired = true;
-    __f__('log', 'at api/http.uts:51', '检测到token过期，执行跳转登录页逻辑');
+    __f__('log', 'at api/http.uts:53', '检测到token过期，执行跳转登录页逻辑');
     // 清除本地token
     uni.removeStorageSync('token');
     clearPushSessionState();
@@ -51,14 +53,14 @@ function handleTokenExpired(): void {
     } as ShowToastOptions);
     // 使用定时器确保Toast显示完成后再跳转
     setTimeout(() => {
-        __f__('log', 'at api/http.uts:66', '正在跳转到登录页...');
+        __f__('log', 'at api/http.uts:68', '正在跳转到登录页...');
         uni.redirectTo({
             url: '/pages/login/login',
             success: () => {
-                __f__('log', 'at api/http.uts:70', '跳转登录页成功');
+                __f__('log', 'at api/http.uts:72', '跳转登录页成功');
             },
             fail: (err) => {
-                __f__('log', 'at api/http.uts:73', '跳转登录页失败:', err);
+                __f__('log', 'at api/http.uts:75', '跳转登录页失败:', err);
                 // 如果跳转失败，尝试使用 reLaunch
                 uni.reLaunch({
                     url: '/pages/login/login'
@@ -70,12 +72,12 @@ function handleTokenExpired(): void {
 // 请求拦截器
 function requestInterceptor(config: RequestOptions): RequestOptions {
     const token = uni.getStorageSync('token');
-    if (token != null && token.toString().length > 0) {
-        if (config.header == null) {
-            config.header = new UTSJSONObject();
-        }
-        config.header!.set('token', token.toString());
+    const authorization = 'Bearer ' + (token != null ? token.toString() : '');
+    if (config.header == null) {
+        config.header = new UTSJSONObject();
     }
+    config.header!.set('Authorization', authorization);
+    config.header!.set('clientId', CLIENT_ID);
     // 显示加载中
     // if (config.showLoading !== false) {
     //     uni.showLoading({
@@ -92,7 +94,7 @@ function responseInterceptor(response: RequestSuccess<any>, config: RequestOptio
 function logHttpError(error: HttpError): void {
     const detail = 'statusCode=' + error.statusCode + ', message=' + error.message + ', data=' + (error.data != null ? error.data.toString() : '');
     AndroidLog.e('HttpRequest', detail);
-    __f__('error', 'at api/http.uts:123', '[HttpRequest] ' + detail);
+    __f__('error', 'at api/http.uts:127', '[HttpRequest] ' + detail);
 }
 // 错误处理
 function errorHandler(error: HttpError, config: RequestOptions): void {
@@ -101,12 +103,15 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
         uni.hideLoading();
     }
     logHttpError(error);
+    if (config.showError == false)
+        return;
+    if (error.statusCode == 401) {
+        handleTokenExpired();
+        return;
+    }
     // 处理错误状态码
     if (error.statusCode != 0) {
         switch (error.statusCode) {
-            case 401:
-                handleTokenExpired();
-                break;
             case 403:
                 showAppToast({
                     title: '没有权限访问',
@@ -149,7 +154,8 @@ function request(options: RequestOptions): Promise<any> {
         method: options.method != null ? options.method : 'GET',
         data: options.data != null ? options.data : {},
         header: options.header != null ? options.header : new UTSJSONObject(),
-        showLoading: options.showLoading != false
+        showLoading: options.showLoading != false,
+        showError: options.showError != false
     };
     // 处理完整URL
     if (!config.url!.startsWith('http')) {
@@ -198,7 +204,8 @@ export function get(url: string, data: any = {}, options: RequestOptions = {} as
         method: 'GET',
         data: data,
         header: options.header,
-        showLoading: options.showLoading
+        showLoading: options.showLoading,
+        showError: options.showError
     } as RequestOptions);
 }
 export function post(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<any> {
@@ -207,7 +214,18 @@ export function post(url: string, data: any = {}, options: RequestOptions = {} a
         method: 'POST',
         data: data,
         header: options.header,
-        showLoading: options.showLoading
+        showLoading: options.showLoading,
+        showError: options.showError
+    } as RequestOptions);
+}
+// 静默发送 POST 请求
+export function postSilently(url: string, data: any): Promise<any> {
+    return request({
+        url: url,
+        method: 'POST',
+        data: data,
+        showLoading: false,
+        showError: false
     } as RequestOptions);
 }
 export function put(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<any> {
@@ -216,7 +234,8 @@ export function put(url: string, data: any = {}, options: RequestOptions = {} as
         method: 'PUT',
         data: data,
         header: options.header,
-        showLoading: options.showLoading
+        showLoading: options.showLoading,
+        showError: options.showError
     } as RequestOptions);
 }
 export function remove(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<any> {
@@ -225,19 +244,18 @@ export function remove(url: string, data: any = {}, options: RequestOptions = {}
         method: 'DELETE',
         data: data,
         header: options.header,
-        showLoading: options.showLoading
+        showLoading: options.showLoading,
+        showError: options.showError
     } as RequestOptions);
 }
 export function upload(url: string, filePath: string, name: string = 'file', formData: UTSJSONObject = {} as UTSJSONObject, options: RequestOptions = {} as RequestOptions): Promise<any> {
     return new Promise<any>((resolve, reject) => {
         // 处理完整URL
         const fullUrl = url.startsWith('http') ? url : BASE_URL + url;
-        // 添加token到header
-        const token = uni.getStorageSync('token');
-        const header = options.header != null ? options.header! : new UTSJSONObject();
-        if (token != null && token.toString().length > 0) {
-            header.set('token', token.toString());
-        }
+        const uploadConfig: RequestOptions = {
+            header: options.header != null ? options.header : new UTSJSONObject()
+        };
+        const header = requestInterceptor(uploadConfig).header!;
         if (options.showLoading != false) {
             uni.showLoading({
                 title: '上传中...',

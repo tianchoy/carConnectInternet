@@ -66,6 +66,7 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
             }
             val logoutBtn = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
+                        await(unbindPushDeviceOnLogout())
                         val res = await(logout())
                         if (res.code == 200) {
                             uni_removeStorageSync("token")

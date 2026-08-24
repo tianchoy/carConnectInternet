@@ -6,6 +6,10 @@ type NormalizedPushEvent = {
     kind: PushEventKind;
     payload: any;
 };
+export type PushRegistrationIdReadyListener = (registrationId: string) => void;
+export type PushSessionAuthenticatedListener = (registrationId: string) => void;
+const pushRegistrationIdReadyListeners: Array<PushRegistrationIdReadyListener> = [];
+const pushSessionAuthenticatedListeners: Array<PushSessionAuthenticatedListener> = [];
 const PUSH_PROVIDER_KEY = 'push_provider';
 const PUSH_LOCAL_PROVIDER_OVERRIDE_KEY = 'push_local_provider_override';
 const PUSH_PENDING_MESSAGE_ID_KEY_PREFIX = 'push.pending_message_id.';
@@ -47,7 +51,27 @@ function sessionKey(provider: PushProviderName): string {
 }
 function pushDebug(provider: PushProviderName, message: string): void {
     AndroidLog.e('PushManager', '[' + provider + '] ' + message);
-    __f__('error', 'at services/push.uts:82', '[PushManager][' + provider + '] ' + message);
+    __f__('error', 'at services/push.uts:88', '[PushManager][' + provider + '] ' + message);
+}
+function notifyPushRegistrationIdReady(registrationId: string): void {
+    for (let index = 0; index < pushRegistrationIdReadyListeners.length; index++) {
+        try {
+            pushRegistrationIdReadyListeners[index](registrationId);
+        }
+        catch (error: any) {
+            __f__('error', 'at services/push.uts:96', '[PushManager] RegistrationID 就绪监听执行失败:', error);
+        }
+    }
+}
+function notifyPushSessionAuthenticated(registrationId: string): void {
+    for (let index = 0; index < pushSessionAuthenticatedListeners.length; index++) {
+        try {
+            pushSessionAuthenticatedListeners[index](registrationId);
+        }
+        catch (error: any) {
+            __f__('error', 'at services/push.uts:106', '[PushManager] 已认证会话监听执行失败:', error);
+        }
+    }
 }
 function stringValue(value: any): string {
     if (value == null)
@@ -185,7 +209,7 @@ class UniPushAdapter implements PushAdapter {
                         onFailure('CID 为空');
                         return;
                     }
-                    pushDebug(this.provider, 'UniPush CID: ' + registrationId);
+                    pushDebug(this.provider, 'UniPush CID 已就绪');
                     onSuccess(registrationId);
                 },
                 fail: (error: any) => {
@@ -309,7 +333,9 @@ class PushManager {
         if (!this.initialized)
             this.init();
         uni.setStorageSync(sessionKey(this.provider), 'authenticated');
+        const cachedRegistrationId = this.getCachedRegistrationId();
         this.refreshRegistrationId();
+        notifyPushSessionAuthenticated(cachedRegistrationId);
     }
     clearSessionState(): void {
         uni.removeStorageSync(sessionKey(this.provider));
@@ -393,7 +419,8 @@ class PushManager {
         this.registrationRetryCount = 0;
         uni.setStorageSync(registrationIdKey(this.provider), registrationId);
         const registrationIdLabel = this.provider == 'unipush' ? 'UniPush CID 已就绪' : 'JPush RegistrationID 已就绪';
-        pushDebug(this.provider, registrationIdLabel + ': ' + registrationId);
+        pushDebug(this.provider, registrationIdLabel);
+        notifyPushRegistrationIdReady(registrationId);
     }
     private requestUniPushRegistrationId(adapter: UniPushAdapter): void {
         this.registrationRequesting = true;
@@ -459,6 +486,12 @@ export function consumePushStaleFlag(): boolean {
 }
 export function getCachedPushRegistrationId(): string {
     return pushManager.getCachedRegistrationId();
+}
+export function onPushRegistrationIdReady(listener: PushRegistrationIdReadyListener): void {
+    pushRegistrationIdReadyListeners.push(listener);
+}
+export function onPushSessionAuthenticated(listener: PushSessionAuthenticatedListener): void {
+    pushSessionAuthenticatedListeners.push(listener);
 }
 // Compatibility alias: this value is a UniPush CID only when UniPush is selected;
 // with JPush it is the JPush RegistrationID.

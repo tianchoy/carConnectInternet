@@ -209,6 +209,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { clearPushSessionState } from '../../services/push.uts'
+import { unbindPushDeviceOnLogout } from '../../services/push-binding.uts'
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
@@ -1261,6 +1262,7 @@ const handleExit = () => {
         content: '确定退出登录吗？',
         success: async (res) => {
             if (res.confirm) {
+                await unbindPushDeviceOnLogout()
                 const res = await logout()
                 if(res.code == 200){
                     clearSavedSelectedDevice()
