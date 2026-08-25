@@ -5087,6 +5087,7 @@
           return {
             phonenumber: { type: String, optional: false },
             smsCode: { type: String, optional: false },
+            deviceId: { type: String, optional: false },
             clientId: { type: String, optional: true },
             tenantId: { type: String, optional: true }
           };
@@ -5098,6 +5099,7 @@
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.phonenumber = this.__props__.phonenumber;
       this.smsCode = this.__props__.smsCode;
+      this.deviceId = this.__props__.deviceId;
       this.clientId = this.__props__.clientId;
       this.tenantId = this.__props__.tenantId;
       delete this.__props__;
@@ -5520,6 +5522,7 @@
     requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
     requestData.set("phonenumber", data.phonenumber);
     requestData.set("smsCode", data.smsCode);
+    requestData.set("devide_id", data.deviceId);
     return post(smsLoginUrl, requestData).then((raw = null) => {
       return jsonDataResponse(raw);
     });
@@ -10228,7 +10231,7 @@
     if (uniVerifyManager != null)
       uniVerifyManager.close();
   }
-  function loginByUniVerify(clientVersion) {
+  function loginByUniVerify(clientVersion, deviceId) {
     return new Promise((resolve) => {
       if (requesting) {
         resolve(createResult(false, false, "正在进行本机号码授权，请稍候", ""));
@@ -10256,6 +10259,7 @@
               requestData.set("platform", getPlatform());
               requestData.set("clientVersion", clientVersion);
               requestData.set("clientId", "428a8310cd442757ae699df5d894f051");
+              requestData.set("devide_id", deviceId);
               requestData.set("grantType", "univerify");
               requestData.set("tenantId", "000000");
               uniVerifyLogin(requestData).then((response) => {
@@ -10409,6 +10413,15 @@
         deviceModel.value = res.deviceModel;
         uni.__log__("log", "at pages/login/login.uvue:222", "设备型号:", deviceModel.value);
       };
+      const getLoginDeviceId = () => {
+        var _a;
+        try {
+          return (_a = uni.getDeviceInfo().deviceId) !== null && _a !== void 0 ? _a : "";
+        } catch (error) {
+          uni.__log__("warn", "at pages/login/login.uvue:229", "获取登录设备标识失败:", error);
+          return "";
+        }
+      };
       const validateForm = () => {
         if (form.value.username.length == 0) {
           showAppToast({ title: "请输入账号", icon: "none" });
@@ -10519,7 +10532,8 @@
               clientId: null,
               tenantId: null,
               phonenumber: smsMobile.value,
-              smsCode: smsCode.value
+              smsCode: smsCode.value,
+              deviceId: getLoginDeviceId()
             }));
             const token = response.data != null ? response.data.getString("access_token", "") : "";
             if (response.code == 200 && token != "") {
@@ -10548,9 +10562,9 @@
               if (appVersion != "")
                 clientVersion = appVersion;
             } catch (error) {
-              uni.__log__("warn", "at pages/login/login.uvue:358", "获取应用版本失败，使用默认版本号:", error);
+              uni.__log__("warn", "at pages/login/login.uvue:371", "获取应用版本失败，使用默认版本号:", error);
             }
-            const result = yield loginByUniVerify(clientVersion);
+            const result = yield loginByUniVerify(clientVersion, getLoginDeviceId());
             if (result.ok) {
               completeLogin(result.token, false);
               return Promise.resolve(null);
@@ -10573,25 +10587,25 @@
             return Promise.resolve(null);
           }
           try {
-            uni.__log__("log", "at pages/login/login.uvue:474", "准备验证表单...");
+            uni.__log__("log", "at pages/login/login.uvue:487", "准备验证表单...");
             if (!validateForm())
               return Promise.resolve(null);
-            uni.__log__("log", "at pages/login/login.uvue:476", "✅ 表单验证通过");
+            uni.__log__("log", "at pages/login/login.uvue:489", "✅ 表单验证通过");
             const newFormData = new UTSJSONObject({
               username: form.value.username,
               password: form.value.password,
               from: deviceModel.value,
               type: "USER"
             });
-            uni.__log__("log", "at pages/login/login.uvue:485", "📤 请求参数:", newFormData);
+            uni.__log__("log", "at pages/login/login.uvue:498", "📤 请求参数:", newFormData);
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "登录中...",
               mask: true
             }));
-            uni.__log__("log", "at pages/login/login.uvue:495", "🚀 开始调用 login 接口...");
+            uni.__log__("log", "at pages/login/login.uvue:508", "🚀 开始调用 login 接口...");
             const res = yield login(newFormData);
-            uni.__log__("log", "at pages/login/login.uvue:497", "✅ 登录接口返回:", res);
+            uni.__log__("log", "at pages/login/login.uvue:510", "✅ 登录接口返回:", res);
             loading.value = false;
             uni.hideLoading();
             const loginData = res.data;
@@ -10605,7 +10619,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/login/login.uvue:516", "❌ 登录失败:", error);
+            uni.__log__("error", "at pages/login/login.uvue:529", "❌ 登录失败:", error);
             loading.value = false;
             uni.hideLoading();
             if (error && error.message) {
@@ -10645,7 +10659,7 @@
         getSystemInfo();
         loadSavedAccount();
         prefetchUniVerify();
-        uni.__log__("log", "at pages/login/login.uvue:615", "pswLogin 初始值:", pswLogin.value);
+        uni.__log__("log", "at pages/login/login.uvue:628", "pswLogin 初始值:", pswLogin.value);
       });
       vue.onUnmounted(() => {
         stopSmsCooldown();

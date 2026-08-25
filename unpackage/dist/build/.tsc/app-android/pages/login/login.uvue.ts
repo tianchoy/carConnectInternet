@@ -119,6 +119,15 @@ const docState = ref(false)
 		console.log('设备型号:', deviceModel.value)
 	}
 
+	const getLoginDeviceId = (): string => {
+		try {
+			return uni.getDeviceInfo().deviceId ?? ''
+		} catch (error) {
+			console.warn('获取登录设备标识失败:', error)
+			return ''
+		}
+	}
+
 	// ===== 表单验证 =====
 	const validateForm = () : boolean => {
 		if (form.value.username.length == 0) {
@@ -227,7 +236,11 @@ const docState = ref(false)
 		if (!ensureAgreementAccepted() || !isValidMobile() || !isValidSmsCode()) return
 		try {
 			smsSubmitting.value = true
-			const response = await smsLogin({ phonenumber: smsMobile.value, smsCode: smsCode.value })
+			const response = await smsLogin({
+				phonenumber: smsMobile.value,
+				smsCode: smsCode.value,
+				deviceId: getLoginDeviceId()
+			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
 			if (response.code == 200 && token != '') {
 				smsCode.value = ''
@@ -254,7 +267,7 @@ const docState = ref(false)
 			} catch (error) {
 				console.warn('获取应用版本失败，使用默认版本号:', error)
 			}
-			const result = await loginByUniVerify(clientVersion)
+			const result = await loginByUniVerify(clientVersion, getLoginDeviceId())
 			if (result.ok) {
 				completeLogin(result.token, false)
 				return

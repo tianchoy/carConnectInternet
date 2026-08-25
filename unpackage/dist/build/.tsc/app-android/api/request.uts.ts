@@ -49,7 +49,7 @@ export type PushDeviceBindRequest = {
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
 export type UniVerifyLoginRequest = UTSJSONObject
 export type SendSmsCodeRequest = { phonenumber: string, tenantId?: string }
-export type SmsLoginRequest = { phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
+export type SmsLoginRequest = { phonenumber: string, smsCode: string, deviceId: string, clientId?: string, tenantId?: string }
 export type DevicePositionResponse = { code: number, msg: string, data: Array<UTSJSONObject> }
 export type TrackPosResponse = { code: number, msg: string, data: UTSJSONObject }
 export type UserInfoResponse = { code: number, msg: string, data: UTSJSONObject }
@@ -181,6 +181,7 @@ export const smsLogin = (data: SmsLoginRequest): Promise<JsonDataResponse> => {
     requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
     requestData.set('phonenumber', data.phonenumber)
     requestData.set('smsCode', data.smsCode)
+    requestData.set('devide_id', data.deviceId)
     return post(smsLoginUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 }
 export const changePassWord = (data: UTSJSONObject): Promise<ChangePasswordResponse> => put(changePSW, data).then((raw: any): ChangePasswordResponse => { return changePasswordResponse(raw) })

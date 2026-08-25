@@ -847,6 +847,8 @@ open class SmsLoginRequest (
     open var phonenumber: String,
     @JsonNotNull
     open var smsCode: String,
+    @JsonNotNull
+    open var deviceId: String,
     open var clientId: String? = null,
     open var tenantId: String? = null,
 ) : UTSObject()
@@ -1081,6 +1083,7 @@ val smsLogin = fun(data: SmsLoginRequest): UTSPromise<JsonDataResponse> {
     )
     requestData.set("phonenumber", data.phonenumber)
     requestData.set("smsCode", data.smsCode)
+    requestData.set("devide_id", data.deviceId)
     return post(smsLoginUrl, requestData).then(fun(raw: Any): JsonDataResponse {
         return jsonDataResponse(raw)
     }
@@ -5498,7 +5501,7 @@ fun closeLoginPage(uniVerifyManager: UniVerifyManager?): Unit {
         uniVerifyManager.close()
     }
 }
-fun loginByUniVerify(clientVersion: String): UTSPromise<UniVerifyResult> {
+fun loginByUniVerify(clientVersion: String, deviceId: String): UTSPromise<UniVerifyResult> {
     return UTSPromise<UniVerifyResult>(fun(resolve, _reject){
         if (requesting) {
             resolve(createResult(false, false, "正在进行本机号码授权，请稍候", ""))
@@ -5521,6 +5524,7 @@ fun loginByUniVerify(clientVersion: String): UTSPromise<UniVerifyResult> {
                     requestData.set("platform", getPlatform())
                     requestData.set("clientVersion", clientVersion)
                     requestData.set("clientId", "428a8310cd442757ae699df5d894f051")
+                    requestData.set("devide_id", deviceId)
                     requestData.set("grantType", "univerify")
                     requestData.set("tenantId", "000000")
                     uniVerifyLogin(requestData).then(fun(response){

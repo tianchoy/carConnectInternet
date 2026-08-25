@@ -13,6 +13,7 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.getAppBaseInfo as uni_getAppBaseInfo
+import io.dcloud.uniapp.extapi.getDeviceInfo as uni_getDeviceInfo
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
@@ -100,6 +101,15 @@ open class GenPagesLoginLogin : BasePage {
                 val res = uni_getSystemInfoSync()
                 deviceModel.value = res.deviceModel
                 console.log("设备型号:", deviceModel.value)
+            }
+            val getLoginDeviceId = fun(): String {
+                try {
+                    return uni_getDeviceInfo(null).deviceId ?: ""
+                }
+                 catch (error: Throwable) {
+                    console.warn("获取登录设备标识失败:", error)
+                    return ""
+                }
             }
             val validateForm = fun(): Boolean {
                 if (form.value.username.length == 0) {
@@ -219,7 +229,7 @@ open class GenPagesLoginLogin : BasePage {
                         }
                         try {
                             smsSubmitting.value = true
-                            val response = await(smsLogin(SmsLoginRequest(phonenumber = smsMobile.value, smsCode = smsCode.value)))
+                            val response = await(smsLogin(SmsLoginRequest(phonenumber = smsMobile.value, smsCode = smsCode.value, deviceId = getLoginDeviceId())))
                             val token = if (response.data != null) {
                                 response.data.getString("access_token", "")
                             } else {
@@ -262,7 +272,7 @@ open class GenPagesLoginLogin : BasePage {
                              catch (error: Throwable) {
                                 console.warn("获取应用版本失败，使用默认版本号:", error)
                             }
-                            val result = await(loginByUniVerify(clientVersion))
+                            val result = await(loginByUniVerify(clientVersion, getLoginDeviceId()))
                             if (result.ok) {
                                 completeLogin(result.token, false)
                                 return@w1
