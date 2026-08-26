@@ -157,7 +157,7 @@ public func buildTencentURL(_ params: ExternalMapNavigationParams) -> String {
 }
 public func buildAmapURL(_ params: ExternalMapNavigationParams) -> String {
     var name = encodedValue(destinationName(params))
-    var sourceApplication = encodedValue("车载GPS")
+    var sourceApplication = encodedValue("中导物联")
     var latitude = params.latitude.toString() ?? ""
     var longitude = params.longitude.toString() ?? ""
     var url = "iosamap://navi?sourceApplication=" + sourceApplication + "&poiname=" + name

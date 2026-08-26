@@ -80,7 +80,7 @@ function buildTencentURL(params: ExternalMapNavigationParams): string {
 }
 function buildAmapURL(params: ExternalMapNavigationParams): string {
     const name = encodedValue(destinationName(params));
-    const sourceApplication = encodedValue('车载GPS');
+    const sourceApplication = encodedValue('中导物联');
     const latitude = params.latitude.toString() ?? '';
     const longitude = params.longitude.toString() ?? '';
     let url = 'iosamap://navi?sourceApplication=' + sourceApplication + '&poiname=' + name;

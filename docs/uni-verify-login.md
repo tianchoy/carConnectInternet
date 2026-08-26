@@ -48,7 +48,7 @@ Android 离线工程必须以最终 release APK/AAB 的证书指纹为准：用 
   "platform": "android",
   "clientVersion": "1.0.0",
   "clientId": "428a8310cd442757ae699df5d894f051",
-  "devide_id": "uni.getDeviceInfo() 返回的设备标识",
+  "device_id": "uni.getDeviceInfo() 返回的设备标识",
   "grantType": "univerify",
   "tenantId": "000000"
 }
@@ -56,7 +56,7 @@ Android 离线工程必须以最终 release APK/AAB 的证书指纹为准：用 
 
 - `openId`、`accessToken` 由 `uni.getUniVerifyManager().login()` 成功回调直接透传；不得由客户端伪造手机号代替。
 - `platform` 仅为 `android` 或 `ios`，用于审计和服务端处理，不可作为身份凭证。
-- `devide_id` 为 App 通过 `uni.getDeviceInfo()` 获取的设备标识，用于服务端关联设备；不是保证永久不变的硬件唯一号。
+- `device_id` 为 App 通过 `uni.getDeviceInfo()` 获取的设备标识，用于服务端关联设备；不是保证永久不变的硬件唯一号。
 - 客户端不会存储或打印完整 `accessToken`。
 
 成功响应（`data.access_token` 必填）：
@@ -135,7 +135,7 @@ phonenumber=13800138000&tenantId=000000
   "tenantId": "000000",
   "phonenumber": "13800138000",
   "smsCode": "4826",
-  "devide_id": "uni.getDeviceInfo() 返回的设备标识"
+  "device_id": "uni.getDeviceInfo() 返回的设备标识"
 }
 ```
 
@@ -146,7 +146,7 @@ phonenumber=13800138000&tenantId=000000
 | `tenantId` | 否 | 客户端默认传 `000000`。 |
 | `phonenumber` | 是 | 用户手机号。 |
 | `smsCode` | 是 | 4 位短信验证码。 |
-| `devide_id` | 是 | App 通过 `uni.getDeviceInfo()` 获取的设备标识，用于服务端关联设备；不是保证永久不变的硬件唯一号。 |
+| `device_id` | 是 | App 通过 `uni.getDeviceInfo()` 获取的设备标识，用于服务端关联设备；不是保证永久不变的硬件唯一号。 |
 
 成功响应必须在 `data.access_token` 返回业务令牌：
 
@@ -171,8 +171,8 @@ phonenumber=13800138000&tenantId=000000
 3. Android/iOS 默认进入一键登录视图；一键登录失败后页面不会自动显示短信表单。
 4. 用户主动选择“验证码登录”后，未同意协议、非法手机号或非 4 位验证码均不能发起对应请求。
 5. 发码请求为 `GET /resource/sms/code`，携带 `phonenumber` 和 `tenantId=000000`；成功后 60 秒内不可重复发送。
-6. 短信登录请求为 `POST /auth/login`，携带完整 SMS 授权字段和 `devide_id`；成功时保存 `data.access_token` 并进入首页。
-7. 一键登录请求为 `POST /auth/login`，携带现有 Uni Verify 授权字段和 `devide_id`。
+6. 短信登录请求为 `POST /auth/login`，携带完整 SMS 授权字段和 `device_id`；成功时保存 `data.access_token` 并进入首页。
+7. 一键登录请求为 `POST /auth/login`，携带现有 Uni Verify 授权字段和 `device_id`。
 8. 正确处理服务端业务错误、网络失败及一键登录取消，且任何按钮的 loading 状态都能恢复。
 
 官方 API 参考：[uni.getUniVerifyManager()](https://doc.dcloud.net.cn/uni-app-x/api/get-univerify-manager.html)。

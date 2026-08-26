@@ -137,7 +137,7 @@ export function loginByUniVerify(clientVersion: string, deviceId: string): Promi
 						requestData.set('platform', getPlatform())
 						requestData.set('clientVersion', clientVersion)
 						requestData.set('clientId', '428a8310cd442757ae699df5d894f051')
-						requestData.set('devide_id', deviceId)
+						requestData.set('device_id', deviceId)
 						requestData.set('grantType', 'univerify')
 						requestData.set('tenantId', '000000')
 						uniVerifyLogin(requestData).then((response) => {

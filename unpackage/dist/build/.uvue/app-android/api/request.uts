@@ -230,7 +230,7 @@ export const smsLogin = (data: SmsLoginRequest): Promise<JsonDataResponse> => {
     requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId);
     requestData.set('phonenumber', data.phonenumber);
     requestData.set('smsCode', data.smsCode);
-    requestData.set('devide_id', data.deviceId);
+    requestData.set('device_id', data.deviceId);
     return post(smsLoginUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw); });
 };
 export const changePassWord = (data: UTSJSONObject): Promise<ChangePasswordResponse> => put(changePSW, data).then((raw: any): ChangePasswordResponse => { return changePasswordResponse(raw); });

@@ -5522,7 +5522,7 @@
     requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
     requestData.set("phonenumber", data.phonenumber);
     requestData.set("smsCode", data.smsCode);
-    requestData.set("devide_id", data.deviceId);
+    requestData.set("device_id", data.deviceId);
     return post(smsLoginUrl, requestData).then((raw = null) => {
       return jsonDataResponse(raw);
     });
@@ -10259,7 +10259,7 @@
               requestData.set("platform", getPlatform());
               requestData.set("clientVersion", clientVersion);
               requestData.set("clientId", "428a8310cd442757ae699df5d894f051");
-              requestData.set("devide_id", deviceId);
+              requestData.set("device_id", deviceId);
               requestData.set("grantType", "univerify");
               requestData.set("tenantId", "000000");
               uniVerifyLogin(requestData).then((response) => {
