@@ -10,6 +10,7 @@ FRAMEWORK_NAME="unimoduleExternalMapNavigation"
 CONFIGURATION="${CONFIGURATION:-Debug}"
 
 RESOURCE_ROOT="${PROJECT_ROOT}/unpackage/resources/app-ios"
+SOURCE_MANIFEST="${PROJECT_ROOT}/manifest.json"
 SOURCE_WWW="${RESOURCE_ROOT}/${APP_ID}/www"
 SOURCE_APP_SERVICE="${SOURCE_WWW}/app-service.js"
 SOURCE_SWIFT="${RESOURCE_ROOT}/uni_modules/${PLUGIN_NAME}/utssdk/app-ios/src/index.swift"
@@ -17,6 +18,7 @@ SOURCE_JPUSH_CONFIG="${RESOURCE_ROOT}/uni_modules/jg-jpush-u/utssdk/app-ios/conf
 SOURCE_JPUSH_SWIFT="${RESOURCE_ROOT}/uni_modules/jg-jpush-u/utssdk/app-ios/src/index.swift"
 
 IOS_APP_ROOT="${IOS_PROJECT_ROOT}/UniAppXDemo"
+IOS_PROJECT_FILE="${IOS_APP_ROOT}/UniAppXDemo.xcodeproj/project.pbxproj"
 TARGET_WWW="${IOS_APP_ROOT}/UniAppXDemo/uni-app-x/apps/${APP_ID}/www"
 TARGET_JPUSH_SWIFT="${IOS_APP_ROOT}/UniAppXDemo/JPushUTSBridge.swift"
 TARGET_JPUSH_INFO_PLIST="${IOS_APP_ROOT}/UniAppXDemo/Info.plist"
@@ -39,6 +41,7 @@ require_path() {
   [[ -e "$1" ]] || fail "找不到 $2：$1"
 }
 
+require_path "${SOURCE_MANIFEST}" "项目 manifest.json"
 require_path "${SOURCE_WWW}" "HBuilderX 生成的 iOS Web 资源"
 require_path "${SOURCE_APP_SERVICE}" "HBuilderX 生成的 iOS app-service.js"
 require_path "${SOURCE_SWIFT}" "HBuilderX 生成的 iOS UTS Swift 源码"
@@ -51,6 +54,130 @@ require_path "${TARGET_JPUSH_SIMULATOR_CONFIG}" "模拟器 DCloud UTS Hook 配�
 require_path "${PLUGIN_PROJECT}" "iOS 外部地图 Framework 工程"
 require_path "${PROJECT_ROOT}/nativeResources/ios/Info.plist" "iOS 源资源 Info.plist"
 require_path "${IOS_APP_ROOT}/UniAppXDemo/Info.plist" "iOS 主工程 Info.plist"
+require_path "${IOS_PROJECT_FILE}" "iOS 主工程 project.pbxproj"
+
+read_manifest_version() {
+  python3 - "${SOURCE_MANIFEST}" <<'PY'
+import json
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+try:
+    manifest = json.loads(path.read_text(encoding='utf-8'))
+except (OSError, json.JSONDecodeError) as error:
+    raise SystemExit(f'无法读取 {path}：{error}')
+
+version_name = manifest.get('versionName')
+version_code = manifest.get('versionCode')
+if not isinstance(version_name, str) or not version_name.strip():
+    raise SystemExit(f'{path} 的 versionName 必须是非空字符串')
+if not isinstance(version_code, str) or not version_code.isdecimal() or int(version_code) <= 0:
+    raise SystemExit(f'{path} 的 versionCode 必须是正整数的字符串')
+
+print(version_name)
+print(version_code)
+PY
+}
+
+version_values=("${(@f)$(read_manifest_version)}")
+VERSION_NAME="${version_values[1]}"
+VERSION_CODE="${version_values[2]}"
+print -- "将同步原生版本：${VERSION_NAME} (${VERSION_CODE})"
+
+sync_xcode_version() {
+  python3 - "$1" "${VERSION_NAME}" "${VERSION_CODE}" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+project_path = Path(sys.argv[1])
+version_name, version_code = sys.argv[2:]
+text = project_path.read_text(encoding='utf-8')
+
+configuration_list = re.search(
+    r'/\* Build configuration list for PBXNativeTarget "UniAppX" \*/ = \{\s*'
+    r'isa = XCConfigurationList;\s*buildConfigurations = \(\s*'
+    r'([A-F0-9]+) /\* Debug \*/,\s*([A-F0-9]+) /\* Release \*/,',
+    text,
+    flags=re.DOTALL,
+)
+if not configuration_list:
+    raise SystemExit(f'{project_path} 未找到 UniAppX 的 Debug/Release 构建配置列表')
+
+for configuration_id, configuration_name in zip(configuration_list.groups(), ('Debug', 'Release')):
+    pattern = (
+        rf'(\n\s*{re.escape(configuration_id)} /\* {configuration_name} \*/ = \{{\n'
+        rf'\s*isa = XCBuildConfiguration;\n\s*buildSettings = \{{)(.*?)(\n\s*\}};\n'
+        rf'\s*name = {configuration_name};\n\s*\}};)'
+    )
+    match = re.search(pattern, text, flags=re.DOTALL)
+    if not match:
+        raise SystemExit(f'{project_path} 无法读取 UniAppX {configuration_name} 配置')
+
+    settings = match.group(2)
+    updated, marketing_count = re.subn(
+        r'^(\s*MARKETING_VERSION = )[^;]+;$',
+        rf'\g<1>{version_name};',
+        settings,
+        flags=re.MULTILINE,
+    )
+    updated, build_count = re.subn(
+        r'^(\s*CURRENT_PROJECT_VERSION = )[^;]+;$',
+        rf'\g<1>{version_code};',
+        updated,
+        flags=re.MULTILINE,
+    )
+    if marketing_count != 1 or build_count != 1:
+        raise SystemExit(
+            f'{project_path} 的 UniAppX {configuration_name} 配置必须各包含一个 '
+            f'MARKETING_VERSION 和 CURRENT_PROJECT_VERSION '
+            f'(实际：{marketing_count} / {build_count})'
+        )
+
+    text = text[:match.start(2)] + updated + text[match.end(2):]
+
+project_path.write_text(text, encoding='utf-8')
+PY
+}
+
+validate_xcode_version() {
+  python3 - "$1" "${VERSION_NAME}" "${VERSION_CODE}" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+project_path = Path(sys.argv[1])
+version_name, version_code = sys.argv[2:]
+text = project_path.read_text(encoding='utf-8')
+
+configuration_list = re.search(
+    r'/\* Build configuration list for PBXNativeTarget "UniAppX" \*/ = \{\s*'
+    r'isa = XCConfigurationList;\s*buildConfigurations = \(\s*'
+    r'([A-F0-9]+) /\* Debug \*/,\s*([A-F0-9]+) /\* Release \*/,',
+    text,
+    flags=re.DOTALL,
+)
+if not configuration_list:
+    raise SystemExit(f'{project_path} 未找到 UniAppX 的 Debug/Release 构建配置列表')
+
+for configuration_id, configuration_name in zip(configuration_list.groups(), ('Debug', 'Release')):
+    pattern = (
+        rf'\n\s*{re.escape(configuration_id)} /\* {configuration_name} \*/ = \{{\n'
+        rf'\s*isa = XCBuildConfiguration;\n\s*buildSettings = \{{(.*?)\n\s*\}};\n'
+        rf'\s*name = {configuration_name};\n\s*\}};'
+    )
+    match = re.search(pattern, text, flags=re.DOTALL)
+    if not match:
+        raise SystemExit(f'{project_path} 无法验证 UniAppX {configuration_name} 配置')
+    settings = match.group(1)
+    if not re.search(rf'^\s*MARKETING_VERSION = {re.escape(version_name)};$', settings, re.MULTILINE):
+        raise SystemExit(f'{project_path} 的 UniAppX {configuration_name} 未同步 MARKETING_VERSION')
+    if not re.search(rf'^\s*CURRENT_PROJECT_VERSION = {re.escape(version_code)};$', settings, re.MULTILINE):
+        raise SystemExit(f'{project_path} 的 UniAppX {configuration_name} 未同步 CURRENT_PROJECT_VERSION')
+PY
+}
+
 
 for plist in \
   "${PROJECT_ROOT}/nativeResources/ios/Info.plist" \
@@ -68,11 +195,15 @@ if missing:
 PY
 done
 
-print -- "[1/6] 同步 HBuilderX 生成的 iOS Web 资源"
+print -- "[1/7] 同步 HBuilderX 生成的 iOS Web 资源"
 mkdir -p "${TARGET_WWW}"
 rsync -a --delete --exclude='.DS_Store' "${SOURCE_WWW}/" "${TARGET_WWW}/"
 
-print -- "[2/6] 同步 JPush iOS 桥接并切换 APNs Hook"
+print -- "[2/7] 同步 iOS 原生包版本"
+sync_xcode_version "${IOS_PROJECT_FILE}"
+validate_xcode_version "${IOS_PROJECT_FILE}"
+
+print -- "[3/7] 同步 JPush iOS 桥接并切换 APNs Hook"
 python3 - "${SOURCE_JPUSH_CONFIG}" "${SOURCE_JPUSH_SWIFT}" "${TARGET_JPUSH_DEVICE_CONFIG}" "${TARGET_JPUSH_SIMULATOR_CONFIG}" <<'PY'
 import json
 from pathlib import Path
@@ -193,7 +324,7 @@ for value in sys.argv[1:]:
         raise SystemExit(f'{path} 的 APNs Hook 配置校验失败')
 PY
 
-print -- "[3/6] 更新 ${FRAMEWORK_NAME} 的 Swift 源码"
+print -- "[4/7] 更新 ${FRAMEWORK_NAME} 的 Swift 源码"
 cp "${SOURCE_SWIFT}" "${PLUGIN_SOURCE}"
 
 # HBuilderX 当前版本仍会为 UIApplication.openURL 生成已废弃的同步调用。
@@ -276,7 +407,7 @@ if 'getAvailableIOSMapProviders' in text:
     raise SystemExit('HBuilderX 生成的 iOS app-service.js 仍包含旧的地图 Provider 对象桥接。')
 PY
 
-print -- "[4/6] 构建模拟器 Framework"
+print -- "[5/7] 构建模拟器 Framework"
 rm -rf "${SIMULATOR_DERIVED_DATA}"
 xcodebuild \
   -project "${PLUGIN_PROJECT}" \
@@ -287,7 +418,7 @@ xcodebuild \
   CODE_SIGNING_ALLOWED=NO \
   build
 
-print -- "[5/6] 构建真机 Framework"
+print -- "[6/7] 构建真机 Framework"
 rm -rf "${DEVICE_DERIVED_DATA}"
 xcodebuild \
   -project "${PLUGIN_PROJECT}" \
@@ -303,7 +434,7 @@ DEVICE_FRAMEWORK="${DEVICE_DERIVED_DATA}/Build/Products/${CONFIGURATION}-iphoneo
 require_path "${SIMULATOR_FRAMEWORK}" "模拟器 Framework"
 require_path "${DEVICE_FRAMEWORK}" "真机 Framework"
 
-print -- "[6/6] 生成并替换 XCFramework"
+print -- "[7/7] 生成并替换 XCFramework"
 mkdir -p "${FRAMEWORK_OUTPUT_ROOT}"
 rm -rf "${FRAMEWORK_OUTPUT}"
 xcodebuild -create-xcframework \

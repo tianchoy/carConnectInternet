@@ -9423,8 +9423,8 @@ fun main(app: IApp) {
 open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
     override var name: String = "中导物联"
     override var appid: String = "__UNI__662B0B4"
-    override var versionName: String = "1.0.0"
-    override var versionCode: String = "100"
+    override var versionName: String = "1.0.1"
+    override var versionCode: String = "101"
     override var uniCompilerVersion: String = "5.23"
     constructor() : super() {}
 }

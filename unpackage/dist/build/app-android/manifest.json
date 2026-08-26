@@ -3,8 +3,8 @@
   "name": "中导物联",
   "description": "",
   "version": {
-    "name": "1.0.0",
-    "code": "100"
+    "name": "1.0.1",
+    "code": "101"
   },
   "uni-app-x": {
     "styleIsolationVersion": "2",
