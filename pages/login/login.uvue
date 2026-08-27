@@ -112,7 +112,7 @@
 		</view>
 	</view>
 	<app-toast></app-toast>
-	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
+	<!-- #ifdef APP-ANDROID || APP-IOS || MP-WEIXIN -->
 	<app-modal></app-modal>
 	<!-- #endif -->
 </template>

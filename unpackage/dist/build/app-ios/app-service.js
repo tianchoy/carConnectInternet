@@ -10190,6 +10190,99 @@
   } }));
   const _style_0$v = { "i-form": { "": { "paddingTop": 4, "paddingRight": 0, "paddingBottom": 4, "paddingLeft": 0 } }, "i-form__message": { "": { "marginTop": 10, "fontSize": 13, "lineHeight": "20px" } }, "i-form__message--success": { "": { "color": "#19be6b" } }, "i-form__message--error": { "": { "color": "#fa3534" } }, "i-form__actions": { "": { "marginTop": 12, "flexDirection": "row", "justifyContent": "flex-end" } } };
   const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["styles", [_style_0$v]]]);
+  const _sfc_main$v = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-modal" }, { __name: "app-modal", setup(__props) {
+    const visible = vue.ref(false);
+    const contentNeedsScroll = vue.ref(false);
+    const scrollTop = vue.ref(0);
+    const options = vue.reactive(new UTSJSONObject({
+      title: "",
+      content: "",
+      showCancel: true,
+      confirmText: "确定",
+      cancelText: "取消"
+    }));
+    const show = (value) => {
+      var _a, _b, _c, _d, _e2;
+      options.title = (_a = value.title) !== null && _a !== void 0 ? _a : "";
+      options.content = (_b = value.content) !== null && _b !== void 0 ? _b : "";
+      options.showCancel = (_c = value.showCancel) !== null && _c !== void 0 ? _c : true;
+      options.confirmText = (_d = value.confirmText) !== null && _d !== void 0 ? _d : "确定";
+      options.cancelText = (_e2 = value.cancelText) !== null && _e2 !== void 0 ? _e2 : "取消";
+      options.success = value.success;
+      contentNeedsScroll.value = options.content.length > 260;
+      scrollTop.value = 0;
+      visible.value = true;
+    };
+    const close = (confirm) => {
+      const success = options.success;
+      visible.value = false;
+      options.success = null;
+      if (success != null) {
+        const result = new AppModalSuccess();
+        result.confirm = confirm;
+        result.cancel = !confirm;
+        success(result);
+      }
+    };
+    registerAppModalHandler(show);
+    vue.onUnmounted(() => {
+      unregisterAppModalHandler(show);
+    });
+    return (_ctx = null, _cache = null) => {
+      return visible.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+        key: 0,
+        class: "app-modal-mask"
+      }), [
+        vue.createElementVNode("view", new UTSJSONObject({
+          class: "app-modal",
+          onClick: _cache[2] || (_cache[2] = vue.withModifiers(() => {
+          }, ["stop"]))
+        }), [
+          options.title ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 0,
+            class: "app-modal-title"
+          }), vue.toDisplayString(options.title), 1)) : vue.createCommentVNode("", true),
+          contentNeedsScroll.value ? (vue.openBlock(), vue.createElementBlock("scroll-view", new UTSJSONObject({
+            key: 1,
+            class: "app-modal-content-scroll",
+            "scroll-y": "true",
+            "scroll-top": scrollTop.value,
+            "show-scrollbar": false
+          }), [
+            vue.createElementVNode("view", new UTSJSONObject({ class: "app-modal-content" }), [
+              vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-content-text" }), vue.toDisplayString(options.content), 1)
+            ])
+          ], 8, ["scroll-top"])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+            key: 2,
+            class: "app-modal-content"
+          }), [
+            vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-content-text" }), vue.toDisplayString(options.content), 1)
+          ])),
+          vue.createElementVNode("view", new UTSJSONObject({ class: "app-modal-footer" }), [
+            options.showCancel ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 0,
+              class: "app-modal-button app-modal-cancel",
+              onClick: _cache[0] || (_cache[0] = ($event = null) => {
+                return close(false);
+              })
+            }), [
+              vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-cancel-text" }), vue.toDisplayString(options.cancelText), 1)
+            ])) : vue.createCommentVNode("", true),
+            vue.createElementVNode("view", new UTSJSONObject({
+              class: "app-modal-button",
+              onClick: _cache[1] || (_cache[1] = ($event = null) => {
+                return close(true);
+              })
+            }), [
+              vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-confirm-text" }), vue.toDisplayString(options.confirmText), 1)
+            ])
+          ])
+        ])
+      ])) : vue.createCommentVNode("", true);
+    };
+  } }));
+  const _style_0$u = { "app-modal-mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "display": "flex", "justifyContent": "center", "alignItems": "center", "backgroundColor": "rgba(0,0,0,0.5)", "zIndex": 10075 } }, "app-modal": { "": { "width": "640rpx", "display": "flex", "flexDirection": "column", "backgroundColor": "#ffffff", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "overflow": "hidden" } }, "app-modal-title": { "": { "paddingTop": "36rpx", "paddingRight": "44rpx", "paddingBottom": "16rpx", "paddingLeft": "44rpx", "color": "#303133", "fontSize": "34rpx", "fontWeight": 600, "lineHeight": "48rpx", "textAlign": "center" } }, "app-modal-content-scroll": { "": { "height": "600rpx", "maxHeight": "600rpx", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0 } }, "app-modal-content": { "": { "paddingTop": "16rpx", "paddingRight": "44rpx", "paddingBottom": "36rpx", "paddingLeft": "44rpx" } }, "app-modal-content-text": { "": { "display": "flex", "width": "100%", "color": "#606266", "fontSize": "28rpx", "lineHeight": "44rpx", "textAlign": "left" } }, "app-modal-footer": { "": { "display": "flex", "flexDirection": "row", "minHeight": "96rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "app-modal-button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "app-modal-cancel": { "": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "app-modal-confirm-text": { "": { "fontSize": "30rpx", "fontWeight": 600, "color": "#2979ff" } }, "app-modal-cancel-text": { "": { "fontSize": "30rpx", "fontWeight": 600, "color": "#606266" } } };
+  const __easycom_7$1 = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["styles", [_style_0$u]]]);
   const _imports_0$2 = "/static/car_location.png";
   const userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。";
   const privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。";
@@ -10489,7 +10582,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$v = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$u = /* @__PURE__ */ vue.defineComponent({
     __name: "login",
     setup(__props) {
       const docState = vue.ref(false);
@@ -10840,6 +10933,7 @@
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
         const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3);
         const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
+        const _component_app_modal = resolveEasycom(vue.resolveDynamicComponent("app-modal"), __easycom_7$1);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -11075,106 +11169,14 @@
               }), vue.toDisplayString(pswLogin.value ? "个人用户登录" : "企业用户登录"), 1)
             ])
           ]),
-          vue.createVNode(_component_app_toast)
+          vue.createVNode(_component_app_toast),
+          vue.createVNode(_component_app_modal)
         ], 64);
       };
     }
   });
-  const _style_0$u = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "phone-login-switch": { ".container ": { "textAlign": "center", "marginTop": "28rpx" } }, "login-methods": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "marginTop": "28rpx" } }, "phone-way": { ".container ": { "fontSize": "25rpx", "color": "#8b8c8d" } }, "sms-mobile-item": { ".container ": { "marginBottom": "20rpx" } }, "sms-code-item": { ".container ": { "marginBottom": "32rpx" } }, "sms-code-input": { ".container ": { "width": "100%" } }, "sms-send-button": { ".container ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "20rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#007AFF", "color": "#ffffff", "fontSize": "24rpx", "whiteSpace": "nowrap" } }, "sms-send-button-disabled": { ".container ": { "backgroundColor": "#B8D7FF" } }, "sms-send-button-text": { ".container ": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
-  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["styles", [_style_0$u]]]);
-  const _sfc_main$u = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-modal" }, { __name: "app-modal", setup(__props) {
-    const visible = vue.ref(false);
-    const contentNeedsScroll = vue.ref(false);
-    const scrollTop = vue.ref(0);
-    const options = vue.reactive(new UTSJSONObject({
-      title: "",
-      content: "",
-      showCancel: true,
-      confirmText: "确定",
-      cancelText: "取消"
-    }));
-    const show = (value) => {
-      var _a, _b, _c, _d, _e2;
-      options.title = (_a = value.title) !== null && _a !== void 0 ? _a : "";
-      options.content = (_b = value.content) !== null && _b !== void 0 ? _b : "";
-      options.showCancel = (_c = value.showCancel) !== null && _c !== void 0 ? _c : true;
-      options.confirmText = (_d = value.confirmText) !== null && _d !== void 0 ? _d : "确定";
-      options.cancelText = (_e2 = value.cancelText) !== null && _e2 !== void 0 ? _e2 : "取消";
-      options.success = value.success;
-      contentNeedsScroll.value = options.content.length > 260;
-      scrollTop.value = 0;
-      visible.value = true;
-    };
-    const close = (confirm) => {
-      const success = options.success;
-      visible.value = false;
-      options.success = null;
-      if (success != null) {
-        const result = new AppModalSuccess();
-        result.confirm = confirm;
-        result.cancel = !confirm;
-        success(result);
-      }
-    };
-    registerAppModalHandler(show);
-    vue.onUnmounted(() => {
-      unregisterAppModalHandler(show);
-    });
-    return (_ctx = null, _cache = null) => {
-      return visible.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-        key: 0,
-        class: "app-modal-mask"
-      }), [
-        vue.createElementVNode("view", new UTSJSONObject({
-          class: "app-modal",
-          onClick: _cache[2] || (_cache[2] = vue.withModifiers(() => {
-          }, ["stop"]))
-        }), [
-          options.title ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 0,
-            class: "app-modal-title"
-          }), vue.toDisplayString(options.title), 1)) : vue.createCommentVNode("", true),
-          contentNeedsScroll.value ? (vue.openBlock(), vue.createElementBlock("scroll-view", new UTSJSONObject({
-            key: 1,
-            class: "app-modal-content-scroll",
-            "scroll-y": "true",
-            "scroll-top": scrollTop.value,
-            "show-scrollbar": false
-          }), [
-            vue.createElementVNode("view", new UTSJSONObject({ class: "app-modal-content" }), [
-              vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-content-text" }), vue.toDisplayString(options.content), 1)
-            ])
-          ], 8, ["scroll-top"])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-            key: 2,
-            class: "app-modal-content"
-          }), [
-            vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-content-text" }), vue.toDisplayString(options.content), 1)
-          ])),
-          vue.createElementVNode("view", new UTSJSONObject({ class: "app-modal-footer" }), [
-            options.showCancel ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 0,
-              class: "app-modal-button app-modal-cancel",
-              onClick: _cache[0] || (_cache[0] = ($event = null) => {
-                return close(false);
-              })
-            }), [
-              vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-cancel-text" }), vue.toDisplayString(options.cancelText), 1)
-            ])) : vue.createCommentVNode("", true),
-            vue.createElementVNode("view", new UTSJSONObject({
-              class: "app-modal-button",
-              onClick: _cache[1] || (_cache[1] = ($event = null) => {
-                return close(true);
-              })
-            }), [
-              vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-confirm-text" }), vue.toDisplayString(options.confirmText), 1)
-            ])
-          ])
-        ])
-      ])) : vue.createCommentVNode("", true);
-    };
-  } }));
-  const _style_0$t = { "app-modal-mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "display": "flex", "justifyContent": "center", "alignItems": "center", "backgroundColor": "rgba(0,0,0,0.5)", "zIndex": 10075 } }, "app-modal": { "": { "width": "640rpx", "display": "flex", "flexDirection": "column", "backgroundColor": "#ffffff", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "overflow": "hidden" } }, "app-modal-title": { "": { "paddingTop": "36rpx", "paddingRight": "44rpx", "paddingBottom": "16rpx", "paddingLeft": "44rpx", "color": "#303133", "fontSize": "34rpx", "fontWeight": 600, "lineHeight": "48rpx", "textAlign": "center" } }, "app-modal-content-scroll": { "": { "height": "600rpx", "maxHeight": "600rpx", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0 } }, "app-modal-content": { "": { "paddingTop": "16rpx", "paddingRight": "44rpx", "paddingBottom": "36rpx", "paddingLeft": "44rpx" } }, "app-modal-content-text": { "": { "display": "flex", "width": "100%", "color": "#606266", "fontSize": "28rpx", "lineHeight": "44rpx", "textAlign": "left" } }, "app-modal-footer": { "": { "display": "flex", "flexDirection": "row", "minHeight": "96rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "app-modal-button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "app-modal-cancel": { "": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "app-modal-confirm-text": { "": { "fontSize": "30rpx", "fontWeight": 600, "color": "#2979ff" } }, "app-modal-cancel-text": { "": { "fontSize": "30rpx", "fontWeight": 600, "color": "#606266" } } };
-  const __easycom_7$1 = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["styles", [_style_0$t]]]);
+  const _style_0$t = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "phone-login-switch": { ".container ": { "textAlign": "center", "marginTop": "28rpx" } }, "login-methods": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "marginTop": "28rpx" } }, "phone-way": { ".container ": { "fontSize": "25rpx", "color": "#8b8c8d" } }, "sms-mobile-item": { ".container ": { "marginBottom": "20rpx" } }, "sms-code-item": { ".container ": { "marginBottom": "32rpx" } }, "sms-code-input": { ".container ": { "width": "100%" } }, "sms-send-button": { ".container ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "20rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#007AFF", "color": "#ffffff", "fontSize": "24rpx", "whiteSpace": "nowrap" } }, "sms-send-button-disabled": { ".container ": { "backgroundColor": "#B8D7FF" } }, "sms-send-button-text": { ".container ": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
+  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["styles", [_style_0$t]]]);
   class PersonalLoginForm extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
