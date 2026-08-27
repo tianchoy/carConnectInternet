@@ -649,7 +649,13 @@ open class GenPagesIndexIndex : BasePage {
                                             "未命名设备"
                                         }
                                     }
-                                    return Device(name = deviceName, deviceName = deviceName, value = imei, imei = imei, deptId = item.getString("companyId", ""), deviceId = item.getString("deviceId", ""), iccid = item.getString("iccid", ""), simMerchant = item.getString("simMerchant", ""), connectionStatus = item.getString("connectionStatus", ""), carType = item.getString("carType", ""), plateNo = item.getString("plateNo", ""), latitude = item.getNumber("latitude", 0), longitude = item.getNumber("longitude", 0))
+                                    val apiDeptId = item.getString("deptId", "")
+                                    val deptId = if (apiDeptId != "") {
+                                        apiDeptId
+                                    } else {
+                                        item.getString("companyId", "")
+                                    }
+                                    return Device(name = deviceName, deviceName = deviceName, value = imei, imei = imei, deptId = deptId, deviceId = item.getString("deviceId", ""), iccid = item.getString("iccid", ""), simMerchant = item.getString("simMerchant", ""), connectionStatus = item.getString("connectionStatus", ""), carType = item.getString("carType", ""), plateNo = item.getString("plateNo", ""), latitude = item.getNumber("latitude", 0), longitude = item.getNumber("longitude", 0))
                                 })
                                 val savedDevice = getSavedSelectedDevice()
                                 val savedIndex = getSavedSelectedDeviceIndex()
@@ -779,7 +785,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val isLogin = ::gen_isLogin_fn
             fun gen_isCarSelected_fn(): Boolean {
-                if (!(currentCarImei.value != "") || !(currentCarDeptId.value != "") || !(currentCarDeviceId.value != "")) {
+                if (!(currentCarImei.value != "")) {
                     showAppToast(ShowToastOptions(title = "请先选择车辆", icon = "none"))
                     return false
                 }
@@ -854,7 +860,7 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isCarSelected()) {
                     return
                 }
-                uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarName.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value))
+                uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value))
             }
             val contactCustomerService = fun(){
                 showAppToast(ShowToastOptions(title = "请在微信小程序中联系客服", icon = "none"))

@@ -6642,12 +6642,14 @@
                 const imei = item.getString("imei", "");
                 const rawDeviceName = item.getString("deviceName", "");
                 const deviceName = rawDeviceName != "" ? rawDeviceName : imei != "" ? imei : "未命名设备";
+                const apiDeptId = item.getString("deptId", "");
+                const deptId = apiDeptId != "" ? apiDeptId : item.getString("companyId", "");
                 return new Device({
                   name: deviceName,
                   deviceName,
                   value: imei,
                   imei,
-                  deptId: item.getString("companyId", ""),
+                  deptId,
                   deviceId: item.getString("deviceId", ""),
                   iccid: item.getString("iccid", ""),
                   simMerchant: item.getString("simMerchant", ""),
@@ -6681,7 +6683,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:966", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:968", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -6717,7 +6719,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:1007", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1009", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -6748,7 +6750,7 @@
           try {
             yield loadDeviceList();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:1041", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1043", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -6773,7 +6775,7 @@
         return true;
       }
       function isCarSelected() {
-        if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
+        if (!currentCarImei.value) {
           showAppToast({
             title: "请先选择车辆",
             icon: "none"
@@ -6791,7 +6793,7 @@
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1085", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1088", "跳转轨迹详情失败:", err);
           }
         });
       };
@@ -6818,7 +6820,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1113", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1116", "跳转添加设备失败:", err);
           }
         });
       };
@@ -6851,7 +6853,7 @@
         if (!isCarSelected())
           return null;
         uni.navigateTo({
-          url: "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarName.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value
+          url: "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value
         });
       };
       const contactCustomerService = () => {
@@ -6870,7 +6872,7 @@
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1203", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1206", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -15773,7 +15775,6 @@
         longitude: 116.40717
       }));
       const mapScale = vue.ref(12);
-      const isMapReady = vue.ref(false);
       const imei = vue.ref("");
       const carStatus = vue.ref("");
       const plateNo = vue.ref("");
@@ -15840,7 +15841,7 @@
           const milliseconds = parseLocalDateTime(decoded);
           return milliseconds == null ? null : formatPlaybackTime(milliseconds);
         } catch (error) {
-          uni.__log__("error", "at pages/playBack/playBack.uvue:205", "解析回放时间失败:", error);
+          uni.__log__("error", "at pages/playBack/playBack.uvue:204", "解析回放时间失败:", error);
           return null;
         }
       }
@@ -15900,7 +15901,6 @@
         const bounds = nullableBounds;
         center.latitude = (bounds.minLat + bounds.maxLat) / 2;
         center.longitude = (bounds.minLng + bounds.maxLng) / 2;
-        isMapReady.value = true;
         const latDiff = bounds.maxLat - bounds.minLat;
         const lngDiff = bounds.maxLng - bounds.minLng;
         const maxDiff = Math.max(latDiff, lngDiff);
@@ -16079,7 +16079,6 @@
         };
         carMarker.value = marker;
         markers.value = [marker];
-        isMapReady.value = true;
       }
       function clearTrackDisplay() {
         trackPoints.value = [];
@@ -16197,7 +16196,7 @@
           } catch (error) {
             if (requestId != replaySessionId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/playBack/playBack.uvue:687", "加载轨迹失败:", error);
+            uni.__log__("error", "at pages/playBack/playBack.uvue:684", "加载轨迹失败:", error);
             showAppToast({ title: "轨迹加载失败", icon: "none" });
             if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
               showCurrentPosition();
@@ -16311,7 +16310,7 @@
         lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
         sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
         eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
-        uni.__log__("log", "at pages/playBack/playBack.uvue:816", sTime.value, eTime.value);
+        uni.__log__("log", "at pages/playBack/playBack.uvue:813", sTime.value, eTime.value);
         const routeStartTime = resolveRouteDateTime(sTime.value);
         const routeEndTime = resolveRouteDateTime(eTime.value);
         if (routeStartTime != null && routeEndTime != null) {
@@ -16349,8 +16348,7 @@
               showCapsule: false
             })),
             vue.createElementVNode("view", new UTSJSONObject({ class: "map-container" }), [
-              isMapReady.value ? (vue.openBlock(), vue.createBlock(_component_map, new UTSJSONObject({
-                key: 0,
+              vue.createVNode(_component_map, new UTSJSONObject({
                 id: "myMap",
                 latitude: center.latitude,
                 longitude: center.longitude,
@@ -16363,7 +16361,7 @@
                 "enable-overlooking": true,
                 "enable-building": true,
                 "enable-3D": true
-              }), null, 8, ["latitude", "longitude", "markers", "polyline", "scale"])) : vue.createCommentVNode("", true),
+              }), null, 8, ["latitude", "longitude", "markers", "polyline", "scale"]),
               vue.createVNode(_component_sub_navBar, new UTSJSONObject({
                 class: "sub-nav-overlay",
                 showTime: false,
@@ -19800,7 +19798,6 @@
         longitude: 116.40717
       }));
       const mapScale = vue.ref(12);
-      const isMapReady = vue.ref(false);
       const isInitialPositionSettled = vue.ref(false);
       const markers = vue.ref([]);
       const carMarker = vue.ref(null);
@@ -19913,7 +19910,6 @@
                 const marker = carMarker.value;
                 if (marker != null) {
                   markers.value = [marker];
-                  isMapReady.value = true;
                 }
                 currentSpeed.value = deviceData.speed ? parseFloat(deviceData.speed.toString()) : 0;
                 currentAddress.value = deviceData.positionUpdateTime ? "最后定位: ".concat(deviceData.positionUpdateTime) : "未知位置";
@@ -19921,7 +19917,7 @@
               }
             });
           } catch (err) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:371", "获取初始位置失败:", err);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:369", "获取初始位置失败:", err);
             showAppToast({
               title: "获取车辆位置失败",
               icon: "none"
@@ -19984,7 +19980,7 @@
           const lng = parseFloat(centerValues[1]);
           const radius = parseFloat(parts[1].trim());
           if (!isValidCoordinate2(lat, lng) || !isFinite(radius) || radius <= 0) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:442", "无效的圆形围栏数据:", circleStr);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:440", "无效的圆形围栏数据:", circleStr);
             return null;
           }
           const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
@@ -19994,7 +19990,7 @@
             radius
           };
         } catch (error) {
-          uni.__log__("error", "at pages/geofencing/geofencing.uvue:452", "解析圆形围栏失败:", error, "数据:", circleStr);
+          uni.__log__("error", "at pages/geofencing/geofencing.uvue:450", "解析圆形围栏失败:", error, "数据:", circleStr);
           return null;
         }
       }
@@ -20109,12 +20105,11 @@
         });
         polygons.value = fencePolygons;
         circles.value = fenceCircles;
-        if (fenceCircles.length > 0 && !selectedFence.value && isInitialPositionSettled.value && !isMapReady.value) {
+        if (fenceCircles.length > 0 && !selectedFence.value && isInitialPositionSettled.value && carMarker.value == null) {
           const firstCircle = fenceCircles[0];
           center.latitude = firstCircle.latitude;
           center.longitude = firstCircle.longitude;
           mapScale.value = firstCircle.radius > 5e4 ? 8 : firstCircle.radius > 2e4 ? 9 : firstCircle.radius > 1e4 ? 10 : firstCircle.radius > 5e3 ? 11 : firstCircle.radius > 2e3 ? 12 : firstCircle.radius > 1e3 ? 13 : firstCircle.radius > 500 ? 14 : firstCircle.radius > 200 ? 15 : 16;
-          isMapReady.value = true;
         }
       };
       function updateMapDisplay() {
@@ -20162,7 +20157,7 @@
             }
             renderFencesOnMap();
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:648", "加载围栏列表失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:645", "加载围栏列表失败:", error);
             showAppToast({ title: "获取围栏列表失败", icon: "none" });
             fenceList.value = [];
             renderFencesOnMap();
@@ -20328,7 +20323,7 @@
               showAppToast({ title: result.msg || "删除失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:856", "删除围栏失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:853", "删除围栏失败:", error);
             showAppToast({ title: "删除失败", icon: "none" });
           }
         });
@@ -20417,7 +20412,7 @@
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:967", "保存围栏失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:964", "保存围栏失败:", error);
             showAppToast({ title: "保存失败，请重试", icon: "none" });
           }
         });
@@ -20519,7 +20514,7 @@
       };
       const switchTab = (tab) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1070", "switchTab", tab, currentFenceId.value);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1067", "switchTab", tab, currentFenceId.value);
           if (activeTab.value === tab)
             return Promise.resolve(null);
           activeTab.value = tab;
@@ -20527,7 +20522,7 @@
           deviceList.value = [];
           initPagination(tab);
           if (tab === "bind") {
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1082", "switchTab,bind:", currentFenceId.value);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1079", "switchTab,bind:", currentFenceId.value);
             yield loadBoundDevices(currentFenceId.value);
           } else {
             yield loadUnboundDevices();
@@ -20545,14 +20540,14 @@
       };
       const toggleDeviceBinding = (deviceImei, bound) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1102", "toggleDeviceBinding", deviceImei, bound);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1099", "toggleDeviceBinding", deviceImei, bound);
           loading.value = true;
           try {
             const params = new UTSJSONObject({
               geofenceId: currentFenceId.value,
               imeis: [deviceImei]
             });
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1109", "toggleDeviceBindingparams", params);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1106", "toggleDeviceBindingparams", params);
             let result = null;
             if (bound) {
               result = yield bindDevices(params);
@@ -20572,7 +20567,7 @@
               showAppToast({ title: result.msg || "操作失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1132", "设备绑定操作失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1129", "设备绑定操作失败:", error);
             showAppToast({ title: "操作失败", icon: "none" });
           } finally {
             loading.value = false;
@@ -20632,10 +20627,10 @@
         var _a;
         (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.$callMethod("close");
         const fence = selectedFence.value;
-        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1203", "删除电子围栏", fence);
+        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1200", "删除电子围栏", fence);
         if (fence != null) {
           const fenceId = fence.getString("id", "");
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1207", "删除电子围栏ID", fenceId);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1204", "删除电子围栏ID", fenceId);
           if (fenceId !== "") {
             deleteFence(fenceId);
           } else {
@@ -20744,8 +20739,7 @@
               showCapsule: false
             })),
             vue.createElementVNode("view", new UTSJSONObject({ class: "map-container" }), [
-              isMapReady.value ? (vue.openBlock(), vue.createBlock(_component_map, new UTSJSONObject({
-                key: 0,
+              vue.createVNode(_component_map, new UTSJSONObject({
                 id: "myMap",
                 latitude: center.latitude,
                 longitude: center.longitude,
@@ -20760,7 +20754,7 @@
                 "enable-overlooking": true,
                 "enable-building": true,
                 "enable-3D": true
-              }), null, 8, ["latitude", "longitude", "scale", "polygons", "markers", "circles"])) : vue.createCommentVNode("", true),
+              }), null, 8, ["latitude", "longitude", "scale", "polygons", "markers", "circles"]),
               vue.createVNode(_component_sub_navBar, new UTSJSONObject({
                 class: "sub-nav-overlay",
                 showTime: false,
@@ -20769,7 +20763,7 @@
                 carStatus: connectionStatus.value
               }), null, 8, ["currentCar", "carStatus"]),
               isDrawing.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                key: 1,
+                key: 0,
                 class: "drag-hint"
               }), [
                 drawingMode.value === "polygon" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({

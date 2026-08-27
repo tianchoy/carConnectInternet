@@ -64,7 +64,6 @@ const center = reactive({
 		longitude: 116.40717
 	})
 	const mapScale = ref(12)
-	const isMapReady = ref(false)
 	const imei = ref<string | null>('')
 	const carStatus = ref<string | null>('')
 	const plateNo = ref<string | null>('')
@@ -226,7 +225,6 @@ const center = reactive({
 
 		center.latitude = (bounds.minLat + bounds.maxLat) / 2
 		center.longitude = (bounds.minLng + bounds.maxLng) / 2
-		isMapReady.value = true
 
 		const latDiff = bounds.maxLat - bounds.minLat
 		const lngDiff = bounds.maxLng - bounds.minLng
@@ -488,7 +486,6 @@ const center = reactive({
 
 		// 设置标记点
 		markers.value = [marker]
-		isMapReady.value = true
 	}
 
 
@@ -810,23 +807,20 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         showCapsule: false
       })),
       _cE("view", _uM({ class: "map-container" }), [
-        isTrue(isMapReady.value)
-          ? _cV(_component_map, _uM({
-              key: 0,
-              id: "myMap",
-              latitude: center.latitude,
-              longitude: center.longitude,
-              markers: markers.value,
-              polyline: polyline.value,
-              scale: mapScale.value,
-              style: _nS(_uM({"width":"100%","height":"100%"})),
-              "show-location": true,
-              "enable-traffic": true,
-              "enable-overlooking": true,
-              "enable-building": true,
-              "enable-3D": true
-            }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"])
-          : _cC("v-if", true),
+        _cV(_component_map, _uM({
+          id: "myMap",
+          latitude: center.latitude,
+          longitude: center.longitude,
+          markers: markers.value,
+          polyline: polyline.value,
+          scale: mapScale.value,
+          style: _nS(_uM({"width":"100%","height":"100%"})),
+          "show-location": true,
+          "enable-traffic": true,
+          "enable-overlooking": true,
+          "enable-building": true,
+          "enable-3D": true
+        }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"]),
         _cV(_component_sub_navBar, _uM({
           class: "sub-nav-overlay",
           showTime: false,

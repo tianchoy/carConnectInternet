@@ -731,12 +731,14 @@ const loadDeviceList = async () => {
                 const imei = item.getString('imei', '')
                 const rawDeviceName = item.getString('deviceName', '')
                 const deviceName = rawDeviceName != '' ? rawDeviceName : (imei != '' ? imei : '未命名设备')
+                const apiDeptId = item.getString('deptId', '')
+                const deptId = apiDeptId != '' ? apiDeptId : item.getString('companyId', '')
                 return {
                     name: deviceName,
                     deviceName: deviceName,
                     value: imei,
                     imei: imei,
-                    deptId: item.getString('companyId', ''),
+                    deptId: deptId,
                     deviceId: item.getString('deviceId', ''),
                     iccid: item.getString('iccid', ''),
                     simMerchant: item.getString('simMerchant', ''),
@@ -882,7 +884,8 @@ function isLogin() : boolean {
 }
 
 function isCarSelected() : boolean {
-    if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
+    
+    if (!currentCarImei.value) {
         showAppToast({
             title: '请先选择车辆',
             icon: 'none'
@@ -962,7 +965,7 @@ const toFence = () => {
     if (!isLogin()) return
     if (!isCarSelected()) return
     uni.navigateTo({
-        url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarName.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
+        url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value  + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
     })
 }
 
