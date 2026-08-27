@@ -8120,8 +8120,8 @@ function populateParameters(fromRes, toRes) {
   const parameters = {
     appId: "__UNI__662B0B4",
     appName: "中导物联",
-    appVersion: "1.0.0",
-    appVersionCode: "100",
+    appVersion: "1.0.1",
+    appVersionCode: "101",
     appLanguage: getAppLanguage(hostLanguage),
     uniCompileVersion: "5.23",
     uniCompilerVersion: "5.23",
@@ -8282,8 +8282,8 @@ const getAppBaseInfo = {
     const parameters = {
       appId: "__UNI__662B0B4",
       appName: "中导物联",
-      appVersion: "1.0.0",
-      appVersionCode: "100",
+      appVersion: "1.0.1",
+      appVersionCode: "101",
       appLanguage: getAppLanguage(hostLanguage),
       hostVersion: version2,
       hostLanguage,
@@ -9144,9 +9144,9 @@ function isConsoleWritable() {
 }
 const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.1.180";
+  const hosts = "127.0.0.1,192.168.1.76";
   const port = "8090";
-  const id = "mp-weixin_46gSby";
+  const id = "mp-weixin_09VFII";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {
@@ -10443,6 +10443,18 @@ const pages = [
     })
   }),
   new UTSJSONObject({
+    path: "pages/login/personal-password-login",
+    style: new UTSJSONObject({
+      navigationBarTitleText: "个人账号登录"
+    })
+  }),
+  new UTSJSONObject({
+    path: "pages/login/register",
+    style: new UTSJSONObject({
+      navigationBarTitleText: "个人用户注册"
+    })
+  }),
+  new UTSJSONObject({
     path: "pages/carInfoDetail/carInfoDetail",
     style: new UTSJSONObject({
       navigationBarTitleText: "车辆详情"
@@ -10872,7 +10884,7 @@ class v {
 function I(e2) {
   return e2 && "string" == typeof e2 ? JSON.parse(e2) : e2;
 }
-const S = true, b = "mp-weixin", k = I(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), A = b, T = I('{"address":["127.0.0.1","192.168.1.180"],"servePort":7001,"debugPort":9000,"initialLaunchType":"remote","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), C = I('[{"provider":"aliyun","spaceName":"zdiot-car","spaceId":"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff","clientSecret":"s9pFKgenncFnOUhRGOJpcw==","endpoint":"https://api.next.bspapp.com","failoverEndpoint":""}]') || [];
+const S = true, b = "mp-weixin", k = I(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), A = b, T = I('{"address":["127.0.0.1","192.168.1.76"],"servePort":7001,"debugPort":9000,"initialLaunchType":"remote","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), C = I('[{"provider":"aliyun","spaceName":"zdiot-car","spaceId":"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff","clientSecret":"s9pFKgenncFnOUhRGOJpcw==","endpoint":"https://api.next.bspapp.com","failoverEndpoint":""}]') || [];
 let O = "";
 try {
   O = "__UNI__662B0B4";

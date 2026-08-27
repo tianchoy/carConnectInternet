@@ -58,7 +58,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = common_vendor.e({
         a: common_vendor.s(__props.isShowStyle ? {
           height: common_vendor.unref(statusBarHeight) + "px",
-          "background-color": "#f1f1f1",
+          "background-color": "#ffffff",
           position: "fixed",
           width: "100%",
           letf: 0,
@@ -66,7 +66,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           "z-index": "100"
         } : {
           height: common_vendor.unref(statusBarHeight) + "px",
-          "background-color": "#f1f1f1"
+          "background-color": "#ffffff"
         }),
         b: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,

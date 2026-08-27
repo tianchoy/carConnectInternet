@@ -52,6 +52,10 @@ const iForm_uvue_vue_type_style_index_0_lang = {};
 
 const login_uvue_vue_type_style_index_0_lang = {};
 
+const personalPasswordLogin_uvue_vue_type_style_index_0_lang = {};
+
+const register_uvue_vue_type_style_index_0_lang = {};
+
 const subNavBar_uvue_vue_type_style_index_0_lang = {};
 
 const iGrid_uvue_vue_type_style_index_0_lang = {};

@@ -66,7 +66,7 @@
     var e2 = new Error(message);
     return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
   };
-  const _sfc_main$L = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
+  const _sfc_main$O = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
     name: {
       type: String,
       default: "home-3-fill"
@@ -396,7 +396,7 @@
       ], 6);
     };
   } }));
-  const _style_0$J = { "i-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "i-icon--badge": { "": { "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34 } }, "i-icon--mini": { "": { "width": 26, "height": 26, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26 } }, "i-icon--large": { "": { "width": 44, "height": 44, "borderTopLeftRadius": 44, "borderTopRightRadius": 44, "borderBottomRightRadius": 44, "borderBottomLeftRadius": 44 } }, "i-icon--primary": { "": { "backgroundColor": "#2979ff" } }, "i-icon--success": { "": { "backgroundColor": "#19be6b" } }, "i-icon--warning": { "": { "backgroundColor": "#ff9900" } }, "i-icon--danger": { "": { "backgroundColor": "#fa3534" } }, "i-icon--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "i-icon__text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": 1 } }, "i-icon__text--badge": { "": { "color": "#ffffff", "fontWeight": 700 } }, "i-icon__text--primary": { "": { "color": "#2979ff" } }, "i-icon__text--success": { "": { "color": "#19be6b" } }, "i-icon__text--warning": { "": { "color": "#ff9900" } }, "i-icon__text--danger": { "": { "color": "#fa3534" } }, "i-icon__image": { "": { "width": 16, "height": 16 } }, "@FONT-FACE": [{ "fontFamily": "remixicon", "src": 'url("/uni_modules/i-ui-x/static/remixicon.woff2") format("woff2"),\n    url("https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.ttf")\n      format("truetype")' }] };
+  const _style_0$M = { "i-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "i-icon--badge": { "": { "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34 } }, "i-icon--mini": { "": { "width": 26, "height": 26, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26 } }, "i-icon--large": { "": { "width": 44, "height": 44, "borderTopLeftRadius": 44, "borderTopRightRadius": 44, "borderBottomRightRadius": 44, "borderBottomLeftRadius": 44 } }, "i-icon--primary": { "": { "backgroundColor": "#2979ff" } }, "i-icon--success": { "": { "backgroundColor": "#19be6b" } }, "i-icon--warning": { "": { "backgroundColor": "#ff9900" } }, "i-icon--danger": { "": { "backgroundColor": "#fa3534" } }, "i-icon--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "i-icon__text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": 1 } }, "i-icon__text--badge": { "": { "color": "#ffffff", "fontWeight": 700 } }, "i-icon__text--primary": { "": { "color": "#2979ff" } }, "i-icon__text--success": { "": { "color": "#19be6b" } }, "i-icon__text--warning": { "": { "color": "#ff9900" } }, "i-icon__text--danger": { "": { "color": "#fa3534" } }, "i-icon__image": { "": { "width": 16, "height": 16 } }, "@FONT-FACE": [{ "fontFamily": "remixicon", "src": 'url("/uni_modules/i-ui-x/static/remixicon.woff2") format("woff2"),\n    url("https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.ttf")\n      format("truetype")' }] };
   const _export_sfc = (sfc, props) => {
     const target = sfc.__vccOpts || sfc;
     for (const [key, val] of props) {
@@ -404,11 +404,11 @@
     }
     return target;
   };
-  const __easycom_2$4 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["styles", [_style_0$J]]]);
+  const __easycom_2$4 = /* @__PURE__ */ _export_sfc(_sfc_main$O, [["styles", [_style_0$M]]]);
   function resolveEasycom(component, easycom2) {
     return typeof component === "string" ? easycom2 : component;
   }
-  const _sfc_main$K = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
+  const _sfc_main$N = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
     percent: { type: Number, default: 45 },
     title: { type: String, default: "" },
     activeColor: { type: String, default: "#19be6b" },
@@ -454,8 +454,8 @@
       ]);
     };
   } }));
-  const _style_0$I = { "i-card": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-title": { "": { "color": "#303133", "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-muted": { "": { "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-row": { "": { "flexDirection": "row", "alignItems": "center", "flexWrap": "wrap" } }, "i-btn": { "": { "minHeight": 34, "marginTop": 10, "marginRight": 8, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "backgroundColor": "#ecf5ff", "alignItems": "center", "justifyContent": "center" } }, "i-btn--plain": { "": { "backgroundColor": "#f5f7fa" } }, "i-btn--danger": { "": { "backgroundColor": "#fef0f0" } }, "i-btn-text": { "": { "color": "#2979ff", "fontSize": 13, "lineHeight": "18px" } }, "i-danger": { "": { "color": "#f56c6c" } }, "i-head": { "": { "justifyContent": "space-between" } }, "i-track": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginRight": 5, "overflow": "hidden" } }, "i-fill": { "": { "height": "100%", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } } };
-  const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["styles", [_style_0$I]]]);
+  const _style_0$L = { "i-card": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-title": { "": { "color": "#303133", "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-muted": { "": { "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-row": { "": { "flexDirection": "row", "alignItems": "center", "flexWrap": "wrap" } }, "i-btn": { "": { "minHeight": 34, "marginTop": 10, "marginRight": 8, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "backgroundColor": "#ecf5ff", "alignItems": "center", "justifyContent": "center" } }, "i-btn--plain": { "": { "backgroundColor": "#f5f7fa" } }, "i-btn--danger": { "": { "backgroundColor": "#fef0f0" } }, "i-btn-text": { "": { "color": "#2979ff", "fontSize": 13, "lineHeight": "18px" } }, "i-danger": { "": { "color": "#f56c6c" } }, "i-head": { "": { "justifyContent": "space-between" } }, "i-track": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginRight": 5, "overflow": "hidden" } }, "i-fill": { "": { "height": "100%", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } } };
+  const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$N, [["styles", [_style_0$L]]]);
   function isString$1(str) {
     return typeof str == "string";
   }
@@ -633,7 +633,7 @@
       this.isInitialized = false;
     }
   }
-  const _sfc_main$J = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$M = /* @__PURE__ */ vue.defineComponent({
     __name: "l-picker-item",
     props: {
       options: { default: [], type: Array },
@@ -857,8 +857,8 @@
       };
     }
   });
-  const _style_0$H = { "l-picker-item__group": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-picker-item__group-item": { "": { "height": "var(--l-picker-item-height, 50px)", "lineHeight": "var(--l-picker-item-height, 50px)", "textAlign": "center", "transitionDuration": "100ms", "transitionProperty": "fontWeight,color", "transitionTimingFunction": "linear", "fontWeight": 400, "color": "var(--l-picker-item-color, #000000E0)", "fontSize": "var(--l-picker-item-font-size, 16px)", "whiteSpace": "nowrap" } }, "l-picker-item__group-item--active": { "": { "color": "var(--l-picker-item-active-color, #000000E0)", "fontWeight": "var(--l-picker-item-active-font-weight, 700)" } }, "l-picker-item__wrapper": { "": { "width": "100%" } }, "@TRANSITION": { "l-picker-item__group-item": { "duration": "100ms", "property": "fontWeight,color", "timingFunction": "linear" } } };
-  const __easycom_0$6 = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["styles", [_style_0$H]]]);
+  const _style_0$K = { "l-picker-item__group": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-picker-item__group-item": { "": { "height": "var(--l-picker-item-height, 50px)", "lineHeight": "var(--l-picker-item-height, 50px)", "textAlign": "center", "transitionDuration": "100ms", "transitionProperty": "fontWeight,color", "transitionTimingFunction": "linear", "fontWeight": 400, "color": "var(--l-picker-item-color, #000000E0)", "fontSize": "var(--l-picker-item-font-size, 16px)", "whiteSpace": "nowrap" } }, "l-picker-item__group-item--active": { "": { "color": "var(--l-picker-item-active-color, #000000E0)", "fontWeight": "var(--l-picker-item-active-font-weight, 700)" } }, "l-picker-item__wrapper": { "": { "width": "100%" } }, "@TRANSITION": { "l-picker-item__group-item": { "duration": "100ms", "property": "fontWeight,color", "timingFunction": "linear" } } };
+  const __easycom_0$6 = /* @__PURE__ */ _export_sfc(_sfc_main$M, [["styles", [_style_0$K]]]);
   function arrayEqual(arr1, arr2) {
     return arr1.length == arr2.length && arr1.every((val, i2) => {
       return val == arr2[i2];
@@ -2711,7 +2711,7 @@
     });
     return state;
   }
-  const _sfc_main$I = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$L = /* @__PURE__ */ vue.defineComponent({
     __name: "l-picker",
     props: {
       cancelBtn: { type: String },
@@ -2990,8 +2990,8 @@
       };
     }
   });
-  const _style_0$G = { "l-picker": { "": { "position": "relative", "backgroundColor": "var(--l-picker-bg-color, #fff)", "borderTopLeftRadius": "var(--l-picker-border-radius, 12px)", "borderTopRightRadius": "var(--l-picker-border-radius, 12px)" } }, "l-picker__toolbar": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "height": "var(--l-picker-toolbar-height, 58px)", "flexDirection": "row", "position": "relative" } }, "l-picker__title": { "": { "position": "absolute", "left": "50%", "top": "50%", "transform": "translateX(-50%) translateY(-50%)", "textAlign": "center", "overflow": "hidden", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "color": "var(--l-picker-title-color, #000000E0)", "lineHeight": "var(--l-picker-title-line-height, 26px)", "fontWeight": "var(--l-picker-title-font-weight, 700)", "fontSize": "var(--l-picker-title-font-size, 18px)" } }, "l-picker__cancel": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginRight": "auto", "color": "var(--l-picker-cancel-color, #000000A6)" } }, "l-picker__confirm": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginLeft": "auto", "color": "var(--l-picker-confirm-color, #3283ff)" } }, "l-picker__main": { "": { "position": "relative", "display": "flex", "height": "var(--l-picker-group-height, 200px)", "flexDirection": "row", "zIndex": 2, "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8 } }, "l-picker__empty": { "": { "pointerEvents": "none", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0, "zIndex": 3 } }, "l-picker__loading": { "": { "zIndex": 3, "backgroundColor": "var(--l-picker-loading-mask-color, rgba(255, 255, 255, 0.9))", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0 } }, "l-picker__indicator": { "": { "position": "absolute", "backgroundColor": "var(--l-picker-indicator-bg-color, #0000000A)", "top": "50%", "left": "var(--l-picker-indicator-margin, 10px)", "right": "var(--l-picker-indicator-margin, 10px)", "height": "var(--l-picker-item-height, 50px)", "transform": "translateY(-50%)", "zIndex": -1, "borderTopLeftRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderTopRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomLeftRadius": "var(--l-picker-indicator-border-radius, 6px)" } } };
-  const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["styles", [_style_0$G]]]);
+  const _style_0$J = { "l-picker": { "": { "position": "relative", "backgroundColor": "var(--l-picker-bg-color, #fff)", "borderTopLeftRadius": "var(--l-picker-border-radius, 12px)", "borderTopRightRadius": "var(--l-picker-border-radius, 12px)" } }, "l-picker__toolbar": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "height": "var(--l-picker-toolbar-height, 58px)", "flexDirection": "row", "position": "relative" } }, "l-picker__title": { "": { "position": "absolute", "left": "50%", "top": "50%", "transform": "translateX(-50%) translateY(-50%)", "textAlign": "center", "overflow": "hidden", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "color": "var(--l-picker-title-color, #000000E0)", "lineHeight": "var(--l-picker-title-line-height, 26px)", "fontWeight": "var(--l-picker-title-font-weight, 700)", "fontSize": "var(--l-picker-title-font-size, 18px)" } }, "l-picker__cancel": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginRight": "auto", "color": "var(--l-picker-cancel-color, #000000A6)" } }, "l-picker__confirm": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginLeft": "auto", "color": "var(--l-picker-confirm-color, #3283ff)" } }, "l-picker__main": { "": { "position": "relative", "display": "flex", "height": "var(--l-picker-group-height, 200px)", "flexDirection": "row", "zIndex": 2, "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8 } }, "l-picker__empty": { "": { "pointerEvents": "none", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0, "zIndex": 3 } }, "l-picker__loading": { "": { "zIndex": 3, "backgroundColor": "var(--l-picker-loading-mask-color, rgba(255, 255, 255, 0.9))", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0 } }, "l-picker__indicator": { "": { "position": "absolute", "backgroundColor": "var(--l-picker-indicator-bg-color, #0000000A)", "top": "50%", "left": "var(--l-picker-indicator-margin, 10px)", "right": "var(--l-picker-indicator-margin, 10px)", "height": "var(--l-picker-item-height, 50px)", "transform": "translateY(-50%)", "zIndex": -1, "borderTopLeftRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderTopRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomLeftRadius": "var(--l-picker-indicator-border-radius, 6px)" } } };
+  const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["styles", [_style_0$J]]]);
   function raf(fn2 = null) {
     if (typeof fn2 == "UniAnimationFrameCallback") {
       return requestAnimationFrame(fn2);
@@ -3159,7 +3159,7 @@
       toggle
     };
   }
-  const _sfc_main$H = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$K = /* @__PURE__ */ vue.defineComponent({
     __name: "l-overlay",
     props: {
       ariaLabel: { default: "关闭", type: String },
@@ -3233,8 +3233,8 @@
       };
     }
   });
-  const _style_0$F = { "l-overlay": { "": { "position": "fixed", "top": 0, "left": 0, "width": "100%", "bottom": 0, "backgroundColor": "var(--l-overlay-bg-color, rgba(0, 0, 0, 0.45))", "transitionProperty": "opacity", "transitionTimingFunction": "ease", "zIndex": "var(--l-overlay-z-index, 998)", "opacity": 1, "transitionDuration": "300ms" } }, "l-fade-enter": { "": { "opacity": 0 } }, "l-fade-leave-to": { "": { "opacity": 0 } }, "@TRANSITION": { "l-overlay": { "property": "opacity", "timingFunction": "ease", "duration": "300ms" } } };
-  const __easycom_0$4 = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["styles", [_style_0$F]]]);
+  const _style_0$I = { "l-overlay": { "": { "position": "fixed", "top": 0, "left": 0, "width": "100%", "bottom": 0, "backgroundColor": "var(--l-overlay-bg-color, rgba(0, 0, 0, 0.45))", "transitionProperty": "opacity", "transitionTimingFunction": "ease", "zIndex": "var(--l-overlay-z-index, 998)", "opacity": 1, "transitionDuration": "300ms" } }, "l-fade-enter": { "": { "opacity": 0 } }, "l-fade-leave-to": { "": { "opacity": 0 } }, "@TRANSITION": { "l-overlay": { "property": "opacity", "timingFunction": "ease", "duration": "300ms" } } };
+  const __easycom_0$4 = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["styles", [_style_0$I]]]);
   function isDef(value) {
     return value != null;
   }
@@ -3268,7 +3268,7 @@
     const value = (_a = addUnit(radius)) !== null && _a !== void 0 ? _a : "0";
     return [value, value, value, value];
   }
-  const _sfc_main$G = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$J = /* @__PURE__ */ vue.defineComponent({
     __name: "l-popup",
     props: /* @__PURE__ */ vue.mergeModels(new UTSJSONObject({
       closeable: { type: Boolean, default: false },
@@ -3423,9 +3423,9 @@
       };
     }
   });
-  const _style_0$E = { "l-popup": { "": { "position": "fixed", "transitionDuration": "300ms", "transitionProperty": "transform,opacity", "transitionTimingFunction": "ease", "backgroundColor": "var(--l-popup-bg-color, #fff)", "overflow": "visible", "opacity": 1 }, ".l-popup-fade-enter": { "opacity": 0 }, ".l-popup-fade-leave-to": { "opacity": 0 }, ".l-popup-fade-enter.l-popup--top": { "transform": "scale(1) translate(0, -100%)" }, ".l-popup-fade-leave-to.l-popup--top": { "transform": "scale(1) translate(0, -100%)" }, ".l-popup-fade-enter.l-popup--bottom": { "transform": "scale(1) translate(0, 100%)" }, ".l-popup-fade-leave-to.l-popup--bottom": { "transform": "scale(1) translate(0, 100%)" }, ".l-popup-fade-enter.l-popup--left": { "transform": "scale(1) translate(-100%, 0)" }, ".l-popup-fade-leave-to.l-popup--left": { "transform": "scale(1) translate(-100%, 0)" }, ".l-popup-fade-enter.l-popup--right": { "transform": "scale(1) translate(100%, 0)" }, ".l-popup-fade-leave-to.l-popup--right": { "transform": "scale(1) translate(100%, 0)" }, ".l-popup-fade-enter.l-popup--center": { "transform": "translate(-50%, -50%)", "opacity": 0 }, ".l-popup-fade-leave-to.l-popup--center": { "transform": "translate(-50%, -50%)", "opacity": 0 }, ".l-dialog-enter.l-popup--center": { "transform": "scale(0.6) translate(-50%, -50%)", "opacity": 0 }, ".l-dialog-leave-to.l-popup--center": { "transform": "scale(0.6) translate(-50%, -50%)", "opacity": 0 } }, "l-popup__close": { "": { "position": "absolute", "top": 0, "right": 0, "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "l-popup__close-icon": { "": { "color": "var(--l-popup-close-icon-color, #000000A6)" } }, "l-popup--top": { "": { "top": 0, "left": 0, "right": 0, "borderBottomLeftRadius": "var(--l-popup-border-radius, 9px)", "borderBottomRightRadius": "var(--l-popup-border-radius, 9px)", "transform": "scale(1) translate(0, 0)" } }, "l-popup--bottom": { "": { "bottom": 0, "left": 0, "right": 0, "borderTopLeftRadius": "var(--l-popup-border-radius, 9px)", "borderTopRightRadius": "var(--l-popup-border-radius, 9px)", "transform": "scale(1) translate(0, 0)" } }, "l-popup--safe-top": { "": { "paddingTop": "var(--uni-safe-area-inset-top)" } }, "l-popup--safe-bottom": { "": { "paddingBottom": "var(--uni-safe-area-inset-bottom)" } }, "l-popup--left": { "": { "top": 0, "left": 0, "bottom": 0, "transform": "scale(1) translate(0, 0)" } }, "l-popup--right": { "": { "top": 0, "right": 0, "bottom": 0, "transform": "scale(1) translate(0, 0)" } }, "l-popup--center": { "": { "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "transformOrigin": "50% 50%", "borderTopLeftRadius": "var(--l-popup-border-radius, 9px)", "borderTopRightRadius": "var(--l-popup-border-radius, 9px)", "borderBottomRightRadius": "var(--l-popup-border-radius, 9px)", "borderBottomLeftRadius": "var(--l-popup-border-radius, 9px)" } }, "@TRANSITION": { "l-popup": { "duration": "300ms", "property": "transform,opacity", "timingFunction": "ease" } } };
-  const __easycom_3$2 = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["styles", [_style_0$E]]]);
-  const _sfc_main$F = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-toast" }, { __name: "i-toast", props: {
+  const _style_0$H = { "l-popup": { "": { "position": "fixed", "transitionDuration": "300ms", "transitionProperty": "transform,opacity", "transitionTimingFunction": "ease", "backgroundColor": "var(--l-popup-bg-color, #fff)", "overflow": "visible", "opacity": 1 }, ".l-popup-fade-enter": { "opacity": 0 }, ".l-popup-fade-leave-to": { "opacity": 0 }, ".l-popup-fade-enter.l-popup--top": { "transform": "scale(1) translate(0, -100%)" }, ".l-popup-fade-leave-to.l-popup--top": { "transform": "scale(1) translate(0, -100%)" }, ".l-popup-fade-enter.l-popup--bottom": { "transform": "scale(1) translate(0, 100%)" }, ".l-popup-fade-leave-to.l-popup--bottom": { "transform": "scale(1) translate(0, 100%)" }, ".l-popup-fade-enter.l-popup--left": { "transform": "scale(1) translate(-100%, 0)" }, ".l-popup-fade-leave-to.l-popup--left": { "transform": "scale(1) translate(-100%, 0)" }, ".l-popup-fade-enter.l-popup--right": { "transform": "scale(1) translate(100%, 0)" }, ".l-popup-fade-leave-to.l-popup--right": { "transform": "scale(1) translate(100%, 0)" }, ".l-popup-fade-enter.l-popup--center": { "transform": "translate(-50%, -50%)", "opacity": 0 }, ".l-popup-fade-leave-to.l-popup--center": { "transform": "translate(-50%, -50%)", "opacity": 0 }, ".l-dialog-enter.l-popup--center": { "transform": "scale(0.6) translate(-50%, -50%)", "opacity": 0 }, ".l-dialog-leave-to.l-popup--center": { "transform": "scale(0.6) translate(-50%, -50%)", "opacity": 0 } }, "l-popup__close": { "": { "position": "absolute", "top": 0, "right": 0, "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "l-popup__close-icon": { "": { "color": "var(--l-popup-close-icon-color, #000000A6)" } }, "l-popup--top": { "": { "top": 0, "left": 0, "right": 0, "borderBottomLeftRadius": "var(--l-popup-border-radius, 9px)", "borderBottomRightRadius": "var(--l-popup-border-radius, 9px)", "transform": "scale(1) translate(0, 0)" } }, "l-popup--bottom": { "": { "bottom": 0, "left": 0, "right": 0, "borderTopLeftRadius": "var(--l-popup-border-radius, 9px)", "borderTopRightRadius": "var(--l-popup-border-radius, 9px)", "transform": "scale(1) translate(0, 0)" } }, "l-popup--safe-top": { "": { "paddingTop": "var(--uni-safe-area-inset-top)" } }, "l-popup--safe-bottom": { "": { "paddingBottom": "var(--uni-safe-area-inset-bottom)" } }, "l-popup--left": { "": { "top": 0, "left": 0, "bottom": 0, "transform": "scale(1) translate(0, 0)" } }, "l-popup--right": { "": { "top": 0, "right": 0, "bottom": 0, "transform": "scale(1) translate(0, 0)" } }, "l-popup--center": { "": { "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "transformOrigin": "50% 50%", "borderTopLeftRadius": "var(--l-popup-border-radius, 9px)", "borderTopRightRadius": "var(--l-popup-border-radius, 9px)", "borderBottomRightRadius": "var(--l-popup-border-radius, 9px)", "borderBottomLeftRadius": "var(--l-popup-border-radius, 9px)" } }, "@TRANSITION": { "l-popup": { "duration": "300ms", "property": "transform,opacity", "timingFunction": "ease" } } };
+  const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["styles", [_style_0$H]]]);
+  const _sfc_main$I = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-toast" }, { __name: "i-toast", props: {
     zIndex: { type: [String, Number], default: 10090 },
     loading: { type: Boolean, default: false },
     title: { type: String, default: "" },
@@ -3672,8 +3672,8 @@
       ], 64);
     };
   } }));
-  const _style_0$D = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "alignSelf": "center", "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
-  const __easycom_0$3 = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["styles", [_style_0$D]]]);
+  const _style_0$G = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "alignSelf": "center", "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
+  const __easycom_0$3 = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["styles", [_style_0$G]]]);
   const iosToastHandlers = [];
   const pendingIosToasts = [];
   const maxPendingToastCount = 10;
@@ -3707,7 +3707,7 @@
       pendingIosToasts.push(options);
     }
   }
-  const _sfc_main$E = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-toast" }, { __name: "app-toast", setup(__props) {
+  const _sfc_main$H = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-toast" }, { __name: "app-toast", setup(__props) {
     const toastRef = vue.ref(null);
     const handleToast = (options) => {
       var _a, _b, _c;
@@ -4084,6 +4084,15 @@
     }
   }
   const modalHandlers = [];
+  function registerAppModalHandler(handler) {
+    if (modalHandlers.indexOf(handler) == -1)
+      modalHandlers.push(handler);
+  }
+  function unregisterAppModalHandler(handler) {
+    const index = modalHandlers.indexOf(handler);
+    if (index >= 0)
+      modalHandlers.splice(index, 1);
+  }
   function showAppModal(options) {
     var _a, _b, _c;
     const handler = modalHandlers.length > 0 ? modalHandlers[modalHandlers.length - 1] : null;
@@ -4969,9 +4978,9 @@
   const userinfo = "/sys/user/info";
   const addDeviceUrl = "/userDevice/add";
   const userDeviceList = "/userDevice/list";
-  const uniVerifyLoginUrl = "/auth/login";
+  const authLoginUrl = "/auth/login";
   const smsSendCodeUrl = "/resource/sms/code";
-  const smsLoginUrl = "/auth/login";
+  const registerUrl = "/auth/register";
   const smsClientId = "428a8310cd442757ae699df5d894f051";
   const defaultTenantId = "000000";
   const changePSW = "/sys/user/password";
@@ -5100,6 +5109,60 @@
       this.phonenumber = this.__props__.phonenumber;
       this.smsCode = this.__props__.smsCode;
       this.deviceId = this.__props__.deviceId;
+      this.clientId = this.__props__.clientId;
+      this.tenantId = this.__props__.tenantId;
+      delete this.__props__;
+    }
+  }
+  class PersonalPasswordLoginRequest extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            username: { type: String, optional: false },
+            password: { type: String, optional: false },
+            clientId: { type: String, optional: true },
+            tenantId: { type: String, optional: true }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = PersonalPasswordLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.username = this.__props__.username;
+      this.password = this.__props__.password;
+      this.clientId = this.__props__.clientId;
+      this.tenantId = this.__props__.tenantId;
+      delete this.__props__;
+    }
+  }
+  class RegisterRequest extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            username: { type: String, optional: false },
+            password: { type: String, optional: false },
+            confirmPassword: { type: String, optional: false },
+            phonenumber: { type: String, optional: false },
+            smsCode: { type: String, optional: false },
+            clientId: { type: String, optional: true },
+            tenantId: { type: String, optional: true }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = RegisterRequest.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.username = this.__props__.username;
+      this.password = this.__props__.password;
+      this.confirmPassword = this.__props__.confirmPassword;
+      this.phonenumber = this.__props__.phonenumber;
+      this.smsCode = this.__props__.smsCode;
       this.clientId = this.__props__.clientId;
       this.tenantId = this.__props__.tenantId;
       delete this.__props__;
@@ -5503,7 +5566,7 @@
     });
   };
   const uniVerifyLogin = (data) => {
-    return post(uniVerifyLoginUrl, data).then((raw = null) => {
+    return post(authLoginUrl, data).then((raw = null) => {
       return jsonDataResponse(raw);
     });
   };
@@ -5515,6 +5578,39 @@
       return basicResponse(raw);
     });
   };
+  const sendSmsRegisterCode = (data) => {
+    return get(smsSendCodeUrl, new UTSJSONObject({
+      phonenumber: data.phonenumber,
+      tenantId: data.tenantId != null ? data.tenantId : defaultTenantId,
+      scene: "register"
+    })).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const personalPasswordLogin = (data) => {
+    const requestData = new UTSJSONObject();
+    requestData.set("grantType", "password");
+    requestData.set("username", data.username);
+    requestData.set("password", data.password);
+    requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
+    requestData.set("clientId", data.clientId != null ? data.clientId : smsClientId);
+    return post(authLoginUrl, requestData).then((raw = null) => {
+      return jsonDataResponse(raw);
+    });
+  };
+  const registerPersonalUser = (data) => {
+    const requestData = new UTSJSONObject();
+    requestData.set("username", data.username);
+    requestData.set("password", data.password);
+    requestData.set("confirmPassword", data.confirmPassword);
+    requestData.set("phonenumber", data.phonenumber);
+    requestData.set("smsCode", data.smsCode);
+    requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
+    requestData.set("clientId", data.clientId != null ? data.clientId : smsClientId);
+    return post(registerUrl, requestData).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
   const smsLogin = (data) => {
     const requestData = new UTSJSONObject();
     requestData.set("clientId", data.clientId != null ? data.clientId : smsClientId);
@@ -5523,7 +5619,7 @@
     requestData.set("phonenumber", data.phonenumber);
     requestData.set("smsCode", data.smsCode);
     requestData.set("device_id", data.deviceId);
-    return post(smsLoginUrl, requestData).then((raw = null) => {
+    return post(authLoginUrl, requestData).then((raw = null) => {
       return jsonDataResponse(raw);
     });
   };
@@ -5990,7 +6086,7 @@
     }
   }
   const userLocationMarkerId = 1;
-  const _sfc_main$D = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$G = /* @__PURE__ */ vue.defineComponent({
     __name: "index",
     setup(__props) {
       const center = vue.reactive(new MapCenter$1({
@@ -6855,8 +6951,8 @@
         const _component_i_line_progress = resolveEasycom(vue.resolveDynamicComponent("i-line-progress"), __easycom_1$4);
         const _component_map = vue.resolveComponent("map");
         const _component_l_picker = resolveEasycom(vue.resolveDynamicComponent("l-picker"), __easycom_0$5);
-        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$1);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("scroll-view", new UTSJSONObject({
             class: "container",
@@ -7190,10 +7286,10 @@
       };
     }
   });
-  const _style_0$C = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "10rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexShrink": 0, "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "flexShrink": 0, "marginLeft": "30rpx" } }, "nav-tool-add": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "width": "40rpx", "height": "40rpx", "alignItems": "center", "justifyContent": "center" } }, "nav-tool-add-image": { ".container .page-bg .top .device-car .nav-tools ": { "width": "36rpx", "height": "36rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh-wrap": { ".container .page-bg .content .map-box .map-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header .map-refresh-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "map-container": { ".container .page-bg .content .map-box ": { "position": "relative", "height": "300rpx" } }, "map-status": { ".container .page-bg .content .map-box .map-container ": { "position": "absolute", "left": "24rpx", "right": "24rpx", "bottom": "24rpx", "paddingTop": "16rpx", "paddingRight": "20rpx", "paddingBottom": "16rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "rgba(0,0,0,0.68)", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "map-status-text": { ".container .page-bg .content .map-box .map-container .map-status ": { "color": "#ffffff", "fontSize": "24rpx" } }, "map-status-retry": { ".container .page-bg .content .map-box .map-container .map-status ": { "flexShrink": 0, "marginLeft": "20rpx", "color": "#8de39b", "fontSize": "24rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc-wrap": { ".container .page-bg .content .mile-record .record-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header .record-desc-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3", "borderTopWidth": "5rpx", "borderRightWidth": "5rpx", "borderBottomWidth": "5rpx", "borderLeftWidth": "5rpx" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
-  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["styles", [_style_0$C]]]);
+  const _style_0$F = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "10rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexShrink": 0, "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "flexShrink": 0, "marginLeft": "30rpx" } }, "nav-tool-add": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "width": "40rpx", "height": "40rpx", "alignItems": "center", "justifyContent": "center" } }, "nav-tool-add-image": { ".container .page-bg .top .device-car .nav-tools ": { "width": "36rpx", "height": "36rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh-wrap": { ".container .page-bg .content .map-box .map-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header .map-refresh-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "map-container": { ".container .page-bg .content .map-box ": { "position": "relative", "height": "300rpx" } }, "map-status": { ".container .page-bg .content .map-box .map-container ": { "position": "absolute", "left": "24rpx", "right": "24rpx", "bottom": "24rpx", "paddingTop": "16rpx", "paddingRight": "20rpx", "paddingBottom": "16rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "rgba(0,0,0,0.68)", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "map-status-text": { ".container .page-bg .content .map-box .map-container .map-status ": { "color": "#ffffff", "fontSize": "24rpx" } }, "map-status-retry": { ".container .page-bg .content .map-box .map-container .map-status ": { "flexShrink": 0, "marginLeft": "20rpx", "color": "#8de39b", "fontSize": "24rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc-wrap": { ".container .page-bg .content .mile-record .record-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header .record-desc-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3", "borderTopWidth": "5rpx", "borderRightWidth": "5rpx", "borderBottomWidth": "5rpx", "borderLeftWidth": "5rpx" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
+  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["styles", [_style_0$F]]]);
   const _imports_0$3 = "/static/back.png";
-  const _sfc_main$C = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$F = /* @__PURE__ */ vue.defineComponent({
     __name: "custom-navBar",
     props: {
       title: String,
@@ -7241,7 +7337,7 @@
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({
-            style: vue.normalizeStyle(__props.isShowStyle ? { height: vue.unref(statusBarHeight) + "px", "background-color": "#f1f1f1", position: "fixed", width: "100%", letf: 0, top: 0, "z-index": "100" } : { height: vue.unref(statusBarHeight) + "px", "background-color": "#f1f1f1" })
+            style: vue.normalizeStyle(__props.isShowStyle ? { height: vue.unref(statusBarHeight) + "px", "background-color": "#ffffff", position: "fixed", width: "100%", letf: 0, top: 0, "z-index": "100" } : { height: vue.unref(statusBarHeight) + "px", "background-color": "#ffffff" })
           }), null, 4),
           vue.createElementVNode("view", new UTSJSONObject({
             class: "navbar",
@@ -7301,9 +7397,9 @@
       };
     }
   });
-  const _style_0$B = { "navbar": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "back-btn": { "": { "display": "flex", "alignItems": "center", "width": "70rpx", "height": "40rpx", "zIndex": 10, "justifyContent": "center" } }, "title": { "": { "textAlign": "center", "fontWeight": "bold", "fontSize": "36rpx" } }, "capsule-item": { "": { "width": 40, "height": "100%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "icon": { "": { "width": "40rpx", "height": "40rpx" } }, "menu-icon": { "": { "width": "60rpx", "height": "60rpx" } } };
-  const __easycom_0$2 = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["styles", [_style_0$B]]]);
-  const _sfc_main$B = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-modal" }, { __name: "i-modal", props: {
+  const _style_0$E = { "navbar": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "back-btn": { "": { "display": "flex", "alignItems": "center", "width": "70rpx", "height": "40rpx", "zIndex": 10, "justifyContent": "center" } }, "title": { "": { "textAlign": "center", "fontWeight": "bold", "fontSize": "36rpx" } }, "capsule-item": { "": { "width": 40, "height": "100%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "icon": { "": { "width": "40rpx", "height": "40rpx" } }, "menu-icon": { "": { "width": "60rpx", "height": "60rpx" } } };
+  const __easycom_0$2 = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["styles", [_style_0$E]]]);
+  const _sfc_main$E = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-modal" }, { __name: "i-modal", props: {
     show: { type: Boolean, default: false },
     title: { type: String, default: "" },
     content: { type: String, default: "" },
@@ -7577,8 +7673,8 @@
       ], 4)) : vue.createCommentVNode("", true);
     };
   } }));
-  const _style_0$A = { "i-modal__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0.5)", "alignItems": "center", "justifyContent": "center", "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-modal": { "": { "position": "relative", "overflow": "hidden", "backgroundColor": "#ffffff", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-modal__close": { "": { "position": "absolute", "right": 8, "top": 8, "zIndex": 2, "width": 34, "height": 34, "alignItems": "center", "justifyContent": "center" } }, "i-modal__close-text": { "": { "color": "#909399", "fontSize": 22, "lineHeight": "30px" } }, "i-modal__title": { "": { "paddingTop": 22, "paddingRight": 22, "paddingBottom": 8, "paddingLeft": 22, "color": "#303133", "fontSize": 17, "fontWeight": 600, "lineHeight": "24px", "textAlign": "center" } }, "i-modal__content-wrap": { "": { "minHeight": 52, "paddingTop": 8, "paddingRight": 22, "paddingBottom": 22, "paddingLeft": 22, "alignItems": "center", "justifyContent": "center" } }, "i-modal__content": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-modal__footer": { "": { "minHeight": 48, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "i-modal__footer--button": { "": { "paddingTop": 10, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14, "borderTopWidth": 0 } }, "i-modal__footer-inner": { "": { "flexDirection": "row" } }, "i-modal__button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 48, "alignItems": "center", "justifyContent": "center" } }, "i-modal__button--cancel": { "": { "borderRightWidth": 1, "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "i-modal__button--model-button": { "": { "height": 40, "marginTop": 0, "marginRight": 5, "marginBottom": 0, "marginLeft": 5, "borderRightWidth": 0, "backgroundColor": "#f5f7fb" } }, "i-modal__button--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-modal__confirm-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-modal__cancel-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-modal__mask": { "property": "opacity", "timingFunction": "ease" }, "i-modal": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
-  const __easycom_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["styles", [_style_0$A]]]);
+  const _style_0$D = { "i-modal__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0.5)", "alignItems": "center", "justifyContent": "center", "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-modal": { "": { "position": "relative", "overflow": "hidden", "backgroundColor": "#ffffff", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-modal__close": { "": { "position": "absolute", "right": 8, "top": 8, "zIndex": 2, "width": 34, "height": 34, "alignItems": "center", "justifyContent": "center" } }, "i-modal__close-text": { "": { "color": "#909399", "fontSize": 22, "lineHeight": "30px" } }, "i-modal__title": { "": { "paddingTop": 22, "paddingRight": 22, "paddingBottom": 8, "paddingLeft": 22, "color": "#303133", "fontSize": 17, "fontWeight": 600, "lineHeight": "24px", "textAlign": "center" } }, "i-modal__content-wrap": { "": { "minHeight": 52, "paddingTop": 8, "paddingRight": 22, "paddingBottom": 22, "paddingLeft": 22, "alignItems": "center", "justifyContent": "center" } }, "i-modal__content": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-modal__footer": { "": { "minHeight": 48, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "i-modal__footer--button": { "": { "paddingTop": 10, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14, "borderTopWidth": 0 } }, "i-modal__footer-inner": { "": { "flexDirection": "row" } }, "i-modal__button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 48, "alignItems": "center", "justifyContent": "center" } }, "i-modal__button--cancel": { "": { "borderRightWidth": 1, "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "i-modal__button--model-button": { "": { "height": 40, "marginTop": 0, "marginRight": 5, "marginBottom": 0, "marginLeft": 5, "borderRightWidth": 0, "backgroundColor": "#f5f7fb" } }, "i-modal__button--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-modal__confirm-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-modal__cancel-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-modal__mask": { "property": "opacity", "timingFunction": "ease" }, "i-modal": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
+  const __easycom_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["styles", [_style_0$D]]]);
   class ModalInstance extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -7643,7 +7739,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$A = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$D = /* @__PURE__ */ vue.defineComponent({
     __name: "message",
     setup(__props) {
       const modal = vue.ref(false);
@@ -8015,7 +8111,7 @@
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "消息中心",
@@ -8104,9 +8200,9 @@
       };
     }
   });
-  const _style_0$z = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-box": { ".container .list-box ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "backgroundColor": "#f56c6c", "marginLeft": "16rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "unread-badge": { ".container .list-box .unread-box ": { "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
-  const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["styles", [_style_0$z]]]);
-  const _sfc_main$z = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-badge" }, { __name: "i-badge", props: {
+  const _style_0$C = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-box": { ".container .list-box ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "backgroundColor": "#f56c6c", "marginLeft": "16rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "unread-badge": { ".container .list-box .unread-box ": { "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
+  const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["styles", [_style_0$C]]]);
+  const _sfc_main$C = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-badge" }, { __name: "i-badge", props: {
     label: {
       type: String,
       default: ""
@@ -8377,11 +8473,11 @@
       ], 2);
     };
   } }));
-  const _style_0$y = { "i-badge": { "": { "position": "relative", "alignSelf": "flex-start", "paddingTop": 10, "paddingRight": 12, "overflow": "visible" } }, "i-badge--left-space": { "": { "paddingLeft": 12, "paddingRight": 0 } }, "i-badge--dot": { "": { "paddingTop": 4, "paddingRight": 4 } }, "i-badge--dot-left-space": { "": { "paddingLeft": 4, "paddingRight": 0 } }, "i-badge--bottomLeft": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottomRight": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottom": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--dot-bottom": { "": { "paddingBottom": 4 } }, "i-badge--top": { "": { "paddingRight": 0 } }, "i-badge--dot-top": { "": { "paddingRight": 0 } }, "i-badge__mark": { "": { "position": "absolute", "zIndex": 2, "minWidth": 20, "height": 20, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10, "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "overflow": "visible" } }, "i-badge__mark--dot": { "": { "width": 8, "minWidth": 8, "height": 8, "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-badge__mark--danger": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--error": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-badge__mark--success": { "": { "backgroundColor": "#5ac725" } }, "i-badge__mark--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-badge__mark--info": { "": { "backgroundColor": "#909399" } }, "i-badge__text": { "": { "color": "#ffffff", "lineHeight": "20px", "whiteSpace": "nowrap" } } };
-  const __easycom_2$3 = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["styles", [_style_0$y]]]);
+  const _style_0$B = { "i-badge": { "": { "position": "relative", "alignSelf": "flex-start", "paddingTop": 10, "paddingRight": 12, "overflow": "visible" } }, "i-badge--left-space": { "": { "paddingLeft": 12, "paddingRight": 0 } }, "i-badge--dot": { "": { "paddingTop": 4, "paddingRight": 4 } }, "i-badge--dot-left-space": { "": { "paddingLeft": 4, "paddingRight": 0 } }, "i-badge--bottomLeft": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottomRight": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottom": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--dot-bottom": { "": { "paddingBottom": 4 } }, "i-badge--top": { "": { "paddingRight": 0 } }, "i-badge--dot-top": { "": { "paddingRight": 0 } }, "i-badge__mark": { "": { "position": "absolute", "zIndex": 2, "minWidth": 20, "height": 20, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10, "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "overflow": "visible" } }, "i-badge__mark--dot": { "": { "width": 8, "minWidth": 8, "height": 8, "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-badge__mark--danger": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--error": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-badge__mark--success": { "": { "backgroundColor": "#5ac725" } }, "i-badge__mark--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-badge__mark--info": { "": { "backgroundColor": "#909399" } }, "i-badge__text": { "": { "color": "#ffffff", "lineHeight": "20px", "whiteSpace": "nowrap" } } };
+  const __easycom_2$3 = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["styles", [_style_0$B]]]);
   const buttonWidth = 120;
   const buttonHeight = 200;
-  const _sfc_main$y = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$B = /* @__PURE__ */ vue.defineComponent({
     __name: "userCenter",
     setup(__props) {
       const userInfo = vue.ref(new UTSJSONObject({
@@ -8492,7 +8588,7 @@
         const _component_i_badge = resolveEasycom(vue.resolveDynamicComponent("i-badge"), __easycom_2$3);
         const _component_movable_view = vue.resolveComponent("movable-view");
         const _component_movable_area = vue.resolveComponent("movable-area");
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -8588,9 +8684,9 @@
       };
     }
   });
-  const _style_0$x = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#ffffff", "position": "relative" } }, "user-info-box": { ".container ": { "width": "100%", "paddingTop": "40rpx", "paddingRight": "60rpx", "paddingBottom": "40rpx", "paddingLeft": "60rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "userinfo": { ".container .user-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "user-info": { ".container .user-info-box ": { "marginLeft": "20rpx", "textAlign": "center", "fontSize": "30rpx", "color": "#333333" } }, "list": { ".container ": { "backgroundColor": "#f5f5f5", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "marginTop": "15rpx", "marginRight": "15rpx", "marginBottom": "15rpx", "marginLeft": "15rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "fontSize": "25rpx" } }, "left": { ".container .list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "badge": { ".container .list .left ": { "marginLeft": "20rpx" } }, "version": { ".container ": { "position": "fixed", "bottom": "50rpx", "left": "20rpx", "right": "20rpx", "textAlign": "center", "fontSize": "25rpx", "color": "#c3c2c2ff", "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx" } }, "movable-area": { ".container ": { "position": "fixed", "top": 0, "left": 0, "right": 0, "bottom": 0, "width": "100%", "height": "100%", "pointerEvents": "none", "zIndex": 999 } } };
-  const PagesUserCenterUserCenter = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["styles", [_style_0$x]]]);
-  const _sfc_main$x = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
+  const _style_0$A = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#ffffff", "position": "relative" } }, "user-info-box": { ".container ": { "width": "100%", "paddingTop": "40rpx", "paddingRight": "60rpx", "paddingBottom": "40rpx", "paddingLeft": "60rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "userinfo": { ".container .user-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "user-info": { ".container .user-info-box ": { "marginLeft": "20rpx", "textAlign": "center", "fontSize": "30rpx", "color": "#333333" } }, "list": { ".container ": { "backgroundColor": "#f5f5f5", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "marginTop": "15rpx", "marginRight": "15rpx", "marginBottom": "15rpx", "marginLeft": "15rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "fontSize": "25rpx" } }, "left": { ".container .list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "badge": { ".container .list .left ": { "marginLeft": "20rpx" } }, "version": { ".container ": { "position": "fixed", "bottom": "50rpx", "left": "20rpx", "right": "20rpx", "textAlign": "center", "fontSize": "25rpx", "color": "#c3c2c2ff", "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx" } }, "movable-area": { ".container ": { "position": "fixed", "top": 0, "left": 0, "right": 0, "bottom": 0, "width": "100%", "height": "100%", "pointerEvents": "none", "zIndex": 999 } } };
+  const PagesUserCenterUserCenter = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["styles", [_style_0$A]]]);
+  const _sfc_main$A = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
     modelValue: {
       type: String,
       default: ""
@@ -8924,9 +9020,9 @@
       ], 6);
     };
   } }));
-  const _style_0$w = { "i-input": { "": { "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "flexDirection": "row", "alignItems": "center" } }, "i-input--disabled": { "": { "opacity": 0.76 } }, "i-input--focus": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff" } }, "i-input__prefix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginRight": 8 } }, "i-input__suffix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginLeft": 8 } }, "i-input__clear": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__eye": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__count": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 12, "lineHeight": "18px" } }, "i-input__field": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0 } } };
-  const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["styles", [_style_0$w]]]);
-  const _sfc_main$w = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form-item" }, { __name: "i-form-item", props: {
+  const _style_0$z = { "i-input": { "": { "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "flexDirection": "row", "alignItems": "center" } }, "i-input--disabled": { "": { "opacity": 0.76 } }, "i-input--focus": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff" } }, "i-input__prefix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginRight": 8 } }, "i-input__suffix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginLeft": 8 } }, "i-input__clear": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__eye": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__count": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 12, "lineHeight": "18px" } }, "i-input__field": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0 } } };
+  const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["styles", [_style_0$z]]]);
+  const _sfc_main$z = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form-item" }, { __name: "i-form-item", props: {
     name: {
       type: String,
       default: ""
@@ -9078,9 +9174,9 @@
       ], 10, ["id"]);
     };
   } }));
-  const _style_0$v = { "i-form-item": { "": { "paddingTop": 12, "paddingRight": 14, "paddingBottom": 12, "paddingLeft": 14, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff" } }, "i-form-item--horizontal": { "": { "flexDirection": "row", "alignItems": "flex-start" } }, "i-form-item__header": { "": { "flexDirection": "row", "alignItems": "center" } }, "i-form-item__header--horizontal": { "": { "minHeight": 40 } }, "i-form-item__required": { "": { "marginRight": 4, "color": "#fa3534", "fontSize": 14, "lineHeight": "22px" } }, "i-form-item__label": { "": { "color": "#303133", "fontSize": 14, "fontWeight": 600, "lineHeight": "22px" } }, "i-form-item__content": { "": { "marginTop": 8 } }, "i-form-item__content--horizontal": { "": { "marginTop": 0 } }, "i-form-item__body": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-form-item__hint": { "": { "marginTop": 6, "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-form-item__error": { "": { "marginTop": 6, "color": "#fa3534", "fontSize": 12, "lineHeight": "18px" } } };
-  const __easycom_2$2 = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["styles", [_style_0$v]]]);
-  const _sfc_main$v = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-checkbox" }, { __name: "i-checkbox", props: {
+  const _style_0$y = { "i-form-item": { "": { "paddingTop": 12, "paddingRight": 14, "paddingBottom": 12, "paddingLeft": 14, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff" } }, "i-form-item--horizontal": { "": { "flexDirection": "row", "alignItems": "flex-start" } }, "i-form-item__header": { "": { "flexDirection": "row", "alignItems": "center" } }, "i-form-item__header--horizontal": { "": { "minHeight": 40 } }, "i-form-item__required": { "": { "marginRight": 4, "color": "#fa3534", "fontSize": 14, "lineHeight": "22px" } }, "i-form-item__label": { "": { "color": "#303133", "fontSize": 14, "fontWeight": 600, "lineHeight": "22px" } }, "i-form-item__content": { "": { "marginTop": 8 } }, "i-form-item__content--horizontal": { "": { "marginTop": 0 } }, "i-form-item__body": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-form-item__hint": { "": { "marginTop": 6, "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-form-item__error": { "": { "marginTop": 6, "color": "#fa3534", "fontSize": 12, "lineHeight": "18px" } } };
+  const __easycom_2$2 = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["styles", [_style_0$y]]]);
+  const _sfc_main$y = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-checkbox" }, { __name: "i-checkbox", props: {
     name: {
       type: [String, Number],
       default: ""
@@ -9328,9 +9424,9 @@
       ], 2);
     };
   } }));
-  const _style_0$u = { "i-checkbox": { "": { "minHeight": 32, "flexDirection": "row", "alignItems": "center" } }, "i-checkbox--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "i-checkbox--button": { "": { "minWidth": 64, "minHeight": 34, "paddingTop": 7, "paddingRight": 12, "paddingBottom": 7, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox--button-checked": { "": { "borderTopColor": "#2979ff", "borderRightColor": "#2979ff", "borderBottomColor": "#2979ff", "borderLeftColor": "#2979ff", "backgroundColor": "#ecf5ff" } }, "i-checkbox--button-plain-checked": { "": { "backgroundColor": "#ffffff" } }, "i-checkbox--disabled": { "": { "opacity": 0.5 } }, "i-checkbox--border": { "": { "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4" } }, "i-checkbox__box": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox__mark": { "": { "lineHeight": "18px" } }, "i-checkbox__label": { "": { "marginLeft": 8, "lineHeight": "22px" } }, "i-checkbox__label--button": { "": { "marginLeft": 0, "textAlign": "center" } } };
-  const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["styles", [_style_0$u]]]);
-  const _sfc_main$u = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-button" }, { __name: "i-button", props: {
+  const _style_0$x = { "i-checkbox": { "": { "minHeight": 32, "flexDirection": "row", "alignItems": "center" } }, "i-checkbox--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "i-checkbox--button": { "": { "minWidth": 64, "minHeight": 34, "paddingTop": 7, "paddingRight": 12, "paddingBottom": 7, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox--button-checked": { "": { "borderTopColor": "#2979ff", "borderRightColor": "#2979ff", "borderBottomColor": "#2979ff", "borderLeftColor": "#2979ff", "backgroundColor": "#ecf5ff" } }, "i-checkbox--button-plain-checked": { "": { "backgroundColor": "#ffffff" } }, "i-checkbox--disabled": { "": { "opacity": 0.5 } }, "i-checkbox--border": { "": { "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4" } }, "i-checkbox__box": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox__mark": { "": { "lineHeight": "18px" } }, "i-checkbox__label": { "": { "marginLeft": 8, "lineHeight": "22px" } }, "i-checkbox__label--button": { "": { "marginLeft": 0, "textAlign": "center" } } };
+  const __easycom_5 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["styles", [_style_0$x]]]);
+  const _sfc_main$x = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-button" }, { __name: "i-button", props: {
     hairline: {
       type: Boolean,
       default: true
@@ -9756,9 +9852,9 @@
       ], 14, ["hover-class", "hover-stop-propagation", "hover-start-time", "hover-stay-time", "data-name"]));
     };
   } }));
-  const _style_0$t = { "i-button": { "": { "display": "flex", "height": 44, "minWidth": 86, "paddingTop": 0, "paddingRight": 18, "paddingBottom": 0, "paddingLeft": 18, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "backgroundColor": "#f4f4f5", "alignItems": "center", "justifyContent": "center", "flexDirection": "row", "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "overflow": "hidden" } }, "i-button__inner": { "": { "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-button--block": { "": { "width": "100%" } }, "i-button--large": { "": { "height": 50, "minWidth": 108, "paddingTop": 0, "paddingRight": 22, "paddingBottom": 0, "paddingLeft": 22 } }, "i-button--normal": { "": { "height": 44 } }, "i-button--small": { "": { "height": 36, "minWidth": 72, "paddingTop": 0, "paddingRight": 14, "paddingBottom": 0, "paddingLeft": 14 } }, "i-button--mini": { "": { "height": 30, "minWidth": 58, "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10 } }, "i-button--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-button--success": { "": { "backgroundColor": "#5ac725" } }, "i-button--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-button--error": { "": { "backgroundColor": "#f56c6c" } }, "i-button--info": { "": { "backgroundColor": "#909399" } }, "i-button--default": { "": { "backgroundColor": "#f4f4f5", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain-primary": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff", "backgroundColor": "#ffffff" } }, "i-button--plain-success": { "": { "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725", "backgroundColor": "#ffffff" } }, "i-button--plain-warning": { "": { "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d", "backgroundColor": "#ffffff" } }, "i-button--plain-error": { "": { "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c", "backgroundColor": "#ffffff" } }, "i-button--plain-info": { "": { "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399", "backgroundColor": "#ffffff" } }, "i-button--hairline": { "": { "borderTopWidth": 0.5, "borderRightWidth": 0.5, "borderBottomWidth": 0.5, "borderLeftWidth": 0.5 } }, "i-button--disabled": { "": { "opacity": 0.6 } }, "i-button--loading": { "": { "opacity": 0.9 } }, "i-button--hover": { "": { "opacity": 0.86 } }, "i-button__text": { "": { "color": "#ffffff", "fontSize": 15, "fontWeight": 500, "lineHeight": "22px" } }, "i-button__text--small": { "": { "fontSize": 13, "lineHeight": "20px" } }, "i-button__text--default": { "": { "color": "#303133" } }, "i-button__text--plain-primary": { "": { "color": "#3c9cff" } }, "i-button__text--plain-success": { "": { "color": "#5ac725" } }, "i-button__text--plain-warning": { "": { "color": "#f9ae3d" } }, "i-button__text--plain-error": { "": { "color": "#f56c6c" } }, "i-button__text--plain-info": { "": { "color": "#909399" } }, "i-button__text--plain-default": { "": { "color": "#303133" } }, "i-button__text--disabled": { "": { "opacity": 0.9 } }, "i-button__icon": { "": { "marginRight": 6, "color": "#ffffff", "fontSize": 15, "lineHeight": "22px" } }, "i-button__icon--right": { "": { "marginRight": 0, "marginLeft": 6 } }, "i-button__loading": { "": { "marginRight": 6, "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.45)", "borderBottomColor": "rgba(255,255,255,0.45)", "borderLeftColor": "rgba(255,255,255,0.45)", "boxSizing": "border-box" } }, "i-button__loading--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button__text--loading": { "": { "opacity": 0.96 } }, "i-button__loading--muted": { "": { "borderTopColor": "#606266", "borderRightColor": "rgba(48,49,51,0.18)", "borderBottomColor": "rgba(48,49,51,0.18)", "borderLeftColor": "rgba(48,49,51,0.18)" } }, "i-button__loading--plain-primary": { "": { "borderTopColor": "#3c9cff" } }, "i-button__loading--plain-success": { "": { "borderTopColor": "#5ac725" } }, "i-button__loading--plain-warning": { "": { "borderTopColor": "#f9ae3d" } }, "i-button__loading--plain-error": { "": { "borderTopColor": "#f56c6c" } }, "i-button__loading--plain-info": { "": { "borderTopColor": "#909399" } } };
-  const __easycom_2$1 = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["styles", [_style_0$t]]]);
-  const _sfc_main$t = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form" }, { __name: "i-form", props: {
+  const _style_0$w = { "i-button": { "": { "display": "flex", "height": 44, "minWidth": 86, "paddingTop": 0, "paddingRight": 18, "paddingBottom": 0, "paddingLeft": 18, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "backgroundColor": "#f4f4f5", "alignItems": "center", "justifyContent": "center", "flexDirection": "row", "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "overflow": "hidden" } }, "i-button__inner": { "": { "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-button--block": { "": { "width": "100%" } }, "i-button--large": { "": { "height": 50, "minWidth": 108, "paddingTop": 0, "paddingRight": 22, "paddingBottom": 0, "paddingLeft": 22 } }, "i-button--normal": { "": { "height": 44 } }, "i-button--small": { "": { "height": 36, "minWidth": 72, "paddingTop": 0, "paddingRight": 14, "paddingBottom": 0, "paddingLeft": 14 } }, "i-button--mini": { "": { "height": 30, "minWidth": 58, "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10 } }, "i-button--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-button--success": { "": { "backgroundColor": "#5ac725" } }, "i-button--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-button--error": { "": { "backgroundColor": "#f56c6c" } }, "i-button--info": { "": { "backgroundColor": "#909399" } }, "i-button--default": { "": { "backgroundColor": "#f4f4f5", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain-primary": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff", "backgroundColor": "#ffffff" } }, "i-button--plain-success": { "": { "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725", "backgroundColor": "#ffffff" } }, "i-button--plain-warning": { "": { "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d", "backgroundColor": "#ffffff" } }, "i-button--plain-error": { "": { "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c", "backgroundColor": "#ffffff" } }, "i-button--plain-info": { "": { "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399", "backgroundColor": "#ffffff" } }, "i-button--hairline": { "": { "borderTopWidth": 0.5, "borderRightWidth": 0.5, "borderBottomWidth": 0.5, "borderLeftWidth": 0.5 } }, "i-button--disabled": { "": { "opacity": 0.6 } }, "i-button--loading": { "": { "opacity": 0.9 } }, "i-button--hover": { "": { "opacity": 0.86 } }, "i-button__text": { "": { "color": "#ffffff", "fontSize": 15, "fontWeight": 500, "lineHeight": "22px" } }, "i-button__text--small": { "": { "fontSize": 13, "lineHeight": "20px" } }, "i-button__text--default": { "": { "color": "#303133" } }, "i-button__text--plain-primary": { "": { "color": "#3c9cff" } }, "i-button__text--plain-success": { "": { "color": "#5ac725" } }, "i-button__text--plain-warning": { "": { "color": "#f9ae3d" } }, "i-button__text--plain-error": { "": { "color": "#f56c6c" } }, "i-button__text--plain-info": { "": { "color": "#909399" } }, "i-button__text--plain-default": { "": { "color": "#303133" } }, "i-button__text--disabled": { "": { "opacity": 0.9 } }, "i-button__icon": { "": { "marginRight": 6, "color": "#ffffff", "fontSize": 15, "lineHeight": "22px" } }, "i-button__icon--right": { "": { "marginRight": 0, "marginLeft": 6 } }, "i-button__loading": { "": { "marginRight": 6, "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.45)", "borderBottomColor": "rgba(255,255,255,0.45)", "borderLeftColor": "rgba(255,255,255,0.45)", "boxSizing": "border-box" } }, "i-button__loading--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button__text--loading": { "": { "opacity": 0.96 } }, "i-button__loading--muted": { "": { "borderTopColor": "#606266", "borderRightColor": "rgba(48,49,51,0.18)", "borderBottomColor": "rgba(48,49,51,0.18)", "borderLeftColor": "rgba(48,49,51,0.18)" } }, "i-button__loading--plain-primary": { "": { "borderTopColor": "#3c9cff" } }, "i-button__loading--plain-success": { "": { "borderTopColor": "#5ac725" } }, "i-button__loading--plain-warning": { "": { "borderTopColor": "#f9ae3d" } }, "i-button__loading--plain-error": { "": { "borderTopColor": "#f56c6c" } }, "i-button__loading--plain-info": { "": { "borderTopColor": "#909399" } } };
+  const __easycom_2$1 = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["styles", [_style_0$w]]]);
+  const _sfc_main$w = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form" }, { __name: "i-form", props: {
     modelValue: {
       type: Object,
       default() {
@@ -10090,9 +10186,66 @@
       ], 2);
     };
   } }));
-  const _style_0$s = { "i-form": { "": { "paddingTop": 4, "paddingRight": 0, "paddingBottom": 4, "paddingLeft": 0 } }, "i-form__message": { "": { "marginTop": 10, "fontSize": 13, "lineHeight": "20px" } }, "i-form__message--success": { "": { "color": "#19be6b" } }, "i-form__message--error": { "": { "color": "#fa3534" } }, "i-form__actions": { "": { "marginTop": 12, "flexDirection": "row", "justifyContent": "flex-end" } } };
-  const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["styles", [_style_0$s]]]);
+  const _style_0$v = { "i-form": { "": { "paddingTop": 4, "paddingRight": 0, "paddingBottom": 4, "paddingLeft": 0 } }, "i-form__message": { "": { "marginTop": 10, "fontSize": 13, "lineHeight": "20px" } }, "i-form__message--success": { "": { "color": "#19be6b" } }, "i-form__message--error": { "": { "color": "#fa3534" } }, "i-form__actions": { "": { "marginTop": 12, "flexDirection": "row", "justifyContent": "flex-end" } } };
+  const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["styles", [_style_0$v]]]);
   const _imports_0$2 = "/static/car_location.png";
+  const userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。";
+  const privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。";
+  const POST_LOGIN_INITIALIZATION_DELAY = 1200;
+  let pushServicesInitialized = false;
+  let pushServicesInitializationScheduled = false;
+  function startupLog(message) {
+    uni.__log__("log", "at services/app-startup.uts:16", "[AppStartup] " + message);
+  }
+  function hasLoginToken() {
+    const token = uni.getStorageSync("token");
+    return token != null && token.toString() != "";
+  }
+  function initializePushServices() {
+    pushServicesInitializationScheduled = false;
+    if (!hasLoginToken()) {
+      startupLog("当前未登录，跳过推送初始化");
+      return null;
+    }
+    if (pushServicesInitialized) {
+      markPushSessionAuthenticated();
+      clearPushBadge();
+      return null;
+    }
+    pushServicesInitialized = true;
+    startupLog("开始登录后的推送初始化");
+    initPushBinding();
+    initPush();
+    clearPushBadge();
+    markPushSessionAuthenticated();
+    startupLog("登录后的推送初始化已触发");
+  }
+  function schedulePostLoginInitialization() {
+    if (!hasLoginToken())
+      return null;
+    if (pushServicesInitialized) {
+      markPushSessionAuthenticated();
+      clearPushBadge();
+      return null;
+    }
+    if (pushServicesInitializationScheduled)
+      return null;
+    pushServicesInitializationScheduled = true;
+    startupLog("已安排登录后的推送初始化");
+    setTimeout(() => {
+      initializePushServices();
+    }, POST_LOGIN_INITIALIZATION_DELAY);
+  }
+  function refreshInitializedPushServices() {
+    if (!pushServicesInitialized)
+      return null;
+    refreshPushClientId();
+  }
+  function clearInitializedPushBadge() {
+    if (!pushServicesInitialized)
+      return null;
+    clearPushBadge();
+  }
   class UniVerifyPreLoginResult extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -10334,9 +10487,7 @@
       delete this.__props__;
     }
   }
-  const userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。";
-  const privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。";
-  const _sfc_main$s = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$v = /* @__PURE__ */ vue.defineComponent({
     __name: "login",
     setup(__props) {
       const docState = vue.ref(false);
@@ -10357,6 +10508,12 @@
         password: ""
       }));
       const deviceModel = vue.ref("");
+      const isAccountPasswordLoginReady = vue.computed(() => {
+        return form.value.username != "" && form.value.password != "";
+      });
+      const isSmsLoginReady = vue.computed(() => {
+        return smsMobile.value != "" && smsCode.value != "";
+      });
       const pswrules = [
         new UTSJSONObject({ name: "username", required: true, message: "请输入账号" }),
         new UTSJSONObject({ name: "password", required: true, message: "请输入密码" })
@@ -10374,7 +10531,7 @@
           form.value.password = account.getString("password", "");
           rememberPassword.value = form.value.username != "" || form.value.password != "";
         } catch (error) {
-          uni.__log__("error", "at pages/login/login.uvue:179", "加载保存的账号密码失败:", error);
+          uni.__log__("error", "at pages/login/login.uvue:189", "加载保存的账号密码失败:", error);
         }
       }
       const isPswLogin = () => {
@@ -10411,14 +10568,14 @@
       const getSystemInfo = () => {
         const res = uni.getSystemInfoSync();
         deviceModel.value = res.deviceModel;
-        uni.__log__("log", "at pages/login/login.uvue:222", "设备型号:", deviceModel.value);
+        uni.__log__("log", "at pages/login/login.uvue:232", "设备型号:", deviceModel.value);
       };
       const getLoginDeviceId = () => {
         var _a;
         try {
           return (_a = uni.getDeviceInfo().deviceId) !== null && _a !== void 0 ? _a : "";
         } catch (error) {
-          uni.__log__("warn", "at pages/login/login.uvue:229", "获取登录设备标识失败:", error);
+          uni.__log__("warn", "at pages/login/login.uvue:239", "获取登录设备标识失败:", error);
           return "";
         }
       };
@@ -10442,10 +10599,14 @@
           saveAccountPassword();
         uni.setStorageSync("token", token);
         resetTokenExpiredState();
-        markPushSessionAuthenticated();
         showAppToast({ title: "登录成功", icon: "success" });
         setTimeout(() => {
-          uni.reLaunch({ url: "/pages/index/index" });
+          uni.reLaunch({
+            url: "/pages/index/index",
+            success: () => {
+              schedulePostLoginInitialization();
+            }
+          });
         }, 500);
       };
       const ensureAgreementAccepted = () => {
@@ -10453,6 +10614,11 @@
           return true;
         showAppToast({ title: "请先阅读并同意用户协议", icon: "error" });
         return false;
+      };
+      const openPersonalPasswordLogin = () => {
+        uni.navigateTo({
+          url: "/pages/login/personal-password-login"
+        });
       };
       const openSmsLogin = () => {
         smsLoginMode.value = true;
@@ -10562,7 +10728,7 @@
               if (appVersion != "")
                 clientVersion = appVersion;
             } catch (error) {
-              uni.__log__("warn", "at pages/login/login.uvue:371", "获取应用版本失败，使用默认版本号:", error);
+              uni.__log__("warn", "at pages/login/login.uvue:391", "获取应用版本失败，使用默认版本号:", error);
             }
             const result = yield loginByUniVerify(clientVersion, getLoginDeviceId());
             if (result.ok) {
@@ -10587,25 +10753,25 @@
             return Promise.resolve(null);
           }
           try {
-            uni.__log__("log", "at pages/login/login.uvue:487", "准备验证表单...");
+            uni.__log__("log", "at pages/login/login.uvue:507", "准备验证表单...");
             if (!validateForm())
               return Promise.resolve(null);
-            uni.__log__("log", "at pages/login/login.uvue:489", "✅ 表单验证通过");
+            uni.__log__("log", "at pages/login/login.uvue:509", "✅ 表单验证通过");
             const newFormData = new UTSJSONObject({
               username: form.value.username,
               password: form.value.password,
               from: deviceModel.value,
               type: "USER"
             });
-            uni.__log__("log", "at pages/login/login.uvue:498", "📤 请求参数:", newFormData);
+            uni.__log__("log", "at pages/login/login.uvue:518", "📤 请求参数:", newFormData);
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "登录中...",
               mask: true
             }));
-            uni.__log__("log", "at pages/login/login.uvue:508", "🚀 开始调用 login 接口...");
+            uni.__log__("log", "at pages/login/login.uvue:528", "🚀 开始调用 login 接口...");
             const res = yield login(newFormData);
-            uni.__log__("log", "at pages/login/login.uvue:510", "✅ 登录接口返回:", res);
+            uni.__log__("log", "at pages/login/login.uvue:530", "✅ 登录接口返回:", res);
             loading.value = false;
             uni.hideLoading();
             const loginData = res.data;
@@ -10619,7 +10785,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/login/login.uvue:529", "❌ 登录失败:", error);
+            uni.__log__("error", "at pages/login/login.uvue:549", "❌ 登录失败:", error);
             loading.value = false;
             uni.hideLoading();
             if (error && error.message) {
@@ -10659,7 +10825,7 @@
         getSystemInfo();
         loadSavedAccount();
         prefetchUniVerify();
-        uni.__log__("log", "at pages/login/login.uvue:628", "pswLogin 初始值:", pswLogin.value);
+        uni.__log__("log", "at pages/login/login.uvue:600", "pswLogin 初始值:", pswLogin.value);
       });
       vue.onUnmounted(() => {
         stopSmsCooldown();
@@ -10668,10 +10834,10 @@
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
-        const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_3$1);
+        const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_5);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
         const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -10754,7 +10920,8 @@
                       vue.createVNode(_component_i_button, new UTSJSONObject({
                         type: "primary",
                         onClick: submit,
-                        loading: loading.value
+                        loading: loading.value,
+                        disabled: loading.value || !isAccountPasswordLoginReady.value
                       }), {
                         default: vue.withCtx(() => {
                           return [
@@ -10762,7 +10929,7 @@
                           ];
                         }),
                         _: 1
-                      }, 8, ["loading"])
+                      }, 8, ["loading", "disabled"])
                     ];
                   }),
                   _: 1
@@ -10781,11 +10948,15 @@
                     }),
                     _: 1
                   }, 8, ["loading"]),
-                  vue.createElementVNode("view", new UTSJSONObject({
-                    class: "phone-login-switch",
-                    onClick: openSmsLogin
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "phone-way" }), "验证码登录")
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "login-methods" }), [
+                    vue.createElementVNode("text", new UTSJSONObject({
+                      class: "phone-way",
+                      onClick: openPersonalPasswordLogin
+                    }), "账号密码登录"),
+                    vue.createElementVNode("text", new UTSJSONObject({
+                      class: "phone-way",
+                      onClick: openSmsLogin
+                    }), "验证码登录")
                   ])
                 ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 1 }), [
                   vue.createVNode(_component_i_form, null, {
@@ -10850,7 +11021,8 @@
                         vue.createVNode(_component_i_button, new UTSJSONObject({
                           type: "primary",
                           onClick: submitSmsLogin,
-                          loading: smsSubmitting.value
+                          loading: smsSubmitting.value,
+                          disabled: smsSubmitting.value || !isSmsLoginReady.value
                         }), {
                           default: vue.withCtx(() => {
                             return [
@@ -10858,7 +11030,7 @@
                             ];
                           }),
                           _: 1
-                        }, 8, ["loading"])
+                        }, 8, ["loading", "disabled"])
                       ];
                     }),
                     _: 1
@@ -10906,8 +11078,752 @@
       };
     }
   });
-  const _style_0$r = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "phone-login-switch": { ".container ": { "textAlign": "center", "marginTop": "28rpx" } }, "phone-way": { ".container .phone-login-switch ": { "fontSize": "25rpx", "color": "#8b8c8d" } }, "sms-mobile-item": { ".container ": { "marginBottom": "20rpx" } }, "sms-code-item": { ".container ": { "marginBottom": "32rpx" } }, "sms-code-input": { ".container ": { "width": "100%" } }, "sms-send-button": { ".container ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "20rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#007AFF", "color": "#ffffff", "fontSize": "24rpx", "whiteSpace": "nowrap" } }, "sms-send-button-disabled": { ".container ": { "backgroundColor": "#B8D7FF" } }, "sms-send-button-text": { ".container ": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
-  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["styles", [_style_0$r]]]);
+  const _style_0$u = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "phone-login-switch": { ".container ": { "textAlign": "center", "marginTop": "28rpx" } }, "login-methods": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "marginTop": "28rpx" } }, "phone-way": { ".container ": { "fontSize": "25rpx", "color": "#8b8c8d" } }, "sms-mobile-item": { ".container ": { "marginBottom": "20rpx" } }, "sms-code-item": { ".container ": { "marginBottom": "32rpx" } }, "sms-code-input": { ".container ": { "width": "100%" } }, "sms-send-button": { ".container ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "20rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#007AFF", "color": "#ffffff", "fontSize": "24rpx", "whiteSpace": "nowrap" } }, "sms-send-button-disabled": { ".container ": { "backgroundColor": "#B8D7FF" } }, "sms-send-button-text": { ".container ": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
+  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["styles", [_style_0$u]]]);
+  const _sfc_main$u = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-modal" }, { __name: "app-modal", setup(__props) {
+    const visible = vue.ref(false);
+    const contentNeedsScroll = vue.ref(false);
+    const scrollTop = vue.ref(0);
+    const options = vue.reactive(new UTSJSONObject({
+      title: "",
+      content: "",
+      showCancel: true,
+      confirmText: "确定",
+      cancelText: "取消"
+    }));
+    const show = (value) => {
+      var _a, _b, _c, _d, _e2;
+      options.title = (_a = value.title) !== null && _a !== void 0 ? _a : "";
+      options.content = (_b = value.content) !== null && _b !== void 0 ? _b : "";
+      options.showCancel = (_c = value.showCancel) !== null && _c !== void 0 ? _c : true;
+      options.confirmText = (_d = value.confirmText) !== null && _d !== void 0 ? _d : "确定";
+      options.cancelText = (_e2 = value.cancelText) !== null && _e2 !== void 0 ? _e2 : "取消";
+      options.success = value.success;
+      contentNeedsScroll.value = options.content.length > 260;
+      scrollTop.value = 0;
+      visible.value = true;
+    };
+    const close = (confirm) => {
+      const success = options.success;
+      visible.value = false;
+      options.success = null;
+      if (success != null) {
+        const result = new AppModalSuccess();
+        result.confirm = confirm;
+        result.cancel = !confirm;
+        success(result);
+      }
+    };
+    registerAppModalHandler(show);
+    vue.onUnmounted(() => {
+      unregisterAppModalHandler(show);
+    });
+    return (_ctx = null, _cache = null) => {
+      return visible.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+        key: 0,
+        class: "app-modal-mask"
+      }), [
+        vue.createElementVNode("view", new UTSJSONObject({
+          class: "app-modal",
+          onClick: _cache[2] || (_cache[2] = vue.withModifiers(() => {
+          }, ["stop"]))
+        }), [
+          options.title ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 0,
+            class: "app-modal-title"
+          }), vue.toDisplayString(options.title), 1)) : vue.createCommentVNode("", true),
+          contentNeedsScroll.value ? (vue.openBlock(), vue.createElementBlock("scroll-view", new UTSJSONObject({
+            key: 1,
+            class: "app-modal-content-scroll",
+            "scroll-y": "true",
+            "scroll-top": scrollTop.value,
+            "show-scrollbar": false
+          }), [
+            vue.createElementVNode("view", new UTSJSONObject({ class: "app-modal-content" }), [
+              vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-content-text" }), vue.toDisplayString(options.content), 1)
+            ])
+          ], 8, ["scroll-top"])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+            key: 2,
+            class: "app-modal-content"
+          }), [
+            vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-content-text" }), vue.toDisplayString(options.content), 1)
+          ])),
+          vue.createElementVNode("view", new UTSJSONObject({ class: "app-modal-footer" }), [
+            options.showCancel ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 0,
+              class: "app-modal-button app-modal-cancel",
+              onClick: _cache[0] || (_cache[0] = ($event = null) => {
+                return close(false);
+              })
+            }), [
+              vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-cancel-text" }), vue.toDisplayString(options.cancelText), 1)
+            ])) : vue.createCommentVNode("", true),
+            vue.createElementVNode("view", new UTSJSONObject({
+              class: "app-modal-button",
+              onClick: _cache[1] || (_cache[1] = ($event = null) => {
+                return close(true);
+              })
+            }), [
+              vue.createElementVNode("text", new UTSJSONObject({ class: "app-modal-confirm-text" }), vue.toDisplayString(options.confirmText), 1)
+            ])
+          ])
+        ])
+      ])) : vue.createCommentVNode("", true);
+    };
+  } }));
+  const _style_0$t = { "app-modal-mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "display": "flex", "justifyContent": "center", "alignItems": "center", "backgroundColor": "rgba(0,0,0,0.5)", "zIndex": 10075 } }, "app-modal": { "": { "width": "640rpx", "display": "flex", "flexDirection": "column", "backgroundColor": "#ffffff", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "overflow": "hidden" } }, "app-modal-title": { "": { "paddingTop": "36rpx", "paddingRight": "44rpx", "paddingBottom": "16rpx", "paddingLeft": "44rpx", "color": "#303133", "fontSize": "34rpx", "fontWeight": 600, "lineHeight": "48rpx", "textAlign": "center" } }, "app-modal-content-scroll": { "": { "height": "600rpx", "maxHeight": "600rpx", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0 } }, "app-modal-content": { "": { "paddingTop": "16rpx", "paddingRight": "44rpx", "paddingBottom": "36rpx", "paddingLeft": "44rpx" } }, "app-modal-content-text": { "": { "display": "flex", "width": "100%", "color": "#606266", "fontSize": "28rpx", "lineHeight": "44rpx", "textAlign": "left" } }, "app-modal-footer": { "": { "display": "flex", "flexDirection": "row", "minHeight": "96rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "app-modal-button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "app-modal-cancel": { "": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "app-modal-confirm-text": { "": { "fontSize": "30rpx", "fontWeight": 600, "color": "#2979ff" } }, "app-modal-cancel-text": { "": { "fontSize": "30rpx", "fontWeight": 600, "color": "#606266" } } };
+  const __easycom_7$1 = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["styles", [_style_0$t]]]);
+  class PersonalLoginForm extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            username: { type: String, optional: false },
+            password: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = PersonalLoginForm.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.username = this.__props__.username;
+      this.password = this.__props__.password;
+      delete this.__props__;
+    }
+  }
+  const _sfc_main$t = /* @__PURE__ */ vue.defineComponent({
+    __name: "personal-password-login",
+    setup(__props) {
+      const form = vue.ref(new PersonalLoginForm({
+        username: "",
+        password: ""
+      }));
+      const agreementAccepted = vue.ref(false);
+      const submitting = vue.ref(false);
+      const isLoginReady = vue.computed(() => {
+        return form.value.username != "" && form.value.password != "";
+      });
+      const rules = [
+        new UTSJSONObject({ name: "username", required: true, message: "请输入账号" }),
+        new UTSJSONObject({ name: "password", required: true, message: "请输入密码" })
+      ];
+      const toggleAgreement = () => {
+        agreementAccepted.value = !agreementAccepted.value;
+      };
+      const validateForm = () => {
+        if (form.value.username.length == 0) {
+          showAppToast({ title: "请输入账号", icon: "none" });
+          return false;
+        }
+        if (form.value.password.length == 0) {
+          showAppToast({ title: "请输入密码", icon: "none" });
+          return false;
+        }
+        if (!agreementAccepted.value) {
+          showAppToast({ title: "请先阅读并同意用户协议", icon: "none" });
+          return false;
+        }
+        return true;
+      };
+      const completeLogin = (token) => {
+        uni.setStorageSync("token", token);
+        resetTokenExpiredState();
+        showAppToast({ title: "登录成功", icon: "success" });
+        setTimeout(() => {
+          uni.reLaunch({
+            url: "/pages/index/index",
+            success: () => {
+              schedulePostLoginInitialization();
+            }
+          });
+        }, 500);
+      };
+      const submitLogin = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (submitting.value || !validateForm())
+            return Promise.resolve(null);
+          try {
+            submitting.value = true;
+            const response = yield personalPasswordLogin(new PersonalPasswordLoginRequest({
+              clientId: null,
+              tenantId: null,
+              username: form.value.username,
+              password: form.value.password
+            }));
+            const token = response.data != null ? response.data.getString("access_token", "") : "";
+            if (response.code == 200 && token != "") {
+              completeLogin(token);
+              return Promise.resolve(null);
+            }
+            showAppToast({ title: response.msg || "登录失败，请检查账号和密码", icon: "none" });
+          } catch (error) {
+            showAppToast({ title: "登录失败，请检查网络后重试", icon: "none" });
+          } finally {
+            submitting.value = false;
+          }
+        });
+      };
+      const goRegister = () => {
+        uni.navigateTo({ url: "/pages/login/register" });
+      };
+      const backToLogin = () => {
+        uni.navigateBack(new UTSJSONObject({
+          fail: () => {
+            uni.reLaunch({ url: "/pages/login/login" });
+          }
+        }));
+      };
+      const gotoAgreement = () => {
+        showAppModal(new UTSJSONObject({ title: "用户协议", content: userAgreement, showCancel: false }));
+      };
+      const gotoPrivacy = () => {
+        showAppModal(new UTSJSONObject({ title: "隐私政策", content: privacyPolicy, showCancel: false }));
+      };
+      return (_ctx = null, _cache = null) => {
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
+        const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
+        const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
+        const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3);
+        const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_5);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
+        const _component_app_modal = resolveEasycom(vue.resolveDynamicComponent("app-modal"), __easycom_7$1);
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
+            vue.createVNode(_component_custom_navBar, new UTSJSONObject({
+              title: "个人账号登录",
+              "show-back": true,
+              backgroundColor: "#fff",
+              textColor: "#333",
+              showCapsule: false
+            })),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "banner" }), [
+              vue.createElementVNode("image", new UTSJSONObject({
+                src: _imports_0$2,
+                class: "banner-image",
+                mode: "aspectFill"
+              })),
+              vue.createElementVNode("text", new UTSJSONObject({ class: "title" }), "车联网")
+            ]),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "content" }), [
+              vue.createVNode(_component_i_form, new UTSJSONObject({
+                modelValue: form.value,
+                rules,
+                labelDirection: "horizontal",
+                watchValidStatus: ""
+              }), {
+                default: vue.withCtx(() => {
+                  return [
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      name: "username",
+                      label: "",
+                      required: "",
+                      labelDirection: "horizontal",
+                      labelWidth: "0"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createVNode(_component_i_input, new UTSJSONObject({
+                            modelValue: form.value.username,
+                            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event = null) => {
+                              return form.value.username = $event;
+                            }),
+                            placeholder: "请输入账号",
+                            clearable: ""
+                          }), null, 8, ["modelValue"])
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      name: "password",
+                      label: "",
+                      required: "",
+                      labelDirection: "horizontal",
+                      labelWidth: "0"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createVNode(_component_i_input, new UTSJSONObject({
+                            modelValue: form.value.password,
+                            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event = null) => {
+                              return form.value.password = $event;
+                            }),
+                            placeholder: "请输入密码",
+                            type: "password",
+                            password: true
+                          }), null, 8, ["modelValue"])
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(_component_i_button, new UTSJSONObject({
+                      type: "primary",
+                      onClick: submitLogin,
+                      loading: submitting.value,
+                      disabled: !isLoginReady.value || submitting.value
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createTextVNode("登录")
+                        ];
+                      }),
+                      _: 1
+                    }, 8, ["loading", "disabled"])
+                  ];
+                }),
+                _: 1
+              }, 8, ["modelValue"]),
+              vue.createElementVNode("view", new UTSJSONObject({ class: "documents" }), [
+                vue.createVNode(_component_i_checkbox, new UTSJSONObject({
+                  checked: agreementAccepted.value,
+                  onChange: toggleAgreement
+                }), null, 8, ["checked"]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "doc-info-box" }), [
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "doc-text" }), "已阅读并同意"),
+                  vue.createElementVNode("text", new UTSJSONObject({
+                    class: "doc-link",
+                    onClick: gotoAgreement
+                  }), "《用户协议》"),
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "doc-text" }), "和"),
+                  vue.createElementVNode("text", new UTSJSONObject({
+                    class: "doc-link",
+                    onClick: gotoPrivacy
+                  }), "《隐私政策》")
+                ])
+              ])
+            ]),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "page-actions" }), [
+              vue.createElementVNode("text", new UTSJSONObject({
+                class: "action-link",
+                onClick: goRegister
+              }), "立即注册"),
+              vue.createElementVNode("text", new UTSJSONObject({ class: "action-divider" }), "|"),
+              vue.createElementVNode("text", new UTSJSONObject({
+                class: "action-link",
+                onClick: backToLogin
+              }), "返回其他登录方式")
+            ])
+          ]),
+          vue.createVNode(_component_app_toast),
+          vue.createVNode(_component_app_modal)
+        ], 64);
+      };
+    }
+  });
+  const _style_0$s = { "container": { "": { "backgroundColor": "#ffffff" } }, "banner": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "260rpx", "backgroundColor": "#ffffff" } }, "banner-image": { "": { "width": "180rpx", "height": "180rpx" } }, "title": { "": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { "": { "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "documents": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { "": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { "": { "fontSize": "28rpx" } }, "page-actions": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "marginTop": "40rpx" } }, "action-link": { "": { "fontSize": "26rpx", "color": "#8b8c8d" } }, "action-divider": { "": { "marginTop": 0, "marginRight": "28rpx", "marginBottom": 0, "marginLeft": "28rpx", "color": "#d9d9d9" } }, "i-form-item": { "": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
+  const PagesLoginPersonalPasswordLogin = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["styles", [_style_0$s]]]);
+  class RegisterForm extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            username: { type: String, optional: false },
+            password: { type: String, optional: false },
+            confirmPassword: { type: String, optional: false },
+            mobile: { type: String, optional: false },
+            smsCode: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = RegisterForm.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.username = this.__props__.username;
+      this.password = this.__props__.password;
+      this.confirmPassword = this.__props__.confirmPassword;
+      this.mobile = this.__props__.mobile;
+      this.smsCode = this.__props__.smsCode;
+      delete this.__props__;
+    }
+  }
+  const _sfc_main$s = /* @__PURE__ */ vue.defineComponent({
+    __name: "register",
+    setup(__props) {
+      const form = vue.ref(new RegisterForm({
+        username: "",
+        password: "",
+        confirmPassword: "",
+        mobile: "",
+        smsCode: ""
+      }));
+      const agreementAccepted = vue.ref(false);
+      const smsCooldown = vue.ref(0);
+      const smsSending = vue.ref(false);
+      const submitting = vue.ref(false);
+      let smsCooldownTimer = null;
+      const hasPasswordMismatch = vue.computed(() => {
+        return form.value.password != "" && form.value.confirmPassword != "" && form.value.password != form.value.confirmPassword;
+      });
+      const isRegisterReady = vue.computed(() => {
+        return form.value.username != "" && form.value.password != "" && form.value.confirmPassword != "" && form.value.mobile != "" && form.value.smsCode != "";
+      });
+      const rules = [
+        new UTSJSONObject({ name: "username", required: true, message: "请输入账号" }),
+        new UTSJSONObject({ name: "password", required: true, message: "请输入密码" }),
+        new UTSJSONObject({ name: "confirmPassword", required: true, message: "请再次输入密码" }),
+        new UTSJSONObject({ name: "mobile", required: true, message: "请输入手机号" }),
+        new UTSJSONObject({ name: "smsCode", required: true, message: "请输入验证码" })
+      ];
+      const toggleAgreement = () => {
+        agreementAccepted.value = !agreementAccepted.value;
+      };
+      const isValidMobile = () => {
+        if (!/^1[3-9]\d{9}$/.test(form.value.mobile)) {
+          showAppToast({ title: "请输入正确的手机号", icon: "none" });
+          return false;
+        }
+        return true;
+      };
+      const isValidSmsCode = () => {
+        if (!/^\d{4}$/.test(form.value.smsCode)) {
+          showAppToast({ title: "请输入4位验证码", icon: "none" });
+          return false;
+        }
+        return true;
+      };
+      const stopSmsCooldown = () => {
+        const timer = smsCooldownTimer;
+        if (timer != null) {
+          clearInterval(timer);
+          smsCooldownTimer = null;
+        }
+      };
+      const startSmsCooldown = () => {
+        stopSmsCooldown();
+        smsCooldown.value = 60;
+        smsCooldownTimer = setInterval(() => {
+          smsCooldown.value -= 1;
+          if (smsCooldown.value <= 0) {
+            smsCooldown.value = 0;
+            stopSmsCooldown();
+          }
+        }, 1e3);
+      };
+      const requestSmsCode = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (smsCooldown.value > 0 || smsSending.value)
+            return Promise.resolve(null);
+          if (form.value.mobile.length == 0) {
+            showAppToast({ title: "请输入手机号", icon: "none" });
+            return Promise.resolve(null);
+          }
+          if (!isValidMobile())
+            return Promise.resolve(null);
+          try {
+            smsSending.value = true;
+            const response = yield sendSmsRegisterCode(new SendSmsCodeRequest({
+              tenantId: null,
+              phonenumber: form.value.mobile
+            }));
+            if (response.code != 200) {
+              showAppToast({ title: response.msg || "验证码发送失败", icon: "none" });
+              return Promise.resolve(null);
+            }
+            startSmsCooldown();
+            showAppToast({ title: "验证码已发送", icon: "success" });
+          } catch (error) {
+            showAppToast({ title: "验证码发送失败，请检查网络", icon: "none" });
+          } finally {
+            smsSending.value = false;
+          }
+        });
+      };
+      const validateForm = () => {
+        if (form.value.username.length == 0) {
+          showAppToast({ title: "请输入账号", icon: "none" });
+          return false;
+        }
+        if (form.value.password.length == 0) {
+          showAppToast({ title: "请输入密码", icon: "none" });
+          return false;
+        }
+        if (form.value.confirmPassword.length == 0) {
+          showAppToast({ title: "请再次输入密码", icon: "none" });
+          return false;
+        }
+        if (form.value.password != form.value.confirmPassword) {
+          showAppToast({ title: "两次输入的密码不一致", icon: "none" });
+          return false;
+        }
+        if (form.value.mobile.length == 0) {
+          showAppToast({ title: "请输入手机号", icon: "none" });
+          return false;
+        }
+        if (!isValidMobile())
+          return false;
+        if (form.value.smsCode.length == 0) {
+          showAppToast({ title: "请输入验证码", icon: "none" });
+          return false;
+        }
+        if (!isValidSmsCode())
+          return false;
+        if (!agreementAccepted.value) {
+          showAppToast({ title: "请先阅读并同意用户协议", icon: "none" });
+          return false;
+        }
+        return true;
+      };
+      const submitRegister = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (submitting.value || !validateForm())
+            return Promise.resolve(null);
+          try {
+            submitting.value = true;
+            const response = yield registerPersonalUser(new RegisterRequest({
+              clientId: null,
+              tenantId: null,
+              username: form.value.username,
+              password: form.value.password,
+              confirmPassword: form.value.confirmPassword,
+              phonenumber: form.value.mobile,
+              smsCode: form.value.smsCode
+            }));
+            if (response.code != 200) {
+              showAppToast({ title: response.msg || "注册失败，请稍后重试", icon: "none" });
+              return Promise.resolve(null);
+            }
+            showAppToast({ title: response.msg || "注册成功，请登录", icon: "success" });
+            setTimeout(() => {
+              uni.navigateBack(new UTSJSONObject({
+                fail: () => {
+                  uni.reLaunch({ url: "/pages/login/personal-password-login" });
+                }
+              }));
+            }, 500);
+          } catch (error) {
+            showAppToast({ title: "注册失败，请检查网络后重试", icon: "none" });
+          } finally {
+            submitting.value = false;
+          }
+        });
+      };
+      const backToPersonalLogin = () => {
+        uni.navigateBack(new UTSJSONObject({
+          fail: () => {
+            uni.reLaunch({ url: "/pages/login/personal-password-login" });
+          }
+        }));
+      };
+      const gotoAgreement = () => {
+        showAppModal(new UTSJSONObject({ title: "用户协议", content: userAgreement, showCancel: false }));
+      };
+      const gotoPrivacy = () => {
+        showAppModal(new UTSJSONObject({ title: "隐私政策", content: privacyPolicy, showCancel: false }));
+      };
+      vue.onUnmounted(() => {
+        stopSmsCooldown();
+      });
+      return (_ctx = null, _cache = null) => {
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
+        const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
+        const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
+        const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3);
+        const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_5);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
+        const _component_app_modal = resolveEasycom(vue.resolveDynamicComponent("app-modal"), __easycom_7$1);
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
+            vue.createVNode(_component_custom_navBar, new UTSJSONObject({
+              title: "个人用户注册",
+              "show-back": true,
+              backgroundColor: "#fff",
+              textColor: "#333",
+              showCapsule: false
+            })),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "content" }), [
+              vue.createVNode(_component_i_form, new UTSJSONObject({
+                modelValue: form.value,
+                rules,
+                labelDirection: "horizontal",
+                watchValidStatus: ""
+              }), {
+                default: vue.withCtx(() => {
+                  return [
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      name: "username",
+                      label: "",
+                      required: "",
+                      labelDirection: "horizontal",
+                      labelWidth: "0"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createVNode(_component_i_input, new UTSJSONObject({
+                            modelValue: form.value.username,
+                            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event = null) => {
+                              return form.value.username = $event;
+                            }),
+                            placeholder: "请输入账号",
+                            clearable: ""
+                          }), null, 8, ["modelValue"])
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      name: "password",
+                      label: "",
+                      required: "",
+                      labelDirection: "horizontal",
+                      labelWidth: "0"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createVNode(_component_i_input, new UTSJSONObject({
+                            modelValue: form.value.password,
+                            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event = null) => {
+                              return form.value.password = $event;
+                            }),
+                            placeholder: "请输入密码",
+                            type: "password",
+                            password: true
+                          }), null, 8, ["modelValue"])
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      name: "confirmPassword",
+                      label: "",
+                      required: "",
+                      labelDirection: "horizontal",
+                      labelWidth: "0"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createVNode(_component_i_input, new UTSJSONObject({
+                            modelValue: form.value.confirmPassword,
+                            "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event = null) => {
+                              return form.value.confirmPassword = $event;
+                            }),
+                            placeholder: "请再次输入密码",
+                            type: "password",
+                            password: true
+                          }), null, 8, ["modelValue"]),
+                          hasPasswordMismatch.value ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                            key: 0,
+                            class: "password-mismatch-tip"
+                          }), "两次输入的密码不一致")) : vue.createCommentVNode("", true)
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      name: "mobile",
+                      label: "",
+                      required: "",
+                      labelDirection: "horizontal",
+                      labelWidth: "0"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createVNode(_component_i_input, new UTSJSONObject({
+                            modelValue: form.value.mobile,
+                            "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event = null) => {
+                              return form.value.mobile = $event;
+                            }),
+                            placeholder: "请输入手机号",
+                            type: "number",
+                            maxlength: 11,
+                            clearable: ""
+                          }), null, 8, ["modelValue"])
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      name: "smsCode",
+                      label: "",
+                      required: "",
+                      labelDirection: "horizontal",
+                      labelWidth: "0"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createVNode(_component_i_input, new UTSJSONObject({
+                            class: "sms-code-input",
+                            modelValue: form.value.smsCode,
+                            "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event = null) => {
+                              return form.value.smsCode = $event;
+                            }),
+                            placeholder: "请输入4位验证码",
+                            type: "number",
+                            maxlength: 4,
+                            clearable: ""
+                          }), {
+                            suffix: vue.withCtx(() => {
+                              return [
+                                vue.createElementVNode("view", new UTSJSONObject({
+                                  class: vue.normalizeClass(["sms-send-button", new UTSJSONObject({ "sms-send-button-disabled": smsCooldown.value > 0 || smsSending.value })]),
+                                  onClick: requestSmsCode
+                                }), [
+                                  vue.createElementVNode("text", new UTSJSONObject({ class: "sms-send-button-text" }), vue.toDisplayString(smsCooldown.value > 0 ? smsCooldown.value + "秒后重试" : "获取验证码"), 1)
+                                ], 2)
+                              ];
+                            }),
+                            _: 1
+                          }, 8, ["modelValue"])
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(_component_i_button, new UTSJSONObject({
+                      type: "primary",
+                      onClick: submitRegister,
+                      loading: submitting.value,
+                      disabled: !isRegisterReady.value || submitting.value
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createTextVNode("注册")
+                        ];
+                      }),
+                      _: 1
+                    }, 8, ["loading", "disabled"])
+                  ];
+                }),
+                _: 1
+              }, 8, ["modelValue"]),
+              vue.createElementVNode("view", new UTSJSONObject({ class: "documents" }), [
+                vue.createVNode(_component_i_checkbox, new UTSJSONObject({
+                  checked: agreementAccepted.value,
+                  onChange: toggleAgreement
+                }), null, 8, ["checked"]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "doc-info-box" }), [
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "doc-text" }), "已阅读并同意"),
+                  vue.createElementVNode("text", new UTSJSONObject({
+                    class: "doc-link",
+                    onClick: gotoAgreement
+                  }), "《用户协议》"),
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "doc-text" }), "和"),
+                  vue.createElementVNode("text", new UTSJSONObject({
+                    class: "doc-link",
+                    onClick: gotoPrivacy
+                  }), "《隐私政策》")
+                ])
+              ])
+            ]),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "login-link-box" }), [
+              vue.createElementVNode("text", new UTSJSONObject({
+                class: "login-link",
+                onClick: backToPersonalLogin
+              }), "已有账号？去登录")
+            ])
+          ]),
+          vue.createVNode(_component_app_toast),
+          vue.createVNode(_component_app_modal)
+        ], 64);
+      };
+    }
+  });
+  const _style_0$r = { "container": { "": { "backgroundColor": "#ffffff" } }, "content": { "": { "paddingTop": "50rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "sms-code-input": { "": { "width": "100%" } }, "password-mismatch-tip": { "": { "display": "flex", "marginTop": "8rpx", "color": "#f56c6c", "fontSize": "24rpx" } }, "sms-send-button": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "20rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#007AFF" } }, "sms-send-button-disabled": { "": { "backgroundColor": "#B8D7FF" } }, "sms-send-button-text": { "": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx", "whiteSpace": "nowrap" } }, "documents": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { "": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { "": { "fontSize": "28rpx" } }, "login-link-box": { "": { "display": "flex", "justifyContent": "center", "marginTop": "40rpx" } }, "login-link": { "": { "fontSize": "26rpx", "color": "#8b8c8d", "textAlign": "center" } }, "i-form-item": { "": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
+  const PagesLoginRegister = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["styles", [_style_0$r]]]);
   class PickerItem extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -12009,7 +12925,7 @@
         const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$1);
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -13122,7 +14038,7 @@
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
         const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -15421,8 +16337,8 @@
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
         const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$l);
-        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$1);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -15660,7 +16576,7 @@
       };
       return (_ctx = null, _cache = null) => {
         const _component_l_icon = vue.resolveComponent("l-icon");
-        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
+        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$1);
         return vue.openBlock(), vue.createBlock(_component_l_popup, new UTSJSONObject({
           modelValue: vue.unref(innerValue),
           "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event = null) => {
@@ -16360,7 +17276,7 @@
         const _component_map = vue.resolveComponent("map");
         const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -17085,10 +18001,10 @@
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
         const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$l);
-        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
+        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$1);
         const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
         const _component_i_tag = resolveEasycom(vue.resolveDynamicComponent("i-tag"), __easycom_1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "里程记录",
@@ -17349,9 +18265,9 @@
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
         const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$l);
-        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
+        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$1);
         const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -17563,7 +18479,7 @@
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -17753,7 +18669,7 @@
         const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
         const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -17946,7 +18862,7 @@
       };
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "车辆管理",
@@ -18187,7 +19103,7 @@
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -19817,7 +20733,7 @@
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_radio = resolveEasycom(vue.resolveDynamicComponent("i-radio"), __easycom_6);
         const _component_i_switch = resolveEasycom(vue.resolveDynamicComponent("i-switch"), __easycom_7);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -20380,7 +21296,7 @@
       });
       return (_ctx = null, _cache = null) => {
         const _component_camera = vue.resolveComponent("camera");
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ class: "container" }), [
           vue.createElementVNode("view", new UTSJSONObject({ class: "scancode-box" }), [
             cameraVisible.value ? (vue.openBlock(), vue.createBlock(_component_camera, new UTSJSONObject({
@@ -20507,7 +21423,7 @@
       });
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "续费管理",
@@ -20816,7 +21732,7 @@
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -21047,7 +21963,7 @@
       return (_ctx = null, _cache = null) => {
         const _component_web_view = vue.resolveComponent("web-view");
         const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "webview-container" }), [
             webviewUrl.value ? (vue.openBlock(), vue.createBlock(_component_web_view, new UTSJSONObject({
@@ -21404,7 +22320,7 @@
         const _component_map = vue.resolveComponent("map");
         const _component_i_tag = resolveEasycom(vue.resolveDynamicComponent("i-tag"), __easycom_1);
         const _component_indexListMode = resolveEasycom(vue.resolveDynamicComponent("indexListMode"), __easycom_2);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$H);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -21476,6 +22392,8 @@
   __definePage("pages/message/message", PagesMessageMessage);
   __definePage("pages/userCenter/userCenter", PagesUserCenterUserCenter);
   __definePage("pages/login/login", PagesLoginLogin);
+  __definePage("pages/login/personal-password-login", PagesLoginPersonalPasswordLogin);
+  __definePage("pages/login/register", PagesLoginRegister);
   __definePage("pages/carInfoDetail/carInfoDetail", PagesCarInfoDetailCarInfoDetail);
   __definePage("pages/addCar/addCar", PagesAddCarAddCar);
   __definePage("pages/playBack/playBack", PagesPlayBackPlayBack);
@@ -21495,22 +22413,22 @@
   __definePage("pages/deviceList/deviceList", PagesDeviceListDeviceList);
   const _sfc_main = vue.defineComponent({
     onLaunch: function() {
-      uni.__log__("log", "at App.uvue:77", "App onLaunch");
-      initPushBinding();
-      initPush();
-      clearPushBadge();
+      uni.__log__("log", "at App.uvue:80", "App onLaunch");
+      if (uni.getStorageSync("token") != null) {
+        schedulePostLoginInitialization();
+      }
     },
     onShow: function() {
-      uni.__log__("log", "at App.uvue:89", "App Show");
-      clearPushBadge();
-      refreshPushClientId();
+      uni.__log__("log", "at App.uvue:93", "App Show");
+      clearInitializedPushBadge();
+      refreshInitializedPushServices();
     },
     onHide: function() {
-      uni.__log__("log", "at App.uvue:94", "App Hide");
-      clearPushBadge();
+      uni.__log__("log", "at App.uvue:98", "App Hide");
+      clearInitializedPushBadge();
     },
     onExit: function() {
-      uni.__log__("log", "at App.uvue:116", "App Exit");
+      uni.__log__("log", "at App.uvue:120", "App Exit");
     }
   });
   const _style_0 = { "uni-row": { "": { "flexDirection": "row" } }, "uni-column": { "": { "flexDirection": "column" } } };
@@ -21544,6 +22462,18 @@
       path: "pages/login/login",
       style: new UTSJSONObject({
         navigationBarTitleText: "登陆"
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/login/personal-password-login",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "个人账号登录"
+      })
+    }),
+    new UTSJSONObject({
+      path: "pages/login/register",
+      style: new UTSJSONObject({
+        navigationBarTitleText: "个人用户注册"
       })
     }),
     new UTSJSONObject({

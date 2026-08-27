@@ -1,0 +1,13 @@
+{
+  "navigationBarTitleText": "个人用户注册",
+  "usingComponents": {
+    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
+    "i-input": "../../uni_modules/i-ui-x/components/i-input/i-input",
+    "i-form-item": "../../uni_modules/i-ui-x/components/i-form-item/i-form-item",
+    "i-button": "../../uni_modules/i-ui-x/components/i-button/i-button",
+    "i-form": "../../uni_modules/i-ui-x/components/i-form/i-form",
+    "i-checkbox": "../../uni_modules/i-ui-x/components/i-checkbox/i-checkbox",
+    "app-toast": "../../components/app-toast/app-toast",
+    "app-modal": "../../components/app-modal/app-modal"
+  }
+}

@@ -17,6 +17,7 @@ import io.dcloud.uniapp.extapi.getDeviceInfo as uni_getDeviceInfo
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
+import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
@@ -44,6 +45,14 @@ open class GenPagesLoginLogin : BasePage {
             val nativeLoginLoading = ref(false)
             val form = ref<FormData>(FormData(username = "", password = ""))
             val deviceModel = ref("")
+            val isAccountPasswordLoginReady = computed<Boolean>(fun(): Boolean {
+                return form.value.username != "" && form.value.password != ""
+            }
+            )
+            val isSmsLoginReady = computed<Boolean>(fun(): Boolean {
+                return smsMobile.value != "" && smsCode.value != ""
+            }
+            )
             val pswrules = _uA<UTSJSONObject>(_uO("name" to "username", "required" to true, "message" to "请输入账号"), _uO("name" to "password", "required" to true, "message" to "请输入密码"))
             val updateFormValid = fun(valid: Boolean): Unit {
                 formValid.value = valid
@@ -132,10 +141,12 @@ open class GenPagesLoginLogin : BasePage {
                 }
                 uni_setStorageSync("token", token)
                 resetTokenExpiredState()
-                markPushSessionAuthenticated()
                 showAppToast(ShowToastOptions(title = "登录成功", icon = "success"))
                 setTimeout(fun(){
-                    uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))
+                    uni_reLaunch(ReLaunchOptions(url = "/pages/index/index", success = fun(_){
+                        schedulePostLoginInitialization()
+                    }
+                    ))
                 }
                 , 500)
             }
@@ -145,6 +156,9 @@ open class GenPagesLoginLogin : BasePage {
                 }
                 showAppToast(ShowToastOptions(title = "请先阅读并同意用户协议", icon = "error"))
                 return false
+            }
+            val openPersonalPasswordLogin = fun(): Unit {
+                uni_navigateTo(NavigateToOptions(url = "/pages/login/personal-password-login"))
             }
             val openSmsLogin = fun(): Unit {
                 smsLoginMode.value = true
@@ -336,8 +350,6 @@ open class GenPagesLoginLogin : BasePage {
                         }
                 })
             }
-            val userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。"
-            val privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。"
             val gotoIndex = fun(){
                 uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))
             }
@@ -404,12 +416,13 @@ open class GenPagesLoginLogin : BasePage {
                                                     "checked"
                                                 ))
                                             )),
-                                            _cV(_component_i_button, _uM("type" to "primary", "onClick" to submit, "loading" to loading.value), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                            _cV(_component_i_button, _uM("type" to "primary", "onClick" to submit, "loading" to loading.value, "disabled" to (loading.value || !isAccountPasswordLoginReady.value)), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                                 return _uA(
                                                     "提交"
                                                 )
                                             }), "_" to 1), 8, _uA(
-                                                "loading"
+                                                "loading",
+                                                "disabled"
                                             ))
                                         )
                                     }), "_" to 1), 8, _uA(
@@ -427,8 +440,9 @@ open class GenPagesLoginLogin : BasePage {
                                             }), "_" to 1), 8, _uA(
                                                 "loading"
                                             )),
-                                            _cE("view", _uM("class" to "phone-login-switch", "onClick" to openSmsLogin), _uA(
-                                                _cE("text", _uM("class" to "phone-way"), "验证码登录")
+                                            _cE("view", _uM("class" to "login-methods"), _uA(
+                                                _cE("text", _uM("class" to "phone-way", "onClick" to openPersonalPasswordLogin), "账号密码登录"),
+                                                _cE("text", _uM("class" to "phone-way", "onClick" to openSmsLogin), "验证码登录")
                                             ))
                                         ))
                                     } else {
@@ -474,13 +488,14 @@ open class GenPagesLoginLogin : BasePage {
                                                         )
                                                     }
                                                     ), "_" to 1)),
-                                                    _cV(_component_i_button, _uM("type" to "primary", "onClick" to submitSmsLogin, "loading" to smsSubmitting.value), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                    _cV(_component_i_button, _uM("type" to "primary", "onClick" to submitSmsLogin, "loading" to smsSubmitting.value, "disabled" to (smsSubmitting.value || !isSmsLoginReady.value)), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                                         return _uA(
                                                             "手机号验证码登录"
                                                         )
                                                     }
                                                     ), "_" to 1), 8, _uA(
-                                                        "loading"
+                                                        "loading",
+                                                        "disabled"
                                                     ))
                                                 )
                                             }
@@ -527,7 +542,7 @@ open class GenPagesLoginLogin : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#ffffff")), "banner" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "height" to "20%")), "banner-image" to _uM(".container .banner " to _uM("width" to "180rpx", "height" to "180rpx")), "title" to _uM(".container .banner " to _uM("fontSize" to "40rpx", "fontWeight" to "bold", "color" to "#333333")), "content" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "70rpx", "paddingBottom" to "20rpx", "paddingLeft" to "70rpx")), "other-login" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "30rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "documents" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "marginTop" to "40rpx")), "doc-info-box" to _uM(".container .content .documents " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "whiteSpace" to "nowrap")), "doc-link" to _uM(".container .content .documents .doc-info-box " to _uM("color" to "#007AFF", "fontSize" to "28rpx")), "doc-text" to _uM(".container .content .documents .doc-info-box " to _uM("fontSize" to "28rpx")), "remember-password" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "20rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "i-checkbox" to _uM(".container .content .remember-password " to _uM("display" to "flex", "alignItems" to "center")), "other-way" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "25rpx", "marginTop" to "40rpx", "color" to "#999999")), "noLogin" to _uM(".container .other-way " to _uM("borderRightWidth" to "1rpx", "borderRightStyle" to "solid", "borderRightColor" to "#999999", "paddingRight" to "50rpx")), "BLogin" to _uM(".container .other-way " to _uM("paddingLeft" to "50rpx")), "wechat-login-btn" to _uM(".container " to _uM("!color" to "#ffffff")), "phone-login-switch" to _uM(".container " to _uM("textAlign" to "center", "marginTop" to "28rpx")), "phone-way" to _uM(".container .phone-login-switch " to _uM("fontSize" to "25rpx", "color" to "#8b8c8d")), "sms-mobile-item" to _uM(".container " to _uM("marginBottom" to "20rpx")), "sms-code-item" to _uM(".container " to _uM("marginBottom" to "32rpx")), "sms-code-input" to _uM(".container " to _uM("width" to "100%")), "sms-send-button" to _uM(".container " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "height" to "56rpx", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "20rpx", "borderTopLeftRadius" to "28rpx", "borderTopRightRadius" to "28rpx", "borderBottomRightRadius" to "28rpx", "borderBottomLeftRadius" to "28rpx", "backgroundColor" to "#007AFF", "color" to "#ffffff", "fontSize" to "24rpx", "whiteSpace" to "nowrap")), "sms-send-button-disabled" to _uM(".container " to _uM("backgroundColor" to "#B8D7FF")), "sms-send-button-text" to _uM(".container " to _uM("color" to "#ffffff", "fontSize" to "24rpx", "lineHeight" to "56rpx")), "i-form-item" to _uM(".container " to _uM("paddingTop" to 12, "paddingRight" to 0, "paddingBottom" to 12, "paddingLeft" to 0)))
+                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#ffffff")), "banner" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "height" to "20%")), "banner-image" to _uM(".container .banner " to _uM("width" to "180rpx", "height" to "180rpx")), "title" to _uM(".container .banner " to _uM("fontSize" to "40rpx", "fontWeight" to "bold", "color" to "#333333")), "content" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "70rpx", "paddingBottom" to "20rpx", "paddingLeft" to "70rpx")), "other-login" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "30rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "documents" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "marginTop" to "40rpx")), "doc-info-box" to _uM(".container .content .documents " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "whiteSpace" to "nowrap")), "doc-link" to _uM(".container .content .documents .doc-info-box " to _uM("color" to "#007AFF", "fontSize" to "28rpx")), "doc-text" to _uM(".container .content .documents .doc-info-box " to _uM("fontSize" to "28rpx")), "remember-password" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "20rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "i-checkbox" to _uM(".container .content .remember-password " to _uM("display" to "flex", "alignItems" to "center")), "other-way" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "25rpx", "marginTop" to "40rpx", "color" to "#999999")), "noLogin" to _uM(".container .other-way " to _uM("borderRightWidth" to "1rpx", "borderRightStyle" to "solid", "borderRightColor" to "#999999", "paddingRight" to "50rpx")), "BLogin" to _uM(".container .other-way " to _uM("paddingLeft" to "50rpx")), "wechat-login-btn" to _uM(".container " to _uM("!color" to "#ffffff")), "phone-login-switch" to _uM(".container " to _uM("textAlign" to "center", "marginTop" to "28rpx")), "login-methods" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "marginTop" to "28rpx")), "phone-way" to _uM(".container " to _uM("fontSize" to "25rpx", "color" to "#8b8c8d")), "sms-mobile-item" to _uM(".container " to _uM("marginBottom" to "20rpx")), "sms-code-item" to _uM(".container " to _uM("marginBottom" to "32rpx")), "sms-code-input" to _uM(".container " to _uM("width" to "100%")), "sms-send-button" to _uM(".container " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "height" to "56rpx", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "20rpx", "borderTopLeftRadius" to "28rpx", "borderTopRightRadius" to "28rpx", "borderBottomRightRadius" to "28rpx", "borderBottomLeftRadius" to "28rpx", "backgroundColor" to "#007AFF", "color" to "#ffffff", "fontSize" to "24rpx", "whiteSpace" to "nowrap")), "sms-send-button-disabled" to _uM(".container " to _uM("backgroundColor" to "#B8D7FF")), "sms-send-button-text" to _uM(".container " to _uM("color" to "#ffffff", "fontSize" to "24rpx", "lineHeight" to "56rpx")), "i-form-item" to _uM(".container " to _uM("paddingTop" to 12, "paddingRight" to 0, "paddingBottom" to 12, "paddingLeft" to 0)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

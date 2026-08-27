@@ -369,6 +369,9 @@ function consumePendingMessageId() {
 function consumePushStaleFlag() {
   return pushManager.consumeStaleFlag();
 }
+function getCachedPushRegistrationId() {
+  return pushManager.getCachedRegistrationId();
+}
 function onPushRegistrationIdReady(listener) {
   pushRegistrationIdReadyListeners.push(listener);
 }
@@ -378,6 +381,7 @@ function onPushSessionAuthenticated(listener) {
 exports.clearPushSessionState = clearPushSessionState;
 exports.consumePendingMessageId = consumePendingMessageId;
 exports.consumePushStaleFlag = consumePushStaleFlag;
+exports.getCachedPushRegistrationId = getCachedPushRegistrationId;
 exports.onPushRegistrationIdReady = onPushRegistrationIdReady;
 exports.onPushSessionAuthenticated = onPushSessionAuthenticated;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/services/push.js.map

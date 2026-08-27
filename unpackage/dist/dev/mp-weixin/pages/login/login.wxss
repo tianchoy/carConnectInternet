@@ -28,53 +28,6 @@
 .container[class].data-v-27a30816 {
   height: 100%;
   background-color: #fff;
-  /*
-   * 短信验证码登录功能暂时停用。
-   *
-  .phone-login-switch {
-  	text-align: center;
-  	margin-top: 28rpx;
-  	.phone-way{
-  		font-size: 25rpx;
-  		color: #8b8c8d;
-  	}
-  }
-
-  .sms-mobile-item {
-  	margin-bottom: 20rpx;
-  }
-
-  .sms-code-item {
-  	margin-bottom: 32rpx;
-  }
-
-  .sms-code-input {
-  	width: 100%;
-  }
-
-  .sms-send-button {
-  	display: flex;
-  	align-items: center;
-  	justify-content: center;
-  	height: 56rpx;
-  	padding: 0 20rpx;
-  	border-radius: 28rpx;
-  	background-color: #007AFF;
-  	color: #fff;
-  	font-size: 24rpx;
-  	white-space: nowrap;
-  }
-
-  .sms-send-button-disabled {
-  	background-color: #B8D7FF;
-  }
-
-  .sms-send-button-text {
-  	color: #fff;
-  	font-size: 24rpx;
-  	line-height: 56rpx;
-  }
-  */
 }
 .container .banner[class].data-v-27a30816 {
   background-color: #fff;
@@ -155,6 +108,49 @@
 }
 .container .wechat-login-btn[class].data-v-27a30816 {
   color: #fff !important;
+}
+.container .phone-login-switch[class].data-v-27a30816 {
+  text-align: center;
+  margin-top: 28rpx;
+}
+.container .login-methods[class].data-v-27a30816 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 28rpx;
+}
+.container .phone-way[class].data-v-27a30816 {
+  font-size: 25rpx;
+  color: #8b8c8d;
+}
+.container .sms-mobile-item[class].data-v-27a30816 {
+  margin-bottom: 20rpx;
+}
+.container .sms-code-item[class].data-v-27a30816 {
+  margin-bottom: 32rpx;
+}
+.container .sms-code-input[class].data-v-27a30816 {
+  width: 100%;
+}
+.container .sms-send-button[class].data-v-27a30816 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 20rpx;
+  border-radius: 28rpx;
+  background-color: #007AFF;
+  color: #fff;
+  font-size: 24rpx;
+  white-space: nowrap;
+}
+.container .sms-send-button-disabled[class].data-v-27a30816 {
+  background-color: #B8D7FF;
+}
+.container .sms-send-button-text[class].data-v-27a30816 {
+  color: #fff;
+  font-size: 24rpx;
+  line-height: 56rpx;
 }
 .container.data-v-27a30816 .i-form-item[class] {
   padding: 12px 0;

@@ -300,6 +300,15 @@ function post(url, data = new common_vendor.UTSJSONObject({}), options = new Req
     showError: options.showError
   }));
 }
+function postSilently(url, data = null) {
+  return request(new common_vendor.UTSJSONObject({
+    url,
+    method: "POST",
+    data,
+    showLoading: false,
+    showError: false
+  }));
+}
 function put(url, data = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
   url: null,
   method: null,
@@ -336,6 +345,7 @@ function remove(url, data = new common_vendor.UTSJSONObject({}), options = new R
 }
 exports.get = get;
 exports.post = post;
+exports.postSilently = postSilently;
 exports.put = put;
 exports.remove = remove;
 exports.resetTokenExpiredState = resetTokenExpiredState;

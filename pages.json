@@ -31,6 +31,18 @@
 			}
 		},
 		{
+			"path": "pages/login/personal-password-login",
+			"style": {
+				"navigationBarTitleText": "个人账号登录"
+			}
+		},
+		{
+			"path": "pages/login/register",
+			"style": {
+				"navigationBarTitleText": "个人用户注册"
+			}
+		},
+		{
 			"path": "pages/carInfoDetail/carInfoDetail",
 			"style": {
 				"navigationBarTitleText": "车辆详情"

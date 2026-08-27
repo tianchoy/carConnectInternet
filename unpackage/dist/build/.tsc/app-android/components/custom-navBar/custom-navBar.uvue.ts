@@ -66,9 +66,9 @@ const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
 
   return _cE(Fragment, null, [
     _cE("view", _uM({
-      style: _nS(_ctx.isShowStyle?_uM({ height: unref(statusBarHeight) + 'px','background-color':'#f1f1f1',position:'fixed',width:'100%',letf:0,top:0,'z-index':'100'})
+      style: _nS(_ctx.isShowStyle?_uM({ height: unref(statusBarHeight) + 'px','background-color':'#ffffff',position:'fixed',width:'100%',letf:0,top:0,'z-index':'100'})
 		:
-		_uM({ height: unref(statusBarHeight) + 'px','background-color':'#f1f1f1',}) )
+		_uM({ height: unref(statusBarHeight) + 'px','background-color':'#ffffff',}) )
     }), null, 4 /* STYLE */),
     _cE("view", _uM({
       class: "navbar",

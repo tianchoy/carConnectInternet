@@ -10,10 +10,10 @@ const userinfo = '/sys/user/info'
 const addDeviceUrl = '/userDevice/add'
 const userDeviceList = '/userDevice/list'
 const wechatLogin = '/authLogin'
-// 后端待实现的示例接口：Uni Verify 服务端换号并签发业务 token 后可按正式约定替换。
-const uniVerifyLoginUrl = '/auth/login'
+// 个人一键、短信验证码和账号密码登录均通过 grantType 区分。
+const authLoginUrl = '/auth/login'
 const smsSendCodeUrl = '/resource/sms/code'
-const smsLoginUrl = '/auth/login'
+const registerUrl = '/auth/register'
 const smsClientId = '428a8310cd442757ae699df5d894f051'
 const defaultTenantId = '000000'
 const changePSW = '/sys/user/password'
@@ -50,6 +50,8 @@ export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject 
 export type UniVerifyLoginRequest = UTSJSONObject
 export type SendSmsCodeRequest = { phonenumber: string, tenantId?: string }
 export type SmsLoginRequest = { phonenumber: string, smsCode: string, deviceId: string, clientId?: string, tenantId?: string }
+export type PersonalPasswordLoginRequest = { username: string, password: string, clientId?: string, tenantId?: string }
+export type RegisterRequest = { username: string, password: string, confirmPassword: string, phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
 export type DevicePositionResponse = { code: number, msg: string, data: Array<UTSJSONObject> }
 export type TrackPosResponse = { code: number, msg: string, data: UTSJSONObject }
 export type UserInfoResponse = { code: number, msg: string, data: UTSJSONObject }
@@ -169,11 +171,36 @@ export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListRe
 export const PostWechatlogin = (data: UTSJSONObject): Promise<JsonDataResponse> => post(wechatLogin, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 
 // 后端待实现的示例接口：服务端必须使用 openId/accessToken 换取手机号，前端不可上传手机号作为一键登录凭据。
-export const uniVerifyLogin = (data: UniVerifyLoginRequest): Promise<JsonDataResponse> => post(uniVerifyLoginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const uniVerifyLogin = (data: UniVerifyLoginRequest): Promise<JsonDataResponse> => post(authLoginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 export const sendSmsLoginCode = (data: SendSmsCodeRequest): Promise<BasicResponse> => get(smsSendCodeUrl, {
     phonenumber: data.phonenumber,
     tenantId: data.tenantId != null ? data.tenantId : defaultTenantId
 } as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const sendSmsRegisterCode = (data: SendSmsCodeRequest): Promise<BasicResponse> => get(smsSendCodeUrl, {
+    phonenumber: data.phonenumber,
+    tenantId: data.tenantId != null ? data.tenantId : defaultTenantId,
+    scene: 'register'
+} as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const personalPasswordLogin = (data: PersonalPasswordLoginRequest): Promise<JsonDataResponse> => {
+    const requestData = new UTSJSONObject()
+    requestData.set('grantType', 'password')
+    requestData.set('username', data.username)
+    requestData.set('password', data.password)
+    requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
+    requestData.set('clientId', data.clientId != null ? data.clientId : smsClientId)
+    return post(authLoginUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+}
+export const registerPersonalUser = (data: RegisterRequest): Promise<BasicResponse> => {
+    const requestData = new UTSJSONObject()
+    requestData.set('username', data.username)
+    requestData.set('password', data.password)
+    requestData.set('confirmPassword', data.confirmPassword)
+    requestData.set('phonenumber', data.phonenumber)
+    requestData.set('smsCode', data.smsCode)
+    requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
+    requestData.set('clientId', data.clientId != null ? data.clientId : smsClientId)
+    return post(registerUrl, requestData).then((raw: any): BasicResponse => { return basicResponse(raw) })
+}
 export const smsLogin = (data: SmsLoginRequest): Promise<JsonDataResponse> => {
     const requestData = new UTSJSONObject()
     requestData.set('clientId', data.clientId != null ? data.clientId : smsClientId)
@@ -182,7 +209,7 @@ export const smsLogin = (data: SmsLoginRequest): Promise<JsonDataResponse> => {
     requestData.set('phonenumber', data.phonenumber)
     requestData.set('smsCode', data.smsCode)
     requestData.set('device_id', data.deviceId)
-    return post(smsLoginUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+    return post(authLoginUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 }
 export const changePassWord = (data: UTSJSONObject): Promise<ChangePasswordResponse> => put(changePSW, data).then((raw: any): ChangePasswordResponse => { return changePasswordResponse(raw) })
 export const getUserMsgList = (data?: UTSJSONObject): Promise<MessageResponse> => (data != null ? get(userMsgList, data) : get(userMsgList)).then((raw: any): MessageResponse => {

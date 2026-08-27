@@ -9,6 +9,11 @@ const userinfo = "/sys/user/info";
 const addDeviceUrl = "/userDevice/add";
 const userDeviceList = "/userDevice/list";
 const wechatLogin = "/authLogin";
+const authLoginUrl = "/auth/login";
+const smsSendCodeUrl = "/resource/sms/code";
+const registerUrl = "/auth/register";
+const smsClientId = "428a8310cd442757ae699df5d894f051";
+const defaultTenantId = "000000";
 const changePSW = "/sys/user/password";
 const userMsgList = "/usermessage/listForUser";
 const msgState = "/usermessage/detail/";
@@ -26,6 +31,7 @@ const deleteDevice = "/userDevice/del";
 const cmdActionUrl = "/command/cmdAction";
 const cmdByMidUrl = "/command/cmdByMid";
 const cmdSendUrl = "/command/sendCmd";
+const pushUnbindUrl = "/app/push/unbind";
 class BasicResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -92,6 +98,110 @@ class JsonDataResponse extends common_vendor.UTS.UTSType {
     this.code = this.__props__.code;
     this.msg = this.__props__.msg;
     this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
+class SendSmsCodeRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          phonenumber: { type: String, optional: false },
+          tenantId: { type: String, optional: true }
+        };
+      },
+      name: "SendSmsCodeRequest"
+    };
+  }
+  constructor(options, metadata = SendSmsCodeRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.phonenumber = this.__props__.phonenumber;
+    this.tenantId = this.__props__.tenantId;
+    delete this.__props__;
+  }
+}
+class SmsLoginRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          phonenumber: { type: String, optional: false },
+          smsCode: { type: String, optional: false },
+          deviceId: { type: String, optional: false },
+          clientId: { type: String, optional: true },
+          tenantId: { type: String, optional: true }
+        };
+      },
+      name: "SmsLoginRequest"
+    };
+  }
+  constructor(options, metadata = SmsLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.phonenumber = this.__props__.phonenumber;
+    this.smsCode = this.__props__.smsCode;
+    this.deviceId = this.__props__.deviceId;
+    this.clientId = this.__props__.clientId;
+    this.tenantId = this.__props__.tenantId;
+    delete this.__props__;
+  }
+}
+class PersonalPasswordLoginRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          username: { type: String, optional: false },
+          password: { type: String, optional: false },
+          clientId: { type: String, optional: true },
+          tenantId: { type: String, optional: true }
+        };
+      },
+      name: "PersonalPasswordLoginRequest"
+    };
+  }
+  constructor(options, metadata = PersonalPasswordLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.username = this.__props__.username;
+    this.password = this.__props__.password;
+    this.clientId = this.__props__.clientId;
+    this.tenantId = this.__props__.tenantId;
+    delete this.__props__;
+  }
+}
+class RegisterRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          username: { type: String, optional: false },
+          password: { type: String, optional: false },
+          confirmPassword: { type: String, optional: false },
+          phonenumber: { type: String, optional: false },
+          smsCode: { type: String, optional: false },
+          clientId: { type: String, optional: true },
+          tenantId: { type: String, optional: true }
+        };
+      },
+      name: "RegisterRequest"
+    };
+  }
+  constructor(options, metadata = RegisterRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.username = this.__props__.username;
+    this.password = this.__props__.password;
+    this.confirmPassword = this.__props__.confirmPassword;
+    this.phonenumber = this.__props__.phonenumber;
+    this.smsCode = this.__props__.smsCode;
+    this.clientId = this.__props__.clientId;
+    this.tenantId = this.__props__.tenantId;
     delete this.__props__;
   }
 }
@@ -510,6 +620,39 @@ const PostWechatlogin = (data) => {
     return jsonDataResponse(raw);
   });
 };
+const sendSmsRegisterCode = (data) => {
+  return api_http.get(smsSendCodeUrl, new common_vendor.UTSJSONObject({
+    phonenumber: data.phonenumber,
+    tenantId: data.tenantId != null ? data.tenantId : defaultTenantId,
+    scene: "register"
+  })).then((raw = null) => {
+    return basicResponse(raw);
+  });
+};
+const personalPasswordLogin = (data) => {
+  const requestData = new common_vendor.UTSJSONObject();
+  requestData.set("grantType", "password");
+  requestData.set("username", data.username);
+  requestData.set("password", data.password);
+  requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
+  requestData.set("clientId", data.clientId != null ? data.clientId : smsClientId);
+  return api_http.post(authLoginUrl, requestData).then((raw = null) => {
+    return jsonDataResponse(raw);
+  });
+};
+const registerPersonalUser = (data) => {
+  const requestData = new common_vendor.UTSJSONObject();
+  requestData.set("username", data.username);
+  requestData.set("password", data.password);
+  requestData.set("confirmPassword", data.confirmPassword);
+  requestData.set("phonenumber", data.phonenumber);
+  requestData.set("smsCode", data.smsCode);
+  requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
+  requestData.set("clientId", data.clientId != null ? data.clientId : smsClientId);
+  return api_http.post(registerUrl, requestData).then((raw = null) => {
+    return basicResponse(raw);
+  });
+};
 const changePassWord = (data) => {
   return api_http.put(changePSW, data).then((raw = null) => {
     return changePasswordResponse(raw);
@@ -594,7 +737,15 @@ const sendCmd = (data) => {
     return new SendCmdResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response), data: response.getString("data", "") });
   });
 };
+const unbindPushDevice = (registrationId) => {
+  return api_http.postSilently(pushUnbindUrl + "?registrationId=" + encodeURIComponent(registrationId), new common_vendor.UTSJSONObject()).then((raw = null) => {
+    return basicResponse(raw);
+  });
+};
+exports.PersonalPasswordLoginRequest = PersonalPasswordLoginRequest;
 exports.PostWechatlogin = PostWechatlogin;
+exports.RegisterRequest = RegisterRequest;
+exports.SendSmsCodeRequest = SendSmsCodeRequest;
 exports.addDevice = addDevice;
 exports.addGeofence = addGeofence;
 exports.bindDevices = bindDevices;
@@ -615,9 +766,13 @@ exports.getUserInfo = getUserInfo;
 exports.getUserMsgList = getUserMsgList;
 exports.login = login;
 exports.logout = logout;
+exports.personalPasswordLogin = personalPasswordLogin;
+exports.registerPersonalUser = registerPersonalUser;
 exports.sendCmd = sendCmd;
 exports.sendCommand = sendCommand;
+exports.sendSmsRegisterCode = sendSmsRegisterCode;
 exports.setMsgState = setMsgState;
 exports.unbindDevices = unbindDevices;
+exports.unbindPushDevice = unbindPushDevice;
 exports.updateGeofence = updateGeofence;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

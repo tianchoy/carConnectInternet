@@ -1,11 +1,12 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
+const api_request = require("../../api/request.js");
 const utils_toast = require("../../utils/toast.js");
 const utils_modal = require("../../utils/modal.js");
-require("../../services/push.js");
+const utils_legal = require("../../utils/legal.js");
+const services_appStartup = require("../../services/app-startup.js");
 const api_http = require("../../api/http.js");
-const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
@@ -70,52 +71,6 @@ class SavedAccount extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-const userAgreement = `
-欢迎使用车联网平台！
-
-一、服务条款的确认和接纳
-本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。
-
-二、服务内容
-1. 车联网平台提供车辆管理、远程控制、数据分析等服务。
-2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。
-
-三、用户账号
-用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。
-
-四、用户隐私保护
-保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。
-
-五、免责声明
-1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。
-2. 对于因不可抗力造成的服务中断，平台不承担责任。
-
-六、法律适用
-本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。
-
-如有任何疑问，请联系我们。`;
-const privacyPolicy = `
-车联网平台非常重视您的隐私保护！
-
-一、信息收集
-1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。
-2. 我们会在您注册、使用服务时收集必要的信息。
-
-二、信息使用
-1. 我们使用收集的信息来提供、维护和改进服务。
-2. 我们不会向第三方出售或分享您的个人信息。
-
-三、信息保护
-1. 我们采用行业标准的安全措施保护您的信息。
-2. 我们会定期评估安全措施的有效性。
-
-四、未成年人保护
-我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。
-
-五、政策更新
-我们可能会更新隐私政策，更新后的政策将在平台公布。
-
-如有任何隐私问题，请联系我们。`;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "login",
   setup(__props) {
@@ -125,11 +80,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const formValid = common_vendor.ref(false);
     const loading = common_vendor.ref(false);
     common_vendor.ref(false);
+    const smsMobile = common_vendor.ref("");
+    const smsCode = common_vendor.ref("");
+    common_vendor.ref(0);
+    common_vendor.ref(false);
+    common_vendor.ref(false);
+    common_vendor.ref(false);
     const form = common_vendor.ref(new FormData({
       username: "",
       password: ""
     }));
     const deviceModel = common_vendor.ref("");
+    const isAccountPasswordLoginReady = common_vendor.computed(() => {
+      return form.value.username != "" && form.value.password != "";
+    });
+    common_vendor.computed(() => {
+      return smsMobile.value != "" && smsCode.value != "";
+    });
     const pswrules = [
       new common_vendor.UTSJSONObject({ name: "username", required: true, message: "请输入账号" }),
       new common_vendor.UTSJSONObject({ name: "password", required: true, message: "请输入密码" })
@@ -147,7 +114,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         form.value.password = account.getString("password", "");
         rememberPassword.value = form.value.username != "" || form.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.uvue:184", "加载保存的账号密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/login/login.uvue:189", "加载保存的账号密码失败:", error);
       }
     }
     const isPswLogin = () => {
@@ -184,7 +151,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
       deviceModel.value = res.deviceModel;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:227", "设备型号:", deviceModel.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:232", "设备型号:", deviceModel.value);
     };
     const validateForm = () => {
       if (form.value.username.length == 0) {
@@ -208,7 +175,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       api_http.resetTokenExpiredState();
       utils_toast.showAppToast({ title: "登录成功", icon: "success" });
       setTimeout(() => {
-        common_vendor.index.reLaunch({ url: "/pages/index/index" });
+        common_vendor.index.reLaunch({
+          url: "/pages/index/index",
+          success: () => {
+            services_appStartup.schedulePostLoginInitialization();
+          }
+        });
       }, 500);
     };
     const loginBt = () => {
@@ -275,7 +247,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           completeLogin(token, false);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:445", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:482", "微信登录失败:", error);
           utils_toast.showAppToast({
             title: "微信登录失败",
             icon: "none"
@@ -295,25 +267,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         }
         try {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:470", "准备验证表单...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:507", "准备验证表单...");
           if (!validateForm())
             return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:472", "✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:509", "✅ 表单验证通过");
           const newFormData = new common_vendor.UTSJSONObject({
             username: form.value.username,
             password: form.value.password,
             from: deviceModel.value,
             type: "USER"
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:481", "📤 请求参数:", newFormData);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:518", "📤 请求参数:", newFormData);
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "登录中...",
             mask: true
           }));
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:491", "🚀 开始调用 login 接口...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:528", "🚀 开始调用 login 接口...");
           const res = yield api_request.login(newFormData);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:493", "✅ 登录接口返回:", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:530", "✅ 登录接口返回:", res);
           loading.value = false;
           common_vendor.index.hideLoading();
           const loginData = res.data;
@@ -327,7 +299,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:512", "❌ 登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:549", "❌ 登录失败:", error);
           loading.value = false;
           common_vendor.index.hideLoading();
           if (error && error.message) {
@@ -352,21 +324,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const gotoAgreement = () => {
       utils_modal.showAppModal(new common_vendor.UTSJSONObject({
         title: "用户协议",
-        content: userAgreement,
+        content: utils_legal.userAgreement,
         showCancel: false
       }));
     };
     const gotoPrivacy = () => {
       utils_modal.showAppModal(new common_vendor.UTSJSONObject({
         title: "隐私政策",
-        content: privacyPolicy,
+        content: utils_legal.privacyPolicy,
         showCancel: false
       }));
     };
     common_vendor.onMounted(() => {
       getSystemInfo();
       loadSavedAccount();
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:611", "pswLogin 初始值:", pswLogin.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:600", "pswLogin 初始值:", pswLogin.value);
+    });
+    common_vendor.onUnmounted(() => {
     });
     return (_ctx, _cache) => {
       "raw js";
@@ -428,6 +402,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         n: common_vendor.p({
           type: "primary",
           loading: loading.value,
+          disabled: loading.value || !isAccountPasswordLoginReady.value,
           class: "data-v-27a30816"
         }),
         o: common_vendor.o(updateFormValid, "00"),
@@ -441,22 +416,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : common_vendor.e({
         q: !docState.value
       }, !docState.value ? {
-        r: common_vendor.o(loginBt, "85")
+        r: common_vendor.o(loginBt, "8b")
       } : {}, {
         s: docState.value
       }, docState.value ? {
-        t: common_vendor.o(handleGetPhoneNumber, "7c")
+        t: common_vendor.o(handleGetPhoneNumber, "d0")
       } : {}), {
-        v: common_vendor.o(isDocState, "13"),
+        v: common_vendor.o(isDocState, "ad"),
         w: common_vendor.p({
           checked: docState.value,
           class: "data-v-27a30816"
         }),
-        x: common_vendor.o(gotoAgreement, "bb"),
-        y: common_vendor.o(gotoPrivacy, "64"),
-        z: common_vendor.o(gotoIndex, "a1"),
+        x: common_vendor.o(gotoAgreement, "04"),
+        y: common_vendor.o(gotoPrivacy, "3c"),
+        z: common_vendor.o(gotoIndex, "c0"),
         A: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
-        B: common_vendor.o(isPswLogin, "9e"),
+        B: common_vendor.o(isPswLogin, "44"),
         C: `${_ctx.u_s_b_h}px`,
         D: `${_ctx.u_s_a_i_b}px`,
         E: common_vendor.p({

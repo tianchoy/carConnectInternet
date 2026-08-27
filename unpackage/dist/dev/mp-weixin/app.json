@@ -4,6 +4,8 @@
     "pages/message/message",
     "pages/userCenter/userCenter",
     "pages/login/login",
+    "pages/login/personal-password-login",
+    "pages/login/register",
     "pages/carInfoDetail/carInfoDetail",
     "pages/addCar/addCar",
     "pages/playBack/playBack",

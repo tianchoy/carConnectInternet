@@ -47,7 +47,7 @@
 					</view>
 
 					<!-- 提交按钮 -->
-					<i-button type="primary" @click="submit" :loading="loading">提交</i-button>
+					<i-button type="primary" @click="submit" :loading="loading" :disabled="loading || !isAccountPasswordLoginReady">提交</i-button>
 				</i-form>
 			</view>
 
@@ -66,8 +66,9 @@
 				<!-- #ifdef APP-ANDROID || APP-IOS -->
 				<view v-if="!smsLoginMode">
 					<i-button type="primary" @click="startUniVerifyLogin" :loading="nativeLoginLoading">本机号码一键登录</i-button>
-					<view class="phone-login-switch" @click="openSmsLogin">
-						<text class="phone-way">验证码登录</text>
+					<view class="login-methods">
+						<text class="phone-way" @click="openPersonalPasswordLogin">账号密码登录</text>
+						<text class="phone-way" @click="openSmsLogin">验证码登录</text>
 					</view>
 				</view>
 				<view v-else>
@@ -88,7 +89,7 @@
 								</template>
 							</i-input>
 						</i-form-item>
-						<i-button type="primary" @click="submitSmsLogin" :loading="smsSubmitting">手机号验证码登录</i-button>
+						<i-button type="primary" @click="submitSmsLogin" :loading="smsSubmitting" :disabled="smsSubmitting || !isSmsLoginReady">手机号验证码登录</i-button>
 					</i-form>
 					<view class="phone-login-switch" @click="closeSmsLogin"><text class="phone-way">返回一键登录</text></view>
 				</view>
@@ -119,8 +120,9 @@
 <script setup lang="uts">
 import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
-	import { ref, onMounted, onUnmounted } from 'vue'
-	import { markPushSessionAuthenticated } from '../../services/push.uts'
+	import { userAgreement, privacyPolicy } from '../../utils/legal.uts'
+	import { ref, computed, onMounted, onUnmounted } from 'vue'
+	import { schedulePostLoginInitialization } from '../../services/app-startup.uts'
 	import { resetTokenExpiredState } from '../../api/http.uts'
 	import { login, PostWechatlogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 	// #ifdef APP-ANDROID || APP-IOS
@@ -157,6 +159,14 @@ import { showAppToast } from '../../utils/toast.uts'
 	})
 
 	const deviceModel = ref('')
+
+	const isAccountPasswordLoginReady = computed<boolean>(() => {
+		return form.value.username != '' && form.value.password != ''
+	})
+
+	const isSmsLoginReady = computed<boolean>(() => {
+		return smsMobile.value != '' && smsCode.value != ''
+	})
 
 	const pswrules = [
 		{ name: 'username', required: true, message: '请输入账号' } as UTSJSONObject,
@@ -254,10 +264,14 @@ import { showAppToast } from '../../utils/toast.uts'
 		if (savePassword) saveAccountPassword()
 		uni.setStorageSync('token', token)
 		resetTokenExpiredState()
-		markPushSessionAuthenticated()
 		showAppToast({ title: '登录成功', icon: 'success' })
 		setTimeout(() => {
-			uni.reLaunch({ url: '/pages/index/index' })
+			uni.reLaunch({
+				url: '/pages/index/index',
+				success: () => {
+					schedulePostLoginInitialization()
+				}
+			})
 		}, 500)
 	}
 
@@ -265,6 +279,12 @@ import { showAppToast } from '../../utils/toast.uts'
 		if (docState.value) return true
 		showAppToast({ title: '请先阅读并同意用户协议', icon: 'error' })
 		return false
+	}
+
+	const openPersonalPasswordLogin = (): void => {
+		uni.navigateTo({
+			url: '/pages/login/personal-password-login'
+		})
 	}
 
 	const openSmsLogin = (): void => {
@@ -545,54 +565,6 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 	}
 
-	// ===== 协议内容 =====
-	const userAgreement = `
-欢迎使用车联网平台！
-
-一、服务条款的确认和接纳
-本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。
-
-二、服务内容
-1. 车联网平台提供车辆管理、远程控制、数据分析等服务。
-2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。
-
-三、用户账号
-用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。
-
-四、用户隐私保护
-保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。
-
-五、免责声明
-1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。
-2. 对于因不可抗力造成的服务中断，平台不承担责任。
-
-六、法律适用
-本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。
-
-如有任何疑问，请联系我们。`
-
-	const privacyPolicy = `
-车联网平台非常重视您的隐私保护！
-
-一、信息收集
-1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。
-2. 我们会在您注册、使用服务时收集必要的信息。
-
-二、信息使用
-1. 我们使用收集的信息来提供、维护和改进服务。
-2. 我们不会向第三方出售或分享您的个人信息。
-
-三、信息保护
-1. 我们采用行业标准的安全措施保护您的信息。
-2. 我们会定期评估安全措施的有效性。
-
-四、未成年人保护
-我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。
-
-五、政策更新
-我们可能会更新隐私政策，更新后的政策将在平台公布。
-
-如有任何隐私问题，请联系我们。`
 
 	// 跳转到首页
 	const gotoIndex = () => {
@@ -735,10 +707,18 @@ import { showAppToast } from '../../utils/toast.uts'
 		.phone-login-switch {
 			text-align: center;
 			margin-top: 28rpx;
-			.phone-way{
-				font-size: 25rpx;
-				color: #8b8c8d;
-			}
+		}
+
+		.login-methods {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			margin-top: 28rpx;
+		}
+
+		.phone-way {
+			font-size: 25rpx;
+			color: #8b8c8d;
 		}
 
 		.sms-mobile-item {

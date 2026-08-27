@@ -1,6 +1,9 @@
 <script lang="uts">
-	import { initPush, refreshPushClientId, clearPushBadge } from './services/push.uts'
-	import { initPushBinding } from './services/push-binding.uts'
+	import {
+		schedulePostLoginInitialization,
+		refreshInitializedPushServices,
+		clearInitializedPushBadge
+	} from './services/app-startup.uts'
 	import { ensureNotificationPermission } from './utils/cameraPermission.uts'
 
 	let firstBackTime = 0
@@ -76,9 +79,10 @@
 		onLaunch: function () {
 			console.log('App onLaunch')
 			checkForUpdates()
-			initPushBinding()
-			initPush()
-			clearPushBadge()
+			// Push/APNs 首次注册会抢占 iOS 冷启动主线程，改为登录成功后的延后阶段。
+			if (uni.getStorageSync('token') != null) {
+				schedulePostLoginInitialization()
+			}
 			// #ifdef APP-ANDROID
 			ensureNotificationPermission((status) => {
 				console.log('[NotificationPermission] ' + status)
@@ -87,12 +91,12 @@
 		},
 		onShow: function () {
 			console.log('App Show')
-			clearPushBadge()
-			refreshPushClientId()
+			clearInitializedPushBadge()
+			refreshInitializedPushServices()
 		},
 		onHide: function () {
 			console.log('App Hide')
-			clearPushBadge()
+			clearInitializedPushBadge()
 		},
 		// #ifdef APP-ANDROID
 		onLastPageBackPress: function () {

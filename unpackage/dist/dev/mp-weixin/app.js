@@ -1,13 +1,14 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
-require("./services/push.js");
-const services_pushBinding = require("./services/push-binding.js");
+const services_appStartup = require("./services/app-startup.js");
 if (!Math) {
   "./pages/index/index.js";
   "./pages/message/message.js";
   "./pages/userCenter/userCenter.js";
   "./pages/login/login.js";
+  "./pages/login/personal-password-login.js";
+  "./pages/login/register.js";
   "./pages/carInfoDetail/carInfoDetail.js";
   "./pages/addCar/addCar.js";
   "./pages/playBack/playBack.js";
@@ -32,16 +33,16 @@ function checkForUpdates() {
     updateManager = common_vendor.index.getUpdateManager();
     if (updateManager) {
       updateManager.onCheckForUpdate((res = null) => {
-        common_vendor.index.__f__("log", "at App.uvue:20", "检查更新结果:", res);
+        common_vendor.index.__f__("log", "at App.uvue:23", "检查更新结果:", res);
         if (res.hasUpdate) {
-          common_vendor.index.__f__("log", "at App.uvue:23", "发现新版本，正在后台下载...");
+          common_vendor.index.__f__("log", "at App.uvue:26", "发现新版本，正在后台下载...");
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "下载新版本中"
           }));
         }
       });
       updateManager.onUpdateReady(() => {
-        common_vendor.index.__f__("log", "at App.uvue:32", "新版本下载完成");
+        common_vendor.index.__f__("log", "at App.uvue:35", "新版本下载完成");
         common_vendor.index.hideLoading();
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新提示",
@@ -56,7 +57,7 @@ function checkForUpdates() {
         }));
       });
       updateManager.onUpdateFailed(() => {
-        common_vendor.index.__f__("error", "at App.uvue:52", "新版本下载失败");
+        common_vendor.index.__f__("error", "at App.uvue:55", "新版本下载失败");
         common_vendor.index.hideLoading();
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新失败",
@@ -76,18 +77,20 @@ function checkForUpdates() {
 }
 const _sfc_main = common_vendor.defineComponent({
   onLaunch: function() {
-    common_vendor.index.__f__("log", "at App.uvue:77", "App onLaunch");
+    common_vendor.index.__f__("log", "at App.uvue:80", "App onLaunch");
     checkForUpdates();
-    services_pushBinding.initPushBinding();
+    if (common_vendor.index.getStorageSync("token") != null) {
+      services_appStartup.schedulePostLoginInitialization();
+    }
   },
   onShow: function() {
-    common_vendor.index.__f__("log", "at App.uvue:89", "App Show");
+    common_vendor.index.__f__("log", "at App.uvue:93", "App Show");
   },
   onHide: function() {
-    common_vendor.index.__f__("log", "at App.uvue:94", "App Hide");
+    common_vendor.index.__f__("log", "at App.uvue:98", "App Hide");
   },
   onExit: function() {
-    common_vendor.index.__f__("log", "at App.uvue:116", "App Exit");
+    common_vendor.index.__f__("log", "at App.uvue:120", "App Exit");
   }
 });
 function createApp() {

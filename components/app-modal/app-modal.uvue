@@ -120,6 +120,8 @@
 	}
 
 	.app-modal-content-text {
+		display: flex;
+		width: 100%;
 		color: #606266;
 		font-size: 28rpx;
 		line-height: 44rpx;

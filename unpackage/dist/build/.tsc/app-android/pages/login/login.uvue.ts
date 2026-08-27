@@ -8,8 +8,9 @@ import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
-	import { ref, onMounted, onUnmounted } from 'vue'
-	import { markPushSessionAuthenticated } from '../../services/push.uts'
+	import { userAgreement, privacyPolicy } from '../../utils/legal.uts'
+	import { ref, computed, onMounted, onUnmounted } from 'vue'
+	import { schedulePostLoginInitialization } from '../../services/app-startup.uts'
 	import { resetTokenExpiredState } from '../../api/http.uts'
 	import { login, PostWechatlogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 
@@ -54,6 +55,14 @@ const docState = ref(false)
 	})
 
 	const deviceModel = ref('')
+
+	const isAccountPasswordLoginReady = computed<boolean>(() => {
+		return form.value.username != '' && form.value.password != ''
+	})
+
+	const isSmsLoginReady = computed<boolean>(() => {
+		return smsMobile.value != '' && smsCode.value != ''
+	})
 
 	const pswrules = [
 		{ name: 'username', required: true, message: '请输入账号' } as UTSJSONObject,
@@ -151,10 +160,14 @@ const docState = ref(false)
 		if (savePassword) saveAccountPassword()
 		uni.setStorageSync('token', token)
 		resetTokenExpiredState()
-		markPushSessionAuthenticated()
 		showAppToast({ title: '登录成功', icon: 'success' })
 		setTimeout(() => {
-			uni.reLaunch({ url: '/pages/index/index' })
+			uni.reLaunch({
+				url: '/pages/index/index',
+				success: () => {
+					schedulePostLoginInitialization()
+				}
+			})
 		}, 500)
 	}
 
@@ -162,6 +175,12 @@ const docState = ref(false)
 		if (docState.value) return true
 		showAppToast({ title: '请先阅读并同意用户协议', icon: 'error' })
 		return false
+	}
+
+	const openPersonalPasswordLogin = (): void => {
+		uni.navigateTo({
+			url: '/pages/login/personal-password-login'
+		})
 	}
 
 	const openSmsLogin = (): void => {
@@ -442,54 +461,6 @@ const docState = ref(false)
 		}
 	}
 
-	// ===== 协议内容 =====
-	const userAgreement = `
-欢迎使用车联网平台！
-
-一、服务条款的确认和接纳
-本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。
-
-二、服务内容
-1. 车联网平台提供车辆管理、远程控制、数据分析等服务。
-2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。
-
-三、用户账号
-用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。
-
-四、用户隐私保护
-保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。
-
-五、免责声明
-1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。
-2. 对于因不可抗力造成的服务中断，平台不承担责任。
-
-六、法律适用
-本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。
-
-如有任何疑问，请联系我们。`
-
-	const privacyPolicy = `
-车联网平台非常重视您的隐私保护！
-
-一、信息收集
-1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。
-2. 我们会在您注册、使用服务时收集必要的信息。
-
-二、信息使用
-1. 我们使用收集的信息来提供、维护和改进服务。
-2. 我们不会向第三方出售或分享您的个人信息。
-
-三、信息保护
-1. 我们采用行业标准的安全措施保护您的信息。
-2. 我们会定期评估安全措施的有效性。
-
-四、未成年人保护
-我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。
-
-五、政策更新
-我们可能会更新隐私政策，更新后的政策将在平台公布。
-
-如有任何隐私问题，请联系我们。`
 
 	// 跳转到首页
 	const gotoIndex = () => {
@@ -616,11 +587,12 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                   _cV(_component_i_button, _uM({
                     type: "primary",
                     onClick: submit,
-                    loading: loading.value
+                    loading: loading.value,
+                    disabled: loading.value || !isAccountPasswordLoginReady.value
                   }), _uM({
                     default: withSlotCtx((): any[] => ["提交"]),
                     _: 1 /* STABLE */
-                  }), 8 /* PROPS */, ["loading"])
+                  }), 8 /* PROPS */, ["loading", "disabled"])
                 ]),
                 _: 1 /* STABLE */
               }), 8 /* PROPS */, ["modelValue"])
@@ -636,11 +608,15 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                       default: withSlotCtx((): any[] => ["本机号码一键登录"]),
                       _: 1 /* STABLE */
                     }), 8 /* PROPS */, ["loading"]),
-                    _cE("view", _uM({
-                      class: "phone-login-switch",
-                      onClick: openSmsLogin
-                    }), [
-                      _cE("text", _uM({ class: "phone-way" }), "验证码登录")
+                    _cE("view", _uM({ class: "login-methods" }), [
+                      _cE("text", _uM({
+                        class: "phone-way",
+                        onClick: openPersonalPasswordLogin
+                      }), "账号密码登录"),
+                      _cE("text", _uM({
+                        class: "phone-way",
+                        onClick: openSmsLogin
+                      }), "验证码登录")
                     ])
                   ])
                 : _cE("view", _uM({ key: 1 }), [
@@ -695,11 +671,12 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                         _cV(_component_i_button, _uM({
                           type: "primary",
                           onClick: submitSmsLogin,
-                          loading: smsSubmitting.value
+                          loading: smsSubmitting.value,
+                          disabled: smsSubmitting.value || !isSmsLoginReady.value
                         }), _uM({
                           default: withSlotCtx((): any[] => ["手机号验证码登录"]),
                           _: 1 /* STABLE */
-                        }), 8 /* PROPS */, ["loading"])
+                        }), 8 /* PROPS */, ["loading", "disabled"])
                       ]),
                       _: 1 /* STABLE */
                     })),
@@ -749,4 +726,4 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
 
 })
 export default __sfc__
-const GenPagesLoginLoginStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#ffffff"]]))], ["banner", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["height", "20%"]])]])], ["banner-image", _uM([[".container .banner ", _uM([["width", "180rpx"], ["height", "180rpx"]])]])], ["title", _uM([[".container .banner ", _uM([["fontSize", "40rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["content", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "70rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "70rpx"]])]])], ["other-login", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "30rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["documents", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["marginTop", "40rpx"]])]])], ["doc-info-box", _uM([[".container .content .documents ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["whiteSpace", "nowrap"]])]])], ["doc-link", _uM([[".container .content .documents .doc-info-box ", _uM([["color", "#007AFF"], ["fontSize", "28rpx"]])]])], ["doc-text", _uM([[".container .content .documents .doc-info-box ", _uM([["fontSize", "28rpx"]])]])], ["remember-password", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["i-checkbox", _uM([[".container .content .remember-password ", _uM([["display", "flex"], ["alignItems", "center"]])]])], ["other-way", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "25rpx"], ["marginTop", "40rpx"], ["color", "#999999"]])]])], ["noLogin", _uM([[".container .other-way ", _uM([["borderRightWidth", "1rpx"], ["borderRightStyle", "solid"], ["borderRightColor", "#999999"], ["paddingRight", "50rpx"]])]])], ["BLogin", _uM([[".container .other-way ", _uM([["paddingLeft", "50rpx"]])]])], ["wechat-login-btn", _uM([[".container ", _uM([["!color", "#ffffff"]])]])], ["phone-login-switch", _uM([[".container ", _uM([["textAlign", "center"], ["marginTop", "28rpx"]])]])], ["phone-way", _uM([[".container .phone-login-switch ", _uM([["fontSize", "25rpx"], ["color", "#8b8c8d"]])]])], ["sms-mobile-item", _uM([[".container ", _uM([["marginBottom", "20rpx"]])]])], ["sms-code-item", _uM([[".container ", _uM([["marginBottom", "32rpx"]])]])], ["sms-code-input", _uM([[".container ", _uM([["width", "100%"]])]])], ["sms-send-button", _uM([[".container ", _uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["height", "56rpx"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "28rpx"], ["borderTopRightRadius", "28rpx"], ["borderBottomRightRadius", "28rpx"], ["borderBottomLeftRadius", "28rpx"], ["backgroundColor", "#007AFF"], ["color", "#ffffff"], ["fontSize", "24rpx"], ["whiteSpace", "nowrap"]])]])], ["sms-send-button-disabled", _uM([[".container ", _uM([["backgroundColor", "#B8D7FF"]])]])], ["sms-send-button-text", _uM([[".container ", _uM([["color", "#ffffff"], ["fontSize", "24rpx"], ["lineHeight", "56rpx"]])]])], ["i-form-item", _uM([[".container ", _uM([["paddingTop", 12], ["paddingRight", 0], ["paddingBottom", 12], ["paddingLeft", 0]])]])]])]
+const GenPagesLoginLoginStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#ffffff"]]))], ["banner", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["height", "20%"]])]])], ["banner-image", _uM([[".container .banner ", _uM([["width", "180rpx"], ["height", "180rpx"]])]])], ["title", _uM([[".container .banner ", _uM([["fontSize", "40rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["content", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "70rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "70rpx"]])]])], ["other-login", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "30rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["documents", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["marginTop", "40rpx"]])]])], ["doc-info-box", _uM([[".container .content .documents ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["whiteSpace", "nowrap"]])]])], ["doc-link", _uM([[".container .content .documents .doc-info-box ", _uM([["color", "#007AFF"], ["fontSize", "28rpx"]])]])], ["doc-text", _uM([[".container .content .documents .doc-info-box ", _uM([["fontSize", "28rpx"]])]])], ["remember-password", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["i-checkbox", _uM([[".container .content .remember-password ", _uM([["display", "flex"], ["alignItems", "center"]])]])], ["other-way", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "25rpx"], ["marginTop", "40rpx"], ["color", "#999999"]])]])], ["noLogin", _uM([[".container .other-way ", _uM([["borderRightWidth", "1rpx"], ["borderRightStyle", "solid"], ["borderRightColor", "#999999"], ["paddingRight", "50rpx"]])]])], ["BLogin", _uM([[".container .other-way ", _uM([["paddingLeft", "50rpx"]])]])], ["wechat-login-btn", _uM([[".container ", _uM([["!color", "#ffffff"]])]])], ["phone-login-switch", _uM([[".container ", _uM([["textAlign", "center"], ["marginTop", "28rpx"]])]])], ["login-methods", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["marginTop", "28rpx"]])]])], ["phone-way", _uM([[".container ", _uM([["fontSize", "25rpx"], ["color", "#8b8c8d"]])]])], ["sms-mobile-item", _uM([[".container ", _uM([["marginBottom", "20rpx"]])]])], ["sms-code-item", _uM([[".container ", _uM([["marginBottom", "32rpx"]])]])], ["sms-code-input", _uM([[".container ", _uM([["width", "100%"]])]])], ["sms-send-button", _uM([[".container ", _uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["height", "56rpx"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "28rpx"], ["borderTopRightRadius", "28rpx"], ["borderBottomRightRadius", "28rpx"], ["borderBottomLeftRadius", "28rpx"], ["backgroundColor", "#007AFF"], ["color", "#ffffff"], ["fontSize", "24rpx"], ["whiteSpace", "nowrap"]])]])], ["sms-send-button-disabled", _uM([[".container ", _uM([["backgroundColor", "#B8D7FF"]])]])], ["sms-send-button-text", _uM([[".container ", _uM([["color", "#ffffff"], ["fontSize", "24rpx"], ["lineHeight", "56rpx"]])]])], ["i-form-item", _uM([[".container ", _uM([["paddingTop", 12], ["paddingRight", 0], ["paddingBottom", 12], ["paddingLeft", 0]])]])]])]
