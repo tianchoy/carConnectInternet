@@ -24,7 +24,7 @@ open class GenPagesLoginPersonalPasswordLogin : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesLoginPersonalPasswordLogin
             val _cache = __ins.renderCache
-            val form = ref<PersonalLoginForm>(PersonalLoginForm(username = "", password = ""))
+            val form = ref<PersonalLoginForm__1>(PersonalLoginForm__1(username = "", password = ""))
             val agreementAccepted = ref(false)
             val submitting = ref(false)
             val isLoginReady = computed<Boolean>(fun(): Boolean {

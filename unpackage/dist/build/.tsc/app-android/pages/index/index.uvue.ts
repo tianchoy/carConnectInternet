@@ -396,6 +396,7 @@ const userLocationMarkerId = 1
 
 async function centerOnUserLocation() {
     if (!hasUserLocation.value) return
+    isMapReady.value = false
     center.latitude = userLocation.latitude
     center.longitude = userLocation.longitude
     markers.value = []
@@ -411,6 +412,7 @@ async function centerOnUserLocation() {
         '当前位置'
     )
     markers.value = [nextMarker]
+    isMapReady.value = true
 }
 
 function getUserLocation() {
@@ -545,6 +547,7 @@ const devicePositionUpdateTime = computed<string>(() => {
 })
 const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
     positionState.value = 'loading'
+    isMapReady.value = false
     markers.value = []
     try {
         const res = await getDevicePos(data)
@@ -579,7 +582,9 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
         center.longitude = convertedCoord.lng
         positionState.value = 'available'
 
-        await delay(100)
+        await delay(50)
+        markers.value = []
+        await delay(50)
 
         const nextMarker = createMarker(
             1,
@@ -590,6 +595,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
         )
 
         markers.value = [nextMarker]
+        isMapReady.value = true
         console.log('标记点更新完成:', data.getString('deviceId', ''), convertedCoord.lat, convertedCoord.lng)
         return true
     } catch (error) {
@@ -1124,7 +1130,6 @@ onLoad(() => {
     initDimensions()
 
     if (checkToken()) {
-        isMapReady.value = true
         loadDeviceList()
     }
 })

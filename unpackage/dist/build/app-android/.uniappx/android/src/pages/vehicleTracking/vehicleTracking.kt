@@ -29,6 +29,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             val carType = ref<String>("")
             val center = reactive(_uO("latitude" to 39.90469, "longitude" to 116.40717))
             val mapScale = ref(15)
+            val isMapReady = ref(false)
             val temporaryRenderPoints = ref(_uA<CoordinatePoint>())
             val TRACKING_POLL_INTERVAL_MS: Number = 1000
             val TRACKING_ANIMATION_DURATION_MS: Number = 900
@@ -79,6 +80,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             val createVehicleMarker = ::gen_createVehicleMarker_fn
             fun gen_loadInitialPosition_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
+                        isMapReady.value = false
                         try {
                             val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
@@ -128,6 +130,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                                         )
                                         markerInitialized.value = true
                                     }
+                                    isMapReady.value = true
                                 }
                             }
                             )
@@ -563,14 +566,19 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                     _cE("view", _uM("class" to "container"), _uA(
                         _cV(_component_custom_navBar, _uM("title" to "车辆跟踪", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
                         _cE("view", _uM("class" to "map-container"), _uA(
-                            _cV(_component_map, _uM("id" to "myMap", "latitude" to currentPosition.latitude, "longitude" to currentPosition.longitude, "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
-                                "latitude",
-                                "longitude",
-                                "markers",
-                                "polyline",
-                                "scale",
-                                "style"
-                            )),
+                            if (isTrue(isMapReady.value)) {
+                                _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to currentPosition.latitude, "longitude" to currentPosition.longitude, "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
+                                    "latitude",
+                                    "longitude",
+                                    "markers",
+                                    "polyline",
+                                    "scale",
+                                    "style"
+                                ))
+                            } else {
+                                _cC("v-if", true)
+                            }
+                            ,
                             _cV(_component_sub_navBar, _uM("class" to "sub-nav-overlay", "currentTime" to currentTime.value, "currentCar" to currentCar.value, "times" to times.value, "showCar" to true, "onUpdate:currentTime" to handleCurrentTimeUpdate, "carStatus" to connectionStatus.value), null, 8, _uA(
                                 "currentTime",
                                 "currentCar",

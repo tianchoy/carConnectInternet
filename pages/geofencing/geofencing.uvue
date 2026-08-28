@@ -3,7 +3,7 @@
 		<custom-navBar title="地理围栏" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
 		<view class="map-container">
-			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :scale="mapScale"
+			<map v-if="isMapReady" id="myMap" :latitude="center.latitude" :longitude="center.longitude" :scale="mapScale"
 				style="width:100%;height:100%" :show-location="false" :polygons="polygons" :markers="markers"
 				:circles="circles" @tap="handleMapTap" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 				</map>
@@ -215,6 +215,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		longitude: 116.40717
 	})
 	const mapScale = ref(12)
+	const isMapReady = ref(false)
 	const isInitialPositionSettled = ref(false)
 	const markers = ref<Array<Marker>>([]) // 标记点
 	const carMarker = ref<Marker | null>(null) // 车辆标记点
@@ -302,6 +303,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		})
 
 		try {
+			isMapReady.value = false
 			const data = { deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
 			const positions = res.data
@@ -354,6 +356,7 @@ import { showAppToast } from '../../utils/toast.uts'
 					const marker = carMarker.value
 					if (marker != null) {
 						markers.value = [marker]
+						isMapReady.value = true
 					}
 
 					// 更新车辆信息
@@ -589,6 +592,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			const firstCircle = fenceCircles[0]
 			center.latitude = firstCircle.latitude
 			center.longitude = firstCircle.longitude
+			isMapReady.value = true
 			// 根据半径设置合适的缩放级别
 			mapScale.value = firstCircle.radius > 50000 ? 8 : firstCircle.radius > 20000 ? 9 : firstCircle.radius > 10000 ? 10 : firstCircle.radius > 5000 ? 11 : firstCircle.radius > 2000 ? 12 : firstCircle.radius > 1000 ? 13 : firstCircle.radius > 500 ? 14 : firstCircle.radius > 200 ? 15 : 16
 		}
@@ -715,6 +719,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	// 调整地图中心到围栏中心位置
 	const setMapCenterToFence = (fence : UTSJSONObject) : void => {
+		if (carMarker.value != null) return
 		const fenceType = getFenceType(fence)
 		const area = fence.getString('area', '')
 

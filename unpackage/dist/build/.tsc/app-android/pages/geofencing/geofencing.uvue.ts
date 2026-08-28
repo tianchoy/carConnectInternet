@@ -72,6 +72,7 @@ const imei = ref<string | null>(null)
 		longitude: 116.40717
 	})
 	const mapScale = ref(12)
+	const isMapReady = ref(false)
 	const isInitialPositionSettled = ref(false)
 	const markers = ref<Array<Marker>>([]) // 标记点
 	const carMarker = ref<Marker | null>(null) // 车辆标记点
@@ -159,6 +160,7 @@ const imei = ref<string | null>(null)
 		})
 
 		try {
+			isMapReady.value = false
 			const data = { deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
 			const positions = res.data
@@ -211,6 +213,7 @@ const imei = ref<string | null>(null)
 					const marker = carMarker.value
 					if (marker != null) {
 						markers.value = [marker]
+						isMapReady.value = true
 					}
 
 					// 更新车辆信息
@@ -446,6 +449,7 @@ const imei = ref<string | null>(null)
 			const firstCircle = fenceCircles[0]
 			center.latitude = firstCircle.latitude
 			center.longitude = firstCircle.longitude
+			isMapReady.value = true
 			// 根据半径设置合适的缩放级别
 			mapScale.value = firstCircle.radius > 50000 ? 8 : firstCircle.radius > 20000 ? 9 : firstCircle.radius > 10000 ? 10 : firstCircle.radius > 5000 ? 11 : firstCircle.radius > 2000 ? 12 : firstCircle.radius > 1000 ? 13 : firstCircle.radius > 500 ? 14 : firstCircle.radius > 200 ? 15 : 16
 		}
@@ -564,6 +568,7 @@ const imei = ref<string | null>(null)
 
 	// 调整地图中心到围栏中心位置
 	const setMapCenterToFence = (fence : UTSJSONObject) : void => {
+		if (carMarker.value != null) return
 		const fenceType = getFenceType(fence)
 		const area = fence.getString('area', '')
 
@@ -1228,22 +1233,25 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
         showCapsule: false
       })),
       _cE("view", _uM({ class: "map-container" }), [
-        _cV(_component_map, _uM({
-          id: "myMap",
-          latitude: center.latitude,
-          longitude: center.longitude,
-          scale: mapScale.value,
-          style: _nS(_uM({"width":"100%","height":"100%"})),
-          "show-location": false,
-          polygons: polygons.value,
-          markers: markers.value,
-          circles: circles.value,
-          onTap: handleMapTap,
-          "enable-traffic": true,
-          "enable-overlooking": true,
-          "enable-building": true,
-          "enable-3D": true
-        }), null, 8 /* PROPS */, ["latitude", "longitude", "scale", "style", "polygons", "markers", "circles"]),
+        isTrue(isMapReady.value)
+          ? _cV(_component_map, _uM({
+              key: 0,
+              id: "myMap",
+              latitude: center.latitude,
+              longitude: center.longitude,
+              scale: mapScale.value,
+              style: _nS(_uM({"width":"100%","height":"100%"})),
+              "show-location": false,
+              polygons: polygons.value,
+              markers: markers.value,
+              circles: circles.value,
+              onTap: handleMapTap,
+              "enable-traffic": true,
+              "enable-overlooking": true,
+              "enable-building": true,
+              "enable-3D": true
+            }), null, 8 /* PROPS */, ["latitude", "longitude", "scale", "style", "polygons", "markers", "circles"])
+          : _cC("v-if", true),
         _cV(_component_sub_navBar, _uM({
           class: "sub-nav-overlay",
           showTime: false,
@@ -1253,7 +1261,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
         }), null, 8 /* PROPS */, ["currentCar", "carStatus"]),
         isTrue(isDrawing.value)
           ? _cE("view", _uM({
-              key: 0,
+              key: 1,
               class: "drag-hint"
             }), [
               drawingMode.value === 'polygon'

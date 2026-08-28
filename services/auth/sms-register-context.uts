@@ -1,0 +1,21 @@
+export type SmsRegisterContext = {
+	phonenumber: string
+	smsCode: string
+}
+
+let pendingContext: SmsRegisterContext | null = null
+
+export function saveSmsRegisterContext(phonenumber: string, smsCode: string): void {
+	pendingContext = {
+		phonenumber,
+		smsCode
+	}
+}
+
+export function getSmsRegisterContext(): SmsRegisterContext | null {
+	return pendingContext
+}
+
+export function clearSmsRegisterContext(): void {
+	pendingContext = null
+}

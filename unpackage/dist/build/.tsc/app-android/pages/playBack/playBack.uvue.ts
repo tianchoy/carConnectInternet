@@ -64,6 +64,7 @@ const center = reactive({
 		longitude: 116.40717
 	})
 	const mapScale = ref(12)
+	const isMapReady = ref(false)
 	const imei = ref<string | null>('')
 	const carStatus = ref<string | null>('')
 	const plateNo = ref<string | null>('')
@@ -486,10 +487,12 @@ const center = reactive({
 
 		// 设置标记点
 		markers.value = [marker]
+		isMapReady.value = true
 	}
 
 
 	function clearTrackDisplay() : void {
+		isMapReady.value = false
 		trackPoints.value = []
 		isTrackPlayable.value = false
 		currentIndex.value = 0
@@ -587,7 +590,11 @@ const center = reactive({
 		initCarMarker()
 		initPolyline()
 		adjustMapToFitTrack()
+		const firstPoint = trackPoints.value[0]
+		center.latitude = firstPoint.latitude
+		center.longitude = firstPoint.longitude
 		renderPlaybackIndex()
+		isMapReady.value = true
 	}
 	const loadTrackPos = async () => {
 		pausePlayback()
@@ -807,20 +814,23 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         showCapsule: false
       })),
       _cE("view", _uM({ class: "map-container" }), [
-        _cV(_component_map, _uM({
-          id: "myMap",
-          latitude: center.latitude,
-          longitude: center.longitude,
-          markers: markers.value,
-          polyline: polyline.value,
-          scale: mapScale.value,
-          style: _nS(_uM({"width":"100%","height":"100%"})),
-          "show-location": true,
-          "enable-traffic": true,
-          "enable-overlooking": true,
-          "enable-building": true,
-          "enable-3D": true
-        }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"]),
+        isTrue(isMapReady.value)
+          ? _cV(_component_map, _uM({
+              key: 0,
+              id: "myMap",
+              latitude: center.latitude,
+              longitude: center.longitude,
+              markers: markers.value,
+              polyline: polyline.value,
+              scale: mapScale.value,
+              style: _nS(_uM({"width":"100%","height":"100%"})),
+              "show-location": true,
+              "enable-traffic": true,
+              "enable-overlooking": true,
+              "enable-building": true,
+              "enable-3D": true
+            }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"])
+          : _cC("v-if", true),
         _cV(_component_sub_navBar, _uM({
           class: "sub-nav-overlay",
           showTime: false,

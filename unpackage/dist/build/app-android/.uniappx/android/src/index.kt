@@ -782,7 +782,6 @@ fun getResponseDataArray(response: UTSJSONObject): UTSArray<UTSJSONObject> {
         _uA()
     }
 }
-val loginUrl = "/sys/login"
 val devicePos = "/gps/lastPosition?deptId="
 val trackPos = "/gps/trackPos?"
 val userinfo = "/sys/user/info"
@@ -791,9 +790,10 @@ val userDeviceList = "/userDevice/list"
 val authLoginUrl = "/auth/login"
 val smsSendCodeUrl = "/resource/sms/code"
 val registerUrl = "/auth/register"
+val forgotPasswordResetUrl = "/auth/forgot-password/reset"
 val smsClientId = "428a8310cd442757ae699df5d894f051"
 val defaultTenantId = "000000"
-val changePSW = "/sys/user/password"
+val changePasswordUrl = "/user/profile/updatePassword"
 val userMsgList = "/usermessage/listForUser"
 val msgState = "/usermessage/detail/"
 val updateDevice = "/device/update"
@@ -836,7 +836,6 @@ open class JsonDataResponse (
     @JsonNotNull
     open var data: UTSJSONObject,
 ) : UTSObject()
-typealias UniVerifyLoginRequest = UTSJSONObject
 open class SendSmsCodeRequest (
     @JsonNotNull
     open var phonenumber: String,
@@ -847,8 +846,6 @@ open class SmsLoginRequest (
     open var phonenumber: String,
     @JsonNotNull
     open var smsCode: String,
-    @JsonNotNull
-    open var deviceId: String,
     open var clientId: String? = null,
     open var tenantId: String? = null,
 ) : UTSObject()
@@ -861,8 +858,7 @@ open class PersonalPasswordLoginRequest (
     open var tenantId: String? = null,
 ) : UTSObject()
 open class RegisterRequest (
-    @JsonNotNull
-    open var username: String,
+    open var username: String? = null,
     @JsonNotNull
     open var password: String,
     @JsonNotNull
@@ -873,6 +869,17 @@ open class RegisterRequest (
     open var smsCode: String,
     open var clientId: String? = null,
     open var tenantId: String? = null,
+) : UTSObject()
+open class ForgotPasswordResetRequest (
+    open var tenantId: String? = null,
+    @JsonNotNull
+    open var phonenumber: String,
+    @JsonNotNull
+    open var smsCode: String,
+    @JsonNotNull
+    open var newPassword: String,
+    @JsonNotNull
+    open var confirmPassword: String,
 ) : UTSObject()
 open class DevicePositionResponse (
     @JsonNotNull
@@ -962,11 +969,13 @@ open class SendCmdResponse (
     @JsonNotNull
     open var data: String,
 ) : UTSObject()
-open class ChangePasswordResponse (
+open class ChangePasswordRequest (
     @JsonNotNull
-    open var code: Number,
+    open var oldPassword: String,
     @JsonNotNull
-    open var msg: String,
+    open var newPassword: String,
+    @JsonNotNull
+    open var confirmPassword: String,
 ) : UTSObject()
 open class MessageResponse (
     @JsonNotNull
@@ -1010,16 +1019,6 @@ fun userInfoResponse(raw: Any): UserInfoResponse {
 fun deviceDetailResponse(raw: Any): DeviceDetailResponse {
     val response = jsonDataResponse(raw)
     return DeviceDetailResponse(code = response.code, msg = response.msg, data = response.data)
-}
-fun changePasswordResponse(raw: Any): ChangePasswordResponse {
-    val response = basicResponse(raw)
-    return ChangePasswordResponse(code = response.code, msg = response.msg)
-}
-val login = fun(data: UTSJSONObject): UTSPromise<JsonDataResponse> {
-    return post(loginUrl, data).then(fun(raw: Any): JsonDataResponse {
-        return jsonDataResponse(raw)
-    }
-    )
 }
 val logout = fun(): UTSPromise<BasicResponse> {
     return post(logoutUrl).then(fun(raw: Any): BasicResponse {
@@ -1071,12 +1070,6 @@ val getUserDeviceList = fun(data: UTSJSONObject): UTSPromise<UserDeviceListRespo
     }
     )
 }
-val uniVerifyLogin = fun(data: UniVerifyLoginRequest): UTSPromise<JsonDataResponse> {
-    return post(authLoginUrl, data).then(fun(raw: Any): JsonDataResponse {
-        return jsonDataResponse(raw)
-    }
-    )
-}
 val sendSmsLoginCode = fun(data: SendSmsCodeRequest): UTSPromise<BasicResponse> {
     return get(smsSendCodeUrl, _uO("phonenumber" to data.phonenumber, "tenantId" to if (data.tenantId != null) {
         data.tenantId
@@ -1095,6 +1088,17 @@ val sendSmsRegisterCode = fun(data: SendSmsCodeRequest): UTSPromise<BasicRespons
         defaultTenantId
     }
     , "scene" to "register")).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val sendSmsForgotPasswordCode = fun(data: SendSmsCodeRequest): UTSPromise<BasicResponse> {
+    return get(smsSendCodeUrl, _uO("phonenumber" to data.phonenumber, "tenantId" to if (data.tenantId != null) {
+        data.tenantId
+    } else {
+        defaultTenantId
+    }
+    , "scene" to "forgot")).then(fun(raw: Any): BasicResponse {
         return basicResponse(raw)
     }
     )
@@ -1121,9 +1125,11 @@ val personalPasswordLogin = fun(data: PersonalPasswordLoginRequest): UTSPromise<
     }
     )
 }
-val registerPersonalUser = fun(data: RegisterRequest): UTSPromise<BasicResponse> {
+val registerPersonalUser = fun(data: RegisterRequest): UTSPromise<JsonDataResponse> {
     val requestData = UTSJSONObject()
-    requestData.set("username", data.username)
+    if (data.username != null && data.username != "") {
+        requestData.set("username", data.username)
+    }
     requestData.set("password", data.password)
     requestData.set("confirmPassword", data.confirmPassword)
     requestData.set("phonenumber", data.phonenumber)
@@ -1140,8 +1146,8 @@ val registerPersonalUser = fun(data: RegisterRequest): UTSPromise<BasicResponse>
         smsClientId
     }
     )
-    return post(registerUrl, requestData).then(fun(raw: Any): BasicResponse {
-        return basicResponse(raw)
+    return post(registerUrl, requestData).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
     }
     )
 }
@@ -1162,15 +1168,31 @@ val smsLogin = fun(data: SmsLoginRequest): UTSPromise<JsonDataResponse> {
     )
     requestData.set("phonenumber", data.phonenumber)
     requestData.set("smsCode", data.smsCode)
-    requestData.set("device_id", data.deviceId)
     return post(authLoginUrl, requestData).then(fun(raw: Any): JsonDataResponse {
         return jsonDataResponse(raw)
     }
     )
 }
-val changePassWord = fun(data: UTSJSONObject): UTSPromise<ChangePasswordResponse> {
-    return put(changePSW, data).then(fun(raw: Any): ChangePasswordResponse {
-        return changePasswordResponse(raw)
+val resetForgotPassword = fun(data: ForgotPasswordResetRequest): UTSPromise<JsonDataResponse> {
+    val requestData = UTSJSONObject()
+    requestData.set("tenantId", if (data.tenantId != null) {
+        data.tenantId
+    } else {
+        defaultTenantId
+    }
+    )
+    requestData.set("phonenumber", data.phonenumber)
+    requestData.set("smsCode", data.smsCode)
+    requestData.set("newPassword", data.newPassword)
+    requestData.set("confirmPassword", data.confirmPassword)
+    return post(forgotPasswordResetUrl, requestData).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
+    }
+    )
+}
+val updatePassword = fun(data: ChangePasswordRequest): UTSPromise<BasicResponse> {
+    return post(changePasswordUrl, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
     }
     )
 }
@@ -5467,16 +5489,6 @@ val GenUniModulesIUiXComponentsIInputIInputClass = CreateVueComponent(GenUniModu
     return GenUniModulesIUiXComponentsIInputIInput(instance)
 }
 )
-val GenUniModulesIUiXComponentsIFormItemIFormItemClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormItemIFormItem::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormItemIFormItem.name, inheritAttrs = GenUniModulesIUiXComponentsIFormItemIFormItem.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormItemIFormItem.inject, props = GenUniModulesIUiXComponentsIFormItemIFormItem.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormItemIFormItem.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormItemIFormItem.emits, components = GenUniModulesIUiXComponentsIFormItemIFormItem.components, styles = GenUniModulesIUiXComponentsIFormItemIFormItem.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesIUiXComponentsIFormItemIFormItem.setup(props as GenUniModulesIUiXComponentsIFormItemIFormItem)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIFormItemIFormItem {
-    return GenUniModulesIUiXComponentsIFormItemIFormItem(instance)
-}
-)
 val GenUniModulesIUiXComponentsICheckboxICheckboxClass = CreateVueComponent(GenUniModulesIUiXComponentsICheckboxICheckbox::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsICheckboxICheckbox.name, inheritAttrs = GenUniModulesIUiXComponentsICheckboxICheckbox.inheritAttrs, inject = GenUniModulesIUiXComponentsICheckboxICheckbox.inject, props = GenUniModulesIUiXComponentsICheckboxICheckbox.props, propsNeedCastKeys = GenUniModulesIUiXComponentsICheckboxICheckbox.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsICheckboxICheckbox.emits, components = GenUniModulesIUiXComponentsICheckboxICheckbox.components, styles = GenUniModulesIUiXComponentsICheckboxICheckbox.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenUniModulesIUiXComponentsICheckboxICheckbox.setup(props as GenUniModulesIUiXComponentsICheckboxICheckbox)
@@ -5497,38 +5509,33 @@ val GenUniModulesIUiXComponentsIButtonIButtonClass = CreateVueComponent(GenUniMo
     return GenUniModulesIUiXComponentsIButtonIButton(instance)
 }
 )
-val GenUniModulesIUiXComponentsIFormIFormClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormIForm::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormIForm.name, inheritAttrs = GenUniModulesIUiXComponentsIFormIForm.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormIForm.inject, props = GenUniModulesIUiXComponentsIFormIForm.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormIForm.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormIForm.emits, components = GenUniModulesIUiXComponentsIFormIForm.components, styles = GenUniModulesIUiXComponentsIFormIForm.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
-        return GenUniModulesIUiXComponentsIFormIForm.setup(props as GenUniModulesIUiXComponentsIFormIForm, ctx)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIFormIForm {
-    return GenUniModulesIUiXComponentsIFormIForm(instance)
-}
-)
 val userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。"
 val privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。"
+open class SmsRegisterContext (
+    @JsonNotNull
+    open var phonenumber: String,
+    @JsonNotNull
+    open var smsCode: String,
+) : UTSObject()
+var pendingContext: SmsRegisterContext? = null
+fun saveSmsRegisterContext(phonenumber: String, smsCode: String): Unit {
+    pendingContext = SmsRegisterContext(phonenumber = phonenumber, smsCode = smsCode)
+}
+fun getSmsRegisterContext(): SmsRegisterContext? {
+    return pendingContext
+}
+fun clearSmsRegisterContext(): Unit {
+    pendingContext = null
+}
 open class UniVerifyPreLoginResult (
     @JsonNotNull
     open var ok: Boolean = false,
     @JsonNotNull
     open var message: String,
 ) : UTSObject()
-open class UniVerifyResult (
-    @JsonNotNull
-    open var ok: Boolean = false,
-    @JsonNotNull
-    open var cancelled: Boolean = false,
-    @JsonNotNull
-    open var message: String,
-    @JsonNotNull
-    open var token: String,
-) : UTSObject()
 @JvmField
 var manager: UniVerifyManager? = null
 var preLoginReady = false
-var requesting = false
 fun getPlatform(): String {
     return "android"
 }
@@ -5537,26 +5544,6 @@ fun getManager(): UniVerifyManager {
         manager = uni_getUniVerifyManager()
     }
     return manager!!
-}
-fun getErrorMessage(error: UniVerifyManagerLoginFail): String {
-    val errCode = error.errCode
-    console.error("Uni Verify 授权失败:", errCode, error.errMsg)
-    if (errCode == 30001) {
-        return "已取消本机号码授权"
-    }
-    if (errCode == 30004 || errCode == 30005 || errCode == 30006) {
-        return "运营商认证失败，请检查 SIM 卡、移动网络后重试"
-    }
-    if (errCode == 30007) {
-        return "本机号码授权已过期，请重试"
-    }
-    if (errCode == 30008) {
-        return "正在进行本机号码授权，请稍候"
-    }
-    if (errCode == 40001 || errCode == 40002) {
-        return "网络异常，请检查移动网络后重试"
-    }
-    return "本机号码授权失败（错误码：" + errCode + "），请稍后重试"
 }
 fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
     val errCode = error.errCode
@@ -5636,153 +5623,6 @@ fun ensurePreLogin(): UTSPromise<UniVerifyPreLoginResult> {
 fun prefetchUniVerify(): Unit {
     ensurePreLogin()
 }
-fun createResult(ok: Boolean, cancelled: Boolean, message: String, token: String): UniVerifyResult {
-    return UniVerifyResult(ok = ok, cancelled = cancelled, message = message, token = token)
-}
-fun closeLoginPage(uniVerifyManager: UniVerifyManager?): Unit {
-    if (uniVerifyManager != null) {
-        uniVerifyManager.close()
-    }
-}
-fun loginByUniVerify(clientVersion: String, deviceId: String): UTSPromise<UniVerifyResult> {
-    return UTSPromise<UniVerifyResult>(fun(resolve, _reject){
-        if (requesting) {
-            resolve(createResult(false, false, "正在进行本机号码授权，请稍候", ""))
-            return
-        }
-        requesting = true
-        ensurePreLogin().then(fun(preLoginResult){
-            if (!preLoginResult.ok) {
-                requesting = false
-                resolve(createResult(false, false, preLoginResult.message, ""))
-                return
-            }
-            var uniVerifyManager: UniVerifyManager? = null
-            try {
-                uniVerifyManager = getManager()
-                uniVerifyManager.login(UniVerifyManagerLoginOptions(uniVerifyStyle = UniVerifyManagerLoginStyle(fullScreen = false, loginBtnText = "本机号码一键登录"), success = fun(result: UniVerifyManagerLoginSuccess){
-                    val requestData = UTSJSONObject()
-                    requestData.set("openId", result.openId)
-                    requestData.set("accessToken", result.accessToken)
-                    requestData.set("platform", getPlatform())
-                    requestData.set("clientVersion", clientVersion)
-                    requestData.set("clientId", "428a8310cd442757ae699df5d894f051")
-                    requestData.set("device_id", deviceId)
-                    requestData.set("grantType", "univerify")
-                    requestData.set("tenantId", "000000")
-                    uniVerifyLogin(requestData).then(fun(response){
-                        val loginData = response.data
-                        val token = if (loginData != null) {
-                            loginData.getString("access_token", "")
-                        } else {
-                            ""
-                        }
-                        if (response.code == 200 && token != "") {
-                            resolve(createResult(true, false, "", token))
-                        } else {
-                            resolve(createResult(false, false, if (response.msg != "") {
-                                response.msg
-                            } else {
-                                "本机号码登录失败，请稍后重试"
-                            }
-                            , ""))
-                        }
-                    }
-                    ).`catch`(fun(){
-                        resolve(createResult(false, false, "登录服务连接失败，请检查网络后重试", ""))
-                    }
-                    ).`finally`(fun(){
-                        closeLoginPage(uniVerifyManager)
-                        requesting = false
-                    }
-                    )
-                }
-                , fail = fun(error: UniVerifyManagerLoginFail){
-                    preLoginReady = false
-                    resolve(createResult(false, error.errCode == 30001, getErrorMessage(error), ""))
-                    closeLoginPage(uniVerifyManager)
-                    requesting = false
-                }
-                ))
-            }
-             catch (error: Throwable) {
-                resolve(createResult(false, false, "当前设备不支持本机号码一键登录", ""))
-                requesting = false
-            }
-        }
-        ).`catch`(fun(){
-            requesting = false
-            resolve(createResult(false, false, "一键登录预取号异常，请检查 SIM 卡、移动网络及服务配置", ""))
-        }
-        )
-    }
-    )
-}
-open class FormData (
-    @JsonNotNull
-    open var username: String,
-    @JsonNotNull
-    open var password: String,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return FormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class FormDataReactiveObject : FormData, IUTSReactive<FormData> {
-    override var __v_raw: FormData
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: FormData, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormDataReactiveObject {
-        return FormDataReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var username: String
-        get() {
-            return _tRG(__v_raw, "username", __v_raw.username, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("username")) {
-                return
-            }
-            val oldValue = __v_raw.username
-            __v_raw.username = value
-            _tRS(__v_raw, "username", oldValue, value)
-        }
-    override var password: String
-        get() {
-            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("password")) {
-                return
-            }
-            val oldValue = __v_raw.password
-            __v_raw.password = value
-            _tRS(__v_raw, "password", oldValue, value)
-        }
-}
-open class SavedAccount (
-    @JsonNotNull
-    open var username: String,
-    @JsonNotNull
-    open var password: String,
-) : UTSObject()
-val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginLogin.inheritAttrs, inject = GenPagesLoginLogin.inject, props = GenPagesLoginLogin.props, propsNeedCastKeys = GenPagesLoginLogin.propsNeedCastKeys, emits = GenPagesLoginLogin.emits, components = GenPagesLoginLogin.components, styles = GenPagesLoginLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesLoginLogin.setup(props as GenPagesLoginLogin)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesLoginLogin {
-    return GenPagesLoginLogin(instance, renderer)
-}
-)
 open class PersonalLoginForm (
     @JsonNotNull
     open var username: String,
@@ -5832,45 +5672,59 @@ class PersonalLoginFormReactiveObject : PersonalLoginForm, IUTSReactive<Personal
             _tRS(__v_raw, "password", oldValue, value)
         }
 }
-val GenPagesLoginPersonalPasswordLoginClass = CreateVueComponent(GenPagesLoginPersonalPasswordLogin::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginPersonalPasswordLogin.inheritAttrs, inject = GenPagesLoginPersonalPasswordLogin.inject, props = GenPagesLoginPersonalPasswordLogin.props, propsNeedCastKeys = GenPagesLoginPersonalPasswordLogin.propsNeedCastKeys, emits = GenPagesLoginPersonalPasswordLogin.emits, components = GenPagesLoginPersonalPasswordLogin.components, styles = GenPagesLoginPersonalPasswordLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesLoginPersonalPasswordLogin.setup(props as GenPagesLoginPersonalPasswordLogin)
+val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginLogin.inheritAttrs, inject = GenPagesLoginLogin.inject, props = GenPagesLoginLogin.props, propsNeedCastKeys = GenPagesLoginLogin.propsNeedCastKeys, emits = GenPagesLoginLogin.emits, components = GenPagesLoginLogin.components, styles = GenPagesLoginLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginLogin.setup(props as GenPagesLoginLogin)
     }
     )
 }
-, fun(instance, renderer): GenPagesLoginPersonalPasswordLogin {
-    return GenPagesLoginPersonalPasswordLogin(instance, renderer)
+, fun(instance, renderer): GenPagesLoginLogin {
+    return GenPagesLoginLogin(instance, renderer)
 }
 )
-open class RegisterForm (
+val GenUniModulesIUiXComponentsIFormItemIFormItemClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormItemIFormItem::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormItemIFormItem.name, inheritAttrs = GenUniModulesIUiXComponentsIFormItemIFormItem.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormItemIFormItem.inject, props = GenUniModulesIUiXComponentsIFormItemIFormItem.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormItemIFormItem.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormItemIFormItem.emits, components = GenUniModulesIUiXComponentsIFormItemIFormItem.components, styles = GenUniModulesIUiXComponentsIFormItemIFormItem.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesIUiXComponentsIFormItemIFormItem.setup(props as GenUniModulesIUiXComponentsIFormItemIFormItem)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIFormItemIFormItem {
+    return GenUniModulesIUiXComponentsIFormItemIFormItem(instance)
+}
+)
+val GenUniModulesIUiXComponentsIFormIFormClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormIForm::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormIForm.name, inheritAttrs = GenUniModulesIUiXComponentsIFormIForm.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormIForm.inject, props = GenUniModulesIUiXComponentsIFormIForm.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormIForm.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormIForm.emits, components = GenUniModulesIUiXComponentsIFormIForm.components, styles = GenUniModulesIUiXComponentsIFormIForm.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
+        return GenUniModulesIUiXComponentsIFormIForm.setup(props as GenUniModulesIUiXComponentsIFormIForm, ctx)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIFormIForm {
+    return GenUniModulesIUiXComponentsIFormIForm(instance)
+}
+)
+open class PersonalLoginForm__1 (
     @JsonNotNull
     open var username: String,
     @JsonNotNull
     open var password: String,
-    @JsonNotNull
-    open var confirmPassword: String,
-    @JsonNotNull
-    open var mobile: String,
-    @JsonNotNull
-    open var smsCode: String,
 ) : UTSReactiveObject() {
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return RegisterFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+        return PersonalLoginForm__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
-class RegisterFormReactiveObject : RegisterForm, IUTSReactive<RegisterForm> {
-    override var __v_raw: RegisterForm
+class PersonalLoginForm__1ReactiveObject : PersonalLoginForm__1, IUTSReactive<PersonalLoginForm__1> {
+    override var __v_raw: PersonalLoginForm__1
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: RegisterForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password, confirmPassword = __v_raw.confirmPassword, mobile = __v_raw.mobile, smsCode = __v_raw.smsCode) {
+    constructor(__v_raw: PersonalLoginForm__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
         this.__v_skip = __v_skip
     }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): RegisterFormReactiveObject {
-        return RegisterFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PersonalLoginForm__1ReactiveObject {
+        return PersonalLoginForm__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
     }
     override var username: String
         get() {
@@ -5896,17 +5750,54 @@ class RegisterFormReactiveObject : RegisterForm, IUTSReactive<RegisterForm> {
             __v_raw.password = value
             _tRS(__v_raw, "password", oldValue, value)
         }
-    override var confirmPassword: String
+}
+val GenPagesLoginPersonalPasswordLoginClass = CreateVueComponent(GenPagesLoginPersonalPasswordLogin::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginPersonalPasswordLogin.inheritAttrs, inject = GenPagesLoginPersonalPasswordLogin.inject, props = GenPagesLoginPersonalPasswordLogin.props, propsNeedCastKeys = GenPagesLoginPersonalPasswordLogin.propsNeedCastKeys, emits = GenPagesLoginPersonalPasswordLogin.emits, components = GenPagesLoginPersonalPasswordLogin.components, styles = GenPagesLoginPersonalPasswordLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginPersonalPasswordLogin.setup(props as GenPagesLoginPersonalPasswordLogin)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginPersonalPasswordLogin {
+    return GenPagesLoginPersonalPasswordLogin(instance, renderer)
+}
+)
+open class RegisterForm (
+    @JsonNotNull
+    open var password: String,
+    @JsonNotNull
+    open var mobile: String,
+    @JsonNotNull
+    open var smsCode: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return RegisterFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class RegisterFormReactiveObject : RegisterForm, IUTSReactive<RegisterForm> {
+    override var __v_raw: RegisterForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: RegisterForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(password = __v_raw.password, mobile = __v_raw.mobile, smsCode = __v_raw.smsCode) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): RegisterFormReactiveObject {
+        return RegisterFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var password: String
         get() {
-            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
         }
         set(value) {
-            if (!__v_canSet("confirmPassword")) {
+            if (!__v_canSet("password")) {
                 return
             }
-            val oldValue = __v_raw.confirmPassword
-            __v_raw.confirmPassword = value
-            _tRS(__v_raw, "confirmPassword", oldValue, value)
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
         }
     override var mobile: String
         get() {
@@ -5941,6 +5832,152 @@ val GenPagesLoginRegisterClass = CreateVueComponent(GenPagesLoginRegister::class
 }
 , fun(instance, renderer): GenPagesLoginRegister {
     return GenPagesLoginRegister(instance, renderer)
+}
+)
+open class ForgotPasswordForm (
+    @JsonNotNull
+    open var mobile: String,
+    @JsonNotNull
+    open var smsCode: String,
+    @JsonNotNull
+    open var password: String,
+    @JsonNotNull
+    open var confirmPassword: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return ForgotPasswordFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class ForgotPasswordFormReactiveObject : ForgotPasswordForm, IUTSReactive<ForgotPasswordForm> {
+    override var __v_raw: ForgotPasswordForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: ForgotPasswordForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(mobile = __v_raw.mobile, smsCode = __v_raw.smsCode, password = __v_raw.password, confirmPassword = __v_raw.confirmPassword) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): ForgotPasswordFormReactiveObject {
+        return ForgotPasswordFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var mobile: String
+        get() {
+            return _tRG(__v_raw, "mobile", __v_raw.mobile, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("mobile")) {
+                return
+            }
+            val oldValue = __v_raw.mobile
+            __v_raw.mobile = value
+            _tRS(__v_raw, "mobile", oldValue, value)
+        }
+    override var smsCode: String
+        get() {
+            return _tRG(__v_raw, "smsCode", __v_raw.smsCode, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("smsCode")) {
+                return
+            }
+            val oldValue = __v_raw.smsCode
+            __v_raw.smsCode = value
+            _tRS(__v_raw, "smsCode", oldValue, value)
+        }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+    override var confirmPassword: String
+        get() {
+            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("confirmPassword")) {
+                return
+            }
+            val oldValue = __v_raw.confirmPassword
+            __v_raw.confirmPassword = value
+            _tRS(__v_raw, "confirmPassword", oldValue, value)
+        }
+}
+val GenPagesLoginForgotPasswordClass = CreateVueComponent(GenPagesLoginForgotPassword::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginForgotPassword.inheritAttrs, inject = GenPagesLoginForgotPassword.inject, props = GenPagesLoginForgotPassword.props, propsNeedCastKeys = GenPagesLoginForgotPassword.propsNeedCastKeys, emits = GenPagesLoginForgotPassword.emits, components = GenPagesLoginForgotPassword.components, styles = GenPagesLoginForgotPassword.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginForgotPassword.setup(props as GenPagesLoginForgotPassword)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginForgotPassword {
+    return GenPagesLoginForgotPassword(instance, renderer)
+}
+)
+open class PasswordForm (
+    @JsonNotNull
+    open var password: String,
+    @JsonNotNull
+    open var confirmPassword: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return PasswordFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class PasswordFormReactiveObject : PasswordForm, IUTSReactive<PasswordForm> {
+    override var __v_raw: PasswordForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: PasswordForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(password = __v_raw.password, confirmPassword = __v_raw.confirmPassword) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PasswordFormReactiveObject {
+        return PasswordFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+    override var confirmPassword: String
+        get() {
+            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("confirmPassword")) {
+                return
+            }
+            val oldValue = __v_raw.confirmPassword
+            __v_raw.confirmPassword = value
+            _tRS(__v_raw, "confirmPassword", oldValue, value)
+        }
+}
+val GenPagesLoginSetPasswordClass = CreateVueComponent(GenPagesLoginSetPassword::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginSetPassword.inheritAttrs, inject = GenPagesLoginSetPassword.inject, props = GenPagesLoginSetPassword.props, propsNeedCastKeys = GenPagesLoginSetPassword.propsNeedCastKeys, emits = GenPagesLoginSetPassword.emits, components = GenPagesLoginSetPassword.components, styles = GenPagesLoginSetPassword.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginSetPassword.setup(props as GenPagesLoginSetPassword)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginSetPassword {
+    return GenPagesLoginSetPassword(instance, renderer)
 }
 )
 open class PickerItem (
@@ -9048,76 +9085,68 @@ val GenPagesUserCenterUserInfoUserInfoClass = CreateVueComponent(GenPagesUserCen
     return GenPagesUserCenterUserInfoUserInfo(instance, renderer)
 }
 )
-open class UserInfo__1 (
+open class PasswordForm__1 (
     @JsonNotNull
-    open var id: String,
+    open var oldPassword: String,
     @JsonNotNull
-    open var mobile: String,
+    open var newPassword: String,
+    @JsonNotNull
+    open var confirmPassword: String,
 ) : UTSReactiveObject() {
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return UserInfo__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+        return PasswordForm__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
-class UserInfo__1ReactiveObject : UserInfo__1, IUTSReactive<UserInfo__1> {
-    override var __v_raw: UserInfo__1
+class PasswordForm__1ReactiveObject : PasswordForm__1, IUTSReactive<PasswordForm__1> {
+    override var __v_raw: PasswordForm__1
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: UserInfo__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(id = __v_raw.id, mobile = __v_raw.mobile) {
+    constructor(__v_raw: PasswordForm__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(oldPassword = __v_raw.oldPassword, newPassword = __v_raw.newPassword, confirmPassword = __v_raw.confirmPassword) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
         this.__v_skip = __v_skip
     }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UserInfo__1ReactiveObject {
-        return UserInfo__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PasswordForm__1ReactiveObject {
+        return PasswordForm__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
     }
-    override var id: String
+    override var oldPassword: String
         get() {
-            return _tRG(__v_raw, "id", __v_raw.id, __v_isReadonly, __v_isShallow)
+            return _tRG(__v_raw, "oldPassword", __v_raw.oldPassword, __v_isReadonly, __v_isShallow)
         }
         set(value) {
-            if (!__v_canSet("id")) {
+            if (!__v_canSet("oldPassword")) {
                 return
             }
-            val oldValue = __v_raw.id
-            __v_raw.id = value
-            _tRS(__v_raw, "id", oldValue, value)
+            val oldValue = __v_raw.oldPassword
+            __v_raw.oldPassword = value
+            _tRS(__v_raw, "oldPassword", oldValue, value)
         }
-    override var mobile: String
+    override var newPassword: String
         get() {
-            return _tRG(__v_raw, "mobile", __v_raw.mobile, __v_isReadonly, __v_isShallow)
+            return _tRG(__v_raw, "newPassword", __v_raw.newPassword, __v_isReadonly, __v_isShallow)
         }
         set(value) {
-            if (!__v_canSet("mobile")) {
+            if (!__v_canSet("newPassword")) {
                 return
             }
-            val oldValue = __v_raw.mobile
-            __v_raw.mobile = value
-            _tRS(__v_raw, "mobile", oldValue, value)
+            val oldValue = __v_raw.newPassword
+            __v_raw.newPassword = value
+            _tRS(__v_raw, "newPassword", oldValue, value)
         }
-}
-open class FormInstance (
-    open var validate: () -> Boolean,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return FormInstanceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class FormInstanceReactiveObject : FormInstance, IUTSReactive<FormInstance> {
-    override var __v_raw: FormInstance
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: FormInstance, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(validate = __v_raw.validate) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormInstanceReactiveObject {
-        return FormInstanceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
+    override var confirmPassword: String
+        get() {
+            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("confirmPassword")) {
+                return
+            }
+            val oldValue = __v_raw.confirmPassword
+            __v_raw.confirmPassword = value
+            _tRS(__v_raw, "confirmPassword", oldValue, value)
+        }
 }
 val GenPagesUserCenterEditPasswordEditPasswordClass = CreateVueComponent(GenPagesUserCenterEditPasswordEditPassword::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesUserCenterEditPasswordEditPassword.inheritAttrs, inject = GenPagesUserCenterEditPasswordEditPassword.inject, props = GenPagesUserCenterEditPasswordEditPassword.props, propsNeedCastKeys = GenPagesUserCenterEditPasswordEditPassword.propsNeedCastKeys, emits = GenPagesUserCenterEditPasswordEditPassword.emits, components = GenPagesUserCenterEditPasswordEditPassword.components, styles = GenPagesUserCenterEditPasswordEditPassword.styles, setup = fun(props: ComponentPublicInstance): Any? {
@@ -9738,6 +9767,8 @@ fun definePageRoutes() {
     __uniRoutes.push(UniPageRoute(path = "pages/login/login", component = GenPagesLoginLoginClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "登陆")))
     __uniRoutes.push(UniPageRoute(path = "pages/login/personal-password-login", component = GenPagesLoginPersonalPasswordLoginClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "个人账号登录")))
     __uniRoutes.push(UniPageRoute(path = "pages/login/register", component = GenPagesLoginRegisterClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "个人用户注册")))
+    __uniRoutes.push(UniPageRoute(path = "pages/login/forgot-password", component = GenPagesLoginForgotPasswordClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "忘记密码")))
+    __uniRoutes.push(UniPageRoute(path = "pages/login/set-password", component = GenPagesLoginSetPasswordClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "设置登录密码")))
     __uniRoutes.push(UniPageRoute(path = "pages/carInfoDetail/carInfoDetail", component = GenPagesCarInfoDetailCarInfoDetailClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "车辆详情")))
     __uniRoutes.push(UniPageRoute(path = "pages/addCar/addCar", component = GenPagesAddCarAddCarClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "添加车辆")))
     __uniRoutes.push(UniPageRoute(path = "pages/playBack/playBack", component = GenPagesPlayBackPlayBackClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "轨迹回放")))

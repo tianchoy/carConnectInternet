@@ -14,9 +14,10 @@ const wechatLogin = '/authLogin'
 const authLoginUrl = '/auth/login'
 const smsSendCodeUrl = '/resource/sms/code'
 const registerUrl = '/auth/register'
+const forgotPasswordResetUrl = '/auth/forgot-password/reset'
 const smsClientId = '428a8310cd442757ae699df5d894f051'
 const defaultTenantId = '000000'
-const changePSW = '/sys/user/password'
+const changePasswordUrl = '/user/profile/updatePassword'
 const userMsgList = '/usermessage/listForUser'
 const msgState = '/usermessage/detail/'
 const updateDevice = '/device/update'
@@ -49,9 +50,10 @@ export type PushDeviceBindRequest = {
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
 export type UniVerifyLoginRequest = UTSJSONObject
 export type SendSmsCodeRequest = { phonenumber: string, tenantId?: string }
-export type SmsLoginRequest = { phonenumber: string, smsCode: string, deviceId: string, clientId?: string, tenantId?: string }
+export type SmsLoginRequest = { phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
 export type PersonalPasswordLoginRequest = { username: string, password: string, clientId?: string, tenantId?: string }
-export type RegisterRequest = { username: string, password: string, confirmPassword: string, phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
+export type RegisterRequest = { username?: string, password: string, confirmPassword: string, phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
+export type ForgotPasswordResetRequest = { tenantId?: string, phonenumber: string, smsCode: string, newPassword: string, confirmPassword: string }
 export type DevicePositionResponse = { code: number, msg: string, data: Array<UTSJSONObject> }
 export type TrackPosResponse = { code: number, msg: string, data: UTSJSONObject }
 export type UserInfoResponse = { code: number, msg: string, data: UTSJSONObject }
@@ -63,7 +65,7 @@ export type DevicePageData = { list: Array<UTSJSONObject>, totalPage: number, to
 export type DevicePageResponse = { code: number, msg: string, data: DevicePageData }
 export type CommandListResponse = { code: number, msg: string, data: Array<UTSJSONObject> }
 export type SendCmdResponse = { code: number, msg: string, data: string }
-export type ChangePasswordResponse = { code: number, msg: string }
+export type ChangePasswordRequest = { oldPassword: string, newPassword: string, confirmPassword: string }
 export type MessageResponse = { code: number, msg: string, data: UserDeviceListData }
 
 function basicResponse(raw: any): BasicResponse {
@@ -131,11 +133,6 @@ function deviceDetailResponse(raw: any): DeviceDetailResponse {
     return { code: response.code, msg: response.msg, data: response.data }
 }
 
-function changePasswordResponse(raw: any): ChangePasswordResponse {
-    const response = basicResponse(raw)
-    return { code: response.code, msg: response.msg }
-}
-
 export const login = (data: UTSJSONObject): Promise<JsonDataResponse> => post(loginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 export const logout = (): Promise<BasicResponse> => post(logoutUrl).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const getCustomList = (): Promise<JsonDataResponse> => get(customList).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
@@ -181,6 +178,11 @@ export const sendSmsRegisterCode = (data: SendSmsCodeRequest): Promise<BasicResp
     tenantId: data.tenantId != null ? data.tenantId : defaultTenantId,
     scene: 'register'
 } as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const sendSmsForgotPasswordCode = (data: SendSmsCodeRequest): Promise<BasicResponse> => get(smsSendCodeUrl, {
+    phonenumber: data.phonenumber,
+    tenantId: data.tenantId != null ? data.tenantId : defaultTenantId,
+    scene: 'forgot'
+} as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const personalPasswordLogin = (data: PersonalPasswordLoginRequest): Promise<JsonDataResponse> => {
     const requestData = new UTSJSONObject()
     requestData.set('grantType', 'password')
@@ -190,16 +192,16 @@ export const personalPasswordLogin = (data: PersonalPasswordLoginRequest): Promi
     requestData.set('clientId', data.clientId != null ? data.clientId : smsClientId)
     return post(authLoginUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 }
-export const registerPersonalUser = (data: RegisterRequest): Promise<BasicResponse> => {
+export const registerPersonalUser = (data: RegisterRequest): Promise<JsonDataResponse> => {
     const requestData = new UTSJSONObject()
-    requestData.set('username', data.username)
+    if (data.username != null && data.username != '') requestData.set('username', data.username)
     requestData.set('password', data.password)
     requestData.set('confirmPassword', data.confirmPassword)
     requestData.set('phonenumber', data.phonenumber)
     requestData.set('smsCode', data.smsCode)
     requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
     requestData.set('clientId', data.clientId != null ? data.clientId : smsClientId)
-    return post(registerUrl, requestData).then((raw: any): BasicResponse => { return basicResponse(raw) })
+    return post(registerUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 }
 export const smsLogin = (data: SmsLoginRequest): Promise<JsonDataResponse> => {
     const requestData = new UTSJSONObject()
@@ -208,10 +210,18 @@ export const smsLogin = (data: SmsLoginRequest): Promise<JsonDataResponse> => {
     requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
     requestData.set('phonenumber', data.phonenumber)
     requestData.set('smsCode', data.smsCode)
-    requestData.set('device_id', data.deviceId)
     return post(authLoginUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 }
-export const changePassWord = (data: UTSJSONObject): Promise<ChangePasswordResponse> => put(changePSW, data).then((raw: any): ChangePasswordResponse => { return changePasswordResponse(raw) })
+export const resetForgotPassword = (data: ForgotPasswordResetRequest): Promise<JsonDataResponse> => {
+    const requestData = new UTSJSONObject()
+    requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
+    requestData.set('phonenumber', data.phonenumber)
+    requestData.set('smsCode', data.smsCode)
+    requestData.set('newPassword', data.newPassword)
+    requestData.set('confirmPassword', data.confirmPassword)
+    return post(forgotPasswordResetUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+}
+export const updatePassword = (data: ChangePasswordRequest): Promise<BasicResponse> => post(changePasswordUrl, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const getUserMsgList = (data?: UTSJSONObject): Promise<MessageResponse> => (data != null ? get(userMsgList, data) : get(userMsgList)).then((raw: any): MessageResponse => {
     return messagePageResponse(raw)
 })

@@ -29,6 +29,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             val deviceName = ref<String?>(null)
             val center = reactive(_uO("latitude" to 39.90469, "longitude" to 116.40717))
             val mapScale = ref(12)
+            val isMapReady = ref(false)
             val isInitialPositionSettled = ref(false)
             val markers = ref(_uA<Marker>())
             val carMarker = ref<Marker?>(null)
@@ -95,6 +96,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return wrapUTSPromise(suspend w1@{
                         uni_showLoading(ShowLoadingOptions(title = "获取车辆位置中..."))
                         try {
+                            isMapReady.value = false
                             val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
                             val positions = res.data
@@ -150,6 +152,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                         markers.value = _uA(
                                             marker
                                         )
+                                        isMapReady.value = true
                                     }
                                     currentSpeed.value = if (isTruthy(deviceData["speed"])) {
                                         parseFloat(deviceData["speed"].toString())
@@ -340,6 +343,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     val firstCircle = fenceCircles[0]
                     center["latitude"] = firstCircle.latitude
                     center["longitude"] = firstCircle.longitude
+                    isMapReady.value = true
                     mapScale.value = if (firstCircle.radius > 50000) {
                         8
                     } else {
@@ -483,6 +487,9 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return CoordinateBounds(minLat = minLat, maxLat = maxLat, minLng = minLng, maxLng = maxLng)
             }
             val setMapCenterToFence = fun(fence: UTSJSONObject): Unit {
+                if (carMarker.value != null) {
+                    return
+                }
                 val fenceType = getFenceType(fence)
                 val area = fence.getString("area", "")
                 if (fenceType === "circle") {
@@ -1075,21 +1082,26 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     _cE("view", _uM("class" to "container"), _uA(
                         _cV(_component_custom_navBar, _uM("title" to "地理围栏", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
                         _cE("view", _uM("class" to "map-container"), _uA(
-                            _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "polygons" to polygons.value, "markers" to markers.value, "circles" to circles.value, "onTap" to handleMapTap, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
-                                "latitude",
-                                "longitude",
-                                "scale",
-                                "style",
-                                "polygons",
-                                "markers",
-                                "circles"
-                            )),
+                            if (isTrue(isMapReady.value)) {
+                                _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "polygons" to polygons.value, "markers" to markers.value, "circles" to circles.value, "onTap" to handleMapTap, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
+                                    "latitude",
+                                    "longitude",
+                                    "scale",
+                                    "style",
+                                    "polygons",
+                                    "markers",
+                                    "circles"
+                                ))
+                            } else {
+                                _cC("v-if", true)
+                            }
+                            ,
                             _cV(_component_sub_navBar, _uM("class" to "sub-nav-overlay", "showTime" to false, "currentCar" to currentCar.value, "showCar" to true, "carStatus" to connectionStatus.value), null, 8, _uA(
                                 "currentCar",
                                 "carStatus"
                             )),
                             if (isTrue(isDrawing.value)) {
-                                _cE("view", _uM("key" to 0, "class" to "drag-hint"), _uA(
+                                _cE("view", _uM("key" to 1, "class" to "drag-hint"), _uA(
                                     if (drawingMode.value === "polygon") {
                                         _cE("text", _uM("key" to 0, "class" to "drag-hint-text"), "点击地图添加围栏点,至少需要3个点")
                                     } else {

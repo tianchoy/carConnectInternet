@@ -42,19 +42,23 @@ const userCenter_uvue_vue_type_style_index_0_lang = {};
 
 const iInput_uvue_vue_type_style_index_0_lang = {};
 
-const iFormItem_uvue_vue_type_style_index_0_lang = {};
-
 const iCheckbox_uvue_vue_type_style_index_0_lang = {};
 
 const iButton_uvue_vue_type_style_index_0_lang = {};
 
-const iForm_uvue_vue_type_style_index_0_lang = {};
-
 const login_uvue_vue_type_style_index_0_lang = {};
+
+const iFormItem_uvue_vue_type_style_index_0_lang = {};
+
+const iForm_uvue_vue_type_style_index_0_lang = {};
 
 const personalPasswordLogin_uvue_vue_type_style_index_0_lang = {};
 
 const register_uvue_vue_type_style_index_0_lang = {};
+
+const forgotPassword_uvue_vue_type_style_index_0_lang = {};
+
+const setPassword_uvue_vue_type_style_index_0_lang = {};
 
 const subNavBar_uvue_vue_type_style_index_0_lang = {};
 

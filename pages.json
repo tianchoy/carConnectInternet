@@ -43,6 +43,18 @@
 			}
 		},
 		{
+			"path": "pages/login/forgot-password",
+			"style": {
+				"navigationBarTitleText": "忘记密码"
+			}
+		},
+		{
+			"path": "pages/login/set-password",
+			"style": {
+				"navigationBarTitleText": "设置登录密码"
+			}
+		},
+		{
 			"path": "pages/carInfoDetail/carInfoDetail",
 			"style": {
 				"navigationBarTitleText": "车辆详情"

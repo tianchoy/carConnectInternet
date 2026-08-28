@@ -3,7 +3,7 @@
 		<custom-navBar title="轨迹回放" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
 		<view class="map-container">
-			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
+			<map v-if="isMapReady" id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="true" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 				</map>
 				<sub-navBar class="sub-nav-overlay" :showTime="false" :currentCar="plateNo" :showCar="true" :carStatus='carStatus'></sub-navBar>
@@ -113,6 +113,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		longitude: 116.40717
 	})
 	const mapScale = ref(12)
+	const isMapReady = ref(false)
 	const imei = ref<string | null>('')
 	const carStatus = ref<string | null>('')
 	const plateNo = ref<string | null>('')
@@ -537,10 +538,12 @@ import { showAppToast } from '../../utils/toast.uts'
 
 		// 设置标记点
 		markers.value = [marker]
+		isMapReady.value = true
 	}
 
 
 	function clearTrackDisplay() : void {
+		isMapReady.value = false
 		trackPoints.value = []
 		isTrackPlayable.value = false
 		currentIndex.value = 0
@@ -638,7 +641,11 @@ import { showAppToast } from '../../utils/toast.uts'
 		initCarMarker()
 		initPolyline()
 		adjustMapToFitTrack()
+		const firstPoint = trackPoints.value[0]
+		center.latitude = firstPoint.latitude
+		center.longitude = firstPoint.longitude
 		renderPlaybackIndex()
+		isMapReady.value = true
 	}
 	const loadTrackPos = async () => {
 		pausePlayback()

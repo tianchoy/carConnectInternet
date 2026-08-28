@@ -48,6 +48,7 @@ const __sfc__ = defineComponent({
             longitude: 116.40717
         });
         const mapScale = ref(15);
+        const isMapReady = ref(false);
         const temporaryRenderPoints = ref<Array<CoordinatePoint>>([]);
         const TRACKING_POLL_INTERVAL_MS = 1000;
         const TRACKING_ANIMATION_DURATION_MS = 900;
@@ -117,6 +118,7 @@ const __sfc__ = defineComponent({
             } as Marker;
         }
         async function loadInitialPosition(): Promise<void> {
+            isMapReady.value = false;
             try {
                 const data = {
                     deptId: deptId.value,
@@ -178,6 +180,7 @@ const __sfc__ = defineComponent({
                             markers.value = [createVehicleMarker(iconPath)];
                             markerInitialized.value = true;
                         }
+                        isMapReady.value = true;
                     }
                 });
                 if (!foundDevice) {
@@ -547,20 +550,23 @@ const __sfc__ = defineComponent({
                         showCapsule: false
                     })),
                     _cE("view", _uM({ class: "map-container" }), [
-                        _cV(_component_map, _uM({
-                            id: "myMap",
-                            latitude: currentPosition.latitude,
-                            longitude: currentPosition.longitude,
-                            markers: markers.value,
-                            polyline: polyline.value,
-                            scale: mapScale.value,
-                            style: _nS(_uM({ "width": "100%", "height": "100%" })),
-                            "show-location": false,
-                            "enable-traffic": true,
-                            "enable-overlooking": true,
-                            "enable-building": true,
-                            "enable-3D": true
-                        }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"]),
+                        isTrue(isMapReady.value)
+                            ? _cV(_component_map, _uM({
+                                key: 0,
+                                id: "myMap",
+                                latitude: currentPosition.latitude,
+                                longitude: currentPosition.longitude,
+                                markers: markers.value,
+                                polyline: polyline.value,
+                                scale: mapScale.value,
+                                style: _nS(_uM({ "width": "100%", "height": "100%" })),
+                                "show-location": false,
+                                "enable-traffic": true,
+                                "enable-overlooking": true,
+                                "enable-building": true,
+                                "enable-3D": true
+                            }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"])
+                            : _cC("v-if", true),
                         _cV(_component_sub_navBar, _uM({
                             class: "sub-nav-overlay",
                             currentTime: currentTime.value,

@@ -334,6 +334,7 @@ open class GenPagesIndexIndex : BasePage {
                         if (!hasUserLocation.value) {
                             return@w1
                         }
+                        isMapReady.value = false
                         center.latitude = userLocation.latitude
                         center.longitude = userLocation.longitude
                         markers.value = _uA()
@@ -345,6 +346,7 @@ open class GenPagesIndexIndex : BasePage {
                         markers.value = _uA(
                             nextMarker
                         )
+                        isMapReady.value = true
                 })
             }
             val centerOnUserLocation = ::gen_centerOnUserLocation_fn
@@ -464,6 +466,7 @@ open class GenPagesIndexIndex : BasePage {
             val loadDevicePos = fun(data: UTSJSONObject): UTSPromise<Boolean> {
                 return wrapUTSPromise(suspend w1@{
                         positionState.value = "loading"
+                        isMapReady.value = false
                         markers.value = _uA()
                         try {
                             val res = await(getDevicePos(data))
@@ -488,11 +491,14 @@ open class GenPagesIndexIndex : BasePage {
                             center.latitude = convertedCoord.lat
                             center.longitude = convertedCoord.lng
                             positionState.value = "available"
-                            await(delay(100))
+                            await(delay(50))
+                            markers.value = _uA()
+                            await(delay(50))
                             val nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value)
                             markers.value = _uA(
                                 nextMarker
                             )
+                            isMapReady.value = true
                             console.log("标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng)
                             return@w1 true
                         }
@@ -939,7 +945,6 @@ open class GenPagesIndexIndex : BasePage {
                 uni_hideTabBar(null)
                 initDimensions()
                 if (checkToken()) {
-                    isMapReady.value = true
                     loadDeviceList()
                 }
             }

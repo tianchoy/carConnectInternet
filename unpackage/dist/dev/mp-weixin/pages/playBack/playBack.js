@@ -139,6 +139,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       longitude: 116.40717
     }));
     const mapScale = common_vendor.ref(12);
+    const isMapReady = common_vendor.ref(false);
     const imei = common_vendor.ref("");
     const carStatus = common_vendor.ref("");
     const plateNo = common_vendor.ref("");
@@ -205,7 +206,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:204", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:205", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -443,8 +444,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       };
       carMarker.value = marker;
       markers.value = [marker];
+      isMapReady.value = true;
     }
     function clearTrackDisplay() {
+      isMapReady.value = false;
       trackPoints.value = [];
       isTrackPlayable.value = false;
       currentIndex.value = 0;
@@ -517,6 +520,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       initPolyline();
       adjustMapToFitTrack();
       renderPlaybackIndex();
+      isMapReady.value = true;
     }
     const loadTrackPos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -560,7 +564,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:684", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:688", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -665,16 +669,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       applyPlaybackSpeed(value);
     }
     common_vendor.onLoad((option) => {
-      var _a, _b, _c, _d, _e, _f, _g, _h;
+      var _a, _b, _c, _d, _f, _g, _h, _j;
       imei.value = (_a = option.imei) !== null && _a !== void 0 ? _a : null;
       carStatus.value = (_b = option.connectionStatus) !== null && _b !== void 0 ? _b : "";
       plateNo.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "";
       carType.value = (_d = option.carType) !== null && _d !== void 0 ? _d : "";
-      lat.value = (_e = option.lat) !== null && _e !== void 0 ? _e : null;
-      lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
-      sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
-      eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:813", sTime.value, eTime.value);
+      lat.value = (_f = option.lat) !== null && _f !== void 0 ? _f : null;
+      lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
+      sTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
+      eTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:817", sTime.value, eTime.value);
       const routeStartTime = resolveRouteDateTime(sTime.value);
       const routeEndTime = resolveRouteDateTime(eTime.value);
       if (routeStartTime != null && routeEndTime != null) {
@@ -695,7 +699,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     return (_ctx, _cache) => {
       "raw js";
-      const __returned__ = {
+      const __returned__ = common_vendor.e({
         a: common_vendor.p({
           title: "轨迹回放",
           ["show-back"]: true,
@@ -703,89 +707,92 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: false
         }),
-        b: common_vendor.sei("myMap", "map"),
-        c: center.latitude,
-        d: center.longitude,
-        e: markers.value,
-        f: polyline.value,
-        g: mapScale.value,
-        h: common_vendor.p({
+        b: isMapReady.value
+      }, isMapReady.value ? {
+        c: common_vendor.sei("myMap", "map"),
+        d: center.latitude,
+        e: center.longitude,
+        f: markers.value,
+        g: polyline.value,
+        h: mapScale.value
+      } : {}, {
+        i: common_vendor.p({
           showTime: false,
           currentCar: plateNo.value,
           showCar: true,
           carStatus: carStatus.value,
           class: "sub-nav-overlay"
         }),
-        i: common_vendor.p({
+        j: common_vendor.p({
           name: "/static/rili.png",
           fontSize: "15"
         }),
-        j: common_vendor.t(getPlaybackDate(startTime.value)),
-        k: common_vendor.t(getPlaybackClock(startTime.value)),
-        l: common_vendor.o(($event) => {
-          return showPicker("start");
-        }, "67"),
+        k: common_vendor.t(getPlaybackDate(startTime.value)),
+        l: common_vendor.t(getPlaybackClock(startTime.value)),
         m: common_vendor.o(($event) => {
           return showPicker("start");
+        }, "df"),
+        n: common_vendor.o(($event) => {
+          return showPicker("start");
         }, "72"),
-        n: common_vendor.p({
+        o: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15",
           class: "date-arrow"
         }),
-        o: common_vendor.t(getPlaybackDate(endTime.value)),
-        p: common_vendor.t(getPlaybackClock(endTime.value)),
-        q: common_vendor.o(($event) => {
-          return showPicker("end");
-        }, "b1"),
+        p: common_vendor.t(getPlaybackDate(endTime.value)),
+        q: common_vendor.t(getPlaybackClock(endTime.value)),
         r: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "5a"),
-        s: common_vendor.p({
+        }, "5c"),
+        s: common_vendor.o(($event) => {
+          return showPicker("end");
+        }, "02"),
+        t: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15",
           class: "date-arrow"
         }),
-        t: common_vendor.o(togglePlayback, "0c"),
-        v: common_vendor.p({
+        v: common_vendor.o(togglePlayback, "3f"),
+        w: common_vendor.p({
           type: "primary",
           size: "small",
           text: isPlaying.value ? "暂停" : "播放"
         }),
-        w: common_vendor.o(setPlaybackSpeedFromValue, "a6"),
-        x: common_vendor.o(($event) => {
+        x: common_vendor.o(setPlaybackSpeedFromValue, "ac"),
+        y: common_vendor.o(($event) => {
           return playbackSpeed.value = $event;
-        }, "dd"),
-        y: common_vendor.p({
+        }, "7d"),
+        z: common_vendor.p({
           min: 5,
           max: 50,
           step: 5,
           modelValue: playbackSpeed.value
         }),
-        z: common_vendor.t(playbackSpeed.value),
-        A: common_vendor.t(currentTime.value),
-        B: common_vendor.t(currentSpeed.value),
-        C: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        D: common_vendor.o(onConfirm, "f0"),
-        E: common_vendor.o(onCancel, "c0"),
-        F: common_vendor.p({
+        A: common_vendor.t(playbackSpeed.value),
+        B: common_vendor.t(currentTime.value),
+        C: common_vendor.t(currentSpeed.value),
+        D: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
+        E: common_vendor.o(onConfirm, "85"),
+        F: common_vendor.o(onCancel, "9f"),
+        G: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           title: pickerTitle.value,
           mode: 63,
           format: "YYYY-MM-DD HH:mm:ss"
         }),
-        G: common_vendor.o(($event) => {
+        H: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }, "45"),
-        H: common_vendor.p({
+        }, "40"),
+        I: common_vendor.p({
           position: "bottom",
           closeable: false,
           modelValue: showDateTimePicker.value
         }),
-        I: `${_ctx.u_s_b_h}px`,
-        J: `${_ctx.u_s_a_i_b}px`
-      };
+        J: `${_ctx.u_s_b_h}px`,
+        K: `${_ctx.u_s_a_i_b}px`
+      });
       return __returned__;
     };
   }
