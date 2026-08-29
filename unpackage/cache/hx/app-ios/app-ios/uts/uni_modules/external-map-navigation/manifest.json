@@ -1,0 +1,18 @@
+{
+  "version": "1",
+  "env": {
+    "vapor": false,
+    "compilerVersion": "5.23"
+  },
+  "files": {
+    "utssdk/app-ios/index.uts": {
+      "md5": "2f207beffcdb888e9f42d24d8ff87102"
+    },
+    "utssdk/interface.uts": {
+      "md5": "6367ce44ad855f04240618dfd5badce4"
+    },
+    "package.json": {
+      "md5": "17ecab34cef23792035891f8f719266b"
+    }
+  }
+}

@@ -5068,6 +5068,56 @@
       delete this.__props__;
     }
   }
+  class LegacyEnterpriseLoginRequest extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            username: { type: String, optional: false },
+            password: { type: String, optional: false },
+            clientId: { type: String, optional: true },
+            tenantId: { type: String, optional: true }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = LegacyEnterpriseLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.username = this.__props__.username;
+      this.password = this.__props__.password;
+      this.clientId = this.__props__.clientId;
+      this.tenantId = this.__props__.tenantId;
+      delete this.__props__;
+    }
+  }
+  class WechatLoginRequest extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: String, optional: false },
+            encryptedData: { type: String, optional: false },
+            iv: { type: String, optional: false },
+            clientId: { type: String, optional: true },
+            tenantId: { type: String, optional: true }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = WechatLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.encryptedData = this.__props__.encryptedData;
+      this.iv = this.__props__.iv;
+      this.clientId = this.__props__.clientId;
+      this.tenantId = this.__props__.tenantId;
+      delete this.__props__;
+    }
+  }
   class SendSmsCodeRequest extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -10058,10 +10108,37 @@
       delete this.__props__;
     }
   };
+  class EnterpriseLoginForm extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            username: { type: String, optional: false },
+            password: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = EnterpriseLoginForm.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.username = this.__props__.username;
+      this.password = this.__props__.password;
+      delete this.__props__;
+    }
+  }
   const _sfc_main$y = /* @__PURE__ */ vue.defineComponent({
     __name: "login",
     setup(__props) {
       const docState = vue.ref(false);
+      vue.ref(false);
+      vue.ref(new EnterpriseLoginForm({
+        username: "",
+        password: ""
+      }));
+      vue.ref(false);
+      vue.ref(false);
       const smsLoginMode = vue.ref(false);
       const personalForm = vue.ref(new PersonalLoginForm$1({
         username: "",
@@ -10460,7 +10537,7 @@
       };
     }
   });
-  const _style_0$x = { "container": { "": { "height": "100%", "backgroundColor": "#fbfcfe" } }, "banner": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "height": "230rpx", "backgroundColor": "#fbfcfe" } }, "banner-image": { "": { "width": "160rpx", "height": "160rpx" } }, "title": { "": { "marginLeft": "12rpx", "color": "#333333", "fontSize": "42rpx", "fontWeight": "bold" } }, "content": { "": { "paddingTop": "40rpx", "paddingRight": "38rpx", "paddingBottom": 0, "paddingLeft": "38rpx" } }, "login-form": { "": { "width": "100%" } }, "login-input": { "": { "width": "100%", "borderTopLeftRadius": "25rpx", "borderTopRightRadius": "25rpx", "borderBottomRightRadius": "25rpx", "borderBottomLeftRadius": "25rpx", "marginBottom": "26rpx" } }, "password-input": { "": { "marginBottom": "34rpx" } }, "documents": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "6rpx" } }, "doc-info-box": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-text": { "": { "fontSize": "30rpx", "lineHeight": "44rpx", "color": "#8195ac" } }, "doc-link": { "": { "fontSize": "30rpx", "lineHeight": "44rpx", "color": "#2e83df" } }, "wechat-login": { "": { "marginTop": "42rpx", "paddingTop": 0, "paddingRight": "38rpx", "paddingBottom": 0, "paddingLeft": "38rpx" } }, "wechat-login-button": { "": { "width": "100%", "borderTopColor": "#2f83df", "borderRightColor": "#2f83df", "borderBottomColor": "#2f83df", "borderLeftColor": "#2f83df", "borderTopLeftRadius": "52rpx", "borderTopRightRadius": "52rpx", "borderBottomRightRadius": "52rpx", "borderBottomLeftRadius": "52rpx", "color": "#2f83df", "fontSize": "32rpx" } }, "page-actions": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "marginTop": "54rpx" } }, "action-item": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": 0, "marginRight": "17rpx", "marginBottom": 0, "marginLeft": "17rpx" } }, "action-link": { "": { "color": "#5b92cc", "fontSize": "29rpx", "fontWeight": 500, "lineHeight": "42rpx" } }, "action-arrow": { "": { "color": "#5b92cc", "fontSize": "34rpx", "fontWeight": 500, "lineHeight": "42rpx", "marginLeft": "5rpx" } }, "sms-country-code": { "": { "color": "#5d7a9b", "fontSize": "32rpx", "fontWeight": 500, "marginRight": "20rpx" } }, "sms-send-button": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "18rpx", "paddingBottom": 0, "paddingLeft": "18rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#3485df" } }, "sms-send-button-disabled": { "": { "backgroundColor": "#b8d7ff" } }, "sms-send-button-text": { "": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx", "whiteSpace": "nowrap" } }, "i-input": { "": { "boxSizing": "border-box", "paddingTop": 0, "paddingRight": "34rpx", "paddingBottom": 0, "paddingLeft": "34rpx", "!borderTopWidth": "2rpx", "!borderRightWidth": "2rpx", "!borderBottomWidth": "2rpx", "!borderLeftWidth": "2rpx" } }, "i-input__field": { "": { "paddingTop": 0, "paddingBottom": 0 } }, "i-checkbox": { "": { "minHeight": "44rpx" } }, "i-button__text": { "": { "fontSize": "38rpx", "fontWeight": 600, "letterSpacing": "2rpx" } }, "login-submit": { "": { "marginTop": "42rpx" } }, "i-input--focus": { "": { "!borderTopColor": "#3485df", "!borderRightColor": "#3485df", "!borderBottomColor": "#3485df", "!borderLeftColor": "#3485df", "backgroundColor": "#ffffff" } }, "i-input__eye": { "": { "marginLeft": "14rpx", "opacity": 0.78 } }, "i-checkbox__box": { "": { "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx" } } };
+  const _style_0$x = { "container": { "": { "height": "100%", "backgroundColor": "#fbfcfe" } }, "banner": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "height": "230rpx", "backgroundColor": "#fbfcfe" } }, "banner-image": { "": { "width": "160rpx", "height": "160rpx" } }, "title": { "": { "marginLeft": "12rpx", "color": "#333333", "fontSize": "42rpx", "fontWeight": "bold" } }, "content": { "": { "paddingTop": "40rpx", "paddingRight": "38rpx", "paddingBottom": 0, "paddingLeft": "38rpx" } }, "mini-program-content": { "": { "paddingTop": "40rpx", "paddingRight": "38rpx", "paddingBottom": 0, "paddingLeft": "38rpx" } }, "wechat-login": { ".mini-program-content ": { "marginBottom": "20rpx", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 }, "": { "marginTop": "42rpx", "paddingTop": 0, "paddingRight": "38rpx", "paddingBottom": 0, "paddingLeft": "38rpx" } }, "enterprise-login-form": { "": { "width": "100%" } }, "remember-password": { "": { "display": "flex", "marginBottom": "25rpx" } }, "mini-program-actions": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "marginTop": "48rpx", "color": "#5b92cc", "fontSize": "30rpx" } }, "mini-program-action": { "": { "paddingTop": 0, "paddingRight": "44rpx", "paddingBottom": 0, "paddingLeft": "44rpx" } }, "no-login": { "": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#a9bfd7" } }, "login-form": { "": { "width": "100%" } }, "login-input": { "": { "width": "100%", "borderTopLeftRadius": "25rpx", "borderTopRightRadius": "25rpx", "borderBottomRightRadius": "25rpx", "borderBottomLeftRadius": "25rpx", "marginBottom": "26rpx" } }, "password-input": { "": { "marginBottom": "34rpx" } }, "documents": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "25rpx" } }, "doc-info-box": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-text": { "": { "fontSize": "30rpx", "lineHeight": "44rpx", "color": "#8195ac" } }, "doc-link": { "": { "fontSize": "30rpx", "lineHeight": "44rpx", "color": "#2e83df" } }, "wechat-login-button": { "": { "width": "100%", "borderTopColor": "#2f83df", "borderRightColor": "#2f83df", "borderBottomColor": "#2f83df", "borderLeftColor": "#2f83df", "borderTopLeftRadius": "52rpx", "borderTopRightRadius": "52rpx", "borderBottomRightRadius": "52rpx", "borderBottomLeftRadius": "52rpx", "color": "#2f83df", "fontSize": "32rpx" } }, "page-actions": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "marginTop": "54rpx" } }, "action-item": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": 0, "marginRight": "17rpx", "marginBottom": 0, "marginLeft": "17rpx" } }, "action-link": { "": { "color": "#5b92cc", "fontSize": "29rpx", "fontWeight": 500, "lineHeight": "42rpx" } }, "action-arrow": { "": { "color": "#5b92cc", "fontSize": "34rpx", "fontWeight": 500, "lineHeight": "42rpx", "marginLeft": "5rpx" } }, "sms-country-code": { "": { "color": "#5d7a9b", "fontSize": "32rpx", "fontWeight": 500, "marginRight": "20rpx" } }, "sms-send-button": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "18rpx", "paddingBottom": 0, "paddingLeft": "18rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#3485df" } }, "sms-send-button-disabled": { "": { "backgroundColor": "#b8d7ff" } }, "sms-send-button-text": { "": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx", "whiteSpace": "nowrap" } }, "i-input": { "": { "boxSizing": "border-box", "paddingTop": 0, "paddingRight": "34rpx", "paddingBottom": 0, "paddingLeft": "34rpx", "!borderTopWidth": "2rpx", "!borderRightWidth": "2rpx", "!borderBottomWidth": "2rpx", "!borderLeftWidth": "2rpx" } }, "i-input__field": { "": { "paddingTop": 0, "paddingBottom": 0 } }, "i-checkbox": { "": { "minHeight": "44rpx" } }, "i-button__text": { "": { "fontSize": "38rpx", "fontWeight": 600, "letterSpacing": "2rpx" } }, "login-submit": { "": { "marginTop": "42rpx" } }, "i-input--focus": { "": { "!borderTopColor": "#3485df", "!borderRightColor": "#3485df", "!borderBottomColor": "#3485df", "!borderLeftColor": "#3485df", "backgroundColor": "#ffffff" } }, "i-input__eye": { "": { "marginLeft": "14rpx", "opacity": 0.78 } }, "i-checkbox__box": { "": { "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx" } } };
   const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["styles", [_style_0$x]]]);
   const _sfc_main$x = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form-item" }, { __name: "i-form-item", props: {
     name: {
@@ -20783,7 +20860,7 @@
           }
         });
       }
-      function loadUnboundDevices() {
+      function loadUnboundDevices(fenceId) {
         return __awaiter(this, void 0, void 0, function* () {
           const page = pagination.unbind;
           if (!page.hasMore || page.loadingMore)
@@ -20792,7 +20869,8 @@
           try {
             const res = yield getUnboundDevices(new UTSJSONObject({
               pageNum: page.pageNum,
-              pageSize: page.pageSize
+              pageSize: page.pageSize,
+              geoId: fenceId
             }));
             if (res.code == 200) {
               const pageData = res.data;
@@ -20830,7 +20908,7 @@
       };
       const switchTab = (tab) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1072", "switchTab", tab, currentFenceId.value);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1073", "switchTab", tab, currentFenceId.value);
           if (activeTab.value === tab)
             return Promise.resolve(null);
           activeTab.value = tab;
@@ -20838,10 +20916,10 @@
           deviceList.value = [];
           initPagination(tab);
           if (tab === "bind") {
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1084", "switchTab,bind:", currentFenceId.value);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1085", "switchTab,bind:", currentFenceId.value);
             yield loadBoundDevices(currentFenceId.value);
           } else {
-            yield loadUnboundDevices();
+            yield loadUnboundDevices(currentFenceId.value);
           }
         });
       };
@@ -20851,19 +20929,19 @@
         if (activeTab.value === "bind") {
           loadBoundDevices(currentFenceId.value);
         } else {
-          loadUnboundDevices();
+          loadUnboundDevices(currentFenceId.value);
         }
       };
       const toggleDeviceBinding = (deviceImei, bound) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1104", "toggleDeviceBinding", deviceImei, bound);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1105", "toggleDeviceBinding", deviceImei, bound);
           loading.value = true;
           try {
             const params = new UTSJSONObject({
               geofenceId: currentFenceId.value,
               imeis: [deviceImei]
             });
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1111", "toggleDeviceBindingparams", params);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1112", "toggleDeviceBindingparams", params);
             let result = null;
             if (bound) {
               result = yield bindDevices(params);
@@ -20877,13 +20955,13 @@
               if (activeTab.value === "bind") {
                 yield loadBoundDevices(currentFenceId.value);
               } else {
-                yield loadUnboundDevices();
+                yield loadUnboundDevices(currentFenceId.value);
               }
             } else {
               showAppToast({ title: result.msg || "操作失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1134", "设备绑定操作失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1135", "设备绑定操作失败:", error);
             showAppToast({ title: "操作失败", icon: "none" });
           } finally {
             loading.value = false;
@@ -20943,10 +21021,10 @@
         var _a;
         (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.$callMethod("close");
         const fence = selectedFence.value;
-        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1205", "删除电子围栏", fence);
+        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1206", "删除电子围栏", fence);
         if (fence != null) {
           const fenceId = fence.getString("id", "");
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1209", "删除电子围栏ID", fenceId);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1210", "删除电子围栏ID", fenceId);
           if (fenceId !== "") {
             deleteFence(fenceId);
           } else {
@@ -21339,6 +21417,7 @@
                         vue.createElementVNode("text", new UTSJSONObject({ class: "label" }), "告警类型:"),
                         vue.createElementVNode("view", new UTSJSONObject({ class: "radio-options" }), [
                           vue.createVNode(_component_i_radio, new UTSJSONObject({
+                            class: "alarm-radio",
                             modelValue: fenceForm.alarmType,
                             "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event = null) => {
                               return fenceForm.alarmType = $event;
@@ -21348,12 +21427,13 @@
                           }), {
                             default: vue.withCtx(() => {
                               return [
-                                vue.createTextVNode("不告警")
+                                vue.createElementVNode("text", new UTSJSONObject({ class: "alarm-radio-label" }), "不告警")
                               ];
                             }),
                             _: 1
                           }, 8, ["modelValue"]),
                           vue.createVNode(_component_i_radio, new UTSJSONObject({
+                            class: "alarm-radio",
                             modelValue: fenceForm.alarmType,
                             "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event = null) => {
                               return fenceForm.alarmType = $event;
@@ -21363,12 +21443,13 @@
                           }), {
                             default: vue.withCtx(() => {
                               return [
-                                vue.createTextVNode("出入告警")
+                                vue.createElementVNode("text", new UTSJSONObject({ class: "alarm-radio-label" }), "出入告警")
                               ];
                             }),
                             _: 1
                           }, 8, ["modelValue"]),
                           vue.createVNode(_component_i_radio, new UTSJSONObject({
+                            class: "alarm-radio",
                             modelValue: fenceForm.alarmType,
                             "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event = null) => {
                               return fenceForm.alarmType = $event;
@@ -21378,12 +21459,13 @@
                           }), {
                             default: vue.withCtx(() => {
                               return [
-                                vue.createTextVNode("出告警")
+                                vue.createElementVNode("text", new UTSJSONObject({ class: "alarm-radio-label" }), "出告警")
                               ];
                             }),
                             _: 1
                           }, 8, ["modelValue"]),
                           vue.createVNode(_component_i_radio, new UTSJSONObject({
+                            class: "alarm-radio",
                             modelValue: fenceForm.alarmType,
                             "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event = null) => {
                               return fenceForm.alarmType = $event;
@@ -21393,7 +21475,7 @@
                           }), {
                             default: vue.withCtx(() => {
                               return [
-                                vue.createTextVNode("入告警")
+                                vue.createElementVNode("text", new UTSJSONObject({ class: "alarm-radio-label" }), "入告警")
                               ];
                             }),
                             _: 1
@@ -21515,7 +21597,7 @@
       };
     }
   });
-  const _style_0$7 = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "150rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "fence-operations": { ".container ": { "backgroundColor": "#ffffff", "paddingBottom": "50rpx" } }, "fence-header": { ".container .fence-operations ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "40rpx", "paddingBottom": "20rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "fence-name": { ".container .fence-operations .fence-header ": { "fontSize": "32rpx", "fontWeight": "bold" } }, "fence-actions": { ".container .fence-operations ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "column", "boxShadow": "0 -2px 10px rgba(0, 0, 0, 0.1)" } }, "drawing-mode-selector": { ".container .tools-panel ": { "marginBottom": "20rpx", "paddingBottom": "20rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "mode-title": { ".container .tools-panel .drawing-mode-selector ": { "fontSize": "28rpx", "marginBottom": "15rpx", "color": "#333333", "fontWeight": 500 } }, "mode-buttons": { ".container .tools-panel .drawing-mode-selector ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "mode-button-spacing": { ".container .tools-panel .drawing-mode-selector .mode-buttons ": { "marginLeft": "20rpx" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "20rpx" } }, "status-info": { ".container .tools-panel ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" } }, "fence-list": { ".container ": { "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#ffffff" } }, "list-header": { ".container .fence-list ": { "flexShrink": 0, "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "title": { ".container .fence-list .list-header ": { "fontSize": "32rpx", "fontWeight": "bold" } }, "list-content": { ".container .fence-list ": { "height": "640rpx", "boxSizing": "border-box", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "fence-item": { ".container .fence-list .list-content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "fence-info": { ".container .fence-list .list-content .fence-item ": { "display": "flex", "flexDirection": "column", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "name": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "30rpx", "fontWeight": 500, "marginBottom": "8rpx" }, ".container .device-dialog .device-list .device-item .device-info ": { "fontSize": "30rpx", "marginBottom": "8rpx" } }, "type": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "24rpx", "color": "#2979ff", "marginBottom": "8rpx" } }, "devices": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "24rpx", "color": "#999999" } }, "empty": { ".container .fence-list .list-content ": { "paddingTop": "100rpx", "paddingRight": 0, "paddingBottom": "100rpx", "paddingLeft": 0 }, ".container .device-dialog .device-list ": { "paddingTop": "100rpx", "paddingRight": 0, "paddingBottom": "100rpx", "paddingLeft": 0 } }, "edit-dialog": { ".container ": { "backgroundColor": "#ffffff", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "overflow": "hidden" } }, "dialog-header": { ".container .edit-dialog ": { "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" }, ".container .device-dialog ": { "display": "flex", "justifyContent": "space-between", "flexDirection": "row", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "dialog-title": { ".container .edit-dialog ": { "textAlign": "center", "fontSize": "32rpx", "fontWeight": "bold" } }, "dialog-content": { ".container .edit-dialog ": { "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "radio-group": { ".container .edit-dialog .dialog-content ": { "marginTop": "30rpx" } }, "label": { ".container .edit-dialog .dialog-content .radio-group ": { "marginBottom": "30rpx", "fontSize": "28rpx", "fontWeight": 500 } }, "radio-options": { ".container .edit-dialog .dialog-content .radio-group ": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap", "alignItems": "center" } }, "dialog-actions": { ".container .edit-dialog ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" }, ".container .device-dialog ": { "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" } }, "device-dialog": { ".container ": { "height": "800rpx", "display": "flex", "flexDirection": "column", "backgroundColor": "#ffffff" } }, "dialog-tabs": { ".container .device-dialog ": { "display": "flex", "flexDirection": "row", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "tab": { ".container .device-dialog .dialog-tabs ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "textAlign": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "fontSize": "28rpx" }, ".container .device-dialog .dialog-tabs .active": { "color": "#2979ff", "borderBottomWidth": "4rpx", "borderBottomStyle": "solid", "borderBottomColor": "#2979ff" } }, "device-list": { ".container .device-dialog ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0, "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "75rpx", "paddingLeft": "20rpx", "boxSizing": "border-box" } }, "device-item": { ".container .device-dialog .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "device-info": { ".container .device-dialog .device-list .device-item ": { "display": "flex", "flexDirection": "column" } }, "status": { ".container .device-dialog .device-list .device-item .device-info ": { "fontSize": "24rpx", "color": "#999999" } }, "loading-tip": { ".container .device-dialog .device-list ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "no-more": { ".container .device-dialog .device-list ": { "textAlign": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "26rpx" } }, "drag-hint-text": { ".container ": { "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "textAlign": "center" } }, "status-text": { ".container ": { "fontSize": "28rpx", "color": "#333333" } }, "empty-text-box": { ".container ": { "marginTop": "30rpx" } }, "empty-text": { ".container ": { "textAlign": "center", "fontSize": "22rpx", "color": "#999999" } }, "i-popup__content": { ".container ": { "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "i-grid-item": { ".container ": { "!alignItems": "flex-start", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "10rpx", "marginLeft": 0 } } };
+  const _style_0$7 = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "150rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "fence-operations": { ".container ": { "backgroundColor": "#ffffff", "paddingBottom": "50rpx" } }, "fence-header": { ".container .fence-operations ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "40rpx", "paddingBottom": "20rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "fence-name": { ".container .fence-operations .fence-header ": { "fontSize": "32rpx", "fontWeight": "bold" } }, "fence-actions": { ".container .fence-operations ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "column", "boxShadow": "0 -2px 10px rgba(0, 0, 0, 0.1)" } }, "drawing-mode-selector": { ".container .tools-panel ": { "marginBottom": "20rpx", "paddingBottom": "20rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "mode-title": { ".container .tools-panel .drawing-mode-selector ": { "fontSize": "28rpx", "marginBottom": "15rpx", "color": "#333333", "fontWeight": 500 } }, "mode-buttons": { ".container .tools-panel .drawing-mode-selector ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "mode-button-spacing": { ".container .tools-panel .drawing-mode-selector .mode-buttons ": { "marginLeft": "20rpx" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "20rpx" } }, "status-info": { ".container .tools-panel ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" } }, "fence-list": { ".container ": { "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#ffffff" } }, "list-header": { ".container .fence-list ": { "flexShrink": 0, "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "title": { ".container .fence-list .list-header ": { "fontSize": "32rpx", "fontWeight": "bold" } }, "list-content": { ".container .fence-list ": { "height": "640rpx", "boxSizing": "border-box", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "fence-item": { ".container .fence-list .list-content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "fence-info": { ".container .fence-list .list-content .fence-item ": { "display": "flex", "flexDirection": "column", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "name": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "30rpx", "fontWeight": 500, "marginBottom": "8rpx" }, ".container .device-dialog .device-list .device-item .device-info ": { "fontSize": "30rpx", "marginBottom": "8rpx" } }, "type": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "24rpx", "color": "#2979ff", "marginBottom": "8rpx" } }, "devices": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "24rpx", "color": "#999999" } }, "empty": { ".container .fence-list .list-content ": { "paddingTop": "100rpx", "paddingRight": 0, "paddingBottom": "100rpx", "paddingLeft": 0 }, ".container .device-dialog .device-list ": { "paddingTop": "100rpx", "paddingRight": 0, "paddingBottom": "100rpx", "paddingLeft": 0 } }, "edit-dialog": { ".container ": { "backgroundColor": "#ffffff", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "overflow": "hidden" } }, "dialog-header": { ".container .edit-dialog ": { "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" }, ".container .device-dialog ": { "display": "flex", "justifyContent": "space-between", "flexDirection": "row", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "dialog-title": { ".container .edit-dialog ": { "textAlign": "center", "fontSize": "32rpx", "fontWeight": "bold" } }, "dialog-content": { ".container .edit-dialog ": { "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "radio-group": { ".container .edit-dialog .dialog-content ": { "marginTop": "30rpx" } }, "label": { ".container .edit-dialog .dialog-content .radio-group ": { "marginBottom": "30rpx", "fontSize": "28rpx", "fontWeight": 500 } }, "radio-options": { ".container .edit-dialog .dialog-content .radio-group ": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap", "alignItems": "center" } }, "alarm-radio": { ".container .edit-dialog .dialog-content .radio-group ": { "width": "50%", "marginBottom": "24rpx" } }, "alarm-radio-label": { ".container .edit-dialog .dialog-content .radio-group ": { "marginLeft": "10rpx" } }, "dialog-actions": { ".container .edit-dialog ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" }, ".container .device-dialog ": { "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" } }, "device-dialog": { ".container ": { "height": "800rpx", "display": "flex", "flexDirection": "column", "backgroundColor": "#ffffff" } }, "dialog-tabs": { ".container .device-dialog ": { "display": "flex", "flexDirection": "row", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "tab": { ".container .device-dialog .dialog-tabs ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "textAlign": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "fontSize": "28rpx" }, ".container .device-dialog .dialog-tabs .active": { "color": "#2979ff", "borderBottomWidth": "4rpx", "borderBottomStyle": "solid", "borderBottomColor": "#2979ff" } }, "device-list": { ".container .device-dialog ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0, "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "75rpx", "paddingLeft": "20rpx", "boxSizing": "border-box" } }, "device-item": { ".container .device-dialog .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "device-info": { ".container .device-dialog .device-list .device-item ": { "display": "flex", "flexDirection": "column" } }, "status": { ".container .device-dialog .device-list .device-item .device-info ": { "fontSize": "24rpx", "color": "#999999" } }, "loading-tip": { ".container .device-dialog .device-list ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "no-more": { ".container .device-dialog .device-list ": { "textAlign": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "26rpx" } }, "drag-hint-text": { ".container ": { "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "textAlign": "center" } }, "status-text": { ".container ": { "fontSize": "28rpx", "color": "#333333" } }, "empty-text-box": { ".container ": { "marginTop": "30rpx" } }, "empty-text": { ".container ": { "textAlign": "center", "fontSize": "22rpx", "color": "#999999" } }, "i-popup__content": { ".container ": { "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "i-grid-item": { ".container ": { "!alignItems": "flex-start", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "10rpx", "marginLeft": 0 } } };
   const PagesGeofencingGeofencing = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["styles", [_style_0$7]]]);
   const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "scancode",
@@ -22549,9 +22631,10 @@
             if (from) {
               const params = new UTSJSONObject({ pageSize: 1e3 });
               const res = yield getUserDeviceList(params);
+              uni.__log__("log", "at pages/deviceList/deviceList.uvue:145", "获取设备列表:", res);
               const list = res.code == 200 && res.data != null ? res.data.list : null;
               if (list == null || !Array.isArray(list)) {
-                uni.__log__("warn", "at pages/deviceList/deviceList.uvue:147", "获取设备列表返回异常:", res);
+                uni.__log__("warn", "at pages/deviceList/deviceList.uvue:148", "获取设备列表返回异常:", res);
                 originalDeviceList.value = [];
                 markers.value = [];
                 return Promise.resolve(null);
@@ -22563,7 +22646,7 @@
             originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, "tencent");
             updateMarkers(originalDeviceList.value);
           } catch (err) {
-            uni.__log__("error", "at pages/deviceList/deviceList.uvue:158", "获取设备列表失败:", err);
+            uni.__log__("error", "at pages/deviceList/deviceList.uvue:159", "获取设备列表失败:", err);
             originalDeviceList.value = [];
             markers.value = [];
             showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -22588,19 +22671,6 @@
           yield loadUserDeviceList([], true);
         });
       };
-      const getLocation = () => {
-        uni.getLocation(new UTSJSONObject({
-          type: "wgs84",
-          success: (res) => {
-            uni.__log__("log", "at pages/deviceList/deviceList.uvue:187", "获取位置成功:", res);
-            userLocation.value.latitude = res.latitude;
-            userLocation.value.longitude = res.longitude;
-          },
-          fail: (err) => {
-            uni.__log__("log", "at pages/deviceList/deviceList.uvue:192", "获取位置失败:", err);
-          }
-        }));
-      };
       const changeState = (type) => {
         pickerStateTitle.value = type;
       };
@@ -22612,7 +22682,7 @@
           return device["deviceId"] == markerId;
         });
         if (selectedDevice == null) {
-          uni.__log__("warn", "at pages/deviceList/deviceList.uvue:222", "未找到对应的设备信息", markerId);
+          uni.__log__("warn", "at pages/deviceList/deviceList.uvue:209", "未找到对应的设备信息", markerId);
           return null;
         }
         const imeiValue = (_a = selectedDevice["imei"]) !== null && _a !== void 0 ? _a : "";
@@ -22623,7 +22693,6 @@
         });
       };
       vue.onLoad((options) => {
-        getLocation();
         loadUserDeviceList([], true);
       });
       return (_ctx = null, _cache = null) => {

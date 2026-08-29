@@ -203,6 +203,13 @@
   flex-wrap: wrap;
   align-items: center;
 }
+.container .edit-dialog .dialog-content .radio-group .alarm-radio[class] {
+  width: 50%;
+  margin-bottom: 24rpx;
+}
+.container .edit-dialog .dialog-content .radio-group .alarm-radio-label[class] {
+  margin-left: 10rpx;
+}
 .container .edit-dialog .dialog-actions[class] {
   display: flex;
   flex-direction: row;

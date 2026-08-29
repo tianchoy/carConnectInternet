@@ -12,7 +12,6 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
-import io.dcloud.uniapp.extapi.getLocation as uni_getLocation
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 open class GenPagesDeviceListDeviceList : BasePage {
@@ -136,6 +135,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             if (from) {
                                 val params: UTSJSONObject = _uO("pageSize" to 1000)
                                 val res = await(getUserDeviceList(params))
+                                console.log("获取设备列表:", res)
                                 val list = if (res.code == 200 && res.data != null) {
                                     res.data.list
                                 } else {
@@ -181,17 +181,6 @@ open class GenPagesDeviceListDeviceList : BasePage {
                         await(loadUserDeviceList(_uA(), true))
                 })
             }
-            val getLocation = fun(){
-                uni_getLocation(GetLocationOptions(type = "wgs84", success = fun(res){
-                    console.log("获取位置成功:", res)
-                    userLocation.value["latitude"] = res.latitude
-                    userLocation.value["longitude"] = res.longitude
-                }
-                , fail = fun(err){
-                    console.log("获取位置失败:", err)
-                }
-                ))
-            }
             val changeState = fun(type: String){
                 pickerStateTitle.value = type
             }
@@ -216,7 +205,6 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?imei=" + imeiValue + "&deptId=" + companyId.toString() + "&deviceId=" + deviceId.toString()))
             }
             onLoad(fun(options){
-                getLocation()
                 loadUserDeviceList(_uA(), true)
             }
             )

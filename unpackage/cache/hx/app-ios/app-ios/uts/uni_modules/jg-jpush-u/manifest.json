@@ -1,0 +1,69 @@
+{
+  "version": "1",
+  "env": {
+    "vapor": false,
+    "compilerVersion": "5.23"
+  },
+  "files": {
+    "utssdk/app-ios/index.uts": {
+      "md5": "6cb3dcfb19bc7803d56603210bfd15fe"
+    },
+    "utssdk/interface.uts": {
+      "md5": "de0b03c7d9b8c3e1a2bee34c26385962"
+    },
+    "utssdk/unierror.uts": {
+      "md5": "b015d94977486c8fa6cbd27f5117909d"
+    },
+    "API_Comparison_Documentation.md": {
+      "md5": "a233fe1abf3c8930c72e9aa904c41d98"
+    },
+    "Android_API_Documentation.md": {
+      "md5": "4ff059c4d64efa19f92086e6e40be318"
+    },
+    "Android_Integration_Guide.md": {
+      "md5": "e69d8e48248cb79385448f5fdac0d9a5"
+    },
+    "HarmonyOS_API_Documentation.md": {
+      "md5": "b40b374fc82be160f168419b746776ef"
+    },
+    "api.md": {
+      "md5": "2a7aeac6015fb3a109c627cbf68cf7c1"
+    },
+    "iOS_API_Documentation.md": {
+      "md5": "806d0021114dca3791369272b1ae4d82"
+    },
+    "iOS_Integration_Guide.md": {
+      "md5": "f694f4b26d83934d506353ac77a3123c"
+    },
+    "package.json": {
+      "md5": "d999f04238dd2273c3d24240773559b8"
+    },
+    "readme_me.md": {
+      "md5": "120b8a5e7580827637307d55393c8065"
+    },
+    "utssdk/app-ios/PrivacyInfo.xcprivacy": {
+      "md5": "62672ee56f790e628c8e262dae1d2ede"
+    },
+    "utssdk/app-ios/UTS.entitlements": {
+      "md5": "0157f2440e2fd85080b7fd1a177d8751"
+    },
+    "utssdk/app-ios/config.json": {
+      "md5": "110e0bccc667595d99bd26946f6f7bb8"
+    },
+    "utssdk/app-ios/Libs/JCore/JGCOREAPI.h": {
+      "md5": "86841225afbe6a872937300a5ac85d61"
+    },
+    "utssdk/app-ios/Libs/JCore/JGInforCollectionAuth.h": {
+      "md5": "bb52ee4d948d50f7ac6b79836a8b999b"
+    },
+    "utssdk/app-ios/Libs/JCore/libJCore.a": {
+      "md5": "570f9d99a43d4658a386c214f0ef2106"
+    },
+    "utssdk/app-ios/Libs/JPush/JPUSHService.h": {
+      "md5": "e43c226fb1649d11c80699304716d56c"
+    },
+    "utssdk/app-ios/Libs/JPush/libJPush.a": {
+      "md5": "ab25f52590ac9e73378b7cecbdec8387"
+    }
+  }
+}

@@ -106,10 +106,10 @@
 					<view class="radio-group">
 						<text class="label">告警类型:</text>
 						<view class="radio-options">
-							<i-radio v-model="fenceForm.alarmType" name="0" iconPlacement="left">不告警</i-radio>
-							<i-radio v-model="fenceForm.alarmType" name="1" iconPlacement="left">出入告警</i-radio>
-							<i-radio v-model="fenceForm.alarmType" name="2" iconPlacement="left">出告警</i-radio>
-							<i-radio v-model="fenceForm.alarmType" name="3" iconPlacement="left">入告警</i-radio>
+							<i-radio class="alarm-radio" v-model="fenceForm.alarmType" name="0" iconPlacement="left"><text class="alarm-radio-label">不告警</text></i-radio>
+							<i-radio class="alarm-radio" v-model="fenceForm.alarmType" name="1" iconPlacement="left"><text class="alarm-radio-label">出入告警</text></i-radio>
+							<i-radio class="alarm-radio" v-model="fenceForm.alarmType" name="2" iconPlacement="left"><text class="alarm-radio-label">出告警</text></i-radio>
+							<i-radio class="alarm-radio" v-model="fenceForm.alarmType" name="3" iconPlacement="left"><text class="alarm-radio-label">入告警</text></i-radio>
 						</view>
 					</view>
 				</view>
@@ -1022,7 +1022,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 	}
 
-	async function loadUnboundDevices() : Promise<void> {
+	async function loadUnboundDevices(fenceId : string) : Promise<void> {
 		const page = pagination.unbind
 		if (!page.hasMore || page.loadingMore) return
 
@@ -1030,7 +1030,8 @@ import { showAppToast } from '../../utils/toast.uts'
 		try {
 			const res = await getUnboundDevices({
 				pageNum: page.pageNum,
-				pageSize: page.pageSize
+				pageSize: page.pageSize,
+				geoId: fenceId
 			})
 
 			if (res.code == 200) {
@@ -1084,7 +1085,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			console.log('switchTab,bind:', currentFenceId.value)
 			await loadBoundDevices(currentFenceId.value)
 		} else {
-			await loadUnboundDevices()
+			await loadUnboundDevices(currentFenceId.value)
 		}
 	}
 
@@ -1095,7 +1096,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		if (activeTab.value === 'bind') {
 			loadBoundDevices(currentFenceId.value)
 		} else {
-			loadUnboundDevices()
+			loadUnboundDevices(currentFenceId.value)
 		}
 	}
 
@@ -1125,7 +1126,7 @@ import { showAppToast } from '../../utils/toast.uts'
 				if (activeTab.value === 'bind') {
 					await loadBoundDevices(currentFenceId.value)
 				} else {
-					await loadUnboundDevices()
+					await loadUnboundDevices(currentFenceId.value)
 				}
 			} else {
 				showAppToast({ title: result.msg || '操作失败', icon: 'none' })
@@ -1571,6 +1572,15 @@ import { showAppToast } from '../../utils/toast.uts'
 						flex-direction: row;
 						flex-wrap: wrap;
 						align-items: center;
+					}
+
+					.alarm-radio {
+						width: 50%;
+						margin-bottom: 24rpx;
+					}
+
+					.alarm-radio-label {
+						margin-left: 10rpx;
 					}
 
 				}

@@ -26,43 +26,64 @@
 /* 透明度 */
 /* 文章场景相关 */
 .container[class].data-v-3038f9e3 {
-  background-color: #fff;
+  height: 100%;
+  background-color: #fbfcfe;
 }
 .content[class].data-v-3038f9e3 {
-  padding: 50rpx 70rpx 20rpx;
+  padding: 50rpx 32rpx 0;
 }
-.sms-code-input[class].data-v-3038f9e3 {
-  width: 100%;
-}
-.password-mismatch-tip[class].data-v-3038f9e3 {
+.page-title[class].data-v-3038f9e3 {
   display: flex;
-  margin-top: 8rpx;
-  color: #f56c6c;
-  font-size: 24rpx;
+  color: #1f2d3d;
+  font-size: 54rpx;
+  font-weight: 700;
+  line-height: 76rpx;
+}
+.register-input[class].data-v-3038f9e3 {
+  width: 100%;
+  border-radius: 25rpx;
+  margin-top: 52rpx;
+}
+.sms-code-input[class].data-v-3038f9e3,
+.password-input[class].data-v-3038f9e3 {
+  margin-top: 28rpx;
+}
+.country-code[class].data-v-3038f9e3 {
+  color: #5d7a9b;
+  font-size: 34rpx;
+  font-weight: 500;
+  margin-right: 20rpx;
 }
 .sms-send-button[class].data-v-3038f9e3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 56rpx;
-  padding: 0 20rpx;
-  border-radius: 28rpx;
-  background-color: #007AFF;
+  height: 58rpx;
+  padding: 0 18rpx;
+  border-radius: 29rpx;
 }
 .sms-send-button-disabled[class].data-v-3038f9e3 {
-  background-color: #B8D7FF;
+  opacity: 0.45;
 }
 .sms-send-button-text[class].data-v-3038f9e3 {
-  color: #fff;
-  font-size: 24rpx;
-  line-height: 56rpx;
+  color: #1878e5;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 58rpx;
   white-space: nowrap;
+}
+.password-hint[class].data-v-3038f9e3 {
+  display: flex;
+  margin: 22rpx 6rpx 0;
+  color: #7f96ae;
+  font-size: 26rpx;
+  line-height: 40rpx;
 }
 .documents[class].data-v-3038f9e3 {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-top: 40rpx;
+  margin-top: 38rpx;
 }
 .doc-info-box[class].data-v-3038f9e3 {
   display: flex;
@@ -70,23 +91,42 @@
   align-items: center;
   white-space: nowrap;
 }
+.doc-text[class].data-v-3038f9e3,
 .doc-link[class].data-v-3038f9e3 {
-  color: #007AFF;
-  font-size: 28rpx;
+  font-size: 30rpx;
+  line-height: 44rpx;
 }
 .doc-text[class].data-v-3038f9e3 {
-  font-size: 28rpx;
+  color: #8397ad;
+}
+.doc-link[class].data-v-3038f9e3 {
+  color: #1878e5;
+}
+.submit-button[class].data-v-3038f9e3 {
+  margin-top: 46rpx;
 }
 .login-link-box[class].data-v-3038f9e3 {
   display: flex;
   justify-content: center;
-  margin-top: 40rpx;
+  margin-top: 52rpx;
 }
 .login-link[class].data-v-3038f9e3 {
-  font-size: 26rpx;
-  color: #8b8c8d;
+  color: #3485df;
+  font-size: 30rpx;
+  line-height: 48rpx;
   text-align: center;
 }
-.data-v-3038f9e3 .i-form-item[class] {
-  padding: 12px 0;
+.data-v-3038f9e3 .i-input[class] {
+  box-sizing: border-box;
+}
+.data-v-3038f9e3 .i-input__field[class] {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.data-v-3038f9e3 .i-checkbox[class] {
+  min-height: 44rpx;
+}
+.data-v-3038f9e3 .i-button__text[class] {
+  font-size: 38rpx;
+  font-weight: 600;
 }

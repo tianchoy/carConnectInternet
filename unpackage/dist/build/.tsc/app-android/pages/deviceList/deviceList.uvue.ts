@@ -131,6 +131,7 @@ const mapScale = ref(4)
 			if (from) {
 				const params: UTSJSONObject = { pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
+				console.log('获取设备列表:', res)
 				const list = (res.code == 200 && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
 				if (list == null || !Array.isArray(list)) {
 					console.warn('获取设备列表返回异常:', res)
@@ -167,20 +168,6 @@ const mapScale = ref(4)
 		}
 		// 解绑成功后刷新设备列表
 		await loadUserDeviceList([],true)
-	}
-	// 获取当前位置
-	const getLocation = () => {
-		uni.getLocation({
-			type: 'wgs84',
-			success: (res) => {
-				console.log('获取位置成功:', res)
-				userLocation.value.latitude = res.latitude
-				userLocation.value.longitude = res.longitude
-			},
-			fail: (err) => {
-				console.log('获取位置失败:', err)
-			}
-		})
 	}
 
 	// 订阅消息
@@ -220,7 +207,6 @@ const mapScale = ref(4)
 	}
 
 	onLoad((options) => {
-		getLocation()
 		loadUserDeviceList([], true)
 	})
 

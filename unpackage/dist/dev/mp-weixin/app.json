@@ -6,6 +6,8 @@
     "pages/login/login",
     "pages/login/personal-password-login",
     "pages/login/register",
+    "pages/login/forgot-password",
+    "pages/login/set-password",
     "pages/carInfoDetail/carInfoDetail",
     "pages/addCar/addCar",
     "pages/playBack/playBack",

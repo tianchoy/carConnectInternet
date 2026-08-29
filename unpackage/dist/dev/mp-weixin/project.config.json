@@ -15,7 +15,7 @@
   },
   "compileType": "miniprogram",
   "libVersion": "",
-  "appid": "wx197f5f7e9b9833bc",
+  "appid": "wx2ebcdca9a6dfc8f0",
   "projectname": "中导物联",
   "condition": {
     "search": {
@@ -34,5 +34,6 @@
       "current": -1,
       "list": []
     }
-  }
+  },
+  "isGameTourist": false
 }

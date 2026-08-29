@@ -443,5 +443,45 @@ xcodebuild -create-xcframework \
   -output "${FRAMEWORK_OUTPUT}"
 
 plutil -lint "${FRAMEWORK_OUTPUT}/Info.plist" >/dev/null
+
+python3 - "${IOS_PROJECT_FILE}" "${FRAMEWORK_NAME}" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+project_path = Path(sys.argv[1])
+framework_name = sys.argv[2] + '.xcframework'
+text = project_path.read_text(encoding='utf-8')
+
+reference = re.search(
+    rf'^\s*([A-F0-9]+) /\* {re.escape(framework_name)} \*/ = \{{'
+    rf'isa = PBXFileReference;[^\n]*path = GeneratedFrameworks/{re.escape(framework_name)};',
+    text,
+    flags=re.MULTILINE,
+)
+if reference is None:
+    raise SystemExit(f'{project_path} 缺少 {framework_name} 的文件引用。')
+
+reference_id = reference.group(1)
+linked = re.search(
+    rf'^\s*([A-F0-9]+) /\* {re.escape(framework_name)} in Frameworks \*/ = \{{'
+    rf'isa = PBXBuildFile; fileRef = {reference_id} /\* {re.escape(framework_name)} \*/;',
+    text,
+    flags=re.MULTILINE,
+)
+embedded = re.search(
+    rf'^\s*([A-F0-9]+) /\* {re.escape(framework_name)} in Embed Frameworks \*/ = \{{'
+    rf'isa = PBXBuildFile; fileRef = {reference_id} /\* {re.escape(framework_name)} \*/; '
+    rf'settings = \{{ATTRIBUTES = \(CodeSignOnCopy, RemoveHeadersOnCopy, \); \}};',
+    text,
+    flags=re.MULTILINE,
+)
+if linked is None or embedded is None:
+    raise SystemExit(f'{project_path} 未配置 {framework_name} 的链接或嵌入构建项。')
+
+if linked.group(1) not in text or embedded.group(1) not in text:
+    raise SystemExit(f'{project_path} 未在 UniAppX 构建阶段使用 {framework_name}。')
+PY
+
 print -- "完成：${FRAMEWORK_OUTPUT}"
 print -- "接下来请打开 ${IOS_APP_ROOT}/UniAppXDemo.xcworkspace 进行真机运行或 Archive。"

@@ -1,0 +1,8 @@
+{
+  "version": "1",
+  "dependencies": {
+    "dependencies": [
+      "cn.jiguang.sdk.plugin:huawei:6.2.0"
+    ]
+  }
+}

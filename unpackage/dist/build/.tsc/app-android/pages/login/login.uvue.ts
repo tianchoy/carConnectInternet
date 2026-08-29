@@ -10,13 +10,18 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 	import { userAgreement, privacyPolicy } from '../../utils/legal.uts'
 	import { schedulePostLoginInitialization } from '../../services/app-startup.uts'
 	import { resetTokenExpiredState } from '../../api/http.uts'
-	import { PostWechatlogin, personalPasswordLogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
+	import { PostWechatlogin, login, personalPasswordLogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 	import { saveSmsRegisterContext } from '../../services/auth/sms-register-context.uts'
 
 	import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
 
 
 	type PersonalLoginForm = {
+		username: string
+		password: string
+	}
+
+	type EnterpriseLoginForm = {
 		username: string
 		password: string
 	}
@@ -30,6 +35,13 @@ const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
 	const docState = ref(false)
+	const pswLogin = ref(false)
+	const enterpriseForm = ref<EnterpriseLoginForm>({
+		username: '',
+		password: ''
+	})
+	const rememberPassword = ref(false)
+	const enterpriseSubmitting = ref(false)
 	const smsLoginMode = ref(false)
 	const personalForm = ref<PersonalLoginForm>({
 		username: '',
@@ -314,6 +326,71 @@ const _cache = __ins.renderCache;
 
 	}
 
+	const gotoIndex = (): void => {
+		uni.reLaunch({ url: '/pages/index/index' })
+	}
+
+	const loadSavedEnterpriseAccount = (): void => {
+		try {
+			const rawAccount = uni.getStorageSync('savedEnterpriseAccount')
+			if (rawAccount == null || rawAccount == '') return
+			const account = typeof rawAccount == 'string' ? JSON.parse(rawAccount) as UTSJSONObject : rawAccount as UTSJSONObject
+			enterpriseForm.value.username = account.getString('username', '')
+			enterpriseForm.value.password = account.getString('password', '')
+			rememberPassword.value = enterpriseForm.value.username != '' || enterpriseForm.value.password != ''
+		} catch (error) {
+			console.warn('加载保存的企业账号失败:', error)
+		}
+	}
+
+	const toggleEnterpriseLogin = (): void => {
+		pswLogin.value = !pswLogin.value
+		if (pswLogin.value) loadSavedEnterpriseAccount()
+	}
+
+	const toggleRememberPassword = (): void => {
+		rememberPassword.value = !rememberPassword.value
+		if (!rememberPassword.value) uni.removeStorageSync('savedEnterpriseAccount')
+	}
+
+	const saveEnterpriseAccount = (): void => {
+		if (rememberPassword.value && enterpriseForm.value.username != '' && enterpriseForm.value.password != '') {
+			uni.setStorageSync('savedEnterpriseAccount', JSON.stringify({ username: enterpriseForm.value.username, password: enterpriseForm.value.password }))
+		} else if (!rememberPassword.value) {
+			uni.removeStorageSync('savedEnterpriseAccount')
+		}
+	}
+
+	const submitEnterpriseLogin = async (): Promise<void> => {
+		if (enterpriseSubmitting.value || !ensureAgreementAccepted()) return
+		if (enterpriseForm.value.username == '') {
+			showAppToast({ title: '请输入账号', icon: 'none' })
+			return
+		}
+		if (enterpriseForm.value.password == '') {
+			showAppToast({ title: '请输入登录密码', icon: 'none' })
+			return
+		}
+		try {
+			enterpriseSubmitting.value = true
+			const response = await login({
+				username: enterpriseForm.value.username,
+				password: enterpriseForm.value.password
+			})
+			const token = response.data != null ? response.data.getString('access_token', response.data.getString('token', '')) : ''
+			if (response.code == 200 && token != '') {
+				saveEnterpriseAccount()
+				completeLogin(token)
+				return
+			}
+			showAppToast({ title: response.msg || '登录失败，请检查账号和密码', icon: 'none' })
+		} catch (error) {
+			showAppToast({ title: '登录失败，请检查网络后重试', icon: 'none' })
+		} finally {
+			enterpriseSubmitting.value = false
+		}
+	}
+
 	const gotoAgreement = (): void => {
 		showAppModal({ title: '用户协议', content: userAgreement, showCancel: false })
 	}
@@ -554,4 +631,4 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
 
 })
 export default __sfc__
-const GenPagesLoginLoginStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#fbfcfe"]]))], ["banner", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["height", "230rpx"], ["backgroundColor", "#fbfcfe"]]))], ["banner-image", _pS(_uM([["width", "160rpx"], ["height", "160rpx"]]))], ["title", _pS(_uM([["marginLeft", "12rpx"], ["color", "#333333"], ["fontSize", "42rpx"], ["fontWeight", "bold"]]))], ["content", _pS(_uM([["paddingTop", "40rpx"], ["paddingRight", "38rpx"], ["paddingBottom", 0], ["paddingLeft", "38rpx"]]))], ["login-form", _pS(_uM([["width", "100%"]]))], ["login-input", _pS(_uM([["width", "100%"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["marginBottom", "26rpx"]]))], ["password-input", _pS(_uM([["marginBottom", "34rpx"]]))], ["documents", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", "6rpx"]]))], ["doc-info-box", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["whiteSpace", "nowrap"]]))], ["doc-text", _pS(_uM([["fontSize", "30rpx"], ["lineHeight", "44rpx"], ["color", "#8195ac"]]))], ["doc-link", _pS(_uM([["fontSize", "30rpx"], ["lineHeight", "44rpx"], ["color", "#2e83df"]]))], ["wechat-login", _pS(_uM([["marginTop", "42rpx"], ["paddingTop", 0], ["paddingRight", "38rpx"], ["paddingBottom", 0], ["paddingLeft", "38rpx"]]))], ["wechat-login-button", _pS(_uM([["width", "100%"], ["borderTopColor", "#2f83df"], ["borderRightColor", "#2f83df"], ["borderBottomColor", "#2f83df"], ["borderLeftColor", "#2f83df"], ["borderTopLeftRadius", "52rpx"], ["borderTopRightRadius", "52rpx"], ["borderBottomRightRadius", "52rpx"], ["borderBottomLeftRadius", "52rpx"], ["color", "#2f83df"], ["fontSize", "32rpx"]]))], ["page-actions", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["marginTop", "54rpx"]]))], ["action-item", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", 0], ["marginRight", "17rpx"], ["marginBottom", 0], ["marginLeft", "17rpx"]]))], ["action-link", _pS(_uM([["color", "#5b92cc"], ["fontSize", "29rpx"], ["fontWeight", 500], ["lineHeight", "42rpx"]]))], ["action-arrow", _pS(_uM([["color", "#5b92cc"], ["fontSize", "34rpx"], ["fontWeight", 500], ["lineHeight", "42rpx"], ["marginLeft", "5rpx"]]))], ["sms-country-code", _pS(_uM([["color", "#5d7a9b"], ["fontSize", "32rpx"], ["fontWeight", 500], ["marginRight", "20rpx"]]))], ["sms-send-button", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["height", "56rpx"], ["paddingTop", 0], ["paddingRight", "18rpx"], ["paddingBottom", 0], ["paddingLeft", "18rpx"], ["borderTopLeftRadius", "28rpx"], ["borderTopRightRadius", "28rpx"], ["borderBottomRightRadius", "28rpx"], ["borderBottomLeftRadius", "28rpx"], ["backgroundColor", "#3485df"]]))], ["sms-send-button-disabled", _pS(_uM([["backgroundColor", "#b8d7ff"]]))], ["sms-send-button-text", _pS(_uM([["color", "#ffffff"], ["fontSize", "24rpx"], ["lineHeight", "56rpx"], ["whiteSpace", "nowrap"]]))], ["i-input", _pS(_uM([["boxSizing", "border-box"], ["paddingTop", 0], ["paddingRight", "34rpx"], ["paddingBottom", 0], ["paddingLeft", "34rpx"], ["!borderTopWidth", "2rpx"], ["!borderRightWidth", "2rpx"], ["!borderBottomWidth", "2rpx"], ["!borderLeftWidth", "2rpx"]]))], ["i-input__field", _pS(_uM([["paddingTop", 0], ["paddingBottom", 0]]))], ["i-checkbox", _pS(_uM([["minHeight", "44rpx"]]))], ["i-button__text", _pS(_uM([["fontSize", "38rpx"], ["fontWeight", 600], ["letterSpacing", "2rpx"]]))], ["login-submit", _pS(_uM([["marginTop", "42rpx"]]))], ["i-input--focus", _pS(_uM([["!borderTopColor", "#3485df"], ["!borderRightColor", "#3485df"], ["!borderBottomColor", "#3485df"], ["!borderLeftColor", "#3485df"], ["backgroundColor", "#ffffff"]]))], ["i-input__eye", _pS(_uM([["marginLeft", "14rpx"], ["opacity", 0.78]]))], ["i-checkbox__box", _pS(_uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopLeftRadius", "12rpx"], ["borderTopRightRadius", "12rpx"], ["borderBottomRightRadius", "12rpx"], ["borderBottomLeftRadius", "12rpx"]]))]])]
+const GenPagesLoginLoginStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#fbfcfe"]]))], ["banner", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["height", "230rpx"], ["backgroundColor", "#fbfcfe"]]))], ["banner-image", _pS(_uM([["width", "160rpx"], ["height", "160rpx"]]))], ["title", _pS(_uM([["marginLeft", "12rpx"], ["color", "#333333"], ["fontSize", "42rpx"], ["fontWeight", "bold"]]))], ["content", _pS(_uM([["paddingTop", "40rpx"], ["paddingRight", "38rpx"], ["paddingBottom", 0], ["paddingLeft", "38rpx"]]))], ["mini-program-content", _pS(_uM([["paddingTop", "40rpx"], ["paddingRight", "38rpx"], ["paddingBottom", 0], ["paddingLeft", "38rpx"]]))], ["wechat-login", _uM([[".mini-program-content ", _uM([["marginBottom", "20rpx"], ["paddingTop", 0], ["paddingRight", 0], ["paddingBottom", 0], ["paddingLeft", 0]])], ["", _uM([["marginTop", "42rpx"], ["paddingTop", 0], ["paddingRight", "38rpx"], ["paddingBottom", 0], ["paddingLeft", "38rpx"]])]])], ["enterprise-login-form", _pS(_uM([["width", "100%"]]))], ["remember-password", _pS(_uM([["display", "flex"], ["marginBottom", "25rpx"]]))], ["mini-program-actions", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["marginTop", "48rpx"], ["color", "#5b92cc"], ["fontSize", "30rpx"]]))], ["mini-program-action", _pS(_uM([["paddingTop", 0], ["paddingRight", "44rpx"], ["paddingBottom", 0], ["paddingLeft", "44rpx"]]))], ["no-login", _pS(_uM([["borderRightWidth", "1rpx"], ["borderRightStyle", "solid"], ["borderRightColor", "#a9bfd7"]]))], ["login-form", _pS(_uM([["width", "100%"]]))], ["login-input", _pS(_uM([["width", "100%"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["marginBottom", "26rpx"]]))], ["password-input", _pS(_uM([["marginBottom", "34rpx"]]))], ["documents", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", "25rpx"]]))], ["doc-info-box", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["whiteSpace", "nowrap"]]))], ["doc-text", _pS(_uM([["fontSize", "30rpx"], ["lineHeight", "44rpx"], ["color", "#8195ac"]]))], ["doc-link", _pS(_uM([["fontSize", "30rpx"], ["lineHeight", "44rpx"], ["color", "#2e83df"]]))], ["wechat-login-button", _pS(_uM([["width", "100%"], ["borderTopColor", "#2f83df"], ["borderRightColor", "#2f83df"], ["borderBottomColor", "#2f83df"], ["borderLeftColor", "#2f83df"], ["borderTopLeftRadius", "52rpx"], ["borderTopRightRadius", "52rpx"], ["borderBottomRightRadius", "52rpx"], ["borderBottomLeftRadius", "52rpx"], ["color", "#2f83df"], ["fontSize", "32rpx"]]))], ["page-actions", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["marginTop", "54rpx"]]))], ["action-item", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", 0], ["marginRight", "17rpx"], ["marginBottom", 0], ["marginLeft", "17rpx"]]))], ["action-link", _pS(_uM([["color", "#5b92cc"], ["fontSize", "29rpx"], ["fontWeight", 500], ["lineHeight", "42rpx"]]))], ["action-arrow", _pS(_uM([["color", "#5b92cc"], ["fontSize", "34rpx"], ["fontWeight", 500], ["lineHeight", "42rpx"], ["marginLeft", "5rpx"]]))], ["sms-country-code", _pS(_uM([["color", "#5d7a9b"], ["fontSize", "32rpx"], ["fontWeight", 500], ["marginRight", "20rpx"]]))], ["sms-send-button", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["height", "56rpx"], ["paddingTop", 0], ["paddingRight", "18rpx"], ["paddingBottom", 0], ["paddingLeft", "18rpx"], ["borderTopLeftRadius", "28rpx"], ["borderTopRightRadius", "28rpx"], ["borderBottomRightRadius", "28rpx"], ["borderBottomLeftRadius", "28rpx"], ["backgroundColor", "#3485df"]]))], ["sms-send-button-disabled", _pS(_uM([["backgroundColor", "#b8d7ff"]]))], ["sms-send-button-text", _pS(_uM([["color", "#ffffff"], ["fontSize", "24rpx"], ["lineHeight", "56rpx"], ["whiteSpace", "nowrap"]]))], ["i-input", _pS(_uM([["boxSizing", "border-box"], ["paddingTop", 0], ["paddingRight", "34rpx"], ["paddingBottom", 0], ["paddingLeft", "34rpx"], ["!borderTopWidth", "2rpx"], ["!borderRightWidth", "2rpx"], ["!borderBottomWidth", "2rpx"], ["!borderLeftWidth", "2rpx"]]))], ["i-input__field", _pS(_uM([["paddingTop", 0], ["paddingBottom", 0]]))], ["i-checkbox", _pS(_uM([["minHeight", "44rpx"]]))], ["i-button__text", _pS(_uM([["fontSize", "38rpx"], ["fontWeight", 600], ["letterSpacing", "2rpx"]]))], ["login-submit", _pS(_uM([["marginTop", "42rpx"]]))], ["i-input--focus", _pS(_uM([["!borderTopColor", "#3485df"], ["!borderRightColor", "#3485df"], ["!borderBottomColor", "#3485df"], ["!borderLeftColor", "#3485df"], ["backgroundColor", "#ffffff"]]))], ["i-input__eye", _pS(_uM([["marginLeft", "14rpx"], ["opacity", 0.78]]))], ["i-checkbox__box", _pS(_uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopLeftRadius", "12rpx"], ["borderTopRightRadius", "12rpx"], ["borderBottomRightRadius", "12rpx"], ["borderBottomLeftRadius", "12rpx"]]))]])]

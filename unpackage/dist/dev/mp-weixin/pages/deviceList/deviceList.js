@@ -133,9 +133,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (from) {
             const params = new common_vendor.UTSJSONObject({ pageSize: 1e3 });
             const res = yield api_request.getUserDeviceList(params);
+            common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:145", "获取设备列表:", res);
             const list = res.code == 200 && res.data != null ? res.data.list : null;
             if (list == null || !Array.isArray(list)) {
-              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:147", "获取设备列表返回异常:", res);
+              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:148", "获取设备列表返回异常:", res);
               originalDeviceList.value = [];
               markers.value = [];
               return Promise.resolve(null);
@@ -147,7 +148,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
           updateMarkers(originalDeviceList.value);
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:158", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:159", "获取设备列表失败:", err);
           originalDeviceList.value = [];
           markers.value = [];
           utils_toast.showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -172,19 +173,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         yield loadUserDeviceList([], true);
       });
     };
-    const getLocation = () => {
-      common_vendor.index.getLocation(new common_vendor.UTSJSONObject({
-        type: "wgs84",
-        success: (res) => {
-          common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:187", "获取位置成功:", res);
-          userLocation.value.latitude = res.latitude;
-          userLocation.value.longitude = res.longitude;
-        },
-        fail: (err) => {
-          common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:192", "获取位置失败:", err);
-        }
-      }));
-    };
     const changeState = (type) => {
       pickerStateTitle.value = type;
     };
@@ -196,7 +184,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return device["deviceId"] == markerId;
       });
       if (selectedDevice == null) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:222", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:209", "未找到对应的设备信息", markerId);
         return null;
       }
       const imeiValue = (_a = selectedDevice["imei"]) !== null && _a !== void 0 ? _a : "";
@@ -207,7 +195,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad((options) => {
-      getLocation();
       loadUserDeviceList([], true);
     });
     return (_ctx, _cache) => {

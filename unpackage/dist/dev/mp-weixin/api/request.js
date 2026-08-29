@@ -12,9 +12,10 @@ const wechatLogin = "/authLogin";
 const authLoginUrl = "/auth/login";
 const smsSendCodeUrl = "/resource/sms/code";
 const registerUrl = "/auth/register";
+const forgotPasswordResetUrl = "/auth/forgot-password/reset";
 const smsClientId = "428a8310cd442757ae699df5d894f051";
 const defaultTenantId = "000000";
-const changePSW = "/sys/user/password";
+const changePasswordUrl = "/user/profile/updatePassword";
 const userMsgList = "/usermessage/listForUser";
 const msgState = "/usermessage/detail/";
 const updateDevice = "/device/update";
@@ -101,6 +102,58 @@ class JsonDataResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class LegacyEnterpriseLoginRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          username: { type: String, optional: false },
+          password: { type: String, optional: false },
+          clientId: { type: String, optional: true },
+          tenantId: { type: String, optional: true }
+        };
+      },
+      name: "LegacyEnterpriseLoginRequest"
+    };
+  }
+  constructor(options, metadata = LegacyEnterpriseLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.username = this.__props__.username;
+    this.password = this.__props__.password;
+    this.clientId = this.__props__.clientId;
+    this.tenantId = this.__props__.tenantId;
+    delete this.__props__;
+  }
+}
+class WechatLoginRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: String, optional: false },
+          encryptedData: { type: String, optional: false },
+          iv: { type: String, optional: false },
+          clientId: { type: String, optional: true },
+          tenantId: { type: String, optional: true }
+        };
+      },
+      name: "WechatLoginRequest"
+    };
+  }
+  constructor(options, metadata = WechatLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.encryptedData = this.__props__.encryptedData;
+    this.iv = this.__props__.iv;
+    this.clientId = this.__props__.clientId;
+    this.tenantId = this.__props__.tenantId;
+    delete this.__props__;
+  }
+}
 class SendSmsCodeRequest extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -130,7 +183,6 @@ class SmsLoginRequest extends common_vendor.UTS.UTSType {
         return {
           phonenumber: { type: String, optional: false },
           smsCode: { type: String, optional: false },
-          deviceId: { type: String, optional: false },
           clientId: { type: String, optional: true },
           tenantId: { type: String, optional: true }
         };
@@ -143,7 +195,6 @@ class SmsLoginRequest extends common_vendor.UTS.UTSType {
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.phonenumber = this.__props__.phonenumber;
     this.smsCode = this.__props__.smsCode;
-    this.deviceId = this.__props__.deviceId;
     this.clientId = this.__props__.clientId;
     this.tenantId = this.__props__.tenantId;
     delete this.__props__;
@@ -180,7 +231,7 @@ class RegisterRequest extends common_vendor.UTS.UTSType {
       kind: 2,
       get fields() {
         return {
-          username: { type: String, optional: false },
+          username: { type: String, optional: true },
           password: { type: String, optional: false },
           confirmPassword: { type: String, optional: false },
           phonenumber: { type: String, optional: false },
@@ -202,6 +253,33 @@ class RegisterRequest extends common_vendor.UTS.UTSType {
     this.smsCode = this.__props__.smsCode;
     this.clientId = this.__props__.clientId;
     this.tenantId = this.__props__.tenantId;
+    delete this.__props__;
+  }
+}
+class ForgotPasswordResetRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          tenantId: { type: String, optional: true },
+          phonenumber: { type: String, optional: false },
+          smsCode: { type: String, optional: false },
+          newPassword: { type: String, optional: false },
+          confirmPassword: { type: String, optional: false }
+        };
+      },
+      name: "ForgotPasswordResetRequest"
+    };
+  }
+  constructor(options, metadata = ForgotPasswordResetRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.tenantId = this.__props__.tenantId;
+    this.phonenumber = this.__props__.phonenumber;
+    this.smsCode = this.__props__.smsCode;
+    this.newPassword = this.__props__.newPassword;
+    this.confirmPassword = this.__props__.confirmPassword;
     delete this.__props__;
   }
 }
@@ -458,24 +536,26 @@ class SendCmdResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-class ChangePasswordResponse extends common_vendor.UTS.UTSType {
+class ChangePasswordRequest extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
       get fields() {
         return {
-          code: { type: Number, optional: false },
-          msg: { type: String, optional: false }
+          oldPassword: { type: String, optional: false },
+          newPassword: { type: String, optional: false },
+          confirmPassword: { type: String, optional: false }
         };
       },
-      name: "ChangePasswordResponse"
+      name: "ChangePasswordRequest"
     };
   }
-  constructor(options, metadata = ChangePasswordResponse.get$UTSMetadata$(), isJSONParse = false) {
+  constructor(options, metadata = ChangePasswordRequest.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.code = this.__props__.code;
-    this.msg = this.__props__.msg;
+    this.oldPassword = this.__props__.oldPassword;
+    this.newPassword = this.__props__.newPassword;
+    this.confirmPassword = this.__props__.confirmPassword;
     delete this.__props__;
   }
 }
@@ -560,12 +640,13 @@ function deviceDetailResponse(raw = null) {
   const response = jsonDataResponse(raw);
   return new DeviceDetailResponse({ code: response.code, msg: response.msg, data: response.data });
 }
-function changePasswordResponse(raw = null) {
-  const response = basicResponse(raw);
-  return new ChangePasswordResponse({ code: response.code, msg: response.msg });
-}
 const login = (data) => {
-  return api_http.post(loginUrl, data).then((raw = null) => {
+  const requestData = new common_vendor.UTSJSONObject();
+  requestData.set("username", data.username);
+  requestData.set("password", data.password);
+  requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
+  requestData.set("clientId", data.clientId != null ? data.clientId : smsClientId);
+  return api_http.post(loginUrl, requestData).then((raw = null) => {
     return jsonDataResponse(raw);
   });
 };
@@ -616,7 +697,13 @@ const getUserDeviceList = (data) => {
   });
 };
 const PostWechatlogin = (data) => {
-  return api_http.post(wechatLogin, data).then((raw = null) => {
+  const requestData = new common_vendor.UTSJSONObject();
+  requestData.set("code", data.code);
+  requestData.set("encryptedData", data.encryptedData);
+  requestData.set("iv", data.iv);
+  requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
+  requestData.set("clientId", data.clientId != null ? data.clientId : smsClientId);
+  return api_http.post(wechatLogin, requestData).then((raw = null) => {
     return jsonDataResponse(raw);
   });
 };
@@ -625,6 +712,15 @@ const sendSmsRegisterCode = (data) => {
     phonenumber: data.phonenumber,
     tenantId: data.tenantId != null ? data.tenantId : defaultTenantId,
     scene: "register"
+  })).then((raw = null) => {
+    return basicResponse(raw);
+  });
+};
+const sendSmsForgotPasswordCode = (data) => {
+  return api_http.get(smsSendCodeUrl, new common_vendor.UTSJSONObject({
+    phonenumber: data.phonenumber,
+    tenantId: data.tenantId != null ? data.tenantId : defaultTenantId,
+    scene: "forgot"
   })).then((raw = null) => {
     return basicResponse(raw);
   });
@@ -642,7 +738,8 @@ const personalPasswordLogin = (data) => {
 };
 const registerPersonalUser = (data) => {
   const requestData = new common_vendor.UTSJSONObject();
-  requestData.set("username", data.username);
+  if (data.username != null && data.username != "")
+    requestData.set("username", data.username);
   requestData.set("password", data.password);
   requestData.set("confirmPassword", data.confirmPassword);
   requestData.set("phonenumber", data.phonenumber);
@@ -650,12 +747,23 @@ const registerPersonalUser = (data) => {
   requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
   requestData.set("clientId", data.clientId != null ? data.clientId : smsClientId);
   return api_http.post(registerUrl, requestData).then((raw = null) => {
-    return basicResponse(raw);
+    return jsonDataResponse(raw);
   });
 };
-const changePassWord = (data) => {
-  return api_http.put(changePSW, data).then((raw = null) => {
-    return changePasswordResponse(raw);
+const resetForgotPassword = (data) => {
+  const requestData = new common_vendor.UTSJSONObject();
+  requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);
+  requestData.set("phonenumber", data.phonenumber);
+  requestData.set("smsCode", data.smsCode);
+  requestData.set("newPassword", data.newPassword);
+  requestData.set("confirmPassword", data.confirmPassword);
+  return api_http.post(forgotPasswordResetUrl, requestData).then((raw = null) => {
+    return jsonDataResponse(raw);
+  });
+};
+const updatePassword = (data) => {
+  return api_http.post(changePasswordUrl, data).then((raw = null) => {
+    return basicResponse(raw);
   });
 };
 const getUserMsgList = (data = null) => {
@@ -742,14 +850,17 @@ const unbindPushDevice = (registrationId) => {
     return basicResponse(raw);
   });
 };
+exports.ChangePasswordRequest = ChangePasswordRequest;
+exports.ForgotPasswordResetRequest = ForgotPasswordResetRequest;
+exports.LegacyEnterpriseLoginRequest = LegacyEnterpriseLoginRequest;
 exports.PersonalPasswordLoginRequest = PersonalPasswordLoginRequest;
 exports.PostWechatlogin = PostWechatlogin;
 exports.RegisterRequest = RegisterRequest;
 exports.SendSmsCodeRequest = SendSmsCodeRequest;
+exports.WechatLoginRequest = WechatLoginRequest;
 exports.addDevice = addDevice;
 exports.addGeofence = addGeofence;
 exports.bindDevices = bindDevices;
-exports.changePassWord = changePassWord;
 exports.delDevice = delDevice;
 exports.deleteGeofence = deleteGeofence;
 exports.editDeviceInfo = editDeviceInfo;
@@ -768,11 +879,14 @@ exports.login = login;
 exports.logout = logout;
 exports.personalPasswordLogin = personalPasswordLogin;
 exports.registerPersonalUser = registerPersonalUser;
+exports.resetForgotPassword = resetForgotPassword;
 exports.sendCmd = sendCmd;
 exports.sendCommand = sendCommand;
+exports.sendSmsForgotPasswordCode = sendSmsForgotPasswordCode;
 exports.sendSmsRegisterCode = sendSmsRegisterCode;
 exports.setMsgState = setMsgState;
 exports.unbindDevices = unbindDevices;
 exports.unbindPushDevice = unbindPushDevice;
 exports.updateGeofence = updateGeofence;
+exports.updatePassword = updatePassword;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

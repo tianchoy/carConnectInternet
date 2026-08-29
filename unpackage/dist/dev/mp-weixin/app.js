@@ -9,6 +9,8 @@ if (!Math) {
   "./pages/login/login.js";
   "./pages/login/personal-password-login.js";
   "./pages/login/register.js";
+  "./pages/login/forgot-password.js";
+  "./pages/login/set-password.js";
   "./pages/carInfoDetail/carInfoDetail.js";
   "./pages/addCar/addCar.js";
   "./pages/playBack/playBack.js";

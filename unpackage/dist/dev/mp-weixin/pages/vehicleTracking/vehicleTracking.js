@@ -177,6 +177,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function loadInitialPosition() {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        isMapReady.value = false;
         try {
           const data = new common_vendor.UTSJSONObject({
             deptId: deptId.value,
@@ -243,7 +244,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:247", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:248", "获取初始位置失败:", err);
           utils_toast.showAppToast({
             title: "网络请求失败",
             icon: "none"
@@ -260,7 +261,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const marker = createVehicleMarker(iconPath);
       markers.value = [marker];
       markerInitialized.value = true;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:268", "初始化标记点完成");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:269", "初始化标记点完成");
     }
     function calculateMapRotation(direction) {
       let rotation = direction;
@@ -279,7 +280,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     common_vendor.onLoad((option) => {
       var _a, _b, _c, _d, _f;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:289", "option", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:290", "option", option);
       connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
       imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
       currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
@@ -501,7 +502,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pendingJumpTime = "";
           acceptLivePosition(item, position, positionTime, sessionId);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:487", "获取跟踪位置失败:", error);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:488", "获取跟踪位置失败:", error);
         } finally {
           if (sessionId == trackingSessionId)
             isTrackRequestPending = false;

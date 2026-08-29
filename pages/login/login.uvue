@@ -8,6 +8,7 @@
 			<text class="title">中导物联</text>
 		</view>
 
+		<!-- #ifdef APP-ANDROID || APP-IOS -->
 		<view class="content">
 			<view v-if="!smsLoginMode" class="login-form">
 				<i-input
@@ -111,25 +112,29 @@
 				登录
 			</i-button>
 		</view>
-
-		<!-- #ifdef MP-WEIXIN -->
-		<view class="wechat-login">
-			<button v-if="!docState" class="wechat-login-button" type="primary" plain="true" @click="loginBt">
-				个人用户登录
-			</button>
-			<button
-				v-else
-				class="wechat-login-button"
-				open-type="getPhoneNumber"
-				type="primary"
-				plain="true"
-				@getphonenumber="handleGetPhoneNumber"
-			>
-				个人用户登录
-			</button>
-		</view>
 		<!-- #endif -->
 
+		<!-- #ifdef MP-WEIXIN -->
+		<view class="mini-program-content">
+			<view v-if="pswLogin" class="enterprise-login-form">
+				<i-input v-model="enterpriseForm.username" class="login-input" placeholder="请输入账号" clearable height="100rpx" round="25rpx" borderColor="#d9e5f2" placeholderStyle="color:#a7b8cb;font-size:28rpx;" fontSize="28rpx" color="#333333" />
+				<i-input v-model="enterpriseForm.password" class="login-input password-input" placeholder="请输入登录密码" :password="true" height="100rpx" round="25rpx" borderColor="#d9e5f2" placeholderStyle="color:#a7b8cb;font-size:28rpx;" fontSize="28rpx" color="#333333" />
+				<view class="remember-password"><i-checkbox :checked="rememberPassword" @change="toggleRememberPassword" label="记住密码" /></view>
+				<i-button class="login-submit" type="primary" block round="25rpx" color="#3485df" customStyle="height:104rpx;" @click="submitEnterpriseLogin" :loading="enterpriseSubmitting">登录</i-button>
+			</view>
+			<view v-else class="wechat-login">
+				<button v-if="!docState" class="wechat-login-button" type="primary" plain="true" @click="loginBt">个人用户登录</button>
+				<button v-else class="wechat-login-button" open-type="getPhoneNumber" type="primary" plain="true" @getphonenumber="handleGetPhoneNumber">个人用户登录</button>
+			</view>
+			<view class="documents">
+				<i-checkbox :checked="docState" @change="isDocState" size="40rpx" iconSize="28rpx" activeColor="#3485df" inactiveColor="#a9bfd7"></i-checkbox>
+				<view class="doc-info-box"><text class="doc-text">我已阅读并同意</text><text class="doc-link" @click="gotoAgreement">《用户协议》</text><text class="doc-text">和</text><text class="doc-link" @click="gotoPrivacy">《隐私政策》</text></view>
+			</view>
+		</view>
+		<view class="mini-program-actions"><view class="mini-program-action no-login" @click="gotoIndex">暂不登录</view><view class="mini-program-action" @click="toggleEnterpriseLogin">{{ pswLogin ? '个人用户登录' : '企业用户登录' }}</view></view>
+		<!-- #endif -->
+
+		<!-- #ifdef APP-ANDROID || APP-IOS -->
 		<view class="page-actions">
 			<view class="action-item" @click="toggleLoginMode">
 				<text class="action-link">{{ smsLoginMode ? '密码登录' : '验证码登录' }}</text>
@@ -144,6 +149,7 @@
 				<text class="action-arrow">›</text>
 			</view>
 		</view>
+		<!-- #endif -->
 
 		<!--
 		企业账号密码登录入口已按当前需求注释，保留原逻辑以便后续恢复：
@@ -174,7 +180,7 @@
 	import { userAgreement, privacyPolicy } from '../../utils/legal.uts'
 	import { schedulePostLoginInitialization } from '../../services/app-startup.uts'
 	import { resetTokenExpiredState } from '../../api/http.uts'
-	import { PostWechatlogin, personalPasswordLogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
+	import { PostWechatlogin, login, personalPasswordLogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 	import { saveSmsRegisterContext } from '../../services/auth/sms-register-context.uts'
 	// #ifdef APP-ANDROID || APP-IOS
 	import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
@@ -185,7 +191,19 @@
 		password: string
 	}
 
+	type EnterpriseLoginForm = {
+		username: string
+		password: string
+	}
+
 	const docState = ref(false)
+	const pswLogin = ref(false)
+	const enterpriseForm = ref<EnterpriseLoginForm>({
+		username: '',
+		password: ''
+	})
+	const rememberPassword = ref(false)
+	const enterpriseSubmitting = ref(false)
 	const smsLoginMode = ref(false)
 	const personalForm = ref<PersonalLoginForm>({
 		username: '',
@@ -470,6 +488,71 @@
 		// #endif
 	}
 
+	const gotoIndex = (): void => {
+		uni.reLaunch({ url: '/pages/index/index' })
+	}
+
+	const loadSavedEnterpriseAccount = (): void => {
+		try {
+			const rawAccount = uni.getStorageSync('savedEnterpriseAccount')
+			if (rawAccount == null || rawAccount == '') return
+			const account = typeof rawAccount == 'string' ? JSON.parse(rawAccount) as UTSJSONObject : rawAccount as UTSJSONObject
+			enterpriseForm.value.username = account.getString('username', '')
+			enterpriseForm.value.password = account.getString('password', '')
+			rememberPassword.value = enterpriseForm.value.username != '' || enterpriseForm.value.password != ''
+		} catch (error) {
+			console.warn('加载保存的企业账号失败:', error)
+		}
+	}
+
+	const toggleEnterpriseLogin = (): void => {
+		pswLogin.value = !pswLogin.value
+		if (pswLogin.value) loadSavedEnterpriseAccount()
+	}
+
+	const toggleRememberPassword = (): void => {
+		rememberPassword.value = !rememberPassword.value
+		if (!rememberPassword.value) uni.removeStorageSync('savedEnterpriseAccount')
+	}
+
+	const saveEnterpriseAccount = (): void => {
+		if (rememberPassword.value && enterpriseForm.value.username != '' && enterpriseForm.value.password != '') {
+			uni.setStorageSync('savedEnterpriseAccount', JSON.stringify({ username: enterpriseForm.value.username, password: enterpriseForm.value.password }))
+		} else if (!rememberPassword.value) {
+			uni.removeStorageSync('savedEnterpriseAccount')
+		}
+	}
+
+	const submitEnterpriseLogin = async (): Promise<void> => {
+		if (enterpriseSubmitting.value || !ensureAgreementAccepted()) return
+		if (enterpriseForm.value.username == '') {
+			showAppToast({ title: '请输入账号', icon: 'none' })
+			return
+		}
+		if (enterpriseForm.value.password == '') {
+			showAppToast({ title: '请输入登录密码', icon: 'none' })
+			return
+		}
+		try {
+			enterpriseSubmitting.value = true
+			const response = await login({
+				username: enterpriseForm.value.username,
+				password: enterpriseForm.value.password
+			})
+			const token = response.data != null ? response.data.getString('access_token', response.data.getString('token', '')) : ''
+			if (response.code == 200 && token != '') {
+				saveEnterpriseAccount()
+				completeLogin(token)
+				return
+			}
+			showAppToast({ title: response.msg || '登录失败，请检查账号和密码', icon: 'none' })
+		} catch (error) {
+			showAppToast({ title: '登录失败，请检查网络后重试', icon: 'none' })
+		} finally {
+			enterpriseSubmitting.value = false
+		}
+	}
+
 	const gotoAgreement = (): void => {
 		showAppModal({ title: '用户协议', content: userAgreement, showCancel: false })
 	}
@@ -559,6 +642,42 @@
 		padding: 40rpx 38rpx 0;
 	}
 
+	.mini-program-content {
+		padding: 40rpx 38rpx 0;
+	}
+
+	.mini-program-content .wechat-login {
+		margin-bottom: 20rpx;
+		padding: 0;
+	}
+
+	.enterprise-login-form {
+		width: 100%;
+	}
+
+	.remember-password {
+		display: flex;
+		margin-bottom: 25rpx;
+	}
+
+	.mini-program-actions {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		margin-top: 48rpx;
+		color: #5b92cc;
+		font-size: 30rpx;
+	}
+
+	.mini-program-action {
+		padding: 0 44rpx;
+	}
+
+	.no-login {
+		border-right: 1rpx solid #a9bfd7;
+	}
+
 	.login-form {
 		width: 100%;
 	}
@@ -577,7 +696,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		margin-top: 6rpx;
+		margin-top: 25rpx;
 	}
 
 	.doc-info-box {

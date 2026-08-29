@@ -9146,7 +9146,7 @@ const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.1.76";
   const port = "8090";
-  const id = "mp-weixin_09VFII";
+  const id = "mp-weixin_bcFtPC";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {
@@ -10452,6 +10452,18 @@ const pages = [
     path: "pages/login/register",
     style: new UTSJSONObject({
       navigationBarTitleText: "个人用户注册"
+    })
+  }),
+  new UTSJSONObject({
+    path: "pages/login/forgot-password",
+    style: new UTSJSONObject({
+      navigationBarTitleText: "忘记密码"
+    })
+  }),
+  new UTSJSONObject({
+    path: "pages/login/set-password",
+    style: new UTSJSONObject({
+      navigationBarTitleText: "设置登录密码"
     })
   }),
   new UTSJSONObject({

@@ -48,6 +48,8 @@ export type PushDeviceBindRequest = {
     appVersion: string
 }
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
+export type LegacyEnterpriseLoginRequest = { username: string, password: string, clientId?: string, tenantId?: string }
+export type WechatLoginRequest = { code: string, encryptedData: string, iv: string, clientId?: string, tenantId?: string }
 export type UniVerifyLoginRequest = UTSJSONObject
 export type SendSmsCodeRequest = { phonenumber: string, tenantId?: string }
 export type SmsLoginRequest = { phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
@@ -133,7 +135,14 @@ function deviceDetailResponse(raw: any): DeviceDetailResponse {
     return { code: response.code, msg: response.msg, data: response.data }
 }
 
-export const login = (data: UTSJSONObject): Promise<JsonDataResponse> => post(loginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const login = (data: LegacyEnterpriseLoginRequest): Promise<JsonDataResponse> => {
+    const requestData = new UTSJSONObject()
+    requestData.set('username', data.username)
+    requestData.set('password', data.password)
+    requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
+    requestData.set('clientId', data.clientId != null ? data.clientId : smsClientId)
+    return post(loginUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+}
 export const logout = (): Promise<BasicResponse> => post(logoutUrl).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const getCustomList = (): Promise<JsonDataResponse> => get(customList).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 export const getCustomDeviceList = (deptId: string): Promise<JsonDataResponse> => get(customDeviceList, { deptId } as UTSJSONObject).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
@@ -165,7 +174,15 @@ export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListRe
     return userDevicePageResponse(raw)
 })
 
-export const PostWechatlogin = (data: UTSJSONObject): Promise<JsonDataResponse> => post(wechatLogin, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const PostWechatlogin = (data: WechatLoginRequest): Promise<JsonDataResponse> => {
+    const requestData = new UTSJSONObject()
+    requestData.set('code', data.code)
+    requestData.set('encryptedData', data.encryptedData)
+    requestData.set('iv', data.iv)
+    requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
+    requestData.set('clientId', data.clientId != null ? data.clientId : smsClientId)
+    return post(wechatLogin, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+}
 
 // 后端待实现的示例接口：服务端必须使用 openId/accessToken 换取手机号，前端不可上传手机号作为一键登录凭据。
 export const uniVerifyLogin = (data: UniVerifyLoginRequest): Promise<JsonDataResponse> => post(authLoginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })

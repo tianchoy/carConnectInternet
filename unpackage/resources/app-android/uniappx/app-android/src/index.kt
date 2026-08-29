@@ -5672,6 +5672,55 @@ class PersonalLoginFormReactiveObject : PersonalLoginForm, IUTSReactive<Personal
             _tRS(__v_raw, "password", oldValue, value)
         }
 }
+open class EnterpriseLoginForm (
+    @JsonNotNull
+    open var username: String,
+    @JsonNotNull
+    open var password: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return EnterpriseLoginFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class EnterpriseLoginFormReactiveObject : EnterpriseLoginForm, IUTSReactive<EnterpriseLoginForm> {
+    override var __v_raw: EnterpriseLoginForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: EnterpriseLoginForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): EnterpriseLoginFormReactiveObject {
+        return EnterpriseLoginFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var username: String
+        get() {
+            return _tRG(__v_raw, "username", __v_raw.username, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("username")) {
+                return
+            }
+            val oldValue = __v_raw.username
+            __v_raw.username = value
+            _tRS(__v_raw, "username", oldValue, value)
+        }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+}
 val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginLogin.inheritAttrs, inject = GenPagesLoginLogin.inject, props = GenPagesLoginLogin.props, propsNeedCastKeys = GenPagesLoginLogin.propsNeedCastKeys, emits = GenPagesLoginLogin.emits, components = GenPagesLoginLogin.components, styles = GenPagesLoginLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesLoginLogin.setup(props as GenPagesLoginLogin)
