@@ -10075,11 +10075,16 @@
       const smsSubmitting = vue.ref(false);
       let smsCooldownTimer = null;
       vue.ref(false);
-      vue.computed(() => {
+      const isPersonalPasswordLoginReady = vue.computed(() => {
         return personalForm.value.username != "" && personalForm.value.password != "";
       });
-      vue.computed(() => {
-        return smsMobile.value != "" && smsCode.value != "";
+      const isSmsLoginReady = vue.computed(() => {
+        return /^1[3-9]\d{9}$/.test(smsMobile.value) && /^\d{6}$/.test(smsCode.value);
+      });
+      const isLoginSubmitReady = vue.computed(() => {
+        const isFormReady = smsLoginMode.value ? isSmsLoginReady.value : isPersonalPasswordLoginReady.value;
+        const isSubmitting = smsLoginMode.value ? smsSubmitting.value : personalSubmitting.value;
+        return isFormReady && docState.value && !isSubmitting;
       });
       const isDocState = () => {
         docState.value = !docState.value;
@@ -10412,7 +10417,8 @@
                 color: "#3485df",
                 customStyle: "height:104rpx;",
                 onClick: submitLogin,
-                loading: smsLoginMode.value ? smsSubmitting.value : personalSubmitting.value
+                loading: smsLoginMode.value ? smsSubmitting.value : personalSubmitting.value,
+                disabled: !isLoginSubmitReady.value
               }), {
                 default: vue.withCtx(() => {
                   return [
@@ -10420,7 +10426,7 @@
                   ];
                 }),
                 _: 1
-              }, 8, ["loading"])
+              }, 8, ["loading", "disabled"])
             ]),
             vue.createElementVNode("view", new UTSJSONObject({ class: "page-actions" }), [
               vue.createElementVNode("view", new UTSJSONObject({
@@ -11221,6 +11227,17 @@
       const smsSending = vue.ref(false);
       const submitting = vue.ref(false);
       let smsCooldownTimer = null;
+      const isRegisterSubmitReady = vue.computed(() => {
+        const password = form.value.password;
+        let categoryCount = 0;
+        if (/[0-9]/.test(password))
+          categoryCount += 1;
+        if (/[A-Za-z]/.test(password))
+          categoryCount += 1;
+        if (/[^A-Za-z0-9]/.test(password))
+          categoryCount += 1;
+        return /^1[3-9]\d{9}$/.test(form.value.mobile) && /^\d{6}$/.test(form.value.smsCode) && password.length >= 8 && password.length <= 16 && categoryCount >= 2 && agreementAccepted.value && !submitting.value;
+      });
       const toggleAgreement = () => {
         agreementAccepted.value = !agreementAccepted.value;
       };
@@ -11492,6 +11509,7 @@
                 color: "#3485df",
                 customStyle: "height:104rpx;",
                 loading: submitting.value,
+                disabled: !isRegisterSubmitReady.value,
                 onClick: submitRegister
               }), {
                 default: vue.withCtx(() => {
@@ -11500,7 +11518,7 @@
                   ];
                 }),
                 _: 1
-              }, 8, ["loading"]),
+              }, 8, ["loading", "disabled"]),
               vue.createElementVNode("view", new UTSJSONObject({
                 class: "login-link-box",
                 onClick: backToLogin
@@ -11556,6 +11574,20 @@
       const smsSending = vue.ref(false);
       const resetSubmitting = vue.ref(false);
       let smsCooldownTimer = null;
+      const isIdentityVerificationReady = vue.computed(() => {
+        return /^1[3-9]\d{9}$/.test(form.value.mobile) && /^\d{6}$/.test(form.value.smsCode);
+      });
+      const isPasswordResetReady = vue.computed(() => {
+        const password = form.value.password;
+        let categoryCount = 0;
+        if (/[0-9]/.test(password))
+          categoryCount += 1;
+        if (/[A-Za-z]/.test(password))
+          categoryCount += 1;
+        if (/[^A-Za-z0-9]/.test(password))
+          categoryCount += 1;
+        return password.length >= 8 && password.length <= 16 && categoryCount >= 2 && form.value.confirmPassword != "" && password == form.value.confirmPassword && !resetSubmitting.value;
+      });
       const isValidMobile = () => {
         if (!/^1[3-9]\d{9}$/.test(form.value.mobile)) {
           showAppToast({ title: "请输入正确的手机号", icon: "none" });
@@ -11795,6 +11827,7 @@
                   round: "25rpx",
                   color: "#3485df",
                   customStyle: "height:104rpx;",
+                  disabled: !isIdentityVerificationReady.value,
                   onClick: goToPasswordStep
                 }), {
                   default: vue.withCtx(() => {
@@ -11803,7 +11836,7 @@
                     ];
                   }),
                   _: 1
-                })
+                }, 8, ["disabled"])
               ])) : currentStep.value == 2 ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
                 key: 1,
                 class: "form-section password-section"
@@ -11847,6 +11880,7 @@
                   color: "#3485df",
                   customStyle: "height:104rpx;",
                   loading: resetSubmitting.value,
+                  disabled: !isPasswordResetReady.value,
                   onClick: completePasswordReset
                 }), {
                   default: vue.withCtx(() => {
@@ -11855,7 +11889,7 @@
                     ];
                   }),
                   _: 1
-                }, 8, ["loading"])
+                }, 8, ["loading", "disabled"])
               ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
                 key: 2,
                 class: "success-section"
@@ -18864,6 +18898,17 @@
       }));
       const submitting = vue.ref(false);
       const sessionEnding = vue.ref(false);
+      const isPasswordUpdateReady = vue.computed(() => {
+        const newPassword = form.value.newPassword;
+        let categoryCount = 0;
+        if (/[0-9]/.test(newPassword))
+          categoryCount += 1;
+        if (/[A-Za-z]/.test(newPassword))
+          categoryCount += 1;
+        if (/[^A-Za-z0-9]/.test(newPassword))
+          categoryCount += 1;
+        return form.value.oldPassword != "" && newPassword.length >= 8 && newPassword.length <= 16 && categoryCount >= 2 && form.value.oldPassword != newPassword && form.value.confirmPassword != "" && newPassword == form.value.confirmPassword && !submitting.value;
+      });
       const isValidPassword = (password) => {
         if (password.length < 8 || password.length > 16) {
           showAppToast({ title: "密码长度应为8至16位", icon: "none" });
@@ -19019,6 +19064,7 @@
                 color: "#3485df",
                 customStyle: "height:104rpx;",
                 loading: submitting.value,
+                disabled: !isPasswordUpdateReady.value,
                 onClick: submitPasswordUpdate
               }), {
                 default: vue.withCtx(() => {
@@ -19027,7 +19073,7 @@
                   ];
                 }),
                 _: 1
-              }, 8, ["loading"]),
+              }, 8, ["loading", "disabled"]),
               vue.createElementVNode("text", new UTSJSONObject({
                 class: "forgot-password-link",
                 onClick: goForgotPassword

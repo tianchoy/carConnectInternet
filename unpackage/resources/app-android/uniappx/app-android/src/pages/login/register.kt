@@ -28,6 +28,21 @@ open class GenPagesLoginRegister : BasePage {
             val smsSending = ref(false)
             val submitting = ref(false)
             var smsCooldownTimer: Number? = null
+            val isRegisterSubmitReady = computed<Boolean>(fun(): Boolean {
+                val password = form.value.password
+                var categoryCount: Number = 0
+                if (UTSRegExp("[0-9]", "").test(password)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[A-Za-z]", "").test(password)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[^A-Za-z0-9]", "").test(password)) {
+                    categoryCount += 1
+                }
+                return UTSRegExp("^1[3-9]\\d{9}\$", "").test(form.value.mobile) && UTSRegExp("^\\d{6}\$", "").test(form.value.smsCode) && password.length >= 8 && password.length <= 16 && categoryCount >= 2 && agreementAccepted.value && !submitting.value
+            }
+            )
             val toggleAgreement = fun(): Unit {
                 agreementAccepted.value = !agreementAccepted.value
             }
@@ -263,13 +278,14 @@ open class GenPagesLoginRegister : BasePage {
                                     _cE("text", _uM("class" to "doc-link", "onClick" to gotoPrivacy), "《隐私政策》")
                                 ))
                             )),
-                            _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to submitting.value, "onClick" to submitRegister), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to submitting.value, "disabled" to !isRegisterSubmitReady.value, "onClick" to submitRegister), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
                                     " 注册并登录 "
                                 )
                             }
                             ), "_" to 1), 8, _uA(
-                                "loading"
+                                "loading",
+                                "disabled"
                             )),
                             _cE("view", _uM("class" to "login-link-box", "onClick" to backToLogin), _uA(
                                 _cE("text", _uM("class" to "login-link"), "已有账号？去登录")

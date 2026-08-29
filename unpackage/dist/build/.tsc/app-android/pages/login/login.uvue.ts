@@ -49,7 +49,13 @@ const _cache = __ins.renderCache;
 	})
 
 	const isSmsLoginReady = computed<boolean>(() => {
-		return smsMobile.value != '' && smsCode.value != ''
+		return /^1[3-9]\d{9}$/.test(smsMobile.value) && /^\d{6}$/.test(smsCode.value)
+	})
+
+	const isLoginSubmitReady = computed<boolean>(() => {
+		const isFormReady = smsLoginMode.value ? isSmsLoginReady.value : isPersonalPasswordLoginReady.value
+		const isSubmitting = smsLoginMode.value ? smsSubmitting.value : personalSubmitting.value
+		return isFormReady && docState.value && !isSubmitting
 	})
 
 	const isDocState = (): void => {
@@ -503,11 +509,12 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
           color: "#3485df",
           customStyle: "height:104rpx;",
           onClick: submitLogin,
-          loading: smsLoginMode.value ? smsSubmitting.value : personalSubmitting.value
+          loading: smsLoginMode.value ? smsSubmitting.value : personalSubmitting.value,
+          disabled: !isLoginSubmitReady.value
         }), _uM({
           default: withSlotCtx((): any[] => [" 登录 "]),
           _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["loading"])
+        }), 8 /* PROPS */, ["loading", "disabled"])
       ]),
       _cE("view", _uM({ class: "page-actions" }), [
         _cE("view", _uM({

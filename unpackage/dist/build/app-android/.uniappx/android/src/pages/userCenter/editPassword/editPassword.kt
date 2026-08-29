@@ -26,6 +26,21 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
             val form = ref<PasswordForm__1>(PasswordForm__1(oldPassword = "", newPassword = "", confirmPassword = ""))
             val submitting = ref(false)
             val sessionEnding = ref(false)
+            val isPasswordUpdateReady = computed<Boolean>(fun(): Boolean {
+                val newPassword = form.value.newPassword
+                var categoryCount: Number = 0
+                if (UTSRegExp("[0-9]", "").test(newPassword)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[A-Za-z]", "").test(newPassword)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[^A-Za-z0-9]", "").test(newPassword)) {
+                    categoryCount += 1
+                }
+                return form.value.oldPassword != "" && newPassword.length >= 8 && newPassword.length <= 16 && categoryCount >= 2 && form.value.oldPassword != newPassword && form.value.confirmPassword != "" && newPassword == form.value.confirmPassword && !submitting.value
+            }
+            )
             val isValidPassword = fun(password: String): Boolean {
                 if (password.length < 8 || password.length > 16) {
                     showAppToast(ShowToastOptions(title = "密码长度应为8至16位", icon = "none"))
@@ -153,13 +168,14 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                                     "onUpdate:modelValue"
                                 ))
                             )),
-                            _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to submitting.value, "onClick" to submitPasswordUpdate), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to submitting.value, "disabled" to !isPasswordUpdateReady.value, "onClick" to submitPasswordUpdate), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
                                     " 确认修改 "
                                 )
                             }
                             ), "_" to 1), 8, _uA(
-                                "loading"
+                                "loading",
+                                "disabled"
                             )),
                             _cE("text", _uM("class" to "forgot-password-link", "onClick" to goForgotPassword), "忘记当前密码？")
                         ))

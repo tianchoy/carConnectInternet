@@ -152,7 +152,7 @@ public func buildTencentURL(_ params: ExternalMapNavigationParams) -> String {
     var longitude = params.longitude.toString() ?? ""
     var url = "qqmap://map/routeplan?type=drive&from=" + origin + "&fromcoord=CurrentLocation&to=" + name
     url += "&tocoord=" + latitude + "," + longitude
-    url += "&referer=FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
+    url += "&referer=WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
     return url
 }
 public func buildAmapURL(_ params: ExternalMapNavigationParams) -> String {

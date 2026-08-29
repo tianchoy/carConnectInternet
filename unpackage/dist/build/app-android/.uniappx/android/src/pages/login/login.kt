@@ -39,7 +39,21 @@ open class GenPagesLoginLogin : BasePage {
             }
             )
             val isSmsLoginReady = computed<Boolean>(fun(): Boolean {
-                return smsMobile.value != "" && smsCode.value != ""
+                return UTSRegExp("^1[3-9]\\d{9}\$", "").test(smsMobile.value) && UTSRegExp("^\\d{6}\$", "").test(smsCode.value)
+            }
+            )
+            val isLoginSubmitReady = computed<Boolean>(fun(): Boolean {
+                val isFormReady = if (smsLoginMode.value) {
+                    isSmsLoginReady.value
+                } else {
+                    isPersonalPasswordLoginReady.value
+                }
+                val isSubmitting = if (smsLoginMode.value) {
+                    smsSubmitting.value
+                } else {
+                    personalSubmitting.value
+                }
+                return isFormReady && docState.value && !isSubmitting
             }
             )
             val isDocState = fun(): Unit {
@@ -338,13 +352,14 @@ open class GenPagesLoginLogin : BasePage {
                             } else {
                                 personalSubmitting.value
                             }
-                            ), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            , "disabled" to !isLoginSubmitReady.value), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
                                     " 登录 "
                                 )
                             }
                             ), "_" to 1), 8, _uA(
-                                "loading"
+                                "loading",
+                                "disabled"
                             ))
                         )),
                         _cE("view", _uM("class" to "page-actions"), _uA(

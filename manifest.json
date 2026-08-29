@@ -64,7 +64,7 @@
 				"uni-camera": {},
 				"uni-map": {
 					"tencent": {
-						"key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
+						"key": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
 					}
 				},
 				"uni-location": {
@@ -111,7 +111,7 @@
 						"appkey_android": "您的高德地图Android Key"
 					},
 					"qqmap": {
-						"appkey_android": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
+						"appkey_android": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
 					}
 				}
 			},
@@ -170,7 +170,7 @@
 				"uni-barcode-scanning": {},
 				"uni-map": {
 					"tencent": {
-						"key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
+						"key": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
 					}
 				}
 			},

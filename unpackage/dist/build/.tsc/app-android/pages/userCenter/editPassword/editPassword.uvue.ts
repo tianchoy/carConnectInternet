@@ -2,7 +2,7 @@ import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvu
 import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 	import { updatePassword } from '../../../api/request.uts'
 	import { clearPushSessionState } from '../../../services/push.uts'
 	import { showAppToast } from '../../../utils/toast.uts'
@@ -28,6 +28,23 @@ const _cache = __ins.renderCache;
 	})
 	const submitting = ref(false)
 	const sessionEnding = ref(false)
+
+	const isPasswordUpdateReady = computed<boolean>(() => {
+		const newPassword = form.value.newPassword
+		let categoryCount = 0
+		if (/[0-9]/.test(newPassword)) categoryCount += 1
+		if (/[A-Za-z]/.test(newPassword)) categoryCount += 1
+		if (/[^A-Za-z0-9]/.test(newPassword)) categoryCount += 1
+
+		return form.value.oldPassword != ''
+			&& newPassword.length >= 8
+			&& newPassword.length <= 16
+			&& categoryCount >= 2
+			&& form.value.oldPassword != newPassword
+			&& form.value.confirmPassword != ''
+			&& newPassword == form.value.confirmPassword
+			&& !submitting.value
+	})
 
 	const isValidPassword = (password: string): boolean => {
 		if (password.length < 8 || password.length > 16) {
@@ -177,11 +194,12 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           color: "#3485df",
           customStyle: "height:104rpx;",
           loading: submitting.value,
+          disabled: !isPasswordUpdateReady.value,
           onClick: submitPasswordUpdate
         }), _uM({
           default: withSlotCtx((): any[] => [" 确认修改 "]),
           _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["loading"]),
+        }), 8 /* PROPS */, ["loading", "disabled"]),
         _cE("text", _uM({
           class: "forgot-password-link",
           onClick: goForgotPassword

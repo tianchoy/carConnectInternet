@@ -2,7 +2,7 @@ import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvu
 import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 	import { resetForgotPassword, sendSmsForgotPasswordCode } from '../../api/request.uts'
 	import { showAppToast } from '../../utils/toast.uts'
 
@@ -33,6 +33,25 @@ const _cache = __ins.renderCache;
 	const smsSending = ref(false)
 	const resetSubmitting = ref(false)
 	let smsCooldownTimer: number | null = null
+
+	const isIdentityVerificationReady = computed<boolean>(() => {
+		return /^1[3-9]\d{9}$/.test(form.value.mobile) && /^\d{6}$/.test(form.value.smsCode)
+	})
+
+	const isPasswordResetReady = computed<boolean>(() => {
+		const password = form.value.password
+		let categoryCount = 0
+		if (/[0-9]/.test(password)) categoryCount += 1
+		if (/[A-Za-z]/.test(password)) categoryCount += 1
+		if (/[^A-Za-z0-9]/.test(password)) categoryCount += 1
+
+		return password.length >= 8
+			&& password.length <= 16
+			&& categoryCount >= 2
+			&& form.value.confirmPassword != ''
+			&& password == form.value.confirmPassword
+			&& !resetSubmitting.value
+	})
 
 	const isValidMobile = (): boolean => {
 		if (!/^1[3-9]\d{9}$/.test(form.value.mobile)) {
@@ -263,11 +282,12 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
                 round: "25rpx",
                 color: "#3485df",
                 customStyle: "height:104rpx;",
+                disabled: !isIdentityVerificationReady.value,
                 onClick: goToPasswordStep
               }), _uM({
                 default: withSlotCtx((): any[] => [" 下一步 "]),
                 _: 1 /* STABLE */
-              }))
+              }), 8 /* PROPS */, ["disabled"])
             ])
           : currentStep.value == 2
             ? _cE("view", _uM({
@@ -309,11 +329,12 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
                   color: "#3485df",
                   customStyle: "height:104rpx;",
                   loading: resetSubmitting.value,
+                  disabled: !isPasswordResetReady.value,
                   onClick: completePasswordReset
                 }), _uM({
                   default: withSlotCtx((): any[] => [" 确认重置 "]),
                   _: 1 /* STABLE */
-                }), 8 /* PROPS */, ["loading"])
+                }), 8 /* PROPS */, ["loading", "disabled"])
               ])
             : _cE("view", _uM({
                 key: 2,

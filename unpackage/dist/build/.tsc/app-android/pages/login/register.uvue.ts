@@ -4,7 +4,7 @@ import _easycom_i_checkbox from '@/uni_modules/i-ui-x/components/i-checkbox/i-ch
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 	import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { sendSmsRegisterCode, registerPersonalUser } from '../../api/request.uts'
@@ -36,6 +36,22 @@ const _cache = __ins.renderCache;
 	const smsSending = ref(false)
 	const submitting = ref(false)
 	let smsCooldownTimer: number | null = null
+
+	const isRegisterSubmitReady = computed<boolean>(() => {
+		const password = form.value.password
+		let categoryCount = 0
+		if (/[0-9]/.test(password)) categoryCount += 1
+		if (/[A-Za-z]/.test(password)) categoryCount += 1
+		if (/[^A-Za-z0-9]/.test(password)) categoryCount += 1
+
+		return /^1[3-9]\d{9}$/.test(form.value.mobile)
+			&& /^\d{6}$/.test(form.value.smsCode)
+			&& password.length >= 8
+			&& password.length <= 16
+			&& categoryCount >= 2
+			&& agreementAccepted.value
+			&& !submitting.value
+	})
 
 	const toggleAgreement = (): void => {
 		agreementAccepted.value = !agreementAccepted.value
@@ -295,11 +311,12 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
           color: "#3485df",
           customStyle: "height:104rpx;",
           loading: submitting.value,
+          disabled: !isRegisterSubmitReady.value,
           onClick: submitRegister
         }), _uM({
           default: withSlotCtx((): any[] => [" 注册并登录 "]),
           _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["loading"]),
+        }), 8 /* PROPS */, ["loading", "disabled"]),
         _cE("view", _uM({
           class: "login-link-box",
           onClick: backToLogin

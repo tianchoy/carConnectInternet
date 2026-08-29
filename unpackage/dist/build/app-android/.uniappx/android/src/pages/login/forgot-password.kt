@@ -32,6 +32,25 @@ open class GenPagesLoginForgotPassword : BasePage {
             val smsSending = ref(false)
             val resetSubmitting = ref(false)
             var smsCooldownTimer: Number? = null
+            val isIdentityVerificationReady = computed<Boolean>(fun(): Boolean {
+                return UTSRegExp("^1[3-9]\\d{9}\$", "").test(form.value.mobile) && UTSRegExp("^\\d{6}\$", "").test(form.value.smsCode)
+            }
+            )
+            val isPasswordResetReady = computed<Boolean>(fun(): Boolean {
+                val password = form.value.password
+                var categoryCount: Number = 0
+                if (UTSRegExp("[0-9]", "").test(password)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[A-Za-z]", "").test(password)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[^A-Za-z0-9]", "").test(password)) {
+                    categoryCount += 1
+                }
+                return password.length >= 8 && password.length <= 16 && categoryCount >= 2 && form.value.confirmPassword != "" && password == form.value.confirmPassword && !resetSubmitting.value
+            }
+            )
             val isValidMobile = fun(): Boolean {
                 if (!UTSRegExp("^1[3-9]\\d{9}\$", "").test(form.value.mobile)) {
                     showAppToast(ShowToastOptions(title = "请输入正确的手机号", icon = "none"))
@@ -251,11 +270,13 @@ open class GenPagesLoginForgotPassword : BasePage {
                                         "modelValue",
                                         "onUpdate:modelValue"
                                     )),
-                                    _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "onClick" to goToPasswordStep), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                    _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "disabled" to !isIdentityVerificationReady.value, "onClick" to goToPasswordStep), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                         return _uA(
                                             " 下一步 "
                                         )
-                                    }), "_" to 1))
+                                    }), "_" to 1), 8, _uA(
+                                        "disabled"
+                                    ))
                                 ))
                             } else {
                                 if (currentStep.value == 2) {
@@ -273,12 +294,13 @@ open class GenPagesLoginForgotPassword : BasePage {
                                             "modelValue",
                                             "onUpdate:modelValue"
                                         )),
-                                        _cV(_component_i_button, _uM("class" to "submit-button password-submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to resetSubmitting.value, "onClick" to completePasswordReset), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                        _cV(_component_i_button, _uM("class" to "submit-button password-submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to resetSubmitting.value, "disabled" to !isPasswordResetReady.value, "onClick" to completePasswordReset), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                             return _uA(
                                                 " 确认重置 "
                                             )
                                         }), "_" to 1), 8, _uA(
-                                            "loading"
+                                            "loading",
+                                            "disabled"
                                         ))
                                     ))
                                 } else {
