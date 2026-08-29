@@ -203,7 +203,7 @@ open class GenPagesLoginLogin : BasePage {
                                 completeLogin(token)
                                 return@w1
                             }
-                            if (response.msg.indexOf("NEED_REGISTER:") == 0) {
+                            if (response.msg.indexOf("NEED_REGISTER:") == 0 || response.msg.indexOf("NEED_SET_PASSWORD:") == 0) {
                                 saveSmsRegisterContext(smsMobile.value, smsCode.value)
                                 uni_navigateTo(NavigateToOptions(url = "/pages/login/set-password"))
                                 return@w1

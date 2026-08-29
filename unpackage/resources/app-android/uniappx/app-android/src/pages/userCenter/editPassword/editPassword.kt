@@ -153,7 +153,7 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                                     "onUpdate:modelValue"
                                 ))
                             )),
-                            _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "shape" to "circle", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to submitting.value, "onClick" to submitPasswordUpdate), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to submitting.value, "onClick" to submitPasswordUpdate), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
                                     " 确认修改 "
                                 )

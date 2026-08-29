@@ -201,7 +201,7 @@ const _cache = __ins.renderCache;
 				completeLogin(token)
 				return
 			}
-			if (response.msg.indexOf('NEED_REGISTER:') == 0) {
+			if (response.msg.indexOf('NEED_REGISTER:') == 0 || response.msg.indexOf('NEED_SET_PASSWORD:') == 0) {
 				saveSmsRegisterContext(smsMobile.value, smsCode.value)
 				uni.navigateTo({ url: '/pages/login/set-password' })
 				return

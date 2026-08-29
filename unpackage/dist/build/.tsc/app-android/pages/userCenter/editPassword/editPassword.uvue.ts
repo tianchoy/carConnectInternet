@@ -173,7 +173,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           class: "submit-button",
           type: "primary",
           block: "",
-          shape: "circle",
+          round: "25rpx",
           color: "#3485df",
           customStyle: "height:104rpx;",
           loading: submitting.value,
