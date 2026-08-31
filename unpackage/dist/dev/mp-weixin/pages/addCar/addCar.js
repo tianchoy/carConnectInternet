@@ -302,7 +302,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           labelDirection: "horizontal",
           class: "data-v-6409e324"
         }),
-        e: common_vendor.o(scanCode, "bf"),
+        e: common_vendor.o(scanCode, "9d"),
         f: common_vendor.p({
           name: "/static/sancode.png",
           fontSize: "24",
@@ -310,7 +310,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         g: common_vendor.o(($event) => {
           return carInfo.value.imei = $event;
-        }, "62"),
+        }, "9d"),
         h: common_vendor.p({
           border: "none",
           placeholder: "请输入设备ID(必填)",
@@ -318,23 +318,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-6409e324"
         }),
         i: common_vendor.p({
-          label: "*设备ID",
+          label: "设备ID",
           name: "imei",
+          required: true,
           labelDirection: "horizontal",
           class: "data-v-6409e324"
         }),
         j: common_vendor.t(carInfo.value.deviceTypeValue || "请选择设备图标(必选)"),
         k: !carInfo.value.deviceTypeValue ? 1 : "",
-        l: common_vendor.o(deviceTypeSelectFun, "82"),
+        l: common_vendor.o(deviceTypeSelectFun, "ae"),
         m: common_vendor.p({
           label: "车标",
           name: "deviceType",
+          required: true,
           labelDirection: "horizontal",
           class: "data-v-6409e324"
         }),
         n: common_vendor.o(($event) => {
           return carInfo.value.plateNo = $event;
-        }, "29"),
+        }, "5e"),
         o: common_vendor.p({
           border: "none",
           placeholder: "请输入车牌号",
@@ -347,8 +349,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           labelDirection: "horizontal",
           class: "data-v-6409e324"
         }),
-        q: common_vendor.o(updateCarIconSelectorVisible, "2f"),
-        r: common_vendor.o(selectIcon, "02"),
+        q: common_vendor.o(updateCarIconSelectorVisible, "fd"),
+        r: common_vendor.o(selectIcon, "8d"),
         s: common_vendor.p({
           show: carIconSelectorVisible.value,
           class: "data-v-6409e324"
@@ -362,7 +364,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           watchValidStatus: true,
           class: "data-v-6409e324"
         }),
-        w: common_vendor.o(submit, "53"),
+        w: common_vendor.o(submit, "a8"),
         x: common_vendor.p({
           type: "primary",
           loading: loading.value,

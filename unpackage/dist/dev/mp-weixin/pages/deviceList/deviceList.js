@@ -155,9 +155,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    const unbindDevice = (imei) => {
+    const unbindDevice = (deviceId) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_request.delDevice(imei);
+        const res = yield api_request.delDevice(deviceId);
         if (res.code == 200) {
           utils_toast.showAppToast({
             title: "解绑成功",

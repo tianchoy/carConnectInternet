@@ -168,7 +168,7 @@ export const getUserInfo = (): Promise<UserInfoResponse> => get(userinfo).then((
 })
 
 export const addDevice = (data: UTSJSONObject): Promise<BasicResponse> => post(addDeviceUrl, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
-export const delDevice = (imei: string): Promise<BasicResponse> => post(deleteDevice, { imei } as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const delDevice = (deviceId: string): Promise<BasicResponse> => post(deleteDevice, { deviceId } as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
 
 export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListResponse> => post(userDeviceList, data).then((raw: any): UserDeviceListResponse => {
     return userDevicePageResponse(raw)

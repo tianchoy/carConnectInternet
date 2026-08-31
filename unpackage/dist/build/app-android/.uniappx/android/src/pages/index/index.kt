@@ -52,7 +52,8 @@ open class GenPagesIndexIndex : BasePage {
                 return ""
             }
             )
-            val mapScale = ref(12)
+            val initialMapScale: Number = 12
+            val mapScale = ref(initialMapScale)
             val isMapReady = ref(false)
             val statusBarHeight = ref(20)
             val menuButtonInfo = ref(null)
@@ -402,6 +403,21 @@ open class GenPagesIndexIndex : BasePage {
                 totalMileage.value = 0
                 averageSpeed.value = 0
             }
+            val clearCurrentCar = fun(): Unit {
+                currentCarImei.value = ""
+                currentCarDeptId.value = ""
+                currentCarDeviceId.value = ""
+                currentCarIccId.value = ""
+                currentCarName.value = ""
+                currentCarSimMerchant.value = ""
+                currentCarConnectionStatus.value = ""
+                currentCarCarType.value = ""
+                currentCarPlateNo.value = ""
+                pickerValues.value = _uA()
+                deviceDetail.value = DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = 0, voltage = 0, signalStrength = 0), connectionStatus = "offline", lastUpdateTime = "")
+                lastUpdateTime.value = "--:--:--"
+                clearTripData()
+            }
             val processTripData = fun(data: UTSJSONObject): Unit {
                 val trips = data.getArray<UTSJSONObject>("trips")
                 if (trips != null && trips.length > 0) {
@@ -453,6 +469,17 @@ open class GenPagesIndexIndex : BasePage {
                         }
                 })
             }
+            val centerMapOnDevice = fun(latitude: Number, longitude: Number): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        center.latitude = latitude
+                        center.longitude = longitude
+                        mapScale.value = initialMapScale
+                        isMapReady.value = false
+                        await(nextTick())
+                        await(delay(50))
+                        isMapReady.value = true
+                })
+            }
             val devicePosInfo = ref<UTSJSONObject?>(null)
             val devicePositionUpdateTime = computed<String>(fun(): String {
                 val position = devicePosInfo.value
@@ -466,8 +493,6 @@ open class GenPagesIndexIndex : BasePage {
             val loadDevicePos = fun(data: UTSJSONObject): UTSPromise<Boolean> {
                 return wrapUTSPromise(suspend w1@{
                         positionState.value = "loading"
-                        isMapReady.value = false
-                        markers.value = _uA()
                         try {
                             val res = await(getDevicePos(data))
                             val positions = res.data
@@ -488,17 +513,17 @@ open class GenPagesIndexIndex : BasePage {
                                 return@w1 false
                             }
                             val convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
-                            center.latitude = convertedCoord.lat
-                            center.longitude = convertedCoord.lng
                             positionState.value = "available"
-                            await(delay(50))
-                            markers.value = _uA()
-                            await(delay(50))
                             val nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value)
                             markers.value = _uA(
                                 nextMarker
                             )
-                            isMapReady.value = true
+                            try {
+                                await(centerMapOnDevice(convertedCoord.lat, convertedCoord.lng))
+                            }
+                             catch (mapError: Throwable) {
+                                console.error("刷新地图视图失败", mapError)
+                            }
                             console.log("标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng)
                             return@w1 true
                         }
@@ -628,8 +653,12 @@ open class GenPagesIndexIndex : BasePage {
                                 , icon = "none"))
                                 return@w1
                             }
+                            console.log("加载车辆列表返回:", res.data)
                             val pageData = res.data
                             if (pageData == null) {
+                                userDeviceList.value = _uA()
+                                deviceList.value = _uA()
+                                clearCurrentCar()
                                 markers.value = _uA()
                                 positionState.value = "empty"
                                 if (hasUserLocation.value) {
@@ -736,6 +765,9 @@ open class GenPagesIndexIndex : BasePage {
                                     )))
                                 }
                             } else {
+                                userDeviceList.value = _uA()
+                                deviceList.value = _uA()
+                                clearCurrentCar()
                                 markers.value = _uA()
                                 positionState.value = "empty"
                                 if (hasUserLocation.value) {
@@ -766,7 +798,7 @@ open class GenPagesIndexIndex : BasePage {
                         }
                         uni_showLoading(ShowLoadingOptions(title = "刷新位置中...", mask = true))
                         try {
-                            await(loadDeviceList())
+                            await(loadDevicePos(_uO("deviceId" to currentCarDeviceId.value, "deviceids" to currentCarImei.value)))
                         }
                          catch (error: Throwable) {
                             console.error("刷新位置失败", error)
@@ -791,7 +823,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val isLogin = ::gen_isLogin_fn
             fun gen_isCarSelected_fn(): Boolean {
-                if (!(currentCarImei.value != "")) {
+                if (!hasDevice.value || !(currentCarDeviceId.value != "")) {
                     showAppToast(ShowToastOptions(title = "请先选择车辆", icon = "none"))
                     return false
                 }
@@ -848,6 +880,9 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isLogin()) {
                     return
                 }
+                if (!isCarSelected()) {
+                    return
+                }
                 if (positionState.value != "available") {
                     showAppToast(ShowToastOptions(title = if (positionMessage.value != "") {
                         positionMessage.value
@@ -897,15 +932,16 @@ open class GenPagesIndexIndex : BasePage {
             }
             fun gen_unbindCurrentDevice_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        val result = await(delDevice(currentCarImei.value))
+                        val result = await(delDevice(currentCarDeviceId.value))
+                        console.log("解绑设备结果:", result)
                         if (result.code == 200) {
                             showAppToast(ShowToastOptions(title = "解绑成功", icon = "none"))
                             clearSavedSelectedDevice()
                             clearSavedSelectedDeviceIndex()
+                            await(loadDeviceList())
                         } else {
                             showAppToast(ShowToastOptions(title = "解绑失败", icon = "error"))
                         }
-                        await(loadDeviceList())
                 })
             }
             val unbindCurrentDevice = ::gen_unbindCurrentDevice_fn

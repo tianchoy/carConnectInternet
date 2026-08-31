@@ -686,8 +686,8 @@ const addDevice = (data) => {
     return basicResponse(raw);
   });
 };
-const delDevice = (imei) => {
-  return api_http.post(deleteDevice, new common_vendor.UTSJSONObject({ imei })).then((raw = null) => {
+const delDevice = (deviceId) => {
+  return api_http.post(deleteDevice, new common_vendor.UTSJSONObject({ deviceId })).then((raw = null) => {
     return basicResponse(raw);
   });
 };

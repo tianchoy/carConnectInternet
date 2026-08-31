@@ -16,7 +16,7 @@
 					</i-input>
 				</i-form-item>
 
-				<i-form-item label="*设备ID" name="imei"  labelDirection="horizontal">
+				<i-form-item label="设备ID" name="imei" required  labelDirection="horizontal">
 					<i-input border="none" v-model="carInfo.imei" placeholder="请输入设备ID(必填)">
 						<template v-slot:suffix>
 							<i-icon name="/static/sancode.png" fontSize="24" @click="scanCode"></i-icon>
@@ -24,7 +24,7 @@
 					</i-input>
 				</i-form-item>
 
-				<i-form-item label="车标" name="deviceType" labelDirection="horizontal">
+				<i-form-item label="车标" name="deviceType" required labelDirection="horizontal">
 					<view class="car-type-selector" @click="deviceTypeSelectFun">
 						<text class="clickable" :class="{ 'placeholder': !carInfo.deviceTypeValue }">
 							{{ carInfo.deviceTypeValue || '请选择设备图标(必选)' }}

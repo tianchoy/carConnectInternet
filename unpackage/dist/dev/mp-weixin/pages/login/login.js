@@ -164,7 +164,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "登录失败", icon: "none" });
             return Promise.resolve(null);
           }
-          const token = loginData.getString("access_token", "");
+          const token = loginData.getString("token", "");
           if (token == "") {
             utils_toast.showAppToast({ title: "登录失败: 未获取到token", icon: "none" });
             return Promise.resolve(null);

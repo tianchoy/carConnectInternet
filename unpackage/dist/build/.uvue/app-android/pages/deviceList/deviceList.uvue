@@ -140,8 +140,8 @@ const __sfc__ = defineComponent({
             }
         };
         // 解绑设备
-        const unbindDevice = async (imei: string): Promise<void> => {
-            const res = await delDevice(imei);
+        const unbindDevice = async (deviceId: string): Promise<void> => {
+            const res = await delDevice(deviceId);
             if (res.code == 200) {
                 showAppToast({
                     title: '解绑成功',

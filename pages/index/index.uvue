@@ -265,7 +265,8 @@ const positionMessage = computed<string>(() => {
     if (positionState.value == 'failed') return '位置获取失败，请检查网络后重试'
     return ''
 })
-const mapScale = ref(12)
+const initialMapScale = 12
+const mapScale = ref(initialMapScale)
 const isMapReady = ref(false)
 const statusBarHeight = ref(20)
 const menuButtonInfo = ref(null)
@@ -661,6 +662,30 @@ const clearTripData = () : void => {
     averageSpeed.value = 0
 }
 
+const clearCurrentCar = (): void => {
+    currentCarImei.value = ''
+    currentCarDeptId.value = ''
+    currentCarDeviceId.value = ''
+    currentCarIccId.value = ''
+    currentCarName.value = ''
+    currentCarSimMerchant.value = ''
+    currentCarConnectionStatus.value = ''
+    currentCarCarType.value = ''
+    currentCarPlateNo.value = ''
+    pickerValues.value = []
+    deviceDetail.value = {
+        deviceStatus: {
+            batteryPercent: 0,
+            voltage: 0,
+            signalStrength: 0
+        },
+        connectionStatus: 'offline',
+        lastUpdateTime: ''
+    }
+    lastUpdateTime.value = '--:--:--'
+    clearTripData()
+}
+
 // 处理行程数据
 const processTripData = (data : UTSJSONObject) : void => {
     const trips = data.getArray<UTSJSONObject>('trips')
@@ -722,6 +747,18 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
     }
 }
 
+// 地图已被用户拖动后，响应式 center 属性不会强制改变原生地图视野。
+// 重新挂载地图以确保各端都按受控中心点和缩放级别显示，避免单点 includePoints 在 iOS 上放大视野。
+const centerMapOnDevice = async (latitude: number, longitude: number): Promise<void> => {
+    center.latitude = latitude
+    center.longitude = longitude
+    mapScale.value = initialMapScale
+    isMapReady.value = false
+    await nextTick()
+    await delay(50)
+    isMapReady.value = true
+}
+
 // 加载设备位置
 const devicePosInfo = ref<UTSJSONObject | null>(null)
 const devicePositionUpdateTime = computed<string>(() => {
@@ -730,8 +767,6 @@ const devicePositionUpdateTime = computed<string>(() => {
 })
 const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
     positionState.value = 'loading'
-    isMapReady.value = false
-    markers.value = []
     try {
         const res = await getDevicePos(data)
         const positions = res.data
@@ -761,13 +796,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
         }
 
         const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
-        center.latitude = convertedCoord.lat
-        center.longitude = convertedCoord.lng
         positionState.value = 'available'
-
-        await delay(50)
-        markers.value = []
-        await delay(50)
 
         const nextMarker = createMarker(
             1,
@@ -777,8 +806,14 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
             currentCarName.value
         )
 
+        // 使用新数组触发原生地图的标记点更新。
         markers.value = [nextMarker]
-        isMapReady.value = true
+        try {
+            await centerMapOnDevice(convertedCoord.lat, convertedCoord.lng)
+        } catch (mapError) {
+            // 原生地图视图刷新异常不应覆盖已成功取得的车辆位置。
+            console.error('刷新地图视图失败', mapError)
+        }
         console.log('标记点更新完成:', data.getString('deviceId', ''), convertedCoord.lat, convertedCoord.lng)
         return true
     } catch (error) {
@@ -897,9 +932,12 @@ const loadDeviceList = async () => {
             })
             return
         }
-
+        console.log('加载车辆列表返回:', res.data)
         const pageData = res.data
         if (pageData == null) {
+            userDeviceList.value = []
+            deviceList.value = []
+            clearCurrentCar()
             markers.value = []
             positionState.value = 'empty'
             if (hasUserLocation.value) {
@@ -1000,6 +1038,9 @@ const loadDeviceList = async () => {
                 await loadTrackPos(createTrackRequestData(device.imei != '' ? device.imei : device.value))
             }
         } else {
+            userDeviceList.value = []
+            deviceList.value = []
+            clearCurrentCar()
             markers.value = []
             positionState.value = 'empty'
             if (hasUserLocation.value) {
@@ -1044,7 +1085,10 @@ const refreshLocation = async () => {
         mask: true
     })
     try {
-        await loadDeviceList()
+        await loadDevicePos({
+            deviceId: currentCarDeviceId.value,
+            deviceids: currentCarImei.value
+        } as UTSJSONObject)
     } catch (error) {
         console.error('刷新位置失败', error)
         showAppToast({
@@ -1073,8 +1117,7 @@ function isLogin() : boolean {
 }
 
 function isCarSelected() : boolean {
-    
-    if (!currentCarImei.value) {
+    if (!hasDevice.value || !currentCarDeviceId.value) {
         showAppToast({
             title: '请先选择车辆',
             icon: 'none'
@@ -1135,6 +1178,7 @@ const toMsgCenter = () => {
 // 跳转查找车辆
 const toFindCar = () => {
     if (!isLogin()) return
+    if (!isCarSelected()) return
     if (positionState.value != 'available') {
         showAppToast({
             title: positionMessage.value || '暂无有效车辆位置',
@@ -1231,7 +1275,8 @@ const gotoLogin = () => {
 }
 
 async function unbindCurrentDevice() : Promise<void> {
-    const result = await delDevice(currentCarImei.value)
+    const result = await delDevice(currentCarDeviceId.value)
+    console.log('解绑设备结果:', result)
     if (result.code == 200) {
         showAppToast({
             title: '解绑成功',
@@ -1239,13 +1284,14 @@ async function unbindCurrentDevice() : Promise<void> {
         })
         clearSavedSelectedDevice()
         clearSavedSelectedDeviceIndex()
+
+        await loadDeviceList()
     } else {
         showAppToast({
             title: '解绑失败',
             icon: 'error'
         })
     }
-    await loadDeviceList()
 }
 
 // 解绑设备

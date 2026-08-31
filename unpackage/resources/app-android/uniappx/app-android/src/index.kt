@@ -1058,8 +1058,8 @@ val addDevice = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
     }
     )
 }
-val delDevice = fun(imei: String): UTSPromise<BasicResponse> {
-    return post(deleteDevice, _uO("imei" to imei)).then(fun(raw: Any): BasicResponse {
+val delDevice = fun(deviceId: String): UTSPromise<BasicResponse> {
+    return post(deleteDevice, _uO("deviceId" to deviceId)).then(fun(raw: Any): BasicResponse {
         return basicResponse(raw)
     }
     )

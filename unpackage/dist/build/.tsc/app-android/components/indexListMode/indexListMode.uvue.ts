@@ -22,7 +22,7 @@ const props = __props
 __ins.emit(event, ...do_not_transform_spread)
 }
 	const modal = ref<boolean>(false)
-	const imeis = ref('')
+	const selectedDeviceId = ref('')
 	// 是否需要刷新数据
 	const needRefresh = ref(false)
 	// 支付
@@ -68,15 +68,15 @@ __ins.emit(event, ...do_not_transform_spread)
 
 	}
 	// 解绑设备
-	const unbindDevice = (imei : string) => {
-		imeis.value = imei
+	const unbindDevice = (deviceId : string) => {
+		selectedDeviceId.value = deviceId
 		// 显示确认弹窗
 		modal.value = true
 	}
 	const confirm = () => {
 		// 确认解绑设备
-		// console.log(imeis.value)
-		emit('unbindDevice', imeis.value)
+		// console.log(selectedDeviceId.value)
+		emit('unbindDevice', selectedDeviceId.value)
 		// 隐藏确认弹窗
 		modal.value = false
 	}
@@ -125,7 +125,7 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
                     class: "device-tool-spacing",
                     text: "解绑",
                     type: "warning",
-                    onClick: withModifiers(() => {unbindDevice(item.imei)}, ["stop"])
+                    onClick: withModifiers(() => {unbindDevice(item.deviceId)}, ["stop"])
                   }), null, 8 /* PROPS */, ["onClick"])
                 ])
               ]),

@@ -473,7 +473,7 @@
 				showAppToast({ title: res.msg || '登录失败', icon: 'none' })
 				return
 			}
-			const token = loginData.getString('access_token', '')
+			const token = loginData.getString('token', '')
 			if (token == '') {
 				showAppToast({ title: '登录失败: 未获取到token', icon: 'none' })
 				return

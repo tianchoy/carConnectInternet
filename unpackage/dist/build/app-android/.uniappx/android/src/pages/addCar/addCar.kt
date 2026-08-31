@@ -200,7 +200,7 @@ open class GenPagesAddCarAddCar : BasePage {
                                         )
                                     }
                                     ), "_" to 1)),
-                                    _cV(_component_i_form_item, _uM("label" to "*设备ID", "name" to "imei", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                    _cV(_component_i_form_item, _uM("label" to "设备ID", "name" to "imei", "required" to "", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                         return _uA(
                                             _cV(_component_i_input, _uM("border" to "none", "modelValue" to carInfo.value.imei, "onUpdate:modelValue" to fun(`$event`: String){
                                                 carInfo.value.imei = `$event`
@@ -217,7 +217,7 @@ open class GenPagesAddCarAddCar : BasePage {
                                         )
                                     }
                                     ), "_" to 1)),
-                                    _cV(_component_i_form_item, _uM("label" to "车标", "name" to "deviceType", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                    _cV(_component_i_form_item, _uM("label" to "车标", "name" to "deviceType", "required" to "", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                         return _uA(
                                             _cE("view", _uM("class" to "car-type-selector", "onClick" to deviceTypeSelectFun), _uA(
                                                 _cE("text", _uM("class" to _nC(_uA(

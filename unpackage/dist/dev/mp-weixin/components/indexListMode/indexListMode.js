@@ -24,7 +24,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const props = __props;
     const emit = __emit;
     const modal = common_vendor.ref(false);
-    const imeis = common_vendor.ref("");
+    const selectedDeviceId = common_vendor.ref("");
     const needRefresh = common_vendor.ref(false);
     const pay = (iccid, simMerchant) => {
       if (simMerchant.toLowerCase() == "zddx") {
@@ -49,12 +49,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       }));
     };
-    const unbindDevice = (imei) => {
-      imeis.value = imei;
+    const unbindDevice = (deviceId) => {
+      selectedDeviceId.value = deviceId;
       modal.value = true;
     };
     const confirm = () => {
-      emit("unbindDevice", imeis.value);
+      emit("unbindDevice", selectedDeviceId.value);
       modal.value = false;
     };
     const cancel = () => {
@@ -86,7 +86,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, index),
             e: "245c735a-1-" + i0,
             f: common_vendor.o(($event) => {
-              return unbindDevice(item.imei);
+              return unbindDevice(item.deviceId);
             }, index),
             g: "245c735a-2-" + i0,
             h: common_vendor.t(item.imei),
@@ -106,8 +106,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "device-tool-spacing"
         })
       } : {}, {
-        e: common_vendor.o(confirm, "16"),
-        f: common_vendor.o(cancel, "2f"),
+        e: common_vendor.o(confirm, "cf"),
+        f: common_vendor.o(cancel, "d2"),
         g: common_vendor.p({
           show: common_vendor.unref(modal),
           title: "提示",

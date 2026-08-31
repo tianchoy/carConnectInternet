@@ -164,9 +164,9 @@ open class GenPagesDeviceListDeviceList : BasePage {
                         }
                 })
             }
-            val unbindDevice = fun(imei: String): UTSPromise<Unit> {
+            val unbindDevice = fun(deviceId: String): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        val res = await(delDevice(imei))
+                        val res = await(delDevice(deviceId))
                         if (res.code == 200) {
                             showAppToast(ShowToastOptions(title = "解绑成功", icon = "success"))
                             uni_setStorageSync("needRefreshHome", true)

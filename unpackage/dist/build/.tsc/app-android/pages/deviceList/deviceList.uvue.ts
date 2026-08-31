@@ -152,8 +152,8 @@ const mapScale = ref(4)
 		}
 	}
 		// 解绑设备
-	const unbindDevice = async (imei : string) => {
-		const res = await delDevice(imei)
+	const unbindDevice = async (deviceId : string) => {
+		const res = await delDevice(deviceId)
 		if (res.code == 200) {
 			showAppToast({
 				title: '解绑成功',
