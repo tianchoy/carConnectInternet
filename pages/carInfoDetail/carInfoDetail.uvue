@@ -583,35 +583,40 @@ import { openLocation } from '../../utils/openLocation.uts'
 	}
 
 	const baseList = computed(() => {
-	const list = [{
-		image: '/static/gjhf.png',
-		text: '轨迹回放'
-	}, {
-		image: '/static/clgz.png',
-		text: '车辆跟踪'
-	}, {
-		image: '/static/lcjl.png',
-		text: '里程记录'
-	}, {
-		image: '/static/tcjl.png',
-		text: '停车记录'
-	},
-	{
-		image: '/static/dzwl.png',
-		text: '电子围栏'
-	},
-	{
-		image: '/static/navto.png',
-		text: '一键寻车'
-	},
-	{
-		image: '/static/power.png',
-		text: '恢复油电'
-	},
-	{
-		image: '/static/offpower.png',
-		text: '断开油电'
-	}]
+		const list = [{
+				image: '/static/gjhf.png',
+				text: '轨迹回放'
+			}, {
+				image: '/static/clgz.png',
+				text: '车辆跟踪'
+			}, {
+				image: '/static/lcjl.png',
+				text: '里程记录'
+			}, {
+				image: '/static/tcjl.png',
+				text: '停车记录'
+			},
+			{
+				image: '/static/dzwl.png',
+				text: '电子围栏'
+			},
+			{
+				image: '/static/navto.png',
+				text: '一键寻车'
+			},
+			{
+				image: '/static/power.png',
+				text: '恢复油电'
+			},
+			{
+				image: '/static/offpower.png',
+				text: '断开油电'
+			},
+			{
+					image: '/static/cmd.png',
+					text: '发送指令'
+				}
+		]
 
 	// 根据 productId 决定是否添加发送指令选项
 	const productId = currentCarInfo.value.productId

@@ -95,6 +95,7 @@
 .container .list-box .empty-state .empty-state-text[class] {
   color: #999;
   font-size: 28rpx;
+  text-align: center;
 }
 .container .list-box .new-message-tip[class] {
   background: linear-gradient(135deg, #2979ff, #07c160);

@@ -38,13 +38,13 @@
                 <view class="car-state">
                     <view class="state-item">
                         <text class="state-label">设备状态</text>
-                        <text class="state-value" :class="{'online': safeDeviceDetail.connectionStatus == 'online'}">
-                            {{safeDeviceDetail.connectionStatus == 'online' ? '在线' : '离线'}}
+                        <text class="state-value" :class="{'online': hasDevice && safeDeviceDetail.connectionStatus == 'online'}">
+                            {{hasDevice ? (safeDeviceDetail.connectionStatus == 'online' ? '在线' : '离线') : '--'}}
                         </text>
                     </view>
                     <view class="state-item">
                         <text class="state-label">最后定位</text>
-                        <text class="state-value">{{ devicePositionUpdateTime }}</text>
+                        <text class="state-value">{{ hasDevice ? devicePositionUpdateTime : '暂无位置' }}</text>
                     </view>
                 </view>
             </view>
@@ -308,6 +308,11 @@ const deviceDetail = ref<DeviceDetailState>({
 })
 const markers = ref([] as Marker[])
 const lastUpdateTime = ref('--:--:--')
+const devicePosInfo = ref<UTSJSONObject | null>(null)
+const devicePositionUpdateTime = computed<string>(() => {
+    const position = devicePosInfo.value
+    return position != null ? position.getString('positionUpdateTime', '暂无位置') : '暂无位置'
+})
 
 // 本地存储key
 const SELECTED_DEVICE_STORAGE_KEY: string = 'selected_device_info'
@@ -576,7 +581,7 @@ const createMarker = (id: number, lat: number, lng: number, type: string, title?
 }
 
 // 获取用户当前位置
-const userLocationMarkerId = 1
+const userLocationMarkerId = 10000
 
 async function centerOnUserLocation() {
     if (!hasUserLocation.value) return
@@ -683,6 +688,8 @@ const clearCurrentCar = (): void => {
         lastUpdateTime: ''
     }
     lastUpdateTime.value = '--:--:--'
+    positionState.value = 'empty'
+    devicePosInfo.value = null
     clearTripData()
 }
 
@@ -760,11 +767,6 @@ const centerMapOnDevice = async (latitude: number, longitude: number): Promise<v
 }
 
 // 加载设备位置
-const devicePosInfo = ref<UTSJSONObject | null>(null)
-const devicePositionUpdateTime = computed<string>(() => {
-    const position = devicePosInfo.value
-    return position != null ? position.getString('positionUpdateTime', '暂无位置') : '暂无位置'
-})
 const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
     positionState.value = 'loading'
     try {

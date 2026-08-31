@@ -299,7 +299,7 @@ const sendCommand = async (): Promise<void> => {
 }
 </script>
 <style scoped lang="scss">
-	.container { background-color: #f5f5f5; display: flex; flex-direction: column; padding-bottom: 30rpx; }
+	.container { background-color: #f5f5f5;height: 100%; display: flex; flex-direction: column; padding-bottom: 30rpx; }
 	.device-info, .section { background: #fff; border-radius: 10rpx; padding: 20rpx; margin: 0 20rpx 30rpx; }
 	.device-info { display: flex; align-items: center; }
 	.device-label { font-size: 28rpx; color: #666; white-space: nowrap; }

@@ -6144,6 +6144,7 @@ fun __uts_large_list_fill_fill_1(__arr: UTSArray<UTSJSONObject>): Unit {
     __arr.push(_uO("image" to "/static/navto.png", "text" to "一键寻车"))
     __arr.push(_uO("image" to "/static/power.png", "text" to "恢复油电"))
     __arr.push(_uO("image" to "/static/offpower.png", "text" to "断开油电"))
+    __arr.push(_uO("image" to "/static/cmd.png", "text" to "发送指令"))
 }
 fun __uts_large_list_build_0(): UTSArray<UTSJSONObject> {
     val __arr = _uA<UTSJSONObject>()

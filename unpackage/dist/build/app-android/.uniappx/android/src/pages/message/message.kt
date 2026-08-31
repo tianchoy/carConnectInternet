@@ -31,13 +31,22 @@ open class GenPagesMessageMessage : BasePage {
             val pageSize = ref(10)
             val totalPage = ref(1)
             val loadStatus = ref("loadmore")
-            val isLoading = ref(false)
+            val isListLoading = ref(false)
+            val isCheckingNewMessages = ref(false)
+            val hasLoadedInitial = ref(false)
             val hasNewMessages = ref(false)
             val newMessageCount = ref(0)
-            val lastUpdateTime = ref(Date().getTime())
             val Login = ref(false)
             val messageScrollViewportHeight = ref(0)
             val isNearMessageListBottom = ref(false)
+            val isInitialLoading = computed<Boolean>(fun(): Boolean {
+                return isListLoading.value && !hasLoadedInitial.value && msgList.value.length == 0
+            }
+            )
+            val showLoadMore = computed<Boolean>(fun(): Boolean {
+                return msgList.value.length > 0 && (isListLoading.value || loadStatus.value == "loadmore" || loadStatus.value == "nomore")
+            }
+            )
             var checkTimer: Number = 0
             val isPageActive = ref(false)
             fun gen_stopNewMessageCheck_fn(): Unit {
@@ -60,10 +69,10 @@ open class GenPagesMessageMessage : BasePage {
             val vibrateAlert = ::gen_vibrateAlert_fn
             fun gen_prependLatestMessages_fn(): UTSPromise<Number> {
                 return wrapUTSPromise(suspend w1@{
-                        if (isLoading.value) {
+                        if (isListLoading.value || isCheckingNewMessages.value) {
                             return@w1 0
                         }
-                        isLoading.value = true
+                        isCheckingNewMessages.value = true
                         try {
                             val res = await(getUserMsgList(_uO("page" to 1, "pageSize" to 50)))
                             val pageData = res.data
@@ -90,13 +99,6 @@ open class GenPagesMessageMessage : BasePage {
                             )
                             if (latestMessages.length > 0) {
                                 msgList.value = latestMessages.concat(msgList.value)
-                                val newestCreateTime = latestMessages[0].getString("createTime", "")
-                                if (newestCreateTime != "") {
-                                    val newestTime = parseLocalDateTime(newestCreateTime)
-                                    if (newestTime != null) {
-                                        lastUpdateTime.value = newestTime
-                                    }
-                                }
                             }
                             return@w1 latestMessages.length
                         }
@@ -105,14 +107,14 @@ open class GenPagesMessageMessage : BasePage {
                             return@w1 0
                         }
                          finally {
-                            isLoading.value = false
+                            isCheckingNewMessages.value = false
                         }
                 })
             }
             val prependLatestMessages = ::gen_prependLatestMessages_fn
             fun gen_checkNewMessages_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        if (!isPageActive.value || isLoading.value) {
+                        if (!isPageActive.value || isListLoading.value || isCheckingNewMessages.value) {
                             return@w1
                         }
                         val insertedCount = await(prependLatestMessages())
@@ -138,18 +140,19 @@ open class GenPagesMessageMessage : BasePage {
                 , 10000)
             }
             val startNewMessageCheck = ::gen_startNewMessageCheck_fn
-            fun loadMsgList(isInit: Boolean = false): UTSPromise<Unit> {
+            fun loadMsgList(isInit: Boolean = false): UTSPromise<Boolean> {
                 return wrapUTSPromise(suspend w1@{
-                        if (isLoading.value) {
-                            return@w1
+                        if (isListLoading.value || isCheckingNewMessages.value) {
+                            return@w1 false
                         }
                         if (isInit) {
                             currPage.value = 1
                             msgList.value = _uA()
+                            hasLoadedInitial.value = false
                             loadStatus.value = "loadmore"
                             isNearMessageListBottom.value = false
                         }
-                        isLoading.value = true
+                        isListLoading.value = true
                         try {
                             if (!isInit) {
                                 loadStatus.value = "loading"
@@ -157,12 +160,16 @@ open class GenPagesMessageMessage : BasePage {
                             val res = await(getUserMsgList(_uO("page" to currPage.value, "pageSize" to pageSize.value)))
                             if (res.code != 200) {
                                 loadStatus.value = "loadmore"
-                                return@w1
+                                return@w1 false
                             }
                             val data = res.data
                             if (data == null) {
+                                totalPage.value = currPage.value
                                 loadStatus.value = "nomore"
-                                return@w1
+                                if (isInit) {
+                                    hasLoadedInitial.value = true
+                                }
+                                return@w1 true
                             }
                             val totalPages = if (data.totalPage > 0) {
                                 data.totalPage
@@ -171,11 +178,10 @@ open class GenPagesMessageMessage : BasePage {
                             }
                             totalPage.value = totalPages
                             val newData: UTSArray<UTSJSONObject> = data.list
+                            val isEmptyInitial = isInit && newData.length == 0
                             if (isInit) {
                                 msgList.value = newData
-                                if (newData.length > 0) {
-                                    lastUpdateTime.value = Date().getTime()
-                                }
+                                hasLoadedInitial.value = true
                             } else {
                                 newData.forEach(fun(item: UTSJSONObject): Unit {
                                     val messageId = item.getString("messageId", "")
@@ -189,7 +195,7 @@ open class GenPagesMessageMessage : BasePage {
                                 }
                                 )
                             }
-                            loadStatus.value = if (currPage.value >= totalPage.value) {
+                            loadStatus.value = if (isEmptyInitial || currPage.value >= totalPage.value) {
                                 "nomore"
                             } else {
                                 "loadmore"
@@ -198,13 +204,15 @@ open class GenPagesMessageMessage : BasePage {
                                 hasNewMessages.value = false
                                 newMessageCount.value = 0
                             }
+                            return@w1 true
                         }
                          catch (error: Throwable) {
                             loadStatus.value = "loadmore"
                             console.error("请求异常:", error)
+                            return@w1 false
                         }
                          finally {
-                            isLoading.value = false
+                            isListLoading.value = false
                         }
                 })
             }
@@ -269,7 +277,7 @@ open class GenPagesMessageMessage : BasePage {
             val handleItemClick = ::gen_handleItemClick_fn
             fun gen_openPendingPushMessage_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        if (isLoading.value) {
+                        if (isListLoading.value || isCheckingNewMessages.value) {
                             setTimeout(fun(){
                                 gen_openPendingPushMessage_fn()
                             }
@@ -295,53 +303,46 @@ open class GenPagesMessageMessage : BasePage {
                 })
             }
             val openPendingPushMessage = ::gen_openPendingPushMessage_fn
+            val finishPageLifecycle = fun(): Unit {
+                isPageActive.value = false
+                stopNewMessageCheck()
+            }
+            val resumePageLifecycle = fun(): Unit {
+                isPageActive.value = true
+                startNewMessageCheck()
+                openPendingPushMessage()
+                checkNewMessages()
+            }
             onShow(fun(){
-                if (Login.value) {
-                    console.log("页面显示 - 启动自动刷新")
-                    isPageActive.value = true
-                    measureMessageScrollViewport()
-                    startNewMessageCheck()
-                    openPendingPushMessage()
-                    checkNewMessages()
+                if (!Login.value) {
+                    return
                 }
+                console.log("页面显示 - 启动自动刷新")
+                measureMessageScrollViewport()
+                resumePageLifecycle()
             }
             )
             onHide(fun(){
                 console.log("页面隐藏 - 停止自动刷新")
-                if (Login.value) {
-                    console.log("页面隐藏 - 停止自动刷新")
-                    isPageActive.value = false
-                    stopNewMessageCheck()
-                }
+                finishPageLifecycle()
             }
             )
             onUnload(fun(){
                 console.log("页面卸载 - 清理资源")
-                if (Login.value) {
-                    console.log("页面卸载 - 清理资源")
-                    isPageActive.value = false
-                    stopNewMessageCheck()
-                }
+                finishPageLifecycle()
             }
             )
             onActivated(fun(){
-                console.log("页面激活 - 启动自动刷新")
-                if (Login.value) {
-                    console.log("页面激活 - 启动自动刷新")
-                    isPageActive.value = true
-                    startNewMessageCheck()
-                    openPendingPushMessage()
-                    checkNewMessages()
+                if (!Login.value) {
+                    return
                 }
+                console.log("页面激活 - 启动自动刷新")
+                resumePageLifecycle()
             }
             )
             onDeactivated(fun(){
                 console.log("页面停用 - 停止自动刷新")
-                if (Login.value) {
-                    console.log("页面停用 - 停止自动刷新")
-                    isPageActive.value = false
-                    stopNewMessageCheck()
-                }
+                finishPageLifecycle()
             }
             )
             val onRefresherRefresh = fun(){
@@ -357,18 +358,22 @@ open class GenPagesMessageMessage : BasePage {
             }
             val loadMore = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        if (isLoading.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
+                        if (isListLoading.value || isCheckingNewMessages.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
                             if (currPage.value >= totalPage.value) {
                                 loadStatus.value = "nomore"
                             }
                             return@w1
                         }
-                        currPage.value++
-                        await(loadMsgList())
+                        val previousPage = currPage.value
+                        currPage.value = previousPage + 1
+                        val loaded = await(loadMsgList())
+                        if (!loaded) {
+                            currPage.value = previousPage
+                        }
                 })
             }
             val onScrollToLower = fun(){
-                if (loadStatus.value == "loadmore" && !isLoading.value) {
+                if (loadStatus.value == "loadmore" && !isListLoading.value && !isCheckingNewMessages.value) {
                     loadMore()
                 }
             }
@@ -448,16 +453,22 @@ open class GenPagesMessageMessage : BasePage {
                     _cE("view", _uM("class" to "container"), _uA(
                         _cE("scroll-view", _uM("scroll-y" to "true", "show-scrollbar" to false, "class" to "scroll-container", "id" to "message-scroll-container", "refresher-enabled" to "", "refresher-triggered" to refresherTriggered.value, "lower-threshold" to 100, "onRefresherrefresh" to onRefresherRefresh, "onScrolltolower" to onScrollToLower, "onScroll" to onMessageScroll), _uA(
                             _cE("view", _uM("class" to "list-box"), _uA(
-                                if (isTrue(msgList.value.length == 0 && !isLoading.value)) {
+                                if (isTrue(isInitialLoading.value)) {
                                     _cE("view", _uM("key" to 0, "class" to "empty-state"), _uA(
-                                        _cE("text", _uM("class" to "empty-state-text"), "暂无消息")
+                                        _cE("text", _uM("class" to "empty-state-text"), "加载中...")
                                     ))
                                 } else {
-                                    _cC("v-if", true)
+                                    if (isTrue(hasLoadedInitial.value && msgList.value.length == 0)) {
+                                        _cE("view", _uM("key" to 1, "class" to "empty-state"), _uA(
+                                            _cE("text", _uM("class" to "empty-state-text"), "暂无消息")
+                                        ))
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
                                 }
                                 ,
                                 if (isTrue(hasNewMessages.value)) {
-                                    _cE("view", _uM("key" to 1, "class" to "new-message-tip", "onClick" to loadNewMessages), _uA(
+                                    _cE("view", _uM("key" to 2, "class" to "new-message-tip", "onClick" to loadNewMessages), _uA(
                                         _cE("text", null, "有 " + _tD(newMessageCount.value) + " 条新消息，点击查看", 1)
                                     ))
                                 } else {
@@ -488,15 +499,15 @@ open class GenPagesMessageMessage : BasePage {
                                     ))
                                 }
                                 ), 128),
-                                if (isTrue(Login.value)) {
-                                    _cE("view", _uM("key" to 2, "class" to "load-more"), _uA(
-                                        if (loadStatus.value == "loading") {
-                                            _cE("text", _uM("key" to 0, "class" to "tips-text"), "上拉加载更多")
+                                if (isTrue(showLoadMore.value)) {
+                                    _cE("view", _uM("key" to 3, "class" to "load-more"), _uA(
+                                        if (isTrue(isListLoading.value)) {
+                                            _cE("text", _uM("key" to 0, "class" to "tips-text"), "加载中...")
                                         } else {
                                             if (loadStatus.value == "nomore") {
                                                 _cE("text", _uM("key" to 1, "class" to "tips-text"), "没有更多了")
                                             } else {
-                                                _cE("text", _uM("key" to 2, "class" to "tips-text"), "加载中...")
+                                                _cE("text", _uM("key" to 2, "class" to "tips-text"), "上拉加载更多")
                                             }
                                         }
                                     ))
@@ -524,7 +535,7 @@ open class GenPagesMessageMessage : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("width" to "100%", "position" to "fixed", "top" to "170rpx", "bottom" to 0, "backgroundColor" to "#f5f5f5")), "scroll-container" to _uM(".container " to _uM("height" to "100%", "width" to "100%")), "list-box" to _uM(".container " to _uM("width" to "100%", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "position" to "relative")), "message-item" to _uM(".container .list-box " to _uM("marginBottom" to "20rpx", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#ffffff")), "message-header" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between")), "message-content-row" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between", "marginTop" to "16rpx")), "message-title" to _uM(".container .list-box " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "fontSize" to "30rpx", "color" to "#333333", "whiteSpace" to "nowrap", "textOverflow" to "ellipsis", "overflow" to "hidden")), "message-content" to _uM(".container .list-box " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "fontSize" to "26rpx", "color" to "#666666", "whiteSpace" to "nowrap", "textOverflow" to "ellipsis", "overflow" to "hidden")), "unread-box" to _uM(".container .list-box " to _uM("display" to "flex", "flexShrink" to 0, "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "4rpx", "paddingRight" to "12rpx", "paddingBottom" to "4rpx", "paddingLeft" to "12rpx", "backgroundColor" to "#f56c6c", "marginLeft" to "16rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "unread-badge" to _uM(".container .list-box .unread-box " to _uM("color" to "#ffffff", "fontSize" to "22rpx")), "empty-state" to _uM(".container .list-box " to _uM("display" to "flex", "justifyContent" to "center", "paddingTop" to "50rpx", "paddingRight" to 0, "paddingBottom" to "50rpx", "paddingLeft" to 0)), "empty-state-text" to _uM(".container .list-box .empty-state " to _uM("color" to "#999999", "fontSize" to "28rpx")), "new-message-tip" to _uM(".container .list-box " to _uM("backgroundImage" to "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor" to "rgba(0,0,0,0)", "color" to "#FFFFFF", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "textAlign" to "center", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginBottom" to "20rpx", "fontSize" to "26rpx")), "load-more" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "paddingTop" to "30rpx", "paddingRight" to 0, "paddingBottom" to "30rpx", "paddingLeft" to 0)), "tips-text" to _uM(".container .list-box .load-more " to _uM("color" to "#999999", "fontSize" to "26rpx", "textAlign" to "center")))
+                return _uM("container" to _pS(_uM("width" to "100%", "position" to "fixed", "top" to "170rpx", "bottom" to 0, "backgroundColor" to "#f5f5f5")), "scroll-container" to _uM(".container " to _uM("height" to "100%", "width" to "100%")), "list-box" to _uM(".container " to _uM("width" to "100%", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "position" to "relative")), "message-item" to _uM(".container .list-box " to _uM("marginBottom" to "20rpx", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#ffffff")), "message-header" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between")), "message-content-row" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between", "marginTop" to "16rpx")), "message-title" to _uM(".container .list-box " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "fontSize" to "30rpx", "color" to "#333333", "whiteSpace" to "nowrap", "textOverflow" to "ellipsis", "overflow" to "hidden")), "message-content" to _uM(".container .list-box " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "fontSize" to "26rpx", "color" to "#666666", "whiteSpace" to "nowrap", "textOverflow" to "ellipsis", "overflow" to "hidden")), "unread-box" to _uM(".container .list-box " to _uM("display" to "flex", "flexShrink" to 0, "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "4rpx", "paddingRight" to "12rpx", "paddingBottom" to "4rpx", "paddingLeft" to "12rpx", "backgroundColor" to "#f56c6c", "marginLeft" to "16rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "unread-badge" to _uM(".container .list-box .unread-box " to _uM("color" to "#ffffff", "fontSize" to "22rpx")), "empty-state" to _uM(".container .list-box " to _uM("display" to "flex", "justifyContent" to "center", "paddingTop" to "50rpx", "paddingRight" to 0, "paddingBottom" to "50rpx", "paddingLeft" to 0)), "empty-state-text" to _uM(".container .list-box .empty-state " to _uM("color" to "#999999", "fontSize" to "28rpx", "textAlign" to "center")), "new-message-tip" to _uM(".container .list-box " to _uM("backgroundImage" to "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor" to "rgba(0,0,0,0)", "color" to "#FFFFFF", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "textAlign" to "center", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginBottom" to "20rpx", "fontSize" to "26rpx")), "load-more" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "paddingTop" to "30rpx", "paddingRight" to 0, "paddingBottom" to "30rpx", "paddingLeft" to 0)), "tips-text" to _uM(".container .list-box .load-more " to _uM("color" to "#999999", "fontSize" to "26rpx", "textAlign" to "center")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

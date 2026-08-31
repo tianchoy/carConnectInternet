@@ -5506,7 +5506,7 @@
       delete this.__props__;
     }
   }
-  let MessageResponse$1 = class MessageResponse2 extends UTS.UTSType {
+  class MessageResponse extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
         kind: 2,
@@ -5519,7 +5519,7 @@
         }
       };
     }
-    constructor(options, metadata = MessageResponse2.get$UTSMetadata$(), isJSONParse = false) {
+    constructor(options, metadata = MessageResponse.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.code = this.__props__.code;
@@ -5527,7 +5527,7 @@
       this.data = this.__props__.data;
       delete this.__props__;
     }
-  };
+  }
   function basicResponse(raw = null) {
     const response = asJSONObject(raw);
     return new BasicResponse({ code: getResponseCode(response), msg: getResponseMessage(response) });
@@ -5568,7 +5568,7 @@
   }
   function messagePageResponse(raw = null) {
     const page = devicePageResponse(raw);
-    return new MessageResponse$1({
+    return new MessageResponse({
       code: page.code,
       msg: page.msg,
       data: new UserDeviceListData$1({
@@ -6168,7 +6168,7 @@
       delete this.__props__;
     }
   }
-  const userLocationMarkerId = 1;
+  const userLocationMarkerId = 1e4;
   const _sfc_main$I = /* @__PURE__ */ vue.defineComponent({
     __name: "index",
     setup(__props) {
@@ -6223,6 +6223,11 @@
       }));
       const markers = vue.ref([]);
       const lastUpdateTime = vue.ref("--:--:--");
+      const devicePosInfo = vue.ref(null);
+      const devicePositionUpdateTime = vue.computed(() => {
+        const position = devicePosInfo.value;
+        return position != null ? position.getString("positionUpdateTime", "暂无位置") : "暂无位置";
+      });
       const safeDeviceDetail = vue.computed(() => {
         const detail = deviceDetail2.value;
         return new DeviceDetailState({
@@ -6279,9 +6284,9 @@
             longitude: device.longitude
           });
           uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:384", "保存选中设备成功:", deviceInfo);
+          uni.__log__("log", "at pages/index/index.uvue:389", "保存选中设备成功:", deviceInfo);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:386", "保存选中设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:391", "保存选中设备失败:", error);
         }
       };
       const decodeSavedDevice = (raw = null) => {
@@ -6327,23 +6332,23 @@
             return null;
           return decodeSavedDevice(rawDevice);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:446", "获取保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:451", "获取保存设备失败:", error);
         }
         return null;
       };
       const clearSavedSelectedDevice = () => {
         try {
           uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:455", "清除保存设备成功");
+          uni.__log__("log", "at pages/index/index.uvue:460", "清除保存设备成功");
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:457", "清除保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:462", "清除保存设备失败:", error);
         }
       };
       const saveSelectedDeviceIndex = (index) => {
         try {
           uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:466", "保存选中设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:471", "保存选中设备索引失败:", error);
         }
       };
       const getSavedSelectedDeviceIndex = () => {
@@ -6354,7 +6359,7 @@
             return isNaN(index) || index < 0 ? null : index;
           }
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:479", "获取保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:484", "获取保存设备索引失败:", error);
         }
         return null;
       };
@@ -6362,7 +6367,7 @@
         try {
           uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:489", "清除保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:494", "清除保存设备索引失败:", error);
         }
       };
       const findDeviceIndex = (imei, deviceId) => {
@@ -6448,7 +6453,7 @@
         uni.getLocation(new UTSJSONObject({
           type: "gcj02",
           success: (res) => {
-            uni.__log__("log", "at pages/index/index.uvue:606", "用户当前位置:", res);
+            uni.__log__("log", "at pages/index/index.uvue:611", "用户当前位置:", res);
             userLocation.latitude = res.latitude;
             userLocation.longitude = res.longitude;
             hasUserLocation.value = true;
@@ -6457,7 +6462,7 @@
             }
           },
           fail: (err) => {
-            uni.__log__("error", "at pages/index/index.uvue:615", "获取用户当前位置失败:", err.errMsg, err);
+            uni.__log__("error", "at pages/index/index.uvue:620", "获取用户当前位置失败:", err.errMsg, err);
           }
         }));
       }
@@ -6468,7 +6473,7 @@
             const res = yield getDeviceDetail(deviceId);
             const detail = res.data;
             if (res.code != 200 || detail == null) {
-              uni.__log__("error", "at pages/index/index.uvue:626", "加载设备详情失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:631", "加载设备详情失败:", res.msg);
               return Promise.resolve(null);
             }
             if (detail != null) {
@@ -6490,7 +6495,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:648", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:653", "加载设备详情失败", error);
           }
         });
       };
@@ -6525,6 +6530,8 @@
           lastUpdateTime: ""
         };
         lastUpdateTime.value = "--:--:--";
+        positionState.value = "empty";
+        devicePosInfo.value = null;
         clearTripData();
       };
       const processTripData = (data) => {
@@ -6565,7 +6572,7 @@
             if (requestId != trackRequestId)
               return Promise.resolve(null);
             if (res.code != 200) {
-              uni.__log__("error", "at pages/index/index.uvue:732", "加载轨迹失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:739", "加载轨迹失败:", res.msg);
               clearTripData();
               return Promise.resolve(null);
             }
@@ -6578,7 +6585,7 @@
           } catch (error) {
             if (requestId != trackRequestId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/index/index.uvue:745", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:752", "加载轨迹失败", error);
             clearTripData();
           }
         });
@@ -6594,11 +6601,6 @@
           isMapReady.value = true;
         });
       };
-      const devicePosInfo = vue.ref(null);
-      const devicePositionUpdateTime = vue.computed(() => {
-        const position = devicePosInfo.value;
-        return position != null ? position.getString("positionUpdateTime", "暂无位置") : "暂无位置";
-      });
       const loadDevicePos = (data) => {
         return __awaiter(this, void 0, void 0, function* () {
           positionState.value = "loading";
@@ -6606,7 +6608,7 @@
             const res = yield getDevicePos(data);
             const positions = res.data;
             if (res.code != 200 || positions == null || positions.length == 0) {
-              uni.__log__("warn", "at pages/index/index.uvue:774", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
+              uni.__log__("warn", "at pages/index/index.uvue:776", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
               positionState.value = "empty";
               return false;
             }
@@ -6616,7 +6618,7 @@
             const lng = position.getNumber("longitude", 0);
             const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
             if (!isValidCoordinate2) {
-              uni.__log__("error", "at pages/index/index.uvue:789", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              uni.__log__("error", "at pages/index/index.uvue:791", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
               positionState.value = "invalid";
               showAppToast({
                 title: "定位数据异常",
@@ -6631,12 +6633,12 @@
             try {
               yield centerMapOnDevice(convertedCoord.lat, convertedCoord.lng);
             } catch (mapError) {
-              uni.__log__("error", "at pages/index/index.uvue:815", "刷新地图视图失败", mapError);
+              uni.__log__("error", "at pages/index/index.uvue:817", "刷新地图视图失败", mapError);
             }
-            uni.__log__("log", "at pages/index/index.uvue:817", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
+            uni.__log__("log", "at pages/index/index.uvue:819", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
             return true;
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:820", "加载设备位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:822", "加载设备位置失败", error);
             positionState.value = "failed";
             showAppToast({
               title: "定位失败，请重试",
@@ -6648,7 +6650,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:832", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:834", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -6661,7 +6663,7 @@
               icon: "none"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:845", "切换车辆失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:847", "切换车辆失败", error);
             showAppToast({
               title: "切换失败，请重试",
               icon: "none"
@@ -6701,7 +6703,7 @@
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:891", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:893", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -6740,7 +6742,7 @@
               });
               return Promise.resolve(null);
             }
-            uni.__log__("log", "at pages/index/index.uvue:935", "加载车辆列表返回:", res.data);
+            uni.__log__("log", "at pages/index/index.uvue:937", "加载车辆列表返回:", res.data);
             const pageData = res.data;
             if (pageData == null) {
               userDeviceList2.value = [];
@@ -6807,7 +6809,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:1012", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:1014", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -6846,7 +6848,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:1056", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1058", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -6880,7 +6882,7 @@
               deviceids: currentCarImei.value
             }));
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:1093", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1095", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -6923,7 +6925,7 @@
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1137", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1139", "跳转轨迹详情失败:", err);
           }
         });
       };
@@ -6950,7 +6952,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1165", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1167", "跳转添加设备失败:", err);
           }
         });
       };
@@ -7004,7 +7006,7 @@
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1256", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1258", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -7024,7 +7026,7 @@
       function unbindCurrentDevice() {
         return __awaiter(this, void 0, void 0, function* () {
           const result = yield delDevice(currentCarDeviceId.value);
-          uni.__log__("log", "at pages/index/index.uvue:1279", "解绑设备结果:", result);
+          uni.__log__("log", "at pages/index/index.uvue:1281", "解绑设备结果:", result);
           if (result.code == 200) {
             showAppToast({
               title: "解绑成功",
@@ -7172,12 +7174,12 @@
                   vue.createElementVNode("view", new UTSJSONObject({ class: "state-item" }), [
                     vue.createElementVNode("text", new UTSJSONObject({ class: "state-label" }), "设备状态"),
                     vue.createElementVNode("text", new UTSJSONObject({
-                      class: vue.normalizeClass(["state-value", new UTSJSONObject({ "online": safeDeviceDetail.value.connectionStatus == "online" })])
-                    }), vue.toDisplayString(safeDeviceDetail.value.connectionStatus == "online" ? "在线" : "离线"), 3)
+                      class: vue.normalizeClass(["state-value", new UTSJSONObject({ "online": hasDevice.value && safeDeviceDetail.value.connectionStatus == "online" })])
+                    }), vue.toDisplayString(hasDevice.value ? safeDeviceDetail.value.connectionStatus == "online" ? "在线" : "离线" : "--"), 3)
                   ]),
                   vue.createElementVNode("view", new UTSJSONObject({ class: "state-item" }), [
                     vue.createElementVNode("text", new UTSJSONObject({ class: "state-label" }), "最后定位"),
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "state-value" }), vue.toDisplayString(devicePositionUpdateTime.value), 1)
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "state-value" }), vue.toDisplayString(hasDevice.value ? devicePositionUpdateTime.value : "暂无位置"), 1)
                   ])
                 ])
               ], 4),
@@ -7809,70 +7811,6 @@
   } }));
   const _style_0$F = { "i-modal__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0.5)", "alignItems": "center", "justifyContent": "center", "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-modal": { "": { "position": "relative", "overflow": "hidden", "backgroundColor": "#ffffff", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-modal__close": { "": { "position": "absolute", "right": 8, "top": 8, "zIndex": 2, "width": 34, "height": 34, "alignItems": "center", "justifyContent": "center" } }, "i-modal__close-text": { "": { "color": "#909399", "fontSize": 22, "lineHeight": "30px" } }, "i-modal__title": { "": { "paddingTop": 22, "paddingRight": 22, "paddingBottom": 8, "paddingLeft": 22, "color": "#303133", "fontSize": 17, "fontWeight": 600, "lineHeight": "24px", "textAlign": "center" } }, "i-modal__content-wrap": { "": { "minHeight": 52, "paddingTop": 8, "paddingRight": 22, "paddingBottom": 22, "paddingLeft": 22, "alignItems": "center", "justifyContent": "center" } }, "i-modal__content": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-modal__footer": { "": { "minHeight": 48, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "i-modal__footer--button": { "": { "paddingTop": 10, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14, "borderTopWidth": 0 } }, "i-modal__footer-inner": { "": { "flexDirection": "row" } }, "i-modal__button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 48, "alignItems": "center", "justifyContent": "center" } }, "i-modal__button--cancel": { "": { "borderRightWidth": 1, "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "i-modal__button--model-button": { "": { "height": 40, "marginTop": 0, "marginRight": 5, "marginBottom": 0, "marginLeft": 5, "borderRightWidth": 0, "backgroundColor": "#f5f7fb" } }, "i-modal__button--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-modal__confirm-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-modal__cancel-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-modal__mask": { "property": "opacity", "timingFunction": "ease" }, "i-modal": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
   const __easycom_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["styles", [_style_0$F]]]);
-  class ModalInstance extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            open: { type: "Unknown", optional: false },
-            close: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = ModalInstance.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.open = this.__props__.open;
-      this.close = this.__props__.close;
-      delete this.__props__;
-    }
-  }
-  class MessageData extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            list: { type: "Unknown", optional: false },
-            total: { type: Number, optional: false },
-            totalPage: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = MessageData.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.list = this.__props__.list;
-      this.total = this.__props__.total;
-      this.totalPage = this.__props__.totalPage;
-      delete this.__props__;
-    }
-  }
-  class MessageResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: MessageData, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = MessageResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
   const _sfc_main$F = /* @__PURE__ */ vue.defineComponent({
     __name: "message",
     setup(__props) {
@@ -7884,18 +7822,25 @@
       const pageSize = vue.ref(10);
       const totalPage = vue.ref(1);
       const loadStatus = vue.ref("loadmore");
-      const isLoading = vue.ref(false);
+      const isListLoading = vue.ref(false);
+      const isCheckingNewMessages = vue.ref(false);
+      const hasLoadedInitial = vue.ref(false);
       const hasNewMessages = vue.ref(false);
       const newMessageCount = vue.ref(0);
-      const lastUpdateTime = vue.ref((/* @__PURE__ */ new Date()).getTime());
       const Login = vue.ref(false);
       const messageScrollViewportHeight = vue.ref(0);
       const isNearMessageListBottom = vue.ref(false);
+      const isInitialLoading = vue.computed(() => {
+        return isListLoading.value && !hasLoadedInitial.value && msgList.value.length == 0;
+      });
+      const showLoadMore = vue.computed(() => {
+        return msgList.value.length > 0 && (isListLoading.value || loadStatus.value == "loadmore" || loadStatus.value == "nomore");
+      });
       let checkTimer = 0;
       const isPageActive = vue.ref(false);
       function stopNewMessageCheck() {
         if (checkTimer > 0) {
-          uni.__log__("log", "at pages/message/message.uvue:109", "停止定时消息检查");
+          uni.__log__("log", "at pages/message/message.uvue:105", "停止定时消息检查");
           clearInterval(checkTimer);
           checkTimer = 0;
         }
@@ -7907,9 +7852,9 @@
       }
       function prependLatestMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-          if (isLoading.value)
+          if (isListLoading.value || isCheckingNewMessages.value)
             return 0;
-          isLoading.value = true;
+          isCheckingNewMessages.value = true;
           try {
             const res = yield getUserMsgList(new UTSJSONObject({ page: 1, pageSize: 50 }));
             const pageData = res.data;
@@ -7932,25 +7877,19 @@
             });
             if (latestMessages.length > 0) {
               msgList.value = [...latestMessages, ...msgList.value];
-              const newestCreateTime = latestMessages[0].getString("createTime", "");
-              if (newestCreateTime != "") {
-                const newestTime = parseLocalDateTime(newestCreateTime);
-                if (newestTime != null)
-                  lastUpdateTime.value = newestTime;
-              }
             }
             return latestMessages.length;
           } catch (error) {
-            uni.__log__("error", "at pages/message/message.uvue:156", "检查新消息失败:", error);
+            uni.__log__("error", "at pages/message/message.uvue:147", "检查新消息失败:", error);
             return 0;
           } finally {
-            isLoading.value = false;
+            isCheckingNewMessages.value = false;
           }
         });
       }
       function checkNewMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-          if (!isPageActive.value || isLoading.value)
+          if (!isPageActive.value || isListLoading.value || isCheckingNewMessages.value)
             return Promise.resolve(null);
           const insertedCount = yield prependLatestMessages();
           if (insertedCount > 0) {
@@ -7964,25 +7903,26 @@
         if (checkTimer > 0) {
           stopNewMessageCheck();
         }
-        uni.__log__("log", "at pages/message/message.uvue:180", "启动定时消息检查");
+        uni.__log__("log", "at pages/message/message.uvue:171", "启动定时消息检查");
         checkTimer = setInterval(() => {
           if (isPageActive.value) {
-            uni.__log__("log", "at pages/message/message.uvue:184", "定时检查新消息...");
+            uni.__log__("log", "at pages/message/message.uvue:175", "定时检查新消息...");
             checkNewMessages();
           }
         }, 1e4);
       }
       function loadMsgList(isInit = false) {
         return __awaiter(this, void 0, void 0, function* () {
-          if (isLoading.value)
-            return Promise.resolve(null);
+          if (isListLoading.value || isCheckingNewMessages.value)
+            return false;
           if (isInit) {
             currPage.value = 1;
             msgList.value = [];
+            hasLoadedInitial.value = false;
             loadStatus.value = "loadmore";
             isNearMessageListBottom.value = false;
           }
-          isLoading.value = true;
+          isListLoading.value = true;
           try {
             if (!isInit)
               loadStatus.value = "loading";
@@ -7992,20 +7932,23 @@
             }));
             if (res.code != 200) {
               loadStatus.value = "loadmore";
-              return Promise.resolve(null);
+              return false;
             }
             const data = res.data;
             if (data == null) {
+              totalPage.value = currPage.value;
               loadStatus.value = "nomore";
-              return Promise.resolve(null);
+              if (isInit)
+                hasLoadedInitial.value = true;
+              return true;
             }
             const totalPages = data.totalPage > 0 ? data.totalPage : 1;
             totalPage.value = totalPages;
             const newData = data.list;
+            const isEmptyInitial = isInit && newData.length == 0;
             if (isInit) {
               msgList.value = newData;
-              if (newData.length > 0)
-                lastUpdateTime.value = (/* @__PURE__ */ new Date()).getTime();
+              hasLoadedInitial.value = true;
             } else {
               newData.forEach((item) => {
                 const messageId = item.getString("messageId", "");
@@ -8016,26 +7959,28 @@
                   msgList.value.push(item);
               });
             }
-            loadStatus.value = currPage.value >= totalPage.value ? "nomore" : "loadmore";
+            loadStatus.value = isEmptyInitial || currPage.value >= totalPage.value ? "nomore" : "loadmore";
             if (isInit) {
               hasNewMessages.value = false;
               newMessageCount.value = 0;
             }
+            return true;
           } catch (error) {
             loadStatus.value = "loadmore";
-            uni.__log__("error", "at pages/message/message.uvue:236", "请求异常:", error);
+            uni.__log__("error", "at pages/message/message.uvue:232", "请求异常:", error);
+            return false;
           } finally {
-            isLoading.value = false;
+            isListLoading.value = false;
           }
         });
       }
       function loadNewMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:244", "加载新消息");
+          uni.__log__("log", "at pages/message/message.uvue:241", "加载新消息");
           yield prependLatestMessages();
           hasNewMessages.value = false;
           newMessageCount.value = 0;
-          uni.__log__("log", "at pages/message/message.uvue:248", "新消息加载完成");
+          uni.__log__("log", "at pages/message/message.uvue:245", "新消息加载完成");
         });
       }
       vue.onLoad(() => {
@@ -8077,14 +8022,14 @@
                 }
               }
             } catch (error) {
-              uni.__log__("error", "at pages/message/message.uvue:295", "更新状态失败:", error);
+              uni.__log__("error", "at pages/message/message.uvue:288", "更新状态失败:", error);
             }
           }
         });
       }
       function openPendingPushMessage() {
         return __awaiter(this, void 0, void 0, function* () {
-          if (isLoading.value) {
+          if (isListLoading.value || isCheckingNewMessages.value) {
             setTimeout(() => {
               void openPendingPushMessage();
             }, 150);
@@ -8104,52 +8049,43 @@
             yield handleItemClick(message);
         });
       }
+      const finishPageLifecycle = () => {
+        isPageActive.value = false;
+        stopNewMessageCheck();
+      };
+      const resumePageLifecycle = () => {
+        isPageActive.value = true;
+        startNewMessageCheck();
+        void openPendingPushMessage();
+        void checkNewMessages();
+      };
       vue.onShow(() => {
-        if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:319", "页面显示 - 启动自动刷新");
-          isPageActive.value = true;
-          measureMessageScrollViewport();
-          startNewMessageCheck();
-          void openPendingPushMessage();
-          checkNewMessages();
-        }
+        if (!Login.value)
+          return null;
+        uni.__log__("log", "at pages/message/message.uvue:324", "页面显示 - 启动自动刷新");
+        measureMessageScrollViewport();
+        resumePageLifecycle();
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/message/message.uvue:331", "页面隐藏 - 停止自动刷新");
-        if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:333", "页面隐藏 - 停止自动刷新");
-          isPageActive.value = false;
-          stopNewMessageCheck();
-        }
+        uni.__log__("log", "at pages/message/message.uvue:330", "页面隐藏 - 停止自动刷新");
+        finishPageLifecycle();
       });
       vue.onUnload(() => {
-        uni.__log__("log", "at pages/message/message.uvue:341", "页面卸载 - 清理资源");
-        if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:343", "页面卸载 - 清理资源");
-          isPageActive.value = false;
-          stopNewMessageCheck();
-        }
+        uni.__log__("log", "at pages/message/message.uvue:335", "页面卸载 - 清理资源");
+        finishPageLifecycle();
       });
       vue.onActivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:350", "页面激活 - 启动自动刷新");
-        if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:352", "页面激活 - 启动自动刷新");
-          isPageActive.value = true;
-          startNewMessageCheck();
-          void openPendingPushMessage();
-          checkNewMessages();
-        }
+        if (!Login.value)
+          return null;
+        uni.__log__("log", "at pages/message/message.uvue:341", "页面激活 - 启动自动刷新");
+        resumePageLifecycle();
       });
       vue.onDeactivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:362", "页面停用 - 停止自动刷新");
-        if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:364", "页面停用 - 停止自动刷新");
-          isPageActive.value = false;
-          stopNewMessageCheck();
-        }
+        uni.__log__("log", "at pages/message/message.uvue:346", "页面停用 - 停止自动刷新");
+        finishPageLifecycle();
       });
       const onRefresherRefresh = () => {
-        uni.__log__("log", "at pages/message/message.uvue:372", "下拉刷新触发");
+        uni.__log__("log", "at pages/message/message.uvue:352", "下拉刷新触发");
         refresherTriggered.value = true;
         loadMsgList(true).then(() => {
           refresherTriggered.value = false;
@@ -8159,18 +8095,21 @@
       };
       const loadMore = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          if (isLoading.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
+          if (isListLoading.value || isCheckingNewMessages.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
             if (currPage.value >= totalPage.value) {
               loadStatus.value = "nomore";
             }
             return Promise.resolve(null);
           }
-          currPage.value++;
-          yield loadMsgList();
+          const previousPage = currPage.value;
+          currPage.value = previousPage + 1;
+          const loaded = yield loadMsgList();
+          if (!loaded)
+            currPage.value = previousPage;
         });
       };
       const onScrollToLower = () => {
-        if (loadStatus.value == "loadmore" && !isLoading.value) {
+        if (loadStatus.value == "loadmore" && !isListLoading.value && !isCheckingNewMessages.value) {
           loadMore();
         }
       };
@@ -8269,14 +8208,19 @@
               onScroll: onMessageScroll
             }), [
               vue.createElementVNode("view", new UTSJSONObject({ class: "list-box" }), [
-                msgList.value.length == 0 && !isLoading.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                isInitialLoading.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
                   key: 0,
+                  class: "empty-state"
+                }), [
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "empty-state-text" }), "加载中...")
+                ])) : hasLoadedInitial.value && msgList.value.length == 0 ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                  key: 1,
                   class: "empty-state"
                 }), [
                   vue.createElementVNode("text", new UTSJSONObject({ class: "empty-state-text" }), "暂无消息")
                 ])) : vue.createCommentVNode("", true),
                 hasNewMessages.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                  key: 1,
+                  key: 2,
                   class: "new-message-tip",
                   onClick: loadNewMessages
                 }), [
@@ -8305,20 +8249,20 @@
                     ])
                   ], 8, ["onClick"]);
                 }), 128)),
-                Login.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                  key: 2,
+                showLoadMore.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                  key: 3,
                   class: "load-more"
                 }), [
-                  loadStatus.value == "loading" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                  isListLoading.value ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
                     key: 0,
                     class: "tips-text"
-                  }), "上拉加载更多")) : loadStatus.value == "nomore" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                  }), "加载中...")) : loadStatus.value == "nomore" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
                     key: 1,
                     class: "tips-text"
                   }), "没有更多了")) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
                     key: 2,
                     class: "tips-text"
-                  }), "加载中..."))
+                  }), "上拉加载更多"))
                 ])) : vue.createCommentVNode("", true)
               ])
             ], 40, ["refresher-triggered"]),
@@ -8334,7 +8278,7 @@
       };
     }
   });
-  const _style_0$E = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-box": { ".container .list-box ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "backgroundColor": "#f56c6c", "marginLeft": "16rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "unread-badge": { ".container .list-box .unread-box ": { "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
+  const _style_0$E = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-box": { ".container .list-box ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "backgroundColor": "#f56c6c", "marginLeft": "16rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "unread-badge": { ".container .list-box .unread-box ": { "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx", "textAlign": "center" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
   const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["styles", [_style_0$E]]]);
   const _sfc_main$E = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-badge" }, { __name: "i-badge", props: {
     label: {
@@ -13136,6 +13080,9 @@
         }), new UTSJSONObject({
           image: "/static/offpower.png",
           text: "断开油电"
+        }), new UTSJSONObject({
+          image: "/static/cmd.png",
+          text: "发送指令"
         })];
         const productId = currentCarInfo.value.productId;
         if (productId == "product-1141811865601576960" || productId == "product-1183161303028600832") {
@@ -13190,7 +13137,7 @@
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:689", "操作失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:694", "操作失败:", error);
             showAppToast({
               title: "操作失败，请重试",
               icon: "none"
@@ -13222,7 +13169,7 @@
             const addr = yield getAddress(center.latitude, center.longitude);
             address.value = addr.result.formatted_address;
           } catch (error) {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:725", "获取地址信息失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:730", "获取地址信息失败:", error);
           }
         });
       };
@@ -13310,7 +13257,7 @@
               showAppToast({ title: res.msg || "获取设备详情失败", icon: "none" });
             }
           } else {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:822", "设备id获取失败");
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:827", "设备id获取失败");
           }
         });
       };
@@ -13335,17 +13282,17 @@
         });
       });
       vue.onShow(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:856", "页面显示，检查自动刷新状态");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:861", "页面显示，检查自动刷新状态");
         if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
           setupAutoRefresh(currentTime.value);
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:865", "页面隐藏时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:870", "页面隐藏时停止自动刷新");
         stopAutoRefresh();
       });
       vue.onUnmounted(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:870", "页面卸载时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:875", "页面卸载时停止自动刷新");
         stopAutoRefresh();
       });
       return (_ctx = null, _cache = null) => {
@@ -16795,7 +16742,7 @@
                 polyline: polyline.value,
                 scale: mapScale.value,
                 style: new UTSJSONObject({ "width": "100%", "height": "100%" }),
-                "show-location": true,
+                "show-location": false,
                 "enable-traffic": true,
                 "enable-overlooking": true,
                 "enable-building": true,
@@ -22329,7 +22276,7 @@
       };
     }
   });
-  const _style_0$4 = { "container": { "": { "backgroundColor": "#f5f5f5", "display": "flex", "flexDirection": "column", "paddingBottom": "30rpx" } }, "device-info": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx", "display": "flex", "alignItems": "center" } }, "section": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx" } }, "device-label": { "": { "fontSize": "28rpx", "color": "#666666", "whiteSpace": "nowrap" } }, "section-title": { "": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "marginBottom": "20rpx" } }, "type-list": { "": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap", "alignItems": "center" } }, "type-item": { "": { "marginRight": "20rpx", "marginBottom": "20rpx", "paddingTop": "15rpx", "paddingRight": "30rpx", "paddingBottom": "15rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f0f0f0", "borderTopLeftRadius": "50rpx", "borderTopRightRadius": "50rpx", "borderBottomRightRadius": "50rpx", "borderBottomLeftRadius": "50rpx" }, ".active": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "type-name": { ".type-item.active ": { "color": "#ffffff" }, "": { "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap" } }, "command-list": { "": { "display": "flex", "flexDirection": "column" } }, "command-item": { "": { "width": "100%", "boxSizing": "border-box", "paddingTop": "25rpx", "paddingRight": "25rpx", "paddingBottom": "25rpx", "paddingLeft": "25rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" }, ".command-item+": { "marginTop": "20rpx" }, ".active": { "borderTopColor": "#007AFF", "borderRightColor": "#007AFF", "borderBottomColor": "#007AFF", "borderLeftColor": "#007AFF", "backgroundColor": "#f0f8ff" } }, "command-name": { "": { "fontSize": "30rpx", "color": "#333333", "marginBottom": "10rpx" } }, "command-descr": { "": { "fontSize": "24rpx", "color": "#999999", "lineHeight": "36rpx" } }, "param-form": { "": { "display": "flex", "flexDirection": "column" } }, "param-item": { "": { "display": "flex", "flexDirection": "column" }, ".param-item+": { "marginTop": "30rpx" } }, "radio-group": { "": { "display": "flex", "flexDirection": "column" } }, "param-label": { "": { "marginBottom": "15rpx", "fontSize": "28rpx", "color": "#333333" } }, "param-input": { "": { "width": "100%", "boxSizing": "border-box", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "backgroundImage": "none", "backgroundColor": "#ffffff" } }, "param-error": { "": { "color": "#e43d33", "fontSize": "26rpx", "marginBottom": "20rpx" } }, "no-param-tip": { "": { "color": "#999999", "fontSize": "26rpx", "marginBottom": "20rpx" } }, "radio-item": { "": { "display": "flex", "alignItems": "center" }, ".radio-item+": { "marginTop": "20rpx" } }, "radio-icon": { "": { "marginRight": "20rpx", "width": "36rpx", "height": "36rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#cccccc", "borderRightColor": "#cccccc", "borderBottomColor": "#cccccc", "borderLeftColor": "#cccccc", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "radio-inner": { "": { "width": "25rpx", "height": "25rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "backgroundImage": "none", "backgroundColor": "rgba(0,0,0,0)" }, ".checked": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "radio-label": { "": { "fontSize": "26rpx", "color": "#333333" } }, "submit-btn": { "": { "marginTop": "30rpx" } }, "empty-state": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "backgroundImage": "none", "backgroundColor": "#ffffff", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx" } }, "loading": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "backgroundImage": "none", "backgroundColor": "#ffffff", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx" } }, "placeholder": { "": { "color": "#cccccc" } } };
+  const _style_0$4 = { "container": { "": { "backgroundColor": "#f5f5f5", "height": "100%", "display": "flex", "flexDirection": "column", "paddingBottom": "30rpx" } }, "device-info": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx", "display": "flex", "alignItems": "center" } }, "section": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx" } }, "device-label": { "": { "fontSize": "28rpx", "color": "#666666", "whiteSpace": "nowrap" } }, "section-title": { "": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "marginBottom": "20rpx" } }, "type-list": { "": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap", "alignItems": "center" } }, "type-item": { "": { "marginRight": "20rpx", "marginBottom": "20rpx", "paddingTop": "15rpx", "paddingRight": "30rpx", "paddingBottom": "15rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f0f0f0", "borderTopLeftRadius": "50rpx", "borderTopRightRadius": "50rpx", "borderBottomRightRadius": "50rpx", "borderBottomLeftRadius": "50rpx" }, ".active": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "type-name": { ".type-item.active ": { "color": "#ffffff" }, "": { "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap" } }, "command-list": { "": { "display": "flex", "flexDirection": "column" } }, "command-item": { "": { "width": "100%", "boxSizing": "border-box", "paddingTop": "25rpx", "paddingRight": "25rpx", "paddingBottom": "25rpx", "paddingLeft": "25rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" }, ".command-item+": { "marginTop": "20rpx" }, ".active": { "borderTopColor": "#007AFF", "borderRightColor": "#007AFF", "borderBottomColor": "#007AFF", "borderLeftColor": "#007AFF", "backgroundColor": "#f0f8ff" } }, "command-name": { "": { "fontSize": "30rpx", "color": "#333333", "marginBottom": "10rpx" } }, "command-descr": { "": { "fontSize": "24rpx", "color": "#999999", "lineHeight": "36rpx" } }, "param-form": { "": { "display": "flex", "flexDirection": "column" } }, "param-item": { "": { "display": "flex", "flexDirection": "column" }, ".param-item+": { "marginTop": "30rpx" } }, "radio-group": { "": { "display": "flex", "flexDirection": "column" } }, "param-label": { "": { "marginBottom": "15rpx", "fontSize": "28rpx", "color": "#333333" } }, "param-input": { "": { "width": "100%", "boxSizing": "border-box", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "backgroundImage": "none", "backgroundColor": "#ffffff" } }, "param-error": { "": { "color": "#e43d33", "fontSize": "26rpx", "marginBottom": "20rpx" } }, "no-param-tip": { "": { "color": "#999999", "fontSize": "26rpx", "marginBottom": "20rpx" } }, "radio-item": { "": { "display": "flex", "alignItems": "center" }, ".radio-item+": { "marginTop": "20rpx" } }, "radio-icon": { "": { "marginRight": "20rpx", "width": "36rpx", "height": "36rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#cccccc", "borderRightColor": "#cccccc", "borderBottomColor": "#cccccc", "borderLeftColor": "#cccccc", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "radio-inner": { "": { "width": "25rpx", "height": "25rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "backgroundImage": "none", "backgroundColor": "rgba(0,0,0,0)" }, ".checked": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "radio-label": { "": { "fontSize": "26rpx", "color": "#333333" } }, "submit-btn": { "": { "marginTop": "30rpx" } }, "empty-state": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "backgroundImage": "none", "backgroundColor": "#ffffff", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx" } }, "loading": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "backgroundImage": "none", "backgroundColor": "#ffffff", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx" } }, "placeholder": { "": { "color": "#cccccc" } } };
   const PagesCmdCmd = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["styles", [_style_0$4]]]);
   const emptyImage = "/static/empty.png";
   const _sfc_main$3 = /* @__PURE__ */ vue.defineComponent({

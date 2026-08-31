@@ -73,6 +73,16 @@ open class GenPagesIndexIndex : BasePage {
             val deviceDetail = ref<DeviceDetailState>(DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = 0, voltage = 0, signalStrength = 0), connectionStatus = "offline", lastUpdateTime = ""))
             val markers = ref(_uA<Marker>())
             val lastUpdateTime = ref("--:--:--")
+            val devicePosInfo = ref<UTSJSONObject?>(null)
+            val devicePositionUpdateTime = computed<String>(fun(): String {
+                val position = devicePosInfo.value
+                return if (position != null) {
+                    position.getString("positionUpdateTime", "暂无位置")
+                } else {
+                    "暂无位置"
+                }
+            }
+            )
             val SELECTED_DEVICE_STORAGE_KEY: String = "selected_device_info"
             val SELECTED_DEVICE_INDEX_STORAGE_KEY: String = "selected_device_index"
             val safeDeviceDetail = computed<DeviceDetailState>(fun(): DeviceDetailState {
@@ -329,7 +339,7 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 , width = 30, height = 30, anchor = Anchor(x = 0.5, y = 0.5), callout = callout)
             }
-            val userLocationMarkerId: Number = 1
+            val userLocationMarkerId: Number = 10000
             fun gen_centerOnUserLocation_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         if (!hasUserLocation.value) {
@@ -416,6 +426,8 @@ open class GenPagesIndexIndex : BasePage {
                 pickerValues.value = _uA()
                 deviceDetail.value = DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = 0, voltage = 0, signalStrength = 0), connectionStatus = "offline", lastUpdateTime = "")
                 lastUpdateTime.value = "--:--:--"
+                positionState.value = "empty"
+                devicePosInfo.value = null
                 clearTripData()
             }
             val processTripData = fun(data: UTSJSONObject): Unit {
@@ -480,16 +492,6 @@ open class GenPagesIndexIndex : BasePage {
                         isMapReady.value = true
                 })
             }
-            val devicePosInfo = ref<UTSJSONObject?>(null)
-            val devicePositionUpdateTime = computed<String>(fun(): String {
-                val position = devicePosInfo.value
-                return if (position != null) {
-                    position.getString("positionUpdateTime", "暂无位置")
-                } else {
-                    "暂无位置"
-                }
-            }
-            )
             val loadDevicePos = fun(data: UTSJSONObject): UTSPromise<Boolean> {
                 return wrapUTSPromise(suspend w1@{
                         positionState.value = "loading"
@@ -1059,17 +1061,26 @@ open class GenPagesIndexIndex : BasePage {
                                         _cE("text", _uM("class" to "state-label"), "设备状态"),
                                         _cE("text", _uM("class" to _nC(_uA(
                                             "state-value",
-                                            _uM("online" to (safeDeviceDetail.value.connectionStatus == "online"))
-                                        ))), _tD(if (safeDeviceDetail.value.connectionStatus == "online") {
-                                            "在线"
+                                            _uM("online" to (hasDevice.value && safeDeviceDetail.value.connectionStatus == "online"))
+                                        ))), _tD(if (hasDevice.value) {
+                                            if (safeDeviceDetail.value.connectionStatus == "online") {
+                                                "在线"
+                                            } else {
+                                                "离线"
+                                            }
                                         } else {
-                                            "离线"
+                                            "--"
                                         }
                                         ), 3)
                                     )),
                                     _cE("view", _uM("class" to "state-item"), _uA(
                                         _cE("text", _uM("class" to "state-label"), "最后定位"),
-                                        _cE("text", _uM("class" to "state-value"), _tD(devicePositionUpdateTime.value), 1)
+                                        _cE("text", _uM("class" to "state-value"), _tD(if (hasDevice.value) {
+                                            devicePositionUpdateTime.value
+                                        } else {
+                                            "暂无位置"
+                                        }
+                                        ), 1)
                                     ))
                                 ))
                             ), 4),

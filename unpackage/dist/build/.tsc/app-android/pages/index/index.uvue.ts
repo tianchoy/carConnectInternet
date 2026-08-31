@@ -140,6 +140,11 @@ const deviceDetail = ref<DeviceDetailState>({
 })
 const markers = ref([] as Marker[])
 const lastUpdateTime = ref('--:--:--')
+const devicePosInfo = ref<UTSJSONObject | null>(null)
+const devicePositionUpdateTime = computed<string>(() => {
+    const position = devicePosInfo.value
+    return position != null ? position.getString('positionUpdateTime', '暂无位置') : '暂无位置'
+})
 
 // 本地存储key
 const SELECTED_DEVICE_STORAGE_KEY: string = 'selected_device_info'
@@ -393,7 +398,7 @@ const createMarker = (id: number, lat: number, lng: number, type: string, title?
 }
 
 // 获取用户当前位置
-const userLocationMarkerId = 1
+const userLocationMarkerId = 10000
 
 async function centerOnUserLocation() {
     if (!hasUserLocation.value) return
@@ -500,6 +505,8 @@ const clearCurrentCar = (): void => {
         lastUpdateTime: ''
     }
     lastUpdateTime.value = '--:--:--'
+    positionState.value = 'empty'
+    devicePosInfo.value = null
     clearTripData()
 }
 
@@ -577,11 +584,6 @@ const centerMapOnDevice = async (latitude: number, longitude: number): Promise<v
 }
 
 // 加载设备位置
-const devicePosInfo = ref<UTSJSONObject | null>(null)
-const devicePositionUpdateTime = computed<string>(() => {
-    const position = devicePosInfo.value
-    return position != null ? position.getString('positionUpdateTime', '暂无位置') : '暂无位置'
-})
 const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
     positionState.value = 'loading'
     try {
@@ -1299,12 +1301,12 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
             _cE("view", _uM({ class: "state-item" }), [
               _cE("text", _uM({ class: "state-label" }), "设备状态"),
               _cE("text", _uM({
-                class: _nC(["state-value", _uM({'online': safeDeviceDetail.value.connectionStatus == 'online'})])
-              }), _tD(safeDeviceDetail.value.connectionStatus == 'online' ? '在线' : '离线'), 3 /* TEXT, CLASS */)
+                class: _nC(["state-value", _uM({'online': hasDevice.value && safeDeviceDetail.value.connectionStatus == 'online'})])
+              }), _tD(hasDevice.value ? (safeDeviceDetail.value.connectionStatus == 'online' ? '在线' : '离线') : '--'), 3 /* TEXT, CLASS */)
             ]),
             _cE("view", _uM({ class: "state-item" }), [
               _cE("text", _uM({ class: "state-label" }), "最后定位"),
-              _cE("text", _uM({ class: "state-value" }), _tD(devicePositionUpdateTime.value), 1 /* TEXT */)
+              _cE("text", _uM({ class: "state-value" }), _tD(hasDevice.value ? devicePositionUpdateTime.value : '暂无位置'), 1 /* TEXT */)
             ])
           ])
         ], 4 /* STYLE */),

@@ -16,7 +16,10 @@
 
 			<view class="list-box">
 				<!-- 显示空状态 -->
-				<view v-if="msgList.length == 0 && !isLoading" class="empty-state">
+				<view v-if="isInitialLoading" class="empty-state">
+					<text class="empty-state-text">加载中...</text>
+				</view>
+				<view v-else-if="hasLoadedInitial && msgList.length == 0" class="empty-state">
 					<text class="empty-state-text">暂无消息</text>
 				</view>
 				<!-- 新消息提示 -->
@@ -40,10 +43,10 @@
 						</view>
 					</view>
 				</view>
-				<view v-if="Login" class="load-more">
-					<text class="tips-text" v-if="loadStatus == 'loading'">上拉加载更多</text>
+				<view v-if="showLoadMore" class="load-more">
+					<text class="tips-text" v-if="isListLoading">加载中...</text>
 					<text class="tips-text" v-else-if="loadStatus == 'nomore'">没有更多了</text>
-					<text class="tips-text" v-else>加载中...</text>
+					<text class="tips-text" v-else>上拉加载更多</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -61,15 +64,10 @@
 </template>
 
 <script setup lang="uts">
-	import { ref, onActivated, onDeactivated } from 'vue'
+	import { ref, computed, onActivated, onDeactivated } from 'vue'
 	import { getUserMsgList, setMsgState } from '../../api/request.uts'
 	import { consumePendingMessageId, consumePushStaleFlag } from '../../services/push.uts'
 	import { parseLocalDateTime } from '../../utils/formateTime.uts'
-
-	type ModalInstance = {
-		open: () => void
-		close: () => void
-	}
 
 	const modal = ref<boolean>(false)
 	const modalContent = ref<UTSJSONObject>({})
@@ -81,28 +79,26 @@
 	const pageSize = ref(10)         // 每页条数
 	const totalPage = ref(1)         // 总页数
 	const loadStatus = ref('loadmore') // 加载状态
-	const isLoading = ref(false)     // 是否正在加载中
+	const isListLoading = ref(false) // 消息列表是否正在加载
+	const isCheckingNewMessages = ref(false) // 是否正在检查新消息
+	const hasLoadedInitial = ref(false) // 首次列表请求是否完成
 	const hasNewMessages = ref(false) // 是否有新消息
 	const newMessageCount = ref(0)   // 新消息数量
-	const lastUpdateTime = ref(new Date().getTime()) // 最后更新时间
 	const Login = ref(false)
 	const messageScrollViewportHeight = ref(0)
 	const isNearMessageListBottom = ref(false)
 
+	const isInitialLoading = computed<boolean>(() => {
+		return isListLoading.value && !hasLoadedInitial.value && msgList.value.length == 0
+	})
+
+	const showLoadMore = computed<boolean>(() => {
+		return msgList.value.length > 0 && (isListLoading.value || loadStatus.value == 'loadmore' || loadStatus.value == 'nomore')
+	})
+
 	// 定时器相关
 	let checkTimer: number = 0
 	const isPageActive = ref(false)
-	type MessageData = {
-		list: Array<UTSJSONObject>
-		total: number
-		totalPage: number
-	};
-	type MessageResponse = {
-		code: number
-		msg: string
-		data: MessageData
-	};
-
 	// 停止新消息检查
 	function stopNewMessageCheck() : void {
 		if (checkTimer > 0) {
@@ -120,8 +116,8 @@
 	}
 
 	async function prependLatestMessages() : Promise<number> {
-		if (isLoading.value) return 0
-		isLoading.value = true
+		if (isListLoading.value || isCheckingNewMessages.value) return 0
+		isCheckingNewMessages.value = true
 		try {
 			const res = await getUserMsgList({ page: 1, pageSize: 50 })
 			const pageData = res.data
@@ -145,24 +141,19 @@
 
 			if (latestMessages.length > 0) {
 				msgList.value = [...latestMessages, ...msgList.value]
-				const newestCreateTime = latestMessages[0].getString('createTime', '')
-				if (newestCreateTime != '') {
-					const newestTime = parseLocalDateTime(newestCreateTime)
-					if (newestTime != null) lastUpdateTime.value = newestTime
-				}
 			}
 			return latestMessages.length
 		} catch (error) {
 			console.error('检查新消息失败:', error)
 			return 0
 		} finally {
-			isLoading.value = false
+			isCheckingNewMessages.value = false
 		}
 	}
 
 	// 检查新消息
 	async function checkNewMessages() : Promise<void> {
-		if (!isPageActive.value || isLoading.value) return
+		if (!isPageActive.value || isListLoading.value || isCheckingNewMessages.value) return
 		const insertedCount = await prependLatestMessages()
 		if (insertedCount > 0) {
 			hasNewMessages.value = true
@@ -189,15 +180,16 @@
 
 
 	// 加载消息列表
-	async function loadMsgList(isInit : boolean = false) : Promise<void> {
-		if (isLoading.value) return
+	async function loadMsgList(isInit : boolean = false) : Promise<boolean> {
+		if (isListLoading.value || isCheckingNewMessages.value) return false
 		if (isInit) {
 			currPage.value = 1
 			msgList.value = []
+				hasLoadedInitial.value = false
 			loadStatus.value = 'loadmore'
 			isNearMessageListBottom.value = false
 		}
-		isLoading.value = true
+		isListLoading.value = true
 		try {
 			if (!isInit) loadStatus.value = 'loading'
 			const res = await getUserMsgList({
@@ -206,19 +198,22 @@
 			})
 			if (res.code != 200) {
 				loadStatus.value = 'loadmore'
-				return
+				return false
 			}
 			const data = res.data
 			if (data == null) {
+				totalPage.value = currPage.value
 				loadStatus.value = 'nomore'
-				return
+				if (isInit) hasLoadedInitial.value = true
+				return true
 			}
 			const totalPages = data.totalPage > 0 ? data.totalPage : 1
 			totalPage.value = totalPages
 			const newData : Array<UTSJSONObject> = data.list
+			const isEmptyInitial = isInit && newData.length == 0
 			if (isInit) {
 				msgList.value = newData
-				if (newData.length > 0) lastUpdateTime.value = new Date().getTime()
+				hasLoadedInitial.value = true
 			} else {
 				newData.forEach((item : UTSJSONObject) : void => {
 					const messageId = item.getString('messageId', '')
@@ -226,16 +221,18 @@
 					if (!exists) msgList.value.push(item)
 				})
 			}
-			loadStatus.value = currPage.value >= totalPage.value ? 'nomore' : 'loadmore'
+			loadStatus.value = isEmptyInitial || currPage.value >= totalPage.value ? 'nomore' : 'loadmore'
 			if (isInit) {
 				hasNewMessages.value = false
 				newMessageCount.value = 0
 			}
+			return true
 		} catch (error) {
 			loadStatus.value = 'loadmore'
 			console.error('请求异常:', error)
+			return false
 		} finally {
-			isLoading.value = false
+			isListLoading.value = false
 		}
 	}
 
@@ -261,10 +258,6 @@
 			Login.value = false
 		}
 	})
-
-		const gotoLogin = () => {
-			uni.redirectTo({ url: '/pages/login/login' })
-		}
 
 	const measureMessageScrollViewport = () : void => {
 		uni.createSelectorQuery().select('#message-scroll-container').boundingClientRect((rect : any) => {
@@ -298,7 +291,7 @@
 	}
 
 	async function openPendingPushMessage() : Promise<void> {
-		if (isLoading.value) {
+		if (isListLoading.value || isCheckingNewMessages.value) {
 			setTimeout(() => {
 				void openPendingPushMessage()
 			}, 150)
@@ -313,58 +306,45 @@
 		if (message != null) await handleItemClick(message)
 	}
 
+	const finishPageLifecycle = (): void => {
+		isPageActive.value = false
+		stopNewMessageCheck()
+	}
+
+	const resumePageLifecycle = (): void => {
+		isPageActive.value = true
+		startNewMessageCheck()
+		void openPendingPushMessage()
+		void checkNewMessages()
+	}
+
 	// 页面显示时启动定时器
 	onShow(() => {
-		if (Login.value) {
-			console.log('页面显示 - 启动自动刷新')
-			isPageActive.value = true
-			measureMessageScrollViewport()
-			startNewMessageCheck()
-			void openPendingPushMessage()
-			// 立即检查一次新消息
-			checkNewMessages()
-		}
+		if (!Login.value) return
+		console.log('页面显示 - 启动自动刷新')
+		measureMessageScrollViewport()
+		resumePageLifecycle()
 	})
 
-	// 页面隐藏时停止定时器
 	onHide(() => {
 		console.log('页面隐藏 - 停止自动刷新')
-		if (Login.value) {
-			console.log('页面隐藏 - 停止自动刷新')
-			isPageActive.value = false
-			stopNewMessageCheck()
-		}
+		finishPageLifecycle()
 	})
 
-	// 页面卸载时清理资源
 	onUnload(() => {
 		console.log('页面卸载 - 清理资源')
-		if (Login.value) {
-			console.log('页面卸载 - 清理资源')
-			isPageActive.value = false
-			stopNewMessageCheck()
-		}
+		finishPageLifecycle()
 	})
 
 	onActivated(() => {
+		if (!Login.value) return
 		console.log('页面激活 - 启动自动刷新')
-		if (Login.value) {
-			console.log('页面激活 - 启动自动刷新')
-			isPageActive.value = true
-			startNewMessageCheck()
-			void openPendingPushMessage()
-			// 立即检查一次新消息
-			checkNewMessages()
-		}
+		resumePageLifecycle()
 	})
 
 	onDeactivated(() => {
 		console.log('页面停用 - 停止自动刷新')
-		if (Login.value) {
-			console.log('页面停用 - 停止自动刷新')
-			isPageActive.value = false
-			stopNewMessageCheck()
-		}
+		finishPageLifecycle()
 	})
 
 	// 下拉刷新处理
@@ -380,20 +360,22 @@
 
 	// 加载更多
 	const loadMore = async () => {
-		if (isLoading.value || loadStatus.value != 'loadmore' || currPage.value >= totalPage.value) {
+		if (isListLoading.value || isCheckingNewMessages.value || loadStatus.value != 'loadmore' || currPage.value >= totalPage.value) {
 			if (currPage.value >= totalPage.value) {
 				loadStatus.value = 'nomore'
 			}
 			return
 		}
 
-		currPage.value++
-		await loadMsgList()
+		const previousPage = currPage.value
+		currPage.value = previousPage + 1
+		const loaded = await loadMsgList()
+		if (!loaded) currPage.value = previousPage
 	}
 
 	// 滚动到底部加载更多
 	const onScrollToLower = () => {
-		if (loadStatus.value == 'loadmore' && !isLoading.value) {
+		if (loadStatus.value == 'loadmore' && !isListLoading.value && !isCheckingNewMessages.value) {
 			loadMore()
 		}
 	}
@@ -552,6 +534,7 @@
 				.empty-state-text {
 					color: #999;
 					font-size: 28rpx;
+					text-align: center;
 				}
 			}
 

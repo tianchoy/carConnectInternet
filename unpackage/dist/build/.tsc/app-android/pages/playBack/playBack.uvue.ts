@@ -824,7 +824,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               polyline: polyline.value,
               scale: mapScale.value,
               style: _nS(_uM({"width":"100%","height":"100%"})),
-              "show-location": true,
+              "show-location": false,
               "enable-traffic": true,
               "enable-overlooking": true,
               "enable-building": true,
