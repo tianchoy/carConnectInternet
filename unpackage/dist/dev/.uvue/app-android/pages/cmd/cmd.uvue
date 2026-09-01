@@ -1,10 +1,20 @@
+import { AppModalOptions } from "../../utils/modal";
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue';
+import _easycom_i_tabs from '@/uni_modules/i-ui-x/components/i-tabs/i-tabs.uvue';
 import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue';
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue';
+import _easycom_i_action_sheet from '@/uni_modules/i-ui-x/components/i-action-sheet/i-action-sheet.uvue';
+import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue';
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
+import { computed, ref } from 'vue';
+import { getAppAvailableCommands, getAppCommandDetail, getAppCommandHistory, retryAppCommand, sendAppCommand } from '../../api/request.uts';
+import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts';
 import { showAppToast } from '../../utils/toast.uts';
-import { ref, computed } from 'vue';
-import { getCmdAction, getCmdByMid, sendCmd } from '@/api/request';
+type TabItem = {
+    __$originalPosition?: UTSSourceMapPosition<"TabItem", "pages/cmd/cmd.uvue", 201, 6>;
+    name: string;
+    value: string;
+};
 const __sfc__ = defineComponent({
     __name: 'cmd',
     setup(__props) {
@@ -12,80 +22,179 @@ const __sfc__ = defineComponent({
         const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
         const _cache = __ins.renderCache;
         const imei = ref('');
-        const commandTypes = ref<Array<UTSJSONObject>>([]);
-        const selectedTypeId = ref<string | number | null>(null);
-        const commands = ref<Array<UTSJSONObject>>([]);
-        const selectedCommandId = ref<string | number | null>(null);
+        const deviceId = ref('');
+        const activeTab = ref('send');
+        const tabItems: Array<TabItem> = [
+            { name: '下发指令', value: 'send' } as TabItem,
+            { name: '指令记录', value: 'history' } as TabItem
+        ];
+        const availableCommands = ref<Array<UTSJSONObject>>([]);
         const selectedCommand = ref<UTSJSONObject | null>(null);
+        const selectedCommandId = ref('');
         const paramConfigs = ref<Array<UTSJSONObject>>([]);
         const paramValues = ref<Array<string>>([]);
+        const paramErrors = ref<Array<string>>([]);
         const paramConfigError = ref('');
-        const loading = ref(false);
-        const sending = ref(false);
-        const isFormValid = computed<boolean>((): boolean => {
-            if (selectedCommand.value == null || paramConfigError.value != '')
+        const isCommandLoading = ref(false);
+        const isSending = ref(false);
+        const optionSheetVisible = ref(false);
+        const optionSheetTitle = ref('请选择');
+        const optionActions = ref<Array<UTSJSONObject>>([]);
+        const activeOptionIndex = ref(-1);
+        const historyRecords = ref<Array<UTSJSONObject>>([]);
+        const historyPageNum = ref(1);
+        const historyPageSize = 10;
+        const historyTotal = ref(0);
+        const isHistoryLoading = ref(false);
+        const hasLoadedHistory = ref(false);
+        const hasMoreHistory = ref(true);
+        const refreshing = ref(false);
+        const hasReachedHistoryBottom = ref(false);
+        const detailVisible = ref(false);
+        const isDetailLoading = ref(false);
+        const detailRecord = ref<UTSJSONObject>({} as UTSJSONObject);
+        const isRetrying = ref(false);
+        function getString(item: UTSJSONObject | null, key: string): string {
+            return item != null ? item.getString(key, '') : '';
+        }
+        function getBoolean(item: UTSJSONObject | null, key: string): boolean {
+            if (item == null)
                 return false;
-            return paramValues.value.length == paramConfigs.value.length &&
-                paramValues.value.every((value: string): boolean => value != '');
+            return item.getBoolean(key, false) || getString(item, key) == '1';
+        }
+        function getCommandKey(command: UTSJSONObject, index: number): string {
+            const cmdId = getString(command, 'cmdId');
+            return cmdId != '' ? cmdId : 'command_' + index.toString(10);
+        }
+        function getCommandName(command: UTSJSONObject | null): string {
+            const name = getString(command, 'cmdName');
+            return name != '' ? name : '未命名指令';
+        }
+        function getCommandCode(command: UTSJSONObject | null): string { return getString(command, 'cmdCode'); }
+        function getCommandRemark(command: UTSJSONObject | null): string { return getString(command, 'remark'); }
+        function isCommandAllowed(command: UTSJSONObject | null): boolean { return getBoolean(command, 'appAllowed'); }
+        function commandNeedsParams(command: UTSJSONObject | null): boolean { return getString(command, 'needParam') == '1'; }
+        function isSelectedCommand(command: UTSJSONObject): boolean { return getCommandKey(command, 0) == selectedCommandId.value; }
+        function getParamKey(param: UTSJSONObject, index: number): string {
+            const key = getString(param, 'key');
+            return key != '' ? key : 'param_' + index.toString(10);
+        }
+        function getParamLabel(param: UTSJSONObject): string {
+            const label = getString(param, 'label');
+            return label != '' ? label : '参数';
+        }
+        function getParamType(param: UTSJSONObject): string { return getString(param, 'type'); }
+        function isParamRequired(param: UTSJSONObject): boolean { return getBoolean(param, 'required'); }
+        function getParamPlaceholder(param: UTSJSONObject): string {
+            const placeholder = getString(param, 'placeholder');
+            return placeholder != '' ? placeholder : '请输入' + getParamLabel(param);
+        }
+        function getParamValue(index: number): string { return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : ''; }
+        function getParamError(index: number): string { return index >= 0 && index < paramErrors.value.length ? paramErrors.value[index] : ''; }
+        function getParamOptions(param: UTSJSONObject): Array<UTSJSONObject> {
+            const options = param.getArray<UTSJSONObject>('options');
+            return options != null ? options : [];
+        }
+        function getOptionValue(option: UTSJSONObject): string { return getString(option, 'value'); }
+        function getOptionLabel(option: UTSJSONObject): string {
+            const label = getString(option, 'label');
+            return label != '' ? label : getOptionValue(option);
+        }
+        function parseNumber(value: string): number {
+            const parsed = parseFloat(value);
+            return isNaN(parsed) ? 0 : Number.from(parsed);
+        }
+        function validateParam(index: number, updateError: boolean): string {
+            if (index < 0 || index >= paramConfigs.value.length)
+                return '';
+            const param = paramConfigs.value[index];
+            const value = getParamValue(index).trim();
+            let error = '';
+            if (isParamRequired(param) && value == '') {
+                error = '请填写' + getParamLabel(param);
+            }
+            else if (value != '' && getParamType(param) == 'number') {
+                const numberValue = parseFloat(value);
+                if (isNaN(numberValue)) {
+                    error = getParamLabel(param) + '必须为数字';
+                }
+                else {
+                    const minText = getString(param, 'min');
+                    const maxText = getString(param, 'max');
+                    if (minText != '' && numberValue < parseNumber(minText))
+                        error = getParamLabel(param) + '不能小于' + minText;
+                    if (error == '' && maxText != '' && numberValue > parseNumber(maxText))
+                        error = getParamLabel(param) + '不能大于' + maxText;
+                }
+            }
+            if (updateError && index >= 0 && index < paramErrors.value.length)
+                paramErrors.value[index] = error;
+            return error;
+        }
+        function getStatusValue(record: UTSJSONObject | null): string { return getString(record, 'sendStatus'); }
+        function getStatusText(record: UTSJSONObject | null): string {
+            const status = getStatusValue(record);
+            if (status == '1')
+                return '下发成功';
+            if (status == '2')
+                return '下发失败';
+            return '等待下发';
+        }
+        function getStatusClass(record: UTSJSONObject | null): string {
+            const status = getStatusValue(record);
+            if (status == '1')
+                return 'status-success';
+            if (status == '2')
+                return 'status-failed';
+            return 'status-pending';
+        }
+        const displayDeviceIdentity = computed<string>((): string => {
+            return imei.value != '' ? imei.value : (deviceId.value != '' ? '设备 ' + deviceId.value : '未识别设备');
         });
-        const sortByCmdNameLengthAndAlphabet = (data: Array<UTSJSONObject>): Array<UTSJSONObject> => {
-            const sortedData = data.slice();
-            sortedData.sort((a: UTSJSONObject, b: UTSJSONObject): number => {
-                const aName = (a['cmdName'] as string | null) ?? '';
-                const bName = (b['cmdName'] as string | null) ?? '';
-                if (aName.length != bName.length)
-                    return aName.length - bName.length;
-                if (aName == bName)
-                    return 0;
-                return aName < bName ? -1 : 1;
-            });
-            return sortedData;
-        };
-        const getParamLabel = (config: UTSJSONObject): string => {
-            const label = config['label'];
-            return label == null ? '参数' : label.toString();
-        };
-        const getParamMaxLength = (config: UTSJSONObject): number => {
-            const max = config['max'];
-            return typeof max == 'number' ? max as number : -1;
-        };
-        const getRadioItems = (config: UTSJSONObject): Array<UTSJSONObject> => {
-            return (config['items'] as Array<UTSJSONObject> | null) ?? [];
-        };
-        const getRadioValue = (item: UTSJSONObject): string => {
-            const value = item['value'];
-            return value == null ? '' : value.toString();
-        };
-        const getRadioDescription = (item: UTSJSONObject): string => {
-            const desc = item['desc'];
-            return desc == null ? '' : desc.toString();
-        };
-        const parseParamConfigs = (details: string | null): Array<UTSJSONObject> => {
+        const isHistoryInitialLoading = computed<boolean>((): boolean => {
+            return isHistoryLoading.value && !hasLoadedHistory.value && historyRecords.value.length == 0;
+        });
+        const isFormValid = computed<boolean>((): boolean => {
+            if (selectedCommand.value == null || !isCommandAllowed(selectedCommand.value) || paramConfigError.value != '')
+                return false;
+            if (paramValues.value.length != paramConfigs.value.length)
+                return false;
+            for (let index = 0; index < paramConfigs.value.length; index++) {
+                if (validateParam(index, false) != '')
+                    return false;
+            }
+            return true;
+        });
+        const canRetryDetail = computed<boolean>((): boolean => {
+            const status = getStatusValue(detailRecord.value);
+            return !isDetailLoading.value && (status == '0' || status == '2');
+        });
+        function parseParamConfigs(schema: string): Array<UTSJSONObject> {
             paramConfigError.value = '';
-            if (details == null || details.trim().length == 0)
+            if (schema.trim() == '')
                 return [];
             try {
-                const parsed = UTSAndroid.consoleDebugError(JSON.parse(details), " at pages/cmd/cmd.uvue:130");
+                const parsed = UTSAndroid.consoleDebugError(JSON.parse(schema), " at pages/cmd/cmd.uvue:359");
                 if (!Array.isArray(parsed)) {
                     paramConfigError.value = '指令参数配置格式无效';
                     return [];
                 }
                 const configs = parsed as Array<UTSJSONObject>;
                 for (let index = 0; index < configs.length; index++) {
-                    const config = configs[index];
-                    if (config == null) {
-                        paramConfigError.value = '指令参数配置无效';
+                    const param = configs[index];
+                    if (param == null || getString(param, 'key') == '' || getString(param, 'label') == '') {
+                        paramConfigError.value = '指令参数配置不完整';
                         return [];
                     }
-                    const type = config['type'] as string | null;
-                    if (type != 'input' && type != 'number' && type != 'radio') {
+                    const type = getParamType(param);
+                    if (type != 'text' && type != 'number' && type != 'select') {
                         paramConfigError.value = '该指令包含暂不支持的参数类型';
                         return [];
                     }
-                    if (type == 'radio') {
-                        const items = getRadioItems(config);
-                        if (items.length == 0 || items.some((item: UTSJSONObject): boolean => getRadioValue(item) == '' || getRadioDescription(item) == '')) {
-                            paramConfigError.value = '指令单选参数配置无效';
+                    if (type == 'select') {
+                        const options = getParamOptions(param);
+                        if (options.length == 0 || options.some((option: UTSJSONObject): boolean => getOptionValue(option) == '' || getOptionLabel(option) == '')) {
+                            paramConfigError.value = '指令下拉参数配置无效';
                             return [];
                         }
                     }
@@ -93,317 +202,706 @@ const __sfc__ = defineComponent({
                 return configs;
             }
             catch (error: any) {
-                console.error('解析参数配置失败:', error, " at pages/cmd/cmd.uvue:158");
+                console.error('解析指令参数配置失败:', error, " at pages/cmd/cmd.uvue:386");
                 paramConfigError.value = '指令参数配置无效';
                 return [];
             }
-        };
-        const initializeParamValues = (configs: Array<UTSJSONObject>): Array<string> => {
+        }
+        function initializeParamValues(configs: Array<UTSJSONObject>): Array<string> {
             const values: Array<string> = [];
             for (let index = 0; index < configs.length; index++) {
-                const config = configs[index];
-                const defaultValue = config['default'];
-                let value = '';
-                if (defaultValue != null) {
-                    value = defaultValue.toString();
-                }
-                else if ((config['type'] as string | null) == 'radio') {
-                    value = getRadioValue(getRadioItems(config)[0]);
-                }
-                values.push(value);
+                const defaultValue = configs[index].getString('default', '');
+                values.push(defaultValue);
             }
             return values;
-        };
-        const getParamValue = (index: number): string => {
-            return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : '';
-        };
-        const updateParamValueFromEvent = (index: number, value: any): void => {
-            if (sending.value || index < 0 || index >= paramValues.value.length)
+        }
+        function updateParamValue(index: number, value: any): void {
+            if (isSending.value || index < 0 || index >= paramValues.value.length)
                 return;
             paramValues.value[index] = value == null ? '' : value.toString();
-        };
-        const loadCommandTypes = async (): Promise<void> => {
-            try {
-                loading.value = true;
-                const response = await getCmdAction();
-                if (response.code == 200 && response.data != null) {
-                    commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
-                }
-                else {
-                    showAppToast({ title: response.msg != '' ? response.msg : '加载指令类型失败', icon: 'none' } as ShowToastOptions);
-                }
-            }
-            catch (error: any) {
-                console.error('加载指令类型出错:', error, " at pages/cmd/cmd.uvue:199");
-                showAppToast({ title: '网络错误', icon: 'none' } as ShowToastOptions);
-            }
-            finally {
-                loading.value = false;
-            }
-        };
-        onLoad((options) => {
-            imei.value = options["imei"] ?? '';
-            loadCommandTypes();
-        });
-        const selectTypeByItem = async (type: UTSJSONObject): Promise<void> => {
-            if (sending.value)
+            validateParam(index, true);
+        }
+        function getSelectedOptionLabel(index: number): string {
+            if (index < 0 || index >= paramConfigs.value.length)
+                return '';
+            const value = getParamValue(index);
+            if (value == '')
+                return '';
+            const option = getParamOptions(paramConfigs.value[index]).find((item: UTSJSONObject): boolean => getOptionValue(item) == value);
+            return option == null ? value : getOptionLabel(option);
+        }
+        function openOptionSheet(index: number): void {
+            if (isSending.value || index < 0 || index >= paramConfigs.value.length)
                 return;
-            const typeId = type['cmdmId'] as string | number | null;
-            if (typeId == null)
+            const param = paramConfigs.value[index];
+            if (getParamType(param) != 'select')
                 return;
-            selectedTypeId.value = typeId;
-            selectedCommandId.value = null;
+            activeOptionIndex.value = index;
+            optionSheetTitle.value = '请选择' + getParamLabel(param);
+            const actions: Array<UTSJSONObject> = [];
+            getParamOptions(param).forEach((option: UTSJSONObject): void => {
+                const action = new UTSJSONObject(new UTSSourceMapPosition("action", "pages/cmd/cmd.uvue", 423, 9));
+                action.set('name', getOptionLabel(option));
+                action.set('value', getOptionValue(option));
+                actions.push(action);
+            });
+            optionActions.value = actions;
+            optionSheetVisible.value = true;
+        }
+        function getEventItem(event: any): UTSJSONObject | null {
+            if (event == null || typeof event != 'object')
+                return null;
+            return (event as UTSJSONObject).getJSON('item');
+        }
+        function selectOption(event: any): void {
+            const index = activeOptionIndex.value;
+            if (index < 0 || index >= paramValues.value.length)
+                return;
+            const item = getEventItem(event);
+            const value = item != null ? getString(item, 'value') : '';
+            if (value != '') {
+                paramValues.value[index] = value;
+                validateParam(index, true);
+            }
+            activeOptionIndex.value = -1;
+        }
+        function resetSelection(): void {
             selectedCommand.value = null;
+            selectedCommandId.value = '';
             paramConfigs.value = [];
             paramValues.value = [];
+            paramErrors.value = [];
             paramConfigError.value = '';
-            commands.value = [];
+        }
+        async function loadAvailableCommands(): Promise<void> {
+            if (deviceId.value == '' || isCommandLoading.value)
+                return;
             try {
-                loading.value = true;
-                const response = await getCmdByMid({ imei: imei.value, cmdmId: typeId } as UTSJSONObject);
-                if (response.code == 200 && response.data != null) {
-                    commands.value = response.data;
+                isCommandLoading.value = true;
+                const response = await getAppAvailableCommands(deviceId.value);
+                if (response.code == 200) {
+                    availableCommands.value = response.data;
+                    const stillSelected = selectedCommandId.value != '' ? response.data.find((command: UTSJSONObject): boolean => getCommandKey(command, 0) == selectedCommandId.value) : null;
+                    if (stillSelected == null)
+                        resetSelection();
                 }
                 else {
-                    showAppToast({ title: response.msg != '' ? response.msg : '加载指令列表失败', icon: 'none' } as ShowToastOptions);
+                    availableCommands.value = [];
+                    resetSelection();
+                    showAppToast({ title: response.msg != '' ? response.msg : '加载可用指令失败', icon: 'none' } as ShowToastOptions);
                 }
             }
             catch (error: any) {
-                console.error('加载指令列表出错:', error, " at pages/cmd/cmd.uvue:232");
-                showAppToast({ title: '网络错误', icon: 'none' } as ShowToastOptions);
+                console.error('加载可用指令失败:', error, " at pages/cmd/cmd.uvue:479");
+                showAppToast({ title: '加载可用指令失败，请检查网络', icon: 'none' } as ShowToastOptions);
             }
             finally {
-                loading.value = false;
+                isCommandLoading.value = false;
             }
-        };
-        const selectCommand = (command: UTSJSONObject): void => {
-            if (sending.value)
+        }
+        function selectCommand(command: UTSJSONObject): void {
+            if (isSending.value)
                 return;
-            selectedCommandId.value = command['predictCmdId'] as string | number | null;
+            if (!isCommandAllowed(command)) {
+                showAppToast({ title: '该指令不允许在 App 端下发', icon: 'none' } as ShowToastOptions);
+                return;
+            }
             selectedCommand.value = command;
-            const configs = parseParamConfigs(command['details'] as string | null);
+            selectedCommandId.value = getCommandKey(command, 0);
+            const configs = parseParamConfigs(getString(command, 'paramSchema'));
             paramConfigs.value = configs;
             paramValues.value = paramConfigError.value == '' ? initializeParamValues(configs) : [];
-        };
-        const selectRadio = (index: number, value: string): void => {
-            if (sending.value || index < 0 || index >= paramValues.value.length)
-                return;
-            paramValues.value[index] = value;
-        };
-        const sendCommand = async (): Promise<void> => {
-            if (sending.value)
-                return;
-            if (selectedCommand.value == null) {
-                showAppToast({ title: '请选择指令', icon: 'none' } as ShowToastOptions);
-                return;
-            }
-            if (paramConfigError.value != '') {
-                showAppToast({ title: paramConfigError.value, icon: 'none' } as ShowToastOptions);
-                return;
-            }
-            if (!isFormValid.value) {
-                showAppToast({ title: '请填写所有参数', icon: 'none' } as ShowToastOptions);
-                return;
-            }
-            const command = selectedCommand.value!;
-            let cmdData = (command['params'] as string | null) ?? '';
+            paramErrors.value = configs.map((_param: UTSJSONObject): string => '');
+        }
+        function buildCommandParams(): UTSJSONObject {
+            const params = new UTSJSONObject(new UTSSourceMapPosition("params", "pages/cmd/cmd.uvue", 501, 8));
             for (let index = 0; index < paramConfigs.value.length; index++) {
-                const config = paramConfigs.value[index];
-                const configuredPlaceholder = config['placeholder'] as string | null;
-                const placeholder = configuredPlaceholder != null && configuredPlaceholder.length > 0
-                    ? configuredPlaceholder
-                    : '${param' + (index + 1).toString(10) + '}';
-                cmdData = cmdData.split(placeholder).join(paramValues.value[index]);
+                const value = getParamValue(index).trim();
+                if (value != '')
+                    params.set(getParamKey(paramConfigs.value[index], index), value);
             }
+            return params;
+        }
+        async function loadHistoryPage(reset: boolean): Promise<void> {
+            if (deviceId.value == '' || isHistoryLoading.value || (!reset && !hasMoreHistory.value))
+                return;
+            const requestedPage = reset ? 1 : historyPageNum.value;
             try {
-                sending.value = true;
-                const response = await sendCmd({
-                    imei: imei.value,
-                    type: (command['cmdCode'] as string | null) ?? '',
-                    password: null,
-                    cmdData: UTSAndroid.consoleDebugError(encodeURIComponent(cmdData), " at pages/cmd/cmd.uvue:285"),
-                    predictCmdId: command['predictCmdId']
-                } as UTSJSONObject);
+                isHistoryLoading.value = true;
+                const query = new UTSJSONObject(new UTSSourceMapPosition("query", "pages/cmd/cmd.uvue", 514, 9));
+                query.set('deviceId', deviceId.value);
+                query.set('pageNum', requestedPage);
+                query.set('pageSize', historyPageSize);
+                const response = await getAppCommandHistory(query);
+                if (response.code != 200) {
+                    showAppToast({ title: response.msg != '' ? response.msg : '加载指令记录失败', icon: 'none' } as ShowToastOptions);
+                    return;
+                }
+                const rows = response.data.rows;
+                if (reset)
+                    historyRecords.value = rows;
+                else
+                    historyRecords.value = [...historyRecords.value, ...rows];
+                historyTotal.value = response.data.total;
+                historyPageNum.value = requestedPage + 1;
+                hasMoreHistory.value = historyRecords.value.length < historyTotal.value && rows.length > 0;
+            }
+            catch (error: any) {
+                console.error('加载指令记录失败:', error, " at pages/cmd/cmd.uvue:530");
+                showAppToast({ title: '加载指令记录失败，请检查网络', icon: 'none' } as ShowToastOptions);
+            }
+            finally {
+                hasLoadedHistory.value = true;
+                isHistoryLoading.value = false;
+            }
+        }
+        async function reloadHistory(): Promise<void> {
+            hasReachedHistoryBottom.value = false;
+            historyPageNum.value = 1;
+            historyRecords.value = [];
+            historyTotal.value = 0;
+            hasMoreHistory.value = true;
+            hasLoadedHistory.value = false;
+            await loadHistoryPage(true);
+        }
+        async function sendSelectedCommand(): Promise<void> {
+            const command = selectedCommand.value;
+            if (command == null || deviceId.value == '' || isSending.value)
+                return;
+            const cmdId = getString(command, 'cmdId');
+            if (cmdId == '') {
+                showAppToast({ title: '指令模板信息不完整', icon: 'none' } as ShowToastOptions);
+                return;
+            }
+            const requestData = new UTSJSONObject(new UTSSourceMapPosition("requestData", "pages/cmd/cmd.uvue", 556, 8));
+            requestData.set('deviceId', deviceId.value);
+            requestData.set('cmdId', cmdId);
+            const cmdCode = getCommandCode(command);
+            if (cmdCode != '')
+                requestData.set('cmdCode', cmdCode);
+            requestData.set('params', buildCommandParams());
+            try {
+                isSending.value = true;
+                const response = await sendAppCommand(requestData);
                 if (response.code == 200) {
-                    showAppToast({ title: response.msg != '' ? response.msg : '指令发送成功', icon: 'success' } as ShowToastOptions);
+                    const requestIdText = response.data != '' ? '追踪编号：' + response.data : '请在指令记录中查看下发结果';
+                    showAppToast({ title: '指令已提交，' + requestIdText, icon: 'success', duration: 3500 } as ShowToastOptions);
+                    await reloadHistory();
                 }
                 else {
-                    showAppToast({ title: response.msg != '' ? response.msg : '指令发送失败', icon: 'none', duration: 3000 } as ShowToastOptions);
+                    showAppToast({ title: response.msg != '' ? response.msg : '指令下发失败', icon: 'none', duration: 3000 } as ShowToastOptions);
                 }
             }
             catch (error: any) {
-                console.error('发送指令出错:', error, " at pages/cmd/cmd.uvue:294");
-                showAppToast({ title: '网络错误', icon: 'none' } as ShowToastOptions);
+                console.error('下发指令失败:', error, " at pages/cmd/cmd.uvue:573");
+                showAppToast({ title: '指令下发失败，请检查网络', icon: 'none' } as ShowToastOptions);
             }
             finally {
-                sending.value = false;
+                isSending.value = false;
             }
-        };
+        }
+        function confirmSendCommand(): void {
+            if (selectedCommand.value == null) {
+                showAppToast({ title: '请选择要下发的指令', icon: 'none' } as ShowToastOptions);
+                return;
+            }
+            for (let index = 0; index < paramConfigs.value.length; index++)
+                validateParam(index, true);
+            if (!isFormValid.value) {
+                showAppToast({ title: '请检查指令参数', icon: 'none' } as ShowToastOptions);
+                return;
+            }
+            showAppModal({
+                title: '确认下发指令',
+                content: '即将向设备下发“' + getCommandName(selectedCommand.value) + '”。指令下发后可能影响车辆使用，请确认操作。',
+                confirmText: '确认下发',
+                cancelText: '取消',
+                success: (result: AppModalSuccess): void => {
+                    if (result.confirm)
+                        void sendSelectedCommand();
+                }
+            } as AppModalOptions);
+        }
+        function getRecordKey(record: UTSJSONObject, index: number): string {
+            const id = getString(record, 'id');
+            return id != '' ? id : 'record_' + index.toString(10);
+        }
+        function getRecordName(record: UTSJSONObject | null): string {
+            const name = getString(record, 'cmdName');
+            return name != '' ? name : (getString(record, 'commandType') != '' ? getString(record, 'commandType') : '未知指令');
+        }
+        function getRecordTime(record: UTSJSONObject | null): string {
+            const time = getString(record, 'sendTime');
+            return time != '' ? time : getString(record, 'createTime');
+        }
+        function getRecordRetryCount(record: UTSJSONObject | null): string {
+            const count = getString(record, 'retryCount');
+            return count != '' ? count : '0';
+        }
+        function getRecordSummary(record: UTSJSONObject | null): string {
+            const reason = getString(record, 'reason');
+            return reason != '' ? reason : getString(record, 'responseContent');
+        }
+        function markHistoryScroll(event: UniScrollEvent): void {
+            if (activeTab.value != 'history')
+                return;
+        }
+        function loadMoreHistory(): void {
+            if (activeTab.value != 'history' || refreshing.value)
+                return;
+            void loadHistoryPage(false);
+        }
+        async function showCommandDetail(record: UTSJSONObject): Promise<void> {
+            const commandId = getString(record, 'id');
+            if (commandId == '')
+                return;
+            detailRecord.value = record;
+            detailVisible.value = true;
+            isDetailLoading.value = true;
+            try {
+                const response = await getAppCommandDetail(commandId);
+                if (response.code == 200 && response.data != null) {
+                    detailRecord.value = response.data;
+                }
+                else {
+                    showAppToast({ title: response.msg != '' ? response.msg : '加载指令详情失败', icon: 'none' } as ShowToastOptions);
+                }
+            }
+            catch (error: any) {
+                console.error('加载指令详情失败:', error, " at pages/cmd/cmd.uvue:653");
+                showAppToast({ title: '加载指令详情失败，请检查网络', icon: 'none' } as ShowToastOptions);
+            }
+            finally {
+                isDetailLoading.value = false;
+            }
+        }
+        function closeDetail(): void {
+            detailVisible.value = false;
+        }
+        function getDetailResponse(): string { return getString(detailRecord.value, 'responseContent'); }
+        function getDetailReason(): string { return getString(detailRecord.value, 'reason'); }
+        function getDetailParams(): string { return getString(detailRecord.value, 'commandParams'); }
+        async function retryCommand(commandId: string): Promise<void> {
+            if (isRetrying.value)
+                return;
+            try {
+                isRetrying.value = true;
+                const response = await retryAppCommand(commandId);
+                if (response.code == 200) {
+                    showAppToast({ title: response.msg != '' ? response.msg : '已重新提交指令', icon: 'success' } as ShowToastOptions);
+                    detailVisible.value = false;
+                    await reloadHistory();
+                }
+                else {
+                    showAppToast({ title: response.msg != '' ? response.msg : '重试下发失败', icon: 'none', duration: 3000 } as ShowToastOptions);
+                }
+            }
+            catch (error: any) {
+                console.error('重试下发失败:', error, " at pages/cmd/cmd.uvue:680");
+                showAppToast({ title: '重试下发失败，请检查网络', icon: 'none' } as ShowToastOptions);
+            }
+            finally {
+                isRetrying.value = false;
+            }
+        }
+        function confirmRetryFromDetail(): void {
+            const commandId = getString(detailRecord.value, 'id');
+            if (commandId == '' || isRetrying.value)
+                return;
+            showAppModal({
+                title: '确认重试',
+                content: '将重新下发“' + getRecordName(detailRecord.value) + '”，请确认设备当前状态适合执行此操作。',
+                confirmText: '确认重试',
+                cancelText: '取消',
+                success: (result: AppModalSuccess): void => {
+                    if (result.confirm)
+                        void retryCommand(commandId);
+                }
+            } as AppModalOptions);
+        }
+        function getEventString(event: any, key: string): string {
+            if (event == null || typeof event != 'object')
+                return '';
+            return (event as UTSJSONObject).getString(key, '');
+        }
+        function changeTab(event: any): void {
+            const value = getEventString(event, 'value');
+            if (value == '')
+                return;
+            activeTab.value = value;
+            if (value == 'history' && !hasLoadedHistory.value)
+                void reloadHistory();
+        }
+        async function refreshCurrentTab(): Promise<void> {
+            if (refreshing.value)
+                return;
+            try {
+                refreshing.value = true;
+                if (activeTab.value == 'history')
+                    await reloadHistory();
+                else
+                    await loadAvailableCommands();
+            }
+            finally {
+                refreshing.value = false;
+            }
+        }
+        onLoad((options) => {
+            imei.value = options["imei"] ?? '';
+            deviceId.value = options["deviceId"] ?? '';
+            if (deviceId.value != '')
+                void loadAvailableCommands();
+        });
         return (): any | null => {
             const _component_custom_navBar = resolveEasyComponent("custom-navBar", _easycom_custom_navBar);
+            const _component_i_tabs = resolveEasyComponent("i-tabs", _easycom_i_tabs);
             const _component_i_input = resolveEasyComponent("i-input", _easycom_i_input);
             const _component_i_button = resolveEasyComponent("i-button", _easycom_i_button);
+            const _component_i_action_sheet = resolveEasyComponent("i-action-sheet", _easycom_i_action_sheet);
+            const _component_i_modal = resolveEasyComponent("i-modal", _easycom_i_modal);
             const _component_app_toast = resolveEasyComponent("app-toast", _easycom_app_toast);
             return _cE(Fragment, null, [
-                _cE("view", _uM({ class: "container" }), [
+                _cE("view", _uM({ class: "page" }), [
                     _cV(_component_custom_navBar, _uM({
-                        title: "指令",
+                        title: "指令中心",
                         "show-back": true,
-                        backgroundColor: "#fff",
-                        textColor: "#333",
+                        backgroundColor: "#ffffff",
+                        textColor: "#1f2937",
                         showCapsule: false
                     })),
-                    _cE("view", _uM({ class: "device-info" }), [
-                        _cE("text", _uM({ class: "device-label" }), "设备ID: " + _tD(imei.value), 1 /* TEXT */)
-                    ]),
-                    _cE("view", _uM({ class: "section" }), [
-                        _cE("text", _uM({ class: "section-title" }), "指令类型"),
-                        _cE("view", _uM({ class: "type-container" }), [
-                            _cE("view", _uM({ class: "type-list" }), [
-                                _cE(Fragment, null, RenderHelpers.renderList(commandTypes.value, (type, index, __index, _cached): any => {
-                                    return _cE("view", _uM({
-                                        key: type["cmdmId"],
-                                        class: _nC(["type-item", _uM({ active: selectedTypeId.value == type["cmdmId"] })]),
-                                        onClick: () => { selectTypeByItem(type); }
-                                    }), [
-                                        _cE("text", _uM({
-                                            class: "type-name",
-                                            style: _nS(_uM({ color: selectedTypeId.value == type["cmdmId"] ? '#ffffff' : '#666666' }))
-                                        }), _tD(type["cmdName"]), 5 /* TEXT, STYLE */)
-                                    ], 10 /* CLASS, PROPS */, ["onClick"]);
-                                }), 128 /* KEYED_FRAGMENT */)
+                    _cE("view", _uM({ class: "content-wrap" }), [
+                        _cE("view", _uM({ class: "device-card" }), [
+                            _cE("view", _uM({ class: "device-card-main" }), [
+                                _cE("text", _uM({ class: "device-title" }), "当前设备"),
+                                _cE("text", _uM({ class: "device-imei" }), _tD(displayDeviceIdentity.value), 1 /* TEXT */)
+                            ]),
+                            _cE("view", _uM({ class: "device-id-wrap" }), [
+                                _cE("text", _uM({ class: "device-id-label" }), "设备 ID"),
+                                _cE("text", _uM({ class: "device-id-value" }), _tD(deviceId.value != '' ? deviceId.value : '--'), 1 /* TEXT */)
                             ])
-                        ])
-                    ]),
-                    isTrue(commands.value.length)
-                        ? _cE("view", _uM({
-                            key: 0,
-                            class: "section"
+                        ]),
+                        _cV(_component_i_tabs, _uM({
+                            value: activeTab.value,
+                            list: tabItems,
+                            activeColor: "#1677ff",
+                            inactiveColor: "#667085",
+                            bgColor: "#ffffff",
+                            onChange: ($event: any) => { changeTab($event); }
+                        }), null, 8 /* PROPS */, ["value", "onChange"]),
+                        _cE("scroll-view", _uM({
+                            class: "main-scroll",
+                            "scroll-y": "true",
+                            "show-scrollbar": false,
+                            "refresher-enabled": "",
+                            "refresher-triggered": refreshing.value,
+                            "lower-threshold": 80,
+                            onRefresherrefresh: refreshCurrentTab,
+                            onScroll: markHistoryScroll,
+                            onScrolltolower: loadMoreHistory
                         }), [
-                            _cE("text", _uM({ class: "section-title" }), "指令列表"),
-                            _cE("view", _uM({ class: "command-list" }), [
-                                _cE(Fragment, null, RenderHelpers.renderList(commands.value, (cmd, index, __index, _cached): any => {
-                                    return _cE("view", _uM({
-                                        key: cmd["predictCmdId"],
-                                        class: _nC(["command-item", _uM({ active: selectedCommandId.value == cmd["predictCmdId"] })]),
-                                        onClick: () => { selectCommand(cmd); }
+                            deviceId.value == ''
+                                ? _cE("view", _uM({
+                                    key: 0,
+                                    class: "state-card"
+                                }), [
+                                    _cE("text", _uM({ class: "state-title" }), "无法加载指令"),
+                                    _cE("text", _uM({ class: "state-text" }), "未获取到设备 ID，请返回车辆详情后重新进入。")
+                                ])
+                                : activeTab.value == 'send'
+                                    ? _cE("view", _uM({
+                                        key: 1,
+                                        class: "tab-content"
                                     }), [
-                                        _cE("text", _uM({ class: "command-name" }), _tD(cmd["cmdName"]), 1 /* TEXT */),
-                                        _cE("text", _uM({ class: "command-descr" }), _tD(cmd["remarks"]), 1 /* TEXT */)
-                                    ], 10 /* CLASS, PROPS */, ["onClick"]);
-                                }), 128 /* KEYED_FRAGMENT */)
-                            ])
-                        ])
-                        : _cC("v-if", true),
-                    selectedCommand.value != null
-                        ? _cE("view", _uM({
-                            key: 1,
-                            class: "section"
-                        }), [
-                            _cE("view", _uM({ class: "param-form" }), [
-                                paramConfigError.value != ''
-                                    ? _cE("text", _uM({
-                                        key: 0,
-                                        class: "param-error"
-                                    }), _tD(paramConfigError.value), 1 /* TEXT */)
-                                    : _cC("v-if", true),
-                                _cE(Fragment, null, RenderHelpers.renderList(paramConfigs.value, (param, index, __index, _cached): any => {
-                                    return _cE("view", _uM({
-                                        key: 'param_' + index,
-                                        class: "param-item"
-                                    }), [
-                                        _cE("text", _uM({ class: "param-label" }), _tD(getParamLabel(param)), 1 /* TEXT */),
-                                        param["type"] == 'input'
-                                            ? _cV(_component_i_input, _uM({
-                                                key: 0,
-                                                class: "param-input",
-                                                "model-value": getParamValue(index),
-                                                "onUpdate:modelValue": ($event: any) => { updateParamValueFromEvent(index, $event); },
-                                                placeholder: '请输入' + getParamLabel(param),
-                                                "placeholder-class": "placeholder",
-                                                border: "none",
-                                                height: "44px",
-                                                "font-size": "15px"
-                                            }), null, 8 /* PROPS */, ["model-value", "onUpdate:modelValue", "placeholder"])
-                                            : _cC("v-if", true),
-                                        param["type"] == 'number'
-                                            ? _cV(_component_i_input, _uM({
-                                                key: 1,
-                                                class: "param-input",
-                                                type: "number",
-                                                "model-value": getParamValue(index),
-                                                "onUpdate:modelValue": ($event: any) => { updateParamValueFromEvent(index, $event); },
-                                                placeholder: '请输入' + getParamLabel(param),
-                                                "placeholder-class": "placeholder",
-                                                maxlength: getParamMaxLength(param),
-                                                border: "none",
-                                                height: "44px",
-                                                "font-size": "15px"
-                                            }), null, 8 /* PROPS */, ["model-value", "onUpdate:modelValue", "placeholder", "maxlength"])
-                                            : _cC("v-if", true),
-                                        param["type"] == 'radio'
+                                        _cE("view", _uM({ class: "section-heading" }), [
+                                            _cE("view", null, [
+                                                _cE("text", _uM({ class: "section-title" }), "可用指令"),
+                                                _cE("text", _uM({ class: "section-subtitle" }), "请选择要下发到设备的指令")
+                                            ]),
+                                            _cE("text", _uM({
+                                                class: "refresh-link",
+                                                onClick: loadAvailableCommands
+                                            }), "刷新")
+                                        ]),
+                                        isTrue(isCommandLoading.value)
                                             ? _cE("view", _uM({
-                                                key: 2,
-                                                class: "radio-group"
+                                                key: 0,
+                                                class: "state-card compact-state"
                                             }), [
-                                                _cE(Fragment, null, RenderHelpers.renderList(getRadioItems(param), (item, __key, __index, _cached): any => {
+                                                _cE("text", _uM({ class: "state-text" }), "正在加载可用指令...")
+                                            ])
+                                            : availableCommands.value.length == 0
+                                                ? _cE("view", _uM({
+                                                    key: 1,
+                                                    class: "state-card compact-state"
+                                                }), [
+                                                    _cE("text", _uM({ class: "state-title" }), "暂无可用指令"),
+                                                    _cE("text", _uM({ class: "state-text" }), "请确认设备状态后重试。")
+                                                ])
+                                                : _cE("view", _uM({
+                                                    key: 2,
+                                                    class: "command-list"
+                                                }), [
+                                                    _cE(Fragment, null, RenderHelpers.renderList(availableCommands.value, (command, index, __index, _cached): any => {
+                                                        return _cE("view", _uM({
+                                                            key: getCommandKey(command, index),
+                                                            class: _nC(["command-card", _uM({ selected: isSelectedCommand(command), disabled: !isCommandAllowed(command) })]),
+                                                            onClick: () => { selectCommand(command); }
+                                                        }), [
+                                                            _cE("view", _uM({ class: "command-card-top" }), [
+                                                                _cE("view", _uM({ class: "command-name-wrap" }), [
+                                                                    _cE("text", _uM({ class: "command-name" }), _tD(getCommandName(command)), 1 /* TEXT */)
+                                                                ]),
+                                                                _cE("text", _uM({
+                                                                    class: _nC(["command-status", _uM({ blocked: !isCommandAllowed(command) })])
+                                                                }), _tD(isCommandAllowed(command) ? (commandNeedsParams(command) ? '需填写参数' : '无需参数') : 'App 端不可下发'), 3 /* TEXT, CLASS */)
+                                                            ]),
+                                                            isTrue(getCommandCode(command) != '' || getCommandRemark(command) != '')
+                                                                ? _cE("view", _uM({
+                                                                    key: 0,
+                                                                    class: "command-card-meta"
+                                                                }), [
+                                                                    getCommandCode(command) != ''
+                                                                        ? _cE("text", _uM({
+                                                                            key: 0,
+                                                                            class: "command-code"
+                                                                        }), _tD(getCommandCode(command)), 1 /* TEXT */)
+                                                                        : _cC("v-if", true),
+                                                                    getCommandRemark(command) != ''
+                                                                        ? _cE("text", _uM({
+                                                                            key: 1,
+                                                                            class: "command-remark"
+                                                                        }), _tD(getCommandRemark(command)), 1 /* TEXT */)
+                                                                        : _cC("v-if", true)
+                                                                ])
+                                                                : _cC("v-if", true)
+                                                        ], 10 /* CLASS, PROPS */, ["onClick"]);
+                                                    }), 128 /* KEYED_FRAGMENT */)
+                                                ]),
+                                        selectedCommand.value != null
+                                            ? _cE("view", _uM({
+                                                key: 3,
+                                                class: "form-card"
+                                            }), [
+                                                _cE("view", _uM({ class: "form-header" }), [
+                                                    _cE("view", null, [
+                                                        _cE("text", _uM({ class: "section-title" }), _tD(getCommandName(selectedCommand.value)), 1 /* TEXT */),
+                                                        _cE("text", _uM({ class: "section-subtitle" }), "请确认参数后再下发")
+                                                    ])
+                                                ]),
+                                                paramConfigError.value != ''
+                                                    ? _cE("text", _uM({
+                                                        key: 0,
+                                                        class: "form-error"
+                                                    }), _tD(paramConfigError.value), 1 /* TEXT */)
+                                                    : _cC("v-if", true),
+                                                _cE(Fragment, null, RenderHelpers.renderList(paramConfigs.value, (param, index, __index, _cached): any => {
                                                     return _cE("view", _uM({
-                                                        key: 'radio_' + item["value"],
-                                                        class: "radio-item",
-                                                        onClick: () => { selectRadio(index, getRadioValue(item)); }
+                                                        key: getParamKey(param, index),
+                                                        class: "param-row"
                                                     }), [
-                                                        _cE("view", _uM({ class: "radio-icon" }), [
-                                                            _cE("view", _uM({
-                                                                class: _nC(["radio-inner", _uM({ checked: getParamValue(index) == getRadioValue(item) })])
-                                                            }), null, 2 /* CLASS */)
+                                                        _cE("view", _uM({ class: "param-label-row" }), [
+                                                            _cE("text", _uM({ class: "param-label" }), _tD(getParamLabel(param)), 1 /* TEXT */),
+                                                            isTrue(isParamRequired(param))
+                                                                ? _cE("text", _uM({
+                                                                    key: 0,
+                                                                    class: "required-mark"
+                                                                }), "*")
+                                                                : _cC("v-if", true)
                                                         ]),
-                                                        _cE("text", _uM({ class: "radio-label" }), _tD(getRadioDescription(item)), 1 /* TEXT */)
-                                                    ], 8 /* PROPS */, ["onClick"]);
-                                                }), 128 /* KEYED_FRAGMENT */)
+                                                        isTrue(getParamType(param) == 'text' || getParamType(param) == 'number')
+                                                            ? _cV(_component_i_input, _uM({
+                                                                key: 0,
+                                                                class: "param-input",
+                                                                "model-value": getParamValue(index),
+                                                                type: getParamType(param) == 'number' ? 'number' : 'text',
+                                                                placeholder: getParamPlaceholder(param),
+                                                                "placeholder-class": "input-placeholder",
+                                                                border: "none",
+                                                                "onUpdate:modelValue": ($event: any) => { updateParamValue(index, $event); }
+                                                            }), null, 8 /* PROPS */, ["model-value", "type", "placeholder", "onUpdate:modelValue"])
+                                                            : getParamType(param) == 'select'
+                                                                ? _cE("view", _uM({
+                                                                    key: 1,
+                                                                    class: "select-field",
+                                                                    onClick: () => { openOptionSheet(index); }
+                                                                }), [
+                                                                    _cE("text", _uM({
+                                                                        class: _nC(_uM({ 'select-placeholder': getSelectedOptionLabel(index) == '' }))
+                                                                    }), _tD(getSelectedOptionLabel(index) != '' ? getSelectedOptionLabel(index) : getParamPlaceholder(param)), 3 /* TEXT, CLASS */),
+                                                                    _cE("text", _uM({ class: "select-arrow" }), "›")
+                                                                ], 8 /* PROPS */, ["onClick"])
+                                                                : _cC("v-if", true),
+                                                        getParamError(index) != ''
+                                                            ? _cE("text", _uM({
+                                                                key: 2,
+                                                                class: "param-error"
+                                                            }), _tD(getParamError(index)), 1 /* TEXT */)
+                                                            : _cC("v-if", true)
+                                                    ]);
+                                                }), 128 /* KEYED_FRAGMENT */),
+                                                isTrue(paramConfigs.value.length == 0 && paramConfigError.value == '')
+                                                    ? _cE("text", _uM({
+                                                        key: 1,
+                                                        class: "no-param-text"
+                                                    }), "该指令无需填写参数")
+                                                    : _cC("v-if", true),
+                                                _cV(_component_i_button, _uM({
+                                                    class: "send-button",
+                                                    type: "primary",
+                                                    text: "确认下发指令",
+                                                    loading: isSending.value,
+                                                    disabled: isSending.value || isCommandLoading.value || !isFormValid.value,
+                                                    onClick: confirmSendCommand
+                                                }), null, 8 /* PROPS */, ["loading", "disabled"])
                                             ])
                                             : _cC("v-if", true)
-                                    ]);
-                                }), 128 /* KEYED_FRAGMENT */),
-                                isTrue(paramConfigs.value.length == 0 && paramConfigError.value == '')
-                                    ? _cE("text", _uM({
-                                        key: 1,
-                                        class: "no-param-tip"
-                                    }), "该指令无需填写参数")
-                                    : _cC("v-if", true),
-                                _cV(_component_i_button, _uM({
-                                    type: "primary",
-                                    text: "发送指令",
-                                    class: "submit-btn",
-                                    loading: sending.value,
-                                    disabled: sending.value || loading.value || !isFormValid.value,
-                                    onClick: sendCommand
-                                }), null, 8 /* PROPS */, ["loading", "disabled"])
-                            ])
-                        ])
-                        : _cC("v-if", true),
-                    isTrue(!isTruthy(selectedTypeId.value))
-                        ? _cE("view", _uM({
-                            key: 2,
-                            class: "empty-state"
-                        }), [
-                            _cE("text", _uM({ class: "empty-text" }), "请先选择指令类型")
-                        ])
-                        : _cC("v-if", true),
-                    isTrue(loading.value)
-                        ? _cE("view", _uM({
-                            key: 3,
-                            class: "loading"
-                        }), [
-                            _cE("text", _uM({ class: "loading-text" }), "加载中...")
-                        ])
-                        : isTrue(commands.value.length == 0 && selectedTypeId.value != null)
-                            ? _cE("view", _uM({
-                                key: 4,
-                                class: "empty-state"
-                            }), [
-                                _cE("text", _uM({ class: "empty-text" }), "暂无指令")
-                            ])
-                            : _cC("v-if", true)
+                                    ])
+                                    : _cE("view", _uM({
+                                        key: 2,
+                                        class: "tab-content history-content"
+                                    }), [
+                                        _cE("view", _uM({ class: "section-heading" }), [
+                                            _cE("view", null, [
+                                                _cE("text", _uM({ class: "section-title" }), "指令记录"),
+                                                _cE("text", _uM({ class: "section-subtitle" }), "可查看下发结果或重新尝试失败指令")
+                                            ]),
+                                            _cE("text", _uM({
+                                                class: "refresh-link",
+                                                onClick: reloadHistory
+                                            }), "刷新")
+                                        ]),
+                                        isTrue(isHistoryInitialLoading.value)
+                                            ? _cE("view", _uM({
+                                                key: 0,
+                                                class: "state-card compact-state"
+                                            }), [
+                                                _cE("text", _uM({ class: "state-text" }), "正在加载指令记录...")
+                                            ])
+                                            : historyRecords.value.length == 0
+                                                ? _cE("view", _uM({
+                                                    key: 1,
+                                                    class: "state-card compact-state"
+                                                }), [
+                                                    _cE("text", _uM({ class: "state-title" }), "暂无指令记录"),
+                                                    _cE("text", _uM({ class: "state-text" }), "成功下发指令后，记录将显示在这里。")
+                                                ])
+                                                : _cE("view", _uM({
+                                                    key: 2,
+                                                    class: "history-list"
+                                                }), [
+                                                    _cE(Fragment, null, RenderHelpers.renderList(historyRecords.value, (record, index, __index, _cached): any => {
+                                                        return _cE("view", _uM({
+                                                            key: getRecordKey(record, index),
+                                                            class: "history-card",
+                                                            onClick: () => { showCommandDetail(record); }
+                                                        }), [
+                                                            _cE("view", _uM({ class: "history-card-top" }), [
+                                                                _cE("text", _uM({ class: "history-name" }), _tD(getRecordName(record)), 1 /* TEXT */),
+                                                                _cE("text", _uM({
+                                                                    class: _nC(["history-status", getStatusClass(record)])
+                                                                }), _tD(getStatusText(record)), 3 /* TEXT, CLASS */)
+                                                            ]),
+                                                            _cE("text", _uM({ class: "history-time" }), _tD(getRecordTime(record)), 1 /* TEXT */),
+                                                            getRecordSummary(record) != ''
+                                                                ? _cE("text", _uM({
+                                                                    key: 0,
+                                                                    class: "history-summary"
+                                                                }), _tD(getRecordSummary(record)), 1 /* TEXT */)
+                                                                : _cC("v-if", true),
+                                                            _cE("view", _uM({ class: "history-bottom" }), [
+                                                                _cE("text", _uM({ class: "retry-count" }), "已重试 " + _tD(getRecordRetryCount(record)) + " 次", 1 /* TEXT */),
+                                                                _cE("text", _uM({ class: "detail-link" }), "查看详情 ›")
+                                                            ])
+                                                        ], 8 /* PROPS */, ["onClick"]);
+                                                    }), 128 /* KEYED_FRAGMENT */)
+                                                ]),
+                                        historyRecords.value.length > 0
+                                            ? _cE("view", _uM({
+                                                key: 3,
+                                                class: "history-footer"
+                                            }), [
+                                                isTrue(isHistoryLoading.value)
+                                                    ? _cE("text", _uM({ key: 0 }), "加载中...")
+                                                    : isTrue(!hasMoreHistory.value)
+                                                        ? _cE("text", _uM({ key: 1 }), "没有更多记录了")
+                                                        : _cE("text", _uM({ key: 2 }), "上拉加载更多")
+                                            ])
+                                            : _cC("v-if", true)
+                                    ])
+                        ], 40 /* PROPS, NEED_HYDRATION */, ["refresher-triggered"])
+                    ]),
+                    _cV(_component_i_action_sheet, _uM({
+                        show: optionSheetVisible.value,
+                        "onUpdate:show": ($event: boolean) => { (optionSheetVisible).value = $event; },
+                        title: optionSheetTitle.value,
+                        actions: optionActions.value,
+                        cancelText: "取消",
+                        onSelect: ($event: any) => { selectOption($event); }
+                    }), null, 8 /* PROPS */, ["show", "onUpdate:show", "title", "actions", "onSelect"]),
+                    _cV(_component_i_modal, _uM({
+                        show: detailVisible.value,
+                        title: "指令详情",
+                        confirmText: "关闭",
+                        showCancelButton: canRetryDetail.value,
+                        cancelText: "重试下发",
+                        onConfirm: closeDetail,
+                        onCancel: confirmRetryFromDetail
+                    }), _uM({
+                        default: withSlotCtx((): any[] => [
+                            isTrue(isDetailLoading.value)
+                                ? _cE("view", _uM({
+                                    key: 0,
+                                    class: "detail-loading"
+                                }), [
+                                    _cE("text", null, "正在加载详情...")
+                                ])
+                                : _cE("view", _uM({
+                                    key: 1,
+                                    class: "detail-content"
+                                }), [
+                                    _cE("view", _uM({ class: "detail-row" }), [
+                                        _cE("text", _uM({ class: "detail-label" }), "指令名称"),
+                                        _cE("text", _uM({ class: "detail-value" }), _tD(getRecordName(detailRecord.value)), 1 /* TEXT */)
+                                    ]),
+                                    _cE("view", _uM({ class: "detail-row" }), [
+                                        _cE("text", _uM({ class: "detail-label" }), "下发状态"),
+                                        _cE("text", _uM({ class: "detail-value" }), _tD(getStatusText(detailRecord.value)), 1 /* TEXT */)
+                                    ]),
+                                    _cE("view", _uM({ class: "detail-row" }), [
+                                        _cE("text", _uM({ class: "detail-label" }), "发送时间"),
+                                        _cE("text", _uM({ class: "detail-value" }), _tD(getRecordTime(detailRecord.value)), 1 /* TEXT */)
+                                    ]),
+                                    getDetailResponse() != ''
+                                        ? _cE("view", _uM({
+                                            key: 0,
+                                            class: "detail-row detail-long-row"
+                                        }), [
+                                            _cE("text", _uM({ class: "detail-label" }), "响应信息"),
+                                            _cE("text", _uM({ class: "detail-value" }), _tD(getDetailResponse()), 1 /* TEXT */)
+                                        ])
+                                        : _cC("v-if", true),
+                                    getDetailReason() != ''
+                                        ? _cE("view", _uM({
+                                            key: 1,
+                                            class: "detail-row detail-long-row"
+                                        }), [
+                                            _cE("text", _uM({ class: "detail-label" }), "结果说明"),
+                                            _cE("text", _uM({ class: "detail-value" }), _tD(getDetailReason()), 1 /* TEXT */)
+                                        ])
+                                        : _cC("v-if", true),
+                                    getDetailParams() != ''
+                                        ? _cE("view", _uM({
+                                            key: 2,
+                                            class: "detail-row detail-long-row"
+                                        }), [
+                                            _cE("text", _uM({ class: "detail-label" }), "指令参数"),
+                                            _cE("text", _uM({ class: "detail-value" }), _tD(getDetailParams()), 1 /* TEXT */)
+                                        ])
+                                        : _cC("v-if", true)
+                                ])
+                        ]),
+                        _: 1 /* STABLE */
+                    }), 8 /* PROPS */, ["show", "showCancelButton"])
                 ]),
                 _cV(_component_app_toast)
             ], 64 /* STABLE_FRAGMENT */);
@@ -411,5 +909,5 @@ const __sfc__ = defineComponent({
     }
 });
 export default __sfc__;
-const GenPagesCmdCmdStyles = [_uM([["container", _pS(_uM([["backgroundColor", "#f5f5f5"], ["display", "flex"], ["flexDirection", "column"], ["paddingBottom", "30rpx"]]))], ["device-info", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", 0], ["marginRight", "20rpx"], ["marginBottom", "30rpx"], ["marginLeft", "20rpx"], ["display", "flex"], ["alignItems", "center"]]))], ["section", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", 0], ["marginRight", "20rpx"], ["marginBottom", "30rpx"], ["marginLeft", "20rpx"]]))], ["device-label", _pS(_uM([["fontSize", "28rpx"], ["color", "#666666"], ["whiteSpace", "nowrap"]]))], ["section-title", _pS(_uM([["fontSize", "32rpx"], ["fontWeight", "bold"], ["color", "#333333"], ["marginBottom", "20rpx"]]))], ["type-list", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["alignItems", "center"]]))], ["type-item", _uM([["", _uM([["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["paddingTop", "15rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "15rpx"], ["paddingLeft", "30rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f0f0"], ["borderTopLeftRadius", "50rpx"], ["borderTopRightRadius", "50rpx"], ["borderBottomRightRadius", "50rpx"], ["borderBottomLeftRadius", "50rpx"]])], [".active", _uM([["backgroundImage", "none"], ["backgroundColor", "#007AFF"]])]])], ["type-name", _uM([[".type-item.active ", _uM([["color", "#ffffff"]])], ["", _uM([["fontSize", "26rpx"], ["color", "#666666"], ["whiteSpace", "nowrap"]])]])], ["command-list", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))], ["command-item", _uM([["", _uM([["width", "100%"], ["boxSizing", "border-box"], ["paddingTop", "25rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "25rpx"], ["paddingLeft", "25rpx"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e0e0e0"], ["borderRightColor", "#e0e0e0"], ["borderBottomColor", "#e0e0e0"], ["borderLeftColor", "#e0e0e0"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])], [".command-item+", _uM([["marginTop", "20rpx"]])], [".active", _uM([["borderTopColor", "#007AFF"], ["borderRightColor", "#007AFF"], ["borderBottomColor", "#007AFF"], ["borderLeftColor", "#007AFF"], ["backgroundColor", "#f0f8ff"]])]])], ["command-name", _pS(_uM([["fontSize", "30rpx"], ["color", "#333333"], ["marginBottom", "10rpx"]]))], ["command-descr", _pS(_uM([["fontSize", "24rpx"], ["color", "#999999"], ["lineHeight", "36rpx"]]))], ["param-form", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))], ["param-item", _uM([["", _uM([["display", "flex"], ["flexDirection", "column"]])], [".param-item+", _uM([["marginTop", "30rpx"]])]])], ["radio-group", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))], ["param-label", _pS(_uM([["marginBottom", "15rpx"], ["fontSize", "28rpx"], ["color", "#333333"]]))], ["param-input", _pS(_uM([["width", "100%"], ["boxSizing", "border-box"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e0e0e0"], ["borderRightColor", "#e0e0e0"], ["borderBottomColor", "#e0e0e0"], ["borderLeftColor", "#e0e0e0"], ["borderTopLeftRadius", "8rpx"], ["borderTopRightRadius", "8rpx"], ["borderBottomRightRadius", "8rpx"], ["borderBottomLeftRadius", "8rpx"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"]]))], ["param-error", _pS(_uM([["color", "#e43d33"], ["fontSize", "26rpx"], ["marginBottom", "20rpx"]]))], ["no-param-tip", _pS(_uM([["color", "#999999"], ["fontSize", "26rpx"], ["marginBottom", "20rpx"]]))], ["radio-item", _uM([["", _uM([["display", "flex"], ["alignItems", "center"]])], [".radio-item+", _uM([["marginTop", "20rpx"]])]])], ["radio-icon", _pS(_uM([["marginRight", "20rpx"], ["width", "36rpx"], ["height", "36rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#cccccc"], ["borderRightColor", "#cccccc"], ["borderBottomColor", "#cccccc"], ["borderLeftColor", "#cccccc"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["radio-inner", _uM([["", _uM([["width", "25rpx"], ["height", "25rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["backgroundImage", "none"], ["backgroundColor", "rgba(0,0,0,0)"]])], [".checked", _uM([["backgroundImage", "none"], ["backgroundColor", "#007AFF"]])]])], ["radio-label", _pS(_uM([["fontSize", "26rpx"], ["color", "#333333"]]))], ["submit-btn", _pS(_uM([["marginTop", "30rpx"]]))], ["empty-state", _pS(_uM([["textAlign", "center"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["marginTop", 0], ["marginRight", "20rpx"], ["marginBottom", "30rpx"], ["marginLeft", "20rpx"]]))], ["loading", _pS(_uM([["textAlign", "center"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["marginTop", 0], ["marginRight", "20rpx"], ["marginBottom", "30rpx"], ["marginLeft", "20rpx"]]))], ["placeholder", _pS(_uM([["color", "#cccccc"]]))]])];
+const GenPagesCmdCmdStyles = [_uM([["page", _pS(_uM([["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fb"]]))], ["content-wrap", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["minHeight", 0], ["display", "flex"], ["flexDirection", "column"]]))], ["device-card", _pS(_uM([["display", "flex"], ["justifyContent", "space-between"], ["marginTop", "20rpx"], ["marginRight", "24rpx"], ["marginBottom", "16rpx"], ["marginLeft", "24rpx"], ["paddingTop", "28rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "30rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundImage", "linear-gradient(to right, #1769e0, #56a0f6)"], ["boxShadow", "0 10rpx 28rpx rgba(22, 119, 255, 0.22)"]]))], ["device-card-main", _pS(_uM([["display", "flex"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["minWidth", 0], ["flexDirection", "row"], ["alignItems", "center"]]))], ["device-id-wrap", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "flex-end"]]))], ["section-heading", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginBottom", "20rpx"]]))], ["command-card-top", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["command-name-wrap", _pS(_uM([["display", "flex"], ["minWidth", 0], ["alignItems", "center"]]))], ["form-header", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginBottom", "12rpx"]]))], ["param-label-row", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["marginBottom", "12rpx"]]))], ["history-card-top", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["history-bottom", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["marginTop", "18rpx"]]))], ["detail-row", _pS(_uM([["display", "flex"], ["alignItems", "flex-start"], ["justifyContent", "space-between"], ["paddingTop", "9rpx"], ["paddingRight", 0], ["paddingBottom", "9rpx"], ["paddingLeft", 0]]))], ["device-title", _pS(_uM([["color", "rgba(255,255,255,0.76)"], ["fontSize", "23rpx"], ["marginRight", "20rpx"]]))], ["device-id-label", _pS(_uM([["color", "rgba(255,255,255,0.76)"], ["fontSize", "23rpx"], ["marginRight", "20rpx"]]))], ["device-imei", _pS(_uM([["color", "#ffffff"], ["fontSize", "32rpx"], ["fontWeight", 600]]))], ["device-id-value", _pS(_uM([["marginTop", "8rpx"], ["color", "#ffffff"], ["fontSize", "25rpx"]]))], ["main-scroll", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["minHeight", 0]]))], ["tab-content", _pS(_uM([["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "44rpx"], ["paddingLeft", "24rpx"]]))], ["section-title", _pS(_uM([["color", "#1f2937"], ["fontSize", "32rpx"], ["fontWeight", 600]]))], ["section-subtitle", _pS(_uM([["marginTop", "7rpx"], ["color", "#98a2b3"], ["fontSize", "23rpx"]]))], ["refresh-link", _pS(_uM([["color", "#1677ff"], ["fontSize", "25rpx"]]))], ["detail-link", _pS(_uM([["color", "#1677ff"], ["fontSize", "25rpx"]]))], ["state-card", _pS(_uM([["boxSizing", "border-box"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["marginTop", "32rpx"], ["marginRight", "24rpx"], ["marginBottom", "32rpx"], ["marginLeft", "24rpx"], ["paddingTop", "58rpx"], ["paddingRight", "38rpx"], ["paddingBottom", "58rpx"], ["paddingLeft", "38rpx"], ["alignItems", "center"]]))], ["form-card", _pS(_uM([["boxSizing", "border-box"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["marginTop", "24rpx"], ["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"]]))], ["history-card", _uM([["", _uM([["boxSizing", "border-box"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "26rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "26rpx"], ["paddingLeft", "28rpx"]])], [".history-card+", _uM([["marginTop", "16rpx"]])]])], ["compact-state", _pS(_uM([["marginTop", 0], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0], ["paddingTop", "48rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "48rpx"], ["paddingLeft", "32rpx"]]))], ["state-title", _pS(_uM([["color", "#344054"], ["fontSize", "30rpx"], ["fontWeight", 600], ["textAlign", "center"]]))], ["state-text", _pS(_uM([["marginTop", "12rpx"], ["color", "#98a2b3"], ["fontSize", "25rpx"], ["lineHeight", "38rpx"], ["textAlign", "center"]]))], ["command-list", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))], ["history-list", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))], ["command-card", _uM([["", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "rgba(0,0,0,0)"], ["borderRightColor", "rgba(0,0,0,0)"], ["borderBottomColor", "rgba(0,0,0,0)"], ["borderLeftColor", "rgba(0,0,0,0)"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["backgroundColor", "#ffffff"], ["flexDirection", "row"]])], [".command-card+", _uM([["marginTop", "16rpx"]])], [".selected", _uM([["borderTopColor", "#1677ff"], ["borderRightColor", "#1677ff"], ["borderBottomColor", "#1677ff"], ["borderLeftColor", "#1677ff"], ["backgroundColor", "#f0f7ff"]])], [".disabled", _uM([["opacity", 0.58], ["justifyContent", "space-between"]])]])], ["command-name", _pS(_uM([["color", "#344054"], ["fontSize", "29rpx"], ["fontWeight", 600]]))], ["history-name", _pS(_uM([["color", "#344054"], ["fontSize", "29rpx"], ["fontWeight", 600]]))], ["command-code", _pS(_uM([["marginLeft", "14rpx"], ["paddingTop", "4rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "10rpx"], ["borderTopLeftRadius", "6rpx"], ["borderTopRightRadius", "6rpx"], ["borderBottomRightRadius", "6rpx"], ["borderBottomLeftRadius", "6rpx"], ["color", "#667085"], ["backgroundColor", "#f2f4f7"], ["fontSize", "20rpx"]]))], ["command-status", _uM([["", _uM([["marginLeft", "16rpx"], ["paddingTop", "6rpx"], ["paddingRight", "12rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "12rpx"], ["borderTopLeftRadius", "8rpx"], ["borderTopRightRadius", "8rpx"], ["borderBottomRightRadius", "8rpx"], ["borderBottomLeftRadius", "8rpx"], ["color", "#1668dc"], ["backgroundColor", "#eaf3ff"], ["fontSize", "21rpx"], ["whiteSpace", "nowrap"]])], [".blocked", _uM([["color", "#98a2b3"], ["backgroundColor", "#eaecf0"]])]])], ["history-status", _uM([["", _uM([["marginLeft", "16rpx"], ["paddingTop", "6rpx"], ["paddingRight", "12rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "12rpx"], ["borderTopLeftRadius", "8rpx"], ["borderTopRightRadius", "8rpx"], ["borderBottomRightRadius", "8rpx"], ["borderBottomLeftRadius", "8rpx"], ["color", "#1668dc"], ["backgroundColor", "#eaf3ff"], ["fontSize", "21rpx"], ["whiteSpace", "nowrap"]])], [".status-success", _uM([["color", "#039855"], ["backgroundColor", "#ecfdf3"]])], [".status-failed", _uM([["color", "#d92d20"], ["backgroundColor", "#fef3f2"]])], [".status-pending", _uM([["color", "#b54708"], ["backgroundColor", "#fffaeb"]])]])], ["command-remark", _pS(_uM([["color", "#98a2b3"], ["fontSize", "23rpx"], ["lineHeight", "36rpx"], ["marginTop", "12rpx"]]))], ["history-time", _pS(_uM([["color", "#98a2b3"], ["fontSize", "23rpx"], ["lineHeight", "36rpx"], ["marginTop", "12rpx"]]))], ["history-summary", _pS(_uM([["color", "#667085"], ["fontSize", "23rpx"], ["lineHeight", "36rpx"], ["marginTop", "8rpx"]]))], ["retry-count", _pS(_uM([["color", "#98a2b3"], ["fontSize", "23rpx"], ["lineHeight", "36rpx"]]))], ["form-error", _pS(_uM([["color", "#e34935"], ["fontSize", "23rpx"], ["lineHeight", "34rpx"], ["marginTop", "12rpx"], ["marginRight", 0], ["marginBottom", "12rpx"], ["marginLeft", 0]]))], ["param-error", _pS(_uM([["color", "#e34935"], ["fontSize", "23rpx"], ["lineHeight", "34rpx"], ["marginTop", "8rpx"]]))], ["param-row", _pS(_uM([["marginTop", "28rpx"]]))], ["param-label", _pS(_uM([["color", "#344054"], ["fontSize", "27rpx"]]))], ["required-mark", _pS(_uM([["marginLeft", "6rpx"], ["color", "#f04438"], ["fontSize", "28rpx"]]))], ["param-input", _pS(_uM([["boxSizing", "border-box"], ["width", "100%"], ["minHeight", "82rpx"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#d0d5dd"], ["borderRightColor", "#d0d5dd"], ["borderBottomColor", "#d0d5dd"], ["borderLeftColor", "#d0d5dd"], ["borderTopLeftRadius", "12rpx"], ["borderTopRightRadius", "12rpx"], ["borderBottomRightRadius", "12rpx"], ["borderBottomLeftRadius", "12rpx"], ["backgroundColor", "#ffffff"]]))], ["select-field", _pS(_uM([["boxSizing", "border-box"], ["width", "100%"], ["minHeight", "82rpx"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#d0d5dd"], ["borderRightColor", "#d0d5dd"], ["borderBottomColor", "#d0d5dd"], ["borderLeftColor", "#d0d5dd"], ["borderTopLeftRadius", "12rpx"], ["borderTopRightRadius", "12rpx"], ["borderBottomRightRadius", "12rpx"], ["borderBottomLeftRadius", "12rpx"], ["backgroundColor", "#ffffff"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", 0], ["paddingRight", "24rpx"], ["paddingBottom", 0], ["paddingLeft", "24rpx"], ["color", "#344054"], ["fontSize", "27rpx"]]))], ["select-placeholder", _pS(_uM([["color", "#98a2b3"]]))], ["input-placeholder", _pS(_uM([["color", "#98a2b3"]]))], ["select-arrow", _pS(_uM([["color", "#98a2b3"], ["fontSize", "42rpx"], ["lineHeight", "42rpx"]]))], ["no-param-text", _pS(_uM([["marginTop", "26rpx"], ["color", "#98a2b3"], ["fontSize", "25rpx"]]))], ["send-button", _pS(_uM([["marginTop", "36rpx"]]))], ["history-footer", _pS(_uM([["paddingTop", "28rpx"], ["paddingRight", 0], ["paddingBottom", "12rpx"], ["paddingLeft", 0], ["color", "#98a2b3"], ["fontSize", "23rpx"], ["textAlign", "center"]]))], ["detail-loading", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["width", "100%"], ["alignItems", "center"], ["paddingTop", "28rpx"], ["paddingRight", 0], ["paddingBottom", "28rpx"], ["paddingLeft", 0], ["color", "#98a2b3"], ["fontSize", "25rpx"]]))], ["detail-content", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["width", "100%"]]))], ["detail-label", _pS(_uM([["width", "120rpx"], ["flexShrink", 0], ["color", "#98a2b3"], ["fontSize", "23rpx"]]))], ["detail-value", _uM([["", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["color", "#344054"], ["fontSize", "23rpx"], ["lineHeight", "34rpx"], ["textAlign", "right"]])], [".detail-long-row ", _uM([["marginTop", "5rpx"], ["textAlign", "left"]])]])], ["detail-long-row", _pS(_uM([["flexDirection", "column"]]))]])];
 //# sourceMappingURL=cmd.uvue.map

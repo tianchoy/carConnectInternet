@@ -17,8 +17,8 @@ export function main(app: IApp) {
 export class UniAppConfig extends io.dcloud.uniapp.appframe.AppConfig {
     override name: string = "中导物联"
     override appid: string = "__UNI__662B0B4"
-    override versionName: string = "1.0.0"
-    override versionCode: string = "100"
+    override versionName: string = "1.0.1"
+    override versionCode: string = "101"
     override uniCompilerVersion: string = "5.23"
     
     constructor() { super() }
@@ -28,6 +28,10 @@ import GenPagesIndexIndexClass from './pages/index/index.uvue'
 import GenPagesMessageMessageClass from './pages/message/message.uvue'
 import GenPagesUserCenterUserCenterClass from './pages/userCenter/userCenter.uvue'
 import GenPagesLoginLoginClass from './pages/login/login.uvue'
+import GenPagesLoginPersonalPasswordLoginClass from './pages/login/personal-password-login.uvue'
+import GenPagesLoginRegisterClass from './pages/login/register.uvue'
+import GenPagesLoginForgotPasswordClass from './pages/login/forgot-password.uvue'
+import GenPagesLoginSetPasswordClass from './pages/login/set-password.uvue'
 import GenPagesCarInfoDetailCarInfoDetailClass from './pages/carInfoDetail/carInfoDetail.uvue'
 import GenPagesAddCarAddCarClass from './pages/addCar/addCar.uvue'
 import GenPagesPlayBackPlayBackClass from './pages/playBack/playBack.uvue'
@@ -50,6 +54,10 @@ __uniRoutes.push({ path: "pages/index/index", component: GenPagesIndexIndexClass
 __uniRoutes.push({ path: "pages/message/message", component: GenPagesMessageMessageClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","消息"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/userCenter/userCenter", component: GenPagesUserCenterUserCenterClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","我的"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/login/login", component: GenPagesLoginLoginClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","登陆"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "pages/login/personal-password-login", component: GenPagesLoginPersonalPasswordLoginClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","个人账号登录"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "pages/login/register", component: GenPagesLoginRegisterClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","个人用户注册"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "pages/login/forgot-password", component: GenPagesLoginForgotPasswordClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","忘记密码"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "pages/login/set-password", component: GenPagesLoginSetPasswordClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","设置登录密码"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/carInfoDetail/carInfoDetail", component: GenPagesCarInfoDetailCarInfoDetailClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","车辆详情"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/addCar/addCar", component: GenPagesAddCarAddCarClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","添加车辆"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/playBack/playBack", component: GenPagesPlayBackPlayBackClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","轨迹回放"]]) } as UniPageRoute)
@@ -84,7 +92,7 @@ function defineAppConfig(){
 export class UniCloudConfig extends io.dcloud.unicloud.InternalUniCloudConfig {
     override isDev : boolean = true
     override spaceList : string = "[{\"provider\":\"aliyun\",\"spaceName\":\"zdiot-car\",\"spaceId\":\"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff\",\"clientSecret\":\"s9pFKgenncFnOUhRGOJpcw==\",\"endpoint\":\"https://api.next.bspapp.com\",\"failoverEndpoint\":\"\"}]"
-    override debuggerInfo ?: string = "{\"address\":[\"127.0.0.1\",\"192.168.1.180\"],\"servePort\":7001,\"debugPort\":9000,\"initialLaunchType\":\"remote\",\"skipFiles\":[\"<node_internals>/**\",\"/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js\"]}"
+    override debuggerInfo ?: string = "{\"address\":[\"127.0.0.1\",\"192.168.1.76\"],\"servePort\":7001,\"debugPort\":9000,\"initialLaunchType\":\"remote\",\"skipFiles\":[\"<node_internals>/**\",\"/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js\"]}"
     override secureNetworkEnable : boolean = false
     override secureNetworkConfig ?: string = "[]"
     constructor() { super() }

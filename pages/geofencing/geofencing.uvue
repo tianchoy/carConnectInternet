@@ -1186,6 +1186,10 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	function closeEditDialog() : void {
 		editDialogPopup.value?.$callMethod('close')
+		// 当新增电子围栏时，清空绘制的电子围栏
+		if (editingFence.value == null) {
+			clearDrawing()
+		}
 	}
 
 	function getSelectedFenceName() : string {

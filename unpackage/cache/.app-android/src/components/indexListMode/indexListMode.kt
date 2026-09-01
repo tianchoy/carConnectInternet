@@ -27,14 +27,14 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
                 __ins.emit(event, *do_not_transform_spread)
             }
             val modal = ref<Boolean>(false)
-            val imeis = ref("")
+            val selectedDeviceId = ref("")
             val needRefresh = ref(false)
-            val unbindDevice = fun(imei: String){
-                imeis.value = imei
+            val unbindDevice = fun(deviceId: String){
+                selectedDeviceId.value = deviceId
                 modal.value = true
             }
             val confirm = fun(){
-                emit("unbindDevice", imeis.value)
+                emit("unbindDevice", selectedDeviceId.value)
                 modal.value = false
             }
             val cancel = fun(){
@@ -75,7 +75,7 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
                                         )),
                                         _cE("view", _uM("class" to "device-tools"), _uA(
                                             _cV(_component_i_tag, _uM("class" to "device-tool-spacing", "text" to "解绑", "type" to "warning", "onClick" to withModifiers(fun(){
-                                                unbindDevice(item.imei)
+                                                unbindDevice(item.deviceId)
                                             }, _uA(
                                                 "stop"
                                             ))), null, 8, _uA(

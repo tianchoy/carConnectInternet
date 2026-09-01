@@ -1,6 +1,9 @@
 
-	import { initPush, refreshPushClientId, clearPushBadge } from './services/push.uts'
-	import { initPushBinding } from './services/push-binding.uts'
+	import {
+		schedulePostLoginInitialization,
+		refreshInitializedPushServices,
+		clearInitializedPushBadge
+	} from './services/app-startup.uts'
 	import { ensureNotificationPermission } from './utils/cameraPermission.uts'
 
 	let firstBackTime = 0
@@ -74,29 +77,30 @@
 	
 	const __sfc__ = defineApp({
 		onLaunch: function () {
-			console.log('App onLaunch', " at App.uvue:77")
+			console.log('App onLaunch', " at App.uvue:80")
 			checkForUpdates()
-			initPushBinding()
-			initPush()
-			clearPushBadge()
+			// Push/APNs 首次注册会抢占 iOS 冷启动主线程，改为登录成功后的延后阶段。
+			if (uni.getStorageSync('token') != null) {
+				schedulePostLoginInitialization()
+			}
 
 			ensureNotificationPermission((status) => {
-				console.log('[NotificationPermission] ' + status, " at App.uvue:84")
+				console.log('[NotificationPermission] ' + status, " at App.uvue:88")
 			})
 
 		},
 		onShow: function () {
-			console.log('App Show', " at App.uvue:89")
-			clearPushBadge()
-			refreshPushClientId()
+			console.log('App Show', " at App.uvue:93")
+			clearInitializedPushBadge()
+			refreshInitializedPushServices()
 		},
 		onHide: function () {
-			console.log('App Hide', " at App.uvue:94")
-			clearPushBadge()
+			console.log('App Hide', " at App.uvue:98")
+			clearInitializedPushBadge()
 		},
 
 		onLastPageBackPress: function () {
-			console.log('App LastPageBackPress', " at App.uvue:99")
+			console.log('App LastPageBackPress', " at App.uvue:103")
 			if (firstBackTime == 0) {
 				uni.showToast({
 					title: '再按一次退出应用',
@@ -113,7 +117,7 @@
 		},
 
 		onExit: function () {
-			console.log('App Exit', " at App.uvue:116")
+			console.log('App Exit', " at App.uvue:120")
 		}
 	})
 

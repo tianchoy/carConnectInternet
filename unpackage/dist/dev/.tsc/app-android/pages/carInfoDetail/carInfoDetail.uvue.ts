@@ -486,35 +486,40 @@ const deptId = ref<string | null>('')
 	}
 
 	const baseList = computed(() => {
-	const list = [{
-		image: '/static/gjhf.png',
-		text: '轨迹回放'
-	}, {
-		image: '/static/clgz.png',
-		text: '车辆跟踪'
-	}, {
-		image: '/static/lcjl.png',
-		text: '里程记录'
-	}, {
-		image: '/static/tcjl.png',
-		text: '停车记录'
-	},
-	{
-		image: '/static/dzwl.png',
-		text: '电子围栏'
-	},
-	{
-		image: '/static/navto.png',
-		text: '一键寻车'
-	},
-	{
-		image: '/static/power.png',
-		text: '恢复油电'
-	},
-	{
-		image: '/static/offpower.png',
-		text: '断开油电'
-	}]
+		const list = [{
+				image: '/static/gjhf.png',
+				text: '轨迹回放'
+			}, {
+				image: '/static/clgz.png',
+				text: '车辆跟踪'
+			}, {
+				image: '/static/lcjl.png',
+				text: '里程记录'
+			}, {
+				image: '/static/tcjl.png',
+				text: '停车记录'
+			},
+			{
+				image: '/static/dzwl.png',
+				text: '电子围栏'
+			},
+			{
+				image: '/static/navto.png',
+				text: '一键寻车'
+			},
+			{
+				image: '/static/power.png',
+				text: '恢复油电'
+			},
+			{
+				image: '/static/offpower.png',
+				text: '断开油电'
+			},
+			{
+					image: '/static/cmd.png',
+					text: '发送指令'
+				}
+		]
 
 	// 根据 productId 决定是否添加发送指令选项
 	const productId = currentCarInfo.value.productId
@@ -589,7 +594,7 @@ const deptId = ref<string | null>('')
 			// 隐藏加载中
 			uni.hideLoading()
 
-			console.error('操作失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:689")
+			console.error('操作失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:694")
 			showAppToast({
 				title: '操作失败，请重试',
 				icon: 'none'
@@ -625,7 +630,7 @@ const deptId = ref<string | null>('')
 			const addr = await getAddress(center.latitude, center.longitude);
 			address.value = addr.result.formatted_address;
 		} catch (error) {
-			console.error('获取地址信息失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:725");
+			console.error('获取地址信息失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:730");
 		}
 	}
 
@@ -706,7 +711,7 @@ const deptId = ref<string | null>('')
 		if (itemTo == '发送指令') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/cmd/cmd?imei=' + imei.value
+				url: '/pages/cmd/cmd?imei=' + imei.value + '&deviceId=' + deviceId.value
 			})
 		}
 
@@ -722,7 +727,7 @@ const deptId = ref<string | null>('')
 				showAppToast({ title: res.msg || '获取设备详情失败', icon: 'none' })
 			}
 		} else {
-			console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:822")
+			console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:827")
 		}
 	}
 
@@ -734,7 +739,7 @@ const deptId = ref<string | null>('')
 		userType.value = storedUserType ?? '';
 
 		loadDeviceDetail().then(() => {
-			const data: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 834, 10),
+			const data: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 839, 10),
 				deptId: deptId.value,
 				deviceids: imei.value
 			};
@@ -756,7 +761,7 @@ const deptId = ref<string | null>('')
 
 
 	onShow(() => {
-		console.log('页面显示，检查自动刷新状态', " at pages/carInfoDetail/carInfoDetail.uvue:856")
+		console.log('页面显示，检查自动刷新状态', " at pages/carInfoDetail/carInfoDetail.uvue:861")
 		// 如果设备在线且没有在刷新，重新启动自动刷新
 		if (datainfo.value.connectionStatus == 'online' && !isRefreshing.value) {
 			setupAutoRefresh(currentTime.value)
@@ -765,12 +770,12 @@ const deptId = ref<string | null>('')
 
 	// 新增页面隐藏时的处理
 	onHide(() => {
-		console.log('页面隐藏时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:865")
+		console.log('页面隐藏时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:870")
 		stopAutoRefresh()
 	})
 
 	onUnmounted(() => {
-		console.log('页面卸载时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:870")
+		console.log('页面卸载时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:875")
 		stopAutoRefresh()
 	})
 

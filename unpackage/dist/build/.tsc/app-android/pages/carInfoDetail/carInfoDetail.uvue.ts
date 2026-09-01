@@ -711,7 +711,7 @@ const deptId = ref<string | null>('')
 		if (itemTo == '发送指令') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/cmd/cmd?imei=' + imei.value
+				url: '/pages/cmd/cmd?imei=' + imei.value + '&deviceId=' + deviceId.value
 			})
 		}
 

@@ -57,6 +57,7 @@ const imei = ref<string>('')
 		longitude: 116.40717
 	})
 	const mapScale = ref(15)
+	const isMapReady = ref(false)
 	const temporaryRenderPoints = ref<Array<CoordinatePoint>>([])
 	const TRACKING_POLL_INTERVAL_MS = 1000
 	const TRACKING_ANIMATION_DURATION_MS = 900
@@ -140,8 +141,9 @@ const imei = ref<string>('')
 	}
 
 	async function loadInitialPosition() {
+		isMapReady.value = false
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 167, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 169, 10),
 				deptId: deptId.value,
 				deviceids: imei.value
 			}
@@ -208,6 +210,7 @@ const imei = ref<string>('')
 							markers.value = [createVehicleMarker(iconPath)]
 							markerInitialized.value = true
 						}
+						isMapReady.value = true
 					}
 				})
 
@@ -219,7 +222,7 @@ const imei = ref<string>('')
 				}
 
 		} catch (err) {
-			console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:245")
+			console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:248")
 			showAppToast({
 				title: '网络请求失败',
 				icon: 'none'
@@ -240,7 +243,7 @@ const imei = ref<string>('')
 
 		markers.value = [marker]
 		markerInitialized.value = true
-		console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:266")
+		console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:269")
 	}
 
 	// 计算地图上的旋转角度
@@ -261,7 +264,7 @@ const imei = ref<string>('')
 	}
 
 	onLoad((option) => {
-		console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:287")
+		console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:290")
 		connectionStatus.value = option.connectionStatus ?? ''
 		imei.value = option.imei ?? ''
 		currentCar.value = option.plateNo ?? '未知车辆'
@@ -459,7 +462,7 @@ const imei = ref<string>('')
 			}
 			pendingJumpPosition = null; pendingJumpTime = ''
 			acceptLivePosition(item, position, positionTime, sessionId)
-		} catch (error) { console.error('获取跟踪位置失败:', error, " at pages/vehicleTracking/vehicleTracking.uvue:485") } finally { if (sessionId == trackingSessionId) isTrackRequestPending = false }
+		} catch (error) { console.error('获取跟踪位置失败:', error, " at pages/vehicleTracking/vehicleTracking.uvue:488") } finally { if (sessionId == trackingSessionId) isTrackRequestPending = false }
 	}
 
 	function stopTracking(showToast : boolean = true) : void {
@@ -534,20 +537,23 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         showCapsule: false
       })),
       _cE("view", _uM({ class: "map-container" }), [
-        _cV(_component_map, _uM({
-          id: "myMap",
-          latitude: currentPosition.latitude,
-          longitude: currentPosition.longitude,
-          markers: markers.value,
-          polyline: polyline.value,
-          scale: mapScale.value,
-          style: _nS(_uM({"width":"100%","height":"100%"})),
-          "show-location": false,
-          "enable-traffic": true,
-          "enable-overlooking": true,
-          "enable-building": true,
-          "enable-3D": true
-        }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"]),
+        isTrue(isMapReady.value)
+          ? _cV(_component_map, _uM({
+              key: 0,
+              id: "myMap",
+              latitude: currentPosition.latitude,
+              longitude: currentPosition.longitude,
+              markers: markers.value,
+              polyline: polyline.value,
+              scale: mapScale.value,
+              style: _nS(_uM({"width":"100%","height":"100%"})),
+              "show-location": false,
+              "enable-traffic": true,
+              "enable-overlooking": true,
+              "enable-building": true,
+              "enable-3D": true
+            }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"])
+          : _cC("v-if", true),
         _cV(_component_sub_navBar, _uM({
           class: "sub-nav-overlay",
           currentTime: currentTime.value,

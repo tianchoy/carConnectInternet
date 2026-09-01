@@ -12,7 +12,6 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
-import io.dcloud.uniapp.extapi.getLocation as uni_getLocation
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 open class GenPagesDeviceListDeviceList : BasePage {
@@ -136,6 +135,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             if (from) {
                                 val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 143, 11), "pageSize" to 1000)
                                 val res = await(getUserDeviceList(params))
+                                console.log("获取设备列表:", res, " at pages/deviceList/deviceList.uvue:145")
                                 val list = if (res.code == 200 && res.data != null) {
                                     res.data.list
                                 } else {
@@ -143,7 +143,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                                 }
                                  as UTSArray<UTSJSONObject>?
                                 if (list == null || !UTSArray.isArray(list)) {
-                                    console.warn("获取设备列表返回异常:", res, " at pages/deviceList/deviceList.uvue:147")
+                                    console.warn("获取设备列表返回异常:", res, " at pages/deviceList/deviceList.uvue:148")
                                     originalDeviceList.value = _uA()
                                     markers.value = _uA()
                                     return@w1
@@ -157,16 +157,16 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             updateMarkers(originalDeviceList.value)
                         }
                          catch (err: Throwable) {
-                            console.error("获取设备列表失败:", err, " at pages/deviceList/deviceList.uvue:158")
+                            console.error("获取设备列表失败:", err, " at pages/deviceList/deviceList.uvue:159")
                             originalDeviceList.value = _uA()
                             markers.value = _uA()
                             showAppToast(ShowToastOptions(title = "获取设备列表失败", icon = "none"))
                         }
                 })
             }
-            val unbindDevice = fun(imei: String): UTSPromise<Unit> {
+            val unbindDevice = fun(deviceId: String): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        val res = await(delDevice(imei))
+                        val res = await(delDevice(deviceId))
                         if (res.code == 200) {
                             showAppToast(ShowToastOptions(title = "解绑成功", icon = "success"))
                             uni_setStorageSync("needRefreshHome", true)
@@ -180,17 +180,6 @@ open class GenPagesDeviceListDeviceList : BasePage {
                         }
                         await(loadUserDeviceList(_uA(), true))
                 })
-            }
-            val getLocation = fun(){
-                uni_getLocation(GetLocationOptions(type = "wgs84", success = fun(res){
-                    console.log("获取位置成功:", res, " at pages/deviceList/deviceList.uvue:187")
-                    userLocation.value["latitude"] = res.latitude
-                    userLocation.value["longitude"] = res.longitude
-                }
-                , fail = fun(err){
-                    console.log("获取位置失败:", err, " at pages/deviceList/deviceList.uvue:192")
-                }
-                ))
             }
             val changeState = fun(type: String){
                 pickerStateTitle.value = type
@@ -207,7 +196,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 }
                 )
                 if (selectedDevice == null) {
-                    console.warn("未找到对应的设备信息", markerId, " at pages/deviceList/deviceList.uvue:222")
+                    console.warn("未找到对应的设备信息", markerId, " at pages/deviceList/deviceList.uvue:209")
                     return
                 }
                 val imeiValue = (selectedDevice["imei"] as String?) ?: ""
@@ -216,7 +205,6 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?imei=" + imeiValue + "&deptId=" + companyId.toString() + "&deviceId=" + deviceId.toString()))
             }
             onLoad(fun(options){
-                getLocation()
                 loadUserDeviceList(_uA(), true)
             }
             )

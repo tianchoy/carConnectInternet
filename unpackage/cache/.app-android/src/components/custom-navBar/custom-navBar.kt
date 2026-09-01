@@ -65,9 +65,9 @@ open class GenComponentsCustomNavBarCustomNavBar : VueComponent {
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
                 return _cE(Fragment, null, _uA(
                     _cE("view", _uM("style" to _nS(if (_ctx.isShowStyle) {
-                        _uM("height" to (unref(statusBarHeight) + "px"), "background-color" to "#f1f1f1", "position" to "fixed", "width" to "100%", "letf" to 0, "top" to 0, "z-index" to "100")
+                        _uM("height" to (unref(statusBarHeight) + "px"), "background-color" to "#ffffff", "position" to "fixed", "width" to "100%", "letf" to 0, "top" to 0, "z-index" to "100")
                     } else {
-                        _uM("height" to (unref(statusBarHeight) + "px"), "background-color" to "#f1f1f1")
+                        _uM("height" to (unref(statusBarHeight) + "px"), "background-color" to "#ffffff")
                     }
                     )), null, 4),
                     _cE("view", _uM("class" to "navbar", "style" to _nS(if (_ctx.isShowStyle) {

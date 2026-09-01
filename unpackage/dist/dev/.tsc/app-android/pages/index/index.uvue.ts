@@ -54,19 +54,19 @@ type UserDeviceListData = { __$originalPosition?: UTSSourceMapPosition<"UserDevi
 }
 
 type PositionState = 'loading' | 'available' | 'empty' | 'invalid' | 'failed'
-type DeviceStatus = { __$originalPosition?: UTSSourceMapPosition<"DeviceStatus", "pages/index/index.uvue", 287, 6>;
+type DeviceStatus = { __$originalPosition?: UTSSourceMapPosition<"DeviceStatus", "pages/index/index.uvue", 288, 6>;
     batteryPercent: number
     voltage: number
     signalStrength: number
 }
 
-type DeviceDetailState = { __$originalPosition?: UTSSourceMapPosition<"DeviceDetailState", "pages/index/index.uvue", 293, 6>;
+type DeviceDetailState = { __$originalPosition?: UTSSourceMapPosition<"DeviceDetailState", "pages/index/index.uvue", 294, 6>;
     deviceStatus: DeviceStatus
     connectionStatus: string
     lastUpdateTime: string
 }
 
-type SavedDevice = { __$originalPosition?: UTSSourceMapPosition<"SavedDevice", "pages/index/index.uvue", 389, 6>;
+type SavedDevice = { __$originalPosition?: UTSSourceMapPosition<"SavedDevice", "pages/index/index.uvue", 395, 6>;
     name: string
     deviceName: string
     imei: string
@@ -109,7 +109,8 @@ const positionMessage = computed<string>(() => {
     if (positionState.value == 'failed') return '位置获取失败，请检查网络后重试'
     return ''
 })
-const mapScale = ref(12)
+const initialMapScale = 12
+const mapScale = ref(initialMapScale)
 const isMapReady = ref(false)
 const statusBarHeight = ref(20)
 const menuButtonInfo = ref(null)
@@ -139,6 +140,11 @@ const deviceDetail = ref<DeviceDetailState>({
 })
 const markers = ref([] as Marker[])
 const lastUpdateTime = ref('--:--:--')
+const devicePosInfo = ref<UTSJSONObject | null>(null)
+const devicePositionUpdateTime = computed<string>(() => {
+    const position = devicePosInfo.value
+    return position != null ? position.getString('positionUpdateTime', '暂无位置') : '暂无位置'
+})
 
 // 本地存储key
 const SELECTED_DEVICE_STORAGE_KEY: string = 'selected_device_info'
@@ -197,7 +203,7 @@ const delay = (ms: number): Promise<void> => {
 // 保存选中的设备信息
 const saveSelectedDevice = (device: Device) => {
     try {
-        const deviceInfo = {__$originalPosition: new UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 368, 15),
+        const deviceInfo = {__$originalPosition: new UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 374, 15),
             name: device.deviceName || device.name || device.imei,
             deviceName: device.deviceName || device.name || device.imei,
             imei: device.imei || device.value,
@@ -212,9 +218,9 @@ const saveSelectedDevice = (device: Device) => {
             longitude: device.longitude
         }
         uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, JSON.stringify(deviceInfo))
-        console.log('保存选中设备成功:', deviceInfo, " at pages/index/index.uvue:383")
+        console.log('保存选中设备成功:', deviceInfo, " at pages/index/index.uvue:389")
     } catch (error) {
-        console.error('保存选中设备失败:', error, " at pages/index/index.uvue:385")
+        console.error('保存选中设备失败:', error, " at pages/index/index.uvue:391")
     }
 }
 
@@ -223,7 +229,7 @@ const decodeSavedDevice = (raw: any): SavedDevice | null => {
     let data: UTSJSONObject | null = null
     if (typeof raw == 'string') {
         try {
-            data = UTSAndroid.consoleDebugError(JSON.parse(raw), " at pages/index/index.uvue:409") as UTSJSONObject
+            data = UTSAndroid.consoleDebugError(JSON.parse(raw), " at pages/index/index.uvue:415") as UTSJSONObject
         } catch (error) {
             return null
         }
@@ -259,7 +265,7 @@ const getSavedSelectedDevice = (): SavedDevice | null => {
         if (rawDevice == null) return null
         return decodeSavedDevice(rawDevice)
     } catch (error) {
-        console.error('获取保存设备失败:', error, " at pages/index/index.uvue:445")
+        console.error('获取保存设备失败:', error, " at pages/index/index.uvue:451")
     }
     return null
 }
@@ -268,9 +274,9 @@ const getSavedSelectedDevice = (): SavedDevice | null => {
 const clearSavedSelectedDevice = () => {
     try {
         uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY)
-        console.log('清除保存设备成功', " at pages/index/index.uvue:454")
+        console.log('清除保存设备成功', " at pages/index/index.uvue:460")
     } catch (error) {
-        console.error('清除保存设备失败:', error, " at pages/index/index.uvue:456")
+        console.error('清除保存设备失败:', error, " at pages/index/index.uvue:462")
     }
 }
 
@@ -279,7 +285,7 @@ const saveSelectedDeviceIndex = (index: number) => {
     try {
         uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index)
     } catch (error) {
-        console.error('保存选中设备索引失败:', error, " at pages/index/index.uvue:465")
+        console.error('保存选中设备索引失败:', error, " at pages/index/index.uvue:471")
     }
 }
 
@@ -292,7 +298,7 @@ const getSavedSelectedDeviceIndex = (): number | null => {
             return isNaN(index) || index < 0 ? null : index
         }
     } catch (error) {
-        console.error('获取保存设备索引失败:', error, " at pages/index/index.uvue:478")
+        console.error('获取保存设备索引失败:', error, " at pages/index/index.uvue:484")
     }
     return null
 }
@@ -302,7 +308,7 @@ const clearSavedSelectedDeviceIndex = () => {
     try {
         uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY)
     } catch (error) {
-        console.error('清除保存设备索引失败:', error, " at pages/index/index.uvue:488")
+        console.error('清除保存设备索引失败:', error, " at pages/index/index.uvue:494")
     }
 }
 
@@ -392,10 +398,11 @@ const createMarker = (id: number, lat: number, lng: number, type: string, title?
 }
 
 // 获取用户当前位置
-const userLocationMarkerId = 1
+const userLocationMarkerId = 10000
 
 async function centerOnUserLocation() {
     if (!hasUserLocation.value) return
+    isMapReady.value = false
     center.latitude = userLocation.latitude
     center.longitude = userLocation.longitude
     markers.value = []
@@ -411,13 +418,14 @@ async function centerOnUserLocation() {
         '当前位置'
     )
     markers.value = [nextMarker]
+    isMapReady.value = true
 }
 
 function getUserLocation() {
     uni.getLocation({
         type: 'gcj02',
         success: (res) => {
-            console.log('用户当前位置:', res, " at pages/index/index.uvue:603")
+            console.log('用户当前位置:', res, " at pages/index/index.uvue:611")
             userLocation.latitude = res.latitude
             userLocation.longitude = res.longitude
             hasUserLocation.value = true
@@ -426,7 +434,7 @@ function getUserLocation() {
             }
         },
         fail: (err) => {
-            console.error('获取用户当前位置失败:', err.errMsg, err, " at pages/index/index.uvue:612")
+            console.error('获取用户当前位置失败:', err.errMsg, err, " at pages/index/index.uvue:620")
         }
     })
 }
@@ -437,7 +445,7 @@ const loadDeviceDetail = async (deviceId: string) => {
         const res = await getDeviceDetail(deviceId)
         const detail = res.data
         if (res.code != 200 || detail == null) {
-            console.error('加载设备详情失败:', res.msg, " at pages/index/index.uvue:623")
+            console.error('加载设备详情失败:', res.msg, " at pages/index/index.uvue:631")
             return
         }
         if (detail != null) {
@@ -459,7 +467,7 @@ const loadDeviceDetail = async (deviceId: string) => {
             }
         }
     } catch (error) {
-        console.error('加载设备详情失败', error, " at pages/index/index.uvue:645")
+        console.error('加载设备详情失败', error, " at pages/index/index.uvue:653")
     }
 }
 
@@ -474,6 +482,32 @@ const clearTripData = () : void => {
     tripData.value = []
     totalMileage.value = 0
     averageSpeed.value = 0
+}
+
+const clearCurrentCar = (): void => {
+    currentCarImei.value = ''
+    currentCarDeptId.value = ''
+    currentCarDeviceId.value = ''
+    currentCarIccId.value = ''
+    currentCarName.value = ''
+    currentCarSimMerchant.value = ''
+    currentCarConnectionStatus.value = ''
+    currentCarCarType.value = ''
+    currentCarPlateNo.value = ''
+    pickerValues.value = []
+    deviceDetail.value = {
+        deviceStatus: {
+            batteryPercent: 0,
+            voltage: 0,
+            signalStrength: 0
+        },
+        connectionStatus: 'offline',
+        lastUpdateTime: ''
+    }
+    lastUpdateTime.value = '--:--:--'
+    positionState.value = 'empty'
+    devicePosInfo.value = null
+    clearTripData()
 }
 
 // 处理行程数据
@@ -519,7 +553,7 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
         if (requestId != trackRequestId) return
 
         if (res.code != 200) {
-            console.error('加载轨迹失败:', res.msg, " at pages/index/index.uvue:705")
+            console.error('加载轨迹失败:', res.msg, " at pages/index/index.uvue:739")
             clearTripData()
             return
         }
@@ -532,25 +566,31 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
         processTripData(trackData)
     } catch (error) {
         if (requestId != trackRequestId) return
-        console.error('加载轨迹失败', error, " at pages/index/index.uvue:718")
+        console.error('加载轨迹失败', error, " at pages/index/index.uvue:752")
         clearTripData()
     }
 }
 
+// 地图已被用户拖动后，响应式 center 属性不会强制改变原生地图视野。
+// 重新挂载地图以确保各端都按受控中心点和缩放级别显示，避免单点 includePoints 在 iOS 上放大视野。
+const centerMapOnDevice = async (latitude: number, longitude: number): Promise<void> => {
+    center.latitude = latitude
+    center.longitude = longitude
+    mapScale.value = initialMapScale
+    isMapReady.value = false
+    await nextTick()
+    await delay(50)
+    isMapReady.value = true
+}
+
 // 加载设备位置
-const devicePosInfo = ref<UTSJSONObject | null>(null)
-const devicePositionUpdateTime = computed<string>(() => {
-    const position = devicePosInfo.value
-    return position != null ? position.getString('positionUpdateTime', '暂无位置') : '暂无位置'
-})
 const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
     positionState.value = 'loading'
-    markers.value = []
     try {
         const res = await getDevicePos(data)
         const positions = res.data
         if (res.code != 200 || positions == null || positions.length == 0) {
-            console.warn('获取设备位置失败:', data.getString('deviceId', ''), res.code, " at pages/index/index.uvue:736")
+            console.warn('获取设备位置失败:', data.getString('deviceId', ''), res.code, " at pages/index/index.uvue:776")
             positionState.value = 'empty'
             return false
         }
@@ -565,7 +605,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
             !(lat == 0 && lng == 0)
 
         if (!isValidCoordinate) {
-            console.error('经纬度格式错误', position.getString('latitude', ''), position.getString('longitude', ''), " at pages/index/index.uvue:751")
+            console.error('经纬度格式错误', position.getString('latitude', ''), position.getString('longitude', ''), " at pages/index/index.uvue:791")
             positionState.value = 'invalid'
             showAppToast({
                 title: '定位数据异常',
@@ -575,11 +615,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
         }
 
         const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
-        center.latitude = convertedCoord.lat
-        center.longitude = convertedCoord.lng
         positionState.value = 'available'
-
-        await delay(100)
 
         const nextMarker = createMarker(
             1,
@@ -589,11 +625,18 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
             currentCarName.value
         )
 
+        // 使用新数组触发原生地图的标记点更新。
         markers.value = [nextMarker]
-        console.log('标记点更新完成:', data.getString('deviceId', ''), convertedCoord.lat, convertedCoord.lng, " at pages/index/index.uvue:776")
+        try {
+            await centerMapOnDevice(convertedCoord.lat, convertedCoord.lng)
+        } catch (mapError) {
+            // 原生地图视图刷新异常不应覆盖已成功取得的车辆位置。
+            console.error('刷新地图视图失败', mapError, " at pages/index/index.uvue:817")
+        }
+        console.log('标记点更新完成:', data.getString('deviceId', ''), convertedCoord.lat, convertedCoord.lng, " at pages/index/index.uvue:819")
         return true
     } catch (error) {
-        console.error('加载设备位置失败', error, " at pages/index/index.uvue:779")
+        console.error('加载设备位置失败', error, " at pages/index/index.uvue:822")
         positionState.value = 'failed'
         showAppToast({
             title: '定位失败，请重试',
@@ -605,7 +648,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
 
 // 加载设备数据
 const loadDeviceData = async (device: Device) => {
-    console.log('开始加载设备数据:', device, " at pages/index/index.uvue:791")
+    console.log('开始加载设备数据:', device, " at pages/index/index.uvue:834")
     try {
         await loadDeviceDetail(device.deviceId);
         await loadDevicePos({
@@ -618,7 +661,7 @@ const loadDeviceData = async (device: Device) => {
             icon: 'none'
         })
     } catch (error) {
-        console.error('切换车辆失败', error, " at pages/index/index.uvue:804")
+        console.error('切换车辆失败', error, " at pages/index/index.uvue:847")
         showAppToast({
             title: '切换失败，请重试',
             icon: 'none'
@@ -664,7 +707,7 @@ const handlePickerConfirm = (e: PickerConfirmEvent) => {
     }
 
     if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-        console.log('选择的设备与当前设备相同，不重复加载', " at pages/index/index.uvue:850")
+        console.log('选择的设备与当前设备相同，不重复加载', " at pages/index/index.uvue:893")
         return
     }
 
@@ -708,9 +751,12 @@ const loadDeviceList = async () => {
             })
             return
         }
-
+        console.log('加载车辆列表返回:', res.data, " at pages/index/index.uvue:937")
         const pageData = res.data
         if (pageData == null) {
+            userDeviceList.value = []
+            deviceList.value = []
+            clearCurrentCar()
             markers.value = []
             positionState.value = 'empty'
             if (hasUserLocation.value) {
@@ -731,12 +777,14 @@ const loadDeviceList = async () => {
                 const imei = item.getString('imei', '')
                 const rawDeviceName = item.getString('deviceName', '')
                 const deviceName = rawDeviceName != '' ? rawDeviceName : (imei != '' ? imei : '未命名设备')
+                const apiDeptId = item.getString('deptId', '')
+                const deptId = apiDeptId != '' ? apiDeptId : item.getString('companyId', '')
                 return {
                     name: deviceName,
                     deviceName: deviceName,
                     value: imei,
                     imei: imei,
-                    deptId: item.getString('companyId', ''),
+                    deptId: deptId,
                     deviceId: item.getString('deviceId', ''),
                     iccid: item.getString('iccid', ''),
                     simMerchant: item.getString('simMerchant', ''),
@@ -780,7 +828,7 @@ const loadDeviceList = async () => {
                 // 保存第一个设备作为默认选中
                 saveSelectedDevice(selectedDevice)
                 saveSelectedDeviceIndex(0)
-                console.log('使用第一个设备作为默认:', selectedDevice?.deviceName, " at pages/index/index.uvue:966")
+                console.log('使用第一个设备作为默认:', selectedDevice?.deviceName, " at pages/index/index.uvue:1014")
             }
 
             if (selectedDevice != null) {
@@ -809,6 +857,9 @@ const loadDeviceList = async () => {
                 await loadTrackPos(createTrackRequestData(device.imei != '' ? device.imei : device.value))
             }
         } else {
+            userDeviceList.value = []
+            deviceList.value = []
+            clearCurrentCar()
             markers.value = []
             positionState.value = 'empty'
             if (hasUserLocation.value) {
@@ -821,7 +872,7 @@ const loadDeviceList = async () => {
             })
         }
     } catch (error) {
-        console.error('加载车辆列表失败', error, " at pages/index/index.uvue:1007")
+        console.error('加载车辆列表失败', error, " at pages/index/index.uvue:1058")
         showAppToast({
             title: '加载失败，请下拉重试',
             icon: 'none'
@@ -853,9 +904,12 @@ const refreshLocation = async () => {
         mask: true
     })
     try {
-        await loadDeviceList()
+        await loadDevicePos({
+            deviceId: currentCarDeviceId.value,
+            deviceids: currentCarImei.value
+        } as UTSJSONObject)
     } catch (error) {
-        console.error('刷新位置失败', error, " at pages/index/index.uvue:1041")
+        console.error('刷新位置失败', error, " at pages/index/index.uvue:1095")
         showAppToast({
             title: '刷新失败',
             icon: 'none'
@@ -882,7 +936,7 @@ function isLogin() : boolean {
 }
 
 function isCarSelected() : boolean {
-    if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
+    if (!hasDevice.value || !currentCarDeviceId.value) {
         showAppToast({
             title: '请先选择车辆',
             icon: 'none'
@@ -899,7 +953,7 @@ const toRecordDetail = () => {
     uni.navigateTo({
         url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude,
         fail: (err) => {
-            if (err.errMsg.indexOf('locked') < 0) console.error('跳转轨迹详情失败:', err, " at pages/index/index.uvue:1085")
+            if (err.errMsg.indexOf('locked') < 0) console.error('跳转轨迹详情失败:', err, " at pages/index/index.uvue:1139")
         }
     })
 }
@@ -927,7 +981,7 @@ const toAdd = () => {
     uni.navigateTo({
         url: '/pages/addCar/addCar',
         fail: (err) => {
-            if (err.errMsg.indexOf('locked') < 0) console.error('跳转添加设备失败:', err, " at pages/index/index.uvue:1113")
+            if (err.errMsg.indexOf('locked') < 0) console.error('跳转添加设备失败:', err, " at pages/index/index.uvue:1167")
         }
     })
 }
@@ -943,6 +997,7 @@ const toMsgCenter = () => {
 // 跳转查找车辆
 const toFindCar = () => {
     if (!isLogin()) return
+    if (!isCarSelected()) return
     if (positionState.value != 'available') {
         showAppToast({
             title: positionMessage.value || '暂无有效车辆位置',
@@ -962,7 +1017,7 @@ const toFence = () => {
     if (!isLogin()) return
     if (!isCarSelected()) return
     uni.navigateTo({
-        url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarName.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
+        url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value  + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
     })
 }
 
@@ -1017,7 +1072,7 @@ const toPay = (iccid : string,simMerchant : string) => {
 
 
 
-    console.log('iccid',iccid, " at pages/index/index.uvue:1203")
+    console.log('iccid',iccid, " at pages/index/index.uvue:1258")
     needRefresh.value = false
     showAppToast({
         title: '请在微信小程序中完成充值',
@@ -1039,7 +1094,8 @@ const gotoLogin = () => {
 }
 
 async function unbindCurrentDevice() : Promise<void> {
-    const result = await delDevice(currentCarImei.value)
+    const result = await delDevice(currentCarDeviceId.value)
+    console.log('解绑设备结果:', result, " at pages/index/index.uvue:1281")
     if (result.code == 200) {
         showAppToast({
             title: '解绑成功',
@@ -1047,13 +1103,14 @@ async function unbindCurrentDevice() : Promise<void> {
         })
         clearSavedSelectedDevice()
         clearSavedSelectedDeviceIndex()
+
+        await loadDeviceList()
     } else {
         showAppToast({
             title: '解绑失败',
             icon: 'error'
         })
     }
-    await loadDeviceList()
 }
 
 // 解绑设备
@@ -1121,7 +1178,6 @@ onLoad(() => {
     initDimensions()
 
     if (checkToken()) {
-        isMapReady.value = true
         loadDeviceList()
     }
 })
@@ -1245,12 +1301,12 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
             _cE("view", _uM({ class: "state-item" }), [
               _cE("text", _uM({ class: "state-label" }), "设备状态"),
               _cE("text", _uM({
-                class: _nC(["state-value", _uM({'online': safeDeviceDetail.value.connectionStatus == 'online'})])
-              }), _tD(safeDeviceDetail.value.connectionStatus == 'online' ? '在线' : '离线'), 3 /* TEXT, CLASS */)
+                class: _nC(["state-value", _uM({'online': hasDevice.value && safeDeviceDetail.value.connectionStatus == 'online'})])
+              }), _tD(hasDevice.value ? (safeDeviceDetail.value.connectionStatus == 'online' ? '在线' : '离线') : '--'), 3 /* TEXT, CLASS */)
             ]),
             _cE("view", _uM({ class: "state-item" }), [
               _cE("text", _uM({ class: "state-label" }), "最后定位"),
-              _cE("text", _uM({ class: "state-value" }), _tD(devicePositionUpdateTime.value), 1 /* TEXT */)
+              _cE("text", _uM({ class: "state-value" }), _tD(hasDevice.value ? devicePositionUpdateTime.value : '暂无位置'), 1 /* TEXT */)
             ])
           ])
         ], 4 /* STYLE */),

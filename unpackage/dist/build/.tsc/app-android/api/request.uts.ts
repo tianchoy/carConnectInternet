@@ -37,6 +37,11 @@ const cmdActionUrl = '/command/cmdAction'
 const cmdByMidUrl = '/command/cmdByMid'
 const cmdSendUrl = '/command/sendCmd'
 const cmdRecordByIdUrl = '/command/recordById?id='
+const appCommandAvailableUrl = '/app/command/available-cmds'
+const appCommandSendUrl = '/app/command/send'
+const appCommandListUrl = '/app/command/list'
+const appCommandDetailUrl = '/app/command/'
+const appCommandRetryUrl = '/app/command/retry/'
 const pushBindUrl = '/app/push/bind'
 const pushUnbindUrl = '/app/push/unbind'
 
@@ -67,6 +72,9 @@ export type DevicePageData = { list: Array<UTSJSONObject>, totalPage: number, to
 export type DevicePageResponse = { code: number, msg: string, data: DevicePageData }
 export type CommandListResponse = { code: number, msg: string, data: Array<UTSJSONObject> }
 export type SendCmdResponse = { code: number, msg: string, data: string }
+export type AppCommandPageData = { total: number, rows: Array<UTSJSONObject> }
+export type AppCommandPageResponse = { code: number, msg: string, data: AppCommandPageData }
+export type AppCommandDetailResponse = { code: number, msg: string, data: UTSJSONObject }
 export type ChangePasswordRequest = { oldPassword: string, newPassword: string, confirmPassword: string }
 export type MessageResponse = { code: number, msg: string, data: UserDeviceListData }
 
@@ -133,6 +141,19 @@ function userInfoResponse(raw: any): UserInfoResponse {
 function deviceDetailResponse(raw: any): DeviceDetailResponse {
     const response = jsonDataResponse(raw)
     return { code: response.code, msg: response.msg, data: response.data }
+}
+
+function appCommandPageResponse(raw: any): AppCommandPageResponse {
+    const response = asJSONObject(raw)
+    const rows = response.getArray<UTSJSONObject>('rows')
+    return {
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: {
+            total: response.getNumber('total', 0),
+            rows: rows != null ? rows : []
+        }
+    }
 }
 
 export const login = (data: LegacyEnterpriseLoginRequest): Promise<JsonDataResponse> => {
@@ -274,6 +295,29 @@ export const sendCmd = (data: UTSJSONObject): Promise<SendCmdResponse> => post(c
     return { code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString('data', '') }
 })
 export const getCmdRecordById = (id: string): Promise<JsonDataResponse> => get(`${cmdRecordByIdUrl}${id}`).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+
+export const getAppAvailableCommands = (deviceId: string): Promise<CommandListResponse> => get(appCommandAvailableUrl, { deviceId } as UTSJSONObject).then((raw: any): CommandListResponse => {
+    const response = asJSONObject(raw)
+    return { code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) }
+})
+export const sendAppCommand = (data: UTSJSONObject): Promise<SendCmdResponse> => post(appCommandSendUrl, data).then((raw: any): SendCmdResponse => {
+    const response = asJSONObject(raw)
+    return { code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString('data', '') }
+})
+export const getAppCommandHistory = (query: UTSJSONObject): Promise<AppCommandPageResponse> => {
+    query.set('tenantId', defaultTenantId)
+    return get(appCommandListUrl, query).then((raw: any): AppCommandPageResponse => {
+        return appCommandPageResponse(raw)
+    })
+}
+export const getAppCommandDetail = (commandId: string | number): Promise<AppCommandDetailResponse> => get(`${appCommandDetailUrl}${commandId.toString()}`).then((raw: any): AppCommandDetailResponse => {
+    const response = jsonDataResponse(raw)
+    return { code: response.code, msg: response.msg, data: response.data }
+})
+export const retryAppCommand = (commandId: string | number): Promise<BasicResponse> => get(`${appCommandRetryUrl}${commandId.toString()}`).then((raw: any): BasicResponse => {
+    return basicResponse(raw)
+})
+
 export const unbindPushDevice = (registrationId: string): Promise<BasicResponse> => postSilently(pushUnbindUrl + '?registrationId=' + encodeURIComponent(registrationId), new UTSJSONObject()).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const bindPushDevice = (data: PushDeviceBindRequest): Promise<BasicResponse> => {
     const requestData = new UTSJSONObject()

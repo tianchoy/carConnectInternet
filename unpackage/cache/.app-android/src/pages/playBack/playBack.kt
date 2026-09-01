@@ -189,7 +189,6 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 val bounds = nullableBounds
                 center["latitude"] = (bounds.minLat + bounds.maxLat) / 2
                 center["longitude"] = (bounds.minLng + bounds.maxLng) / 2
-                isMapReady.value = true
                 val latDiff = bounds.maxLat - bounds.minLat
                 val lngDiff = bounds.maxLng - bounds.minLng
                 val maxDiff = Math.max(latDiff, lngDiff)
@@ -338,6 +337,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             }
             val showCurrentPosition = ::gen_showCurrentPosition_fn
             fun gen_clearTrackDisplay_fn(): Unit {
+                isMapReady.value = false
                 trackPoints.value = _uA()
                 isTrackPlayable.value = false
                 currentIndex.value = 0
@@ -420,7 +420,11 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 initCarMarker()
                 initPolyline()
                 adjustMapToFitTrack()
+                val firstPoint = trackPoints.value[0]
+                center["latitude"] = firstPoint.latitude
+                center["longitude"] = firstPoint.longitude
                 renderPlaybackIndex()
+                isMapReady.value = true
             }
             val processTrackData = ::gen_processTrackData_fn
             val loadTrackPos = fun(): UTSPromise<Unit> {
@@ -429,7 +433,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         val requestId = ++replaySessionId
                         clearTrackDisplay()
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 651, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 655, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             if (requestId != replaySessionId) {
@@ -464,7 +468,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:687")
+                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:691")
                             showAppToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
                             if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
                                 showCurrentPosition()
@@ -592,7 +596,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 lng.value = option["lng"] ?: null
                 sTime.value = option["startTime"] ?: ""
                 eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:816")
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:820")
                 val routeStartTime = resolveRouteDateTime(sTime.value)
                 val routeEndTime = resolveRouteDateTime(eTime.value)
                 if (routeStartTime != null && routeEndTime != null) {
@@ -629,7 +633,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         _cV(_component_custom_navBar, _uM("title" to "轨迹回放", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
                         _cE("view", _uM("class" to "map-container"), _uA(
                             if (isTrue(isMapReady.value)) {
-                                _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
+                                _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
                                     "latitude",
                                     "longitude",
                                     "markers",

@@ -29,9 +29,11 @@ const bindDeviceList = "/device/bindGeofenceList";
 const bindGeofence = "/geofence/bind";
 const unbindGeofence = "/geofence/unbind";
 const deleteDevice = "/userDevice/del";
-const cmdActionUrl = "/command/cmdAction";
-const cmdByMidUrl = "/command/cmdByMid";
-const cmdSendUrl = "/command/sendCmd";
+const appCommandAvailableUrl = "/app/command/available-cmds";
+const appCommandSendUrl = "/app/command/send";
+const appCommandListUrl = "/app/command/list";
+const appCommandDetailUrl = "/app/command/";
+const appCommandRetryUrl = "/app/command/retry/";
 const pushUnbindUrl = "/app/push/unbind";
 class BasicResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -536,6 +538,73 @@ class SendCmdResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class AppCommandPageData extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          total: { type: Number, optional: false },
+          rows: { type: "Unknown", optional: false }
+        };
+      },
+      name: "AppCommandPageData"
+    };
+  }
+  constructor(options, metadata = AppCommandPageData.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.total = this.__props__.total;
+    this.rows = this.__props__.rows;
+    delete this.__props__;
+  }
+}
+class AppCommandPageResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: AppCommandPageData, optional: false }
+        };
+      },
+      name: "AppCommandPageResponse"
+    };
+  }
+  constructor(options, metadata = AppCommandPageResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
+class AppCommandDetailResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: "Unknown", optional: false }
+        };
+      },
+      name: "AppCommandDetailResponse"
+    };
+  }
+  constructor(options, metadata = AppCommandDetailResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
 class ChangePasswordRequest extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -639,6 +708,18 @@ function userInfoResponse(raw = null) {
 function deviceDetailResponse(raw = null) {
   const response = jsonDataResponse(raw);
   return new DeviceDetailResponse({ code: response.code, msg: response.msg, data: response.data });
+}
+function appCommandPageResponse(raw = null) {
+  const response = api_response.asJSONObject(raw);
+  const rows = response.getArray("rows");
+  return new AppCommandPageResponse({
+    code: api_response.getResponseCode(response),
+    msg: api_response.getResponseMessage(response),
+    data: new AppCommandPageData({
+      total: response.getNumber("total", 0),
+      rows: rows != null ? rows : []
+    })
+  });
 }
 const login = (data) => {
   const requestData = new common_vendor.UTSJSONObject();
@@ -827,22 +908,32 @@ const unbindDevices = (data) => {
     return basicResponse(raw);
   });
 };
-const getCmdAction = () => {
-  return api_http.get(cmdActionUrl).then((raw = null) => {
+const getAppAvailableCommands = (deviceId) => {
+  return api_http.get(appCommandAvailableUrl, new common_vendor.UTSJSONObject({ deviceId })).then((raw = null) => {
     const response = api_response.asJSONObject(raw);
     return new CommandListResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response), data: api_response.getResponseDataArray(response) });
   });
 };
-const getCmdByMid = (data) => {
-  return api_http.get(cmdByMidUrl, data).then((raw = null) => {
-    const response = api_response.asJSONObject(raw);
-    return new CommandListResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response), data: api_response.getResponseDataArray(response) });
-  });
-};
-const sendCmd = (data) => {
-  return api_http.post(cmdSendUrl, data).then((raw = null) => {
+const sendAppCommand = (data) => {
+  return api_http.post(appCommandSendUrl, data).then((raw = null) => {
     const response = api_response.asJSONObject(raw);
     return new SendCmdResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response), data: response.getString("data", "") });
+  });
+};
+const getAppCommandHistory = (query) => {
+  return api_http.get(appCommandListUrl, query).then((raw = null) => {
+    return appCommandPageResponse(raw);
+  });
+};
+const getAppCommandDetail = (commandId) => {
+  return api_http.get(`${appCommandDetailUrl}${commandId.toString()}`).then((raw = null) => {
+    const response = jsonDataResponse(raw);
+    return new AppCommandDetailResponse({ code: response.code, msg: response.msg, data: response.data });
+  });
+};
+const retryAppCommand = (commandId) => {
+  return api_http.get(`${appCommandRetryUrl}${commandId.toString()}`).then((raw = null) => {
+    return basicResponse(raw);
   });
 };
 const unbindPushDevice = (registrationId) => {
@@ -864,9 +955,10 @@ exports.bindDevices = bindDevices;
 exports.delDevice = delDevice;
 exports.deleteGeofence = deleteGeofence;
 exports.editDeviceInfo = editDeviceInfo;
+exports.getAppAvailableCommands = getAppAvailableCommands;
+exports.getAppCommandDetail = getAppCommandDetail;
+exports.getAppCommandHistory = getAppCommandHistory;
 exports.getBoundDevices = getBoundDevices;
-exports.getCmdAction = getCmdAction;
-exports.getCmdByMid = getCmdByMid;
 exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
 exports.getGeofenceList = getGeofenceList;
@@ -880,7 +972,8 @@ exports.logout = logout;
 exports.personalPasswordLogin = personalPasswordLogin;
 exports.registerPersonalUser = registerPersonalUser;
 exports.resetForgotPassword = resetForgotPassword;
-exports.sendCmd = sendCmd;
+exports.retryAppCommand = retryAppCommand;
+exports.sendAppCommand = sendAppCommand;
 exports.sendCommand = sendCommand;
 exports.sendSmsForgotPasswordCode = sendSmsForgotPasswordCode;
 exports.sendSmsRegisterCode = sendSmsRegisterCode;

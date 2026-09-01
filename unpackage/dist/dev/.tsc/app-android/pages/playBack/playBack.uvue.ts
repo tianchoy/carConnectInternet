@@ -226,7 +226,6 @@ const center = reactive({
 
 		center.latitude = (bounds.minLat + bounds.maxLat) / 2
 		center.longitude = (bounds.minLng + bounds.maxLng) / 2
-		isMapReady.value = true
 
 		const latDiff = bounds.maxLat - bounds.minLat
 		const lngDiff = bounds.maxLng - bounds.minLng
@@ -493,6 +492,7 @@ const center = reactive({
 
 
 	function clearTrackDisplay() : void {
+		isMapReady.value = false
 		trackPoints.value = []
 		isTrackPlayable.value = false
 		currentIndex.value = 0
@@ -590,14 +590,18 @@ const center = reactive({
 		initCarMarker()
 		initPolyline()
 		adjustMapToFitTrack()
+		const firstPoint = trackPoints.value[0]
+		center.latitude = firstPoint.latitude
+		center.longitude = firstPoint.longitude
 		renderPlaybackIndex()
+		isMapReady.value = true
 	}
 	const loadTrackPos = async () => {
 		pausePlayback()
 		const requestId = ++replaySessionId
 		clearTrackDisplay()
 		uni.showLoading({ title: '加载中...' })
-		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 651, 9),
+		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 655, 9),
 			imei: imei.value,
 			startTime: startTime.value.replace(/\//g, '-'),
 			endTime: endTime.value.replace(/\//g, '-'),
@@ -633,7 +637,7 @@ const center = reactive({
 			}
 		} catch (error) {
 			if (requestId != replaySessionId) return
-			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:687")
+			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:691")
 			showAppToast({ title: '轨迹加载失败', icon: 'none' })
 			if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
 				showCurrentPosition()
@@ -762,7 +766,7 @@ const center = reactive({
 		lng.value = option.lng ?? null
 		sTime.value = option.startTime ?? ''
 		eTime.value = option.endTime ?? ''
-		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:816")
+		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:820")
 		const routeStartTime = resolveRouteDateTime(sTime.value)
 		const routeEndTime = resolveRouteDateTime(eTime.value)
 		if (routeStartTime != null && routeEndTime != null) {
@@ -820,7 +824,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               polyline: polyline.value,
               scale: mapScale.value,
               style: _nS(_uM({"width":"100%","height":"100%"})),
-              "show-location": true,
+              "show-location": false,
               "enable-traffic": true,
               "enable-overlooking": true,
               "enable-building": true,

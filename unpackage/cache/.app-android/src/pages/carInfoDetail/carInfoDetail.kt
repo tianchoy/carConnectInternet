@@ -363,7 +363,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                         }
                          catch (error: Throwable) {
                             uni_hideLoading(null)
-                            console.error("操作失败:", error, " at pages/carInfoDetail/carInfoDetail.uvue:689")
+                            console.error("操作失败:", error, " at pages/carInfoDetail/carInfoDetail.uvue:694")
                             showAppToast(ShowToastOptions(title = "操作失败，请重试", icon = "none"))
                         }
                 })
@@ -389,7 +389,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                             address.value = addr.result.formatted_address
                         }
                          catch (error: Throwable) {
-                            console.error("获取地址信息失败:", error, " at pages/carInfoDetail/carInfoDetail.uvue:725")
+                            console.error("获取地址信息失败:", error, " at pages/carInfoDetail/carInfoDetail.uvue:730")
                         }
                 })
             }
@@ -449,7 +449,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 }
                 if (itemTo == "发送指令") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/cmd/cmd?imei=" + imei.value))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/cmd/cmd?imei=" + imei.value + "&deviceId=" + deviceId.value))
                 }
             }
             val loadDeviceDetail = fun(): UTSPromise<Unit> {
@@ -466,7 +466,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                 }, icon = "none"))
                             }
                         } else {
-                            console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:822")
+                            console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:827")
                         }
                 })
             }
@@ -477,7 +477,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 val storedUserType = uni_getStorageSync("userType") as String?
                 userType.value = storedUserType ?: ""
                 loadDeviceDetail().then(fun(){
-                    val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 834, 10), "deptId" to deptId.value, "deviceids" to imei.value)
+                    val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 839, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                     uni_showLoading(ShowLoadingOptions(title = "加载中..."))
                     loadData(data, 3).then(fun(success: Boolean){
                         uni_hideLoading(null)
@@ -491,19 +491,19 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
             }
             )
             onShow(fun(){
-                console.log("页面显示，检查自动刷新状态", " at pages/carInfoDetail/carInfoDetail.uvue:856")
+                console.log("页面显示，检查自动刷新状态", " at pages/carInfoDetail/carInfoDetail.uvue:861")
                 if (datainfo.value["connectionStatus"] == "online" && !isRefreshing.value) {
                     setupAutoRefresh(currentTime.value)
                 }
             }
             )
             onHide(fun(){
-                console.log("页面隐藏时停止自动刷新", " at pages/carInfoDetail/carInfoDetail.uvue:865")
+                console.log("页面隐藏时停止自动刷新", " at pages/carInfoDetail/carInfoDetail.uvue:870")
                 stopAutoRefresh()
             }
             )
             onUnmounted(fun(){
-                console.log("页面卸载时停止自动刷新", " at pages/carInfoDetail/carInfoDetail.uvue:870")
+                console.log("页面卸载时停止自动刷新", " at pages/carInfoDetail/carInfoDetail.uvue:875")
                 stopAutoRefresh()
             }
             )

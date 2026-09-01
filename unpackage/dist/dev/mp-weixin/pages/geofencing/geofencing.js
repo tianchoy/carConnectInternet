@@ -1039,6 +1039,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function closeEditDialog() {
       var _a;
       (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.$callMethod("close");
+      if (editingFence.value == null) {
+        clearDrawing();
+      }
     }
     function getSelectedFenceName() {
       const fence = selectedFence.value;
@@ -1054,10 +1057,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.$callMethod("close");
       const fence = selectedFence.value;
-      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1206", "删除电子围栏", fence);
+      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1210", "删除电子围栏", fence);
       if (fence != null) {
         const fenceId = fence.getString("id", "");
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1210", "删除电子围栏ID", fenceId);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1214", "删除电子围栏ID", fenceId);
         if (fenceId !== "") {
           deleteFence(fenceId);
         } else {

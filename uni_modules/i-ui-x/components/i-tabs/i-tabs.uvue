@@ -10,33 +10,18 @@
       <view class="i-tabs__nav" :style="navStyle">
         <view
           v-for="(item, index) in list"
-          :id="'i-tabs-item-' + String(index)"
-          :key="String(index) + '-' + getItemName(item)"
+          :id="'i-tabs-item-' + index.toString()"
+          :key="index.toString() + '-' + getItemName(item)"
           :class="getItemClass(item, index)"
           :style="getItemStyle(index)"
           @click="select(item, index)"
         >
           <view class="i-tabs__text-wrap">
-            <text
-              :class="
-                currentIndex == index
-                  ? 'i-tabs__text i-tabs__text--active'
-                  : 'i-tabs__text'
-              "
-              :style="getTextStyle(item, index)"
-            >
-              {{ getItemName(item) }}
-            </text>
-            <view v-if="getItemBadge(item).length > 0" class="i-tabs__badge">
-              <text class="i-tabs__badge-text">{{ getItemBadge(item) }}</text>
-            </view>
+            <text :class="currentIndex == index ? 'i-tabs__text i-tabs__text--active' : 'i-tabs__text'" :style="getTextStyle(item, index)">{{ getItemName(item) }}</text>
+            <view v-if="getItemBadge(item).length > 0" class="i-tabs__badge"><text class="i-tabs__badge-text">{{ getItemBadge(item) }}</text></view>
             <view v-if="isItemDot(item)" class="i-tabs__dot"></view>
           </view>
-          <view
-            v-if="showBar && currentIndex == index"
-            class="i-tabs__bar"
-            :style="barStyle"
-          ></view>
+          <view v-if="showBar && currentIndex == index" class="i-tabs__bar" :style="barStyle"></view>
         </view>
       </view>
     </scroll-view>
@@ -49,38 +34,11 @@ import { computed, ref, watch } from 'vue'
 
 defineOptions({ name: 'i-tabs' })
 
-/**
- * Props 说明：依据 DCloud uni-app x 官方规范 Tabs 标签页。
- * - value: 当前选中值；优先匹配 item.value，其次匹配 item.name/text。
- * - current: 当前选中索引；传入 >=0 时优先作为受控索引。
- * - list: 标签数组；对象项支持 name、text、value、badge、disabled。
- * - items: list 的兼容别名，旧 demo 可继续使用。
- * - scrollable: 标签较多时是否横向滚动。
- * - activeColor: 选中态文字和指示条颜色。
- * - inactiveColor: 未选中文字颜色。
- * - bgColor: 容器背景色。
- * - lineWidth: 指示条宽度。
- * - lineHeight: 指示条高度。
- * - fontSize: 标签文字字号。
- * - itemWidth: 每个标签宽度；auto 时自适应。
- * - showBar: 是否显示底部指示条。
- * - disabled: 是否整体禁用点击。
- */
 const props = defineProps({
   value: { type: [String, Number], default: '' },
   current: { type: Number, default: -1 },
-  list: {
-    type: Array,
-    default() {
-      return []
-    },
-  },
-  items: {
-    type: Array,
-    default() {
-      return ['关注', '推荐', '热榜', '本地']
-    },
-  },
+  list: { type: Array, default() { return [] } },
+  items: { type: Array, default() { return ['关注', '推荐', '热榜', '本地'] } },
   scrollable: { type: Boolean, default: false },
   activeColor: { type: String, default: '#2979ff' },
   inactiveColor: { type: String, default: '#606266' },
@@ -93,257 +51,159 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
 })
 
-/**
- * Emits 说明：用于同步标签切换。
- * - click: 点击标签时触发，返回 { index, name, value, item }。
- * - change: 选中标签变化时触发，参数同 click。
- * - select: 选中标签时触发，参数同 click。
- * - update:value: 同步当前 value。
- * - update:current: 同步当前索引。
- */
 const emit = defineEmits(['click', 'change', 'select', 'update:value', 'update:current'])
 
+type TabPayload = { index: number, name: string, value: string, item: any }
 
-const bgColor = computed(() => {
-  return props.bgColor
-})
-const list = computed(() => {
-  if (props.list.length > 0) return props.list
-  return props.items
-})
-
-const currentIndex = ref(resolveIndex())
-const scrollIntoView = ref('i-tabs-item-' + String(currentIndex.value))
-
-const navStyle = computed(() => {
-  if (!props.scrollable) return ''
-  return 'width:' + String(resolveScrollableItemWidth() * list.value.length) + 'px;'
-})
-
-function getItemStyle(index) {
-  if (props.scrollable) return 'width:' + String(resolveScrollableItemWidth()) + 'px;'
-  const width = formatSize(props.itemWidth)
-  if (width == 'auto') return ''
-  return 'width:' + width + ';'
-}
-
-const barStyle = computed(() => {
-  return (
-    'width:' +
-    formatSize(props.lineWidth) +
-    ';height:' +
-    formatSize(props.lineHeight) +
-    ';background-color:' +
-    props.activeColor +
-    ';'
-  )
-})
-
-watch(
-  () => props.value,
-  () => {
-    currentIndex.value = resolveIndex()
-    scrollIntoView.value = 'i-tabs-item-' + String(currentIndex.value)
-  },
-)
-
-watch(
-  () => props.current,
-  () => {
-    currentIndex.value = resolveIndex()
-    scrollIntoView.value = 'i-tabs-item-' + String(currentIndex.value)
-  },
-)
-
-function formatSize(value) {
-  const text = String(value)
-  if (text == 'auto' || text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
+function formatSize(value: string | number): string {
+  const text = value.toString()
+  if (text == 'auto' || text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
   return text + 'px'
 }
 
-function numericSize(value): number {
-  const text = String(value)
-  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
-  if (isNaN(numberValue)) return 0
-  return numberValue
+function numericSize(value: string | number): number {
+  const text = value.toString().replace('px', '').replace('rpx', '').replace('%', '')
+  const parsed = parseFloat(text)
+  return isNaN(parsed) ? 0 : Number.from(parsed)
+}
+
+function configuredList(): Array<any> {
+  const configured = props.list as Array<any>
+  if (configured != null && configured.length > 0) return configured
+  const fallback = props.items as Array<any>
+  return fallback != null ? fallback : [] as Array<any>
+}
+
+function itemValue(item: any, keyName: string): string {
+  if (item == null) return ''
+  // #ifdef APP-ANDROID
+  if (typeof item == 'object') {
+    return (item as UTSJSONObject).getString(keyName, '')
+  }
+  // #endif
+  // #ifndef APP-ANDROID
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    return value == null ? '' : value.toString()
+  }
+  // #endif
+  if (keyName == 'name' || keyName == 'text' || keyName == 'value') return item.toString()
+  return ''
+}
+
+function itemBoolean(item: any, keyName: string): boolean {
+  if (item == null || typeof item != 'object') return false
+  // #ifdef APP-ANDROID
+  return (item as UTSJSONObject).getBoolean(keyName, false)
+  // #endif
+  // #ifndef APP-ANDROID
+  const value = item[keyName]
+  return value === true || value === 1 || value === '1' || value === 'true'
+  // #endif
+}
+
+function getItemName(item: any): string {
+  const name = itemValue(item, 'name')
+  return name.length > 0 ? name : itemValue(item, 'text')
+}
+
+function getItemValue(item: any): string {
+  const value = itemValue(item, 'value')
+  return value.length > 0 ? value : getItemName(item)
+}
+
+function isItemDisabled(item: any): boolean {
+  return itemBoolean(item, 'disabled')
+}
+
+function isItemDot(item: any): boolean {
+  return itemBoolean(item, 'dot')
+}
+
+function getItemBadge(item: any): string {
+  return itemValue(item, 'badge')
 }
 
 function resolveScrollableItemWidth(): number {
   const size = numericSize(props.itemWidth)
-  if (size > 0) return size
-  return 92
+  return size > 0 ? size : 92
 }
 
-function itemValue(item, keyName) {
-  if (item == null) return ''
-  if (typeof item == 'object') {
-    const value = item[keyName]
-    if (value == null) return ''
-    return String(value)
-  }
-  if (keyName == 'name' || keyName == 'text' || keyName == 'value') return String(item)
-  return ''
-}
-
-function getItemName(item) {
-  const name = itemValue(item, 'name')
-  if (name.length > 0) return name
-  return itemValue(item, 'text')
-}
-
-function getItemValue(item) {
-  const value = itemValue(item, 'value')
-  if (value.length > 0) return value
-  return getItemName(item)
-}
-
-function isItemDisabled(item) {
-  if (item == null) return false
-  if (typeof item == 'object') return item['disabled'] == true
-  return false
-}
-
-function isItemDot(item) {
-  if (item == null) return false
-  if (typeof item == 'object') return item['dot'] == true
-  return false
-}
-
-function getItemBadge(item) {
-  return itemValue(item, 'badge')
-}
-
-function resolveIndex() {
+function resolveIndex(): number {
   if (props.current >= 0) return props.current
-  const expected = String(props.value)
-  for (let i = 0; i < list.value.length; i++) {
-    const item = list.value[i]
-    if (getItemValue(item) == expected || getItemName(item) == expected) return i
+  const expected = props.value.toString()
+  const items = configuredList()
+  for (let index = 0; index < items.length; index++) {
+    const item = items[index]
+    if (getItemValue(item) == expected || getItemName(item) == expected) return index
   }
   return 0
 }
 
-function buildPayload(item, index) {
-  return {
-    index,
-    name: getItemName(item),
-    value: getItemValue(item),
-    item,
-  }
+function getItemStyle(index: number): string {
+  if (props.scrollable) return 'width:' + resolveScrollableItemWidth().toString() + 'px;'
+  const width = formatSize(props.itemWidth)
+  return width == 'auto' ? '' : 'width:' + width + ';'
 }
 
-function getItemClass(item, index) {
+function buildPayload(item: any, index: number): TabPayload {
+  return { index, name: getItemName(item), value: getItemValue(item), item }
+}
+
+const bgColor = computed<string>(() : string => props.bgColor)
+const list = computed<Array<any>>(() : Array<any> => configuredList())
+const currentIndex = ref<number>(resolveIndex())
+const scrollIntoView = ref<string>('i-tabs-item-' + currentIndex.value.toString())
+
+function getItemClass(item: any, index: number): string {
   let className = currentIndex.value == index ? 'i-tabs__item i-tabs__item--active' : 'i-tabs__item'
   if (isItemDisabled(item)) className += ' i-tabs__item--disabled'
   return className
 }
 
-function getTextStyle(item, index) {
+function getTextStyle(item: any, index: number): string {
   const color = currentIndex.value == index ? props.activeColor : props.inactiveColor
-  const realColor = isItemDisabled(item) ? '#c8c9cc' : color
-  return 'font-size:' + formatSize(props.fontSize) + ';color:' + realColor + ';'
+  return 'font-size:' + formatSize(props.fontSize) + ';color:' + (isItemDisabled(item) ? '#c8c9cc' : color) + ';'
 }
 
-function select(item, index) {
+function select(item: any, index: number): void {
   if (props.disabled || isItemDisabled(item)) return
   const payload = buildPayload(item, index)
   emit('click', payload)
   if (currentIndex.value == index) return
   currentIndex.value = index
-  scrollIntoView.value = 'i-tabs-item-' + String(index)
+  scrollIntoView.value = 'i-tabs-item-' + index.toString()
   emit('select', payload)
   emit('change', payload)
   emit('update:value', payload.value)
   emit('update:current', index)
 }
+
+const navStyle = computed<string>(() : string => props.scrollable ? 'width:' + (resolveScrollableItemWidth() * list.value.length).toString() + 'px;' : '')
+const barStyle = computed<string>(() : string => 'width:' + formatSize(props.lineWidth) + ';height:' + formatSize(props.lineHeight) + ';background-color:' + props.activeColor + ';')
+
+watch(() : string | number => props.value, () : void => {
+  currentIndex.value = resolveIndex()
+  scrollIntoView.value = 'i-tabs-item-' + currentIndex.value.toString()
+})
+watch(() : number => props.current, () : void => {
+  currentIndex.value = resolveIndex()
+  scrollIntoView.value = 'i-tabs-item-' + currentIndex.value.toString()
+})
 </script>
 
 <style>
-.i-tabs {
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.i-tabs__scroll {
-  width: 100%;
-}
-
-.i-tabs__nav {
-  min-height: 44px;
-  flex-direction: row;
-  align-items: center;
-}
-
-.i-tabs__item {
-  min-width: 72px;
-  min-height: 44px;
-  padding: 0 16px;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  overflow: visible;
-}
-
-.i-tabs__item--active {
-  background-color: #ffffff;
-}
-
-.i-tabs__item--disabled {
-  opacity: 0.55;
-}
-
-.i-tabs__text-wrap {
-  position: relative;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
-}
-
-.i-tabs__text {
-  color: #606266;
-  line-height: 20px;
-}
-
-.i-tabs__text--active {
-  color: #2979ff;
-  font-weight: 600;
-}
-
-.i-tabs__bar {
-  margin-top: 5px;
-  border-radius: 999px;
-}
-
-.i-tabs__badge {
-  position: absolute;
-  right: -20px;
-  top: -9px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  border-radius: 8px;
-  background-color: #f56c6c;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-.i-tabs__badge-text {
-  color: #ffffff;
-  font-size: 10px;
-  line-height: 14px;
-}
-
-.i-tabs__dot {
-  position: absolute;
-  right: -9px;
-  top: -5px;
-  width: 7px;
-  height: 7px;
-  border-radius: 4px;
-  background-color: #f56c6c;
-}
+.i-tabs { border-radius: 8px; overflow: hidden; }
+.i-tabs__scroll { width: 100%; }
+.i-tabs__nav { min-height: 44px; flex-direction: row; align-items: center; }
+.i-tabs__item { min-width: 72px; min-height: 44px; padding: 0 16px; align-items: center; justify-content: center; box-sizing: border-box; overflow: visible; }
+.i-tabs__item--active { background-color: #ffffff; }
+.i-tabs__item--disabled { opacity: 0.55; }
+.i-tabs__text-wrap { position: relative; flex-direction: row; align-items: center; justify-content: center; overflow: visible; }
+.i-tabs__text { color: #606266; line-height: 20px; }
+.i-tabs__text--active { color: #2979ff; font-weight: 600; }
+.i-tabs__bar { margin-top: 5px; border-radius: 999px; }
+.i-tabs__badge { position: absolute; right: -20px; top: -9px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background-color: #f56c6c; align-items: center; justify-content: center; box-sizing: border-box; }
+.i-tabs__badge-text { color: #ffffff; font-size: 10px; line-height: 14px; }
+.i-tabs__dot { position: absolute; right: -9px; top: -5px; width: 7px; height: 7px; border-radius: 4px; background-color: #f56c6c; }
 </style>

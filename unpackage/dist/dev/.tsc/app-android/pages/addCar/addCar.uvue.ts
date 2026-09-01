@@ -329,8 +329,9 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               _: 1 /* STABLE */
             })),
             _cV(_component_i_form_item, _uM({
-              label: "*设备ID",
+              label: "设备ID",
               name: "imei",
+              required: "",
               labelDirection: "horizontal"
             }), _uM({
               default: withSlotCtx((): any[] => [
@@ -355,6 +356,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cV(_component_i_form_item, _uM({
               label: "车标",
               name: "deviceType",
+              required: "",
               labelDirection: "horizontal"
             }), _uM({
               default: withSlotCtx((): any[] => [

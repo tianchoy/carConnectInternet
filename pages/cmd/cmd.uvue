@@ -1,333 +1,1105 @@
 <template>
-	<view class="container">
-		<custom-navBar title="指令" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+	<view class="page">
+		<custom-navBar title="指令中心" :show-back="true" backgroundColor="#ffffff" textColor="#1f2937" :showCapsule="false">
 		</custom-navBar>
-		<view class="device-info">
-			<text class="device-label">设备ID: {{ imei}}</text>
-		</view>
-		<view class="section">
-			<text class="section-title">指令类型</text>
-			<view class="type-container">
-				<view class="type-list">
-					<view v-for="(type,index) in commandTypes" :key="type.cmdmId" class="type-item"
-						:class="{ active: selectedTypeId == type.cmdmId }" @click="selectTypeByItem(type)">
-						<text class="type-name" :style="{ color: selectedTypeId == type.cmdmId ? '#ffffff' : '#666666' }">{{ type.cmdName }}</text>
-					</view>
-				</view>
-			</view>
-		</view>
-		<view class="section" v-if="commands.length">
-			<text class="section-title">指令列表</text>
-			<view class="command-list">
-				<view v-for="(cmd,index) in commands" :key="cmd.predictCmdId" class="command-item"
-					:class="{ active: selectedCommandId == cmd.predictCmdId }" @click="selectCommand(cmd)">
-					<text class="command-name">{{ cmd.cmdName }}</text>
-					<text class="command-descr">{{ cmd.remarks }}</text>
-				</view>
-			</view>
-		</view>
 
-		<view class="section" v-if="selectedCommand != null">
-			<view class="param-form">
-				<text v-if="paramConfigError != ''" class="param-error">{{ paramConfigError }}</text>
-				<view v-for="(param, index) in paramConfigs" :key="'param_' + index" class="param-item">
-					<text class="param-label">{{ getParamLabel(param) }}</text>
-					<i-input v-if="param.type == 'input'" class="param-input" :model-value="getParamValue(index)"
-						@update:model-value="updateParamValueFromEvent(index, $event)" :placeholder="'请输入' + getParamLabel(param)"
-						placeholder-class="placeholder" border="none" height="44px" font-size="15px" />
-					<i-input v-if="param.type == 'number'" class="param-input" type="number"
-						:model-value="getParamValue(index)" @update:model-value="updateParamValueFromEvent(index, $event)"
-						:placeholder="'请输入' + getParamLabel(param)" placeholder-class="placeholder" :maxlength="getParamMaxLength(param)"
-						border="none" height="44px" font-size="15px" />
-					<view v-if="param.type == 'radio'" class="radio-group">
-						<view v-for="item in getRadioItems(param)" :key="'radio_' + item.value" class="radio-item"
-							@click="selectRadio(index, getRadioValue(item))">
-							<view class="radio-icon"><view class="radio-inner" :class="{ checked: getParamValue(index) == getRadioValue(item) }"></view></view>
-							<text class="radio-label">{{ getRadioDescription(item) }}</text>
+		<view class="content-wrap">
+			<view class="device-card">
+				<view class="device-card-main">
+					<text class="device-title">当前设备</text>
+					<text class="device-imei">{{ displayDeviceIdentity }}</text>
+				</view>
+				<view class="device-id-wrap">
+					<text class="device-id-label">设备 ID</text>
+					<text class="device-id-value">{{ deviceId != '' ? deviceId : '--' }}</text>
+				</view>
+			</view>
+
+			<i-tabs
+				:value="activeTab"
+				:list="tabItems"
+				activeColor="#1677ff"
+				inactiveColor="#667085"
+				bgColor="#ffffff"
+				@change="changeTab($event)"
+			></i-tabs>
+
+			<scroll-view
+				class="main-scroll"
+				scroll-y="true"
+				:show-scrollbar="false"
+				refresher-enabled
+				:refresher-triggered="refreshing"
+				:lower-threshold="80"
+				@refresherrefresh="refreshCurrentTab"
+				@scroll="markHistoryScroll"
+				@scrolltolower="loadMoreHistory"
+			>
+				<view v-if="deviceId == ''" class="state-card">
+					<text class="state-title">无法加载指令</text>
+					<text class="state-text">未获取到设备 ID，请返回车辆详情后重新进入。</text>
+				</view>
+
+				<view v-else-if="activeTab == 'send'" class="tab-content">
+					<view class="section-heading">
+						<view>
+							<text class="section-title">可用指令</text>
+							<text class="section-subtitle">请选择要下发到设备的指令</text>
+						</view>
+						<text class="refresh-link" @click="loadAvailableCommands">刷新</text>
+					</view>
+
+					<view v-if="isCommandLoading" class="state-card compact-state">
+						<text class="state-text">正在加载可用指令...</text>
+					</view>
+					<view v-else-if="availableCommands.length == 0" class="state-card compact-state">
+						<text class="state-title">暂无可用指令</text>
+						<text class="state-text">请确认设备状态后重试。</text>
+					</view>
+					<view v-else class="command-list">
+						<view
+							v-for="(command, index) in availableCommands"
+							:key="getCommandKey(command, index)"
+							class="command-card"
+							:class="{ selected: isSelectedCommand(command), disabled: !isCommandAllowed(command) }"
+							@click="selectCommand(command)"
+						>
+							<view class="command-card-top">
+								<view class="command-name-wrap">
+									<text class="command-name">{{ getCommandName(command) }}</text>
+								</view>
+								<text class="command-status" :class="{ blocked: !isCommandAllowed(command) }">
+									{{ isCommandAllowed(command) ? (commandNeedsParams(command) ? '需填写参数' : '无需参数') : 'App 端不可下发' }}
+								</text>
+							</view>
+							<view v-if="getCommandCode(command) != '' || getCommandRemark(command) != ''" class="command-card-meta">
+								<text v-if="getCommandCode(command) != ''" class="command-code">{{ getCommandCode(command) }}</text>
+								<text v-if="getCommandRemark(command) != ''" class="command-remark">{{ getCommandRemark(command) }}</text>
+							</view>
 						</view>
 					</view>
+
+					<view v-if="selectedCommand != null" class="form-card">
+						<view class="form-header">
+							<view>
+								<text class="section-title">{{ getCommandName(selectedCommand) }}</text>
+								<text class="section-subtitle">请确认参数后再下发</text>
+							</view>
+						</view>
+						<text v-if="paramConfigError != ''" class="form-error">{{ paramConfigError }}</text>
+						<view v-for="(param, index) in paramConfigs" :key="getParamKey(param, index)" class="param-row">
+							<view class="param-label-row">
+								<text class="param-label">{{ getParamLabel(param) }}</text>
+								<text v-if="isParamRequired(param)" class="required-mark">*</text>
+							</view>
+							<i-input
+								v-if="getParamType(param) == 'text' || getParamType(param) == 'number'"
+								class="param-input"
+								:model-value="getParamValue(index)"
+								:type="getParamType(param) == 'number' ? 'number' : 'text'"
+								:placeholder="getParamPlaceholder(param)"
+								placeholder-class="input-placeholder"
+								border="none"
+								@update:model-value="updateParamValue(index, $event)"
+							></i-input>
+							<view v-else-if="getParamType(param) == 'select'" class="select-field" @click="openOptionSheet(index)">
+								<text :class="{ 'select-placeholder': getSelectedOptionLabel(index) == '' }">{{ getSelectedOptionLabel(index) != '' ? getSelectedOptionLabel(index) : getParamPlaceholder(param) }}</text>
+								<text class="select-arrow">›</text>
+							</view>
+							<text v-if="getParamError(index) != ''" class="param-error">{{ getParamError(index) }}</text>
+						</view>
+						<text v-if="paramConfigs.length == 0 && paramConfigError == ''" class="no-param-text">该指令无需填写参数</text>
+						<i-button
+							class="send-button"
+							type="primary"
+							text="确认下发指令"
+							:loading="isSending"
+							:disabled="isSending || isCommandLoading || !isFormValid"
+							@click="confirmSendCommand"
+						></i-button>
+					</view>
 				</view>
-				<text v-if="paramConfigs.length == 0 && paramConfigError == ''" class="no-param-tip">该指令无需填写参数</text>
-				<i-button type="primary" text="发送指令" class="submit-btn" :loading="sending" :disabled="sending || loading || !isFormValid" @click="sendCommand"></i-button>
+
+				<view v-else class="tab-content history-content">
+					<view class="section-heading">
+						<view>
+							<text class="section-title">指令记录</text>
+							<text class="section-subtitle">可查看下发结果或重新尝试失败指令</text>
+						</view>
+						<text class="refresh-link" @click="reloadHistory">刷新</text>
+					</view>
+
+					<view v-if="isHistoryInitialLoading" class="state-card compact-state">
+						<text class="state-text">正在加载指令记录...</text>
+					</view>
+					<view v-else-if="historyRecords.length == 0" class="state-card compact-state">
+						<text class="state-title">暂无指令记录</text>
+						<text class="state-text">成功下发指令后，记录将显示在这里。</text>
+					</view>
+					<view v-else class="history-list">
+						<view v-for="(record, index) in historyRecords" :key="getRecordKey(record, index)" class="history-card" @click="showCommandDetail(record)">
+							<view class="history-card-top">
+								<text class="history-name">{{ getRecordName(record) }}</text>
+								<text class="history-status" :class="getStatusClass(record)">{{ getStatusText(record) }}</text>
+							</view>
+							<text class="history-time">{{ getRecordTime(record) }}</text>
+							<text v-if="getRecordSummary(record) != ''" class="history-summary">{{ getRecordSummary(record) }}</text>
+							<view class="history-bottom">
+								<text class="retry-count">已重试 {{ getRecordRetryCount(record) }} 次</text>
+								<text class="detail-link">查看详情 ›</text>
+							</view>
+						</view>
+					</view>
+					<view v-if="historyRecords.length > 0" class="history-footer">
+						<text v-if="isHistoryLoading">加载中...</text>
+						<text v-else-if="!hasMoreHistory">没有更多记录了</text>
+						<text v-else>上拉加载更多</text>
+					</view>
+				</view>
+			</scroll-view>
+		</view>
+
+		<i-action-sheet
+			v-model:show="optionSheetVisible"
+			:title="optionSheetTitle"
+			:actions="optionActions"
+			cancelText="取消"
+			@select="selectOption($event)"
+		></i-action-sheet>
+
+		<i-modal
+			:show="detailVisible"
+			title="指令详情"
+			confirmText="关闭"
+			:showCancelButton="canRetryDetail"
+			cancelText="重试下发"
+			@confirm="closeDetail"
+			@cancel="confirmRetryFromDetail"
+		>
+			<view v-if="isDetailLoading" class="detail-loading">
+				<text>正在加载详情...</text>
 			</view>
-		</view>
-		<view class="empty-state" v-if="!selectedTypeId">
-			<text class="empty-text">请先选择指令类型</text>
-		</view>
-		<view class="loading" v-if="loading">
-			<text class="loading-text">加载中...</text>
-		</view>
-		<view class="empty-state" v-else-if="commands.length == 0 && selectedTypeId != null">
-			<text class="empty-text">暂无指令</text>
-		</view>
+			<view v-else class="detail-content">
+				<view class="detail-row"><text class="detail-label">指令名称</text><text class="detail-value">{{ getRecordName(detailRecord) }}</text></view>
+				<view class="detail-row"><text class="detail-label">下发状态</text><text class="detail-value">{{ getStatusText(detailRecord) }}</text></view>
+				<view class="detail-row"><text class="detail-label">发送时间</text><text class="detail-value">{{ getRecordTime(detailRecord) }}</text></view>
+				<view v-if="getDetailResponse() != ''" class="detail-row detail-long-row"><text class="detail-label">响应信息</text><text class="detail-value">{{ getDetailResponse() }}</text></view>
+				<view v-if="getDetailReason() != ''" class="detail-row detail-long-row"><text class="detail-label">结果说明</text><text class="detail-value">{{ getDetailReason() }}</text></view>
+				<view v-if="getDetailParams() != ''" class="detail-row detail-long-row"><text class="detail-label">指令参数</text><text class="detail-value">{{ getDetailParams() }}</text></view>
+			</view>
+		</i-modal>
 	</view>
 	<app-toast></app-toast>
 </template>
+
 <script setup lang="uts">
+import { computed, ref } from 'vue'
+import { getAppAvailableCommands, getAppCommandDetail, getAppCommandHistory, retryAppCommand, sendAppCommand } from '../../api/request.uts'
+import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { showAppToast } from '../../utils/toast.uts'
-import { ref, computed } from 'vue'
-import { getCmdAction, getCmdByMid, sendCmd } from '@/api/request'
+
+type TabItem = { name: string, value: string }
 
 const imei = ref('')
-const commandTypes = ref<Array<UTSJSONObject>>([])
-const selectedTypeId = ref<string | number | null>(null)
-const commands = ref<Array<UTSJSONObject>>([])
-const selectedCommandId = ref<string | number | null>(null)
+const deviceId = ref('')
+const activeTab = ref('send')
+const tabItems: Array<TabItem> = [
+	{ name: '下发指令', value: 'send' },
+	{ name: '指令记录', value: 'history' }
+]
+
+const availableCommands = ref<Array<UTSJSONObject>>([])
 const selectedCommand = ref<UTSJSONObject | null>(null)
+const selectedCommandId = ref('')
 const paramConfigs = ref<Array<UTSJSONObject>>([])
 const paramValues = ref<Array<string>>([])
+const paramErrors = ref<Array<string>>([])
 const paramConfigError = ref('')
-const loading = ref(false)
-const sending = ref(false)
+const isCommandLoading = ref(false)
+const isSending = ref(false)
 
-const isFormValid = computed<boolean>(() => {
-	if (selectedCommand.value == null || paramConfigError.value != '') return false
-	return paramValues.value.length == paramConfigs.value.length &&
-		paramValues.value.every((value: string) : boolean => value != '')
+const optionSheetVisible = ref(false)
+const optionSheetTitle = ref('请选择')
+const optionActions = ref<Array<UTSJSONObject>>([])
+const activeOptionIndex = ref(-1)
+
+const historyRecords = ref<Array<UTSJSONObject>>([])
+const historyPageNum = ref(1)
+const historyPageSize = 10
+const historyTotal = ref(0)
+const isHistoryLoading = ref(false)
+const hasLoadedHistory = ref(false)
+const hasMoreHistory = ref(true)
+const refreshing = ref(false)
+const hasReachedHistoryBottom = ref(false)
+
+const detailVisible = ref(false)
+const isDetailLoading = ref(false)
+const detailRecord = ref<UTSJSONObject>({} as UTSJSONObject)
+const isRetrying = ref(false)
+
+function getString(item: UTSJSONObject | null, key: string): string {
+	return item != null ? item.getString(key, '') : ''
+}
+
+function getBoolean(item: UTSJSONObject | null, key: string): boolean {
+	if (item == null) return false
+	return item.getBoolean(key, false) || getString(item, key) == '1'
+}
+
+function getCommandKey(command: UTSJSONObject, index: number): string {
+	const cmdId = getString(command, 'cmdId')
+	return cmdId != '' ? cmdId : 'command_' + index.toString()
+}
+
+function getCommandName(command: UTSJSONObject | null): string {
+	const name = getString(command, 'cmdName')
+	return name != '' ? name : '未命名指令'
+}
+
+function getCommandCode(command: UTSJSONObject | null): string { return getString(command, 'cmdCode') }
+function getCommandRemark(command: UTSJSONObject | null): string { return getString(command, 'remark') }
+function isCommandAllowed(command: UTSJSONObject | null): boolean { return getBoolean(command, 'appAllowed') }
+function commandNeedsParams(command: UTSJSONObject | null): boolean { return getString(command, 'needParam') == '1' }
+function isSelectedCommand(command: UTSJSONObject): boolean { return getCommandKey(command, 0) == selectedCommandId.value }
+
+function getParamKey(param: UTSJSONObject, index: number): string {
+	const key = getString(param, 'key')
+	return key != '' ? key : 'param_' + index.toString()
+}
+function getParamLabel(param: UTSJSONObject): string {
+	const label = getString(param, 'label')
+	return label != '' ? label : '参数'
+}
+function getParamType(param: UTSJSONObject): string { return getString(param, 'type') }
+function isParamRequired(param: UTSJSONObject): boolean { return getBoolean(param, 'required') }
+function getParamPlaceholder(param: UTSJSONObject): string {
+	const placeholder = getString(param, 'placeholder')
+	return placeholder != '' ? placeholder : '请输入' + getParamLabel(param)
+}
+function getParamValue(index: number): string { return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : '' }
+function getParamError(index: number): string { return index >= 0 && index < paramErrors.value.length ? paramErrors.value[index] : '' }
+function getParamOptions(param: UTSJSONObject): Array<UTSJSONObject> {
+	const options = param.getArray<UTSJSONObject>('options')
+	return options != null ? options : []
+}
+function getOptionValue(option: UTSJSONObject): string { return getString(option, 'value') }
+function getOptionLabel(option: UTSJSONObject): string {
+	const label = getString(option, 'label')
+	return label != '' ? label : getOptionValue(option)
+}
+
+function parseNumber(value: string): number {
+	const parsed = parseFloat(value)
+	return isNaN(parsed) ? 0 : Number.from(parsed)
+}
+
+function validateParam(index: number, updateError: boolean): string {
+	if (index < 0 || index >= paramConfigs.value.length) return ''
+	const param = paramConfigs.value[index]
+	const value = getParamValue(index).trim()
+	let error = ''
+	if (isParamRequired(param) && value == '') {
+		error = '请填写' + getParamLabel(param)
+	} else if (value != '' && getParamType(param) == 'number') {
+		const numberValue = parseFloat(value)
+		if (isNaN(numberValue)) {
+			error = getParamLabel(param) + '必须为数字'
+		} else {
+			const minText = getString(param, 'min')
+			const maxText = getString(param, 'max')
+			if (minText != '' && numberValue < parseNumber(minText)) error = getParamLabel(param) + '不能小于' + minText
+			if (error == '' && maxText != '' && numberValue > parseNumber(maxText)) error = getParamLabel(param) + '不能大于' + maxText
+		}
+	}
+	if (updateError && index >= 0 && index < paramErrors.value.length) paramErrors.value[index] = error
+	return error
+}
+
+function getStatusValue(record: UTSJSONObject | null): string { return getString(record, 'sendStatus') }
+function getStatusText(record: UTSJSONObject | null): string {
+	const status = getStatusValue(record)
+	if (status == '1') return '下发成功'
+	if (status == '2') return '下发失败'
+	return '等待下发'
+}
+function getStatusClass(record: UTSJSONObject | null): string {
+	const status = getStatusValue(record)
+	if (status == '1') return 'status-success'
+	if (status == '2') return 'status-failed'
+	return 'status-pending'
+}
+
+const displayDeviceIdentity = computed<string>(() : string => {
+	return imei.value != '' ? imei.value : (deviceId.value != '' ? '设备 ' + deviceId.value : '未识别设备')
 })
 
-const sortByCmdNameLengthAndAlphabet = (data: Array<UTSJSONObject>): Array<UTSJSONObject> => {
-	const sortedData = data.slice()
-	sortedData.sort((a: UTSJSONObject, b: UTSJSONObject): number => {
-		const aName = (a['cmdName'] as string | null) ?? ''
-		const bName = (b['cmdName'] as string | null) ?? ''
-		if (aName.length != bName.length) return aName.length - bName.length
-		if (aName == bName) return 0
-		return aName < bName ? -1 : 1
-	})
-	return sortedData
-}
+const isHistoryInitialLoading = computed<boolean>(() : boolean => {
+	return isHistoryLoading.value && !hasLoadedHistory.value && historyRecords.value.length == 0
+})
 
-const getParamLabel = (config: UTSJSONObject): string => {
-	const label = config['label']
-	return label == null ? '参数' : label.toString()
-}
+const isFormValid = computed<boolean>(() : boolean => {
+	if (selectedCommand.value == null || !isCommandAllowed(selectedCommand.value) || paramConfigError.value != '') return false
+	if (paramValues.value.length != paramConfigs.value.length) return false
+	for (let index = 0; index < paramConfigs.value.length; index++) {
+		if (validateParam(index, false) != '') return false
+	}
+	return true
+})
 
-const getParamMaxLength = (config: UTSJSONObject): number => {
-	const max = config['max']
-	return typeof max == 'number' ? max : -1
-}
+const canRetryDetail = computed<boolean>(() : boolean => {
+	const status = getStatusValue(detailRecord.value)
+	return !isDetailLoading.value && (status == '0' || status == '2')
+})
 
-const getRadioItems = (config: UTSJSONObject): Array<UTSJSONObject> => {
-	return (config['items'] as Array<UTSJSONObject> | null) ?? []
-}
-
-const getRadioValue = (item: UTSJSONObject): string => {
-	const value = item['value']
-	return value == null ? '' : value.toString()
-}
-
-const getRadioDescription = (item: UTSJSONObject): string => {
-	const desc = item['desc']
-	return desc == null ? '' : desc.toString()
-}
-
-const parseParamConfigs = (details: string | null): Array<UTSJSONObject> => {
+function parseParamConfigs(schema: string): Array<UTSJSONObject> {
 	paramConfigError.value = ''
-	if (details == null || details.trim().length == 0) return []
-
+	if (schema.trim() == '') return []
 	try {
-		const parsed = JSON.parse(details)
+		const parsed = JSON.parse(schema)
 		if (!Array.isArray(parsed)) {
 			paramConfigError.value = '指令参数配置格式无效'
 			return []
 		}
-
 		const configs = parsed as Array<UTSJSONObject>
 		for (let index = 0; index < configs.length; index++) {
-			const config = configs[index]
-			if (config == null) {
-				paramConfigError.value = '指令参数配置无效'
+			const param = configs[index]
+			if (param == null || getString(param, 'key') == '' || getString(param, 'label') == '') {
+				paramConfigError.value = '指令参数配置不完整'
 				return []
 			}
-			const type = config['type'] as string | null
-			if (type != 'input' && type != 'number' && type != 'radio') {
+			const type = getParamType(param)
+			if (type != 'text' && type != 'number' && type != 'select') {
 				paramConfigError.value = '该指令包含暂不支持的参数类型'
 				return []
 			}
-			if (type == 'radio') {
-				const items = getRadioItems(config)
-				if (items.length == 0 || items.some((item: UTSJSONObject): boolean => getRadioValue(item) == '' || getRadioDescription(item) == '')) {
-					paramConfigError.value = '指令单选参数配置无效'
+			if (type == 'select') {
+				const options = getParamOptions(param)
+				if (options.length == 0 || options.some((option: UTSJSONObject): boolean => getOptionValue(option) == '' || getOptionLabel(option) == '')) {
+					paramConfigError.value = '指令下拉参数配置无效'
 					return []
 				}
 			}
 		}
 		return configs
 	} catch (error) {
-		console.error('解析参数配置失败:', error)
+		console.error('解析指令参数配置失败:', error)
 		paramConfigError.value = '指令参数配置无效'
 		return []
 	}
 }
 
-const initializeParamValues = (configs: Array<UTSJSONObject>): Array<string> => {
+function initializeParamValues(configs: Array<UTSJSONObject>): Array<string> {
 	const values: Array<string> = []
 	for (let index = 0; index < configs.length; index++) {
-		const config = configs[index]
-		const defaultValue = config['default']
-		let value = ''
-		if (defaultValue != null) {
-			value = defaultValue.toString()
-		} else if ((config['type'] as string | null) == 'radio') {
-			value = getRadioValue(getRadioItems(config)[0])
-		}
-		values.push(value)
+		const defaultValue = configs[index].getString('default', '')
+		values.push(defaultValue)
 	}
 	return values
 }
 
-const getParamValue = (index: number): string => {
-	return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : ''
-}
-
-const updateParamValueFromEvent = (index: number, value: any): void => {
-	if (sending.value || index < 0 || index >= paramValues.value.length) return
+function updateParamValue(index: number, value: any): void {
+	if (isSending.value || index < 0 || index >= paramValues.value.length) return
 	paramValues.value[index] = value == null ? '' : value.toString()
+	validateParam(index, true)
 }
 
-const loadCommandTypes = async (): Promise<void> => {
+function getSelectedOptionLabel(index: number): string {
+	if (index < 0 || index >= paramConfigs.value.length) return ''
+	const value = getParamValue(index)
+	if (value == '') return ''
+	const option = getParamOptions(paramConfigs.value[index]).find((item: UTSJSONObject): boolean => getOptionValue(item) == value)
+	return option == null ? value : getOptionLabel(option)
+}
+
+function openOptionSheet(index: number): void {
+	if (isSending.value || index < 0 || index >= paramConfigs.value.length) return
+	const param = paramConfigs.value[index]
+	if (getParamType(param) != 'select') return
+	activeOptionIndex.value = index
+	optionSheetTitle.value = '请选择' + getParamLabel(param)
+	const actions: Array<UTSJSONObject> = []
+	getParamOptions(param).forEach((option: UTSJSONObject): void => {
+		const action = new UTSJSONObject()
+		action.set('name', getOptionLabel(option))
+		action.set('value', getOptionValue(option))
+		actions.push(action)
+	})
+	optionActions.value = actions
+	optionSheetVisible.value = true
+}
+
+function getEventItem(event: any): UTSJSONObject | null {
+	if (event == null || typeof event != 'object') return null
+	// #ifdef APP-ANDROID
+	return (event as UTSJSONObject).getJSON('item')
+	// #endif
+	// #ifndef APP-ANDROID
+	const item = event['item']
+	return item == null ? null : item as UTSJSONObject
+	// #endif
+}
+
+function selectOption(event: any): void {
+	const index = activeOptionIndex.value
+	if (index < 0 || index >= paramValues.value.length) return
+	const item = getEventItem(event)
+	const value = item != null ? getString(item, 'value') : ''
+	if (value != '') {
+		paramValues.value[index] = value
+		validateParam(index, true)
+	}
+	activeOptionIndex.value = -1
+}
+
+function resetSelection(): void {
+	selectedCommand.value = null
+	selectedCommandId.value = ''
+	paramConfigs.value = []
+	paramValues.value = []
+	paramErrors.value = []
+	paramConfigError.value = ''
+}
+
+async function loadAvailableCommands(): Promise<void> {
+	if (deviceId.value == '' || isCommandLoading.value) return
 	try {
-		loading.value = true
-		const response = await getCmdAction()
-		if (response.code == 200 && response.data != null) {
-			commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data)
+		isCommandLoading.value = true
+		const response = await getAppAvailableCommands(deviceId.value)
+		if (response.code == 200) {
+			availableCommands.value = response.data
+			const stillSelected = selectedCommandId.value != '' ? response.data.find((command: UTSJSONObject): boolean => getCommandKey(command, 0) == selectedCommandId.value) : null
+			if (stillSelected == null) resetSelection()
 		} else {
-			showAppToast({ title: response.msg != '' ? response.msg : '加载指令类型失败', icon: 'none' })
+			availableCommands.value = []
+			resetSelection()
+			showAppToast({ title: response.msg != '' ? response.msg : '加载可用指令失败', icon: 'none' })
 		}
 	} catch (error) {
-		console.error('加载指令类型出错:', error)
-		showAppToast({ title: '网络错误', icon: 'none' })
+		console.error('加载可用指令失败:', error)
+		showAppToast({ title: '加载可用指令失败，请检查网络', icon: 'none' })
 	} finally {
-		loading.value = false
+		isCommandLoading.value = false
+	}
+}
+
+function selectCommand(command: UTSJSONObject): void {
+	if (isSending.value) return
+	if (!isCommandAllowed(command)) {
+		showAppToast({ title: '该指令不允许在 App 端下发', icon: 'none' })
+		return
+	}
+	selectedCommand.value = command
+	selectedCommandId.value = getCommandKey(command, 0)
+	const configs = parseParamConfigs(getString(command, 'paramSchema'))
+	paramConfigs.value = configs
+	paramValues.value = paramConfigError.value == '' ? initializeParamValues(configs) : []
+	paramErrors.value = configs.map((_param: UTSJSONObject): string => '')
+}
+
+function buildCommandParams(): UTSJSONObject {
+	const params = new UTSJSONObject()
+	for (let index = 0; index < paramConfigs.value.length; index++) {
+		const value = getParamValue(index).trim()
+		if (value != '') params.set(getParamKey(paramConfigs.value[index], index), value)
+	}
+	return params
+}
+
+async function loadHistoryPage(reset: boolean): Promise<void> {
+	if (deviceId.value == '' || isHistoryLoading.value || (!reset && !hasMoreHistory.value)) return
+	const requestedPage = reset ? 1 : historyPageNum.value
+	try {
+		isHistoryLoading.value = true
+		const query = new UTSJSONObject()
+		query.set('deviceId', deviceId.value)
+		query.set('pageNum', requestedPage)
+		query.set('pageSize', historyPageSize)
+		const response = await getAppCommandHistory(query)
+		if (response.code != 200) {
+			showAppToast({ title: response.msg != '' ? response.msg : '加载指令记录失败', icon: 'none' })
+			return
+		}
+		const rows = response.data.rows
+		if (reset) historyRecords.value = rows
+		else historyRecords.value = [...historyRecords.value, ...rows]
+		historyTotal.value = response.data.total
+		historyPageNum.value = requestedPage + 1
+		hasMoreHistory.value = historyRecords.value.length < historyTotal.value && rows.length > 0
+	} catch (error) {
+		console.error('加载指令记录失败:', error)
+		showAppToast({ title: '加载指令记录失败，请检查网络', icon: 'none' })
+	} finally {
+		hasLoadedHistory.value = true
+		isHistoryLoading.value = false
+	}
+}
+
+async function reloadHistory(): Promise<void> {
+	hasReachedHistoryBottom.value = false
+	historyPageNum.value = 1
+	historyRecords.value = []
+	historyTotal.value = 0
+	hasMoreHistory.value = true
+	hasLoadedHistory.value = false
+	await loadHistoryPage(true)
+}
+
+async function sendSelectedCommand(): Promise<void> {
+	const command = selectedCommand.value
+	if (command == null || deviceId.value == '' || isSending.value) return
+	const cmdId = getString(command, 'cmdId')
+	if (cmdId == '') {
+		showAppToast({ title: '指令模板信息不完整', icon: 'none' })
+		return
+	}
+	const requestData = new UTSJSONObject()
+	requestData.set('deviceId', deviceId.value)
+	requestData.set('cmdId', cmdId)
+	const cmdCode = getCommandCode(command)
+	if (cmdCode != '') requestData.set('cmdCode', cmdCode)
+	requestData.set('params', buildCommandParams())
+	try {
+		isSending.value = true
+		const response = await sendAppCommand(requestData)
+		if (response.code == 200) {
+			const requestIdText = response.data != '' ? '追踪编号：' + response.data : '请在指令记录中查看下发结果'
+			showAppToast({ title: '指令已提交，' + requestIdText, icon: 'success', duration: 3500 })
+			await reloadHistory()
+		} else {
+			showAppToast({ title: response.msg != '' ? response.msg : '指令下发失败', icon: 'none', duration: 3000 })
+		}
+	} catch (error) {
+		console.error('下发指令失败:', error)
+		showAppToast({ title: '指令下发失败，请检查网络', icon: 'none' })
+	} finally {
+		isSending.value = false
+	}
+}
+
+function confirmSendCommand(): void {
+	if (selectedCommand.value == null) {
+		showAppToast({ title: '请选择要下发的指令', icon: 'none' })
+		return
+	}
+	for (let index = 0; index < paramConfigs.value.length; index++) validateParam(index, true)
+	if (!isFormValid.value) {
+		showAppToast({ title: '请检查指令参数', icon: 'none' })
+		return
+	}
+	showAppModal({
+		title: '确认下发指令',
+		content: '即将向设备下发“' + getCommandName(selectedCommand.value) + '”。指令下发后可能影响车辆使用，请确认操作。',
+		confirmText: '确认下发',
+		cancelText: '取消',
+		success: (result: AppModalSuccess): void => {
+			if (result.confirm) void sendSelectedCommand()
+		}
+	})
+}
+
+function getRecordKey(record: UTSJSONObject, index: number): string {
+	const id = getString(record, 'id')
+	return id != '' ? id : 'record_' + index.toString()
+}
+function getRecordName(record: UTSJSONObject | null): string {
+	const name = getString(record, 'cmdName')
+	return name != '' ? name : (getString(record, 'commandType') != '' ? getString(record, 'commandType') : '未知指令')
+}
+function getRecordTime(record: UTSJSONObject | null): string {
+	const time = getString(record, 'sendTime')
+	return time != '' ? time : getString(record, 'createTime')
+}
+function getRecordRetryCount(record: UTSJSONObject | null): string {
+	const count = getString(record, 'retryCount')
+	return count != '' ? count : '0'
+}
+function getRecordSummary(record: UTSJSONObject | null): string {
+	const reason = getString(record, 'reason')
+	return reason != '' ? reason : getString(record, 'responseContent')
+}
+
+
+function markHistoryScroll(event: UniScrollEvent): void {
+	if (activeTab.value != 'history') return
+	// #ifdef APP-IOS
+	if (event.detail.deltaY <= 0) hasReachedHistoryBottom.value = false
+	// #endif
+}
+
+function loadMoreHistory(): void {
+	if (activeTab.value != 'history' || refreshing.value) return
+	// #ifdef APP-IOS
+	if (hasReachedHistoryBottom.value) return
+	hasReachedHistoryBottom.value = true
+	// #endif
+	void loadHistoryPage(false)
+}
+
+async function showCommandDetail(record: UTSJSONObject): Promise<void> {
+	const commandId = getString(record, 'id')
+	if (commandId == '') return
+	detailRecord.value = record
+	detailVisible.value = true
+	isDetailLoading.value = true
+	try {
+		const response = await getAppCommandDetail(commandId)
+		if (response.code == 200 && response.data != null) {
+			detailRecord.value = response.data
+		} else {
+			showAppToast({ title: response.msg != '' ? response.msg : '加载指令详情失败', icon: 'none' })
+		}
+	} catch (error) {
+		console.error('加载指令详情失败:', error)
+		showAppToast({ title: '加载指令详情失败，请检查网络', icon: 'none' })
+	} finally {
+		isDetailLoading.value = false
+	}
+}
+
+function closeDetail(): void {
+	detailVisible.value = false
+}
+function getDetailResponse(): string { return getString(detailRecord.value, 'responseContent') }
+function getDetailReason(): string { return getString(detailRecord.value, 'reason') }
+function getDetailParams(): string { return getString(detailRecord.value, 'commandParams') }
+
+async function retryCommand(commandId: string): Promise<void> {
+	if (isRetrying.value) return
+	try {
+		isRetrying.value = true
+		const response = await retryAppCommand(commandId)
+		if (response.code == 200) {
+			showAppToast({ title: response.msg != '' ? response.msg : '已重新提交指令', icon: 'success' })
+			detailVisible.value = false
+			await reloadHistory()
+		} else {
+			showAppToast({ title: response.msg != '' ? response.msg : '重试下发失败', icon: 'none', duration: 3000 })
+		}
+	} catch (error) {
+		console.error('重试下发失败:', error)
+		showAppToast({ title: '重试下发失败，请检查网络', icon: 'none' })
+	} finally {
+		isRetrying.value = false
+	}
+}
+
+function confirmRetryFromDetail(): void {
+	const commandId = getString(detailRecord.value, 'id')
+	if (commandId == '' || isRetrying.value) return
+	showAppModal({
+		title: '确认重试',
+		content: '将重新下发“' + getRecordName(detailRecord.value) + '”，请确认设备当前状态适合执行此操作。',
+		confirmText: '确认重试',
+		cancelText: '取消',
+		success: (result: AppModalSuccess): void => {
+			if (result.confirm) void retryCommand(commandId)
+		}
+	})
+}
+
+function getEventString(event: any, key: string): string {
+	if (event == null || typeof event != 'object') return ''
+	// #ifdef APP-ANDROID
+	return (event as UTSJSONObject).getString(key, '')
+	// #endif
+	// #ifndef APP-ANDROID
+	const value = event[key]
+	return value == null ? '' : value.toString()
+	// #endif
+}
+
+function changeTab(event: any): void {
+	const value = getEventString(event, 'value')
+	if (value == '') return
+	activeTab.value = value
+	if (value == 'history' && !hasLoadedHistory.value) void reloadHistory()
+}
+
+async function refreshCurrentTab(): Promise<void> {
+	if (refreshing.value) return
+	try {
+		refreshing.value = true
+		if (activeTab.value == 'history') await reloadHistory()
+		else await loadAvailableCommands()
+	} finally {
+		refreshing.value = false
 	}
 }
 
 onLoad((options) => {
 	imei.value = options.imei ?? ''
-	loadCommandTypes()
+	deviceId.value = options.deviceId ?? ''
+	if (deviceId.value != '') void loadAvailableCommands()
 })
-
-const selectTypeByItem = async (type: UTSJSONObject): Promise<void> => {
-	if (sending.value) return
-	const typeId = type['cmdmId'] as string | number | null
-	if (typeId == null) return
-	selectedTypeId.value = typeId
-	selectedCommandId.value = null
-	selectedCommand.value = null
-	paramConfigs.value = []
-	paramValues.value = []
-	paramConfigError.value = ''
-	commands.value = []
-
-	try {
-		loading.value = true
-		const response = await getCmdByMid({ imei: imei.value, cmdmId: typeId } as UTSJSONObject)
-		if (response.code == 200 && response.data != null) {
-			commands.value = response.data
-		} else {
-			showAppToast({ title: response.msg != '' ? response.msg : '加载指令列表失败', icon: 'none' })
-		}
-	} catch (error) {
-		console.error('加载指令列表出错:', error)
-		showAppToast({ title: '网络错误', icon: 'none' })
-	} finally {
-		loading.value = false
-	}
-}
-
-const selectCommand = (command: UTSJSONObject): void => {
-	if (sending.value) return
-	selectedCommandId.value = command['predictCmdId'] as string | number | null
-	selectedCommand.value = command
-	const configs = parseParamConfigs(command['details'] as string | null)
-	paramConfigs.value = configs
-	paramValues.value = paramConfigError.value == '' ? initializeParamValues(configs) : []
-}
-
-const selectRadio = (index: number, value: string): void => {
-	if (sending.value || index < 0 || index >= paramValues.value.length) return
-	paramValues.value[index] = value
-}
-
-const sendCommand = async (): Promise<void> => {
-	if (sending.value) return
-	if (selectedCommand.value == null) {
-		showAppToast({ title: '请选择指令', icon: 'none' })
-		return
-	}
-	if (paramConfigError.value != '') {
-		showAppToast({ title: paramConfigError.value, icon: 'none' })
-		return
-	}
-	if (!isFormValid.value) {
-		showAppToast({ title: '请填写所有参数', icon: 'none' })
-		return
-	}
-
-	const command = selectedCommand.value
-	let cmdData = (command['params'] as string | null) ?? ''
-	for (let index = 0; index < paramConfigs.value.length; index++) {
-		const config = paramConfigs.value[index]
-		const configuredPlaceholder = config['placeholder'] as string | null
-		const placeholder = configuredPlaceholder != null && configuredPlaceholder.length > 0
-			? configuredPlaceholder
-			: '${param' + (index + 1).toString() + '}'
-		cmdData = cmdData.split(placeholder).join(paramValues.value[index])
-	}
-
-	try {
-		sending.value = true
-		const response = await sendCmd({
-			imei: imei.value,
-			type: (command['cmdCode'] as string | null) ?? '',
-			password: null,
-			cmdData: encodeURIComponent(cmdData),
-			predictCmdId: command['predictCmdId']
-		} as UTSJSONObject)
-		if (response.code == 200) {
-			showAppToast({ title: response.msg != '' ? response.msg : '指令发送成功', icon: 'success' })
-		} else {
-			showAppToast({ title: response.msg != '' ? response.msg : '指令发送失败', icon: 'none', duration: 3000 })
-		}
-	} catch (error) {
-		console.error('发送指令出错:', error)
-		showAppToast({ title: '网络错误', icon: 'none' })
-	} finally {
-		sending.value = false
-	}
-}
 </script>
+
 <style scoped lang="scss">
-	.container { background-color: #f5f5f5;height: 100%; display: flex; flex-direction: column; padding-bottom: 30rpx; }
-	.device-info, .section { background: #fff; border-radius: 10rpx; padding: 20rpx; margin: 0 20rpx 30rpx; }
-	.device-info { display: flex; align-items: center; }
-	.device-label { font-size: 28rpx; color: #666; white-space: nowrap; }
-	.section-title { font-size: 32rpx; font-weight: bold; color: #333; margin-bottom: 20rpx; }
-	.type-list { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; }
-	.type-item { margin-right: 20rpx; margin-bottom: 20rpx; padding: 15rpx 30rpx; background: #f0f0f0; border-radius: 50rpx; }
-	.type-item.active { background: #007AFF; }
-	.type-item.active .type-name { color: #fff; }
-	.type-name { font-size: 26rpx; color: #666; white-space: nowrap; }
-	.command-list { display: flex; flex-direction: column; }
-	.command-item { width: 100%; box-sizing: border-box; padding: 25rpx; border: 1rpx solid #e0e0e0; border-radius: 10rpx; }
-	.command-item + .command-item { margin-top: 20rpx; }
-	.command-item.active { border-color: #007AFF; background-color: #f0f8ff; }
-	.command-name { font-size: 30rpx; color: #333; margin-bottom: 10rpx; }
-	.command-descr { font-size: 24rpx; color: #999; line-height: 36rpx; }
-	.param-form, .param-item, .radio-group { display: flex; flex-direction: column; }
-	.param-item + .param-item { margin-top: 30rpx; }
-	.param-label { margin-bottom: 15rpx; font-size: 28rpx; color: #333; }
-	.param-input { width: 100%; box-sizing: border-box; border: 1rpx solid #e0e0e0; border-radius: 8rpx; background: #fff; }
-	.param-error { color: #e43d33; font-size: 26rpx; margin-bottom: 20rpx; }
-	.no-param-tip { color: #999; font-size: 26rpx; margin-bottom: 20rpx; }
-	.radio-item { display: flex; align-items: center; }
-	.radio-item + .radio-item { margin-top: 20rpx; }
-	.radio-icon { margin-right: 20rpx; width: 36rpx; height: 36rpx; border-radius: 50%; border: 1rpx solid #ccc; display: flex; align-items: center; justify-content: center; }
-	.radio-inner { width: 25rpx; height: 25rpx; border-radius: 50%; background: transparent; }
-	.radio-inner.checked { background: #007AFF; }
-	.radio-label { font-size: 26rpx; color: #333; }
-	.submit-btn { margin-top: 30rpx; }
-	.empty-state, .loading { text-align: center; padding: 50rpx 20rpx; background: #fff; margin: 0 20rpx 30rpx; }
-	.placeholder { color: #ccc; }
+.page {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fb;
+}
+
+.content-wrap {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.device-card {
+	display: flex;
+	justify-content: space-between;
+	margin: 20rpx 24rpx 16rpx;
+	padding: 28rpx 30rpx;
+	border-radius: 20rpx;
+	background-image: linear-gradient(to right, #1769e0, #56a0f6);
+	box-shadow: 0 10rpx 28rpx rgba(22, 119, 255, 0.22);
+}
+
+.device-card-main, .device-id-wrap, .section-heading, .command-card-top, .command-name-wrap, .form-header, .param-label-row, .history-card-top, .history-bottom, .detail-row {
+	display: flex;
+}
+
+.device-card-main {
+	flex: 1;
+	min-width: 0;
+	flex-direction: row;
+	align-items: center;
+}
+
+.device-title, .device-id-label {
+	color: rgba(255, 255, 255, 0.76);
+	font-size: 23rpx;
+	margin-right: 20rpx;
+}
+
+.device-imei {
+	color: #ffffff;
+	font-size: 32rpx;
+	font-weight: 600;
+}
+
+.device-id-wrap {
+	flex-direction: row;
+	align-items: flex-end;
+}
+
+.device-id-value {
+	margin-top: 8rpx;
+	color: #ffffff;
+	font-size: 25rpx;
+}
+
+.main-scroll {
+	flex: 1;
+	min-height: 0;
+}
+
+.tab-content {
+	padding: 24rpx 24rpx 44rpx;
+}
+
+.section-heading {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20rpx;
+}
+
+.section-title {
+		color: #1f2937;
+	font-size: 32rpx;
+	font-weight: 600;
+}
+
+.section-subtitle {
+		margin-top: 7rpx;
+	color: #98a2b3;
+	font-size: 23rpx;
+}
+
+.refresh-link, .detail-link {
+	color: #1677ff;
+	font-size: 25rpx;
+}
+
+.state-card, .form-card, .history-card {
+	box-sizing: border-box;
+	background-color: #ffffff;
+	border-radius: 18rpx;
+}
+
+.state-card {
+	margin: 32rpx 24rpx;
+	padding: 58rpx 38rpx;
+	align-items: center;
+}
+
+.compact-state {
+	margin: 0;
+	padding: 48rpx 32rpx;
+}
+
+.state-title {
+		color: #344054;
+	font-size: 30rpx;
+	font-weight: 600;
+	text-align: center;
+}
+
+.state-text {
+		margin-top: 12rpx;
+	color: #98a2b3;
+	font-size: 25rpx;
+	line-height: 38rpx;
+	text-align: center;
+}
+
+.command-list, .history-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.command-card {
+	padding: 20rpx;
+	border: 2rpx solid transparent;
+	border-radius: 16rpx;
+	background-color: #ffffff;
+	flex-direction: row;
+}
+
+.command-card + .command-card, .history-card + .history-card {
+	margin-top: 16rpx;
+}
+
+.command-card.selected {
+	border-color: #1677ff;
+	background-color: #f0f7ff;
+}
+
+.command-card.disabled {
+	opacity: 0.58;
+	justify-content: space-between;
+}
+
+.command-card-top, .history-card-top, .history-bottom {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	flex:1;
+}
+
+.command-name-wrap {
+	min-width: 0;
+	align-items: center;
+}
+
+.command-name, .history-name {
+	color: #344054;
+	font-size: 29rpx;
+	font-weight: 600;
+}
+
+.command-code {
+	margin-left: 14rpx;
+	padding: 4rpx 10rpx;
+	border-radius: 6rpx;
+	color: #667085;
+	background-color: #f2f4f7;
+	font-size: 20rpx;
+}
+
+.command-status, .history-status {
+	margin-left: 16rpx;
+	padding: 6rpx 12rpx;
+	border-radius: 8rpx;
+	color: #1668dc;
+	background-color: #eaf3ff;
+	font-size: 21rpx;
+	white-space: nowrap;
+}
+
+.command-status.blocked {
+	color: #98a2b3;
+	background-color: #eaecf0;
+}
+
+.command-remark, .history-time, .history-summary, .retry-count {
+		color: #98a2b3;
+	font-size: 23rpx;
+	line-height: 36rpx;
+}
+
+.command-remark {
+	margin-top: 12rpx;
+}
+
+.form-card {
+	margin-top: 24rpx;
+	padding: 30rpx;
+}
+
+.form-header {
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 12rpx;
+}
+
+.form-error, .param-error {
+		color: #e34935;
+	font-size: 23rpx;
+	line-height: 34rpx;
+}
+
+.form-error {
+	margin: 12rpx 0;
+}
+
+.param-row {
+	margin-top: 28rpx;
+}
+
+.param-label-row {
+	align-items: center;
+	margin-bottom: 12rpx;
+}
+
+.param-label {
+	color: #344054;
+	font-size: 27rpx;
+}
+
+.required-mark {
+	margin-left: 6rpx;
+	color: #f04438;
+	font-size: 28rpx;
+}
+
+.param-input, .select-field {
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 82rpx;
+	border: 1rpx solid #d0d5dd;
+	border-radius: 12rpx;
+	background-color: #ffffff;
+}
+
+.select-field {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 24rpx;
+	color: #344054;
+	font-size: 27rpx;
+}
+
+.select-placeholder, .input-placeholder {
+	color: #98a2b3;
+}
+
+.select-arrow {
+	color: #98a2b3;
+	font-size: 42rpx;
+	line-height: 42rpx;
+}
+
+.param-error {
+	margin-top: 8rpx;
+}
+
+.no-param-text {
+		margin-top: 26rpx;
+	color: #98a2b3;
+	font-size: 25rpx;
+}
+
+.send-button {
+	margin-top: 36rpx;
+}
+
+.history-card {
+	padding: 26rpx 28rpx;
+}
+
+.history-status.status-success {
+	color: #039855;
+	background-color: #ecfdf3;
+}
+
+.history-status.status-failed {
+	color: #d92d20;
+	background-color: #fef3f2;
+}
+
+.history-status.status-pending {
+	color: #b54708;
+	background-color: #fffaeb;
+}
+
+.history-time {
+	margin-top: 12rpx;
+}
+
+.history-summary {
+	margin-top: 8rpx;
+	color: #667085;
+}
+
+.history-bottom {
+	margin-top: 18rpx;
+}
+
+.history-footer {
+	padding: 28rpx 0 12rpx;
+	color: #98a2b3;
+	font-size: 23rpx;
+	text-align: center;
+}
+
+.detail-loading, .detail-content {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.detail-loading {
+	align-items: center;
+	padding: 28rpx 0;
+	color: #98a2b3;
+	font-size: 25rpx;
+}
+
+.detail-row {
+	align-items: flex-start;
+	justify-content: space-between;
+	padding: 9rpx 0;
+}
+
+.detail-label {
+	width: 120rpx;
+	flex-shrink: 0;
+	color: #98a2b3;
+	font-size: 23rpx;
+}
+
+.detail-value {
+	flex: 1;
+	color: #344054;
+	font-size: 23rpx;
+	line-height: 34rpx;
+	text-align: right;
+}
+
+.detail-long-row {
+	flex-direction: column;
+}
+
+.detail-long-row .detail-value {
+	margin-top: 5rpx;
+	text-align: left;
+}
 </style>

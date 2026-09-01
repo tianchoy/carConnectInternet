@@ -609,7 +609,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (itemTo == "发送指令") {
         stopAutoRefresh();
         common_vendor.index.navigateTo({
-          url: "/pages/cmd/cmd?imei=" + imei.value
+          url: "/pages/cmd/cmd?imei=" + imei.value + "&deviceId=" + deviceId.value
         });
       }
     };

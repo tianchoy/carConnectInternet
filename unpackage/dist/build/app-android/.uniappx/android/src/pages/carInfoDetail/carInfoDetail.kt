@@ -449,7 +449,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 }
                 if (itemTo == "发送指令") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/cmd/cmd?imei=" + imei.value))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/cmd/cmd?imei=" + imei.value + "&deviceId=" + deviceId.value))
                 }
             }
             val loadDeviceDetail = fun(): UTSPromise<Unit> {

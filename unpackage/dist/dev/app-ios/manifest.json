@@ -3,8 +3,8 @@
   "name": "中导物联",
   "description": "",
   "version": {
-    "name": "1.0.0",
-    "code": "100"
+    "name": "1.0.1",
+    "code": "101"
   },
   "uni-app-x": {
     "styleIsolationVersion": "2",
@@ -25,7 +25,7 @@
         "uni-barcode-scanning": {},
         "uni-map": {
           "tencent": {
-            "key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
+            "key": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
           }
         }
       },

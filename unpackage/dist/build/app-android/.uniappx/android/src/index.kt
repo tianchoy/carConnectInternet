@@ -807,9 +807,11 @@ val bindDeviceList = "/device/bindGeofenceList"
 val bindGeofence = "/geofence/bind"
 val unbindGeofence = "/geofence/unbind"
 val deleteDevice = "/userDevice/del"
-val cmdActionUrl = "/command/cmdAction"
-val cmdByMidUrl = "/command/cmdByMid"
-val cmdSendUrl = "/command/sendCmd"
+val appCommandAvailableUrl = "/app/command/available-cmds"
+val appCommandSendUrl = "/app/command/send"
+val appCommandListUrl = "/app/command/list"
+val appCommandDetailUrl = "/app/command/"
+val appCommandRetryUrl = "/app/command/retry/"
 val pushBindUrl = "/app/push/bind"
 val pushUnbindUrl = "/app/push/unbind"
 open class BasicResponse (
@@ -969,6 +971,28 @@ open class SendCmdResponse (
     @JsonNotNull
     open var data: String,
 ) : UTSObject()
+open class AppCommandPageData (
+    @JsonNotNull
+    open var total: Number,
+    @JsonNotNull
+    open var rows: UTSArray<UTSJSONObject>,
+) : UTSObject()
+open class AppCommandPageResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: AppCommandPageData,
+) : UTSObject()
+open class AppCommandDetailResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
+) : UTSObject()
 open class ChangePasswordRequest (
     @JsonNotNull
     open var oldPassword: String,
@@ -1019,6 +1043,16 @@ fun userInfoResponse(raw: Any): UserInfoResponse {
 fun deviceDetailResponse(raw: Any): DeviceDetailResponse {
     val response = jsonDataResponse(raw)
     return DeviceDetailResponse(code = response.code, msg = response.msg, data = response.data)
+}
+fun appCommandPageResponse(raw: Any): AppCommandPageResponse {
+    val response = asJSONObject(raw)
+    val rows = response.getArray<UTSJSONObject>("rows")
+    return AppCommandPageResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = AppCommandPageData(total = response.getNumber("total", 0), rows = if (rows != null) {
+        rows
+    } else {
+        _uA()
+    }
+    ))
 }
 val logout = fun(): UTSPromise<BasicResponse> {
     return post(logoutUrl).then(fun(raw: Any): BasicResponse {
@@ -1274,24 +1308,37 @@ val unbindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
     }
     )
 }
-val getCmdAction = fun(): UTSPromise<CommandListResponse> {
-    return get(cmdActionUrl).then(fun(raw: Any): CommandListResponse {
+val getAppAvailableCommands = fun(deviceId: String): UTSPromise<CommandListResponse> {
+    return get(appCommandAvailableUrl, _uO("deviceId" to deviceId)).then(fun(raw: Any): CommandListResponse {
         val response = asJSONObject(raw)
         return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
     }
     )
 }
-val getCmdByMid = fun(data: UTSJSONObject): UTSPromise<CommandListResponse> {
-    return get(cmdByMidUrl, data).then(fun(raw: Any): CommandListResponse {
-        val response = asJSONObject(raw)
-        return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
-    }
-    )
-}
-val sendCmd = fun(data: UTSJSONObject): UTSPromise<SendCmdResponse> {
-    return post(cmdSendUrl, data).then(fun(raw: Any): SendCmdResponse {
+val sendAppCommand = fun(data: UTSJSONObject): UTSPromise<SendCmdResponse> {
+    return post(appCommandSendUrl, data).then(fun(raw: Any): SendCmdResponse {
         val response = asJSONObject(raw)
         return SendCmdResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = response.getString("data", ""))
+    }
+    )
+}
+val getAppCommandHistory = fun(query: UTSJSONObject): UTSPromise<AppCommandPageResponse> {
+    query.set("tenantId", defaultTenantId)
+    return get(appCommandListUrl, query).then(fun(raw: Any): AppCommandPageResponse {
+        return appCommandPageResponse(raw)
+    }
+    )
+}
+val getAppCommandDetail = fun(commandId: Any): UTSPromise<AppCommandDetailResponse> {
+    return get("" + appCommandDetailUrl + commandId.toString()).then(fun(raw: Any): AppCommandDetailResponse {
+        val response = jsonDataResponse(raw)
+        return AppCommandDetailResponse(code = response.code, msg = response.msg, data = response.data)
+    }
+    )
+}
+val retryAppCommand = fun(commandId: Any): UTSPromise<BasicResponse> {
+    return get("" + appCommandRetryUrl + commandId.toString()).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
     }
     )
 }
@@ -9605,6 +9652,52 @@ val GenPagesUserCenterPayDeviceListPayDeviceListClass = CreateVueComponent(GenPa
     return GenPagesUserCenterPayDeviceListPayDeviceList(instance, renderer)
 }
 )
+open class TabPayload (
+    @JsonNotNull
+    open var index: Number,
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var value: String,
+    @JsonNotNull
+    open var item: Any,
+) : UTSObject()
+val GenUniModulesIUiXComponentsITabsITabsClass = CreateVueComponent(GenUniModulesIUiXComponentsITabsITabs::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsITabsITabs.name, inheritAttrs = GenUniModulesIUiXComponentsITabsITabs.inheritAttrs, inject = GenUniModulesIUiXComponentsITabsITabs.inject, props = GenUniModulesIUiXComponentsITabsITabs.props, propsNeedCastKeys = GenUniModulesIUiXComponentsITabsITabs.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsITabsITabs.emits, components = GenUniModulesIUiXComponentsITabsITabs.components, styles = GenUniModulesIUiXComponentsITabsITabs.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesIUiXComponentsITabsITabs.setup(props as GenUniModulesIUiXComponentsITabsITabs)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsITabsITabs {
+    return GenUniModulesIUiXComponentsITabsITabs(instance)
+}
+)
+open class ActionPayload (
+    @JsonNotNull
+    open var index: Number,
+    @JsonNotNull
+    open var item: Any,
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var value: String,
+) : UTSObject()
+val GenUniModulesIUiXComponentsIActionSheetIActionSheetClass = CreateVueComponent(GenUniModulesIUiXComponentsIActionSheetIActionSheet::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIActionSheetIActionSheet.name, inheritAttrs = GenUniModulesIUiXComponentsIActionSheetIActionSheet.inheritAttrs, inject = GenUniModulesIUiXComponentsIActionSheetIActionSheet.inject, props = GenUniModulesIUiXComponentsIActionSheetIActionSheet.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIActionSheetIActionSheet.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIActionSheetIActionSheet.emits, components = GenUniModulesIUiXComponentsIActionSheetIActionSheet.components, styles = GenUniModulesIUiXComponentsIActionSheetIActionSheet.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
+        return GenUniModulesIUiXComponentsIActionSheetIActionSheet.setup(props as GenUniModulesIUiXComponentsIActionSheetIActionSheet, ctx)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIActionSheetIActionSheet {
+    return GenUniModulesIUiXComponentsIActionSheetIActionSheet(instance)
+}
+)
+open class TabItem (
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var value: String,
+) : UTSObject()
 val GenPagesCmdCmdClass = CreateVueComponent(GenPagesCmdCmd::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesCmdCmd.inheritAttrs, inject = GenPagesCmdCmd.inject, props = GenPagesCmdCmd.props, propsNeedCastKeys = GenPagesCmdCmd.propsNeedCastKeys, emits = GenPagesCmdCmd.emits, components = GenPagesCmdCmd.components, styles = GenPagesCmdCmd.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesCmdCmd.setup(props as GenPagesCmdCmd)

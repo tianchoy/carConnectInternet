@@ -2,8 +2,11 @@
   "navigationBarTitleText": "",
   "usingComponents": {
     "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
+    "i-tabs": "../../uni_modules/i-ui-x/components/i-tabs/i-tabs",
     "i-input": "../../uni_modules/i-ui-x/components/i-input/i-input",
     "i-button": "../../uni_modules/i-ui-x/components/i-button/i-button",
+    "i-action-sheet": "../../uni_modules/i-ui-x/components/i-action-sheet/i-action-sheet",
+    "i-modal": "../../uni_modules/i-ui-x/components/i-modal/i-modal",
     "app-toast": "../../components/app-toast/app-toast"
   }
 }

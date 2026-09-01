@@ -1,367 +1,800 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
+const utils_modal = require("../../utils/modal.js");
+const utils_toast = require("../../utils/toast.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
+  const _easycom_i_tabs_1 = common_vendor.resolveComponent("i-tabs");
   const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
   const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
+  const _easycom_i_action_sheet_1 = common_vendor.resolveComponent("i-action-sheet");
+  const _easycom_i_modal_1 = common_vendor.resolveComponent("i-modal");
   const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
-  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_button_1 + _easycom_app_toast_1)();
+  (_easycom_custom_navBar_1 + _easycom_i_tabs_1 + _easycom_i_input_1 + _easycom_i_button_1 + _easycom_i_action_sheet_1 + _easycom_i_modal_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
+const _easycom_i_tabs = () => "../../uni_modules/i-ui-x/components/i-tabs/i-tabs.js";
 const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
 const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-button.js";
+const _easycom_i_action_sheet = () => "../../uni_modules/i-ui-x/components/i-action-sheet/i-action-sheet.js";
+const _easycom_i_modal = () => "../../uni_modules/i-ui-x/components/i-modal/i-modal.js";
 const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_button + _easycom_app_toast)();
+  (_easycom_custom_navBar + _easycom_i_tabs + _easycom_i_input + _easycom_i_button + _easycom_i_action_sheet + _easycom_i_modal + _easycom_app_toast)();
 }
+class TabItem extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: String, optional: false },
+          value: { type: String, optional: false }
+        };
+      },
+      name: "TabItem"
+    };
+  }
+  constructor(options, metadata = TabItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    this.value = this.__props__.value;
+    delete this.__props__;
+  }
+}
+const historyPageSize = 10;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "cmd",
   setup(__props) {
     const imei = common_vendor.ref("");
-    const commandTypes = common_vendor.ref([]);
-    const selectedTypeId = common_vendor.ref(null);
-    const commands = common_vendor.ref([]);
-    const selectedCommandId = common_vendor.ref(null);
+    const deviceId = common_vendor.ref("");
+    const activeTab = common_vendor.ref("send");
+    const tabItems = [
+      new TabItem({ name: "下发指令", value: "send" }),
+      new TabItem({ name: "指令记录", value: "history" })
+    ];
+    const availableCommands = common_vendor.ref([]);
     const selectedCommand = common_vendor.ref(null);
+    const selectedCommandId = common_vendor.ref("");
     const paramConfigs = common_vendor.ref([]);
     const paramValues = common_vendor.ref([]);
+    const paramErrors = common_vendor.ref([]);
     const paramConfigError = common_vendor.ref("");
-    const loading = common_vendor.ref(false);
-    const sending = common_vendor.ref(false);
-    const isFormValid = common_vendor.computed(() => {
-      if (selectedCommand.value == null || paramConfigError.value != "")
+    const isCommandLoading = common_vendor.ref(false);
+    const isSending = common_vendor.ref(false);
+    const optionSheetVisible = common_vendor.ref(false);
+    const optionSheetTitle = common_vendor.ref("请选择");
+    const optionActions = common_vendor.ref([]);
+    const activeOptionIndex = common_vendor.ref(-1);
+    const historyRecords = common_vendor.ref([]);
+    const historyPageNum = common_vendor.ref(1);
+    const historyTotal = common_vendor.ref(0);
+    const isHistoryLoading = common_vendor.ref(false);
+    const hasLoadedHistory = common_vendor.ref(false);
+    const hasMoreHistory = common_vendor.ref(true);
+    const refreshing = common_vendor.ref(false);
+    const hasReachedHistoryBottom = common_vendor.ref(false);
+    const detailVisible = common_vendor.ref(false);
+    const isDetailLoading = common_vendor.ref(false);
+    const detailRecord = common_vendor.ref(new common_vendor.UTSJSONObject({}));
+    const isRetrying = common_vendor.ref(false);
+    function getString(item = null, key) {
+      return item != null ? item.getString(key, "") : "";
+    }
+    function getBoolean(item = null, key) {
+      if (item == null)
         return false;
-      return paramValues.value.length == paramConfigs.value.length && paramValues.value.every((value) => {
-        return value != "";
-      });
+      return item.getBoolean(key, false) || getString(item, key) == "1";
+    }
+    function getCommandKey(command, index) {
+      const cmdId = getString(command, "cmdId");
+      return cmdId != "" ? cmdId : "command_" + index.toString();
+    }
+    function getCommandName(command = null) {
+      const name = getString(command, "cmdName");
+      return name != "" ? name : "未命名指令";
+    }
+    function getCommandCode(command = null) {
+      return getString(command, "cmdCode");
+    }
+    function getCommandRemark(command = null) {
+      return getString(command, "remark");
+    }
+    function isCommandAllowed(command = null) {
+      return getBoolean(command, "appAllowed");
+    }
+    function commandNeedsParams(command = null) {
+      return getString(command, "needParam") == "1";
+    }
+    function isSelectedCommand(command) {
+      return getCommandKey(command, 0) == selectedCommandId.value;
+    }
+    function getParamKey(param, index) {
+      const key = getString(param, "key");
+      return key != "" ? key : "param_" + index.toString();
+    }
+    function getParamLabel(param) {
+      const label = getString(param, "label");
+      return label != "" ? label : "参数";
+    }
+    function getParamType(param) {
+      return getString(param, "type");
+    }
+    function isParamRequired(param) {
+      return getBoolean(param, "required");
+    }
+    function getParamPlaceholder(param) {
+      const placeholder = getString(param, "placeholder");
+      return placeholder != "" ? placeholder : "请输入" + getParamLabel(param);
+    }
+    function getParamValue(index) {
+      return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : "";
+    }
+    function getParamError(index) {
+      return index >= 0 && index < paramErrors.value.length ? paramErrors.value[index] : "";
+    }
+    function getParamOptions(param) {
+      const options = param.getArray("options");
+      return options != null ? options : [];
+    }
+    function getOptionValue(option) {
+      return getString(option, "value");
+    }
+    function getOptionLabel(option) {
+      const label = getString(option, "label");
+      return label != "" ? label : getOptionValue(option);
+    }
+    function parseNumber(value) {
+      const parsed = parseFloat(value);
+      return isNaN(parsed) ? 0 : Number.from(parsed);
+    }
+    function validateParam(index, updateError) {
+      if (index < 0 || index >= paramConfigs.value.length)
+        return "";
+      const param = paramConfigs.value[index];
+      const value = getParamValue(index).trim();
+      let error = "";
+      if (isParamRequired(param) && value == "") {
+        error = "请填写" + getParamLabel(param);
+      } else if (value != "" && getParamType(param) == "number") {
+        const numberValue = parseFloat(value);
+        if (isNaN(numberValue)) {
+          error = getParamLabel(param) + "必须为数字";
+        } else {
+          const minText = getString(param, "min");
+          const maxText = getString(param, "max");
+          if (minText != "" && numberValue < parseNumber(minText))
+            error = getParamLabel(param) + "不能小于" + minText;
+          if (error == "" && maxText != "" && numberValue > parseNumber(maxText))
+            error = getParamLabel(param) + "不能大于" + maxText;
+        }
+      }
+      if (updateError && index >= 0 && index < paramErrors.value.length)
+        paramErrors.value[index] = error;
+      return error;
+    }
+    function getStatusValue(record = null) {
+      return getString(record, "sendStatus");
+    }
+    function getStatusText(record = null) {
+      const status = getStatusValue(record);
+      if (status == "1")
+        return "下发成功";
+      if (status == "2")
+        return "下发失败";
+      return "等待下发";
+    }
+    function getStatusClass(record = null) {
+      const status = getStatusValue(record);
+      if (status == "1")
+        return "status-success";
+      if (status == "2")
+        return "status-failed";
+      return "status-pending";
+    }
+    const displayDeviceIdentity = common_vendor.computed(() => {
+      return imei.value != "" ? imei.value : deviceId.value != "" ? "设备 " + deviceId.value : "未识别设备";
     });
-    const sortByCmdNameLengthAndAlphabet = (data) => {
-      const sortedData = data.slice();
-      sortedData.sort((a, b) => {
-        var _a, _b;
-        const aName = (_a = a["cmdName"]) !== null && _a !== void 0 ? _a : "";
-        const bName = (_b = b["cmdName"]) !== null && _b !== void 0 ? _b : "";
-        if (aName.length != bName.length)
-          return aName.length - bName.length;
-        if (aName == bName)
-          return 0;
-        return aName < bName ? -1 : 1;
-      });
-      return sortedData;
-    };
-    const getParamLabel = (config) => {
-      const label = config["label"];
-      return label == null ? "参数" : label.toString();
-    };
-    const getParamMaxLength = (config) => {
-      const max = config["max"];
-      return typeof max == "number" ? max : -1;
-    };
-    const getRadioItems = (config) => {
-      var _a;
-      return (_a = config["items"]) !== null && _a !== void 0 ? _a : [];
-    };
-    const getRadioValue = (item) => {
-      const value = item["value"];
-      return value == null ? "" : value.toString();
-    };
-    const getRadioDescription = (item) => {
-      const desc = item["desc"];
-      return desc == null ? "" : desc.toString();
-    };
-    const parseParamConfigs = (details = null) => {
+    const isHistoryInitialLoading = common_vendor.computed(() => {
+      return isHistoryLoading.value && !hasLoadedHistory.value && historyRecords.value.length == 0;
+    });
+    const isFormValid = common_vendor.computed(() => {
+      if (selectedCommand.value == null || !isCommandAllowed(selectedCommand.value) || paramConfigError.value != "")
+        return false;
+      if (paramValues.value.length != paramConfigs.value.length)
+        return false;
+      for (let index = 0; index < paramConfigs.value.length; index++) {
+        if (validateParam(index, false) != "")
+          return false;
+      }
+      return true;
+    });
+    const canRetryDetail = common_vendor.computed(() => {
+      const status = getStatusValue(detailRecord.value);
+      return !isDetailLoading.value && (status == "0" || status == "2");
+    });
+    function parseParamConfigs(schema) {
       paramConfigError.value = "";
-      if (details == null || details.trim().length == 0)
+      if (schema.trim() == "")
         return [];
       try {
-        const parsed = common_vendor.UTS.JSON.parse(details);
+        const parsed = common_vendor.UTS.JSON.parse(schema);
         if (!Array.isArray(parsed)) {
           paramConfigError.value = "指令参数配置格式无效";
           return [];
         }
         const configs = parsed;
         for (let index = 0; index < configs.length; index++) {
-          const config = configs[index];
-          if (config == null) {
-            paramConfigError.value = "指令参数配置无效";
+          const param = configs[index];
+          if (param == null || getString(param, "key") == "" || getString(param, "label") == "") {
+            paramConfigError.value = "指令参数配置不完整";
             return [];
           }
-          const type = config["type"];
-          if (type != "input" && type != "number" && type != "radio") {
+          const type = getParamType(param);
+          if (type != "text" && type != "number" && type != "select") {
             paramConfigError.value = "该指令包含暂不支持的参数类型";
             return [];
           }
-          if (type == "radio") {
-            const items = getRadioItems(config);
-            if (items.length == 0 || items.some((item) => {
-              return getRadioValue(item) == "" || getRadioDescription(item) == "";
+          if (type == "select") {
+            const options = getParamOptions(param);
+            if (options.length == 0 || options.some((option) => {
+              return getOptionValue(option) == "" || getOptionLabel(option) == "";
             })) {
-              paramConfigError.value = "指令单选参数配置无效";
+              paramConfigError.value = "指令下拉参数配置无效";
               return [];
             }
           }
         }
         return configs;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:158", "解析参数配置失败:", error);
+        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:386", "解析指令参数配置失败:", error);
         paramConfigError.value = "指令参数配置无效";
         return [];
       }
-    };
-    const initializeParamValues = (configs) => {
+    }
+    function initializeParamValues(configs) {
       const values = [];
       for (let index = 0; index < configs.length; index++) {
-        const config = configs[index];
-        const defaultValue = config["default"];
-        let value = "";
-        if (defaultValue != null) {
-          value = defaultValue.toString();
-        } else if (config["type"] == "radio") {
-          value = getRadioValue(getRadioItems(config)[0]);
-        }
-        values.push(value);
+        const defaultValue = configs[index].getString("default", "");
+        values.push(defaultValue);
       }
       return values;
-    };
-    const getParamValue = (index) => {
-      return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : "";
-    };
-    const updateParamValueFromEvent = (index, value = null) => {
-      if (sending.value || index < 0 || index >= paramValues.value.length)
+    }
+    function updateParamValue(index, value = null) {
+      if (isSending.value || index < 0 || index >= paramValues.value.length)
         return null;
       paramValues.value[index] = value == null ? "" : value.toString();
-    };
-    const loadCommandTypes = () => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        try {
-          loading.value = true;
-          const response = yield api_request.getCmdAction();
-          if (response.code == 200 && response.data != null) {
-            commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
-          } else {
-            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令类型失败", icon: "none" });
-          }
-        } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:199", "加载指令类型出错:", error);
-          utils_toast.showAppToast({ title: "网络错误", icon: "none" });
-        } finally {
-          loading.value = false;
-        }
+      validateParam(index, true);
+    }
+    function getSelectedOptionLabel(index) {
+      if (index < 0 || index >= paramConfigs.value.length)
+        return "";
+      const value = getParamValue(index);
+      if (value == "")
+        return "";
+      const option = common_vendor.UTS.arrayFind(getParamOptions(paramConfigs.value[index]), (item) => {
+        return getOptionValue(item) == value;
       });
-    };
-    common_vendor.onLoad((options) => {
-      var _a;
-      imei.value = (_a = options.imei) !== null && _a !== void 0 ? _a : "";
-      loadCommandTypes();
-    });
-    const selectTypeByItem = (type) => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        if (sending.value)
-          return Promise.resolve(null);
-        const typeId = type["cmdmId"];
-        if (typeId == null)
-          return Promise.resolve(null);
-        selectedTypeId.value = typeId;
-        selectedCommandId.value = null;
-        selectedCommand.value = null;
-        paramConfigs.value = [];
-        paramValues.value = [];
-        paramConfigError.value = "";
-        commands.value = [];
-        try {
-          loading.value = true;
-          const response = yield api_request.getCmdByMid(new common_vendor.UTSJSONObject({ imei: imei.value, cmdmId: typeId }));
-          if (response.code == 200 && response.data != null) {
-            commands.value = response.data;
-          } else {
-            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令列表失败", icon: "none" });
-          }
-        } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:232", "加载指令列表出错:", error);
-          utils_toast.showAppToast({ title: "网络错误", icon: "none" });
-        } finally {
-          loading.value = false;
-        }
-      });
-    };
-    const selectCommand = (command) => {
-      if (sending.value)
+      return option == null ? value : getOptionLabel(option);
+    }
+    function openOptionSheet(index) {
+      if (isSending.value || index < 0 || index >= paramConfigs.value.length)
         return null;
-      selectedCommandId.value = command["predictCmdId"];
+      const param = paramConfigs.value[index];
+      if (getParamType(param) != "select")
+        return null;
+      activeOptionIndex.value = index;
+      optionSheetTitle.value = "请选择" + getParamLabel(param);
+      const actions = [];
+      getParamOptions(param).forEach((option) => {
+        const action = new common_vendor.UTSJSONObject();
+        action.set("name", getOptionLabel(option));
+        action.set("value", getOptionValue(option));
+        actions.push(action);
+      });
+      optionActions.value = actions;
+      optionSheetVisible.value = true;
+    }
+    function getEventItem(event = null) {
+      if (event == null || typeof event != "object")
+        return null;
+      const item = event["item"];
+      return item == null ? null : item;
+    }
+    function selectOption(event = null) {
+      const index = activeOptionIndex.value;
+      if (index < 0 || index >= paramValues.value.length)
+        return null;
+      const item = getEventItem(event);
+      const value = item != null ? getString(item, "value") : "";
+      if (value != "") {
+        paramValues.value[index] = value;
+        validateParam(index, true);
+      }
+      activeOptionIndex.value = -1;
+    }
+    function resetSelection() {
+      selectedCommand.value = null;
+      selectedCommandId.value = "";
+      paramConfigs.value = [];
+      paramValues.value = [];
+      paramErrors.value = [];
+      paramConfigError.value = "";
+    }
+    function loadAvailableCommands() {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (deviceId.value == "" || isCommandLoading.value)
+          return Promise.resolve(null);
+        try {
+          isCommandLoading.value = true;
+          const response = yield api_request.getAppAvailableCommands(deviceId.value);
+          if (response.code == 200) {
+            availableCommands.value = response.data;
+            const stillSelected = selectedCommandId.value != "" ? common_vendor.UTS.arrayFind(response.data, (command) => {
+              return getCommandKey(command, 0) == selectedCommandId.value;
+            }) : null;
+            if (stillSelected == null)
+              resetSelection();
+          } else {
+            availableCommands.value = [];
+            resetSelection();
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载可用指令失败", icon: "none" });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:479", "加载可用指令失败:", error);
+          utils_toast.showAppToast({ title: "加载可用指令失败，请检查网络", icon: "none" });
+        } finally {
+          isCommandLoading.value = false;
+        }
+      });
+    }
+    function selectCommand(command) {
+      if (isSending.value)
+        return null;
+      if (!isCommandAllowed(command)) {
+        utils_toast.showAppToast({ title: "该指令不允许在 App 端下发", icon: "none" });
+        return null;
+      }
       selectedCommand.value = command;
-      const configs = parseParamConfigs(command["details"]);
+      selectedCommandId.value = getCommandKey(command, 0);
+      const configs = parseParamConfigs(getString(command, "paramSchema"));
       paramConfigs.value = configs;
       paramValues.value = paramConfigError.value == "" ? initializeParamValues(configs) : [];
-    };
-    const selectRadio = (index, value) => {
-      if (sending.value || index < 0 || index >= paramValues.value.length)
-        return null;
-      paramValues.value[index] = value;
-    };
-    const sendCommand = () => {
+      paramErrors.value = configs.map((_param) => {
+        return "";
+      });
+    }
+    function buildCommandParams() {
+      const params = new common_vendor.UTSJSONObject();
+      for (let index = 0; index < paramConfigs.value.length; index++) {
+        const value = getParamValue(index).trim();
+        if (value != "")
+          params.set(getParamKey(paramConfigs.value[index], index), value);
+      }
+      return params;
+    }
+    function loadHistoryPage(reset) {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        var _a, _b;
-        if (sending.value)
+        if (deviceId.value == "" || isHistoryLoading.value || !reset && !hasMoreHistory.value)
           return Promise.resolve(null);
-        if (selectedCommand.value == null) {
-          utils_toast.showAppToast({ title: "请选择指令", icon: "none" });
-          return Promise.resolve(null);
-        }
-        if (paramConfigError.value != "") {
-          utils_toast.showAppToast({ title: paramConfigError.value, icon: "none" });
-          return Promise.resolve(null);
-        }
-        if (!isFormValid.value) {
-          utils_toast.showAppToast({ title: "请填写所有参数", icon: "none" });
-          return Promise.resolve(null);
-        }
-        const command = selectedCommand.value;
-        let cmdData = (_a = command["params"]) !== null && _a !== void 0 ? _a : "";
-        for (let index = 0; index < paramConfigs.value.length; index++) {
-          const config = paramConfigs.value[index];
-          const configuredPlaceholder = config["placeholder"];
-          const placeholder = configuredPlaceholder != null && configuredPlaceholder.length > 0 ? configuredPlaceholder : "${param" + (index + 1).toString() + "}";
-          cmdData = cmdData.split(placeholder).join(paramValues.value[index]);
-        }
+        const requestedPage = reset ? 1 : historyPageNum.value;
         try {
-          sending.value = true;
-          const response = yield api_request.sendCmd(new common_vendor.UTSJSONObject({
-            imei: imei.value,
-            type: (_b = command["cmdCode"]) !== null && _b !== void 0 ? _b : "",
-            password: null,
-            cmdData: encodeURIComponent(cmdData),
-            predictCmdId: command["predictCmdId"]
-          }));
-          if (response.code == 200) {
-            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令发送成功", icon: "success" });
-          } else {
-            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令发送失败", icon: "none", duration: 3e3 });
+          isHistoryLoading.value = true;
+          const query = new common_vendor.UTSJSONObject();
+          query.set("deviceId", deviceId.value);
+          query.set("pageNum", requestedPage);
+          query.set("pageSize", historyPageSize);
+          const response = yield api_request.getAppCommandHistory(query);
+          if (response.code != 200) {
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令记录失败", icon: "none" });
+            return Promise.resolve(null);
           }
+          const rows = response.data.rows;
+          if (reset)
+            historyRecords.value = rows;
+          else
+            historyRecords.value = [...historyRecords.value, ...rows];
+          historyTotal.value = response.data.total;
+          historyPageNum.value = requestedPage + 1;
+          hasMoreHistory.value = historyRecords.value.length < historyTotal.value && rows.length > 0;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:294", "发送指令出错:", error);
-          utils_toast.showAppToast({ title: "网络错误", icon: "none" });
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:530", "加载指令记录失败:", error);
+          utils_toast.showAppToast({ title: "加载指令记录失败，请检查网络", icon: "none" });
         } finally {
-          sending.value = false;
+          hasLoadedHistory.value = true;
+          isHistoryLoading.value = false;
         }
       });
-    };
+    }
+    function reloadHistory() {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        hasReachedHistoryBottom.value = false;
+        historyPageNum.value = 1;
+        historyRecords.value = [];
+        historyTotal.value = 0;
+        hasMoreHistory.value = true;
+        hasLoadedHistory.value = false;
+        yield loadHistoryPage(true);
+      });
+    }
+    function sendSelectedCommand() {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const command = selectedCommand.value;
+        if (command == null || deviceId.value == "" || isSending.value)
+          return Promise.resolve(null);
+        const cmdId = getString(command, "cmdId");
+        if (cmdId == "") {
+          utils_toast.showAppToast({ title: "指令模板信息不完整", icon: "none" });
+          return Promise.resolve(null);
+        }
+        const requestData = new common_vendor.UTSJSONObject();
+        requestData.set("deviceId", deviceId.value);
+        requestData.set("cmdId", cmdId);
+        const cmdCode = getCommandCode(command);
+        if (cmdCode != "")
+          requestData.set("cmdCode", cmdCode);
+        requestData.set("params", buildCommandParams());
+        try {
+          isSending.value = true;
+          const response = yield api_request.sendAppCommand(requestData);
+          if (response.code == 200) {
+            const requestIdText = response.data != "" ? "追踪编号：" + response.data : "请在指令记录中查看下发结果";
+            utils_toast.showAppToast({ title: "指令已提交，" + requestIdText, icon: "success", duration: 3500 });
+            yield reloadHistory();
+          } else {
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令下发失败", icon: "none", duration: 3e3 });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:573", "下发指令失败:", error);
+          utils_toast.showAppToast({ title: "指令下发失败，请检查网络", icon: "none" });
+        } finally {
+          isSending.value = false;
+        }
+      });
+    }
+    function confirmSendCommand() {
+      if (selectedCommand.value == null) {
+        utils_toast.showAppToast({ title: "请选择要下发的指令", icon: "none" });
+        return null;
+      }
+      for (let index = 0; index < paramConfigs.value.length; index++)
+        validateParam(index, true);
+      if (!isFormValid.value) {
+        utils_toast.showAppToast({ title: "请检查指令参数", icon: "none" });
+        return null;
+      }
+      utils_modal.showAppModal(new common_vendor.UTSJSONObject({
+        title: "确认下发指令",
+        content: "即将向设备下发“" + getCommandName(selectedCommand.value) + "”。指令下发后可能影响车辆使用，请确认操作。",
+        confirmText: "确认下发",
+        cancelText: "取消",
+        success: (result) => {
+          if (result.confirm)
+            void sendSelectedCommand();
+        }
+      }));
+    }
+    function getRecordKey(record, index) {
+      const id = getString(record, "id");
+      return id != "" ? id : "record_" + index.toString();
+    }
+    function getRecordName(record = null) {
+      const name = getString(record, "cmdName");
+      return name != "" ? name : getString(record, "commandType") != "" ? getString(record, "commandType") : "未知指令";
+    }
+    function getRecordTime(record = null) {
+      const time = getString(record, "sendTime");
+      return time != "" ? time : getString(record, "createTime");
+    }
+    function getRecordRetryCount(record = null) {
+      const count = getString(record, "retryCount");
+      return count != "" ? count : "0";
+    }
+    function getRecordSummary(record = null) {
+      const reason = getString(record, "reason");
+      return reason != "" ? reason : getString(record, "responseContent");
+    }
+    function markHistoryScroll(event) {
+      if (activeTab.value != "history")
+        return null;
+    }
+    function loadMoreHistory() {
+      if (activeTab.value != "history" || refreshing.value)
+        return null;
+      void loadHistoryPage(false);
+    }
+    function showCommandDetail(record) {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const commandId = getString(record, "id");
+        if (commandId == "")
+          return Promise.resolve(null);
+        detailRecord.value = record;
+        detailVisible.value = true;
+        isDetailLoading.value = true;
+        try {
+          const response = yield api_request.getAppCommandDetail(commandId);
+          if (response.code == 200 && response.data != null) {
+            detailRecord.value = response.data;
+          } else {
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令详情失败", icon: "none" });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:653", "加载指令详情失败:", error);
+          utils_toast.showAppToast({ title: "加载指令详情失败，请检查网络", icon: "none" });
+        } finally {
+          isDetailLoading.value = false;
+        }
+      });
+    }
+    function closeDetail() {
+      detailVisible.value = false;
+    }
+    function getDetailResponse() {
+      return getString(detailRecord.value, "responseContent");
+    }
+    function getDetailReason() {
+      return getString(detailRecord.value, "reason");
+    }
+    function getDetailParams() {
+      return getString(detailRecord.value, "commandParams");
+    }
+    function retryCommand(commandId) {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (isRetrying.value)
+          return Promise.resolve(null);
+        try {
+          isRetrying.value = true;
+          const response = yield api_request.retryAppCommand(commandId);
+          if (response.code == 200) {
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "已重新提交指令", icon: "success" });
+            detailVisible.value = false;
+            yield reloadHistory();
+          } else {
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "重试下发失败", icon: "none", duration: 3e3 });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:680", "重试下发失败:", error);
+          utils_toast.showAppToast({ title: "重试下发失败，请检查网络", icon: "none" });
+        } finally {
+          isRetrying.value = false;
+        }
+      });
+    }
+    function confirmRetryFromDetail() {
+      const commandId = getString(detailRecord.value, "id");
+      if (commandId == "" || isRetrying.value)
+        return null;
+      utils_modal.showAppModal(new common_vendor.UTSJSONObject({
+        title: "确认重试",
+        content: "将重新下发“" + getRecordName(detailRecord.value) + "”，请确认设备当前状态适合执行此操作。",
+        confirmText: "确认重试",
+        cancelText: "取消",
+        success: (result) => {
+          if (result.confirm)
+            void retryCommand(commandId);
+        }
+      }));
+    }
+    function getEventString(event = null, key) {
+      if (event == null || typeof event != "object")
+        return "";
+      const value = event[key];
+      return value == null ? "" : value.toString();
+    }
+    function changeTab(event = null) {
+      const value = getEventString(event, "value");
+      if (value == "")
+        return null;
+      activeTab.value = value;
+      if (value == "history" && !hasLoadedHistory.value)
+        void reloadHistory();
+    }
+    function refreshCurrentTab() {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (refreshing.value)
+          return Promise.resolve(null);
+        try {
+          refreshing.value = true;
+          if (activeTab.value == "history")
+            yield reloadHistory();
+          else
+            yield loadAvailableCommands();
+        } finally {
+          refreshing.value = false;
+        }
+      });
+    }
+    common_vendor.onLoad((options) => {
+      var _a, _b;
+      imei.value = (_a = options.imei) !== null && _a !== void 0 ? _a : "";
+      deviceId.value = (_b = options.deviceId) !== null && _b !== void 0 ? _b : "";
+      if (deviceId.value != "")
+        void loadAvailableCommands();
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
         a: common_vendor.p({
-          title: "指令",
+          title: "指令中心",
           ["show-back"]: true,
-          backgroundColor: "#fff",
-          textColor: "#333",
+          backgroundColor: "#ffffff",
+          textColor: "#1f2937",
           showCapsule: false,
           class: "data-v-c4271740"
         }),
-        b: common_vendor.t(imei.value),
-        c: common_vendor.f(commandTypes.value, (type, index, i0) => {
-          return {
-            a: common_vendor.t(type.cmdName),
-            b: selectedTypeId.value == type.cmdmId ? "#ffffff" : "#666666",
-            c: type.cmdmId,
-            d: selectedTypeId.value == type.cmdmId ? 1 : "",
-            e: common_vendor.o(($event) => {
-              return selectTypeByItem(type);
-            }, type.cmdmId)
-          };
+        b: common_vendor.t(displayDeviceIdentity.value),
+        c: common_vendor.t(deviceId.value != "" ? deviceId.value : "--"),
+        d: common_vendor.o(($event) => {
+          return changeTab($event);
+        }, "12"),
+        e: common_vendor.p({
+          value: activeTab.value,
+          list: tabItems,
+          activeColor: "#1677ff",
+          inactiveColor: "#667085",
+          bgColor: "#ffffff",
+          class: "data-v-c4271740"
         }),
-        d: commands.value.length
-      }, commands.value.length ? {
-        e: common_vendor.f(commands.value, (cmd, index, i0) => {
-          return {
-            a: common_vendor.t(cmd.cmdName),
-            b: common_vendor.t(cmd.remarks),
-            c: cmd.predictCmdId,
-            d: selectedCommandId.value == cmd.predictCmdId ? 1 : "",
-            e: common_vendor.o(($event) => {
-              return selectCommand(cmd);
-            }, cmd.predictCmdId)
-          };
+        f: deviceId.value == ""
+      }, deviceId.value == "" ? {} : activeTab.value == "send" ? common_vendor.e({
+        h: common_vendor.o(loadAvailableCommands, "3b"),
+        i: isCommandLoading.value
+      }, isCommandLoading.value ? {} : availableCommands.value.length == 0 ? {} : {
+        k: common_vendor.f(availableCommands.value, (command, index, i0) => {
+          return common_vendor.e({
+            a: common_vendor.t(getCommandName(command)),
+            b: common_vendor.t(isCommandAllowed(command) ? commandNeedsParams(command) ? "需填写参数" : "无需参数" : "App 端不可下发"),
+            c: !isCommandAllowed(command) ? 1 : "",
+            d: getCommandCode(command) != "" || getCommandRemark(command) != ""
+          }, getCommandCode(command) != "" || getCommandRemark(command) != "" ? common_vendor.e({
+            e: getCommandCode(command) != ""
+          }, getCommandCode(command) != "" ? {
+            f: common_vendor.t(getCommandCode(command))
+          } : {}, {
+            g: getCommandRemark(command) != ""
+          }, getCommandRemark(command) != "" ? {
+            h: common_vendor.t(getCommandRemark(command))
+          } : {}) : {}, {
+            i: getCommandKey(command, index),
+            j: isSelectedCommand(command) ? 1 : "",
+            k: !isCommandAllowed(command) ? 1 : "",
+            l: common_vendor.o(($event) => {
+              return selectCommand(command);
+            }, getCommandKey(command, index))
+          });
         })
-      } : {}, {
-        f: selectedCommand.value != null
+      }, {
+        j: availableCommands.value.length == 0,
+        l: selectedCommand.value != null
       }, selectedCommand.value != null ? common_vendor.e({
-        g: paramConfigError.value != ""
+        m: common_vendor.t(getCommandName(selectedCommand.value)),
+        n: paramConfigError.value != ""
       }, paramConfigError.value != "" ? {
-        h: common_vendor.t(paramConfigError.value)
+        o: common_vendor.t(paramConfigError.value)
       } : {}, {
-        i: common_vendor.f(paramConfigs.value, (param, index, i0) => {
+        p: common_vendor.f(paramConfigs.value, (param, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(getParamLabel(param)),
-            b: param.type == "input"
-          }, param.type == "input" ? {
-            c: common_vendor.o(($event) => {
-              return updateParamValueFromEvent(index, $event);
-            }, "param_" + index),
-            d: "c4271740-1-" + i0,
-            e: common_vendor.p({
+            b: isParamRequired(param)
+          }, isParamRequired(param) ? {} : {}, {
+            c: getParamType(param) == "text" || getParamType(param) == "number"
+          }, getParamType(param) == "text" || getParamType(param) == "number" ? {
+            d: common_vendor.o(($event) => {
+              return updateParamValue(index, $event);
+            }, getParamKey(param, index)),
+            e: "c4271740-2-" + i0,
+            f: common_vendor.p({
               ["model-value"]: getParamValue(index),
-              placeholder: "请输入" + getParamLabel(param),
-              ["placeholder-class"]: "placeholder",
+              type: getParamType(param) == "number" ? "number" : "text",
+              placeholder: getParamPlaceholder(param),
+              ["placeholder-class"]: "input-placeholder",
               border: "none",
-              height: "44px",
-              ["font-size"]: "15px",
               class: "param-input data-v-c4271740"
             })
+          } : getParamType(param) == "select" ? {
+            h: common_vendor.t(getSelectedOptionLabel(index) != "" ? getSelectedOptionLabel(index) : getParamPlaceholder(param)),
+            i: getSelectedOptionLabel(index) == "" ? 1 : "",
+            j: common_vendor.o(($event) => {
+              return openOptionSheet(index);
+            }, getParamKey(param, index))
           } : {}, {
-            f: param.type == "number"
-          }, param.type == "number" ? {
-            g: common_vendor.o(($event) => {
-              return updateParamValueFromEvent(index, $event);
-            }, "param_" + index),
-            h: "c4271740-2-" + i0,
-            i: common_vendor.p({
-              type: "number",
-              ["model-value"]: getParamValue(index),
-              placeholder: "请输入" + getParamLabel(param),
-              ["placeholder-class"]: "placeholder",
-              maxlength: getParamMaxLength(param),
-              border: "none",
-              height: "44px",
-              ["font-size"]: "15px",
-              class: "param-input data-v-c4271740"
-            })
+            g: getParamType(param) == "select",
+            k: getParamError(index) != ""
+          }, getParamError(index) != "" ? {
+            l: common_vendor.t(getParamError(index))
           } : {}, {
-            j: param.type == "radio"
-          }, param.type == "radio" ? {
-            k: common_vendor.f(getRadioItems(param), (item, k1, i1) => {
-              return {
-                a: getParamValue(index) == getRadioValue(item) ? 1 : "",
-                b: common_vendor.t(getRadioDescription(item)),
-                c: "radio_" + item.value,
-                d: common_vendor.o(($event) => {
-                  return selectRadio(index, getRadioValue(item));
-                }, "radio_" + item.value)
-              };
-            })
-          } : {}, {
-            l: "param_" + index
+            m: getParamKey(param, index)
           });
         }),
-        j: paramConfigs.value.length == 0 && paramConfigError.value == ""
+        q: paramConfigs.value.length == 0 && paramConfigError.value == ""
       }, paramConfigs.value.length == 0 && paramConfigError.value == "" ? {} : {}, {
-        k: common_vendor.o(sendCommand, "c2"),
-        l: common_vendor.p({
+        r: common_vendor.o(confirmSendCommand, "bf"),
+        s: common_vendor.p({
           type: "primary",
-          text: "发送指令",
-          loading: sending.value,
-          disabled: sending.value || loading.value || !isFormValid.value,
-          class: "submit-btn data-v-c4271740"
+          text: "确认下发指令",
+          loading: isSending.value,
+          disabled: isSending.value || isCommandLoading.value || !isFormValid.value,
+          class: "send-button data-v-c4271740"
         })
-      }) : {}, {
-        m: !selectedTypeId.value
-      }, !selectedTypeId.value ? {} : {}, {
-        n: loading.value
-      }, loading.value ? {} : commands.value.length == 0 && selectedTypeId.value != null ? {} : {}, {
-        o: commands.value.length == 0 && selectedTypeId.value != null,
-        p: `${_ctx.u_s_b_h}px`,
-        q: `${_ctx.u_s_a_i_b}px`,
-        r: common_vendor.p({
+      }) : {}) : common_vendor.e({
+        t: common_vendor.o(reloadHistory, "fc"),
+        v: isHistoryInitialLoading.value
+      }, isHistoryInitialLoading.value ? {} : historyRecords.value.length == 0 ? {} : {
+        x: common_vendor.f(historyRecords.value, (record, index, i0) => {
+          return common_vendor.e({
+            a: common_vendor.t(getRecordName(record)),
+            b: common_vendor.t(getStatusText(record)),
+            c: common_vendor.n(getStatusClass(record)),
+            d: common_vendor.t(getRecordTime(record)),
+            e: getRecordSummary(record) != ""
+          }, getRecordSummary(record) != "" ? {
+            f: common_vendor.t(getRecordSummary(record))
+          } : {}, {
+            g: common_vendor.t(getRecordRetryCount(record)),
+            h: getRecordKey(record, index),
+            i: common_vendor.o(($event) => {
+              return showCommandDetail(record);
+            }, getRecordKey(record, index))
+          });
+        })
+      }, {
+        w: historyRecords.value.length == 0,
+        y: historyRecords.value.length > 0
+      }, historyRecords.value.length > 0 ? common_vendor.e({
+        z: isHistoryLoading.value
+      }, isHistoryLoading.value ? {} : !hasMoreHistory.value ? {} : {}, {
+        A: !hasMoreHistory.value
+      }) : {}), {
+        g: activeTab.value == "send",
+        B: refreshing.value,
+        C: common_vendor.o(refreshCurrentTab, "24"),
+        D: common_vendor.o(markHistoryScroll, "2e"),
+        E: common_vendor.o(loadMoreHistory, "4a"),
+        F: common_vendor.o(($event) => {
+          return selectOption($event);
+        }, "53"),
+        G: common_vendor.o(($event) => {
+          return optionSheetVisible.value = $event;
+        }, "5d"),
+        H: common_vendor.p({
+          title: optionSheetTitle.value,
+          actions: optionActions.value,
+          cancelText: "取消",
+          show: optionSheetVisible.value,
+          class: "data-v-c4271740"
+        }),
+        I: isDetailLoading.value
+      }, isDetailLoading.value ? {} : common_vendor.e({
+        J: common_vendor.t(getRecordName(detailRecord.value)),
+        K: common_vendor.t(getStatusText(detailRecord.value)),
+        L: common_vendor.t(getRecordTime(detailRecord.value)),
+        M: getDetailResponse() != ""
+      }, getDetailResponse() != "" ? {
+        N: common_vendor.t(getDetailResponse())
+      } : {}, {
+        O: getDetailReason() != ""
+      }, getDetailReason() != "" ? {
+        P: common_vendor.t(getDetailReason())
+      } : {}, {
+        Q: getDetailParams() != ""
+      }, getDetailParams() != "" ? {
+        R: common_vendor.t(getDetailParams())
+      } : {}), {
+        S: common_vendor.o(closeDetail, "ef"),
+        T: common_vendor.o(confirmRetryFromDetail, "9e"),
+        U: common_vendor.p({
+          show: detailVisible.value,
+          title: "指令详情",
+          confirmText: "关闭",
+          showCancelButton: canRetryDetail.value,
+          cancelText: "重试下发",
+          class: "data-v-c4271740"
+        }),
+        V: `${_ctx.u_s_b_h}px`,
+        W: `${_ctx.u_s_a_i_b}px`,
+        X: common_vendor.p({
           class: "data-v-c4271740"
         })
       });

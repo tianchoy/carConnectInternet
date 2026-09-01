@@ -12,9 +12,9 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
-import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
-import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
-import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
+import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
+import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
+import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -23,120 +23,161 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesUserCenterEditPasswordEditPassword
             val _cache = __ins.renderCache
-            val userInfo = ref<UserInfo__1>(UserInfo__1(id = "", mobile = ""))
-            val formData = ref(_uO("password" to "", "newPassword" to "", "confirmPassword" to ""))
-            val formRef = ref<FormInstance?>(null)
-            val rules = _uA<UTSJSONObject>(_uO("name" to "password", "required" to true, "message" to "请输入原密码"), _uO("name" to "newPassword", "required" to true, "message" to "请输入新密码"), _uO("name" to "confirmPassword", "required" to true, "message" to "请确认新密码"))
-            val handleSubmit = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
+            val form = ref<PasswordForm__1>(PasswordForm__1(oldPassword = "", newPassword = "", confirmPassword = ""))
+            val submitting = ref(false)
+            val sessionEnding = ref(false)
+            val isPasswordUpdateReady = computed<Boolean>(fun(): Boolean {
+                val newPassword = form.value.newPassword
+                var categoryCount: Number = 0
+                if (UTSRegExp("[0-9]", "").test(newPassword)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[A-Za-z]", "").test(newPassword)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[^A-Za-z0-9]", "").test(newPassword)) {
+                    categoryCount += 1
+                }
+                return form.value.oldPassword != "" && newPassword.length >= 8 && newPassword.length <= 16 && categoryCount >= 2 && form.value.oldPassword != newPassword && form.value.confirmPassword != "" && newPassword == form.value.confirmPassword && !submitting.value
+            }
+            )
+            val isValidPassword = fun(password: String): Boolean {
+                if (password.length < 8 || password.length > 16) {
+                    showAppToast(ShowToastOptions(title = "密码长度应为8至16位", icon = "none"))
+                    return false
+                }
+                var categoryCount: Number = 0
+                if (UTSRegExp("[0-9]", "").test(password)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[A-Za-z]", "").test(password)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[^A-Za-z0-9]", "").test(password)) {
+                    categoryCount += 1
+                }
+                if (categoryCount < 2) {
+                    showAppToast(ShowToastOptions(title = "密码需包含至少两种字符类型", icon = "none"))
+                    return false
+                }
+                return true
+            }
+            val validateForm = fun(): Boolean {
+                if (form.value.oldPassword == "") {
+                    showAppToast(ShowToastOptions(title = "请输入当前密码", icon = "none"))
+                    return false
+                }
+                if (form.value.newPassword == "") {
+                    showAppToast(ShowToastOptions(title = "请输入新密码", icon = "none"))
+                    return false
+                }
+                if (!isValidPassword(form.value.newPassword)) {
+                    return false
+                }
+                if (form.value.oldPassword == form.value.newPassword) {
+                    showAppToast(ShowToastOptions(title = "新密码不能与当前密码相同", icon = "none"))
+                    return false
+                }
+                if (form.value.confirmPassword == "") {
+                    showAppToast(ShowToastOptions(title = "请再次输入新密码", icon = "none"))
+                    return false
+                }
+                if (form.value.newPassword != form.value.confirmPassword) {
+                    showAppToast(ShowToastOptions(title = "两次输入的密码不一致", icon = "none"))
+                    return false
+                }
+                return true
+            }
+            val returnToLogin = fun(): Unit {
+                sessionEnding.value = true
+                uni_removeStorageSync("token")
+                clearPushSessionState()
+                form.value = PasswordForm__1(oldPassword = "", newPassword = "", confirmPassword = "")
+                setTimeout(fun(){
+                    uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
+                }
+                , 1500)
+            }
+            val goForgotPassword = fun(): Unit {
+                uni_navigateTo(NavigateToOptions(url = "/pages/login/forgot-password"))
+            }
+            val submitPasswordUpdate = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        if (submitting.value || !validateForm()) {
+                            return@w1
+                        }
                         try {
-                            val form = formRef.value
-                            if (form == null || !form.validate()) {
-                                throw UTSError("表单验证失败")
+                            submitting.value = true
+                            val response = await(updatePassword(ChangePasswordRequest(oldPassword = form.value.oldPassword, newPassword = form.value.newPassword, confirmPassword = form.value.confirmPassword)))
+                            if (response.code != 200) {
+                                showAppToast(ShowToastOptions(title = if (response.msg != "") {
+                                    response.msg
+                                } else {
+                                    "密码修改失败，请稍后重试"
+                                }
+                                , icon = "none"))
+                                return@w1
                             }
-                            uni_showLoading(ShowLoadingOptions(title = "提交中...", mask = true))
-                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/userCenter/editPassword/editPassword.uvue", 78, 10), "password" to formData.value["password"], "newPassword" to formData.value["newPassword"])
-                            val res = await(changePassWord(submitData))
-                            if (res.code == 200) {
-                                uni_hideLoading(null)
-                                showAppToast(ShowToastOptions(title = "密码修改成功", icon = "success", duration = 2000))
-                                setTimeout(fun(){
-                                    uni_navigateBack(null)
-                                }, 1500)
-                            } else {
-                                uni_hideLoading(null)
-                                showAppToast(ShowToastOptions(title = "密码修改失败", icon = "error", duration = 2000))
-                            }
+                            showAppToast(ShowToastOptions(title = "密码修改成功，请重新登录", icon = "success"))
+                            returnToLogin()
                         }
                          catch (error: Throwable) {
-                            uni_hideLoading(null)
-                            showAppToast(ShowToastOptions(title = "表单验证失败", icon = "none", duration = 2000))
+                            if (!sessionEnding.value) {
+                                showAppToast(ShowToastOptions(title = "密码修改失败，请检查网络后重试", icon = "none"))
+                            }
+                        }
+                         finally {
+                            if (!sessionEnding.value) {
+                                submitting.value = false
+                            }
                         }
                 })
             }
-            onLoad(fun(options){
-                if (options["userInfo"] != null) {
-                    try {
-                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/editPassword/editPassword.uvue:119") as String), " at pages/userCenter/editPassword/editPassword.uvue:119") as UTSJSONObject
-                        console.log(parsedInfo, " at pages/userCenter/editPassword/editPassword.uvue:120")
-                        val userId = parsedInfo.getString("userId")
-                        val mobile = parsedInfo.getString("mobile")
-                        userInfo.value = UserInfo__1(id = if (userId != null) {
-                            userId
-                        } else {
-                            ""
-                        }
-                        , mobile = if (mobile != null) {
-                            mobile
-                        } else {
-                            ""
-                        }
-                        )
-                        console.log("用户信息:", userInfo.value, " at pages/userCenter/editPassword/editPassword.uvue:127")
-                    }
-                     catch (e: Throwable) {
-                        console.error("解析用户信息失败:", e, " at pages/userCenter/editPassword/editPassword.uvue:129")
-                    }
-                }
-            }
-            )
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_i_input = resolveEasyComponent("i-input", GenUniModulesIUiXComponentsIInputIInputClass)
-                val _component_i_form_item = resolveEasyComponent("i-form-item", GenUniModulesIUiXComponentsIFormItemIFormItemClass)
-                val _component_i_form = resolveEasyComponent("i-form", GenUniModulesIUiXComponentsIFormIFormClass)
                 val _component_i_button = resolveEasyComponent("i-button", GenUniModulesIUiXComponentsIButtonIButtonClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 return _cE(Fragment, null, _uA(
                     _cE("view", _uM("class" to "container"), _uA(
-                        _cV(_component_custom_navBar, _uM("title" to "修改密码", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
+                        _cV(_component_custom_navBar, _uM("title" to "", "show-back" to true, "backgroundColor" to "#fbfcfe", "textColor" to "#333333", "showCapsule" to false)),
                         _cE("view", _uM("class" to "content"), _uA(
-                            _cV(_component_i_form, _uM("modelValue" to unref(formData), "rules" to rules, "ref_key" to "formRef", "ref" to formRef), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cE("text", _uM("class" to "page-title"), "修改密码"),
+                            _cE("text", _uM("class" to "page-subtitle"), "修改后，当前及其他设备均需重新登录。"),
+                            _cE("view", _uM("class" to "form-section"), _uA(
+                                _cV(_component_i_input, _uM("modelValue" to form.value.oldPassword, "onUpdate:modelValue" to fun(`$event`: String){
+                                    form.value.oldPassword = `$event`
+                                }
+                                , "class" to "password-input", "placeholder" to "请输入当前密码", "password" to true, "height" to "110rpx", "round" to "25rpx", "borderColor" to "#d7e3ef", "placeholderStyle" to "color:#a8b8ca;font-size:28rpx;", "fontSize" to "28rpx", "color" to "#333333"), null, 8, _uA(
+                                    "modelValue",
+                                    "onUpdate:modelValue"
+                                )),
+                                _cV(_component_i_input, _uM("modelValue" to form.value.newPassword, "onUpdate:modelValue" to fun(`$event`: String){
+                                    form.value.newPassword = `$event`
+                                }
+                                , "class" to "password-input new-password-input", "placeholder" to "请输入新密码", "password" to true, "height" to "110rpx", "round" to "25rpx", "borderColor" to "#d7e3ef", "placeholderStyle" to "color:#a8b8ca;font-size:28rpx;", "fontSize" to "28rpx", "color" to "#333333"), null, 8, _uA(
+                                    "modelValue",
+                                    "onUpdate:modelValue"
+                                )),
+                                _cE("text", _uM("class" to "password-hint"), "8–16 位，且必须包含数字、字母、特殊字符中的至少两种"),
+                                _cV(_component_i_input, _uM("modelValue" to form.value.confirmPassword, "onUpdate:modelValue" to fun(`$event`: String){
+                                    form.value.confirmPassword = `$event`
+                                }
+                                , "class" to "password-input confirm-password-input", "placeholder" to "请再次输入新密码", "password" to true, "height" to "110rpx", "round" to "25rpx", "borderColor" to "#d7e3ef", "placeholderStyle" to "color:#a8b8ca;font-size:28rpx;", "fontSize" to "28rpx", "color" to "#333333"), null, 8, _uA(
+                                    "modelValue",
+                                    "onUpdate:modelValue"
+                                ))
+                            )),
+                            _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to submitting.value, "disabled" to !isPasswordUpdateReady.value, "onClick" to submitPasswordUpdate), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
-                                    _cV(_component_i_form_item, _uM("label" to "原密码", "labelDirection" to "horizontal", "labelWidth" to "80", "name" to "password", "borderBottom" to ""), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                        return _uA(
-                                            _cV(_component_i_input, _uM("modelValue" to unref(formData)["password"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                                unref(formData)["password"] = `$event`
-                                            }
-                                            , "placeholder" to "请输入原密码", "border" to "none", "type" to "password", "password" to "", "customStyle" to "padding:20rpx"), null, 8, _uA(
-                                                "modelValue",
-                                                "onUpdate:modelValue"
-                                            ))
-                                        )
-                                    }
-                                    ), "_" to 1)),
-                                    _cV(_component_i_form_item, _uM("label" to "新密码", "labelDirection" to "horizontal", "labelWidth" to "80", "name" to "newPassword", "borderBottom" to ""), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                        return _uA(
-                                            _cV(_component_i_input, _uM("modelValue" to unref(formData)["newPassword"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                                unref(formData)["newPassword"] = `$event`
-                                            }
-                                            , "placeholder" to "请输入新密码", "border" to "none", "type" to "password", "password" to "", "customStyle" to "padding:20rpx"), null, 8, _uA(
-                                                "modelValue",
-                                                "onUpdate:modelValue"
-                                            ))
-                                        )
-                                    }
-                                    ), "_" to 1)),
-                                    _cV(_component_i_form_item, _uM("label" to "确认密码", "labelDirection" to "horizontal", "labelWidth" to "80", "name" to "confirmPassword"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                        return _uA(
-                                            _cV(_component_i_input, _uM("modelValue" to unref(formData)["confirmPassword"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                                unref(formData)["confirmPassword"] = `$event`
-                                            }
-                                            , "placeholder" to "请再次输入新密码", "border" to "none", "type" to "password", "password" to "", "customStyle" to "padding:20rpx"), null, 8, _uA(
-                                                "modelValue",
-                                                "onUpdate:modelValue"
-                                            ))
-                                        )
-                                    }
-                                    ), "_" to 1))
+                                    " 确认修改 "
                                 )
                             }
                             ), "_" to 1), 8, _uA(
-                                "modelValue"
-                            ))
-                        )),
-                        _cE("view", _uM("class" to "btn"), _uA(
-                            _cV(_component_i_button, _uM("type" to "primary", "text" to "提交修改", "onClick" to handleSubmit))
+                                "loading",
+                                "disabled"
+                            )),
+                            _cE("text", _uM("class" to "forgot-password-link", "onClick" to goForgotPassword), "忘记当前密码？")
                         ))
                     )),
                     _cV(_component_app_toast)
@@ -150,7 +191,7 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("width" to "100%", "height" to "100%", "backgroundColor" to "#f5f5f5")), "content" to _uM(".container " to _uM("marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx", "paddingTop" to "20rpx", "paddingRight" to "40rpx", "paddingBottom" to "20rpx", "paddingLeft" to "40rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "btn" to _uM(".container " to _uM("marginTop" to "50rpx", "marginRight" to "20rpx", "marginBottom" to 0, "marginLeft" to "20rpx")))
+                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#fbfcfe")), "content" to _pS(_uM("paddingTop" to "58rpx", "paddingRight" to "34rpx", "paddingBottom" to "80rpx", "paddingLeft" to "34rpx")), "page-title" to _pS(_uM("display" to "flex", "color" to "#1f2d3d", "fontSize" to "54rpx", "fontWeight" to 700, "lineHeight" to "76rpx")), "page-subtitle" to _pS(_uM("display" to "flex", "marginTop" to "26rpx", "color" to "#7f96ae", "fontSize" to "30rpx", "lineHeight" to "44rpx")), "form-section" to _pS(_uM("marginTop" to "84rpx")), "password-input" to _pS(_uM("width" to "100%", "borderTopLeftRadius" to "25rpx", "borderTopRightRadius" to "25rpx", "borderBottomRightRadius" to "25rpx", "borderBottomLeftRadius" to "25rpx")), "new-password-input" to _pS(_uM("marginTop" to "28rpx")), "confirm-password-input" to _pS(_uM("marginTop" to "30rpx")), "password-hint" to _pS(_uM("display" to "flex", "marginTop" to "22rpx", "marginRight" to "6rpx", "marginBottom" to 0, "marginLeft" to "6rpx", "color" to "#7f96ae", "fontSize" to "26rpx", "lineHeight" to "40rpx")), "submit-button" to _pS(_uM("marginTop" to "72rpx")), "forgot-password-link" to _pS(_uM("display" to "flex", "justifyContent" to "center", "marginTop" to "48rpx", "color" to "#3485df", "fontSize" to "30rpx", "lineHeight" to "44rpx")), "i-input" to _pS(_uM("boxSizing" to "border-box", "paddingTop" to 0, "paddingRight" to "34rpx", "paddingBottom" to 0, "paddingLeft" to "34rpx", "!borderTopWidth" to "2rpx", "!borderRightWidth" to "2rpx", "!borderBottomWidth" to "2rpx", "!borderLeftWidth" to "2rpx")), "i-input__field" to _pS(_uM("paddingTop" to 0, "paddingBottom" to 0)), "i-input--focus" to _pS(_uM("!borderTopColor" to "#3485df", "!borderRightColor" to "#3485df", "!borderBottomColor" to "#3485df", "!borderLeftColor" to "#3485df", "backgroundColor" to "#ffffff")), "i-input__eye" to _pS(_uM("marginLeft" to "14rpx", "opacity" to 0.78)), "i-button__text" to _pS(_uM("fontSize" to "38rpx", "fontWeight" to 600, "letterSpacing" to "2rpx")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

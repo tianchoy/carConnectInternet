@@ -1,0 +1,44 @@
+:host{display:flex;flex-direction:column}
+
+.i-action-sheet__trigger { flex-direction: column;
+}
+.i-action-sheet__mask { position: fixed; left: 0; right: 0; top: 0; bottom: 0; z-index: 99; background-color: rgba(0, 0, 0, 0.45);
+}
+.i-action-sheet__panel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 100; background-color: #f7f7f7; overflow: hidden;
+}
+.i-action-sheet__close { position: absolute; top: 10px; right: 12px; z-index: 2; width: 32px; height: 32px; border-radius: 16px; align-items: center; justify-content: center;
+}
+.i-action-sheet__close-text { color: #909193; font-size: 24px; line-height: 28px;
+}
+.i-action-sheet__header { min-height: 38px; padding: 8px 48px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #eeeeee; background-color: #ffffff; align-items: center; justify-content: center;
+}
+.i-action-sheet__title { color: #909193; font-size: 14px; font-weight: 400; line-height: 20px; text-align: center;
+}
+.i-action-sheet__desc { margin-top: 4px; color: #909193; font-size: 13px; line-height: 20px; text-align: center;
+}
+.i-action-sheet__scroll { max-height: 320px; background-color: #ffffff;
+}
+.i-action-sheet__item { min-height: 51px; padding: 0; margin: 0; border-radius: 0; background-color: #ffffff; border-top-width: 1px; border-top-style: solid; border-top-color: #f2f3f5;
+}
+.i-action-sheet__item--disabled { background-color: #fafafa; opacity: 1;
+}
+.i-action-sheet__item--loading { opacity: 0.72;
+}
+.i-action-sheet__item-inner { min-height: 51px; padding: 8px 16px; align-items: center; justify-content: center;
+}
+.i-action-sheet__main { flex-direction: row; align-items: center; justify-content: center;
+}
+.i-action-sheet__icon { margin-right: 6px;
+}
+.i-action-sheet__item-text { font-size: 15px; line-height: 22px; text-align: center;
+}
+.i-action-sheet__subname { margin-top: 2px; color: #909193; font-size: 12px; line-height: 18px; text-align: center;
+}
+.i-action-sheet__loading { margin-top: 2px; color: #909193; font-size: 12px; line-height: 18px;
+}
+.i-action-sheet__cancel { min-height: 52px; margin-top: 8px; background-color: #ffffff; align-items: center; justify-content: center;
+}
+.i-action-sheet__cancel-text { color: #303133; font-size: 16px; line-height: 22px;
+}
+.i-action-sheet__safe-bottom { height: 12px; background-color: #ffffff;
+}

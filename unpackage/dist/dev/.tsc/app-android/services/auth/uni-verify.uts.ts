@@ -107,7 +107,7 @@ function closeLoginPage(uniVerifyManager: UniVerifyManager | null): void {
 	if (uniVerifyManager != null) uniVerifyManager.close()
 }
 
-export function loginByUniVerify(clientVersion: string): Promise<UniVerifyResult> {
+export function loginByUniVerify(clientVersion: string, deviceId: string): Promise<UniVerifyResult> {
 	return new Promise<UniVerifyResult>((resolve) => {
 		if (requesting) {
 			resolve(createResult(false, false, '正在进行本机号码授权，请稍候', ''))
@@ -137,6 +137,7 @@ export function loginByUniVerify(clientVersion: string): Promise<UniVerifyResult
 						requestData.set('platform', getPlatform())
 						requestData.set('clientVersion', clientVersion)
 						requestData.set('clientId', '428a8310cd442757ae699df5d894f051')
+						requestData.set('device_id', deviceId)
 						requestData.set('grantType', 'univerify')
 						requestData.set('tenantId', '000000')
 						uniVerifyLogin(requestData).then((response) => {

@@ -106,6 +106,10 @@ const scancode_uvue_vue_type_style_index_0_lang = {};
 
 const payDeviceList_uvue_vue_type_style_index_0_lang = {};
 
+const iTabs_uvue_vue_type_style_index_0_lang = {};
+
+const iActionSheet_uvue_vue_type_style_index_0_lang = {};
+
 const cmd_uvue_vue_type_style_index_0_lang = {};
 
 const webview_uvue_vue_type_style_index_0_lang = {};

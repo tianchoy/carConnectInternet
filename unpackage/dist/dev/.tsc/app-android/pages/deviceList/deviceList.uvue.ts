@@ -131,9 +131,10 @@ const mapScale = ref(4)
 			if (from) {
 				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 143, 11),  pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
+				console.log('获取设备列表:', res, " at pages/deviceList/deviceList.uvue:145")
 				const list = (res.code == 200 && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
 				if (list == null || !Array.isArray(list)) {
-					console.warn('获取设备列表返回异常:', res, " at pages/deviceList/deviceList.uvue:147")
+					console.warn('获取设备列表返回异常:', res, " at pages/deviceList/deviceList.uvue:148")
 					originalDeviceList.value = []
 					markers.value = []
 					return
@@ -144,15 +145,15 @@ const mapScale = ref(4)
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
 			updateMarkers(originalDeviceList.value)
 		} catch (err) {
-			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:158")
+			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:159")
 			originalDeviceList.value = []
 			markers.value = []
 			showAppToast({ title: '获取设备列表失败', icon: 'none' })
 		}
 	}
 		// 解绑设备
-	const unbindDevice = async (imei : string) => {
-		const res = await delDevice(imei)
+	const unbindDevice = async (deviceId : string) => {
+		const res = await delDevice(deviceId)
 		if (res.code == 200) {
 			showAppToast({
 				title: '解绑成功',
@@ -168,31 +169,17 @@ const mapScale = ref(4)
 		// 解绑成功后刷新设备列表
 		await loadUserDeviceList([],true)
 	}
-	// 获取当前位置
-	const getLocation = () => {
-		uni.getLocation({
-			type: 'wgs84',
-			success: (res) => {
-				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:187")
-				userLocation.value.latitude = res.latitude
-				userLocation.value.longitude = res.longitude
-			},
-			fail: (err) => {
-				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:192")
-			}
-		})
-	}
 
 	// 订阅消息
 	const subMsg = () => {
-		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:199")
+		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:186")
 		uni.requestSubscribeMessage({
 			tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
 			success: (res) => {
-				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:203")
+				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:190")
 			},
 			fail: (err) => {
-				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:206")
+				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:193")
 			}
 		})
 	}
@@ -208,7 +195,7 @@ const mapScale = ref(4)
 		const markerId = detail != null ? detail['markerId'] : null
 		const selectedDevice = originalDeviceList.value.find((device: UTSJSONObject) => device['deviceId'] == markerId)
 		if (selectedDevice == null) {
-			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:222")
+			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:209")
 			return
 		}
 		const imeiValue = (selectedDevice['imei'] as string | null) ?? ''
@@ -220,7 +207,6 @@ const mapScale = ref(4)
 	}
 
 	onLoad((options) => {
-		getLocation()
 		loadUserDeviceList([], true)
 	})
 

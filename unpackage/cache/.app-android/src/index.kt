@@ -127,9 +127,9 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
     )
 }
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
-    val hosts: String = "127.0.0.1,192.168.1.180"
+    val hosts: String = "127.0.0.1,192.168.1.76"
     val port: String = "8090"
-    val id: String = "app-android_YL8MlA"
+    val id: String = "app-android_2iOAc6"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -908,18 +908,18 @@ fun getResponseDataArray(response: UTSJSONObject): UTSArray<UTSJSONObject> {
         _uA()
     }
 }
-val loginUrl = "/sys/login"
 val devicePos = "/gps/lastPosition?deptId="
 val trackPos = "/gps/trackPos?"
 val userinfo = "/sys/user/info"
 val addDeviceUrl = "/userDevice/add"
 val userDeviceList = "/userDevice/list"
-val uniVerifyLoginUrl = "/auth/login"
+val authLoginUrl = "/auth/login"
 val smsSendCodeUrl = "/resource/sms/code"
-val smsLoginUrl = "/auth/login"
+val registerUrl = "/auth/register"
+val forgotPasswordResetUrl = "/auth/forgot-password/reset"
 val smsClientId = "428a8310cd442757ae699df5d894f051"
 val defaultTenantId = "000000"
-val changePSW = "/sys/user/password"
+val changePasswordUrl = "/user/profile/updatePassword"
 val userMsgList = "/usermessage/listForUser"
 val msgState = "/usermessage/detail/"
 val updateDevice = "/device/update"
@@ -933,9 +933,11 @@ val bindDeviceList = "/device/bindGeofenceList"
 val bindGeofence = "/geofence/bind"
 val unbindGeofence = "/geofence/unbind"
 val deleteDevice = "/userDevice/del"
-val cmdActionUrl = "/command/cmdAction"
-val cmdByMidUrl = "/command/cmdByMid"
-val cmdSendUrl = "/command/sendCmd"
+val appCommandAvailableUrl = "/app/command/available-cmds"
+val appCommandSendUrl = "/app/command/send"
+val appCommandListUrl = "/app/command/list"
+val appCommandDetailUrl = "/app/command/"
+val appCommandRetryUrl = "/app/command/retry/"
 val pushBindUrl = "/app/push/bind"
 val pushUnbindUrl = "/app/push/unbind"
 open class BasicResponse (
@@ -945,7 +947,7 @@ open class BasicResponse (
     open var msg: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("BasicResponse", "api/request.uts", 40, 13)
+        return UTSSourceMapPosition("BasicResponse", "api/request.uts", 46, 13)
     }
 }
 open class PushDeviceBindRequest (
@@ -959,7 +961,7 @@ open class PushDeviceBindRequest (
     open var appVersion: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PushDeviceBindRequest", "api/request.uts", 44, 13)
+        return UTSSourceMapPosition("PushDeviceBindRequest", "api/request.uts", 50, 13)
     }
 }
 open class JsonDataResponse (
@@ -971,17 +973,16 @@ open class JsonDataResponse (
     open var data: UTSJSONObject,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("JsonDataResponse", "api/request.uts", 50, 13)
+        return UTSSourceMapPosition("JsonDataResponse", "api/request.uts", 56, 13)
     }
 }
-typealias UniVerifyLoginRequest = UTSJSONObject
 open class SendSmsCodeRequest (
     @JsonNotNull
     open var phonenumber: String,
     open var tenantId: String? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SendSmsCodeRequest", "api/request.uts", 56, 13)
+        return UTSSourceMapPosition("SendSmsCodeRequest", "api/request.uts", 75, 13)
     }
 }
 open class SmsLoginRequest (
@@ -993,7 +994,51 @@ open class SmsLoginRequest (
     open var tenantId: String? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SmsLoginRequest", "api/request.uts", 60, 13)
+        return UTSSourceMapPosition("SmsLoginRequest", "api/request.uts", 79, 13)
+    }
+}
+open class PersonalPasswordLoginRequest (
+    @JsonNotNull
+    open var username: String,
+    @JsonNotNull
+    open var password: String,
+    open var clientId: String? = null,
+    open var tenantId: String? = null,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("PersonalPasswordLoginRequest", "api/request.uts", 85, 13)
+    }
+}
+open class RegisterRequest (
+    open var username: String? = null,
+    @JsonNotNull
+    open var password: String,
+    @JsonNotNull
+    open var confirmPassword: String,
+    @JsonNotNull
+    open var phonenumber: String,
+    @JsonNotNull
+    open var smsCode: String,
+    open var clientId: String? = null,
+    open var tenantId: String? = null,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("RegisterRequest", "api/request.uts", 91, 13)
+    }
+}
+open class ForgotPasswordResetRequest (
+    open var tenantId: String? = null,
+    @JsonNotNull
+    open var phonenumber: String,
+    @JsonNotNull
+    open var smsCode: String,
+    @JsonNotNull
+    open var newPassword: String,
+    @JsonNotNull
+    open var confirmPassword: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("ForgotPasswordResetRequest", "api/request.uts", 100, 13)
     }
 }
 open class DevicePositionResponse (
@@ -1005,7 +1050,7 @@ open class DevicePositionResponse (
     open var data: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DevicePositionResponse", "api/request.uts", 66, 13)
+        return UTSSourceMapPosition("DevicePositionResponse", "api/request.uts", 107, 13)
     }
 }
 open class TrackPosResponse (
@@ -1017,7 +1062,7 @@ open class TrackPosResponse (
     open var data: UTSJSONObject,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TrackPosResponse", "api/request.uts", 71, 13)
+        return UTSSourceMapPosition("TrackPosResponse", "api/request.uts", 112, 13)
     }
 }
 open class UserInfoResponse (
@@ -1029,7 +1074,7 @@ open class UserInfoResponse (
     open var data: UTSJSONObject,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserInfoResponse", "api/request.uts", 76, 13)
+        return UTSSourceMapPosition("UserInfoResponse", "api/request.uts", 117, 13)
     }
 }
 open class UserDeviceListData (
@@ -1041,7 +1086,7 @@ open class UserDeviceListData (
     open var totalCount: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserDeviceListData", "api/request.uts", 81, 13)
+        return UTSSourceMapPosition("UserDeviceListData", "api/request.uts", 122, 13)
     }
 }
 open class UserDeviceListResponse (
@@ -1053,7 +1098,7 @@ open class UserDeviceListResponse (
     open var data: UserDeviceListData,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserDeviceListResponse", "api/request.uts", 86, 13)
+        return UTSSourceMapPosition("UserDeviceListResponse", "api/request.uts", 127, 13)
     }
 }
 open class DeviceDetailResponse (
@@ -1065,7 +1110,7 @@ open class DeviceDetailResponse (
     open var data: UTSJSONObject,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailResponse", "api/request.uts", 91, 13)
+        return UTSSourceMapPosition("DeviceDetailResponse", "api/request.uts", 132, 13)
     }
 }
 open class GeofenceResponse (
@@ -1077,7 +1122,7 @@ open class GeofenceResponse (
     open var data: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("GeofenceResponse", "api/request.uts", 96, 13)
+        return UTSSourceMapPosition("GeofenceResponse", "api/request.uts", 137, 13)
     }
 }
 open class DevicePageData (
@@ -1089,7 +1134,7 @@ open class DevicePageData (
     open var totalCount: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DevicePageData", "api/request.uts", 101, 13)
+        return UTSSourceMapPosition("DevicePageData", "api/request.uts", 142, 13)
     }
 }
 open class DevicePageResponse (
@@ -1101,7 +1146,7 @@ open class DevicePageResponse (
     open var data: DevicePageData,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DevicePageResponse", "api/request.uts", 106, 13)
+        return UTSSourceMapPosition("DevicePageResponse", "api/request.uts", 147, 13)
     }
 }
 open class CommandListResponse (
@@ -1113,7 +1158,7 @@ open class CommandListResponse (
     open var data: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CommandListResponse", "api/request.uts", 111, 13)
+        return UTSSourceMapPosition("CommandListResponse", "api/request.uts", 152, 13)
     }
 }
 open class SendCmdResponse (
@@ -1125,17 +1170,53 @@ open class SendCmdResponse (
     open var data: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SendCmdResponse", "api/request.uts", 116, 13)
+        return UTSSourceMapPosition("SendCmdResponse", "api/request.uts", 157, 13)
     }
 }
-open class ChangePasswordResponse (
+open class AppCommandPageData (
+    @JsonNotNull
+    open var total: Number,
+    @JsonNotNull
+    open var rows: UTSArray<UTSJSONObject>,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("AppCommandPageData", "api/request.uts", 162, 13)
+    }
+}
+open class AppCommandPageResponse (
     @JsonNotNull
     open var code: Number,
     @JsonNotNull
     open var msg: String,
+    @JsonNotNull
+    open var data: AppCommandPageData,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ChangePasswordResponse", "api/request.uts", 121, 13)
+        return UTSSourceMapPosition("AppCommandPageResponse", "api/request.uts", 166, 13)
+    }
+}
+open class AppCommandDetailResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("AppCommandDetailResponse", "api/request.uts", 171, 13)
+    }
+}
+open class ChangePasswordRequest (
+    @JsonNotNull
+    open var oldPassword: String,
+    @JsonNotNull
+    open var newPassword: String,
+    @JsonNotNull
+    open var confirmPassword: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("ChangePasswordRequest", "api/request.uts", 176, 13)
     }
 }
 open class MessageResponse (
@@ -1147,7 +1228,7 @@ open class MessageResponse (
     open var data: UserDeviceListData,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MessageResponse", "api/request.uts", 125, 13)
+        return UTSSourceMapPosition("MessageResponse", "api/request.uts", 181, 13)
     }
 }
 fun basicResponse(raw: Any): BasicResponse {
@@ -1185,15 +1266,15 @@ fun deviceDetailResponse(raw: Any): DeviceDetailResponse {
     val response = jsonDataResponse(raw)
     return DeviceDetailResponse(code = response.code, msg = response.msg, data = response.data)
 }
-fun changePasswordResponse(raw: Any): ChangePasswordResponse {
-    val response = basicResponse(raw)
-    return ChangePasswordResponse(code = response.code, msg = response.msg)
-}
-val login = fun(data: UTSJSONObject): UTSPromise<JsonDataResponse> {
-    return post(loginUrl, data).then(fun(raw: Any): JsonDataResponse {
-        return jsonDataResponse(raw)
+fun appCommandPageResponse(raw: Any): AppCommandPageResponse {
+    val response = asJSONObject(raw)
+    val rows = response.getArray<UTSJSONObject>("rows")
+    return AppCommandPageResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = AppCommandPageData(total = response.getNumber("total", 0), rows = if (rows != null) {
+        rows
+    } else {
+        _uA()
     }
-    )
+    ))
 }
 val logout = fun(): UTSPromise<BasicResponse> {
     return post(logoutUrl).then(fun(raw: Any): BasicResponse {
@@ -1233,8 +1314,8 @@ val addDevice = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
     }
     )
 }
-val delDevice = fun(imei: String): UTSPromise<BasicResponse> {
-    return post(deleteDevice, _uO("imei" to imei)).then(fun(raw: Any): BasicResponse {
+val delDevice = fun(deviceId: String): UTSPromise<BasicResponse> {
+    return post(deleteDevice, _uO("deviceId" to deviceId)).then(fun(raw: Any): BasicResponse {
         return basicResponse(raw)
     }
     )
@@ -1242,12 +1323,6 @@ val delDevice = fun(imei: String): UTSPromise<BasicResponse> {
 val getUserDeviceList = fun(data: UTSJSONObject): UTSPromise<UserDeviceListResponse> {
     return post(userDeviceList, data).then(fun(raw: Any): UserDeviceListResponse {
         return userDevicePageResponse(raw)
-    }
-    )
-}
-val uniVerifyLogin = fun(data: UniVerifyLoginRequest): UTSPromise<JsonDataResponse> {
-    return post(uniVerifyLoginUrl, data).then(fun(raw: Any): JsonDataResponse {
-        return jsonDataResponse(raw)
     }
     )
 }
@@ -1262,8 +1337,78 @@ val sendSmsLoginCode = fun(data: SendSmsCodeRequest): UTSPromise<BasicResponse> 
     }
     )
 }
+val sendSmsRegisterCode = fun(data: SendSmsCodeRequest): UTSPromise<BasicResponse> {
+    return get(smsSendCodeUrl, _uO("phonenumber" to data.phonenumber, "tenantId" to if (data.tenantId != null) {
+        data.tenantId
+    } else {
+        defaultTenantId
+    }
+    , "scene" to "register")).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val sendSmsForgotPasswordCode = fun(data: SendSmsCodeRequest): UTSPromise<BasicResponse> {
+    return get(smsSendCodeUrl, _uO("phonenumber" to data.phonenumber, "tenantId" to if (data.tenantId != null) {
+        data.tenantId
+    } else {
+        defaultTenantId
+    }
+    , "scene" to "forgot")).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val personalPasswordLogin = fun(data: PersonalPasswordLoginRequest): UTSPromise<JsonDataResponse> {
+    val requestData = UTSJSONObject(UTSSourceMapPosition("requestData", "api/request.uts", 315, 11))
+    requestData.set("grantType", "password")
+    requestData.set("username", data.username)
+    requestData.set("password", data.password)
+    requestData.set("tenantId", if (data.tenantId != null) {
+        data.tenantId
+    } else {
+        defaultTenantId
+    }
+    )
+    requestData.set("clientId", if (data.clientId != null) {
+        data.clientId
+    } else {
+        smsClientId
+    }
+    )
+    return post(authLoginUrl, requestData).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
+    }
+    )
+}
+val registerPersonalUser = fun(data: RegisterRequest): UTSPromise<JsonDataResponse> {
+    val requestData = UTSJSONObject(UTSSourceMapPosition("requestData", "api/request.uts", 324, 11))
+    if (data.username != null && data.username != "") {
+        requestData.set("username", data.username)
+    }
+    requestData.set("password", data.password)
+    requestData.set("confirmPassword", data.confirmPassword)
+    requestData.set("phonenumber", data.phonenumber)
+    requestData.set("smsCode", data.smsCode)
+    requestData.set("tenantId", if (data.tenantId != null) {
+        data.tenantId
+    } else {
+        defaultTenantId
+    }
+    )
+    requestData.set("clientId", if (data.clientId != null) {
+        data.clientId
+    } else {
+        smsClientId
+    }
+    )
+    return post(registerUrl, requestData).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
+    }
+    )
+}
 val smsLogin = fun(data: SmsLoginRequest): UTSPromise<JsonDataResponse> {
-    val requestData = UTSJSONObject(UTSSourceMapPosition("requestData", "api/request.uts", 226, 11))
+    val requestData = UTSJSONObject(UTSSourceMapPosition("requestData", "api/request.uts", 336, 11))
     requestData.set("clientId", if (data.clientId != null) {
         data.clientId
     } else {
@@ -1279,14 +1424,31 @@ val smsLogin = fun(data: SmsLoginRequest): UTSPromise<JsonDataResponse> {
     )
     requestData.set("phonenumber", data.phonenumber)
     requestData.set("smsCode", data.smsCode)
-    return post(smsLoginUrl, requestData).then(fun(raw: Any): JsonDataResponse {
+    return post(authLoginUrl, requestData).then(fun(raw: Any): JsonDataResponse {
         return jsonDataResponse(raw)
     }
     )
 }
-val changePassWord = fun(data: UTSJSONObject): UTSPromise<ChangePasswordResponse> {
-    return put(changePSW, data).then(fun(raw: Any): ChangePasswordResponse {
-        return changePasswordResponse(raw)
+val resetForgotPassword = fun(data: ForgotPasswordResetRequest): UTSPromise<JsonDataResponse> {
+    val requestData = UTSJSONObject(UTSSourceMapPosition("requestData", "api/request.uts", 345, 11))
+    requestData.set("tenantId", if (data.tenantId != null) {
+        data.tenantId
+    } else {
+        defaultTenantId
+    }
+    )
+    requestData.set("phonenumber", data.phonenumber)
+    requestData.set("smsCode", data.smsCode)
+    requestData.set("newPassword", data.newPassword)
+    requestData.set("confirmPassword", data.confirmPassword)
+    return post(forgotPasswordResetUrl, requestData).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
+    }
+    )
+}
+val updatePassword = fun(data: ChangePasswordRequest): UTSPromise<BasicResponse> {
+    return post(changePasswordUrl, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
     }
     )
 }
@@ -1368,35 +1530,48 @@ val unbindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
     }
     )
 }
-val getCmdAction = fun(): UTSPromise<CommandListResponse> {
-    return get(cmdActionUrl).then(fun(raw: Any): CommandListResponse {
+val getAppAvailableCommands = fun(deviceId: String): UTSPromise<CommandListResponse> {
+    return get(appCommandAvailableUrl, _uO("deviceId" to deviceId)).then(fun(raw: Any): CommandListResponse {
         val response = asJSONObject(raw)
         return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
     }
     )
 }
-val getCmdByMid = fun(data: UTSJSONObject): UTSPromise<CommandListResponse> {
-    return get(cmdByMidUrl, data).then(fun(raw: Any): CommandListResponse {
-        val response = asJSONObject(raw)
-        return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
-    }
-    )
-}
-val sendCmd = fun(data: UTSJSONObject): UTSPromise<SendCmdResponse> {
-    return post(cmdSendUrl, data).then(fun(raw: Any): SendCmdResponse {
+val sendAppCommand = fun(data: UTSJSONObject): UTSPromise<SendCmdResponse> {
+    return post(appCommandSendUrl, data).then(fun(raw: Any): SendCmdResponse {
         val response = asJSONObject(raw)
         return SendCmdResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = response.getString("data", ""))
     }
     )
 }
+val getAppCommandHistory = fun(query: UTSJSONObject): UTSPromise<AppCommandPageResponse> {
+    query.set("tenantId", defaultTenantId)
+    return get(appCommandListUrl, query).then(fun(raw: Any): AppCommandPageResponse {
+        return appCommandPageResponse(raw)
+    }
+    )
+}
+val getAppCommandDetail = fun(commandId: Any): UTSPromise<AppCommandDetailResponse> {
+    return get("" + appCommandDetailUrl + commandId.toString()).then(fun(raw: Any): AppCommandDetailResponse {
+        val response = jsonDataResponse(raw)
+        return AppCommandDetailResponse(code = response.code, msg = response.msg, data = response.data)
+    }
+    )
+}
+val retryAppCommand = fun(commandId: Any): UTSPromise<BasicResponse> {
+    return get("" + appCommandRetryUrl + commandId.toString()).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
 val unbindPushDevice = fun(registrationId: String): UTSPromise<BasicResponse> {
-    return postSilently(pushUnbindUrl + "?registrationId=" + UTSAndroid.consoleDebugError(encodeURIComponent(registrationId), " at api/request.uts:268"), UTSJSONObject()).then(fun(raw: Any): BasicResponse {
+    return postSilently(pushUnbindUrl + "?registrationId=" + UTSAndroid.consoleDebugError(encodeURIComponent(registrationId), " at api/request.uts:408"), UTSJSONObject()).then(fun(raw: Any): BasicResponse {
         return basicResponse(raw)
     }
     )
 }
 val bindPushDevice = fun(data: PushDeviceBindRequest): UTSPromise<BasicResponse> {
-    val requestData = UTSJSONObject(UTSSourceMapPosition("requestData", "api/request.uts", 270, 11))
+    val requestData = UTSJSONObject(UTSSourceMapPosition("requestData", "api/request.uts", 410, 11))
     requestData.set("registrationId", data.registrationId)
     requestData.set("platform", data.platform)
     requestData.set("deviceName", data.deviceName)
@@ -1543,6 +1718,68 @@ fun initPushBinding(): Unit {
     }
     )
 }
+val POST_LOGIN_INITIALIZATION_DELAY: Number = 1200
+var pushServicesInitialized = false
+var pushServicesInitializationScheduled = false
+var pushServicesInitializationTimer: Number? = null
+fun startupLog(message: String): Unit {
+    console.log("[AppStartup] " + message, " at services/app-startup.uts:16")
+}
+fun hasLoginToken(): Boolean {
+    val token = uni_getStorageSync("token")
+    return token != null && token.toString() != ""
+}
+fun initializePushServices(): Unit {
+    pushServicesInitializationScheduled = false
+    null
+    if (!hasLoginToken()) {
+        startupLog("当前未登录，跳过推送初始化")
+        return
+    }
+    if (pushServicesInitialized) {
+        markPushSessionAuthenticated()
+        clearPushBadge()
+        return
+    }
+    pushServicesInitialized = true
+    startupLog("开始登录后的推送初始化")
+    initPushBinding()
+    initPush()
+    clearPushBadge()
+    markPushSessionAuthenticated()
+    startupLog("登录后的推送初始化已触发")
+}
+fun schedulePostLoginInitialization(): Unit {
+    if (!hasLoginToken()) {
+        return
+    }
+    if (pushServicesInitialized) {
+        markPushSessionAuthenticated()
+        clearPushBadge()
+        return
+    }
+    if (pushServicesInitializationScheduled) {
+        return
+    }
+    pushServicesInitializationScheduled = true
+    startupLog("已安排登录后的推送初始化")
+    pushServicesInitializationTimer = setTimeout(fun(){
+        initializePushServices()
+    }
+    , POST_LOGIN_INITIALIZATION_DELAY) as Number
+}
+fun refreshInitializedPushServices(): Unit {
+    if (!pushServicesInitialized) {
+        return
+    }
+    refreshPushClientId()
+}
+fun clearInitializedPushBadge(): Unit {
+    if (!pushServicesInitialized) {
+        return
+    }
+    clearPushBadge()
+}
 typealias CameraPermissionStatus = String
 typealias NotificationPermissionStatus = CameraPermissionStatus
 val CAMERA_PERMISSION = "android.permission.CAMERA"
@@ -1644,30 +1881,30 @@ fun checkForUpdates() {}
 open class GenApp : BaseApp {
     constructor(__ins: ComponentInternalInstance) : super(__ins) {
         onLaunch(fun(_: OnLaunchOptions) {
-            console.log("App onLaunch", " at App.uvue:77")
+            console.log("App onLaunch", " at App.uvue:80")
             checkForUpdates()
-            initPushBinding()
-            initPush()
-            clearPushBadge()
+            if (uni_getStorageSync("token") != null) {
+                schedulePostLoginInitialization()
+            }
             ensureNotificationPermission(fun(status){
-                console.log("[NotificationPermission] " + status, " at App.uvue:84")
+                console.log("[NotificationPermission] " + status, " at App.uvue:88")
             }
             )
         }
         , __ins)
         onAppShow(fun(_: OnShowOptions) {
-            console.log("App Show", " at App.uvue:89")
-            clearPushBadge()
-            refreshPushClientId()
+            console.log("App Show", " at App.uvue:93")
+            clearInitializedPushBadge()
+            refreshInitializedPushServices()
         }
         , __ins)
         onAppHide(fun() {
-            console.log("App Hide", " at App.uvue:94")
-            clearPushBadge()
+            console.log("App Hide", " at App.uvue:98")
+            clearInitializedPushBadge()
         }
         , __ins)
         onLastPageBackPress(fun() {
-            console.log("App LastPageBackPress", " at App.uvue:99")
+            console.log("App LastPageBackPress", " at App.uvue:103")
             if (firstBackTime == 0) {
                 uni_showToast(ShowToastOptions(title = "再按一次退出应用", position = "bottom"))
                 firstBackTime = Date.now()
@@ -1681,7 +1918,7 @@ open class GenApp : BaseApp {
         }
         , __ins)
         onExit(fun() {
-            console.log("App Exit", " at App.uvue:116")
+            console.log("App Exit", " at App.uvue:120")
         }
         , __ins)
     }
@@ -5427,7 +5664,7 @@ open class DeviceStatus (
     open var signalStrength: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 287, 6)
+        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 288, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5493,7 +5730,7 @@ open class DeviceDetailState (
     open var lastUpdateTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 293, 6)
+        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 294, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5577,7 +5814,7 @@ open class SavedDevice (
     open var longitude: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 389, 6)
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 395, 6)
     }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
@@ -5650,16 +5887,6 @@ val GenUniModulesIUiXComponentsIInputIInputClass = CreateVueComponent(GenUniModu
     return GenUniModulesIUiXComponentsIInputIInput(instance)
 }
 )
-val GenUniModulesIUiXComponentsIFormItemIFormItemClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormItemIFormItem::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormItemIFormItem.name, inheritAttrs = GenUniModulesIUiXComponentsIFormItemIFormItem.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormItemIFormItem.inject, props = GenUniModulesIUiXComponentsIFormItemIFormItem.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormItemIFormItem.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormItemIFormItem.emits, components = GenUniModulesIUiXComponentsIFormItemIFormItem.components, styles = GenUniModulesIUiXComponentsIFormItemIFormItem.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesIUiXComponentsIFormItemIFormItem.setup(props as GenUniModulesIUiXComponentsIFormItemIFormItem)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIFormItemIFormItem {
-    return GenUniModulesIUiXComponentsIFormItemIFormItem(instance)
-}
-)
 val GenUniModulesIUiXComponentsICheckboxICheckboxClass = CreateVueComponent(GenUniModulesIUiXComponentsICheckboxICheckbox::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsICheckboxICheckbox.name, inheritAttrs = GenUniModulesIUiXComponentsICheckboxICheckbox.inheritAttrs, inject = GenUniModulesIUiXComponentsICheckboxICheckbox.inject, props = GenUniModulesIUiXComponentsICheckboxICheckbox.props, propsNeedCastKeys = GenUniModulesIUiXComponentsICheckboxICheckbox.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsICheckboxICheckbox.emits, components = GenUniModulesIUiXComponentsICheckboxICheckbox.components, styles = GenUniModulesIUiXComponentsICheckboxICheckbox.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenUniModulesIUiXComponentsICheckboxICheckbox.setup(props as GenUniModulesIUiXComponentsICheckboxICheckbox)
@@ -5680,16 +5907,28 @@ val GenUniModulesIUiXComponentsIButtonIButtonClass = CreateVueComponent(GenUniMo
     return GenUniModulesIUiXComponentsIButtonIButton(instance)
 }
 )
-val GenUniModulesIUiXComponentsIFormIFormClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormIForm::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormIForm.name, inheritAttrs = GenUniModulesIUiXComponentsIFormIForm.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormIForm.inject, props = GenUniModulesIUiXComponentsIFormIForm.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormIForm.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormIForm.emits, components = GenUniModulesIUiXComponentsIFormIForm.components, styles = GenUniModulesIUiXComponentsIFormIForm.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
-        return GenUniModulesIUiXComponentsIFormIForm.setup(props as GenUniModulesIUiXComponentsIFormIForm, ctx)
+val userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。"
+val privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。"
+open class SmsRegisterContext (
+    @JsonNotNull
+    open var phonenumber: String,
+    @JsonNotNull
+    open var smsCode: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("SmsRegisterContext", "services/auth/sms-register-context.uts", 1, 13)
     }
-    )
 }
-, fun(instance, renderer): GenUniModulesIUiXComponentsIFormIForm {
-    return GenUniModulesIUiXComponentsIFormIForm(instance)
+var pendingContext: SmsRegisterContext? = null
+fun saveSmsRegisterContext(phonenumber: String, smsCode: String): Unit {
+    pendingContext = SmsRegisterContext(phonenumber = phonenumber, smsCode = smsCode)
 }
-)
+fun getSmsRegisterContext(): SmsRegisterContext? {
+    return pendingContext
+}
+fun clearSmsRegisterContext(): Unit {
+    pendingContext = null
+}
 open class UniVerifyPreLoginResult (
     @JsonNotNull
     open var ok: Boolean = false,
@@ -5700,24 +5939,9 @@ open class UniVerifyPreLoginResult (
         return UTSSourceMapPosition("UniVerifyPreLoginResult", "services/auth/uni-verify.uts", 2, 13)
     }
 }
-open class UniVerifyResult (
-    @JsonNotNull
-    open var ok: Boolean = false,
-    @JsonNotNull
-    open var cancelled: Boolean = false,
-    @JsonNotNull
-    open var message: String,
-    @JsonNotNull
-    open var token: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniVerifyResult", "services/auth/uni-verify.uts", 6, 13)
-    }
-}
 @JvmField
 var manager: UniVerifyManager? = null
 var preLoginReady = false
-var requesting = false
 fun getPlatform(): String {
     return "android"
 }
@@ -5726,26 +5950,6 @@ fun getManager(): UniVerifyManager {
         manager = uni_getUniVerifyManager()
     }
     return manager!!
-}
-fun getErrorMessage(error: UniVerifyManagerLoginFail): String {
-    val errCode = error.errCode
-    console.error("Uni Verify 授权失败:", errCode, error.errMsg, " at services/auth/uni-verify.uts:38")
-    if (errCode == 30001) {
-        return "已取消本机号码授权"
-    }
-    if (errCode == 30004 || errCode == 30005 || errCode == 30006) {
-        return "运营商认证失败，请检查 SIM 卡、移动网络后重试"
-    }
-    if (errCode == 30007) {
-        return "本机号码授权已过期，请重试"
-    }
-    if (errCode == 30008) {
-        return "正在进行本机号码授权，请稍候"
-    }
-    if (errCode == 40001 || errCode == 40002) {
-        return "网络异常，请检查移动网络后重试"
-    }
-    return "本机号码授权失败（错误码：" + errCode + "），请稍后重试"
 }
 fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
     val errCode = error.errCode
@@ -5825,113 +6029,32 @@ fun ensurePreLogin(): UTSPromise<UniVerifyPreLoginResult> {
 fun prefetchUniVerify(): Unit {
     ensurePreLogin()
 }
-fun createResult(ok: Boolean, cancelled: Boolean, message: String, token: String): UniVerifyResult {
-    return UniVerifyResult(ok = ok, cancelled = cancelled, message = message, token = token)
-}
-fun closeLoginPage(uniVerifyManager: UniVerifyManager?): Unit {
-    if (uniVerifyManager != null) {
-        uniVerifyManager.close()
-    }
-}
-fun loginByUniVerify(clientVersion: String): UTSPromise<UniVerifyResult> {
-    return UTSPromise<UniVerifyResult>(fun(resolve, _reject){
-        if (requesting) {
-            resolve(createResult(false, false, "正在进行本机号码授权，请稍候", ""))
-            return
-        }
-        requesting = true
-        ensurePreLogin().then(fun(preLoginResult){
-            if (!preLoginResult.ok) {
-                requesting = false
-                resolve(createResult(false, false, preLoginResult.message, ""))
-                return
-            }
-            var uniVerifyManager: UniVerifyManager? = null
-            try {
-                uniVerifyManager = getManager()
-                uniVerifyManager.login(UniVerifyManagerLoginOptions(uniVerifyStyle = UniVerifyManagerLoginStyle(fullScreen = false, loginBtnText = "本机号码一键登录"), success = fun(result: UniVerifyManagerLoginSuccess){
-                    val requestData = UTSJSONObject(UTSSourceMapPosition("requestData", "services/auth/uni-verify.uts", 130, 31))
-                    requestData.set("openId", result.openId)
-                    requestData.set("accessToken", result.accessToken)
-                    requestData.set("platform", getPlatform())
-                    requestData.set("clientVersion", clientVersion)
-                    requestData.set("clientId", "428a8310cd442757ae699df5d894f051")
-                    requestData.set("grantType", "univerify")
-                    requestData.set("tenantId", "000000")
-                    uniVerifyLogin(requestData).then(fun(response){
-                        val loginData = response.data
-                        val token = if (loginData != null) {
-                            loginData.getString("access_token", "")
-                        } else {
-                            ""
-                        }
-                        if (response.code == 200 && token != "") {
-                            resolve(createResult(true, false, "", token))
-                        } else {
-                            resolve(createResult(false, false, if (response.msg != "") {
-                                response.msg
-                            } else {
-                                "本机号码登录失败，请稍后重试"
-                            }
-                            , ""))
-                        }
-                    }
-                    ).`catch`(fun(){
-                        resolve(createResult(false, false, "登录服务连接失败，请检查网络后重试", ""))
-                    }
-                    ).`finally`(fun(){
-                        closeLoginPage(uniVerifyManager)
-                        requesting = false
-                    }
-                    )
-                }
-                , fail = fun(error: UniVerifyManagerLoginFail){
-                    preLoginReady = false
-                    resolve(createResult(false, error.errCode == 30001, getErrorMessage(error), ""))
-                    closeLoginPage(uniVerifyManager)
-                    requesting = false
-                }
-                ))
-            }
-             catch (error: Throwable) {
-                resolve(createResult(false, false, "当前设备不支持本机号码一键登录", ""))
-                requesting = false
-            }
-        }
-        ).`catch`(fun(){
-            requesting = false
-            resolve(createResult(false, false, "一键登录预取号异常，请检查 SIM 卡、移动网络及服务配置", ""))
-        }
-        )
-    }
-    )
-}
-open class FormData (
+open class PersonalLoginForm (
     @JsonNotNull
     open var username: String,
     @JsonNotNull
     open var password: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 145, 7)
+        return UTSSourceMapPosition("PersonalLoginForm", "pages/login/login.uvue", 189, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return FormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+        return PersonalLoginFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
-class FormDataReactiveObject : FormData, IUTSReactive<FormData> {
-    override var __v_raw: FormData
+class PersonalLoginFormReactiveObject : PersonalLoginForm, IUTSReactive<PersonalLoginForm> {
+    override var __v_raw: PersonalLoginForm
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: FormData, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
+    constructor(__v_raw: PersonalLoginForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
         this.__v_skip = __v_skip
     }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormDataReactiveObject {
-        return FormDataReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PersonalLoginFormReactiveObject {
+        return PersonalLoginFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
     }
     override var username: String
         get() {
@@ -5958,15 +6081,57 @@ class FormDataReactiveObject : FormData, IUTSReactive<FormData> {
             _tRS(__v_raw, "password", oldValue, value)
         }
 }
-open class SavedAccount (
+open class EnterpriseLoginForm (
     @JsonNotNull
     open var username: String,
     @JsonNotNull
     open var password: String,
-) : UTSObject(), IUTSSourceMap {
+) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 149, 7)
+        return UTSSourceMapPosition("EnterpriseLoginForm", "pages/login/login.uvue", 194, 7)
     }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return EnterpriseLoginFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class EnterpriseLoginFormReactiveObject : EnterpriseLoginForm, IUTSReactive<EnterpriseLoginForm> {
+    override var __v_raw: EnterpriseLoginForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: EnterpriseLoginForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): EnterpriseLoginFormReactiveObject {
+        return EnterpriseLoginFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var username: String
+        get() {
+            return _tRG(__v_raw, "username", __v_raw.username, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("username")) {
+                return
+            }
+            val oldValue = __v_raw.username
+            __v_raw.username = value
+            _tRS(__v_raw, "username", oldValue, value)
+        }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
 }
 val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginLogin.inheritAttrs, inject = GenPagesLoginLogin.inject, props = GenPagesLoginLogin.props, propsNeedCastKeys = GenPagesLoginLogin.propsNeedCastKeys, emits = GenPagesLoginLogin.emits, components = GenPagesLoginLogin.components, styles = GenPagesLoginLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
@@ -5976,6 +6141,316 @@ val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java,
 }
 , fun(instance, renderer): GenPagesLoginLogin {
     return GenPagesLoginLogin(instance, renderer)
+}
+)
+val GenUniModulesIUiXComponentsIFormItemIFormItemClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormItemIFormItem::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormItemIFormItem.name, inheritAttrs = GenUniModulesIUiXComponentsIFormItemIFormItem.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormItemIFormItem.inject, props = GenUniModulesIUiXComponentsIFormItemIFormItem.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormItemIFormItem.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormItemIFormItem.emits, components = GenUniModulesIUiXComponentsIFormItemIFormItem.components, styles = GenUniModulesIUiXComponentsIFormItemIFormItem.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesIUiXComponentsIFormItemIFormItem.setup(props as GenUniModulesIUiXComponentsIFormItemIFormItem)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIFormItemIFormItem {
+    return GenUniModulesIUiXComponentsIFormItemIFormItem(instance)
+}
+)
+val GenUniModulesIUiXComponentsIFormIFormClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormIForm::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormIForm.name, inheritAttrs = GenUniModulesIUiXComponentsIFormIForm.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormIForm.inject, props = GenUniModulesIUiXComponentsIFormIForm.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormIForm.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormIForm.emits, components = GenUniModulesIUiXComponentsIFormIForm.components, styles = GenUniModulesIUiXComponentsIFormIForm.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
+        return GenUniModulesIUiXComponentsIFormIForm.setup(props as GenUniModulesIUiXComponentsIFormIForm, ctx)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIFormIForm {
+    return GenUniModulesIUiXComponentsIFormIForm(instance)
+}
+)
+open class PersonalLoginForm__1 (
+    @JsonNotNull
+    open var username: String,
+    @JsonNotNull
+    open var password: String,
+) : UTSReactiveObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("PersonalLoginForm", "pages/login/personal-password-login.uvue", 48, 7)
+    }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return PersonalLoginForm__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class PersonalLoginForm__1ReactiveObject : PersonalLoginForm__1, IUTSReactive<PersonalLoginForm__1> {
+    override var __v_raw: PersonalLoginForm__1
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: PersonalLoginForm__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PersonalLoginForm__1ReactiveObject {
+        return PersonalLoginForm__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var username: String
+        get() {
+            return _tRG(__v_raw, "username", __v_raw.username, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("username")) {
+                return
+            }
+            val oldValue = __v_raw.username
+            __v_raw.username = value
+            _tRS(__v_raw, "username", oldValue, value)
+        }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+}
+val GenPagesLoginPersonalPasswordLoginClass = CreateVueComponent(GenPagesLoginPersonalPasswordLogin::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginPersonalPasswordLogin.inheritAttrs, inject = GenPagesLoginPersonalPasswordLogin.inject, props = GenPagesLoginPersonalPasswordLogin.props, propsNeedCastKeys = GenPagesLoginPersonalPasswordLogin.propsNeedCastKeys, emits = GenPagesLoginPersonalPasswordLogin.emits, components = GenPagesLoginPersonalPasswordLogin.components, styles = GenPagesLoginPersonalPasswordLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginPersonalPasswordLogin.setup(props as GenPagesLoginPersonalPasswordLogin)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginPersonalPasswordLogin {
+    return GenPagesLoginPersonalPasswordLogin(instance, renderer)
+}
+)
+open class RegisterForm (
+    @JsonNotNull
+    open var password: String,
+    @JsonNotNull
+    open var mobile: String,
+    @JsonNotNull
+    open var smsCode: String,
+) : UTSReactiveObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("RegisterForm", "pages/login/register.uvue", 117, 7)
+    }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return RegisterFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class RegisterFormReactiveObject : RegisterForm, IUTSReactive<RegisterForm> {
+    override var __v_raw: RegisterForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: RegisterForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(password = __v_raw.password, mobile = __v_raw.mobile, smsCode = __v_raw.smsCode) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): RegisterFormReactiveObject {
+        return RegisterFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+    override var mobile: String
+        get() {
+            return _tRG(__v_raw, "mobile", __v_raw.mobile, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("mobile")) {
+                return
+            }
+            val oldValue = __v_raw.mobile
+            __v_raw.mobile = value
+            _tRS(__v_raw, "mobile", oldValue, value)
+        }
+    override var smsCode: String
+        get() {
+            return _tRG(__v_raw, "smsCode", __v_raw.smsCode, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("smsCode")) {
+                return
+            }
+            val oldValue = __v_raw.smsCode
+            __v_raw.smsCode = value
+            _tRS(__v_raw, "smsCode", oldValue, value)
+        }
+}
+val GenPagesLoginRegisterClass = CreateVueComponent(GenPagesLoginRegister::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginRegister.inheritAttrs, inject = GenPagesLoginRegister.inject, props = GenPagesLoginRegister.props, propsNeedCastKeys = GenPagesLoginRegister.propsNeedCastKeys, emits = GenPagesLoginRegister.emits, components = GenPagesLoginRegister.components, styles = GenPagesLoginRegister.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginRegister.setup(props as GenPagesLoginRegister)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginRegister {
+    return GenPagesLoginRegister(instance, renderer)
+}
+)
+open class ForgotPasswordForm (
+    @JsonNotNull
+    open var mobile: String,
+    @JsonNotNull
+    open var smsCode: String,
+    @JsonNotNull
+    open var password: String,
+    @JsonNotNull
+    open var confirmPassword: String,
+) : UTSReactiveObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("ForgotPasswordForm", "pages/login/forgot-password.uvue", 147, 7)
+    }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return ForgotPasswordFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class ForgotPasswordFormReactiveObject : ForgotPasswordForm, IUTSReactive<ForgotPasswordForm> {
+    override var __v_raw: ForgotPasswordForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: ForgotPasswordForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(mobile = __v_raw.mobile, smsCode = __v_raw.smsCode, password = __v_raw.password, confirmPassword = __v_raw.confirmPassword) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): ForgotPasswordFormReactiveObject {
+        return ForgotPasswordFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var mobile: String
+        get() {
+            return _tRG(__v_raw, "mobile", __v_raw.mobile, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("mobile")) {
+                return
+            }
+            val oldValue = __v_raw.mobile
+            __v_raw.mobile = value
+            _tRS(__v_raw, "mobile", oldValue, value)
+        }
+    override var smsCode: String
+        get() {
+            return _tRG(__v_raw, "smsCode", __v_raw.smsCode, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("smsCode")) {
+                return
+            }
+            val oldValue = __v_raw.smsCode
+            __v_raw.smsCode = value
+            _tRS(__v_raw, "smsCode", oldValue, value)
+        }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+    override var confirmPassword: String
+        get() {
+            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("confirmPassword")) {
+                return
+            }
+            val oldValue = __v_raw.confirmPassword
+            __v_raw.confirmPassword = value
+            _tRS(__v_raw, "confirmPassword", oldValue, value)
+        }
+}
+val GenPagesLoginForgotPasswordClass = CreateVueComponent(GenPagesLoginForgotPassword::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginForgotPassword.inheritAttrs, inject = GenPagesLoginForgotPassword.inject, props = GenPagesLoginForgotPassword.props, propsNeedCastKeys = GenPagesLoginForgotPassword.propsNeedCastKeys, emits = GenPagesLoginForgotPassword.emits, components = GenPagesLoginForgotPassword.components, styles = GenPagesLoginForgotPassword.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginForgotPassword.setup(props as GenPagesLoginForgotPassword)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginForgotPassword {
+    return GenPagesLoginForgotPassword(instance, renderer)
+}
+)
+open class PasswordForm (
+    @JsonNotNull
+    open var password: String,
+    @JsonNotNull
+    open var confirmPassword: String,
+) : UTSReactiveObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("PasswordForm", "pages/login/set-password.uvue", 63, 7)
+    }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return PasswordFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class PasswordFormReactiveObject : PasswordForm, IUTSReactive<PasswordForm> {
+    override var __v_raw: PasswordForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: PasswordForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(password = __v_raw.password, confirmPassword = __v_raw.confirmPassword) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PasswordFormReactiveObject {
+        return PasswordFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+    override var confirmPassword: String
+        get() {
+            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("confirmPassword")) {
+                return
+            }
+            val oldValue = __v_raw.confirmPassword
+            __v_raw.confirmPassword = value
+            _tRS(__v_raw, "confirmPassword", oldValue, value)
+        }
+}
+val GenPagesLoginSetPasswordClass = CreateVueComponent(GenPagesLoginSetPassword::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginSetPassword.inheritAttrs, inject = GenPagesLoginSetPassword.inject, props = GenPagesLoginSetPassword.props, propsNeedCastKeys = GenPagesLoginSetPassword.propsNeedCastKeys, emits = GenPagesLoginSetPassword.emits, components = GenPagesLoginSetPassword.components, styles = GenPagesLoginSetPassword.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginSetPassword.setup(props as GenPagesLoginSetPassword)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginSetPassword {
+    return GenPagesLoginSetPassword(instance, renderer)
 }
 )
 open class PickerItem (
@@ -6104,6 +6579,7 @@ fun __uts_large_list_fill_fill_1(__arr: UTSArray<UTSJSONObject>): Unit {
     __arr.push(_uO("image" to "/static/navto.png", "text" to "一键寻车"))
     __arr.push(_uO("image" to "/static/power.png", "text" to "恢复油电"))
     __arr.push(_uO("image" to "/static/offpower.png", "text" to "断开油电"))
+    __arr.push(_uO("image" to "/static/cmd.png", "text" to "发送指令"))
 }
 fun __uts_large_list_build_0(): UTSArray<UTSJSONObject> {
     val __arr = _uA<UTSJSONObject>()
@@ -9165,82 +9641,71 @@ val GenPagesUserCenterUserInfoUserInfoClass = CreateVueComponent(GenPagesUserCen
     return GenPagesUserCenterUserInfoUserInfo(instance, renderer)
 }
 )
-open class UserInfo__1 (
+open class PasswordForm__1 (
     @JsonNotNull
-    open var id: String,
+    open var oldPassword: String,
     @JsonNotNull
-    open var mobile: String,
+    open var newPassword: String,
+    @JsonNotNull
+    open var confirmPassword: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserInfo", "pages/userCenter/editPassword/editPassword.uvue", 33, 7)
+        return UTSSourceMapPosition("PasswordForm", "pages/userCenter/editPassword/editPassword.uvue", 78, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return UserInfo__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+        return PasswordForm__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
-class UserInfo__1ReactiveObject : UserInfo__1, IUTSReactive<UserInfo__1> {
-    override var __v_raw: UserInfo__1
+class PasswordForm__1ReactiveObject : PasswordForm__1, IUTSReactive<PasswordForm__1> {
+    override var __v_raw: PasswordForm__1
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: UserInfo__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(id = __v_raw.id, mobile = __v_raw.mobile) {
+    constructor(__v_raw: PasswordForm__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(oldPassword = __v_raw.oldPassword, newPassword = __v_raw.newPassword, confirmPassword = __v_raw.confirmPassword) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
         this.__v_skip = __v_skip
     }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UserInfo__1ReactiveObject {
-        return UserInfo__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PasswordForm__1ReactiveObject {
+        return PasswordForm__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
     }
-    override var id: String
+    override var oldPassword: String
         get() {
-            return _tRG(__v_raw, "id", __v_raw.id, __v_isReadonly, __v_isShallow)
+            return _tRG(__v_raw, "oldPassword", __v_raw.oldPassword, __v_isReadonly, __v_isShallow)
         }
         set(value) {
-            if (!__v_canSet("id")) {
+            if (!__v_canSet("oldPassword")) {
                 return
             }
-            val oldValue = __v_raw.id
-            __v_raw.id = value
-            _tRS(__v_raw, "id", oldValue, value)
+            val oldValue = __v_raw.oldPassword
+            __v_raw.oldPassword = value
+            _tRS(__v_raw, "oldPassword", oldValue, value)
         }
-    override var mobile: String
+    override var newPassword: String
         get() {
-            return _tRG(__v_raw, "mobile", __v_raw.mobile, __v_isReadonly, __v_isShallow)
+            return _tRG(__v_raw, "newPassword", __v_raw.newPassword, __v_isReadonly, __v_isShallow)
         }
         set(value) {
-            if (!__v_canSet("mobile")) {
+            if (!__v_canSet("newPassword")) {
                 return
             }
-            val oldValue = __v_raw.mobile
-            __v_raw.mobile = value
-            _tRS(__v_raw, "mobile", oldValue, value)
+            val oldValue = __v_raw.newPassword
+            __v_raw.newPassword = value
+            _tRS(__v_raw, "newPassword", oldValue, value)
         }
-}
-open class FormInstance (
-    open var validate: () -> Boolean,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FormInstance", "pages/userCenter/editPassword/editPassword.uvue", 37, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return FormInstanceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class FormInstanceReactiveObject : FormInstance, IUTSReactive<FormInstance> {
-    override var __v_raw: FormInstance
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: FormInstance, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(validate = __v_raw.validate) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormInstanceReactiveObject {
-        return FormInstanceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
+    override var confirmPassword: String
+        get() {
+            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("confirmPassword")) {
+                return
+            }
+            val oldValue = __v_raw.confirmPassword
+            __v_raw.confirmPassword = value
+            _tRS(__v_raw, "confirmPassword", oldValue, value)
+        }
 }
 val GenPagesUserCenterEditPasswordEditPasswordClass = CreateVueComponent(GenPagesUserCenterEditPasswordEditPassword::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesUserCenterEditPasswordEditPassword.inheritAttrs, inject = GenPagesUserCenterEditPasswordEditPassword.inject, props = GenPagesUserCenterEditPasswordEditPassword.props, propsNeedCastKeys = GenPagesUserCenterEditPasswordEditPassword.propsNeedCastKeys, emits = GenPagesUserCenterEditPasswordEditPassword.emits, components = GenPagesUserCenterEditPasswordEditPassword.components, styles = GenPagesUserCenterEditPasswordEditPassword.styles, setup = fun(props: ComponentPublicInstance): Any? {
@@ -9609,7 +10074,7 @@ open class CoordinateBounds (
     open var maxLng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 682, 7)
+        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 683, 7)
     }
 }
 val GenPagesGeofencingGeofencingClass = CreateVueComponent(GenPagesGeofencingGeofencing::class.java, fun(): VueComponentOptions {
@@ -9642,6 +10107,64 @@ val GenPagesUserCenterPayDeviceListPayDeviceListClass = CreateVueComponent(GenPa
     return GenPagesUserCenterPayDeviceListPayDeviceList(instance, renderer)
 }
 )
+open class TabPayload (
+    @JsonNotNull
+    open var index: Number,
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var value: String,
+    @JsonNotNull
+    open var item: Any,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("TabPayload", "uni_modules/i-ui-x/components/i-tabs/i-tabs.uvue", 56, 6)
+    }
+}
+val GenUniModulesIUiXComponentsITabsITabsClass = CreateVueComponent(GenUniModulesIUiXComponentsITabsITabs::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsITabsITabs.name, inheritAttrs = GenUniModulesIUiXComponentsITabsITabs.inheritAttrs, inject = GenUniModulesIUiXComponentsITabsITabs.inject, props = GenUniModulesIUiXComponentsITabsITabs.props, propsNeedCastKeys = GenUniModulesIUiXComponentsITabsITabs.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsITabsITabs.emits, components = GenUniModulesIUiXComponentsITabsITabs.components, styles = GenUniModulesIUiXComponentsITabsITabs.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesIUiXComponentsITabsITabs.setup(props as GenUniModulesIUiXComponentsITabsITabs)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsITabsITabs {
+    return GenUniModulesIUiXComponentsITabsITabs(instance)
+}
+)
+open class ActionPayload (
+    @JsonNotNull
+    open var index: Number,
+    @JsonNotNull
+    open var item: Any,
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var value: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("ActionPayload", "uni_modules/i-ui-x/components/i-action-sheet/i-action-sheet.uvue", 81, 6)
+    }
+}
+val GenUniModulesIUiXComponentsIActionSheetIActionSheetClass = CreateVueComponent(GenUniModulesIUiXComponentsIActionSheetIActionSheet::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIActionSheetIActionSheet.name, inheritAttrs = GenUniModulesIUiXComponentsIActionSheetIActionSheet.inheritAttrs, inject = GenUniModulesIUiXComponentsIActionSheetIActionSheet.inject, props = GenUniModulesIUiXComponentsIActionSheetIActionSheet.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIActionSheetIActionSheet.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIActionSheetIActionSheet.emits, components = GenUniModulesIUiXComponentsIActionSheetIActionSheet.components, styles = GenUniModulesIUiXComponentsIActionSheetIActionSheet.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
+        return GenUniModulesIUiXComponentsIActionSheetIActionSheet.setup(props as GenUniModulesIUiXComponentsIActionSheetIActionSheet, ctx)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIActionSheetIActionSheet {
+    return GenUniModulesIUiXComponentsIActionSheetIActionSheet(instance)
+}
+)
+open class TabItem (
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var value: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("TabItem", "pages/cmd/cmd.uvue", 201, 6)
+    }
+}
 val GenPagesCmdCmdClass = CreateVueComponent(GenPagesCmdCmd::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesCmdCmd.inheritAttrs, inject = GenPagesCmdCmd.inject, props = GenPagesCmdCmd.props, propsNeedCastKeys = GenPagesCmdCmd.propsNeedCastKeys, emits = GenPagesCmdCmd.emits, components = GenPagesCmdCmd.components, styles = GenPagesCmdCmd.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesCmdCmd.setup(props as GenPagesCmdCmd)
@@ -9845,8 +10368,8 @@ fun main(app: IApp) {
 open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
     override var name: String = "中导物联"
     override var appid: String = "__UNI__662B0B4"
-    override var versionName: String = "1.0.0"
-    override var versionCode: String = "100"
+    override var versionName: String = "1.0.1"
+    override var versionCode: String = "101"
     override var uniCompilerVersion: String = "5.23"
     constructor() : super() {}
 }
@@ -9855,6 +10378,10 @@ fun definePageRoutes() {
     __uniRoutes.push(UniPageRoute(path = "pages/message/message", component = GenPagesMessageMessageClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "消息")))
     __uniRoutes.push(UniPageRoute(path = "pages/userCenter/userCenter", component = GenPagesUserCenterUserCenterClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "我的")))
     __uniRoutes.push(UniPageRoute(path = "pages/login/login", component = GenPagesLoginLoginClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "登陆")))
+    __uniRoutes.push(UniPageRoute(path = "pages/login/personal-password-login", component = GenPagesLoginPersonalPasswordLoginClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "个人账号登录")))
+    __uniRoutes.push(UniPageRoute(path = "pages/login/register", component = GenPagesLoginRegisterClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "个人用户注册")))
+    __uniRoutes.push(UniPageRoute(path = "pages/login/forgot-password", component = GenPagesLoginForgotPasswordClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "忘记密码")))
+    __uniRoutes.push(UniPageRoute(path = "pages/login/set-password", component = GenPagesLoginSetPasswordClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "设置登录密码")))
     __uniRoutes.push(UniPageRoute(path = "pages/carInfoDetail/carInfoDetail", component = GenPagesCarInfoDetailCarInfoDetailClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "车辆详情")))
     __uniRoutes.push(UniPageRoute(path = "pages/addCar/addCar", component = GenPagesAddCarAddCarClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "添加车辆")))
     __uniRoutes.push(UniPageRoute(path = "pages/playBack/playBack", component = GenPagesPlayBackPlayBackClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "轨迹回放")))
@@ -9896,11 +10423,11 @@ fun defineAppConfig() {
 }
 open class UniCloudConfig : io.dcloud.unicloud.InternalUniCloudConfig, IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniCloudConfig", "main.uts", 79, 14)
+        return UTSSourceMapPosition("UniCloudConfig", "main.uts", 87, 14)
     }
     override var isDev: Boolean = true
     override var spaceList: String = "[{\"provider\":\"aliyun\",\"spaceName\":\"zdiot-car\",\"spaceId\":\"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff\",\"clientSecret\":\"s9pFKgenncFnOUhRGOJpcw==\",\"endpoint\":\"https://api.next.bspapp.com\",\"failoverEndpoint\":\"\"}]"
-    override var debuggerInfo: String? = "{\"address\":[\"127.0.0.1\",\"192.168.1.180\"],\"servePort\":7001,\"debugPort\":9000,\"initialLaunchType\":\"remote\",\"skipFiles\":[\"<node_internals>/**\",\"/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js\"]}"
+    override var debuggerInfo: String? = "{\"address\":[\"127.0.0.1\",\"192.168.1.76\"],\"servePort\":7001,\"debugPort\":9000,\"initialLaunchType\":\"remote\",\"skipFiles\":[\"<node_internals>/**\",\"/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js\"]}"
     override var secureNetworkEnable: Boolean = false
     override var secureNetworkConfig: String? = "[]"
     constructor() : super() {}
