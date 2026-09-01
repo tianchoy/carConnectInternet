@@ -136,6 +136,10 @@
 
 		<!-- #ifdef APP-ANDROID || APP-IOS -->
 		<view class="page-actions">
+			<view v-if="!smsLoginMode" class="action-item" @click="gotoIndex">
+				<text class="action-link">暂不登录</text>
+				<text class="action-arrow">›</text>
+			</view>
 			<view class="action-item" @click="toggleLoginMode">
 				<text class="action-link">{{ smsLoginMode ? '密码登录' : '验证码登录' }}</text>
 				<text class="action-arrow">›</text>

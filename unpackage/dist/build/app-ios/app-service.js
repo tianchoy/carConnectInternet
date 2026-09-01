@@ -10460,6 +10460,9 @@
           smsCooldown.value = 0;
         }
       };
+      const gotoIndex = () => {
+        uni.reLaunch({ url: "/pages/index/index" });
+      };
       const gotoAgreement = () => {
         showAppModal(new UTSJSONObject({ title: "用户协议", content: userAgreement, showCancel: false }));
       };
@@ -10630,6 +10633,14 @@
               }, 8, ["loading", "disabled"])
             ]),
             vue.createElementVNode("view", new UTSJSONObject({ class: "page-actions" }), [
+              !smsLoginMode.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                key: 0,
+                class: "action-item",
+                onClick: gotoIndex
+              }), [
+                vue.createElementVNode("text", new UTSJSONObject({ class: "action-link" }), "暂不登录"),
+                vue.createElementVNode("text", new UTSJSONObject({ class: "action-arrow" }), "›")
+              ])) : vue.createCommentVNode("", true),
               vue.createElementVNode("view", new UTSJSONObject({
                 class: "action-item",
                 onClick: toggleLoginMode
@@ -10638,7 +10649,7 @@
                 vue.createElementVNode("text", new UTSJSONObject({ class: "action-arrow" }), "›")
               ]),
               !smsLoginMode.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                key: 0,
+                key: 1,
                 class: "action-item",
                 onClick: goRegister
               }), [
@@ -10646,7 +10657,7 @@
                 vue.createElementVNode("text", new UTSJSONObject({ class: "action-arrow" }), "›")
               ])) : vue.createCommentVNode("", true),
               !smsLoginMode.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                key: 1,
+                key: 2,
                 class: "action-item",
                 onClick: goForgotPassword
               }), [

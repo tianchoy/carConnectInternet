@@ -171,7 +171,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           completeLogin(token);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:483", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:487", "微信登录失败:", error);
           utils_toast.showAppToast({ title: "微信登录失败", icon: "none" });
         } finally {
           common_vendor.index.hideLoading();
@@ -191,7 +191,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         enterpriseForm.value.password = account.getString("password", "");
         rememberPassword.value = enterpriseForm.value.username != "" || enterpriseForm.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/login/login.uvue:504", "加载保存的企业账号失败:", error);
+        common_vendor.index.__f__("warn", "at pages/login/login.uvue:508", "加载保存的企业账号失败:", error);
       }
     };
     const toggleEnterpriseLogin = () => {

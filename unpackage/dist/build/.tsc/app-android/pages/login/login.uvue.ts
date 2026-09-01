@@ -594,6 +594,16 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
         }), 8 /* PROPS */, ["loading", "disabled"])
       ]),
       _cE("view", _uM({ class: "page-actions" }), [
+        isTrue(!smsLoginMode.value)
+          ? _cE("view", _uM({
+              key: 0,
+              class: "action-item",
+              onClick: gotoIndex
+            }), [
+              _cE("text", _uM({ class: "action-link" }), "暂不登录"),
+              _cE("text", _uM({ class: "action-arrow" }), "›")
+            ])
+          : _cC("v-if", true),
         _cE("view", _uM({
           class: "action-item",
           onClick: toggleLoginMode
@@ -603,7 +613,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
         ]),
         isTrue(!smsLoginMode.value)
           ? _cE("view", _uM({
-              key: 0,
+              key: 1,
               class: "action-item",
               onClick: goRegister
             }), [
@@ -613,7 +623,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
           : _cC("v-if", true),
         isTrue(!smsLoginMode.value)
           ? _cE("view", _uM({
-              key: 1,
+              key: 2,
               class: "action-item",
               onClick: goForgotPassword
             }), [
