@@ -21,17 +21,14 @@
 				activeColor="#1677ff"
 				inactiveColor="#667085"
 				bgColor="#ffffff"
-				@change="changeTab($event)"
+				@update:value="changeTab"
 			></i-tabs>
 
 			<scroll-view
 				class="main-scroll"
 				scroll-y="true"
 				:show-scrollbar="false"
-				refresher-enabled
-				:refresher-triggered="refreshing"
 				:lower-threshold="80"
-				@refresherrefresh="refreshCurrentTab"
 				@scroll="markHistoryScroll"
 				@scrolltolower="loadMoreHistory"
 			>
@@ -151,9 +148,9 @@
 						</view>
 					</view>
 					<view v-if="historyRecords.length > 0" class="history-footer">
-						<text v-if="isHistoryLoading">加载中...</text>
-						<text v-else-if="!hasMoreHistory">没有更多记录了</text>
-						<text v-else>上拉加载更多</text>
+						<text class="loading-text" v-if="isHistoryLoading">加载中...</text>
+						<text class="no-more-text" v-else-if="!hasMoreHistory">没有更多记录了</text>
+						<text class="load-more-text" v-else>上拉加载更多</text>
 					</view>
 				</view>
 			</scroll-view>
@@ -198,14 +195,12 @@ import { getAppAvailableCommands, getAppCommandDetail, getAppCommandHistory, ret
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { showAppToast } from '../../utils/toast.uts'
 
-type TabItem = { name: string, value: string }
-
 const imei = ref('')
 const deviceId = ref('')
 const activeTab = ref('send')
-const tabItems: Array<TabItem> = [
-	{ name: '下发指令', value: 'send' },
-	{ name: '指令记录', value: 'history' }
+const tabItems: Array<UTSJSONObject> = [
+	{ name: '下发指令', value: 'send' } as UTSJSONObject,
+	{ name: '指令记录', value: 'history' } as UTSJSONObject
 ]
 
 const availableCommands = ref<Array<UTSJSONObject>>([])
@@ -230,7 +225,6 @@ const historyTotal = ref(0)
 const isHistoryLoading = ref(false)
 const hasLoadedHistory = ref(false)
 const hasMoreHistory = ref(true)
-const refreshing = ref(false)
 const hasReachedHistoryBottom = ref(false)
 
 const detailVisible = ref(false)
@@ -628,7 +622,7 @@ function markHistoryScroll(event: UniScrollEvent): void {
 }
 
 function loadMoreHistory(): void {
-	if (activeTab.value != 'history' || refreshing.value) return
+	if (activeTab.value != 'history') return
 	// #ifdef APP-IOS
 	if (hasReachedHistoryBottom.value) return
 	hasReachedHistoryBottom.value = true
@@ -698,33 +692,10 @@ function confirmRetryFromDetail(): void {
 	})
 }
 
-function getEventString(event: any, key: string): string {
-	if (event == null || typeof event != 'object') return ''
-	// #ifdef APP-ANDROID
-	return (event as UTSJSONObject).getString(key, '')
-	// #endif
-	// #ifndef APP-ANDROID
-	const value = event[key]
-	return value == null ? '' : value.toString()
-	// #endif
-}
-
-function changeTab(event: any): void {
-	const value = getEventString(event, 'value')
-	if (value == '') return
+function changeTab(value: string): void {
+	if (value == '' || value == activeTab.value) return
 	activeTab.value = value
 	if (value == 'history' && !hasLoadedHistory.value) void reloadHistory()
-}
-
-async function refreshCurrentTab(): Promise<void> {
-	if (refreshing.value) return
-	try {
-		refreshing.value = true
-		if (activeTab.value == 'history') await reloadHistory()
-		else await loadAvailableCommands()
-	} finally {
-		refreshing.value = false
-	}
 }
 
 onLoad((options) => {
@@ -1057,6 +1028,11 @@ onLoad((options) => {
 	padding: 28rpx 0 12rpx;
 	color: #98a2b3;
 	font-size: 23rpx;
+	text-align: center;
+}
+.loading-text, .no-more-text, .load-more-text {
+	color: #999;
+	font-size: 25rpx;
 	text-align: center;
 }
 

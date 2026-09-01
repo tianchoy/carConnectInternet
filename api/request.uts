@@ -305,7 +305,7 @@ export const sendAppCommand = (data: UTSJSONObject): Promise<SendCmdResponse> =>
     return { code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString('data', '') }
 })
 export const getAppCommandHistory = (query: UTSJSONObject): Promise<AppCommandPageResponse> => {
-    // query.set('tenantId', defaultTenantId)
+    query.set('tenantId', defaultTenantId)
     return get(appCommandListUrl, query).then((raw: any): AppCommandPageResponse => {
         return appCommandPageResponse(raw)
     })

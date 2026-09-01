@@ -422,34 +422,44 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const baseList = common_vendor.computed(() => {
-      const list = [new common_vendor.UTSJSONObject({
-        image: "/static/gjhf.png",
-        text: "轨迹回放"
-      }), new common_vendor.UTSJSONObject({
-        image: "/static/clgz.png",
-        text: "车辆跟踪"
-      }), new common_vendor.UTSJSONObject({
-        image: "/static/lcjl.png",
-        text: "里程记录"
-      }), new common_vendor.UTSJSONObject({
-        image: "/static/tcjl.png",
-        text: "停车记录"
-      }), new common_vendor.UTSJSONObject({
-        image: "/static/dzwl.png",
-        text: "电子围栏"
-      }), new common_vendor.UTSJSONObject({
-        image: "/static/navto.png",
-        text: "一键寻车"
-      }), new common_vendor.UTSJSONObject({
-        image: "/static/power.png",
-        text: "恢复油电"
-      }), new common_vendor.UTSJSONObject({
-        image: "/static/offpower.png",
-        text: "断开油电"
-      }), new common_vendor.UTSJSONObject({
-        image: "/static/cmd.png",
-        text: "发送指令"
-      })];
+      const list = [
+        new common_vendor.UTSJSONObject({
+          image: "/static/gjhf.png",
+          text: "轨迹回放"
+        }),
+        new common_vendor.UTSJSONObject({
+          image: "/static/clgz.png",
+          text: "车辆跟踪"
+        }),
+        new common_vendor.UTSJSONObject({
+          image: "/static/lcjl.png",
+          text: "里程记录"
+        }),
+        new common_vendor.UTSJSONObject({
+          image: "/static/tcjl.png",
+          text: "停车记录"
+        }),
+        new common_vendor.UTSJSONObject({
+          image: "/static/dzwl.png",
+          text: "电子围栏"
+        }),
+        new common_vendor.UTSJSONObject({
+          image: "/static/navto.png",
+          text: "一键寻车"
+        }),
+        new common_vendor.UTSJSONObject({
+          image: "/static/power.png",
+          text: "恢复油电"
+        }),
+        new common_vendor.UTSJSONObject({
+          image: "/static/offpower.png",
+          text: "断开油电"
+        })
+        // {
+        // 		image: '/static/cmd.png',
+        // 		text: '发送指令'
+        // 	}
+      ];
       const productId = currentCarInfo.value.productId;
       if (productId == "product-1141811865601576960" || productId == "product-1183161303028600832") {
         list.push(new common_vendor.UTSJSONObject({

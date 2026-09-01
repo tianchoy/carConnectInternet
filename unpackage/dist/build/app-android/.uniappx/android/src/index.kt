@@ -9692,12 +9692,6 @@ val GenUniModulesIUiXComponentsIActionSheetIActionSheetClass = CreateVueComponen
     return GenUniModulesIUiXComponentsIActionSheetIActionSheet(instance)
 }
 )
-open class TabItem (
-    @JsonNotNull
-    open var name: String,
-    @JsonNotNull
-    open var value: String,
-) : UTSObject()
 val GenPagesCmdCmdClass = CreateVueComponent(GenPagesCmdCmd::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesCmdCmd.inheritAttrs, inject = GenPagesCmdCmd.inject, props = GenPagesCmdCmd.props, propsNeedCastKeys = GenPagesCmdCmd.propsNeedCastKeys, emits = GenPagesCmdCmd.emits, components = GenPagesCmdCmd.components, styles = GenPagesCmdCmd.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesCmdCmd.setup(props as GenPagesCmdCmd)

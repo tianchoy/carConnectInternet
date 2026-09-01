@@ -921,6 +921,7 @@ const sendAppCommand = (data) => {
   });
 };
 const getAppCommandHistory = (query) => {
+  query.set("tenantId", defaultTenantId);
   return api_http.get(appCommandListUrl, query).then((raw = null) => {
     return appCommandPageResponse(raw);
   });

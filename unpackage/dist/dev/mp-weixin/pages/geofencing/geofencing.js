@@ -1036,13 +1036,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const deviceName2 = device.getString("deviceName", "");
       return deviceName2 ? deviceName2 : device.getString("plateNo", "");
     }
-    function closeEditDialog() {
-      var _a;
-      (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.$callMethod("close");
-      if (editingFence.value == null) {
-        clearDrawing();
-      }
-    }
     function getSelectedFenceName() {
       const fence = selectedFence.value;
       return fence != null ? fence.getString("name", "") : "";
@@ -1057,10 +1050,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.$callMethod("close");
       const fence = selectedFence.value;
-      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1210", "删除电子围栏", fence);
+      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1202", "删除电子围栏", fence);
       if (fence != null) {
         const fenceId = fence.getString("id", "");
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1214", "删除电子围栏ID", fenceId);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1206", "删除电子围栏ID", fenceId);
         if (fenceId !== "") {
           deleteFence(fenceId);
         } else {
@@ -1127,7 +1120,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       fenceForm.name = `${drawingMode.value === "circle" ? "圆形" : "多边形"}围栏${fenceList.value.length + 1}`;
       (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.$callMethod("open");
     };
-    const clearDrawing = () => {
+    function clearDrawing() {
       isDrawing.value = false;
       points.value = [];
       circleCenter.value = null;
@@ -1137,11 +1130,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       circles.value = [];
       updateMarkers();
       renderFencesOnMap();
-    };
+    }
+    function closeEditDialog() {
+      var _a;
+      (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.$callMethod("close");
+      if (editingFence.value == null) {
+        clearDrawing();
+      }
+    }
     common_vendor.onLoad((option) => {
+      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1356", "加载参数", option);
       connectionStatus.value = option.connectionStatus;
       imei.value = option.imei;
-      currentCar.value = option.plateNo;
+      currentCar.value = option.plateNo || option.deviceName;
       deptId.value = option.deptId;
       carType.value = option.carType;
       deviceName.value = option.deviceName;
