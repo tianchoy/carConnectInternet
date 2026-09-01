@@ -17,7 +17,7 @@
                         <i-icon name="/static/right-bottom.png" fontSize="7"></i-icon>
                     </view>
                     <view class="nav-tools">
-                        <view class="exit" @click="handleExit" v-if="false">
+                        <view class="exit" @click="logout" v-if="false">
                             <image src="../../static/exit.png" mode="aspectFit" class="exit-icon"></image>
                         </view>
                         <i-icon name="/static/reload.png" fontSize="18" @click="handleReload"></i-icon>
@@ -173,6 +173,10 @@
                             <image src="../../static/online.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title">在线客服</text>
                         </view>
+                        <view class="service-item" @click="logout">
+                            <image src="../../static/logout.png" mode="aspectFit" class="icon-image"></image>
+                            <text class="item-title" style="color: #EE793A;">退出登录</text>
+                        </view>
                         <view class="service-item" @click="unbindDevice">
                             <image src="../../static/del.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title" style="color: #d81e06;">删除设备</text>
@@ -210,7 +214,7 @@ import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { clearPushSessionState } from '../../services/push.uts'
 import { unbindPushDeviceOnLogout } from '../../services/push-binding.uts'
-import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
+import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
@@ -1311,30 +1315,32 @@ const unbindDevice = () : void => {
     })
 }
 
+async function performLogout(): Promise<void> {
+    await unbindPushDeviceOnLogout()
+    const res = await logoutRequest()
+    if(res.code == 200){
+        clearSavedSelectedDevice()
+        clearSavedSelectedDeviceIndex()
+        uni.removeStorageSync('token')
+        clearPushSessionState()
+        uni.reLaunch({
+            url:'/pages/login/login'
+        })
+    }else{
+        showAppToast({
+            title: res.msg || '退出账户失败'
+        })
+    }
+}
+
 // 退出登录
-const handleExit = () => {
+const logout = (): void => {
     if (!isLogin()) return
     showAppModal({
         title: '退出登录',
         content: '确定退出登录吗？',
-        success: async (res) => {
-            if (res.confirm) {
-                await unbindPushDeviceOnLogout()
-                const res = await logout()
-                if(res.code == 200){
-                    clearSavedSelectedDevice()
-                    clearSavedSelectedDeviceIndex()
-                    uni.removeStorageSync('token')
-                    clearPushSessionState()
-                    uni.reLaunch({
-                        url:'/pages/login/login'
-                    })
-                }else{
-                    showAppToast({
-                        title: res.msg || '退出账户失败'
-                    })
-                }
-            }
+        success: (res: AppModalSuccess): void => {
+            if (res.confirm) void performLogout()
         }
     })
 }
@@ -1532,7 +1538,6 @@ onLoad(() => {
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
 
             .map-header {
                 display: flex;

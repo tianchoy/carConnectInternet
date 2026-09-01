@@ -135,7 +135,6 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             if (from) {
                                 val params: UTSJSONObject = _uO("pageSize" to 1000)
                                 val res = await(getUserDeviceList(params))
-                                console.log("获取设备列表:", res)
                                 val list = if (res.code == 200 && res.data != null) {
                                     res.data.list
                                 } else {

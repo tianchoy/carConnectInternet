@@ -3753,7 +3753,8 @@
   const _imports_6 = "/static/msg.png";
   const _imports_7 = "/static/pay.png";
   const _imports_8 = "/static/online.png";
-  const _imports_9 = "/static/del.png";
+  const _imports_9 = "/static/logout.png";
+  const _imports_10 = "/static/del.png";
   class Coordinate extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -4988,7 +4989,7 @@
   const msgState = "/usermessage/detail/";
   const updateDevice = "/device/update";
   const deviceDetail = "/device/info/";
-  const logoutUrl = "/sys/logout";
+  const logoutUrl = "/auth/logout";
   const sendcmd = "/command/sendCmd";
   const getGeofence = "/geofence";
   const deleteGeo = "/geofence/";
@@ -6373,9 +6374,9 @@
             longitude: device.longitude
           });
           uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:389", "保存选中设备成功:", deviceInfo);
+          uni.__log__("log", "at pages/index/index.uvue:393", "保存选中设备成功:", deviceInfo);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:391", "保存选中设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:395", "保存选中设备失败:", error);
         }
       };
       const decodeSavedDevice = (raw = null) => {
@@ -6421,23 +6422,23 @@
             return null;
           return decodeSavedDevice(rawDevice);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:451", "获取保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:455", "获取保存设备失败:", error);
         }
         return null;
       };
       const clearSavedSelectedDevice = () => {
         try {
           uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:460", "清除保存设备成功");
+          uni.__log__("log", "at pages/index/index.uvue:464", "清除保存设备成功");
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:462", "清除保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:466", "清除保存设备失败:", error);
         }
       };
       const saveSelectedDeviceIndex = (index) => {
         try {
           uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:471", "保存选中设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:475", "保存选中设备索引失败:", error);
         }
       };
       const getSavedSelectedDeviceIndex = () => {
@@ -6448,7 +6449,7 @@
             return isNaN(index) || index < 0 ? null : index;
           }
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:484", "获取保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:488", "获取保存设备索引失败:", error);
         }
         return null;
       };
@@ -6456,7 +6457,7 @@
         try {
           uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:494", "清除保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:498", "清除保存设备索引失败:", error);
         }
       };
       const findDeviceIndex = (imei, deviceId) => {
@@ -6542,7 +6543,7 @@
         uni.getLocation(new UTSJSONObject({
           type: "gcj02",
           success: (res) => {
-            uni.__log__("log", "at pages/index/index.uvue:611", "用户当前位置:", res);
+            uni.__log__("log", "at pages/index/index.uvue:615", "用户当前位置:", res);
             userLocation.latitude = res.latitude;
             userLocation.longitude = res.longitude;
             hasUserLocation.value = true;
@@ -6551,7 +6552,7 @@
             }
           },
           fail: (err) => {
-            uni.__log__("error", "at pages/index/index.uvue:620", "获取用户当前位置失败:", err.errMsg, err);
+            uni.__log__("error", "at pages/index/index.uvue:624", "获取用户当前位置失败:", err.errMsg, err);
           }
         }));
       }
@@ -6562,7 +6563,7 @@
             const res = yield getDeviceDetail(deviceId);
             const detail = res.data;
             if (res.code != 200 || detail == null) {
-              uni.__log__("error", "at pages/index/index.uvue:631", "加载设备详情失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:635", "加载设备详情失败:", res.msg);
               return Promise.resolve(null);
             }
             if (detail != null) {
@@ -6584,7 +6585,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:653", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:657", "加载设备详情失败", error);
           }
         });
       };
@@ -6661,7 +6662,7 @@
             if (requestId != trackRequestId)
               return Promise.resolve(null);
             if (res.code != 200) {
-              uni.__log__("error", "at pages/index/index.uvue:739", "加载轨迹失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:743", "加载轨迹失败:", res.msg);
               clearTripData();
               return Promise.resolve(null);
             }
@@ -6674,7 +6675,7 @@
           } catch (error) {
             if (requestId != trackRequestId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/index/index.uvue:752", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:756", "加载轨迹失败", error);
             clearTripData();
           }
         });
@@ -6697,7 +6698,7 @@
             const res = yield getDevicePos(data);
             const positions = res.data;
             if (res.code != 200 || positions == null || positions.length == 0) {
-              uni.__log__("warn", "at pages/index/index.uvue:776", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
+              uni.__log__("warn", "at pages/index/index.uvue:780", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
               positionState.value = "empty";
               return false;
             }
@@ -6707,7 +6708,7 @@
             const lng = position.getNumber("longitude", 0);
             const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
             if (!isValidCoordinate2) {
-              uni.__log__("error", "at pages/index/index.uvue:791", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              uni.__log__("error", "at pages/index/index.uvue:795", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
               positionState.value = "invalid";
               showAppToast({
                 title: "定位数据异常",
@@ -6722,12 +6723,12 @@
             try {
               yield centerMapOnDevice(convertedCoord.lat, convertedCoord.lng);
             } catch (mapError) {
-              uni.__log__("error", "at pages/index/index.uvue:817", "刷新地图视图失败", mapError);
+              uni.__log__("error", "at pages/index/index.uvue:821", "刷新地图视图失败", mapError);
             }
-            uni.__log__("log", "at pages/index/index.uvue:819", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
+            uni.__log__("log", "at pages/index/index.uvue:823", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
             return true;
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:822", "加载设备位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:826", "加载设备位置失败", error);
             positionState.value = "failed";
             showAppToast({
               title: "定位失败，请重试",
@@ -6739,7 +6740,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:834", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:838", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -6752,7 +6753,7 @@
               icon: "none"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:847", "切换车辆失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:851", "切换车辆失败", error);
             showAppToast({
               title: "切换失败，请重试",
               icon: "none"
@@ -6792,7 +6793,7 @@
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:893", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:897", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -6831,7 +6832,7 @@
               });
               return Promise.resolve(null);
             }
-            uni.__log__("log", "at pages/index/index.uvue:937", "加载车辆列表返回:", res.data);
+            uni.__log__("log", "at pages/index/index.uvue:941", "加载车辆列表返回:", res.data);
             const pageData = res.data;
             if (pageData == null) {
               userDeviceList2.value = [];
@@ -6898,7 +6899,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:1014", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:1018", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -6937,7 +6938,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:1058", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1062", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -6971,7 +6972,7 @@
               deviceids: currentCarImei.value
             }));
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:1095", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1099", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -7014,7 +7015,7 @@
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1139", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1143", "跳转轨迹详情失败:", err);
           }
         });
       };
@@ -7041,7 +7042,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1167", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1171", "跳转添加设备失败:", err);
           }
         });
       };
@@ -7095,7 +7096,7 @@
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1258", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1262", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -7115,7 +7116,7 @@
       function unbindCurrentDevice() {
         return __awaiter(this, void 0, void 0, function* () {
           const result = yield delDevice(currentCarDeviceId.value);
-          uni.__log__("log", "at pages/index/index.uvue:1281", "解绑设备结果:", result);
+          uni.__log__("log", "at pages/index/index.uvue:1285", "解绑设备结果:", result);
           if (result.code == 200) {
             showAppToast({
               title: "解绑成功",
@@ -7144,6 +7145,37 @@
             if (res.confirm) {
               void unbindCurrentDevice();
             }
+          }
+        }));
+      };
+      function performLogout() {
+        return __awaiter(this, void 0, void 0, function* () {
+          yield unbindPushDeviceOnLogout();
+          const res = yield logout();
+          if (res.code == 200) {
+            clearSavedSelectedDevice();
+            clearSavedSelectedDeviceIndex();
+            uni.removeStorageSync("token");
+            clearPushSessionState();
+            uni.reLaunch({
+              url: "/pages/login/login"
+            });
+          } else {
+            showAppToast({
+              title: res.msg || "退出账户失败"
+            });
+          }
+        });
+      }
+      const logout$1 = () => {
+        if (!isLogin())
+          return null;
+        showAppModal(new UTSJSONObject({
+          title: "退出登录",
+          content: "确定退出登录吗？",
+          success: (res) => {
+            if (res.confirm)
+              void performLogout();
           }
         }));
       };
@@ -7463,10 +7495,24 @@
                     ]),
                     vue.createElementVNode("view", new UTSJSONObject({
                       class: "service-item",
-                      onClick: unbindDevice
+                      onClick: logout$1
                     }), [
                       vue.createElementVNode("image", new UTSJSONObject({
                         src: _imports_9,
+                        mode: "aspectFit",
+                        class: "icon-image"
+                      })),
+                      vue.createElementVNode("text", new UTSJSONObject({
+                        class: "item-title",
+                        style: new UTSJSONObject({ "color": "#EE793A" })
+                      }), "退出登录")
+                    ]),
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "service-item",
+                      onClick: unbindDevice
+                    }), [
+                      vue.createElementVNode("image", new UTSJSONObject({
+                        src: _imports_10,
                         mode: "aspectFit",
                         class: "icon-image"
                       })),
@@ -7511,7 +7557,7 @@
       };
     }
   });
-  const _style_0$J = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "10rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexShrink": 0, "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "flexShrink": 0, "marginLeft": "30rpx" } }, "nav-tool-add": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "width": "40rpx", "height": "40rpx", "alignItems": "center", "justifyContent": "center" } }, "nav-tool-add-image": { ".container .page-bg .top .device-car .nav-tools ": { "width": "36rpx", "height": "36rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh-wrap": { ".container .page-bg .content .map-box .map-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header .map-refresh-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "map-container": { ".container .page-bg .content .map-box ": { "position": "relative", "height": "300rpx" } }, "map-status": { ".container .page-bg .content .map-box .map-container ": { "position": "absolute", "left": "24rpx", "right": "24rpx", "bottom": "24rpx", "paddingTop": "16rpx", "paddingRight": "20rpx", "paddingBottom": "16rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "rgba(0,0,0,0.68)", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "map-status-text": { ".container .page-bg .content .map-box .map-container .map-status ": { "color": "#ffffff", "fontSize": "24rpx" } }, "map-status-retry": { ".container .page-bg .content .map-box .map-container .map-status ": { "flexShrink": 0, "marginLeft": "20rpx", "color": "#8de39b", "fontSize": "24rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc-wrap": { ".container .page-bg .content .mile-record .record-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header .record-desc-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3", "borderTopWidth": "5rpx", "borderRightWidth": "5rpx", "borderBottomWidth": "5rpx", "borderLeftWidth": "5rpx" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
+  const _style_0$J = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "10rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexShrink": 0, "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "flexShrink": 0, "marginLeft": "30rpx" } }, "nav-tool-add": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "width": "40rpx", "height": "40rpx", "alignItems": "center", "justifyContent": "center" } }, "nav-tool-add-image": { ".container .page-bg .top .device-car .nav-tools ": { "width": "36rpx", "height": "36rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh-wrap": { ".container .page-bg .content .map-box .map-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header .map-refresh-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "map-container": { ".container .page-bg .content .map-box ": { "position": "relative", "height": "300rpx" } }, "map-status": { ".container .page-bg .content .map-box .map-container ": { "position": "absolute", "left": "24rpx", "right": "24rpx", "bottom": "24rpx", "paddingTop": "16rpx", "paddingRight": "20rpx", "paddingBottom": "16rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "rgba(0,0,0,0.68)", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "map-status-text": { ".container .page-bg .content .map-box .map-container .map-status ": { "color": "#ffffff", "fontSize": "24rpx" } }, "map-status-retry": { ".container .page-bg .content .map-box .map-container .map-status ": { "flexShrink": 0, "marginLeft": "20rpx", "color": "#8de39b", "fontSize": "24rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc-wrap": { ".container .page-bg .content .mile-record .record-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header .record-desc-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3", "borderTopWidth": "5rpx", "borderRightWidth": "5rpx", "borderBottomWidth": "5rpx", "borderLeftWidth": "5rpx" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
   const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["styles", [_style_0$J]]]);
   const _imports_0$3 = "/static/back.png";
   const _sfc_main$J = /* @__PURE__ */ vue.defineComponent({
@@ -13145,34 +13191,44 @@
         }
       };
       const baseList = vue.computed(() => {
-        const list = [new UTSJSONObject({
-          image: "/static/gjhf.png",
-          text: "轨迹回放"
-        }), new UTSJSONObject({
-          image: "/static/clgz.png",
-          text: "车辆跟踪"
-        }), new UTSJSONObject({
-          image: "/static/lcjl.png",
-          text: "里程记录"
-        }), new UTSJSONObject({
-          image: "/static/tcjl.png",
-          text: "停车记录"
-        }), new UTSJSONObject({
-          image: "/static/dzwl.png",
-          text: "电子围栏"
-        }), new UTSJSONObject({
-          image: "/static/navto.png",
-          text: "一键寻车"
-        }), new UTSJSONObject({
-          image: "/static/power.png",
-          text: "恢复油电"
-        }), new UTSJSONObject({
-          image: "/static/offpower.png",
-          text: "断开油电"
-        }), new UTSJSONObject({
-          image: "/static/cmd.png",
-          text: "发送指令"
-        })];
+        const list = [
+          new UTSJSONObject({
+            image: "/static/gjhf.png",
+            text: "轨迹回放"
+          }),
+          new UTSJSONObject({
+            image: "/static/clgz.png",
+            text: "车辆跟踪"
+          }),
+          new UTSJSONObject({
+            image: "/static/lcjl.png",
+            text: "里程记录"
+          }),
+          new UTSJSONObject({
+            image: "/static/tcjl.png",
+            text: "停车记录"
+          }),
+          new UTSJSONObject({
+            image: "/static/dzwl.png",
+            text: "电子围栏"
+          }),
+          new UTSJSONObject({
+            image: "/static/navto.png",
+            text: "一键寻车"
+          }),
+          new UTSJSONObject({
+            image: "/static/power.png",
+            text: "恢复油电"
+          }),
+          new UTSJSONObject({
+            image: "/static/offpower.png",
+            text: "断开油电"
+          })
+          // {
+          // 		image: '/static/cmd.png',
+          // 		text: '发送指令'
+          // 	}
+        ];
         const productId = currentCarInfo.value.productId;
         if (productId == "product-1141811865601576960" || productId == "product-1183161303028600832") {
           list.push(new UTSJSONObject({
@@ -23741,10 +23797,9 @@
             if (from) {
               const params = new UTSJSONObject({ pageSize: 1e3 });
               const res = yield getUserDeviceList(params);
-              uni.__log__("log", "at pages/deviceList/deviceList.uvue:145", "获取设备列表:", res);
               const list = res.code == 200 && res.data != null ? res.data.list : null;
               if (list == null || !Array.isArray(list)) {
-                uni.__log__("warn", "at pages/deviceList/deviceList.uvue:148", "获取设备列表返回异常:", res);
+                uni.__log__("warn", "at pages/deviceList/deviceList.uvue:147", "获取设备列表返回异常:", res);
                 originalDeviceList.value = [];
                 markers.value = [];
                 return Promise.resolve(null);
@@ -23756,7 +23811,7 @@
             originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, "tencent");
             updateMarkers(originalDeviceList.value);
           } catch (err) {
-            uni.__log__("error", "at pages/deviceList/deviceList.uvue:159", "获取设备列表失败:", err);
+            uni.__log__("error", "at pages/deviceList/deviceList.uvue:158", "获取设备列表失败:", err);
             originalDeviceList.value = [];
             markers.value = [];
             showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -23792,7 +23847,7 @@
           return device["deviceId"] == markerId;
         });
         if (selectedDevice == null) {
-          uni.__log__("warn", "at pages/deviceList/deviceList.uvue:209", "未找到对应的设备信息", markerId);
+          uni.__log__("warn", "at pages/deviceList/deviceList.uvue:208", "未找到对应的设备信息", markerId);
           return null;
         }
         const imeiValue = (_a = selectedDevice["imei"]) !== null && _a !== void 0 ? _a : "";

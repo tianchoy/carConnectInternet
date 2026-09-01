@@ -798,7 +798,7 @@ val userMsgList = "/usermessage/listForUser"
 val msgState = "/usermessage/detail/"
 val updateDevice = "/device/update"
 val deviceDetail = "/device/info/"
-val logoutUrl = "/sys/logout"
+val logoutUrl = "/auth/logout"
 val sendcmd = "/command/sendCmd"
 val getGeofence = "/geofence"
 val deleteGeo = "/geofence/"
@@ -4962,7 +4962,8 @@ val default__3 = "/static/dzwl.png"
 val default__4 = "/static/msg.png"
 val default__5 = "/static/pay.png"
 val default__6 = "/static/online.png"
-val default__7 = "/static/del.png"
+val default__7 = "/static/logout.png"
+val default__8 = "/static/del.png"
 open class TodayTimeRange (
     @JsonNotNull
     open var nowTime: Number,
@@ -6191,7 +6192,6 @@ fun __uts_large_list_fill_fill_1(__arr: UTSArray<UTSJSONObject>): Unit {
     __arr.push(_uO("image" to "/static/navto.png", "text" to "一键寻车"))
     __arr.push(_uO("image" to "/static/power.png", "text" to "恢复油电"))
     __arr.push(_uO("image" to "/static/offpower.png", "text" to "断开油电"))
-    __arr.push(_uO("image" to "/static/cmd.png", "text" to "发送指令"))
 }
 fun __uts_large_list_build_0(): UTSArray<UTSJSONObject> {
     val __arr = _uA<UTSJSONObject>()
@@ -7236,7 +7236,7 @@ open class DayutsObject (
     @JsonNotNull
     open var milliseconds: Number,
 ) : UTSObject()
-val default__8 = DayutsLocale(name = "en", weekdays = _uA(
+val default__9 = DayutsLocale(name = "en", weekdays = _uA(
     "Sunday",
     "Monday",
     "Tuesday",
@@ -7402,7 +7402,7 @@ class LocaleStateReactiveObject : LocaleState, IUTSReactive<LocaleState> {
 }
 var localeState = reactive(LocaleState(lang = "en", locales = localesMap))
 val runBlock2 = run {
-    localeState.locales.set("en", default__8)
+    localeState.locales.set("en", default__9)
     localeState.locales.set("zh-cn", locale)
 }
 open class DayutsIntl {

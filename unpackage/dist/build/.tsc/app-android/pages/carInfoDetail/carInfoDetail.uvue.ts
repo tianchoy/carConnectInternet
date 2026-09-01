@@ -515,23 +515,23 @@ const deptId = ref<string | null>('')
 				image: '/static/offpower.png',
 				text: '断开油电'
 			},
-			{
-					image: '/static/cmd.png',
-					text: '发送指令'
-				}
+			// {
+			// 		image: '/static/cmd.png',
+			// 		text: '发送指令'
+			// 	}
 		]
 
-	// 根据 productId 决定是否添加发送指令选项
-	const productId = currentCarInfo.value.productId
-	if (productId == 'product-1141811865601576960' ||
-		productId == 'product-1183161303028600832') {
-		list.push({
-			image: '/static/cmd.png',
-			text: '发送指令'
-		})
-	}
+		// 根据 productId 决定是否添加发送指令选项
+		const productId = currentCarInfo.value.productId
+		if (productId == 'product-1141811865601576960' ||
+			productId == 'product-1183161303028600832') {
+			list.push({
+				image: '/static/cmd.png',
+				text: '发送指令'
+			})
+		}
 
-	return list
+		return list
 })
 
 

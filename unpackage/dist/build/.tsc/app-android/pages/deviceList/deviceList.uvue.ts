@@ -131,7 +131,6 @@ const mapScale = ref(4)
 			if (from) {
 				const params: UTSJSONObject = { pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
-				console.log('获取设备列表:', res)
 				const list = (res.code == 200 && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
 				if (list == null || !Array.isArray(list)) {
 					console.warn('获取设备列表返回异常:', res)

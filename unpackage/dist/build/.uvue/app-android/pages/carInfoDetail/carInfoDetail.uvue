@@ -46,10 +46,6 @@ function __uts_large_list_fill_fill_1(__arr: UTSJSONObject[]): void {
         image: '/static/offpower.png',
         text: '断开油电'
     });
-    __arr.push({
-        image: '/static/cmd.png',
-        text: '发送指令'
-    });
 }
 function __uts_large_list_build_0(): UTSJSONObject[] {
     const __arr = [] as UTSJSONObject[];
