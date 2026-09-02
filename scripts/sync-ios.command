@@ -395,14 +395,20 @@ from pathlib import Path
 import sys
 
 text = Path(sys.argv[1]).read_text(encoding='utf-8')
+# HBuilderX 的 Debug 输出保留局部变量名，5.25 的本地发布输出会压缩并重命名局部变量。
+# 只校验稳定的桥接入口和地图选择语义，不依赖压缩前的局部变量名。
 required = [
-    'getAvailableIOSMapProviderIds',
-    'const providerIds = [];',
-    'const providerId = providerIds[tapIndex];',
+    'getAvailableIOSMapProviderIdsByJs',
+    'openExternalMapByJs',
+    'showActionSheet',
+    'tapIndex',
+    'qqmap',
+    'iosamap',
+    'baidumap',
 ]
 missing = [value for value in required if value not in text]
 if missing:
-    raise SystemExit('HBuilderX 生成的 iOS app-service.js 缺少预期实现：' + ', '.join(missing))
+    raise SystemExit('HBuilderX 生成的 iOS app-service.js 缺少地图 Provider 实现：' + ', '.join(missing))
 if 'getAvailableIOSMapProviders' in text:
     raise SystemExit('HBuilderX 生成的 iOS app-service.js 仍包含旧的地图 Provider 对象桥接。')
 PY

@@ -1,3 +1,8 @@
+/*
+ * Uni Verify 一键登录暂时停用。
+ * 保留完整实现，后续需要恢复时删除本注释首尾即可。
+ */
+/*
 import { uniVerifyLogin } from '../../api/request.uts'
 
 export type UniVerifyPreLoginResult = {
@@ -172,3 +177,4 @@ export function loginByUniVerify(clientVersion: string, deviceId: string): Promi
 		})
 	})
 }
+*/

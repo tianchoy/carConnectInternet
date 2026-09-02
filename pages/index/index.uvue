@@ -1667,8 +1667,8 @@ onLoad(() => {
             }
             .ring-quarter {
                 position: absolute;
-                width: 125rpx;
-                height: 125rpx;
+                width: 126rpx;
+                height: 126rpx;
                 overflow: hidden;
             }
             .ring-quarter--top-left {

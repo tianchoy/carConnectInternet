@@ -23,7 +23,6 @@ import io.dcloud.uniapp.extapi.getAppBaseInfo as uni_getAppBaseInfo
 import io.dcloud.uniapp.extapi.getPushClientId as uni_getPushClientId
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
-import io.dcloud.uniapp.extapi.getUniVerifyManager as uni_getUniVerifyManager
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import uts.sdk.modules.jgJpushU.init as initAndroidJPush
 import uts.sdk.modules.jgJpushU.setEventCallBack as setJPushEventCallBack
@@ -254,7 +253,7 @@ open class UniPushAdapter : PushAdapter {
                 }
                 , payload = event))
             }
-            )
+            , null)
             onRegistrationAvailable()
         }
          catch (error: Throwable) {
@@ -5575,102 +5574,6 @@ fun getSmsRegisterContext(): SmsRegisterContext? {
 fun clearSmsRegisterContext(): Unit {
     pendingContext = null
 }
-open class UniVerifyPreLoginResult (
-    @JsonNotNull
-    open var ok: Boolean = false,
-    @JsonNotNull
-    open var message: String,
-) : UTSObject()
-@JvmField
-var manager: UniVerifyManager? = null
-var preLoginReady = false
-fun getPlatform(): String {
-    return "android"
-}
-fun getManager(): UniVerifyManager {
-    if (manager == null) {
-        manager = uni_getUniVerifyManager()
-    }
-    return manager!!
-}
-fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
-    val errCode = error.errCode
-    val errMsg = if (error.errMsg != "") {
-        error.errMsg
-    } else {
-        ""
-    }
-    val cause = if (isTruthy(error.cause)) {
-        error.cause
-    } else {
-        ""
-    }
-    console.error("Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + errMsg, "cause=" + (cause as Any))
-    if (errCode == 30005) {
-        return "本机号码预取失败，请检查本地包签名与 Uni Verify 配置，或确认 SIM 卡和移动数据可用"
-    }
-    if (errCode == 1000 || errCode == 1001 || errCode == 1002) {
-        return "一键登录服务未正确配置，请检查应用签名与 Uni Verify 控制台配置"
-    }
-    if (errCode == 1004) {
-        return "一键登录服务已禁用，请检查 Uni Verify 服务状态"
-    }
-    if (errCode == 30001) {
-        return "本机号码预取已取消"
-    }
-    if (errCode == 30004) {
-        if (errMsg.indexOf("-20102") >= 0) {
-            return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK"
-        }
-        if (errMsg.indexOf("-20201") >= 0) {
-            return "未检测到可用 SIM 卡，暂无法使用本机号码一键登录"
-        }
-        if (errMsg.indexOf("-20202") >= 0) {
-            return "未开启蜂窝移动网络，请开启移动数据后重试"
-        }
-        if (errMsg.indexOf("-20203") >= 0) {
-            return "当前运营商暂不支持本机号码一键登录"
-        }
-        return "本机号码预取失败，请稍后重试"
-    }
-    if (errCode == 40001 || errCode == 40002) {
-        return "网络异常，无法获取本机号码，请检查移动网络后重试"
-    }
-    return "本机号码预取失败（错误码：" + errCode + "），请稍后重试"
-}
-fun createPreLoginResult(ok: Boolean, message: String): UniVerifyPreLoginResult {
-    return UniVerifyPreLoginResult(ok = ok, message = message)
-}
-fun ensurePreLogin(): UTSPromise<UniVerifyPreLoginResult> {
-    return UTSPromise<UniVerifyPreLoginResult>(fun(resolve, _reject){
-        try {
-            val uniVerifyManager = getManager()
-            if (preLoginReady || uniVerifyManager.isPreLoginValid()) {
-                preLoginReady = true
-                resolve(createPreLoginResult(true, ""))
-                return
-            }
-            uniVerifyManager.preLogin(UniVerifyManagerPreLoginOptions(success = fun(_res){
-                preLoginReady = true
-                resolve(createPreLoginResult(true, ""))
-            }
-            , fail = fun(error: UniVerifyManagerPreLoginFail){
-                preLoginReady = false
-                resolve(createPreLoginResult(false, getPreLoginErrorMessage(error)))
-            }
-            ))
-        }
-         catch (error: Throwable) {
-            preLoginReady = false
-            console.error("Uni Verify 管理器初始化失败:", error)
-            resolve(createPreLoginResult(false, "一键登录初始化失败，请确认 uni-verify 模块、应用签名与控制台配置"))
-        }
-    }
-    )
-}
-fun prefetchUniVerify(): Unit {
-    ensurePreLogin()
-}
 open class PersonalLoginForm (
     @JsonNotNull
     open var username: String,
@@ -9894,7 +9797,7 @@ open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
     override var appid: String = "__UNI__662B0B4"
     override var versionName: String = "1.0.1"
     override var versionCode: String = "101"
-    override var uniCompilerVersion: String = "5.23"
+    override var uniCompilerVersion: String = "5.25"
     constructor() : super() {}
 }
 fun definePageRoutes() {

@@ -90,7 +90,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref(0);
     common_vendor.ref(false);
     const smsSubmitting = common_vendor.ref(false);
-    common_vendor.ref(false);
     const isPersonalPasswordLoginReady = common_vendor.computed(() => {
       return personalForm.value.username != "" && personalForm.value.password != "";
     });
@@ -171,7 +170,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           completeLogin(token);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:487", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:492", "微信登录失败:", error);
           utils_toast.showAppToast({ title: "微信登录失败", icon: "none" });
         } finally {
           common_vendor.index.hideLoading();
@@ -191,7 +190,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         enterpriseForm.value.password = account.getString("password", "");
         rememberPassword.value = enterpriseForm.value.username != "" || enterpriseForm.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/login/login.uvue:508", "加载保存的企业账号失败:", error);
+        common_vendor.index.__f__("warn", "at pages/login/login.uvue:513", "加载保存的企业账号失败:", error);
       }
     };
     const toggleEnterpriseLogin = () => {
@@ -251,8 +250,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const gotoPrivacy = () => {
       utils_modal.showAppModal(new common_vendor.UTSJSONObject({ title: "隐私政策", content: utils_legal.privacyPolicy, showCancel: false }));
     };
-    common_vendor.onMounted(() => {
-    });
     common_vendor.onUnmounted(() => {
     });
     return (_ctx, _cache) => {

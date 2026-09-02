@@ -4,7 +4,7 @@ import _easycom_i_checkbox from '@/uni_modules/i-ui-x/components/i-checkbox/i-ch
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 	import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { userAgreement, privacyPolicy } from '../../utils/legal.uts'
@@ -12,8 +12,9 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 	import { resetTokenExpiredState } from '../../api/http.uts'
 	import { PostWechatlogin, login, personalPasswordLogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 	import { saveSmsRegisterContext } from '../../services/auth/sms-register-context.uts'
+	// Uni Verify 一键登录暂时停用；保留原调用代码，后续可取消注释恢复。
 
-	import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
+	// import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
 
 
 	type PersonalLoginForm = {
@@ -54,7 +55,10 @@ const _cache = __ins.renderCache;
 	const smsSending = ref(false)
 	const smsSubmitting = ref(false)
 	let smsCooldownTimer: number | null = null
+	// Uni Verify 一键登录暂时停用；保留原实现，后续可取消注释恢复。
+	/*
 	const nativeLoginLoading = ref(false)
+	*/
 
 	const isPersonalPasswordLoginReady = computed<boolean>(() => {
 		return personalForm.value.username != '' && personalForm.value.password != ''
@@ -249,6 +253,7 @@ const _cache = __ins.renderCache;
 		}
 	}
 
+	/*
 	const startUniVerifyLogin = async (): Promise<void> => {
 
 		if (!ensureAgreementAccepted() || nativeLoginLoading.value) return
@@ -274,7 +279,7 @@ const _cache = __ins.renderCache;
 		}
 
 	}
-
+	*/
 	// 默认页面不展示微信登录入口，保留现有小程序登录实现供后续需求恢复。
 	const loginBt = (): void => {
 		if (!docState.value) {
@@ -399,12 +404,14 @@ const _cache = __ins.renderCache;
 		showAppModal({ title: '隐私政策', content: privacyPolicy, showCancel: false })
 	}
 
-	onMounted(() => {
-
-		prefetchUniVerify()
-
-	})
-
+	/*
+	 * 页面挂载时预取 Uni Verify 号码；当前暂时停用，后续可取消注释恢复。
+	 * onMounted(() => {
+	 *
+	 * 	prefetchUniVerify()
+	 *
+	 * })
+	 */
 	onUnmounted(() => {
 		stopSmsCooldown()
 	})

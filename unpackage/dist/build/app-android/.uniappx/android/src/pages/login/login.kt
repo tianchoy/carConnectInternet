@@ -37,7 +37,6 @@ open class GenPagesLoginLogin : BasePage {
             val smsSending = ref(false)
             val smsSubmitting = ref(false)
             var smsCooldownTimer: Number? = null
-            val nativeLoginLoading = ref(false)
             val isPersonalPasswordLoginReady = computed<Boolean>(fun(): Boolean {
                 return personalForm.value.username != "" && personalForm.value.password != ""
             }
@@ -266,10 +265,6 @@ open class GenPagesLoginLogin : BasePage {
             val gotoPrivacy = fun(): Unit {
                 showAppModal(AppModalOptions(title = "隐私政策", content = privacyPolicy, showCancel = false))
             }
-            onMounted(fun(){
-                prefetchUniVerify()
-            }
-            )
             onUnmounted(fun(){
                 stopSmsCooldown()
             }

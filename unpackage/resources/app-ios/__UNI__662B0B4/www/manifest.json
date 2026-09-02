@@ -8,7 +8,7 @@
   },
   "uni-app-x": {
     "styleIsolationVersion": "2",
-    "compilerVersion": "5.23"
+    "compilerVersion": "5.25"
   },
   "app-ios": {
     "distribute": {
@@ -34,18 +34,17 @@
         "uni-getAppBaseInfo": {},
         "uni-getDeviceInfo": {},
         "uni-getSystemInfo": {},
-        "uni-base64ToArrayBuffer": {},
-        "uni-arrayBufferToBase64": {},
         "uni-secure-network": {},
         "uni-media": {},
         "uni-showLoading": {},
         "uni-prompt": {},
         "uni-oauth": {},
-        "uni-location": {},
-        "uni-dialogPage": {},
         "uni-event": {},
         "uni-vibrate": {},
+        "uni-location": {},
+        "uni-dialogPage": {},
         "uni-openLocation": {},
+        "uni-rpx2px": {},
         "uni-cloud-client": {},
         "uni-map-tencent": {},
         "uni-camera": {},

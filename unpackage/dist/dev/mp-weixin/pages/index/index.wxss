@@ -290,8 +290,8 @@
 }
 .container .page-bg .content .mile-record .ring-quarter[class].data-v-00a60067 {
   position: absolute;
-  width: 125rpx;
-  height: 125rpx;
+  width: 126rpx;
+  height: 126rpx;
   overflow: hidden;
 }
 .container .page-bg .content .mile-record .ring-quarter--top-left[class].data-v-00a60067 {

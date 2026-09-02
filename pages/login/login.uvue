@@ -178,7 +178,7 @@
 </template>
 
 <script setup lang="uts">
-	import { ref, computed, onMounted, onUnmounted } from 'vue'
+	import { ref, computed, onUnmounted } from 'vue'
 	import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { userAgreement, privacyPolicy } from '../../utils/legal.uts'
@@ -186,8 +186,9 @@
 	import { resetTokenExpiredState } from '../../api/http.uts'
 	import { PostWechatlogin, login, personalPasswordLogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 	import { saveSmsRegisterContext } from '../../services/auth/sms-register-context.uts'
+	// Uni Verify 一键登录暂时停用；保留原调用代码，后续可取消注释恢复。
 	// #ifdef APP-ANDROID || APP-IOS
-	import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
+	// import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
 	// #endif
 
 	type PersonalLoginForm = {
@@ -220,7 +221,10 @@
 	const smsSending = ref(false)
 	const smsSubmitting = ref(false)
 	let smsCooldownTimer: number | null = null
+	// Uni Verify 一键登录暂时停用；保留原实现，后续可取消注释恢复。
+	/*
 	const nativeLoginLoading = ref(false)
+	*/
 
 	const isPersonalPasswordLoginReady = computed<boolean>(() => {
 		return personalForm.value.username != '' && personalForm.value.password != ''
@@ -415,6 +419,7 @@
 		}
 	}
 
+	/*
 	const startUniVerifyLogin = async (): Promise<void> => {
 		// #ifdef APP-ANDROID || APP-IOS
 		if (!ensureAgreementAccepted() || nativeLoginLoading.value) return
@@ -440,7 +445,7 @@
 		}
 		// #endif
 	}
-
+	*/
 	// 默认页面不展示微信登录入口，保留现有小程序登录实现供后续需求恢复。
 	const loginBt = (): void => {
 		if (!docState.value) {
@@ -565,12 +570,14 @@
 		showAppModal({ title: '隐私政策', content: privacyPolicy, showCancel: false })
 	}
 
-	onMounted(() => {
-		// #ifdef APP-ANDROID || APP-IOS
-		prefetchUniVerify()
-		// #endif
-	})
-
+	/*
+	 * 页面挂载时预取 Uni Verify 号码；当前暂时停用，后续可取消注释恢复。
+	 * onMounted(() => {
+	 * 	// #ifdef APP-ANDROID || APP-IOS
+	 * 	prefetchUniVerify()
+	 * 	// #endif
+	 * })
+	 */
 	onUnmounted(() => {
 		stopSmsCooldown()
 	})
