@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "",
   "usingComponents": {
-    "app-toast": "../../components/app-toast/app-toast"
+    "custom-nav-bar": "../../components/custom-navBar/custom-navBar"
   }
 }

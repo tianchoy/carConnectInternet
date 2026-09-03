@@ -112,11 +112,32 @@ export function openCameraPermissionSettings(): void {
 }
 // #endif
 
-// #ifndef APP-ANDROID
+// ===== 微信小程序相机权限 =====
+// #ifdef MP-WEIXIN
 export function ensureCameraPermission(callback: (status: CameraPermissionStatus) => void): void {
-	callback('granted')
+	uni.authorize({
+		scope: 'scope.camera',
+		success: () => {
+			callback('granted')
+		},
+		fail: (error) => {
+			console.warn('❌ [ensureCameraPermission] 微信小程序相机权限未获得:', error)
+			callback('settingsRequired')
+		}
+	})
 }
 
+export function openCameraPermissionSettings(): void {
+	uni.openSetting({
+		fail: (error) => {
+			console.error('❌ [openCameraPermissionSettings] 打开微信小程序权限设置失败:', error)
+		}
+	})
+}
+// #endif
+
+// ===== 其他非 Android 平台权限兜底 =====
+// #ifndef APP-ANDROID
 export function ensureLocationPermission(callback: (status: LocationPermissionStatus) => void): void {
 	callback('granted')
 }
@@ -125,7 +146,14 @@ export function ensureNotificationPermission(callback: (status: NotificationPerm
 	callback('granted')
 }
 
+// 微信小程序使用上面的 scope.camera 授权；App iOS 等平台无需此处请求。
+// #ifndef MP-WEIXIN
+export function ensureCameraPermission(callback: (status: CameraPermissionStatus) => void): void {
+	callback('granted')
+}
+
 export function openCameraPermissionSettings(): void {
 	console.log('非 Android 平台无需打开相机权限设置')
 }
+// #endif
 // #endif

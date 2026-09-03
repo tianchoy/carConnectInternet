@@ -25,6 +25,7 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* 微信小程序与 App 均使用 camera 扫码预览，权限与行为在脚本条件编译中隔离。 */
 .container[class] {
   height: 100%;
   display: flex;

@@ -1,6 +1,9 @@
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
 import { ref } from 'vue';
 import { showAppToast } from '../../utils/toast.uts';
+import { showAppModal } from '../../utils/modal.uts';
+// ===== 微信小程序：先检查权限，未授权时主动请求后再显示 camera =====
+// ===== App：保留原有 camera 组件事件和资源释放逻辑 =====
 const __sfc__ = defineComponent({
     __name: 'scancode',
     setup(__props) {

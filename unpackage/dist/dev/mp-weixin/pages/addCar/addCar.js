@@ -1,8 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_toast = require("../../utils/toast.js");
-const utils_modal = require("../../utils/modal.js");
-const utils_cameraPermission = require("../../utils/cameraPermission.js");
+require("../../utils/modal.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -136,35 +135,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    const handleCameraPermission = (status) => {
-      isRequestingCameraPermission.value = false;
-      if (status == "granted") {
-        openScanPage();
-        return null;
-      }
-      if (status == "settingsRequired") {
-        utils_modal.showAppModal(new common_vendor.UTSJSONObject({
-          title: "需要相机权限",
-          content: "请在系统设置中开启相机权限后再扫码",
-          confirmText: "去设置",
-          cancelText: "取消",
-          success: (res) => {
-            if (res.confirm)
-              utils_cameraPermission.openCameraPermissionSettings();
-          }
-        }));
-        return null;
-      }
-      utils_toast.showAppToast({ title: "未获得相机权限，无法扫码", icon: "none" });
-    };
     const scanCode = () => {
       if (isRequestingCameraPermission.value || isNavigatingToScanner.value)
         return null;
-      isRequestingCameraPermission.value = true;
-      utils_cameraPermission.ensureCameraPermission(handleCameraPermission);
+      openScanPage();
     };
     const handleScanResult = (data) => {
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:159", "接收到扫码结果:", data.result);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:168", "接收到扫码结果:", data.result);
       if (data.result.length == 15) {
         carInfo.value.imei = "0" + data.result.slice(4, 15);
         return null;
@@ -184,7 +161,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const selectIcon = (item) => {
       const name = item.getString("name", "");
       const text = item.getString("text", "");
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:182", name);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:191", name);
       carInfo.value.deviceType = name;
       carInfo.value.deviceTypeValue = text;
       carIconSelectorVisible.value = false;
@@ -214,11 +191,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:219", "=== 开始提交设备 ===");
+        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:228", "=== 开始提交设备 ===");
         try {
           if (!validateForm())
             return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:224", "✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:233", "✅ 表单验证通过");
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "添加中...",
@@ -230,9 +207,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             carType: carInfo.value.deviceType,
             plateNo: carInfo.value.plateNo
           });
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:239", "📤 提交数据:", submitData);
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:248", "📤 提交数据:", submitData);
           const res = yield api_request.addDevice(submitData);
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:242", "✅ 添加设备返回:", res);
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:251", "✅ 添加设备返回:", res);
           common_vendor.index.hideLoading();
           loading.value = false;
           if (res.code == 200) {
@@ -253,7 +230,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:269", "❌ 添加设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:278", "❌ 添加设备失败:", error);
           common_vendor.index.hideLoading();
           loading.value = false;
           utils_toast.showAppToast({

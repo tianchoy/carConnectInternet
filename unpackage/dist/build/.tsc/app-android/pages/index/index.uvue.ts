@@ -27,6 +27,9 @@ import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
 import { getDeviceIcon } from '../../utils/cars'
 import type { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerValue } from '@/uni_modules/lime-picker'
 
+import AndroidLog from 'android.util.Log'
+
+
 
 type Device = {
     name: string,
@@ -172,7 +175,7 @@ const pickerColumns = computed<PickerColumn[]>(() => {
         const displayName = device.deviceName || device.name || device.imei || '未命名设备'
         const statusText = device.connectionStatus == 'online' ? '在线' : '离线'
         return {
-            id: null,
+            id: device.imei,
             label: `${displayName} (${statusText})`,
             value: device.imei || device.deviceId,
             disabled: false,
@@ -425,8 +428,12 @@ async function centerOnUserLocation() {
 function getUserLocation() {
     uni.getLocation({
         type: 'gcj02',
+        provider:'system',
         success: (res) => {
             console.log('用户当前位置:', res)
+
+            AndroidLog.i('用户当前位置:', JSON.stringify(res))
+
             userLocation.latitude = res.latitude
             userLocation.longitude = res.longitude
             hasUserLocation.value = true
@@ -708,6 +715,7 @@ const handlePickerConfirm = (e: PickerConfirmEvent) => {
     }
 
     if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
+        console.log('选择的设备111:',selectedDevice.imei ,selectedDevice.deviceId,currentCarImei.value,currentCarDeviceId.value)
         console.log('选择的设备与当前设备相同，不重复加载')
         return
     }
@@ -1333,7 +1341,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                     longitude: center.longitude,
                     scale: mapScale.value,
                     style: _nS(_uM({"width":"100%","height":"100%"})),
-                    "show-location": true,
+                    "show-location": false,
                     "enable-traffic": true,
                     "enable-overlooking": true,
                     "enable-building": true,

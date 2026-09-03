@@ -116,8 +116,17 @@ const isRequestingCameraPermission = ref<boolean>(false)
 
 	const scanCode = () => {
 		if (isRequestingCameraPermission.value || isNavigatingToScanner.value) return
+
+		// 微信小程序由扫码页 onLoad 统一查询并请求 scope.camera，确保首次进入时弹出授权框。
+
+
+
+
+		// App 保留原有系统相机权限申请流程。
+
 		isRequestingCameraPermission.value = true
 		ensureCameraPermission(handleCameraPermission)
+
 	}
 
 	// 扫码结果事件处理

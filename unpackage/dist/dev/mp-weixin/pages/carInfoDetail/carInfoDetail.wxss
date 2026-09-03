@@ -282,6 +282,12 @@
   padding: 10rpx 20rpx;
   border-radius: 10rpx;
 }
+.container .tools-panel .imei-box .signal-container .power .satellite-text[class],
+.container .tools-panel .imei-box .signal-container .battery .satellite-text[class] {
+  font-size: 24rpx;
+  color: #3da634;
+  font-weight: bold;
+}
 .container .tools-panel .h-line[class] {
   width: 90%;
   height: 2rpx;

@@ -12,6 +12,7 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
+import android.util.Log as AndroidLog
 import io.dcloud.uniapp.extapi.getLocation as uni_getLocation
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
@@ -112,7 +113,7 @@ open class GenPagesIndexIndex : BasePage {
                         } else {
                             "离线"
                         }
-                        return PickerColumnItem(id = null, label = "" + displayName + " (" + statusText + ")", value = if (device.imei != "") {
+                        return PickerColumnItem(id = device.imei, label = "" + displayName + " (" + statusText + ")", value = if (device.imei != "") {
                             device.imei
                         } else {
                             device.deviceId
@@ -363,8 +364,9 @@ open class GenPagesIndexIndex : BasePage {
             }
             val centerOnUserLocation = ::gen_centerOnUserLocation_fn
             fun gen_getUserLocation_fn() {
-                uni_getLocation(GetLocationOptions(type = "gcj02", success = fun(res){
+                uni_getLocation(GetLocationOptions(type = "gcj02", provider = "system", success = fun(res){
                     console.log("用户当前位置:", res)
+                    AndroidLog.i("用户当前位置:", JSON.stringify(res))
                     userLocation.latitude = res.latitude
                     userLocation.longitude = res.longitude
                     hasUserLocation.value = true
@@ -602,6 +604,7 @@ open class GenPagesIndexIndex : BasePage {
                     return
                 }
                 if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
+                    console.log("选择的设备111:", selectedDevice.imei, selectedDevice.deviceId, currentCarImei.value, currentCarDeviceId.value)
                     console.log("选择的设备与当前设备相同，不重复加载")
                     return
                 }
@@ -1127,7 +1130,7 @@ open class GenPagesIndexIndex : BasePage {
                                     )),
                                     _cE("view", _uM("class" to "map-container"), _uA(
                                         if (isTrue(isMapReady.value)) {
-                                            _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center.latitude, "longitude" to center.longitude, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to false, "markers" to markers.value), null, 8, _uA(
+                                            _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center.latitude, "longitude" to center.longitude, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to false, "markers" to markers.value), null, 8, _uA(
                                                 "latitude",
                                                 "longitude",
                                                 "scale",

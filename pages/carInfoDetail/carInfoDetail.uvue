@@ -70,12 +70,12 @@
 					</view>
 					<view class="power" v-if="carVoltage">
 						<image class="power-icon" src="/static/v.png" />
-						<text>{{carVoltage}}V</text>
+						<text class="satellite-text">{{carVoltage}}V</text>
 					</view>
 					<view class="battery" v-if="batteryPercent"
 						:style="{ color: getBatteryColor(batteryPercent) }">
 						<image class="battery-icon" src="/static/pow.png" alt="" />
-						<text>{{batteryPercent}}%</text>
+						<text class="satellite-text">{{batteryPercent}}%</text>
 					</view>
 				</view>
 			</view>
@@ -1161,6 +1161,12 @@ import { openLocation } from '../../utils/openLocation.uts'
 						background: #f0f8ff;
 						padding: 10rpx 20rpx;
 						border-radius: 10rpx;
+						
+						.satellite-text {
+							font-size: 24rpx;
+							color: #3da634;
+							font-weight: bold;
+						}
 					}
 				}
 			}
