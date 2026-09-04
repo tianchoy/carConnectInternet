@@ -185,10 +185,42 @@ const props = defineProps({
  * - load: 图片加载成功时触发，参数为原生 load 事件对象。
  * - error: 图片加载失败时触发，参数为原生 error 事件对象。
  */
-const emit = defineEmits(['click', 'load', 'error'])
+const emit = defineEmits<{
+  (event: 'click'): void
+  (event: 'load', payload: any): void
+  (event: 'error', payload: any): void
+}>()
 
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text == 'auto') return 'auto'
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
 
-const bgColor = computed(() => {
+function formatDuration(value : any) : string {
+  const duration = parseFloat(value.toString())
+  if (duration >= 0) return duration.toString()
+  return '500'
+}
+
+function sizeStyle() : string {
+  return 'width:' + formatSize(props.width) + ';height:' + formatSize(props.height) + ';'
+}
+
+function isImagePath(value : any) : boolean {
+  const text = value.toString()
+  if (text.indexOf('/') >= 0) return true
+  if (text.indexOf('http') == 0) return true
+  if (text.indexOf('.png') >= 0) return true
+  if (text.indexOf('.jpg') >= 0) return true
+  if (text.indexOf('.jpeg') >= 0) return true
+  if (text.indexOf('.webp') >= 0) return true
+  if (text.indexOf('.gif') >= 0) return true
+  return false
+}
+
+const bgColor = computed(() : string => {
   return props.bgColor
 })
 const loading = ref(props.src.length > 0)
@@ -197,16 +229,16 @@ const loaded = ref(false)
 const previewVisible = ref(false)
 const currentPreview = ref(0)
 
-const rootStyle = computed(() => {
+const rootStyle = computed(() : string => {
   return sizeStyle()
 })
 
-const wrapClass = computed(() => {
+const wrapClass = computed(() : string => {
   if (props.shape == 'circle') return 'i-image i-image--circle'
   return 'i-image i-image--square'
 })
 
-const wrapStyle = computed(() => {
+const wrapStyle = computed(() : string => {
   let style = sizeStyle()
   style = style + 'background-color:' + bgColor.value + ';'
 
@@ -220,7 +252,7 @@ const wrapStyle = computed(() => {
   return style
 })
 
-const mediaStyle = computed(() => {
+const mediaStyle = computed(() : string => {
   let style = sizeStyle()
 
   if (props.fade) {
@@ -237,86 +269,62 @@ const mediaStyle = computed(() => {
   return style
 })
 
-const fallbackStyle = computed(() => {
+const fallbackStyle = computed(() : string => {
   return 'background-color:' + bgColor.value + ';'
 })
 
-const loadingIconIsImage = computed(() => {
+const loadingIconIsImage = computed(() : boolean => {
   return isImagePath(props.loadingIcon)
 })
 
-const errorIconIsImage = computed(() => {
+const errorIconIsImage = computed(() : boolean => {
   return isImagePath(props.errorIcon)
 })
 
-const loadingIconText = computed(() => {
+const loadingIconText = computed(() : string => {
   if (props.loadingIcon == 'photo') return 'IMG'
   return props.loadingIcon
 })
 
-const errorIconText = computed(() => {
+const errorIconText = computed(() : string => {
   if (props.errorIcon == 'error-circle') return '!'
   return props.errorIcon
 })
 
-const previewUrls = computed(() => {
-  const urls = []
-  for (let i = 0; i < props.previewSrcList.length; i++) {
-    const item = String(props.previewSrcList[i])
+const previewUrls = computed(() : Array<string> => {
+  const urls : Array<string> = []
+  const list = props.previewSrcList
+  if (list == null) return urls
+  for (let i = 0; i < list.length; i++) {
+    const raw = list[i]
+    if (raw == null) continue
+    const item = raw.toString()
     if (item.length > 0) urls.push(item)
   }
   return urls
 })
 
-const currentPreviewUrl = computed(() => {
+const currentPreviewUrl = computed(() : string => {
   if (previewUrls.value.length == 0) return ''
-  return previewUrls.value[currentPreview.value]
+  const value = previewUrls.value[currentPreview.value]
+  return value == null ? '' : value
 })
 
-const previewCountText = computed(() => {
+const previewCountText = computed(() : string => {
   if (previewUrls.value.length == 0) return '0/0'
-  return String(currentPreview.value + 1) + '/' + String(previewUrls.value.length)
+  return (currentPreview.value + 1).toString() + '/' + (previewUrls.value.length).toString()
 })
 
 watch(
-  () => props.src,
-  () => {
+  () : string => props.src,
+  () : void => {
     loading.value = props.src.length > 0
     failed.value = props.src.length == 0
     loaded.value = false
   },
 )
 
-function formatSize(value) {
-  const text = String(value)
-  if (text == 'auto') return 'auto'
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
-}
-
-function formatDuration(value) {
-  const duration = Number(value)
-  if (duration >= 0) return String(duration)
-  return '500'
-}
-
-function sizeStyle() {
-  return 'width:' + formatSize(props.width) + ';height:' + formatSize(props.height) + ';'
-}
-
-function isImagePath(value) {
-  const text = String(value)
-  if (text.indexOf('/') >= 0) return true
-  if (text.indexOf('http') == 0) return true
-  if (text.indexOf('.png') >= 0) return true
-  if (text.indexOf('.jpg') >= 0) return true
-  if (text.indexOf('.jpeg') >= 0) return true
-  if (text.indexOf('.webp') >= 0) return true
-  if (text.indexOf('.gif') >= 0) return true
-  return false
-}
-
-function handleClick() {
+function handleClick() : void {
   emit('click')
   if (previewUrls.value.length == 0) return
 
@@ -328,11 +336,11 @@ function handleClick() {
   previewVisible.value = true
 }
 
-function closePreview() {
+function closePreview() : void {
   previewVisible.value = false
 }
 
-function prevPreview() {
+function prevPreview() : void {
   if (previewUrls.value.length == 0) return
   if (currentPreview.value <= 0) {
     currentPreview.value = previewUrls.value.length - 1
@@ -341,7 +349,7 @@ function prevPreview() {
   currentPreview.value = currentPreview.value - 1
 }
 
-function nextPreview() {
+function nextPreview() : void {
   if (previewUrls.value.length == 0) return
   if (currentPreview.value >= previewUrls.value.length - 1) {
     currentPreview.value = 0
@@ -350,14 +358,14 @@ function nextPreview() {
   currentPreview.value = currentPreview.value + 1
 }
 
-function handleLoad(event) {
+function handleLoad(event : any) : void {
   loading.value = false
   failed.value = false
   loaded.value = true
   emit('load', event)
 }
 
-function handleError(event) {
+function handleError(event : any) : void {
   loading.value = false
   failed.value = true
   loaded.value = false

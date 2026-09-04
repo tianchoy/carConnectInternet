@@ -70,8 +70,44 @@ const emit = defineEmits(['click', 'close'])
 const slots = useSlots()
 const visible = ref(true)
 
+function normalizeType(value : any) : string {
+  if (value == 'danger') return 'error'
+  if (value == 'primary') return 'info'
+  if (value == 'success' || value == 'warning' || value == 'info' || value == 'error') {
+    return value.toString()
+  }
+  return 'warning'
+}
+
+function normalizeEffect(value : any) : string {
+  if (value == 'dark' || value == 'plain') return value.toString()
+  return 'light'
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function alertTextColor() : string {
+  const effect = normalizeEffect(props.effect)
+  if (effect == 'dark') return '#ffffff'
+  const type = normalizeType(props.type)
+  if (type == 'success') return '#67c23a'
+  if (type == 'info') return '#909399'
+  if (type == 'error') return '#f56c6c'
+  return '#e6a23c'
+}
+
 const hasIconSlot = computed(() => slots['icon'] != null)
 const hasDescriptionSlot = computed(() => slots['description'] != null)
+
+const alertTextColorStyle = computed(() => {
+  return 'color:' + alertTextColor() + ';'
+})
 
 const alertClass = computed(() => {
   const type = normalizeType(props.type)
@@ -105,47 +141,11 @@ const fontStyle = computed(() => {
 })
 
 const descriptionStyle = computed(() => {
-  const size = Number(props.fontSize)
+  const size = parseFloat((props.fontSize).toString())
   if (isNaN(size)) return alertTextColorStyle.value
   const nextSize = size > 12 ? size - 1 : size
-  return 'font-size:' + String(nextSize) + 'px;' + alertTextColorStyle.value
+  return 'font-size:' + (nextSize).toString() + 'px;' + alertTextColorStyle.value
 })
-
-const alertTextColorStyle = computed(() => {
-  return 'color:' + alertTextColor() + ';'
-})
-
-function alertTextColor(): string {
-  const effect = normalizeEffect(props.effect)
-  if (effect == 'dark') return '#ffffff'
-  const type = normalizeType(props.type)
-  if (type == 'success') return '#67c23a'
-  if (type == 'info') return '#909399'
-  if (type == 'error') return '#f56c6c'
-  return '#e6a23c'
-}
-
-function normalizeType(value) {
-  if (value == 'danger') return 'error'
-  if (value == 'primary') return 'info'
-  if (value == 'success' || value == 'warning' || value == 'info' || value == 'error') {
-    return value
-  }
-  return 'warning'
-}
-
-function normalizeEffect(value) {
-  if (value == 'dark' || value == 'plain') return value
-  return 'light'
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
 
 function handleClick() {
   emit('click')

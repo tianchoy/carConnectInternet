@@ -40,7 +40,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             var playedPolyline: Polyline? = null
             val isPlaying = ref(false)
             val isTrackPlayable = ref(false)
-            val playbackSpeed = ref(5)
+            val playbackSpeed = ref(1)
             val totalDistance = ref(0)
             val currentSpeed = ref(0)
             val currentTime = ref("")
@@ -58,6 +58,14 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val initialStartTime = formatTimes(now.getTime() - 21600000)
             val startTime = ref(initialStartTime)
             val endTime = ref(initialEndTime)
+            val currentPickerValue = computed(fun(): String {
+                return if (currentPickerType.value == "start") {
+                    startTime.value
+                } else {
+                    endTime.value
+                }
+            }
+            )
             fun gen_normalizePlaybackTime_fn(value: String, fallback: String): String {
                 val milliseconds = parseLocalDateTime(value)
                 return if (milliseconds == null) {
@@ -108,7 +116,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     return null
                 }
                 try {
-                    val decoded = (UTSAndroid.consoleDebugError(decodeURIComponent(dateStr), " at pages/playBack/playBack.uvue:201") ?: "").replace(UTSRegExp("\\+", "g"), " ").replace("T", " ")
+                    val decoded = (UTSAndroid.consoleDebugError(decodeURIComponent(dateStr), " at pages/playBack/playBack.uvue:204") ?: "").replace(UTSRegExp("\\+", "g"), " ").replace("T", " ")
                     val milliseconds = parseLocalDateTime(decoded)
                     return if (milliseconds == null) {
                         null
@@ -117,7 +125,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     }
                 }
                  catch (error: Throwable) {
-                    console.error("解析回放时间失败:", error, " at pages/playBack/playBack.uvue:205")
+                    console.error("解析回放时间失败:", error, " at pages/playBack/playBack.uvue:208")
                     return null
                 }
             }
@@ -433,7 +441,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         val requestId = ++replaySessionId
                         clearTrackDisplay()
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 655, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 658, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 1, "withStop" to false, "withPos" to true, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             if (requestId != replaySessionId) {
@@ -468,7 +476,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:691")
+                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:694")
                             showAppToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
                             if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
                                 showCurrentPosition()
@@ -542,8 +550,12 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 }
             }
             val togglePlayback = ::gen_togglePlayback_fn
-            fun gen_onConfirm_fn(value: String) {
-                val formattedValue = normalizeDateTime(value)
+            fun gen_onConfirm_fn(event: UTSJSONObject): Unit {
+                val timestamp = event.getNumber("timestamp", 0)
+                if (!isFinite(timestamp) || timestamp <= 0) {
+                    return
+                }
+                val formattedValue = formatPlaybackTime(timestamp)
                 if (currentPickerType.value == "start") {
                     setPlaybackTimeRange(formattedValue, endTime.value ?: "")
                 } else {
@@ -558,11 +570,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 showDateTimePicker.value = false
             }
             val onCancel = ::gen_onCancel_fn
+            fun gen_onPickerShowChange_fn(value: Boolean) {
+                showDateTimePicker.value = value
+            }
+            val onPickerShowChange = ::gen_onPickerShowChange_fn
             fun gen_applyPlaybackSpeed_fn(value: Number): Unit {
                 if (!isFinite(value)) {
                     return
                 }
-                playbackSpeed.value = Math.min(50, Math.max(5, value))
+                playbackSpeed.value = Math.min(30, Math.max(1, value))
                 if (!isPlaying.value) {
                     return
                 }
@@ -596,7 +612,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 lng.value = option["lng"] ?: null
                 sTime.value = option["startTime"] ?: ""
                 eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:820")
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:828")
                 val routeStartTime = resolveRouteDateTime(sTime.value)
                 val routeEndTime = resolveRouteDateTime(eTime.value)
                 if (routeStartTime != null && routeEndTime != null) {
@@ -625,8 +641,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
                 val _component_i_button = resolveEasyComponent("i-button", GenUniModulesIUiXComponentsIButtonIButtonClass)
                 val _component_i_slider = resolveEasyComponent("i-slider", GenUniModulesIUiXComponentsISliderISliderClass)
-                val _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker", GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePickerClass)
-                val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
+                val _component_i_datetime_picker = resolveEasyComponent("i-datetime-picker", GenUniModulesIUiXComponentsIDatetimePickerIDatetimePickerClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 return _cE(Fragment, null, _uA(
                     _cE("view", _uM("class" to "container"), _uA(
@@ -698,7 +713,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                                     _cV(_component_i_slider, _uM("modelValue" to playbackSpeed.value, "onUpdate:modelValue" to fun(`$event`: Number){
                                         playbackSpeed.value = `$event`
                                     }
-                                    , "min" to 5, "max" to 50, "step" to 5, "onChange" to setPlaybackSpeedFromValue), null, 8, _uA(
+                                    , "min" to 1, "max" to 30, "step" to 1, "onChange" to setPlaybackSpeedFromValue), null, 8, _uA(
                                         "modelValue",
                                         "onUpdate:modelValue"
                                     ))
@@ -719,19 +734,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
                                     _cE("text", _uM("class" to "info-label"), "里程")
                                 ))
                             )),
-                            _cV(_component_l_popup, _uM("modelValue" to showDateTimePicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
-                                showDateTimePicker.value = `$event`
-                            }
-                            , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
-                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "format" to "YYYY-MM-DD HH:mm:ss", "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
-                                        "title"
-                                    ))
+                                    _cE("view")
                                 )
                             }
                             ), "_" to 1), 8, _uA(
-                                "modelValue",
-                                "onUpdate:modelValue"
+                                "show",
+                                "model-value",
+                                "title"
                             ))
                         ))
                     )),

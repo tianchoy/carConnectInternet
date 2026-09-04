@@ -34,6 +34,14 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             val pickerTitle = ref("选择开始时间")
             val startTime = ref("")
             val endTime = ref("")
+            val currentPickerValue = computed(fun(): String {
+                return if (currentPickerType.value === "start") {
+                    startTime.value
+                } else {
+                    endTime.value
+                }
+            }
+            )
             val imei = ref<String?>("")
             val groupedTrips = computed<UTSArray<GroupType>>(fun(): UTSArray<GroupType> {
                 val dateGroups: UTSArray<DateTripGroup> = _uA()
@@ -163,7 +171,7 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                             return@w1
                         }
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 192, 10), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 195, 10), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
                             val res = await(getTrackPos(data))
                             if (res.code != 200) {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
@@ -174,14 +182,14 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                                 , icon = "none"))
                                 return@w1
                             }
-                            console.log("获取里程数据成功:", res, " at pages/mileageRecord/mileageRecord.uvue:206")
+                            console.log("获取里程数据成功:", res, " at pages/mileageRecord/mileageRecord.uvue:209")
                             val trackData = res.data
                             if (trackData != null) {
                                 processTripData(trackData)
                             }
                         }
                          catch (e: Throwable) {
-                            console.error("获取里程数据失败:", e, " at pages/mileageRecord/mileageRecord.uvue:212")
+                            console.error("获取里程数据失败:", e, " at pages/mileageRecord/mileageRecord.uvue:215")
                             showAppToast(ShowToastOptions(title = "数据加载失败", icon = "none"))
                         }
                          finally {
@@ -231,7 +239,12 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                 }
                 showDateTimePicker.value = true
             }
-            val onConfirm = fun(value: String){
+            val onConfirm = fun(event: UTSJSONObject){
+                val timestamp = event.getNumber("timestamp", 0)
+                if (!isFinite(timestamp) || timestamp <= 0) {
+                    return
+                }
+                val value = formatTimes(timestamp)
                 if (currentPickerType.value === "start") {
                     startTime.value = value
                 } else {
@@ -243,11 +256,13 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             val onCancel = fun(){
                 showDateTimePicker.value = false
             }
+            val onPickerShowChange = fun(value: Boolean){
+                showDateTimePicker.value = value
+            }
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
-                val _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker", GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePickerClass)
-                val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
+                val _component_i_datetime_picker = resolveEasyComponent("i-datetime-picker", GenUniModulesIUiXComponentsIDatetimePickerIDatetimePickerClass)
                 val _component_i_empty = resolveEasyComponent("i-empty", GenUniModulesIUiXComponentsIEmptyIEmptyClass)
                 val _component_i_tag = resolveEasyComponent("i-tag", GenUniModulesIUiXComponentsITagITagClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
@@ -285,19 +300,15 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                                     ))
                                 ))
                             )),
-                            _cV(_component_l_popup, _uM("modelValue" to showDateTimePicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
-                                showDateTimePicker.value = `$event`
-                            }
-                            , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
-                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
-                                        "title"
-                                    ))
+                                    _cE("view")
                                 )
                             }
                             ), "_" to 1), 8, _uA(
-                                "modelValue",
-                                "onUpdate:modelValue"
+                                "show",
+                                "model-value",
+                                "title"
                             ))
                         )),
                         _cE("view", _uM("class" to "summary-panel"), _uA(

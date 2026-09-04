@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 
 const __sfc__ = defineComponent({
@@ -14,24 +14,24 @@ name: 'i-modal',
   showCancelButton: { type: Boolean, default: false },
   confirmColor: { type: String, default: '#2979ff' },
   cancelColor: { type: String, default: '#606266' },
-  duration: { type: Number, default: 200 },
+  duration: { type: [String, Number], default: 200 },
   buttonReverse: { type: Boolean, default: false },
   zoom: { type: Boolean, default: true },
-  zIndex: { type: Number, default: 10075 },
+  zIndex: { type: [String, Number], default: 10075 },
   asyncClose: { type: Boolean, default: false },
   closeable: { type: Boolean, default: false },
   closeOnMask: { type: Boolean, default: false },
-  negativeTop: { type: String, default: '0px' },
-  width: { type: String, default: '320px' },
+  negativeTop: { type: [String, Number], default: 0 },
+  width: { type: [String, Number], default: '320px' },
   confirmButtonShape: { type: String, default: '100px' },
-  round: { type: String, default: '6px' },
+  round: { type: [String, Number], default: '6px' },
   buttonModel: { type: String, default: 'text' },
   buttonRadius: { type: String, default: '100px' },
   confirmBgColor: { type: String, default: '' },
   cancelBgColor: { type: String, default: '' },
-  customStyle: { type: String, default: '' },
+  customStyle: { type: [String, Object], default: '' },
 },
-  emits: ['confirm', 'cancel', 'close', 'update:show'],
+  emits: ["confirm", "cancel", "close", "update:show"],
   setup(__props, __setupCtx: SetupContext) {
 const __expose = __setupCtx.expose
 const __ins = getCurrentInstance()!;
@@ -81,143 +81,143 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
-function formatMs(value: number): string {
-  return value.toString() + 'ms'
+function formatMs(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0) return text
+  return text + 'ms'
 }
 
-function formatSize(value: string): string {
-  if (value.indexOf('px') >= 0 || value.indexOf('rpx') >= 0 || value.indexOf('%') >= 0) {
-    return value
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
   }
-  return value + 'px'
+  return text + 'px'
 }
 
-function stringifyStyle(value: string): string {
-  if (value.length == 0) return ''
-  return value.endsWith(';') ? value : value + ';'
+function stringifyStyle(value : any | null) : string {
+  if (value == null) return ''
+  const text = value.toString()
+  if (text == '[object Object]' || text.length == 0) return ''
+  return text.endsWith(';') ? text : text + ';'
 }
 
-function animationDuration(): number {
-  return props.duration
-}
 
 const opened = ref(props.show)
 const active = ref(props.show)
 const loading = ref(false)
 let closeTimer = 0
 
-const maskStyle = computed(() => {
+const maskStyle = computed(() : string => {
   return (
     'z-index:' +
-    props.zIndex.toString() +
+    (props.zIndex).toString() +
     ';opacity:' +
-    (props.show || active.value ? '1' : '0') +
+    (active.value ? '1' : '0') +
     ';transition-duration:' +
     formatMs(props.duration) +
     ';'
   )
 })
 
-const visibleMaskStyle = computed(() => {
-  if (props.show && !opened.value) {
-    return 'z-index:' + props.zIndex.toString() + ';opacity:1;transition-duration:' + formatMs(props.duration) + ';'
-  }
-  return maskStyle.value
-})
-
-const modalClass = computed(() => {
+const modalClass = computed(() : string => {
   const classes = ['i-modal']
   return classes.join(' ')
 })
 
-const modalStyle = computed(() => {
+const modalStyle = computed(() : string => {
   let style = 'width:' + formatSize(props.width) + ';'
   style = style + 'border-radius:' + formatSize(props.round) + ';'
   style = style + 'transition-duration:' + formatMs(props.duration) + ';'
   const top = formatSize(props.negativeTop)
-  const scaleValue = props.zoom ? (props.show || active.value ? '1' : '0.86') : '1'
+  const scaleValue = props.zoom ? (active.value ? '1' : '0.86') : '1'
   const translateValue = top != '0px' ? '-' + top : '0px'
-  style = style + 'opacity:' + (props.show || active.value ? '1' : '0') + ';'
+  style = style + 'opacity:' + (active.value ? '1' : '0') + ';'
   style = style + 'transform:translateY(' + translateValue + ') scale(' + scaleValue + ');'
   style = style + stringifyStyle(props.customStyle)
   return style
 })
 
-const visibleModalStyle = computed(() => {
-  return modalStyle.value
-})
-
-const confirmButtonClass = computed(() => {
+const confirmButtonClass = computed(() : string => {
   const classes = ['i-modal__button', 'i-modal__button--confirm']
   if (props.buttonModel == 'button') classes.push('i-modal__button--model-button')
   if (props.confirmButtonShape == 'square') classes.push('i-modal__button--square')
   return classes.join(' ')
 })
 
-const cancelButtonClass = computed(() => {
+const cancelButtonClass = computed(() : string => {
   const classes = ['i-modal__button', 'i-modal__button--cancel']
   if (props.buttonModel == 'button') classes.push('i-modal__button--model-button')
   return classes.join(' ')
 })
 
-const confirmTextStyle = computed(() => {
+const confirmTextStyle = computed(() : string => {
   return 'color:' + props.confirmColor + ';'
 })
 
-const cancelTextStyle = computed(() => {
+const cancelTextStyle = computed(() : string => {
   return 'color:' + props.cancelColor + ';'
 })
 
-const confirmButtonStyle = computed(() => {
+const confirmButtonStyle = computed(() : string => {
   if (props.buttonModel != 'button') return ''
   let style = 'border-radius:' + formatSize(props.buttonRadius) + ';'
   if (props.confirmBgColor.length > 0) style = style + 'background-color:' + props.confirmBgColor + ';'
   return style
 })
 
-const cancelButtonStyle = computed(() => {
+const cancelButtonStyle = computed(() : string => {
   if (props.buttonModel != 'button') return ''
   let style = 'border-radius:' + formatSize(props.buttonRadius) + ';'
   if (props.cancelBgColor.length > 0) style = style + 'background-color:' + props.cancelBgColor + ';'
   return style
 })
 
-function clearCloseTimer() {
+function clearCloseTimer() : void {
   if (closeTimer > 0) {
     clearTimeout(closeTimer)
     closeTimer = 0
   }
 }
 
-function openPanel() {
+function animationDuration() : number {
+  const text = (props.duration).toString()
+  if (text.indexOf('ms') >= 0) return parseFloat((text.replace('ms', '')).toString())
+  if (text.indexOf('s') >= 0) return parseFloat((text.replace('s', '')).toString()) * 1000
+  const duration = parseFloat((text).toString())
+  if (isNaN(duration)) return 200
+  return duration
+}
+
+function openPanel() : void {
   clearCloseTimer()
   opened.value = true
-  setTimeout(() => {
+  setTimeout(() : void => {
     active.value = true
   }, 20)
 }
 
-function closePanel(shouldEmitUpdate: boolean) {
+function closePanel(shouldEmitUpdate : boolean) : void {
   clearCloseTimer()
   active.value = false
   loading.value = false
-  closeTimer = setTimeout(() => {
+  closeTimer = setTimeout(() : void => {
     opened.value = false
     closeTimer = 0
     if (shouldEmitUpdate) emit('update:show', false)
   }, animationDuration())
 }
 
-function open() {
+function open() : void {
   openPanel()
   emit('update:show', true)
 }
 
-function close() {
+function close() : void {
   closePanel(true)
 }
 
-function confirm() {
+function confirm() : void {
   if (loading.value) return
   emit('confirm')
   if (props.asyncClose) {
@@ -227,21 +227,32 @@ function confirm() {
   close()
 }
 
-function cancel() {
+function cancel() : void {
   emit('cancel')
   closePanel(true)
 }
 
-function closeByIcon() {
+function closeByIcon() : void {
   emit('close')
   closePanel(true)
 }
 
-function handleOverlayClick() {
+function handleOverlayClick() : void {
   if (!props.closeOnMask) return
   emit('close')
   closePanel(true)
 }
+
+watch(
+  () : boolean => props.show,
+  (nextValue : boolean) : void => {
+    if (nextValue) {
+      openPanel()
+    } else {
+      closePanel(false)
+    }
+  },
+)
 
 __expose({
   open,
@@ -250,16 +261,16 @@ __expose({
 
 return (): any | null => {
 
-  return isTrue(_ctx.show || opened.value)
+  return isTrue(opened.value)
     ? _cE("view", _uM({
         key: 0,
         class: "i-modal__mask",
-        style: _nS(visibleMaskStyle.value),
+        style: _nS(maskStyle.value),
         onClick: handleOverlayClick
       }), [
         _cE("view", _uM({
           class: _nC(modalClass.value),
-          style: _nS(visibleModalStyle.value),
+          style: _nS(modalStyle.value),
           onClick: withModifiers(() => {}, ["stop"])
         }), [
           isTrue(_ctx.closeable)

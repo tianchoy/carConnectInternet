@@ -46,31 +46,12 @@ const props = defineProps({
  */
 const emit = defineEmits(['click'])
 
-const beforeLineStyle = computed(() => {
-  return lineStyle(lineWeightBefore())
-})
-
-const afterLineStyle = computed(() => {
-  return lineStyle(lineWeightAfter())
-})
-
-const textStyle = computed(() => {
-  let style = 'color:' + props.color + ';'
-  style = style + 'font-size:' + formatSize(props.size) + ';'
-  if (props.bold) style = style + 'font-weight:700;'
-  return style
-})
-
-const dotStyle = computed(() => {
-  return 'background-color:' + props.lineColor + ';'
-})
-
-function lineStyle(flexValue: number): string {
+function lineStyle(flexValue : number) : string {
   const width = props.hairline ? '0.5px' : '1px'
   const lineType = props.dashed ? 'dashed' : 'solid'
   return (
     'flex:' +
-    String(flexValue) +
+    (flexValue).toString() +
     ';border-top-width:' +
     width +
     ';border-top-style:' +
@@ -81,23 +62,42 @@ function lineStyle(flexValue: number): string {
   )
 }
 
-function lineWeightBefore(): number {
+function lineWeightBefore() : number {
   if (props.position == 'left') return 1
   if (props.position == 'right') return 8
   return 1
 }
 
-function lineWeightAfter(): number {
+function lineWeightAfter() : number {
   if (props.position == 'left') return 8
   if (props.position == 'right') return 1
   return 1
 }
 
-function formatSize(value): string {
-  const text = String(value)
+function formatSize(value : any) : string {
+  const text = (value).toString()
   if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0) return text
   return text + 'px'
 }
+
+const beforeLineStyle = computed(() : string => {
+  return lineStyle(lineWeightBefore())
+})
+
+const afterLineStyle = computed(() : string => {
+  return lineStyle(lineWeightAfter())
+})
+
+const textStyle = computed(() : string => {
+  let style = 'color:' + props.color + ';'
+  style = style + 'font-size:' + formatSize(props.size) + ';'
+  if (props.bold) style = style + 'font-weight:700;'
+  return style
+})
+
+const dotStyle = computed(() : string => {
+  return 'background-color:' + props.lineColor + ';'
+})
 </script>
 
 <style>

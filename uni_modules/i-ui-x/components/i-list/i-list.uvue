@@ -4,7 +4,7 @@
     <view class="i-list__body">
       <view
         v-for="(item, index) in items"
-        :key="String(index) + '-' + getItemTitle(item)"
+        :key="(index).toString() + '-' + getItemTitle(item)"
         :class="selected == index ? 'i-list__item i-list__item--active' : 'i-list__item'"
         :style="getItemStyle(index)"
         @click="select(item, index)"
@@ -62,54 +62,71 @@ const props = defineProps({
  * - click/select/change: 点击列表项时触发，返回 { index, title, item }。
  * - loadmore: 点击加载更多时触发，返回当前 items 数量。
  */
-const emit = defineEmits(['click', 'select', 'change', 'loadmore'])
+const emit = defineEmits<{
+  (event: 'click', payload: any): void
+  (event: 'select', payload: any): void
+  (event: 'change', payload: any): void
+  (event: 'loadmore', count: number): void
+}>()
+
+type IListPayload = {
+  index : number,
+  title : string,
+  item : any | null,
+}
+
 const selected = ref(-1)
 
-const wrapStyle = computed(() => 'background-color:#ffffff;')
+const wrapStyle = computed(() : string => 'background-color:#ffffff;')
 
-function itemValue(item, keyName) {
+function itemValue(item : any | null, keyName : string) : string {
   if (item == null) return ''
   if (typeof item == 'object') {
-    const value = item[keyName]
+    const value = (item as UTSJSONObject)[keyName]
     if (value == null) return ''
-    return String(value)
+    return value.toString()
   }
-  return String(item)
+  return item.toString()
 }
 
-function getItemTitle(item) {
+function getItemTitle(item : any | null) : string {
   const title = itemValue(item, props.titleKey)
   if (title.length > 0) return title
-  return String(item)
+  return item == null ? '' : item.toString()
 }
 
-function getItemDesc(item) {
+function getItemDesc(item : any | null) : string {
   return itemValue(item, props.descKey)
 }
 
-function getItemStyle(index) {
+function getItemCount() : number {
+  const items = props.items
+  return items == null ? 0 : items.length
+}
+
+function getItemStyle(index : number) : string {
   let style = 'background-color:' + props.itemBgColor + ';'
-  if (props.border && index < props.items.length - 1) {
+  if (props.border && index < getItemCount() - 1) {
     style += 'border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:#ebeef5;'
   }
   return style
 }
 
-function getTitleStyle(index) {
+function getTitleStyle(index : number) : string {
   return selected.value == index ? 'color:' + props.activeColor + ';' : ''
 }
 
-function select(item, index) {
+function select(item : any | null, index : number) : void {
   if (!props.clickable) return
   selected.value = index
-  const payload = { index, title: getItemTitle(item), item }
+  const payload : IListPayload = { index, title: getItemTitle(item), item }
   emit('click', payload)
   emit('select', payload)
   emit('change', payload)
 }
 
-function loadMore() {
-  emit('loadmore', props.items.length)
+function loadMore() : void {
+  emit('loadmore', getItemCount())
 }
 </script>
 

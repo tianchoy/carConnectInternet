@@ -112,6 +112,34 @@ export function openCameraPermissionSettings(): void {
 }
 
 
+// ===== 微信小程序相机权限 =====
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ===== 其他非 Android 平台权限兜底 =====
+
+
+
 
 
 

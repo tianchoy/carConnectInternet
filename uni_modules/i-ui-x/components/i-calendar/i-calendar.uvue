@@ -170,16 +170,184 @@ const emit = defineEmits([
   'update:modelValue',
 ])
 
+type ICalendarDay = {
+  key: string
+  text: string
+  value: string
+  empty: boolean
+}
 
+
+function pad(value : number) : string {
+  return value < 10 ? '0' + (value).toString() : (value).toString()
+}
+
+function clamp(value : number, min : number, max : number) : number {
+  return Math.max(min, Math.min(max, value))
+}
+
+function parseDate(value : string) : Date {
+  const date = new Date((value).toString().replace(/-/g, '/'))
+  if (isNaN(date.getTime())) return new Date()
+  return date
+}
+
+function normalizeDate(date : Date) : string {
+  return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate())
+}
+
+function normalizeDateText(value : any | null) : string {
+  if (value == null) return ''
+  const text = value.toString()
+  if (text.length == 0) return ''
+  const date = parseDate(text)
+  return normalizeDate(date)
+}
+
+function normalizeDateList(value : any | null) : Array<string> {
+  const list : Array<string> = []
+  if (value == null) return list
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      const text = normalizeDateText((value[i]).toString())
+      if (text.length > 0) list.push(text)
+    }
+  } else {
+    const text = normalizeDateText((value).toString())
+    if (text.length > 0) list.push(text)
+  }
+  return list
+}
+
+function firstDate(value : any | null) : string {
+  const list = normalizeDateList(value)
+  if (list.length > 0) return list[0]
+  return ''
+}
+
+function hasSelectionValue(value : any | null) : boolean {
+  if (value == null) return false
+  if (Array.isArray(value)) return value.length > 0
+  return (value).toString().length > 0
+}
+
+function hexToLightColor(value : string) : string {
+  const color = value.indexOf('#') == 0 ? value : '#3c9cff'
+  if (color.length != 7) return 'rgba(60,156,255,0.14)'
+  const r = parseInt(color.substring(1, 3), 16)
+  const g = parseInt(color.substring(3, 5), 16)
+  const b = parseInt(color.substring(5, 7), 16)
+  return 'rgba(' + r + ',' + g + ',' + b + ',0.14)'
+}
 
 const weekDays = ref(['日', '一', '二', '三', '四', '五', '六'])
 const today = normalizeDate(new Date())
 const selectedSingle = ref('')
-const selectedMultiple = ref([])
+const selectedMultiple = ref<Array<string>>([])
 const rangeStart = ref('')
 const rangeEnd = ref('')
 const year = ref(new Date().getFullYear())
 const monthIndex = ref(new Date().getMonth())
+
+function firstSelectedDate() : string {
+  if (props.mode == 'multiple' && selectedMultiple.value.length > 0) {
+    return (selectedMultiple.value[0]).toString()
+  }
+  if (props.mode == 'range' && rangeStart.value.length > 0) return rangeStart.value
+  return selectedSingle.value
+}
+
+function syncViewMonth() : void {
+  if (props.month.length >= 7) {
+    const parts = props.month.split('-')
+    const nextYear = parseFloat((parts[0]).toString())
+    const nextMonth = parseFloat((parts[1]).toString())
+    if (!isNaN(nextYear) && !isNaN(nextMonth)) {
+      year.value = nextYear
+      monthIndex.value = clamp(nextMonth - 1, 0, 11)
+      return
+    }
+  }
+
+  const anchor = firstSelectedDate()
+  const date = parseDate(anchor.length > 0 ? anchor : today)
+  year.value = date.getFullYear()
+  monthIndex.value = date.getMonth()
+}
+
+function syncSelection() : void {
+  const source = hasSelectionValue(props.defaultDate) ? props.defaultDate : props.value
+  selectedSingle.value = ''
+  selectedMultiple.value = []
+  rangeStart.value = ''
+  rangeEnd.value = ''
+
+  if (props.mode == 'multiple') {
+    selectedMultiple.value = normalizeDateList(source)
+  } else if (props.mode == 'range') {
+    const values = normalizeDateList(source)
+    if (values.length > 0) rangeStart.value = values[0]
+    if (values.length > 1) rangeEnd.value = values[1]
+  } else {
+    selectedSingle.value = firstDate(source)
+  }
+
+  syncViewMonth()
+}
+
+function currentValue() {
+  if (props.mode == 'multiple') return selectedMultiple.value
+  if (props.mode == 'range') return [rangeStart.value, rangeEnd.value]
+  return selectedSingle.value
+}
+
+function isSelected(value : string) : boolean {
+  if (value.length == 0) return false
+  if (props.mode == 'multiple') return selectedMultiple.value.indexOf(value) >= 0
+  if (props.mode == 'range') return value == rangeStart.value || value == rangeEnd.value
+  return value == selectedSingle.value
+}
+
+function isInRange(value : string) : boolean {
+  if (props.mode != 'range') return false
+  if (rangeStart.value.length == 0 || rangeEnd.value.length == 0) return false
+  return value > rangeStart.value && value < rangeEnd.value
+}
+
+function isDisabled(value : string) : boolean {
+  if (value.length == 0) return false
+  if (props.minDate.length > 0 && value < normalizeDateText(props.minDate)) return true
+  if (props.maxDate.length > 0 && value > normalizeDateText(props.maxDate)) return true
+  return false
+}
+
+function toggleMultiple(value : string) : void {
+  const list = selectedMultiple.value.slice()
+  const index = list.indexOf(value)
+  if (index >= 0) {
+    list.splice(index, 1)
+  } else {
+    list.push(value)
+  }
+  selectedMultiple.value = list
+}
+
+function selectRange(value : string) : void {
+  const nextValue = value.toString()
+  if (rangeStart.value.length == 0 || rangeEnd.value.length > 0) {
+    rangeStart.value = nextValue
+    rangeEnd.value = ''
+    return
+  }
+
+  if (nextValue < rangeStart.value) {
+    rangeEnd.value = rangeStart.value
+    rangeStart.value = nextValue
+    return
+  }
+
+  rangeEnd.value = nextValue
+}
 
 const shouldRender = computed(() => {
   if (props.insert) return true
@@ -217,10 +385,10 @@ const rangeResultText = computed(() => {
   return '日期范围：' + rangeStart.value + ' 至 ' + rangeEnd.value
 })
 
-const days = computed(() => {
+const days = computed(() : Array<ICalendarDay> => {
   const firstDay = new Date(year.value, monthIndex.value, 1).getDay()
   const total = new Date(year.value, monthIndex.value + 1, 0).getDate()
-  const list = []
+  const list : Array<ICalendarDay> = []
 
   for (let i = 0; i < firstDay; i++) {
     list.push({
@@ -235,7 +403,7 @@ const days = computed(() => {
     const value = year.value + '-' + pad(monthIndex.value + 1) + '-' + pad(day)
     list.push({
       key: value,
-      text: String(day),
+      text: (day).toString(),
       value,
       empty: false,
     })
@@ -245,82 +413,39 @@ const days = computed(() => {
 })
 
 watch(
-  () => props.defaultDate,
-  () => {
+  () : any => props.defaultDate,
+  () : void => {
     syncSelection()
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  () : any => props.value,
+  () : void => {
     syncSelection()
   },
 )
 
 watch(
-  () => props.month,
-  () => {
+  () : string => props.month,
+  () : void => {
     syncViewMonth()
   },
 )
 
 watch(
-  () => props.mode,
-  () => {
+  () : string => props.mode,
+  () : void => {
     syncSelection()
   },
 )
 
 syncSelection()
 
-function syncSelection() {
-  const source = hasSelectionValue(props.defaultDate) ? props.defaultDate : props.value
-  selectedSingle.value = ''
-  selectedMultiple.value = []
-  rangeStart.value = ''
-  rangeEnd.value = ''
 
-  if (props.mode == 'multiple') {
-    selectedMultiple.value = normalizeDateList(source)
-  } else if (props.mode == 'range') {
-    const values = normalizeDateList(source)
-    if (values.length > 0) rangeStart.value = values[0]
-    if (values.length > 1) rangeEnd.value = values[1]
-  } else {
-    selectedSingle.value = firstDate(source)
-  }
 
-  syncViewMonth()
-}
 
-function syncViewMonth() {
-  if (props.month.length >= 7) {
-    const parts = props.month.split('-')
-    const nextYear = Number(parts[0])
-    const nextMonth = Number(parts[1])
-    if (!isNaN(nextYear) && !isNaN(nextMonth)) {
-      year.value = nextYear
-      monthIndex.value = clamp(nextMonth - 1, 0, 11)
-      return
-    }
-  }
-
-  const anchor = firstSelectedDate()
-  const date = parseDate(anchor.length > 0 ? anchor : today)
-  year.value = date.getFullYear()
-  monthIndex.value = date.getMonth()
-}
-
-function firstSelectedDate() {
-  if (props.mode == 'multiple' && selectedMultiple.value.length > 0) {
-    return String(selectedMultiple.value[0])
-  }
-  if (props.mode == 'range' && rangeStart.value.length > 0) return rangeStart.value
-  return selectedSingle.value
-}
-
-function select(item) {
+function select(item : ICalendarDay) : void {
   if (item.empty || props.readonly || isDisabled(item.value)) return
 
   if (props.mode == 'multiple') {
@@ -337,32 +462,7 @@ function select(item) {
   emit('update:modelValue', value)
 }
 
-function toggleMultiple(value) {
-  const list = selectedMultiple.value.slice()
-  const index = list.indexOf(value)
-  if (index >= 0) {
-    list.splice(index, 1)
-  } else {
-    list.push(value)
-  }
-  selectedMultiple.value = list
-}
 
-function selectRange(value) {
-  if (rangeStart.value.length == 0 || rangeEnd.value.length > 0) {
-    rangeStart.value = value
-    rangeEnd.value = ''
-    return
-  }
-
-  if (value < rangeStart.value) {
-    rangeEnd.value = rangeStart.value
-    rangeStart.value = value
-    return
-  }
-
-  rangeEnd.value = value
-}
 
 function confirm() {
   const value = currentValue()
@@ -402,13 +502,8 @@ function nextMonth() {
   emit('month-change', currentMonthText.value)
 }
 
-function currentValue() {
-  if (props.mode == 'multiple') return selectedMultiple.value
-  if (props.mode == 'range') return [rangeStart.value, rangeEnd.value]
-  return selectedSingle.value
-}
 
-function dayClass(item) {
+function dayClass(item : ICalendarDay) : string {
   const classes = ['i-calendar__day']
   if (item.empty) classes.push('i-calendar__day--empty')
   if (isDisabled(item.value)) classes.push('i-calendar__day--disabled')
@@ -418,104 +513,39 @@ function dayClass(item) {
   return classes.join(' ')
 }
 
-function dayTextClass(item) {
+function dayTextClass(item : ICalendarDay) : string {
   const classes = ['i-calendar__day-text']
   if (isSelected(item.value)) classes.push('i-calendar__day-text--selected')
   if (isDisabled(item.value)) classes.push('i-calendar__day-text--disabled')
   return classes.join(' ')
 }
 
-function dayStyle(item) {
+function dayStyle(item : ICalendarDay) : string {
   if (item.empty) return ''
   if (isSelected(item.value)) return 'background-color:' + props.color + ';'
   if (isInRange(item.value)) return 'background-color:' + hexToLightColor(props.color) + ';'
   return ''
 }
 
-function dayTip(item) {
+function dayTip(item : ICalendarDay) : string {
   if (props.mode != 'range') return ''
   if (item.value == rangeStart.value) return props.startText
   if (item.value == rangeEnd.value) return props.endText
   return ''
 }
 
-function isSelected(value) {
-  if (value.length == 0) return false
-  if (props.mode == 'multiple') return selectedMultiple.value.indexOf(value) >= 0
-  if (props.mode == 'range') return value == rangeStart.value || value == rangeEnd.value
-  return value == selectedSingle.value
-}
 
-function isInRange(value) {
-  if (props.mode != 'range') return false
-  if (rangeStart.value.length == 0 || rangeEnd.value.length == 0) return false
-  return value > rangeStart.value && value < rangeEnd.value
-}
 
-function isDisabled(value) {
-  if (value.length == 0) return false
-  if (props.minDate.length > 0 && value < normalizeDateText(props.minDate)) return true
-  if (props.maxDate.length > 0 && value > normalizeDateText(props.maxDate)) return true
-  return false
-}
 
-function hasSelectionValue(value) {
-  if (Array.isArray(value)) return value.length > 0
-  return String(value).length > 0
-}
 
-function normalizeDateList(value) {
-  const list = []
-  if (Array.isArray(value)) {
-    for (let i = 0; i < value.length; i++) {
-      const text = normalizeDateText(String(value[i]))
-      if (text.length > 0) list.push(text)
-    }
-  } else {
-    const text = normalizeDateText(String(value))
-    if (text.length > 0) list.push(text)
-  }
-  return list
-}
 
-function firstDate(value) {
-  const list = normalizeDateList(value)
-  if (list.length > 0) return list[0]
-  return ''
-}
 
-function normalizeDateText(value) {
-  if (value.length == 0) return ''
-  const date = parseDate(value)
-  return normalizeDate(date)
-}
 
-function normalizeDate(date) {
-  return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate())
-}
 
-function parseDate(value) {
-  const date = new Date(String(value).replace(/-/g, '/'))
-  if (isNaN(date.getTime())) return new Date()
-  return date
-}
 
-function pad(value) {
-  return value < 10 ? '0' + String(value) : String(value)
-}
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value))
-}
 
-function hexToLightColor(value) {
-  const color = value.indexOf('#') == 0 ? value : '#3c9cff'
-  if (color.length != 7) return 'rgba(60,156,255,0.14)'
-  const r = parseInt(color.substring(1, 3), 16)
-  const g = parseInt(color.substring(3, 5), 16)
-  const b = parseInt(color.substring(5, 7), 16)
-  return 'rgba(' + r + ',' + g + ',' + b + ',0.14)'
-}
+
 </script>
 
 <style>

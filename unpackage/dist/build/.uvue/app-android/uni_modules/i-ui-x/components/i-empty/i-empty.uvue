@@ -43,21 +43,19 @@ const __sfc__ = defineComponent({
         function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
             __ins.emit(event, ...do_not_transform_spread);
         }
-        function formatSize(value: string | number): string {
-            const text = value.toString();
+        function formatSize(value: any): string {
+            const text = (value).toString();
             if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0)
                 return text;
             return text + 'px';
         }
-        function formatBoxSize(value: string | number): string {
-            const text = value.toString();
+        function formatBoxSize(value: any): string {
+            const text = (value).toString();
             if (text.indexOf(' ') >= 0)
                 return text;
             return formatSize(value);
         }
-        const bgColor = computed((): string => {
-            return props.bgColor;
-        });
+        const bgColor = computed((): string => props.bgColor);
         const wrapStyle = computed((): string => 'padding:' + formatBoxSize(props.padding) + ';background-color:' + bgColor.value + ';');
         const iconStyle = computed((): string => 'font-size:' + formatSize(props.iconSize) + ';color:' + props.iconColor + ';');
         const textStyle = computed((): string => 'color:' + props.textColor + ';');

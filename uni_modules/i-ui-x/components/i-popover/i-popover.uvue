@@ -80,6 +80,52 @@ const props = defineProps({
  */
 const emit = defineEmits(["update:show"]);
 
+function normalizedPosition() : string {
+  if (props.position == "bottom") return "bottom";
+  if (props.position == "left") return "left";
+  if (props.position == "right") return "right";
+  if (props.position == "auto") return "bottom";
+  return "top";
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString();
+  if (
+    text.indexOf("px") >= 0 ||
+    text.indexOf("rpx") >= 0 ||
+    text.indexOf("%") >= 0 ||
+    text == "auto"
+  ) return text;
+  return text + "px";
+}
+
+function formatBoxSize(value : any) : string {
+  const text = value.toString();
+  if (text.indexOf(" ") >= 0) return text;
+  return formatSize(value);
+}
+
+function formatHalfSize(value : any) : string {
+  const text = value.toString();
+  if (text.indexOf("rpx") == text.length - 3) {
+    const amount = parseFloat(text.substring(0, text.length - 3));
+    if (!isNaN(amount)) return (amount / 2).toString() + "rpx";
+  }
+  if (text.indexOf("px") == text.length - 2) {
+    const amount = parseFloat(text.substring(0, text.length - 2));
+    if (!isNaN(amount)) return (amount / 2).toString() + "px";
+  }
+  const amount = parseFloat(text);
+  if (!isNaN(amount)) return (amount / 2).toString() + "px";
+  return "6px";
+}
+
+function normalizedArrowOffset(position : string) : string {
+  const text = props.arrowOffset.toString();
+  if (text.length > 0) return formatSize(props.arrowOffset);
+  if (position == "left" || position == "right") return "14px";
+  return "24px";
+}
 
 const bgColor = computed(() => {
   return props.bgColor
@@ -112,11 +158,11 @@ const panelStyle = computed(() => {
     ";border-radius:" +
     formatSize(props.round) +
     ";z-index:" +
-    String(props.zIndex) +
+    (props.zIndex).toString() +
     ";transition-duration:" +
-    String(props.duration) +
+    (props.duration).toString() +
     "ms;";
-  const widthText = String(props.width);
+  const widthText = (props.width).toString();
   if (widthText.length > 0) {
     style = style + "width:" + formatSize(props.width) + ";";
   }
@@ -128,7 +174,7 @@ const contentStyle = computed(() => {
 });
 
 const outsideStyle = computed(() => {
-  return "z-index:" + String(Number(props.zIndex) - 1) + ";";
+  return "z-index:" + (parseFloat((props.zIndex).toString()) - 1).toString() + ";";
 });
 
 const arrowStyle = computed(() => {
@@ -137,7 +183,7 @@ const arrowStyle = computed(() => {
   const offset = normalizedArrowOffset(position);
   let style =
     "position:absolute;width:0;height:0;z-index:" +
-    String(Number(props.zIndex) + 1) +
+    (parseFloat((props.zIndex).toString()) + 1).toString() +
     ";";
 
   if (position == "bottom") {
@@ -216,94 +262,43 @@ const arrowStyle = computed(() => {
 });
 
 watch(
-  () => props.show,
-  (value) => {
+  () : boolean => props.show,
+  (value : boolean) : void => {
     innerShow.value = value;
   },
 );
 
-function normalizedPosition() {
-  if (props.position == "bottom") return "bottom";
-  if (props.position == "left") return "left";
-  if (props.position == "right") return "right";
-  if (props.position == "auto") return "bottom";
-  return "top";
+function openPopover() : void {
+  if (props.disabled) return;
+  innerShow.value = true;
+  emit("update:show", true);
 }
 
-function normalizedArrowOffset(position): string {
-  const text = String(props.arrowOffset);
-  if (text.length > 0) return formatSize(props.arrowOffset);
-  if (position == "left" || position == "right") return "14px";
-  return "24px";
+function hide() : void {
+  innerShow.value = false;
+  emit("update:show", false);
 }
 
-function formatSize(value): string {
-  const text = String(value);
-  if (
-    text.indexOf("px") >= 0 ||
-    text.indexOf("rpx") >= 0 ||
-    text.indexOf("%") >= 0 ||
-    text == "auto"
-  ) {
-    return text;
-  }
-  return text + "px";
+function toggle() : void {
+  if (props.disabled) return;
+  if (innerShow.value) hide();
+  else openPopover();
 }
 
-function formatBoxSize(value): string {
-  const text = String(value);
-  if (text.indexOf(" ") >= 0) return text;
-  return formatSize(value);
-}
-
-function formatHalfSize(value): string {
-  const text = String(value);
-  if (text.indexOf("rpx") == text.length - 3) {
-    const amount = Number(text.substring(0, text.length - 3));
-    if (amount == amount) return String(amount / 2) + "rpx";
-  }
-
-  if (text.indexOf("px") == text.length - 2) {
-    const amount = Number(text.substring(0, text.length - 2));
-    if (amount == amount) return String(amount / 2) + "px";
-  }
-
-  const amount = Number(text);
-  if (amount == amount) return String(amount / 2) + "px";
-  return "6px";
-}
-
-function toggleFromTrigger() {
+function toggleFromTrigger() : void {
   const now = Date.now();
   if (now - lastToggleTime.value < 280) return;
   lastToggleTime.value = now;
   toggle();
 }
 
-function toggle() {
-  if (props.disabled) return;
-  if (innerShow.value) hide();
-  else show();
-}
-
-function show() {
-  if (props.disabled) return;
-  innerShow.value = true;
-  emit("update:show", true);
-}
-
-function hide() {
-  innerShow.value = false;
-  emit("update:show", false);
-}
-
-function handleOutsideClick() {
+function handleOutsideClick() : void {
   if (!props.closeOnClickOutside) return;
   if (!innerShow.value) return;
   hide();
 }
 
-defineExpose({ show, hide });
+defineExpose({ open: openPopover, hide });
 </script>
 
 <style>

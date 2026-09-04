@@ -6,6 +6,10 @@ function formatTimes(timestamp) {
   const d = new Date(timestamp);
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
+function formatTimesToMinute(timestamp) {
+  const d = new Date(timestamp);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 function parseLocalDateTime(timestamp) {
   var _a, _b, _c, _d, _e, _f;
   const match = timestamp.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/);
@@ -36,6 +40,7 @@ function formatLocalTime(timestamp) {
 }
 exports.formatLocalTime = formatLocalTime;
 exports.formatTimes = formatTimes;
+exports.formatTimesToMinute = formatTimesToMinute;
 exports.normalizeLocalDateTime = normalizeLocalDateTime;
 exports.parseLocalDateTime = parseLocalDateTime;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/utils/formateTime.js.map

@@ -15,7 +15,7 @@ import kotlin.properties.Delegates
 open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
     constructor(__ins: ComponentInternalInstance) : super(__ins) {}
     open var name: String by `$props`
-    open var fontSize: String by `$props`
+    open var fontSize: Any by `$props`
     open var fontFamily: String by `$props`
     open var code: String by `$props`
     open var color: String by `$props`
@@ -24,7 +24,7 @@ open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
     open var rotation: Number by `$props`
     open var duration: Number by `$props`
     open var type: String by `$props`
-    open var size: String by `$props`
+    open var size: Any by `$props`
     open var plain: Boolean by `$props`
     open var bgColor: String by `$props`
     open var label: String by `$props`
@@ -41,15 +41,64 @@ open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
             }
             val spinAngle = ref(0)
             var spinTimer: Number = 0
-            fun gen_formatSize_fn(value: String): String {
-                if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("rem") >= 0 || value.indexOf("%") >= 0) {
-                    return value
+            fun gen_normalizeAngle_fn(value: Number): Number {
+                var angle = value % 360
+                if (angle < 0) {
+                    angle = angle + 360
                 }
-                return value + "px"
+                return angle
+            }
+            val normalizeAngle = ::gen_normalizeAngle_fn
+            fun gen_iconTypeColor_fn(): String {
+                if (props.type == "primary") {
+                    return "#2979ff"
+                }
+                if (props.type == "success") {
+                    return "#19be6b"
+                }
+                if (props.type == "warning") {
+                    return "#ff9900"
+                }
+                if (props.type == "danger") {
+                    return "#fa3534"
+                }
+                return "#303133"
+            }
+            val iconTypeColor = ::gen_iconTypeColor_fn
+            fun gen_formatSize_fn(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
             }
             val formatSize = ::gen_formatSize_fn
+            fun gen_startSpin_fn(): Unit {
+                if (spinTimer > 0) {
+                    return
+                }
+                spinTimer = setInterval(fun(): Unit {
+                    val duration = Math.max(120, parseFloat(props.duration.toString(10)))
+                    val step = Math.max(6, Math.round((18000 as Number) / duration))
+                    spinAngle.value = normalizeAngle(spinAngle.value + step)
+                }
+                , 50)
+            }
+            val startSpin = ::gen_startSpin_fn
+            fun gen_stopSpin_fn(): Unit {
+                if (spinTimer > 0) {
+                    clearInterval(spinTimer)
+                    spinTimer = 0
+                }
+                spinAngle.value = 0
+            }
+            val stopSpin = ::gen_stopSpin_fn
             val iconBgColor = computed(fun(): String {
                 return props.bgColor
+            }
+            )
+            val activeRotation = computed(fun(): Number {
+                return normalizeAngle(props.rotation + spinAngle.value)
             }
             )
             val remixCodeMap = __uts_large_remixCodeMap_build_0()
@@ -176,7 +225,7 @@ open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
             }
             )
             val normalizedSize = computed(fun(): String {
-                val value = props.size as String
+                val value = props.size.toString()
                 if (value == "mini" || value == "normal" || value == "large") {
                     return value
                 }
@@ -236,7 +285,7 @@ open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
             }
             )
             val resolvedFontSize = computed(fun(): String {
-                val value = props.size as String
+                val value = props.size.toString()
                 if (value == "mini") {
                     return "14px"
                 }
@@ -253,7 +302,7 @@ open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
             }
             )
             val badgeSize = computed(fun(): String {
-                val value = props.size as String
+                val value = props.size.toString()
                 if (value == "mini") {
                     return "26px"
                 }
@@ -266,10 +315,11 @@ open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
                 if (value.length > 0) {
                     return formatSize(value)
                 }
-                if (props.fontSize.length > 0) {
+                val numberSize = parseFloat(props.fontSize.toString())
+                if (isNaN(numberSize)) {
                     return formatSize(props.fontSize)
                 }
-                return "16px"
+                return formatSize(numberSize + 18)
             }
             )
             val wrapStyle = computed(fun(): String {
@@ -284,30 +334,6 @@ open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
                 return style
             }
             )
-            fun gen_iconTypeColor_fn(): String {
-                if (props.type == "primary") {
-                    return "#2979ff"
-                }
-                if (props.type == "success") {
-                    return "#19be6b"
-                }
-                if (props.type == "warning") {
-                    return "#ff9900"
-                }
-                if (props.type == "danger") {
-                    return "#fa3534"
-                }
-                return "#303133"
-            }
-            val iconTypeColor = ::gen_iconTypeColor_fn
-            val activeRotation = computed(fun(): Number {
-                var angle = (props.rotation + spinAngle.value) % 360
-                if (angle < 0) {
-                    angle = angle + 360
-                }
-                return angle
-            }
-            )
             val imageStyle = computed(fun(): String {
                 val size = resolvedFontSize.value
                 var style = "width:" + size + ";height:" + size + ";"
@@ -318,30 +344,6 @@ open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
                 return style
             }
             )
-            fun gen_startSpin_fn() {
-                if (spinTimer > 0) {
-                    return
-                }
-                spinTimer = setInterval(fun(){
-                    val duration = Math.max(120, props.duration)
-                    val step = Math.max(6, Math.round((18000 as Number) / duration))
-                    var angle = (spinAngle.value + step) % 360
-                    if (angle < 0) {
-                        angle = angle + 360
-                    }
-                    spinAngle.value = angle
-                }
-                , 50)
-            }
-            val startSpin = ::gen_startSpin_fn
-            fun gen_stopSpin_fn() {
-                if (spinTimer > 0) {
-                    clearInterval(spinTimer)
-                    spinTimer = 0
-                }
-                spinAngle.value = 0
-            }
-            val stopSpin = ::gen_stopSpin_fn
             val textStyle = computed(fun(): String {
                 var style = "font-size:" + resolvedFontSize.value + ";"
                 if (props.fontFamily.length > 0 && iconCode.value.length > 0) {
@@ -365,18 +367,40 @@ open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
                 return style
             }
             )
-            onMounted(fun(){
+            watch(fun(): Boolean {
+                return props.spin
+            }
+            , fun(nextValue: Boolean): Unit {
+                if (nextValue) {
+                    startSpin()
+                } else {
+                    stopSpin()
+                }
+            }
+            )
+            watch(fun(): Number {
+                return props.duration
+            }
+            , fun(): Unit {
+                if (props.spin) {
+                    stopSpin()
+                    startSpin()
+                }
+            }
+            )
+            onMounted(fun(): Unit {
                 if (props.spin) {
                     startSpin()
                 }
             }
             )
-            onUnmounted(fun(){
+            onUnmounted(fun(): Unit {
                 stopSpin()
             }
             )
-            fun gen_handleClick_fn() {
-                emit("click", _uO("name" to props.name, "code" to iconCode.value, "label" to props.label))
+            fun gen_handleClick_fn(): Unit {
+                val payload = IIconClickEvent(name = props.name, code = iconCode.value, label = props.label)
+                emit("click", payload)
             }
             val handleClick = ::gen_handleClick_fn
             return fun(): Any? {
@@ -404,7 +428,13 @@ open class GenUniModulesIUiXComponentsIIconIIcon : VueComponent {
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
         var emits: Map<String, Any?> = _uM("click" to null)
-        var props = _nP(_uM("name" to _uM("type" to "String", "default" to "home-3-fill"), "fontSize" to _uM("type" to "String", "default" to "16"), "fontFamily" to _uM("type" to "String", "default" to "remixicon"), "code" to _uM("type" to "String", "default" to ""), "color" to _uM("type" to "String", "default" to "black"), "darkColor" to _uM("type" to "String", "default" to ""), "spin" to _uM("type" to "Boolean", "default" to false), "rotation" to _uM("type" to "Number", "default" to 0), "duration" to _uM("type" to "Number", "default" to 1500), "type" to _uM("type" to "String", "default" to ""), "size" to _uM("type" to "String", "default" to ""), "plain" to _uM("type" to "Boolean", "default" to false), "bgColor" to _uM("type" to "String", "default" to ""), "label" to _uM("type" to "String", "default" to ""), "customStyle" to _uM("type" to "String", "default" to "")))
+        var props = _nP(_uM("name" to _uM("type" to "String", "default" to "home-3-fill"), "fontSize" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to "16"), "fontFamily" to _uM("type" to "String", "default" to "remixicon"), "code" to _uM("type" to "String", "default" to ""), "color" to _uM("type" to "String", "default" to "black"), "darkColor" to _uM("type" to "String", "default" to ""), "spin" to _uM("type" to "Boolean", "default" to false), "rotation" to _uM("type" to "Number", "default" to 0), "duration" to _uM("type" to "Number", "default" to 1500), "type" to _uM("type" to "String", "default" to ""), "size" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to ""), "plain" to _uM("type" to "Boolean", "default" to false), "bgColor" to _uM("type" to "String", "default" to ""), "label" to _uM("type" to "String", "default" to ""), "customStyle" to _uM("type" to "String", "default" to "")))
         var propsNeedCastKeys = _uA(
             "name",
             "fontSize",

@@ -79,7 +79,7 @@ open class GenPagesAddCarAddCar : BasePage {
                 ensureCameraPermission(handleCameraPermission)
             }
             val handleScanResult = fun(data: ScanResultData){
-                console.log("接收到扫码结果:", data.result, " at pages/addCar/addCar.uvue:159")
+                console.log("接收到扫码结果:", data.result, " at pages/addCar/addCar.uvue:168")
                 if (data.result.length == 15) {
                     carInfo.value.imei = "0" + data.result.slice(4, 15)
                     return
@@ -96,7 +96,7 @@ open class GenPagesAddCarAddCar : BasePage {
             val selectIcon = fun(item: CarIconItem__1){
                 val name = item.getString("name", "")
                 val text = item.getString("text", "")
-                console.log(name, " at pages/addCar/addCar.uvue:182")
+                console.log(name, " at pages/addCar/addCar.uvue:191")
                 carInfo.value.deviceType = name
                 carInfo.value.deviceTypeValue = text
                 carIconSelectorVisible.value = false
@@ -120,18 +120,18 @@ open class GenPagesAddCarAddCar : BasePage {
             }
             val submit = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log("=== 开始提交设备 ===", " at pages/addCar/addCar.uvue:219")
+                        console.log("=== 开始提交设备 ===", " at pages/addCar/addCar.uvue:228")
                         try {
                             if (!validateForm()) {
                                 return@w1
                             }
-                            console.log("✅ 表单验证通过", " at pages/addCar/addCar.uvue:224")
+                            console.log("✅ 表单验证通过", " at pages/addCar/addCar.uvue:233")
                             loading.value = true
                             uni_showLoading(ShowLoadingOptions(title = "添加中...", mask = true))
-                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 232, 10), "deviceName" to carInfo.value.deviceName, "imei" to carInfo.value.imei, "carType" to carInfo.value.deviceType, "plateNo" to carInfo.value.plateNo)
-                            console.log("📤 提交数据:", submitData, " at pages/addCar/addCar.uvue:239")
+                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 241, 10), "deviceName" to carInfo.value.deviceName, "imei" to carInfo.value.imei, "carType" to carInfo.value.deviceType, "plateNo" to carInfo.value.plateNo)
+                            console.log("📤 提交数据:", submitData, " at pages/addCar/addCar.uvue:248")
                             val res = await(addDevice(submitData))
-                            console.log("✅ 添加设备返回:", res, " at pages/addCar/addCar.uvue:242")
+                            console.log("✅ 添加设备返回:", res, " at pages/addCar/addCar.uvue:251")
                             uni_hideLoading(null)
                             loading.value = false
                             if (res.code == 200) {
@@ -151,7 +151,7 @@ open class GenPagesAddCarAddCar : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("❌ 添加设备失败:", error, " at pages/addCar/addCar.uvue:269")
+                            console.error("❌ 添加设备失败:", error, " at pages/addCar/addCar.uvue:278")
                             uni_hideLoading(null)
                             loading.value = false
                             showAppToast(ShowToastOptions(title = "添加设备失败", icon = "none"))

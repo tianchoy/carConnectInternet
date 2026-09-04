@@ -77,4 +77,6 @@ export function openCameraPermissionSettings(): void {
         __f__('error', 'at utils/cameraPermission.uts:110', '❌ [openCameraPermissionSettings] 打开权限设置失败:', error);
     }
 }
+// ===== 微信小程序相机权限 =====
+// ===== 其他非 Android 平台权限兜底 =====
 //# sourceMappingURL=cameraPermission.uts.map

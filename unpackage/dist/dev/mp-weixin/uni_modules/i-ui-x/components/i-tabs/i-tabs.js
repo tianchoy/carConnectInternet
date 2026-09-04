@@ -1,39 +1,20 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-class TabPayload extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          index: { type: Number, optional: false },
-          name: { type: String, optional: false },
-          value: { type: String, optional: false },
-          item: { type: "Any", optional: false }
-        };
-      },
-      name: "TabPayload"
-    };
-  }
-  constructor(options, metadata = TabPayload.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.index = this.__props__.index;
-    this.name = this.__props__.name;
-    this.value = this.__props__.value;
-    this.item = this.__props__.item;
-    delete this.__props__;
-  }
-}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ name: "i-tabs" }, { __name: "i-tabs", props: {
   value: { type: [String, Number], default: "" },
   current: { type: Number, default: -1 },
-  list: { type: Array, default() {
-    return [];
-  } },
-  items: { type: Array, default() {
-    return ["关注", "推荐", "热榜", "本地"];
-  } },
+  list: {
+    type: Array,
+    default() {
+      return [];
+    }
+  },
+  items: {
+    type: Array,
+    default() {
+      return ["关注", "推荐", "热榜", "本地"];
+    }
+  },
   scrollable: { type: Boolean, default: false },
   activeColor: { type: String, default: "#2979ff" },
   inactiveColor: { type: String, default: "#606266" },
@@ -48,118 +29,89 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   var __emit = _a.emit;
   const props = __props;
   const emit = __emit;
-  function formatSize(value) {
+  function formatSize(value = null) {
     const text = value.toString();
     if (text == "auto" || text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
       return text;
     return text + "px";
   }
-  function numericSize(value) {
-    const text = value.toString().replace("px", "").replace("rpx", "").replace("%", "");
-    const parsed = parseFloat(text);
-    return isNaN(parsed) ? 0 : Number.from(parsed);
-  }
-  function configuredList() {
-    const configured = props.list;
-    if (configured != null && configured.length > 0)
-      return configured;
-    const fallback = props.items;
-    return fallback != null ? fallback : [];
-  }
-  function itemValue(item = null, keyName) {
-    if (item == null)
-      return "";
-    if (typeof item == "object") {
-      const value = item[keyName];
-      return value == null ? "" : value.toString();
-    }
-    if (keyName == "name" || keyName == "text" || keyName == "value")
-      return item.toString();
-    return "";
-  }
-  function itemBoolean(item = null, keyName) {
-    if (item == null || typeof item != "object")
-      return false;
-    const value = item[keyName];
-    return value === true || value === 1 || value === "1" || value === "true";
-  }
-  function getItemName(item = null) {
-    const name = itemValue(item, "name");
-    return name.length > 0 ? name : itemValue(item, "text");
-  }
-  function getItemValue(item = null) {
-    const value = itemValue(item, "value");
-    return value.length > 0 ? value : getItemName(item);
-  }
-  function isItemDisabled(item = null) {
-    return itemBoolean(item, "disabled");
-  }
-  function isItemDot(item = null) {
-    return itemBoolean(item, "dot");
-  }
-  function getItemBadge(item = null) {
-    return itemValue(item, "badge");
-  }
-  function resolveScrollableItemWidth() {
-    const size = numericSize(props.itemWidth);
-    return size > 0 ? size : 92;
-  }
-  function resolveIndex() {
-    if (props.current >= 0)
-      return props.current;
-    const expected = props.value.toString();
-    const items = configuredList();
-    for (let index = 0; index < items.length; index++) {
-      const item = items[index];
-      if (getItemValue(item) == expected || getItemName(item) == expected)
-        return index;
-    }
-    return 0;
-  }
-  function getItemStyle(index) {
-    if (props.scrollable)
-      return "width:" + resolveScrollableItemWidth().toString() + "px;";
-    const width = formatSize(props.itemWidth);
-    return width == "auto" ? "" : "width:" + width + ";";
-  }
-  function buildPayload(item = null, index) {
-    return new TabPayload({ index, name: getItemName(item), value: getItemValue(item), item });
+  function numericSize(value = null) {
+    const text = value.toString();
+    const numberValue = parseFloat(text.replace("px", "").replace("rpx", "").replace("%", "").toString());
+    if (isNaN(numberValue))
+      return 0;
+    return numberValue;
   }
   const bgColor = common_vendor.computed(() => {
     return props.bgColor;
   });
   const list = common_vendor.computed(() => {
-    return configuredList();
+    const source = props.list;
+    if (source != null && source.length > 0)
+      return source;
+    const items = props.items;
+    if (items != null)
+      return items;
+    const empty = [];
+    return empty;
   });
+  function itemValue(item = null, keyName) {
+    if (item == null)
+      return "";
+    if (typeof item == "object") {
+      const value = item[keyName];
+      if (value == null)
+        return "";
+      return value.toString();
+    }
+    if (keyName == "name" || keyName == "text" || keyName == "value")
+      return item.toString();
+    return "";
+  }
+  function getItemName(item = null) {
+    const name = itemValue(item, "name");
+    if (name.length > 0)
+      return name;
+    return itemValue(item, "text");
+  }
+  function getItemValue(item = null) {
+    const value = itemValue(item, "value");
+    if (value.length > 0)
+      return value;
+    return getItemName(item);
+  }
+  function resolveIndex() {
+    if (props.current >= 0)
+      return props.current;
+    const expected = props.value.toString();
+    for (let i = 0; i < list.value.length; i++) {
+      const item = list.value[i];
+      if (getItemValue(item) == expected || getItemName(item) == expected)
+        return i;
+    }
+    return 0;
+  }
   const currentIndex = common_vendor.ref(resolveIndex());
   const scrollIntoView = common_vendor.ref("i-tabs-item-" + currentIndex.value.toString());
-  function getItemClass(item = null, index) {
-    let className = currentIndex.value == index ? "i-tabs__item i-tabs__item--active" : "i-tabs__item";
-    if (isItemDisabled(item))
-      className += " i-tabs__item--disabled";
-    return className;
-  }
-  function getTextStyle(item = null, index) {
-    const color = currentIndex.value == index ? props.activeColor : props.inactiveColor;
-    return "font-size:" + formatSize(props.fontSize) + ";color:" + (isItemDisabled(item) ? "#c8c9cc" : color) + ";";
-  }
-  function select(item = null, index) {
-    if (props.disabled || isItemDisabled(item))
-      return null;
-    const payload = buildPayload(item, index);
-    emit("click", payload);
-    if (currentIndex.value == index)
-      return null;
-    currentIndex.value = index;
-    scrollIntoView.value = "i-tabs-item-" + index.toString();
-    emit("select", payload);
-    emit("change", payload);
-    emit("update:value", payload.value);
-    emit("update:current", index);
+  function resolveScrollableItemWidth() {
+    const size = numericSize(props.itemWidth);
+    if (size > 0)
+      return size;
+    return 92;
   }
   const navStyle = common_vendor.computed(() => {
-    return props.scrollable ? "width:" + (resolveScrollableItemWidth() * list.value.length).toString() + "px;" : "";
+    if (!props.scrollable)
+      return "";
+    return "width:" + (resolveScrollableItemWidth() * list.value.length).toString() + "px;";
   });
+  function getItemStyle(index) {
+    if (props.scrollable)
+      return "width:" + resolveScrollableItemWidth().toString() + "px;";
+    const width = formatSize(props.itemWidth);
+    if (width == "auto")
+      return "";
+    return "width:" + width + ";";
+  }
   const barStyle = common_vendor.computed(() => {
     return "width:" + formatSize(props.lineWidth) + ";height:" + formatSize(props.lineHeight) + ";background-color:" + props.activeColor + ";";
   });
@@ -175,6 +127,56 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     currentIndex.value = resolveIndex();
     scrollIntoView.value = "i-tabs-item-" + currentIndex.value.toString();
   });
+  function isItemDisabled(item = null) {
+    if (item == null)
+      return false;
+    if (typeof item == "object")
+      return item["disabled"] == true;
+    return false;
+  }
+  function isItemDot(item = null) {
+    if (item == null)
+      return false;
+    if (typeof item == "object")
+      return item["dot"] == true;
+    return false;
+  }
+  function getItemBadge(item = null) {
+    return itemValue(item, "badge");
+  }
+  function buildPayload(item = null, index) {
+    return new common_vendor.UTSJSONObject({
+      index,
+      name: getItemName(item),
+      value: getItemValue(item),
+      item
+    });
+  }
+  function getItemClass(item = null, index) {
+    let className = currentIndex.value == index ? "i-tabs__item i-tabs__item--active" : "i-tabs__item";
+    if (isItemDisabled(item))
+      className += " i-tabs__item--disabled";
+    return className;
+  }
+  function getTextStyle(item = null, index) {
+    const color = currentIndex.value == index ? props.activeColor : props.inactiveColor;
+    const realColor = isItemDisabled(item) ? "#c8c9cc" : color;
+    return "font-size:" + formatSize(props.fontSize) + ";color:" + realColor + ";";
+  }
+  function select(item = null, index) {
+    if (props.disabled || isItemDisabled(item))
+      return null;
+    const payload = buildPayload(item, index);
+    emit("click", payload);
+    if (currentIndex.value == index)
+      return null;
+    currentIndex.value = index;
+    scrollIntoView.value = "i-tabs-item-" + index.toString();
+    emit("select", payload);
+    emit("change", payload);
+    emit("update:value", payload.value);
+    emit("update:current", index);
+  }
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = {

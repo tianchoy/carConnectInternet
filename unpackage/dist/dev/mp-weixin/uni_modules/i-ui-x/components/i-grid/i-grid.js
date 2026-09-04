@@ -67,43 +67,45 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   var __emit = _a.emit;
   const props = __props;
   const emit = __emit;
-  function valueText(value = null) {
-    if (typeof value == "string")
-      return value;
-    if (typeof value == "number" || typeof value == "boolean")
-      return value.toString();
-    return "";
-  }
-  function formatSize(value) {
+  function formatSize(value = null) {
     const text = value.toString();
-    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0 || text == "auto") {
+    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0 || text == "auto")
       return text;
-    }
     return text + "px";
   }
+  const bgColor = common_vendor.computed(() => {
+    return props.bgColor;
+  });
+  const selected = common_vendor.ref(-1);
+  const gridStyle = common_vendor.computed(() => {
+    return "width:" + props.width + ";background-color:" + bgColor.value + ";border-radius:" + formatSize(props.round) + ";";
+  });
   function itemValue(item = null, keyName) {
-    if (item == null || typeof item != "object")
+    if (item == null)
       return "";
-    const values = item;
-    const value = values[keyName];
-    if (value == null)
-      return "";
-    return valueText(value);
+    if (typeof item == "object") {
+      const serialized = common_vendor.UTS.JSON.stringify(item);
+      const object = common_vendor.UTS.JSON.parse(serialized);
+      const value = object[keyName];
+      if (value == null)
+        return "";
+      return value.toString();
+    }
+    return "";
   }
   function getItemText(item = null) {
     const text = itemValue(item, "text");
     if (text.length > 0)
       return text;
-    return valueText(item);
+    if (item == null)
+      return "";
+    return item.toString();
   }
   function getItemIcon(item = null) {
     return itemValue(item, "icon");
   }
   function getItemImage(item = null) {
     return itemValue(item, "image");
-  }
-  function getItemName(item = null) {
-    return itemValue(item, "name");
   }
   function getItemBgColor(item = null) {
     const color = itemValue(item, "bgColor");
@@ -123,22 +125,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return color;
     return props.textColor;
   }
-  function getItemUrl(item = null) {
-    return itemValue(item, "url");
-  }
-  const bgColor = common_vendor.computed(() => {
-    return props.bgColor;
-  });
-  const gridItems = common_vendor.computed(() => {
-    const items = props.items;
-    if (items == null)
-      return [];
-    return items;
-  });
-  const selected = common_vendor.ref(-1);
-  const gridStyle = common_vendor.computed(() => {
-    return "width:" + props.width + ";background-color:" + bgColor.value + ";border-radius:" + formatSize(props.round) + ";";
-  });
   function getColumns() {
     if (props.col <= 1)
       return 1;
@@ -146,12 +132,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return 6;
     return props.col;
   }
+  function getItemCount() {
+    const items = props.items;
+    return items == null ? 0 : items.length;
+  }
   function getRows() {
     const columns = getColumns();
-    const items = props.items;
-    if (items == null)
-      return 0;
-    return Math.ceil(items.length / columns);
+    return Math.ceil(getItemCount() / columns);
   }
   function getItemWidth() {
     const columns = getColumns();
@@ -192,27 +179,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   function getTextStyle(item = null) {
     return "color:" + getItemTextColor(item) + ";font-size:" + formatSize(props.fontSize) + ";";
   }
-  function buildPayload(item = null, index) {
-    return new common_vendor.UTSJSONObject({
-      index,
-      name: getItemName(item),
-      text: getItemText(item),
-      icon: getItemIcon(item),
-      image: getItemImage(item),
-      url: getItemUrl(item)
-    });
-  }
   function select(item = null, index) {
     selected.value = index;
-    const payload = buildPayload(item, index);
-    emit("select", payload);
-    emit("change", payload);
-    emit("click", payload);
+    emit("select", item);
+    emit("change", item);
+    emit("click", item);
   }
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = {
-      a: common_vendor.f(gridItems.value, (item, index, i0) => {
+      a: common_vendor.f(__props.items, (item, index, i0) => {
         return common_vendor.e({
           a: getItemImage(item).length > 0
         }, getItemImage(item).length > 0 ? {

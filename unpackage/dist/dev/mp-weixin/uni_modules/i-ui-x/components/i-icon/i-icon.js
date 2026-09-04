@@ -1,12 +1,35 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
+class IIconClickEvent extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: String, optional: false },
+          code: { type: String, optional: false },
+          label: { type: String, optional: false }
+        };
+      },
+      name: "IIconClickEvent"
+    };
+  }
+  constructor(options, metadata = IIconClickEvent.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    this.code = this.__props__.code;
+    this.label = this.__props__.label;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
   name: {
     type: String,
     default: "home-3-fill"
   },
   fontSize: {
-    type: String,
+    type: [String, Number],
     default: "16"
   },
   fontFamily: {
@@ -42,7 +65,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     default: ""
   },
   size: {
-    type: String,
+    type: [String, Number],
     default: ""
   },
   plain: {
@@ -67,14 +90,51 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   const emit = __emit;
   const spinAngle = common_vendor.ref(0);
   let spinTimer = 0;
-  function formatSize(value) {
-    if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("rem") >= 0 || value.indexOf("%") >= 0) {
-      return value;
+  function normalizeAngle(value) {
+    let angle = value % 360;
+    if (angle < 0)
+      angle = angle + 360;
+    return angle;
+  }
+  function iconTypeColor() {
+    if (props.type == "primary")
+      return "#2979ff";
+    if (props.type == "success")
+      return "#19be6b";
+    if (props.type == "warning")
+      return "#ff9900";
+    if (props.type == "danger")
+      return "#fa3534";
+    return "#303133";
+  }
+  function formatSize(value = null) {
+    const text = value.toString();
+    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0) {
+      return text;
     }
-    return value + "px";
+    return text + "px";
+  }
+  function startSpin() {
+    if (spinTimer > 0)
+      return null;
+    spinTimer = setInterval(() => {
+      const duration = Math.max(120, parseFloat(props.duration.toString()));
+      const step = Math.max(6, Math.round(360 * 50 / duration));
+      spinAngle.value = normalizeAngle(spinAngle.value + step);
+    }, 50);
+  }
+  function stopSpin() {
+    if (spinTimer > 0) {
+      clearInterval(spinTimer);
+      spinTimer = 0;
+    }
+    spinAngle.value = 0;
   }
   const iconBgColor = common_vendor.computed(() => {
     return props.bgColor;
+  });
+  const activeRotation = common_vendor.computed(() => {
+    return normalizeAngle(props.rotation + spinAngle.value);
   });
   const remixCodeMap = /* @__PURE__ */ new Map([
     ["home-3-fill", "ee1a"],
@@ -159,7 +219,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return props.name;
   });
   const normalizedSize = common_vendor.computed(() => {
-    const value = props.size;
+    const value = props.size.toString();
     if (value == "mini" || value == "normal" || value == "large")
       return value;
     if (value.length > 0)
@@ -200,7 +260,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return classes.join(" ");
   });
   const resolvedFontSize = common_vendor.computed(() => {
-    const value = props.size;
+    const value = props.size.toString();
     if (value == "mini")
       return "14px";
     if (value == "normal")
@@ -212,7 +272,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return formatSize(props.fontSize);
   });
   const badgeSize = common_vendor.computed(() => {
-    const value = props.size;
+    const value = props.size.toString();
     if (value == "mini")
       return "26px";
     if (value == "normal")
@@ -221,9 +281,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return "44px";
     if (value.length > 0)
       return formatSize(value);
-    if (props.fontSize.length > 0)
+    const numberSize = parseFloat(props.fontSize.toString());
+    if (isNaN(numberSize))
       return formatSize(props.fontSize);
-    return "16px";
+    return formatSize(numberSize + 18);
   });
   const wrapStyle = common_vendor.computed(() => {
     let style = props.customStyle;
@@ -236,23 +297,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     }
     return style;
   });
-  function iconTypeColor() {
-    if (props.type == "primary")
-      return "#2979ff";
-    if (props.type == "success")
-      return "#19be6b";
-    if (props.type == "warning")
-      return "#ff9900";
-    if (props.type == "danger")
-      return "#fa3534";
-    return "#303133";
-  }
-  const activeRotation = common_vendor.computed(() => {
-    let angle = (props.rotation + spinAngle.value) % 360;
-    if (angle < 0)
-      angle = angle + 360;
-    return angle;
-  });
   const imageStyle = common_vendor.computed(() => {
     const size = resolvedFontSize.value;
     let style = "width:" + size + ";height:" + size + ";";
@@ -261,25 +305,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       style = style + "transform:rotate(" + angle.toString() + "deg);";
     return style;
   });
-  function startSpin() {
-    if (spinTimer > 0)
-      return null;
-    spinTimer = setInterval(() => {
-      const duration = Math.max(120, props.duration);
-      const step = Math.max(6, Math.round(360 * 50 / duration));
-      let angle = (spinAngle.value + step) % 360;
-      if (angle < 0)
-        angle = angle + 360;
-      spinAngle.value = angle;
-    }, 50);
-  }
-  function stopSpin() {
-    if (spinTimer > 0) {
-      clearInterval(spinTimer);
-      spinTimer = 0;
-    }
-    spinAngle.value = 0;
-  }
   const textStyle = common_vendor.computed(() => {
     let style = "font-size:" + resolvedFontSize.value + ";";
     if (props.fontFamily.length > 0 && iconCode.value.length > 0) {
@@ -296,6 +321,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       style = style + "transform:rotate(" + angle.toString() + "deg);";
     return style;
   });
+  common_vendor.watch(() => {
+    return props.spin;
+  }, (nextValue) => {
+    if (nextValue) {
+      startSpin();
+    } else {
+      stopSpin();
+    }
+  });
+  common_vendor.watch(() => {
+    return props.duration;
+  }, () => {
+    if (props.spin) {
+      stopSpin();
+      startSpin();
+    }
+  });
   common_vendor.onMounted(() => {
     if (props.spin)
       startSpin();
@@ -304,11 +346,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     stopSpin();
   });
   function handleClick() {
-    emit("click", new common_vendor.UTSJSONObject({
+    const payload = new IIconClickEvent({
       name: props.name,
       code: iconCode.value,
       label: props.label
-    }));
+    });
+    emit("click", payload);
   }
   return (_ctx, _cache) => {
     "raw js";

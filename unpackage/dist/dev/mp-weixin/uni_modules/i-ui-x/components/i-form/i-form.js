@@ -8,6 +8,152 @@ const _easycom_i_button = () => "../i-button/i-button.js";
 if (!Math) {
   _easycom_i_button();
 }
+class IFormField extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: String, optional: false },
+          label: { type: String, optional: false },
+          value: { type: "Any", optional: true },
+          hasValue: { type: Boolean, optional: false },
+          required: { type: Boolean, optional: false },
+          message: { type: String, optional: false }
+        };
+      },
+      name: "IFormField"
+    };
+  }
+  constructor(options, metadata = IFormField.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    this.label = this.__props__.label;
+    this.value = this.__props__.value;
+    this.hasValue = this.__props__.hasValue;
+    this.required = this.__props__.required;
+    this.message = this.__props__.message;
+    delete this.__props__;
+  }
+}
+class IFormError extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          field: { type: String, optional: false },
+          message: { type: String, optional: false }
+        };
+      },
+      name: "IFormError"
+    };
+  }
+  constructor(options, metadata = IFormError.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.field = this.__props__.field;
+    this.message = this.__props__.message;
+    delete this.__props__;
+  }
+}
+class IFormValidatePayload extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          valid: { type: Boolean, optional: false },
+          message: { type: String, optional: false },
+          errors: { type: "Unknown", optional: false },
+          values: { type: "Unknown", optional: false }
+        };
+      },
+      name: "IFormValidatePayload"
+    };
+  }
+  constructor(options, metadata = IFormValidatePayload.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.valid = this.__props__.valid;
+    this.message = this.__props__.message;
+    this.errors = this.__props__.errors;
+    this.values = this.__props__.values;
+    delete this.__props__;
+  }
+}
+class IFormSubmitPayload extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          valid: { type: Boolean, optional: false },
+          values: { type: "Unknown", optional: false },
+          errors: { type: "Unknown", optional: false },
+          message: { type: String, optional: false }
+        };
+      },
+      name: "IFormSubmitPayload"
+    };
+  }
+  constructor(options, metadata = IFormSubmitPayload.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.valid = this.__props__.valid;
+    this.values = this.__props__.values;
+    this.errors = this.__props__.errors;
+    this.message = this.__props__.message;
+    delete this.__props__;
+  }
+}
+class IFormResetPayload extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          values: { type: "Unknown", optional: false }
+        };
+      },
+      name: "IFormResetPayload"
+    };
+  }
+  constructor(options, metadata = IFormResetPayload.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.values = this.__props__.values;
+    delete this.__props__;
+  }
+}
+class IFormScrollPayload extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          field: { type: String, optional: false },
+          targetId: { type: String, optional: false },
+          selector: { type: String, optional: false },
+          offsetTop: { type: Number, optional: false },
+          duration: { type: Number, optional: false }
+        };
+      },
+      name: "IFormScrollPayload"
+    };
+  }
+  constructor(options, metadata = IFormScrollPayload.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.field = this.__props__.field;
+    this.targetId = this.__props__.targetId;
+    this.selector = this.__props__.selector;
+    this.offsetTop = this.__props__.offsetTop;
+    this.duration = this.__props__.duration;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ name: "i-form" }, { __name: "i-form", props: {
   modelValue: {
     type: Object,
@@ -71,17 +217,99 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     type: Boolean,
     default: false
   }
-}, emits: [
-  "submit",
-  "reset",
-  "validate",
-  "scroll-to-error",
-  "update:modelValid",
-  "update:valid"
-], setup(__props, _a) {
+}, emits: ["submit", "reset", "validate", "scroll-to-error", "update:modelValid", "update:valid"], setup(__props, _a) {
   var __expose = _a.expose, __emit = _a.emit;
   const props = __props;
   const emit = __emit;
+  function objectText(object, keyName) {
+    const value = object[keyName];
+    return value == null ? "" : value.toString();
+  }
+  function normalizeField(raw = null) {
+    if (raw == null || typeof raw != "object")
+      return null;
+    const object = raw;
+    const value = object["value"];
+    return {
+      name: objectText(object, "name"),
+      label: objectText(object, "label"),
+      value,
+      hasValue: value != null,
+      required: object["required"] == true,
+      message: objectText(object, "message")
+    };
+  }
+  function normalizeFields(value = null) {
+    const result = [];
+    if (value == null)
+      return result;
+    for (let i = 0; i < value.length; i++) {
+      const field = normalizeField(value[i]);
+      if (field != null)
+        result.push(field);
+    }
+    return result;
+  }
+  function activeFields() {
+    const fields = normalizeFields(props.fields);
+    if (fields.length > 0)
+      return fields;
+    return normalizeFields(props.rules);
+  }
+  function modelFieldValue(name) {
+    const model = props.modelValue;
+    if (model == null || typeof model != "object")
+      return null;
+    return model[name];
+  }
+  function fieldValue(item) {
+    const configuredValue = item.value;
+    if (item.hasValue && configuredValue != null)
+      return configuredValue;
+    if (item.name.length == 0)
+      return "";
+    const value = modelFieldValue(item.name);
+    return value == null ? "" : value;
+  }
+  function fieldLabel(item) {
+    const label = item.label.length > 0 ? item.label : item.name;
+    return label.length > 0 ? label : "字段";
+  }
+  function fieldMessage(item) {
+    if (item.message.length > 0)
+      return item.message;
+    return fieldLabel(item) + "不能为空";
+  }
+  function checkField(item, selectedKeys) {
+    if (selectedKeys.length > 0 && selectedKeys.indexOf(item.name) < 0)
+      return "";
+    const value = fieldValue(item);
+    if (item.required && value.toString().length == 0)
+      return fieldMessage(item);
+    return "";
+  }
+  function collectValues() {
+    const values = new common_vendor.UTSJSONObject({});
+    const list = activeFields();
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i];
+      if (item.name.length > 0)
+        values[item.name] = fieldValue(item);
+    }
+    return values;
+  }
+  function normalizeIdName(name) {
+    const allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+    let result = "";
+    for (let i = 0; i < name.length; i++) {
+      const char = name.charAt(i);
+      result += allowed.indexOf(char) >= 0 ? char : "-";
+    }
+    return result;
+  }
+  function scrollTargetId(name) {
+    return props.scrollIdPrefix + normalizeIdName(name);
+  }
   const valid = common_vendor.ref(true);
   const message = common_vendor.ref("");
   const errors = common_vendor.ref([]);
@@ -97,123 +325,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   const messageStyle = common_vendor.computed(() => {
     return "text-align:" + props.errorAlign + ";";
   });
-  function valueText(value = null) {
-    if (typeof value == "string")
-      return value;
-    if (typeof value == "number" || typeof value == "boolean")
-      return value.toString();
-    if (Array.isArray(value)) {
-      const list = value;
-      return list.join(",");
-    }
-    if (value != null && typeof value == "object")
-      return "[object Object]";
-    return "";
-  }
-  function activeFields() {
-    const fields = props.fields;
-    if (fields != null && fields.length > 0)
-      return fields;
-    const rules = props.rules;
-    if (rules != null)
-      return rules;
-    return [];
-  }
-  function fieldValue(item) {
-    const configuredValue = item["value"];
-    if (configuredValue != null)
-      return configuredValue;
-    const name = item.getString("name", "");
-    if (name.length == 0)
-      return "";
-    const values = props.modelValue;
-    if (values != null) {
-      const modelValue = values[name];
-      if (modelValue != null)
-        return modelValue;
-    }
-    return "";
-  }
-  function fieldLabel(item) {
-    const label = item.getString("label", item.getString("name", ""));
-    return label.length > 0 ? label : "字段";
-  }
-  function fieldRequired(item) {
-    return item.getBoolean("required", false);
-  }
-  function fieldMessage(item) {
-    const customMessage = item.getString("message", "");
-    if (customMessage.length > 0)
-      return customMessage;
-    return fieldLabel(item) + "不能为空";
-  }
-  function checkField(item, selectedKeys) {
-    const name = item.getString("name", "");
-    if (selectedKeys.length > 0 && selectedKeys.indexOf(name) < 0)
-      return "";
-    const value = fieldValue(item);
-    if (fieldRequired(item) && valueText(value).length == 0) {
-      return fieldMessage(item);
-    }
-    return "";
-  }
-  function collectValues() {
-    const values = new common_vendor.UTSJSONObject({});
-    const list = activeFields();
-    for (let i = 0; i < list.length; i++) {
-      const item = list[i];
-      const name = item.getString("name", "");
-      if (name.length > 0)
-        values[name] = fieldValue(item);
-    }
-    return values;
-  }
-  function numberValue(value) {
-    if (typeof value == "number")
-      return value;
-    return Number.from(parseFloat(value));
-  }
-  function normalizeIdName(name) {
-    let result = "";
-    for (let i = 0; i < name.length; i++) {
-      const char = name.charAt(i);
-      const isNumber = char >= "0" && char <= "9";
-      const isUpper = char >= "A" && char <= "Z";
-      const isLower = char >= "a" && char <= "z";
-      if (isNumber || isUpper || isLower || char == "-" || char == "_") {
-        result = result + char;
-      } else {
-        result = result + "-";
-      }
-    }
-    return result;
-  }
-  function scrollTargetId(name) {
-    return props.scrollIdPrefix + normalizeIdName(name);
-  }
   function scrollToFirstError(nextErrors) {
     if (!props.errorAutoPage || nextErrors.length == 0)
       return null;
-    const field = nextErrors[0].getString("field", "");
+    const field = nextErrors[0].field;
     if (field.length == 0)
       return null;
     const targetId = scrollTargetId(field);
     const selector = "#" + targetId;
-    const offsetTop = numberValue(props.scrollOffsetTop);
-    const duration = numberValue(props.scrollDuration);
-    emit("scroll-to-error", new common_vendor.UTSJSONObject({
+    const offsetTop = parseFloat(props.scrollOffsetTop.toString());
+    const duration = parseFloat(props.scrollDuration.toString());
+    const payload = new IFormScrollPayload({
       field,
       targetId,
       selector,
       offsetTop,
       duration
-    }));
+    });
+    emit("scroll-to-error", payload);
     common_vendor.nextTick$1(() => {
-      common_vendor.index.pageScrollTo(new common_vendor.UTSJSONObject({
-        selector,
-        offsetTop,
-        duration
-      }));
+      common_vendor.index.pageScrollTo(new common_vendor.UTSJSONObject({ selector, offsetTop, duration }));
     });
   }
   function validateFields(selectedKeys, silent) {
@@ -223,27 +354,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       const item = list[i];
       const errorMessage = checkField(item, selectedKeys);
       if (errorMessage.length > 0) {
-        nextErrors.push(new common_vendor.UTSJSONObject({
-          field: item.getString("name", ""),
-          message: errorMessage
-        }));
+        const error = new IFormError({ field: item.name, message: errorMessage });
+        nextErrors.push(error);
       }
     }
     errors.value = nextErrors;
     valid.value = nextErrors.length == 0;
     if (!silent) {
-      if (valid.value) {
-        message.value = "校验通过";
-      } else {
-        const firstError = nextErrors[0];
-        message.value = firstError.getString("message", "");
-      }
-      emit("validate", new common_vendor.UTSJSONObject({
+      message.value = valid.value ? "校验通过" : nextErrors[0].message.toString();
+      const payload = new IFormValidatePayload({
         valid: valid.value,
         message: message.value,
         errors: nextErrors,
         values: collectValues()
-      }));
+      });
+      emit("validate", payload);
       if (!valid.value)
         scrollToFirstError(nextErrors);
     }
@@ -269,7 +394,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   }
   function submit() {
     const isValid = validate();
-    const result = new common_vendor.UTSJSONObject({
+    const result = new IFormSubmitPayload({
       valid: isValid,
       values: collectValues(),
       errors: errors.value,
@@ -279,16 +404,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   }
   function reset() {
     clearValid();
-    emit("reset", new common_vendor.UTSJSONObject({
-      values: collectValues()
-    }));
+    const payload = new IFormResetPayload({ values: collectValues() });
+    emit("reset", payload);
   }
   common_vendor.watch(() => {
-    return [props.fields, props.rules, props.modelValue, props.watchValidStatus];
+    return props.fields;
   }, () => {
     if (props.watchValidStatus)
       validateFields([], true);
   }, { deep: true });
+  common_vendor.watch(() => {
+    return props.rules;
+  }, () => {
+    if (props.watchValidStatus)
+      validateFields([], true);
+  }, { deep: true });
+  common_vendor.watch(() => {
+    return props.modelValue;
+  }, () => {
+    if (props.watchValidStatus)
+      validateFields([], true);
+  }, { deep: true });
+  common_vendor.watch(() => {
+    return props.watchValidStatus;
+  }, (value) => {
+    if (value)
+      validateFields([], true);
+  });
   __expose({
     valid: validFields,
     validate,

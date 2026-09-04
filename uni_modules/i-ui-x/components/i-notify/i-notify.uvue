@@ -56,14 +56,13 @@ const props = defineProps({
  * - close: 通知关闭时触发。
  * - update:show: 同步 show 受控值，支撑 v-model:show。
  */
-const emit = defineEmits(['open', 'close', 'update:show'])
+const emit = defineEmits<{
+  (event: 'open'): void
+  (event: 'close'): void
+  (event: 'update:show', value: boolean): void
+}>()
 
-
-
-
-const bgColor = computed(() => {
-  return props.bgColor
-})
+const bgColor = computed(() : string => props.bgColor)
 const visible = ref(props.show)
 const timer = ref(0)
 const currentTop = ref(props.top)
@@ -79,93 +78,24 @@ const currentZIndex = ref(props.zIndex)
 const currentCustomStyle = ref(props.customStyle)
 const currentShowIcon = ref(props.showIcon)
 
-watch(
-  () => props.show,
-  (nextValue) => {
-    if (nextValue) {
-      applyOptions(null, '')
-      showNotify()
-    } else {
-      close()
-    }
-  },
-)
-
-onUnmounted(() => {
-  clearTimeout(timer.value)
-})
-
-const notifyStyle = computed(() => {
-  let style = 'top:' + topValue() + ';'
-  style += 'z-index:' + String(currentZIndex.value) + ';'
-  style += 'background-color:' + resolveBgColor() + ';'
-  style += 'justify-content:' + justifyContent() + ';'
-  if (typeof currentCustomStyle.value == 'string') style += currentCustomStyle.value
-  return style
-})
-
-const textStyle = computed(() => {
-  return [
-    'color:' + currentColor.value,
-    'font-size:' + addUnit(currentFontSize.value),
-    'text-align:' + normalizeAlign(currentAlign.value),
-  ].join(';')
-})
-
-const iconText = computed(() => {
-  if (currentType.value == 'success') return '✓'
-  if (currentType.value == 'warning') return '!'
-  if (currentType.value == 'error') return '×'
-  return 'i'
-})
-
-function show(options) {
-  applyOptions(options, '')
-  showNotify()
+function setNotifyOption(options : UTSJSONObject, keyName : string) : void {
+  const value = options[keyName]
+  if (value == null) return
+  if (keyName == 'top') currentTop.value = value
+  if (keyName == 'type') currentType.value = (value).toString()
+  if (keyName == 'color') currentColor.value = (value).toString()
+  if (keyName == 'bgColor') currentBgColor.value = (value).toString()
+  if (keyName == 'message') currentMessage.value = (value).toString()
+  if (keyName == 'duration') currentDuration.value = value
+  if (keyName == 'fontSize') currentFontSize.value = value
+  if (keyName == 'safeTop') currentSafeTop.value = value == true
+  if (keyName == 'align') currentAlign.value = (value).toString()
+  if (keyName == 'zIndex') currentZIndex.value = value
+  if (keyName == 'customStyle') currentCustomStyle.value = value
+  if (keyName == 'showIcon') currentShowIcon.value = value == true
 }
 
-function primary(options) {
-  applyOptions(options, 'primary')
-  showNotify()
-}
-
-function success(options) {
-  applyOptions(options, 'success')
-  showNotify()
-}
-
-function warning(options) {
-  applyOptions(options, 'warning')
-  showNotify()
-}
-
-function error(options) {
-  applyOptions(options, 'error')
-  showNotify()
-}
-
-function close() {
-  clearTimeout(timer.value)
-  if (!visible.value) return
-  visible.value = false
-  emit('close')
-  emit('update:show', false)
-}
-
-function showNotify() {
-  clearTimeout(timer.value)
-  visible.value = true
-  emit('open')
-  emit('update:show', true)
-  const duration = Number(currentDuration.value)
-  if (duration > 0) {
-    timer.value = setTimeout(() => {
-      close()
-    }, duration)
-  }
-}
-
-function applyOptions(options, forcedType) {
+function applyNotifyOptions(options : any | null, forcedType : string) : void {
   currentTop.value = props.top
   currentType.value = forcedType.length > 0 ? forcedType : props.type
   currentColor.value = props.color
@@ -184,40 +114,23 @@ function applyOptions(options, forcedType) {
     currentMessage.value = options
     return
   }
-  if (typeof options == 'object') {
-    setValue(options, 'top')
-    setValue(options, 'type')
-    setValue(options, 'color')
-    setValue(options, 'bgColor')
-    setValue(options, 'message')
-    setValue(options, 'duration')
-    setValue(options, 'fontSize')
-    setValue(options, 'safeTop')
-    setValue(options, 'align')
-    setValue(options, 'zIndex')
-    setValue(options, 'customStyle')
-    setValue(options, 'showIcon')
-  }
+  if (typeof options != 'object') return
+  const object = options as UTSJSONObject
+  setNotifyOption(object, 'top')
+  setNotifyOption(object, 'type')
+  setNotifyOption(object, 'color')
+  setNotifyOption(object, 'bgColor')
+  setNotifyOption(object, 'message')
+  setNotifyOption(object, 'duration')
+  setNotifyOption(object, 'fontSize')
+  setNotifyOption(object, 'safeTop')
+  setNotifyOption(object, 'align')
+  setNotifyOption(object, 'zIndex')
+  setNotifyOption(object, 'customStyle')
+  setNotifyOption(object, 'showIcon')
 }
 
-function setValue(options, keyName) {
-  const value = options[keyName]
-  if (value == null) return
-  if (keyName == 'top') currentTop.value = value
-  if (keyName == 'type') currentType.value = String(value)
-  if (keyName == 'color') currentColor.value = String(value)
-  if (keyName == 'bgColor') currentBgColor.value = String(value)
-  if (keyName == 'message') currentMessage.value = String(value)
-  if (keyName == 'duration') currentDuration.value = value
-  if (keyName == 'fontSize') currentFontSize.value = value
-  if (keyName == 'safeTop') currentSafeTop.value = value == true
-  if (keyName == 'align') currentAlign.value = String(value)
-  if (keyName == 'zIndex') currentZIndex.value = value
-  if (keyName == 'customStyle') currentCustomStyle.value = value
-  if (keyName == 'showIcon') currentShowIcon.value = value == true
-}
-
-function addUnit(value: any): string {
+function addUnit(value : any | null) : string {
   if (typeof value == 'number') return value.toString() + 'px'
   const text = value == null ? '' : value.toString()
   if (text == '') return '0px'
@@ -225,27 +138,27 @@ function addUnit(value: any): string {
   return unitReg.test(text) ? text : text + 'px'
 }
 
-function topValue(): string {
-  const offset = Number(currentTop.value)
+function topValue() : string {
+  const offset = parseFloat((currentTop.value).toString())
   const safeTop = currentSafeTop.value ? 44 : 0
   if (!isNaN(offset)) return (offset + safeTop).toString() + 'px'
   if (currentSafeTop.value) return '44px'
   return addUnit(currentTop.value)
 }
 
-function normalizeAlign(value: string): string {
+function normalizeAlign(value : string) : string {
   if (value == 'left' || value == 'right') return value
   return 'center'
 }
 
-function justifyContent(): string {
+function justifyContent() : string {
   const align = normalizeAlign(currentAlign.value)
   if (align == 'left') return 'flex-start'
   if (align == 'right') return 'flex-end'
   return 'center'
 }
 
-function resolveBgColor(): string {
+function resolveBgColor() : string {
   if (currentBgColor.value.length > 0) return currentBgColor.value
   if (currentType.value == 'success') return '#19be6b'
   if (currentType.value == 'warning') return '#ff9900'
@@ -253,13 +166,100 @@ function resolveBgColor(): string {
   return '#2979ff'
 }
 
+function closeNotify() : void {
+  clearTimeout(timer.value)
+  if (!visible.value) return
+  visible.value = false
+  emit('close')
+  emit('update:show', false)
+}
+
+function showNotify() : void {
+  clearTimeout(timer.value)
+  visible.value = true
+  emit('open')
+  emit('update:show', true)
+  const duration = parseFloat(currentDuration.value.toString())
+  if (duration > 0) {
+    timer.value = setTimeout(() : void => {
+      closeNotify()
+    }, duration)
+  }
+}
+
+function openNotify(options : any) : void {
+  applyNotifyOptions(options, '')
+  showNotify()
+}
+
+function primary(options : any) : void {
+  applyNotifyOptions(options, 'primary')
+  showNotify()
+}
+
+function success(options : any) : void {
+  applyNotifyOptions(options, 'success')
+  showNotify()
+}
+
+function warning(options : any) : void {
+  applyNotifyOptions(options, 'warning')
+  showNotify()
+}
+
+function error(options : any) : void {
+  applyNotifyOptions(options, 'error')
+  showNotify()
+}
+
+const notifyStyle = computed(() : string => {
+  let style = 'top:' + topValue() + ';'
+  style += 'z-index:' + currentZIndex.value.toString() + ';'
+  style += 'background-color:' + resolveBgColor() + ';'
+  style += 'justify-content:' + justifyContent() + ';'
+  const customStyle = currentCustomStyle.value
+  if (typeof customStyle == 'string') style += customStyle
+  return style
+})
+
+const textStyle = computed(() : string => {
+  return [
+    'color:' + currentColor.value,
+    'font-size:' + addUnit(currentFontSize.value),
+    'text-align:' + normalizeAlign(currentAlign.value),
+  ].join(';')
+})
+
+const iconText = computed(() : string => {
+  if (currentType.value == 'success') return '✓'
+  if (currentType.value == 'warning') return '!'
+  if (currentType.value == 'error') return '×'
+  return 'i'
+})
+
+watch(
+  () : boolean => props.show,
+  (nextValue : boolean) : void => {
+    if (nextValue) {
+      applyNotifyOptions(null, '')
+      showNotify()
+    } else {
+      closeNotify()
+    }
+  },
+)
+
+onUnmounted(() : void => {
+  clearTimeout(timer.value)
+})
+
 defineExpose({
-  show,
+  open: openNotify,
   primary,
   success,
   warning,
   error,
-  close,
+  close: closeNotify,
 })
 </script>
 

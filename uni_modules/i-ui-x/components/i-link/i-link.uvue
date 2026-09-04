@@ -35,23 +35,28 @@ const props = defineProps({
  * - click: 点击链接时触发，返回 URL。
  * - open: 链接准备打开时触发，返回 URL。
  */
-const emit = defineEmits(['click', 'open'])
-const realUrl = computed(() => props.href.length > 0 ? props.href : props.url)
-const isInternal = computed(() => realUrl.value.indexOf('/') == 0)
-const textStyle = computed(() => {
+const emit = defineEmits<{
+  (event: 'click', url: string): void
+  (event: 'open', url: string): void
+}>()
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+const realUrl = computed(() : string => props.href.length > 0 ? props.href : props.url)
+const isInternal = computed(() : boolean => realUrl.value.indexOf('/') == 0)
+const textStyle = computed(() : string => {
   let style = 'font-size:' + formatSize(props.fontSize) + ';color:' + (props.disabled ? '#c0c4cc' : props.color) + ';'
   style += 'text-decoration:' + (props.underLine ? 'underline' : 'none') + ';'
   return style
 })
-function open() {
+function open() : void {
   if (props.disabled) return
   emit('click', realUrl.value)
   emit('open', realUrl.value)
-}
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
 }
 </script>
 

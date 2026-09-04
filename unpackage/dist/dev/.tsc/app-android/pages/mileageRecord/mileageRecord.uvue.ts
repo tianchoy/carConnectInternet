@@ -1,7 +1,6 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
-import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.uvue'
-import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
+import _easycom_i_datetime_picker from '@/uni_modules/i-ui-x/components/i-datetime-picker/i-datetime-picker.uvue'
 import _easycom_i_empty from '@/uni_modules/i-ui-x/components/i-empty/i-empty.uvue'
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
@@ -36,6 +35,9 @@ const carStatus = ref('在线')
 
 	const startTime = ref('')
 	const endTime = ref('')
+	const currentPickerValue = computed(() : string => {
+		return currentPickerType.value === 'start' ? startTime.value : endTime.value
+	})
 	const imei = ref<string | null>('')
 
 	// 计算属性：按日期分组的行程数据
@@ -134,7 +136,7 @@ const carStatus = ref('在线')
 		})
 		if (!imei.value) return;
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 192, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 195, 10),
 				imei: imei.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
@@ -148,13 +150,13 @@ const carStatus = ref('在线')
 				showAppToast({ title: res.msg || '数据加载失败', icon: 'none' });
 				return;
 			}
-			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:206");
+			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:209");
 			const trackData = res.data
 			if (trackData != null) {
 				processTripData(trackData)
 			}
 		} catch (e) {
-			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:212");
+			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:215");
 			showAppToast({
 				title: '数据加载失败',
 				icon: 'none',
@@ -222,7 +224,10 @@ const carStatus = ref('在线')
 	}
 
 	// 确认选择时间
-	const onConfirm = (value : string) => {
+	const onConfirm = (event : UTSJSONObject) => {
+		const timestamp = event.getNumber('timestamp', 0)
+		if (!isFinite(timestamp) || timestamp <= 0) return
+		const value = formatTimes(timestamp)
 		if (currentPickerType.value === 'start') {
 			startTime.value = value
 		} else {
@@ -237,12 +242,15 @@ const carStatus = ref('在线')
 		showDateTimePicker.value = false
 	}
 
+	const onPickerShowChange = (value : boolean) => {
+		showDateTimePicker.value = value
+	}
+
 return (): any | null => {
 
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
 const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
-const _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker",_easycom_l_date_time_picker)
-const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
+const _component_i_datetime_picker = resolveEasyComponent("i-datetime-picker",_easycom_i_datetime_picker)
 const _component_i_empty = resolveEasyComponent("i-empty",_easycom_i_empty)
 const _component_i_tag = resolveEasyComponent("i-tag",_easycom_i_tag)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
@@ -286,24 +294,22 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             }), null, 8 /* PROPS */, ["onClick"])
           ])
         ]),
-        _cV(_component_l_popup, _uM({
-          modelValue: showDateTimePicker.value,
-          "onUpdate:modelValue": $event => {(showDateTimePicker).value = $event},
-          position: "bottom",
-          closeable: false
+        _cV(_component_i_datetime_picker, _uM({
+          show: showDateTimePicker.value,
+          "model-value": currentPickerValue.value,
+          mode: "datetime",
+          title: pickerTitle.value,
+          "cancel-text": "取消",
+          "confirm-text": "确认",
+          onConfirm: onConfirm,
+          onCancel: onCancel,
+          "onUpdate:show": onPickerShowChange
         }), _uM({
-          default: withSlotCtx((): any[] => [
-            _cV(_component_l_date_time_picker, _uM({
-              "confirm-btn": "确认",
-              "cancel-btn": "取消",
-              title: pickerTitle.value,
-              mode: 63,
-              onConfirm: onConfirm,
-              onCancel: onCancel
-            }), null, 8 /* PROPS */, ["title"])
+          trigger: withSlotCtx((): any[] => [
+            _cE("view")
           ]),
           _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+        }), 8 /* PROPS */, ["show", "model-value", "title"])
       ]),
       _cE("view", _uM({ class: "summary-panel" }), [
         _cE("view", _uM({ class: "summary-item" }), [

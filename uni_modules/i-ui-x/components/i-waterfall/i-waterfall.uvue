@@ -3,7 +3,7 @@
     <view class="i-waterfall__column" :style="leftColumnStyle">
       <view
         v-for="(item, index) in leftItems"
-        :key="'left-' + String(index) + '-' + getItemTitle(item)"
+        :key="'left-' + (index).toString() + '-' + getItemTitle(item)"
         class="i-waterfall__item"
         :style="itemStyle"
         @click="select(item, index * 2)"
@@ -25,7 +25,7 @@
     <view v-if="columnCount >= 2" class="i-waterfall__column" :style="rightColumnStyle">
       <view
         v-for="(item, index) in rightItems"
-        :key="'right-' + String(index) + '-' + getItemTitle(item)"
+        :key="'right-' + (index).toString() + '-' + getItemTitle(item)"
         class="i-waterfall__item"
         :style="itemStyle"
         @click="select(item, index * 2 + 1)"
@@ -74,12 +74,12 @@ const props = defineProps({
   items: {
     type: Array,
     default() {
-      return [
-        { title: '春日上新', desc: '轻盈色彩搭配', image: '' },
-        { title: '通勤套装', desc: '简洁有层次', image: '' },
-        { title: '城市漫游', desc: '舒适出行', image: '' },
-        { title: '周末灵感', desc: '小物和穿搭', image: '' },
-      ]
+      const items : Array<any> = []
+      items.push({ title: '春日上新', desc: '轻盈色彩搭配', image: '' } as UTSJSONObject)
+      items.push({ title: '通勤套装', desc: '简洁有层次', image: '' } as UTSJSONObject)
+      items.push({ title: '城市漫游', desc: '舒适出行', image: '' } as UTSJSONObject)
+      items.push({ title: '周末灵感', desc: '小物和穿搭', image: '' } as UTSJSONObject)
+      return items
     },
   },
   columns: { type: Number, default: 2 },
@@ -104,6 +104,13 @@ const props = defineProps({
  */
 const emit = defineEmits(['select', 'change', 'click', 'loadmore'])
 
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.length == 0) return ''
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
 
 const bgColor = computed(() => {
   return props.bgColor
@@ -112,19 +119,26 @@ const columnCount = computed(() => {
   return props.columns <= 1 ? 1 : 2
 })
 
-const leftItems = computed(() => {
-  const list = []
-  for (let i = 0; i < props.items.length; i++) {
-    if (columnCount.value == 1 || i % 2 == 0) list.push(props.items[i])
+const safeItems = computed(() : Array<any | null> => {
+  const items = props.items
+  if (items != null) return items
+  const empty : Array<any | null> = []
+  return empty
+})
+
+const leftItems = computed(() : Array<any | null> => {
+  const list : Array<any | null> = []
+  for (let i = 0; i < safeItems.value.length; i++) {
+    if (columnCount.value == 1 || i % 2 == 0) list.push(safeItems.value[i])
   }
   return list
 })
 
-const rightItems = computed(() => {
-  const list = []
+const rightItems = computed(() : Array<any | null> => {
+  const list : Array<any | null> = []
   if (columnCount.value == 1) return list
-  for (let i = 0; i < props.items.length; i++) {
-    if (i % 2 == 1) list.push(props.items[i])
+  for (let i = 0; i < safeItems.value.length; i++) {
+    if (i % 2 == 1) list.push(safeItems.value[i])
   }
   return list
 })
@@ -155,53 +169,46 @@ const itemStyle = computed(() => {
 })
 
 const imageStyle = computed(() => {
-  if (String(props.imageHeight).length == 0) return ''
+  if ((props.imageHeight).toString().length == 0) return ''
   return 'height:' + formatSize(props.imageHeight) + ';'
 })
 
-function formatSize(value) {
-  const text = String(value)
-  if (text.length == 0) return ''
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
-}
-
-function getValue(item, keyName) {
+function getValue(item : any | null, keyName : string) : string {
   if (item == null) return ''
   if (typeof item == 'object') {
-    const value = item[keyName]
+    const value = (item as UTSJSONObject)[keyName]
     if (value == null) return ''
-    return String(value)
+    return (value).toString()
   }
   if (keyName == props.titleKey || keyName == 'title' || keyName == 'name' || keyName == 'text') {
-    return String(item)
+    return (item).toString()
   }
   return ''
 }
 
-function getItemTitle(item) {
+function getItemTitle(item : any | null) : string {
   let value = getValue(item, props.titleKey)
   if (value.length > 0) return value
   value = getValue(item, 'name')
   if (value.length > 0) return value
   value = getValue(item, 'text')
   if (value.length > 0) return value
-  return String(item)
+  return item == null ? '' : item.toString()
 }
 
-function getItemDesc(item) {
+function getItemDesc(item : any | null) : string {
   const value = getValue(item, props.descKey)
   if (value.length > 0) return value
   return getValue(item, 'description')
 }
 
-function getItemImage(item) {
+function getItemImage(item : any | null) : string {
   const value = getValue(item, props.imageKey)
   if (value.length > 0) return value
   return getValue(item, 'url')
 }
 
-function select(item, index) {
+function select(item : any | null, index : number) {
   const payload = {
     index,
     item,

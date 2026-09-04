@@ -13,11 +13,11 @@
 					<i-icon name="/static/xiangxia.png" fontSize="15" @click="showPicker('end')"></i-icon>
 				</view>
 			</view>
-			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
-				<l-date-time-picker confirm-btn="确认" cancel-btn="取消" :title="pickerTitle" :mode="63"
-					@confirm="onConfirm" @cancel="onCancel">
-				</l-date-time-picker>
-			</l-popup>
+			<i-datetime-picker :show="showDateTimePicker" :model-value="currentPickerValue" mode="datetime"
+				:title="pickerTitle" cancel-text="取消" confirm-text="确认" @confirm="onConfirm"
+				@cancel="onCancel" @update:show="onPickerShowChange">
+				<template #trigger><view></view></template>
+			</i-datetime-picker>
 		</view>
 		<!-- <view class="mileage_title">
 			<text>设备名称</text>
@@ -53,7 +53,7 @@ import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
-	import { formatTimes, parseLocalDateTime } from '../../utils/formateTime.uts'
+	import { formatTimesToMinute, parseLocalDateTime } from '../../utils/formateTime.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -67,8 +67,12 @@ import { openLocation } from '../../utils/openLocation.uts'
 
 	const startTime = ref('')
 	const endTime = ref('')
+	const currentPickerValue = computed(() : string => {
+		return currentPickerType.value === 'start' ? startTime.value : endTime.value
+	})
 	const imei = ref<string | null>('')
 	type StopRecord = UTSJSONObject
+	const currentDateTime = ref('')
 	const carStopDetail = ref<Array<StopRecord>>([])
 	const getStopNumber = (item: UTSJSONObject, key: string): number => item.getNumber(key, 0)
 	const getStopText = (item: UTSJSONObject, key: string): string => item.getString(key, '')
@@ -92,9 +96,9 @@ import { openLocation } from '../../utils/openLocation.uts'
 
 	const initDateTime = () => {
 		const now = new Date()
-		endTime.value = formatTimes(now.getTime())
+		endTime.value = formatTimesToMinute(now.getTime())
 		// 开始时间默认为当前时间前24小时
-		startTime.value = formatTimes(now.getTime() - 3600000 * 24)
+		startTime.value = formatTimesToMinute(now.getTime() - 3600000 * 24)
 	}
 
 	const loadStopData = async () : Promise<void> => {
@@ -149,7 +153,12 @@ import { openLocation } from '../../utils/openLocation.uts'
 	}
 
 	// 确认选择时间
-	const onConfirm = (value : string) => {
+	const onConfirm = (event : any) : void => {
+		const eventObject = event as UTSJSONObject
+		const timestampValue = eventObject['timestamp']
+		const timestamp = timestampValue == null ? 0 : parseFloat(timestampValue.toString())
+		if (!isFinite(timestamp) || timestamp <= 0) return
+		const value = formatTimesToMinute(timestamp)
 		if (currentPickerType.value === 'start') {
 			startTime.value = value
 		} else {
@@ -161,6 +170,10 @@ import { openLocation } from '../../utils/openLocation.uts'
 
 	const onCancel = () => {
 		showDateTimePicker.value = false
+	}
+
+	const onPickerShowChange = (value : boolean) => {
+		showDateTimePicker.value = value
 	}
 
 	const calculateDuration = (diff:number) : string => {

@@ -39,23 +39,24 @@ const props = defineProps({
  */
 const emit = defineEmits(['click'])
 
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
 const bgColor = computed(() => {
   return props.bgColor
 })
 const visible = computed(() => props.scrollTop >= props.top)
 const wrapStyle = computed(() => {
-  return 'right:' + formatSize(props.right) + ';bottom:' + formatSize(props.bottom) + ';background-color:' + bgColor.value + ';z-index:' + String(props.zIndex) + ';'
+  return 'right:' + formatSize(props.right) + ';bottom:' + formatSize(props.bottom) + ';background-color:' + bgColor.value + ';z-index:' + (props.zIndex).toString() + ';'
 })
 const textStyle = computed(() => 'color:' + props.color + ';')
 
 function backTop() {
   uni.pageScrollTo({ scrollTop: 0, duration: props.duration })
   emit('click')
-}
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
 }
 </script>
 

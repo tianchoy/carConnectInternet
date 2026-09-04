@@ -103,6 +103,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   var __emit = _a.emit;
   const props = __props;
   const emit = __emit;
+  function formatSize(value = null) {
+    const text = value.toString();
+    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0)
+      return text;
+    return text + "px";
+  }
   const bgColor = common_vendor.computed(() => {
     return props.bgColor;
   });
@@ -192,6 +198,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return props.round;
     return props.round.toString().length > 0;
   });
+  const shadowStyle = common_vendor.computed(() => {
+    const value = props.shadow;
+    const text = value.toString();
+    if (text.length == 0 || text == "none")
+      return "";
+    if (Array.isArray(value)) {
+      const list = value;
+      if (list.length >= 4) {
+        const first = list[0];
+        const second = list[1];
+        const third = list[2];
+        const fourth = list[3];
+        if (first != null && second != null && third != null && fourth != null) {
+          return "box-shadow:" + formatSize(first) + " " + formatSize(second) + " " + formatSize(third) + " " + fourth.toString() + ";";
+        }
+      }
+    }
+    return "box-shadow:0 " + formatSize(value) + " " + formatSize(parseFloat(value.toString()) * 2) + " rgba(0,0,0,0.12);";
+  });
   const tagClass = common_vendor.computed(() => {
     const classes = [
       "i-tag",
@@ -219,24 +244,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     if (normalizedSize.value == "xs")
       classes.push("i-tag__close--xs");
     return classes.join(" ");
-  });
-  function formatSize(value = null) {
-    const text = value.toString();
-    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0) {
-      return text;
-    }
-    return text + "px";
-  }
-  const shadowStyle = common_vendor.computed(() => {
-    const value = props.shadow;
-    const text = value.toString();
-    if (text.length == 0 || text == "none")
-      return "";
-    if (Array.isArray(value) && value.length >= 4) {
-      const shadowValues = value;
-      return "box-shadow:" + formatSize(shadowValues[0]) + " " + formatSize(shadowValues[1]) + " " + formatSize(shadowValues[2]) + " " + shadowValues[3].toString() + ";";
-    }
-    return "box-shadow:0 " + formatSize(value) + " " + formatSize(parseFloat(value.toString()) * 2) + " rgba(0,0,0,0.12);";
   });
   const tagStyle = common_vendor.computed(() => {
     let style = "";
@@ -274,14 +281,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   const closeStyle = common_vendor.computed(() => {
     return "color:" + computedTextColor.value + ";";
   });
-  function handleClick(event = null) {
+  function handleClick() {
     if (closeClicking.value) {
       closeClicking.value = false;
       return null;
     }
     if (props.disabled)
       return null;
-    emit("click", event);
+    emit("click", contentText.value);
   }
   function handleClose() {
     if (props.disabled)
@@ -318,7 +325,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       j: common_vendor.t(closeText.value),
       k: common_vendor.n(closeClass.value),
       l: common_vendor.s(closeStyle.value),
-      m: common_vendor.o(handleClose, "43")
+      m: common_vendor.o(handleClose, "ac")
     } : {}, {
       n: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
       o: common_vendor.n(tagClass.value),
@@ -328,7 +335,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
-      s: common_vendor.o(handleClick, "12")
+      s: common_vendor.o(handleClick, "5e")
     });
     return __returned__;
   };

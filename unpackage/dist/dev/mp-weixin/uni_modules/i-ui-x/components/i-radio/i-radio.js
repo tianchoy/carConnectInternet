@@ -83,16 +83,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   const emit = __emit;
   function formatSize(value = null) {
     const text = value.toString();
-    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
       return text;
-    }
     return text + "px";
   }
   const checked = common_vendor.computed(() => {
     if (props.checked)
       return true;
-    const modelValueText = props.modelValue.toString();
-    const value = modelValueText.length > 0 ? props.modelValue : props.value;
+    const value = props.modelValue.toString().length > 0 ? props.modelValue : props.value;
     return value.toString() == props.name.toString();
   });
   const wrapClass = common_vendor.computed(() => {
@@ -126,10 +124,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return "width:" + formatSize(props.size) + ";height:" + formatSize(props.size) + ";border-radius:" + (circle ? formatSize(props.size) : "4px") + ";border-color:" + (checked.value ? props.activeColor : props.inactiveColor) + ";background-color:" + (checked.value && props.shape == "check" ? props.activeColor : "transparent") + ";";
   });
   const dotStyle = common_vendor.computed(() => {
-    return "background-color:" + props.activeColor + ";";
-  });
-  const checkStyle = common_vendor.computed(() => {
-    return "background-color:" + props.activeColor + ";color:" + props.iconColor + ";font-size:" + formatSize(parseFloat(props.iconSize.toString()) + 2) + ";";
+    const fontSize = props.shape == "check" ? formatSize(parseFloat(props.iconSize.toString()) + 2) : formatSize(props.iconSize);
+    return "background-color:" + props.activeColor + ";color:" + props.iconColor + ";font-size:" + fontSize + ";";
   });
   const labelStyle = common_vendor.computed(() => {
     let color = props.labelColor;
@@ -161,7 +157,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     } : {}, {
       d: checked.value && __props.shape == "check"
     }, checked.value && __props.shape == "check" ? {
-      e: common_vendor.s(checkStyle.value)
+      e: common_vendor.s(dotStyle.value)
     } : {}, {
       f: common_vendor.s(boxStyle.value)
     }) : {}, {
@@ -171,7 +167,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       h: common_vendor.t(__props.label),
       i: common_vendor.n(labelClass.value),
       j: common_vendor.s(labelStyle.value),
-      k: common_vendor.o(selectByLabel, "d6"),
+      k: common_vendor.o(selectByLabel, "c0"),
       l: common_vendor.r("d", {
         checked: checked.value
       }),

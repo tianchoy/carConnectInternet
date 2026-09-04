@@ -249,13 +249,109 @@ const emit = defineEmits([
   'update:city',
 ])
 
+type ICascaderItem = {
+  title: string
+  id: string
+  disabled?: boolean
+  children?: Array<ICascaderItem>
+}
 
+type ICascaderMenu = {
+  id: string
+  title: string
+}
 
-const activeIds = ref([])
+function normalizeItems(value : Array<any | null> | null) : Array<ICascaderItem> {
+  const result : Array<ICascaderItem> = []
+  if (value == null) return result
+
+  for (let i = 0; i < value.length; i++) {
+    const rawItem = value[i]
+    if (rawItem == null || typeof rawItem != 'object') continue
+
+    const object = rawItem as UTSJSONObject
+    const rawId = object['id']
+    if (rawId == null) continue
+
+    const rawTitle = object['title']
+    const rawChildren = object['children']
+    let children : Array<ICascaderItem> = []
+    if (rawChildren != null && Array.isArray(rawChildren)) {
+      children = normalizeItems(rawChildren as Array<any | null>)
+    }
+
+    result.push({
+      title: rawTitle == null ? '' : rawTitle.toString(),
+      id: rawId.toString(),
+      disabled: object['disabled'] == true,
+      children: children,
+    })
+  }
+
+  return result
+}
+
+function itemChildren(item : ICascaderItem) : Array<ICascaderItem> {
+  const children = item.children
+  return children == null ? [] : children
+}
+
+function hasChildren(item : ICascaderItem) : boolean {
+  return itemChildren(item).length > 0
+}
+
+function findInList(list : Array<ICascaderItem>, id : string) : ICascaderItem | null {
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
+    if (item.id == id) return item
+  }
+  return null
+}
+
+function findPath(list : Array<ICascaderItem>, id : string) : Array<string> {
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
+    if (item.id == id) return [item.id]
+    if (hasChildren(item)) {
+      const childPath = findPath(itemChildren(item), id)
+      if (childPath.length > 0) {
+        const result : Array<string> = [item.id]
+        for (let j = 0; j < childPath.length; j++) result.push(childPath[j])
+        return result
+      }
+    }
+  }
+  return []
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (
+    text == 'auto' ||
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('%') >= 0
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+
+function columnWidthNumber() : number {
+  const value = parseFloat(props.columnWidth)
+  if (isNaN(value) || value <= 0) return 112
+  return value
+}
+
+function activeColor() : string {
+  return props.itemActiveColor.length > 0 ? props.itemActiveColor : '#3c9cff'
+}
+
+const activeIds = ref<Array<string>>([])
 const popupOpened = ref(props.show)
 const scrollLeft = ref(0)
 
-const defaultList = ref([
+const defaultList = ref<Array<ICascaderItem>>([
   {
     title: '广东省',
     id: '199',
@@ -302,103 +398,42 @@ const defaultList = ref([
   { title: '湖南', id: '99' },
 ])
 
-const sourceList = computed(() => {
-  return props.list.length > 0 ? props.list : defaultList.value
+const sourceList = computed(() : Array<ICascaderItem> => {
+  const list = normalizeItems(props.list)
+  return list.length > 0 ? list : defaultList.value
 })
 
-const levels = computed(() => {
-  const result = []
-  let children = sourceList.value
-  result.push(children)
+function legacyId() : string {
+  if (props.city.length > 0) return props.city
+  return props.province
+}
+
+function currentItem() : ICascaderItem | null {
+  if (activeIds.value.length == 0) return null
+  let children : Array<ICascaderItem> = sourceList.value
+  let current : ICascaderItem | null = null
 
   for (let i = 0; i < activeIds.value.length; i++) {
-    const item = findInList(children, String(activeIds.value[i]))
-    if (item == null || !hasChildren(item)) break
-    children = item.children
-    result.push(children)
+    current = findInList(children, activeIds.value[i])
+    if (current == null) return null
+    if (!hasChildren(current)) return current
+    children = itemChildren(current)
   }
 
-  return result
-})
+  return current
+}
 
-const menus = computed(() => {
-  const result = []
-  let children = sourceList.value
-  for (let i = 0; i < activeIds.value.length; i++) {
-    const item = findInList(children, String(activeIds.value[i]))
-    if (item == null) break
-    result.push({
-      id: item.id,
-      title: item.title,
-    })
-    if (!hasChildren(item)) break
-    children = item.children
+function scrollToColumnCount(count : number) : void {
+  const keepVisibleCount = 2
+  if (count <= keepVisibleCount) {
+    scrollLeft.value = 0
+    return
   }
-  return result
-})
 
-const rootStyle = computed(() => {
-  let style = ''
-  if (props.width != 'auto') style = style + 'width:' + formatSize(props.width) + ';'
-  style = style + 'background-color:' + props.sliderContentBgColor + ';'
-  return style
-})
+  scrollLeft.value = (count - keepVisibleCount) * columnWidthNumber()
+}
 
-const columnStyle = computed(() => {
-  return (
-    'height:' +
-    formatSize(props.height) +
-    ';width:' +
-    formatSize(props.columnWidth) +
-    ';'
-  )
-})
-
-const activeTextStyle = computed(() => {
-  return 'color:' + activeColor() + ';'
-})
-
-const displayText = computed(() => {
-  if (menus.value.length == 0) return props.placeholder
-
-  const texts = []
-  for (let i = 0; i < menus.value.length; i++) texts.push(menus.value[i].title)
-  return texts.join(' / ')
-})
-
-const fieldTextClass = computed(() => {
-  return menus.value.length == 0
-    ? 'i-cascader-field__text i-cascader-field__text--placeholder'
-    : 'i-cascader-field__text'
-})
-
-watch(
-  () => props.modelValue,
-  () => {
-    syncByModelValue()
-  },
-)
-
-watch(
-  () => props.list,
-  () => {
-    syncByModelValue()
-  },
-)
-
-watch(
-  () => props.show,
-  (nextValue) => {
-    if (popupOpened.value == nextValue) return
-    popupOpened.value = nextValue
-    if (nextValue) emit('open')
-    else emit('close')
-  },
-)
-
-syncByModelValue()
-
-function syncByModelValue() {
+function syncByModelValue() : void {
   const id = props.modelValue.length > 0 ? props.modelValue : legacyId()
   if (id.length == 0) {
     activeIds.value = []
@@ -411,16 +446,29 @@ function syncByModelValue() {
   scrollToColumnCount(item != null && hasChildren(item) ? path.length + 1 : path.length)
 }
 
-function legacyId() {
-  if (props.city.length > 0) return props.city
-  return props.province
+function syncLegacyPath() : void {
+  if (activeIds.value.length > 0) emit('update:province', activeIds.value[0])
+  if (activeIds.value.length > 1) emit('update:city', activeIds.value[1])
 }
 
-function selectItem(item, parentIndex, childrenIndex) {
-  emit('cellClick', item, parentIndex, childrenIndex)
-  if (item.disabled) return
+function closePopupOnly() : void {
+  if (!popupOpened.value) return
+  popupOpened.value = false
+  emit('close')
+  emit('update:show', false)
+}
 
-  const nextIds = activeIds.value.slice(0, parentIndex)
+function confirmItem(item : ICascaderItem) : void {
+  emit('confirm', item.id, activeIds.value)
+  emit('update:modelValue', item.id)
+  if (props.popup) closePopupOnly()
+}
+
+function selectItem(item : ICascaderItem, parentIndex : number, childrenIndex : number) : void {
+  emit('cellClick', item, parentIndex, childrenIndex)
+  if (item.disabled == true) return
+
+  const nextIds : Array<string> = activeIds.value.slice(0, parentIndex)
   nextIds.push(item.id)
   activeIds.value = nextIds
 
@@ -431,85 +479,46 @@ function selectItem(item, parentIndex, childrenIndex) {
   if (!props.popup && !hasChildren(item)) confirmItem(item)
 }
 
-function confirmItem(item) {
-  emit('confirm', item.id, activeIds.value)
-  emit('update:modelValue', item.id)
-  if (props.popup) closePopupOnly()
-}
-
-function confirmPopup() {
+function confirmPopup() : void {
   const item = currentItem()
-  if (item == null || item.disabled) return
+  if (item == null || item.disabled == true) return
   confirmItem(item)
 }
 
-function openPopup() {
+function openPopup() : void {
   if (popupOpened.value) return
   popupOpened.value = true
   emit('open')
   emit('update:show', true)
 }
 
-function closePopup() {
+function closePopup() : void {
   emit('cancel')
   closePopupOnly()
 }
 
-function closePopupOnly() {
-  if (!popupOpened.value) return
-  popupOpened.value = false
-  emit('close')
-  emit('update:show', false)
-}
-
-function handleOverlayClick() {
+function handleOverlayClick() : void {
   if (!props.closeOnMask) return
   closePopupOnly()
 }
 
-function currentItem() {
-  if (activeIds.value.length == 0) return null
-  let children = sourceList.value
-  let current = null
-
-  for (let i = 0; i < activeIds.value.length; i++) {
-    current = findInList(children, String(activeIds.value[i]))
-    if (current == null) return null
-    if (!hasChildren(current)) return current
-    children = current.children
-  }
-
-  return current
+function isActive(item : ICascaderItem) : boolean {
+  return activeIds.value.indexOf(item.id) >= 0
 }
 
-function syncLegacyPath() {
-  if (activeIds.value.length > 0) emit('update:province', String(activeIds.value[0]))
-  if (activeIds.value.length > 1) emit('update:city', String(activeIds.value[1]))
-}
-
-function scrollToColumnCount(count) {
-  const keepVisibleCount = 2
-  if (count <= keepVisibleCount) {
-    scrollLeft.value = 0
-    return
-  }
-
-  scrollLeft.value = (count - keepVisibleCount) * columnWidthNumber()
-}
-
-function itemClass(item) {
-  const classes = ['i-cascader__item']
+function itemClass(item : ICascaderItem) : string {
+  const classes : Array<string> = ['i-cascader__item']
   if (isActive(item)) classes.push('i-cascader__item--active')
-  if (item.disabled) classes.push('i-cascader__item--disabled')
+  if (item.disabled == true) classes.push('i-cascader__item--disabled')
   if (hasChildren(item)) classes.push('i-cascader__item--parent')
   return classes.join(' ')
 }
 
-function itemTextClass(item) {
+function itemTextClass(item : ICascaderItem) : string {
   return isActive(item) ? 'i-cascader__text i-cascader__text--active' : 'i-cascader__text'
 }
 
-function itemTextStyle(item) {
+function itemTextStyle(item : ICascaderItem) : string {
   let style = 'font-size:' + formatSize(props.fontSize) + ';'
   style = style + 'color:' + (isActive(item) ? activeColor() : props.itemTextColor) + ';'
   if (props.darkItemTextColor.length > 0) {
@@ -518,59 +527,97 @@ function itemTextStyle(item) {
   return style
 }
 
-function activeColor() {
-  return props.itemActiveColor.length > 0 ? props.itemActiveColor : '#3c9cff'
-}
+const levels = computed(() : Array<Array<ICascaderItem>> => {
+  const result : Array<Array<ICascaderItem>> = []
+  let children = sourceList.value
+  result.push(children)
 
-function isActive(item) {
-  return activeIds.value.indexOf(item.id) >= 0
-}
-
-function hasChildren(item) {
-  return item.children != null && item.children.length > 0
-}
-
-function findInList(list, id) {
-  for (let i = 0; i < list.length; i++) {
-    if (String(list[i].id) == id) return list[i]
+  for (let i = 0; i < activeIds.value.length; i++) {
+    const item = findInList(children, activeIds.value[i])
+    if (item == null || !hasChildren(item)) break
+    children = itemChildren(item)
+    result.push(children)
   }
-  return null
-}
 
-function findPath(list, id) {
-  for (let i = 0; i < list.length; i++) {
-    const item = list[i]
-    if (String(item.id) == id) return [item.id]
-    if (hasChildren(item)) {
-      const childPath = findPath(item.children, id)
-      if (childPath.length > 0) {
-        const result = [item.id]
-        for (let j = 0; j < childPath.length; j++) result.push(childPath[j])
-        return result
-      }
-    }
+  return result
+})
+
+const menus = computed(() : Array<ICascaderMenu> => {
+  const result : Array<ICascaderMenu> = []
+  let children = sourceList.value
+  for (let i = 0; i < activeIds.value.length; i++) {
+    const item = findInList(children, activeIds.value[i])
+    if (item == null) break
+    result.push({
+      id: item.id,
+      title: item.title,
+    })
+    if (!hasChildren(item)) break
+    children = itemChildren(item)
   }
-  return []
-}
+  return result
+})
 
-function formatSize(value) {
-  const text = String(value)
-  if (
-    text == 'auto' ||
-    text.indexOf('px') >= 0 ||
-    text.indexOf('rpx') >= 0 ||
-    text.indexOf('%') >= 0
-  ) {
-    return text
-  }
-  return text + 'px'
-}
+const rootStyle = computed(() : string => {
+  let style = ''
+  if (props.width != 'auto') style = style + 'width:' + formatSize(props.width) + ';'
+  style = style + 'background-color:' + props.sliderContentBgColor + ';'
+  return style
+})
 
-function columnWidthNumber() {
-  const value = parseFloat(String(props.columnWidth))
-  if (isNaN(value) || value <= 0) return 112
-  return value
-}
+const columnStyle = computed(() : string => {
+  return (
+    'height:' +
+    formatSize(props.height) +
+    ';width:' +
+    formatSize(props.columnWidth) +
+    ';'
+  )
+})
+
+const activeTextStyle = computed(() : string => {
+  return 'color:' + activeColor() + ';'
+})
+
+const displayText = computed(() : string => {
+  if (menus.value.length == 0) return props.placeholder
+
+  const texts : Array<string> = []
+  for (let i = 0; i < menus.value.length; i++) texts.push(menus.value[i].title)
+  return texts.join(' / ')
+})
+
+const fieldTextClass = computed(() : string => {
+  return menus.value.length == 0
+    ? 'i-cascader-field__text i-cascader-field__text--placeholder'
+    : 'i-cascader-field__text'
+})
+
+watch(
+  () : string => props.modelValue,
+  () : void => {
+    syncByModelValue()
+  },
+)
+
+watch(
+  () : Array<any | null> | null => props.list,
+  () : void => {
+    syncByModelValue()
+  },
+)
+
+watch(
+  () : boolean => props.show,
+  (nextValue : boolean) : void => {
+    if (popupOpened.value == nextValue) return
+    popupOpened.value = nextValue
+    if (nextValue) emit('open')
+    else emit('close')
+  },
+)
+
+syncByModelValue()
 </script>
 
 <style>

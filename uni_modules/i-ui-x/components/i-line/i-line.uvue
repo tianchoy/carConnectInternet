@@ -25,7 +25,21 @@ const props = defineProps({
   dashed: { type: Boolean, default: false },
 })
 
-const lineStyle = computed(() => {
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function formatBoxSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf(' ') >= 0) return text
+  return formatSize(value)
+}
+
+const lineStyle = computed(() : string => {
   const width = props.hairline ? '0.5px' : '1px'
   const lineType = props.dashed ? 'dashed' : 'solid'
   const margin = formatBoxSize(props.margin)
@@ -58,20 +72,6 @@ const lineStyle = computed(() => {
     ';'
   )
 })
-
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
-
-function formatBoxSize(value): string {
-  const text = String(value)
-  if (text.indexOf(' ') >= 0) return text
-  return formatSize(value)
-}
 </script>
 
 <style>

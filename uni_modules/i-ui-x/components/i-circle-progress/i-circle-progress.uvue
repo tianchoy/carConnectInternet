@@ -45,15 +45,15 @@ const props = defineProps({
  */
 const emit = defineEmits(['click', 'change', 'update:percent'])
 
-const current = ref(props.percent)
+const current = ref<number>(props.percent)
 
-const normalized = computed(() => {
+const normalized = computed(() : number => {
   if (current.value < 0) return 0
   if (current.value > 100) return 100
   return Math.round(current.value)
 })
 
-const circleStyle = computed(() => {
+const circleStyle = computed(() : string => {
   return (
     'width:' +
     props.size +
@@ -72,19 +72,19 @@ const circleStyle = computed(() => {
 })
 
 watch(
-  () => props.percent,
-  (nextValue) => {
+  () : number => props.percent,
+  (nextValue : number) : void => {
     current.value = nextValue
   },
 )
 
-function step(delta) {
+function step(delta : number) : void {
   current.value = Math.min(100, Math.max(0, current.value + delta))
   emit('change', current.value)
   emit('update:percent', current.value)
 }
 
-function emitClick() {
+function emitClick() : void {
   emit('click', current.value)
 }
 </script>

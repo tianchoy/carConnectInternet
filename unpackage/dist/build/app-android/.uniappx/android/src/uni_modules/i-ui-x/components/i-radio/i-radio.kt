@@ -55,8 +55,7 @@ open class GenUniModulesIUiXComponentsIRadioIRadio : VueComponent {
                 if (props.checked) {
                     return true
                 }
-                val modelValueText = props.modelValue.toString()
-                val value = if (modelValueText.length > 0) {
+                val value = if (props.modelValue.toString().length > 0) {
                     props.modelValue
                 } else {
                     props.value
@@ -126,11 +125,12 @@ open class GenUniModulesIUiXComponentsIRadioIRadio : VueComponent {
             }
             )
             val dotStyle = computed(fun(): String {
-                return "background-color:" + props.activeColor + ";"
-            }
-            )
-            val checkStyle = computed(fun(): String {
-                return "background-color:" + props.activeColor + ";color:" + props.iconColor + ";font-size:" + formatSize(parseFloat(props.iconSize.toString()) + 2) + ";"
+                val fontSize = if (props.shape == "check") {
+                    formatSize(parseFloat(props.iconSize.toString()) + 2)
+                } else {
+                    formatSize(props.iconSize)
+                }
+                return ("background-color:" + props.activeColor + ";color:" + props.iconColor + ";font-size:" + fontSize + ";")
             }
             )
             val labelStyle = computed(fun(): String {
@@ -141,7 +141,7 @@ open class GenUniModulesIUiXComponentsIRadioIRadio : VueComponent {
                 return "color:" + color + ";font-size:" + formatSize(props.labelSize) + ";"
             }
             )
-            fun gen_select_fn() {
+            fun gen_select_fn(): Unit {
                 if (props.disabled) {
                     return
                 }
@@ -151,7 +151,7 @@ open class GenUniModulesIUiXComponentsIRadioIRadio : VueComponent {
                 emit("update:checked", true)
             }
             val select = ::gen_select_fn
-            fun gen_selectByLabel_fn() {
+            fun gen_selectByLabel_fn(): Unit {
                 if (props.labelDisabled) {
                     return
                 }
@@ -170,7 +170,7 @@ open class GenUniModulesIUiXComponentsIRadioIRadio : VueComponent {
                                         _cC("v-if", true)
                                     },
                                     if (isTrue(checked.value && _ctx.shape == "check")) {
-                                        _cE("text", _uM("key" to 1, "class" to "i-radio__check", "style" to _nS(checkStyle.value)), "✓", 4)
+                                        _cE("text", _uM("key" to 1, "class" to "i-radio__check", "style" to _nS(dotStyle.value)), "✓", 4)
                                     } else {
                                         _cC("v-if", true)
                                     }

@@ -10,8 +10,8 @@
     >
       <view
         v-for="(group, groupIndex) in groups"
-        :id="'i-index-list-group-' + String(groupIndex)"
-        :key="String(groupIndex) + '-' + getGroupTitle(group, groupIndex)"
+        :id="'i-index-list-group-' + (groupIndex).toString()"
+        :key="(groupIndex).toString() + '-' + getGroupTitle(group, groupIndex)"
         class="i-index-list__group"
       >
         <view
@@ -25,7 +25,7 @@
         </view>
         <view
           v-for="(item, itemIndex) in getGroupItems(group)"
-          :key="String(itemIndex) + '-' + getItemText(item)"
+          :key="(itemIndex).toString() + '-' + getItemText(item)"
           class="i-index-list__item"
           @click="selectItem(group, groupIndex, item, itemIndex)"
         >
@@ -43,7 +43,7 @@
     >
       <text
         v-for="(group, groupIndex) in groups"
-        :key="'bar-' + String(groupIndex)"
+        :key="'bar-' + (groupIndex).toString()"
         :class="
           activeIndex == groupIndex
             ? 'i-index-list__bar-text i-index-list__bar-text--active'
@@ -124,35 +124,114 @@ const props = defineProps({
  * - change: 点击右侧索引切换分组时触发，返回 { groupIndex, index }。
  * - click: 点击列表项时触发，参数同 select。
  */
-const emit = defineEmits(['select', 'change', 'click'])
+const emit = defineEmits<{
+  (event: 'select', payload: any): void
+  (event: 'change', payload: any): void
+  (event: 'click', payload: any): void
+}>()
 
+type IIndexGroup = {
+  title : string,
+  items : Array<any | null>,
+}
 
-const bgColor = computed(() => {
+type IIndexSelectPayload = {
+  groupIndex : number,
+  itemIndex : number,
+  index : string,
+  item : any | null,
+  text : string,
+}
+
+type IIndexChangePayload = {
+  groupIndex : number,
+  index : string,
+}
+
+function objectText(object : UTSJSONObject, keyName : string) : string {
+  const value = object[keyName]
+  return value == null ? '' : value.toString()
+}
+
+function normalizeItems(value : Array<any | null> | null) : Array<any | null> {
+  return value == null ? [] : value
+}
+
+function normalizeGroup(raw : any | null, index : number) : IIndexGroup | null {
+  if (raw == null) return null
+  if (typeof raw != 'object') return { title: raw.toString(), items: [] }
+  const object = raw as UTSJSONObject
+  let title = objectText(object, 'title')
+  if (title.length == 0) title = objectText(object, 'name')
+  if (title.length == 0) title = objectText(object, 'index')
+  if (title.length == 0) title = (index + 1).toString()
+  let items : Array<any | null> = []
+  const rawItems = object['items']
+  if (rawItems != null && Array.isArray(rawItems)) {
+    items = rawItems as Array<any | null>
+  } else {
+    const children = object['children']
+    if (children != null && Array.isArray(children)) items = children as Array<any | null>
+  }
+  return { title, items }
+}
+
+function normalizeGroups(value : Array<any | null> | null) : Array<IIndexGroup> {
+  const result : Array<IIndexGroup> = []
+  if (value == null) return result
+  for (let i = 0; i < value.length; i++) {
+    const group = normalizeGroup(value[i], i)
+    if (group != null) result.push(group)
+  }
+  return result
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function getItemText(item : any | null) : string {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const object = item as UTSJSONObject
+    const name = objectText(object, 'name')
+    if (name.length > 0) return name
+    const text = objectText(object, 'text')
+    if (text.length > 0) return text
+  }
+  return item.toString()
+}
+
+const bgColor = computed(() : string => {
   return props.bgColor
 })
 const activeIndex = ref(0)
 const scrollIntoView = ref('')
-const barId = 'i-index-list-bar-' + String(Math.round(Math.random() * 1000000))
+const barId = 'i-index-list-bar-' + (Math.round(Math.random() * 1000000)).toString()
 const barTop = ref(0)
 const barHeight = ref(0)
 
-const groups = computed(() => {
-  if (props.list.length > 0) return props.list
-  const result = []
-  for (let i = 0; i < props.letters.length; i++) {
-    const title = String(props.letters[i])
-    let items = props.itemsA
-    if (title == 'B') items = props.itemsB
-    if (title == 'S') items = props.itemsS
-    result.push({
-      title,
-      items,
-    })
+const groups = computed(() : Array<IIndexGroup> => {
+  const provided = normalizeGroups(props.list)
+  if (provided.length > 0) return provided
+  const result : Array<IIndexGroup> = []
+  const letters = props.letters
+  if (letters == null) return result
+  for (let i = 0; i < letters.length; i++) {
+    const rawTitle = letters[i]
+    if (rawTitle == null) continue
+    const title = rawTitle.toString()
+    let items = normalizeItems(props.itemsA)
+    if (title == 'B') items = normalizeItems(props.itemsB)
+    if (title == 'S') items = normalizeItems(props.itemsS)
+    result.push({ title, items })
   }
   return result
 })
 
-const groupTitleStyle = computed(() => {
+const groupTitleStyle = computed(() : string => {
   let style = 'background-color:#f5f7fb;'
   if (props.sticky) {
     style += 'position:sticky;top:0;z-index:1;'
@@ -160,125 +239,52 @@ const groupTitleStyle = computed(() => {
   return style
 })
 
-const contentStyle = computed(() => {
+const contentStyle = computed(() : string => {
   return 'height:' + formatSize(props.height) + ';'
 })
 
-function getValue(item, keyName) {
-  if (item == null) return ''
-  if (typeof item == 'object') {
-    const value = item[keyName]
-    if (value == null) return ''
-    return String(value)
-  }
-  return String(item)
+function getGroupTitle(group : IIndexGroup, index : number) : string {
+  return group.title.length > 0 ? group.title : (index + 1).toString()
 }
 
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
+function getGroupItems(group : IIndexGroup) : Array<any | null> {
+  return group.items
 }
 
-function getGroupTitle(group, index) {
-  const title = getValue(group, 'title')
-  if (title.length > 0) return title
-  const name = getValue(group, 'name')
-  if (name.length > 0) return name
-  const indexText = getValue(group, 'index')
-  if (indexText.length > 0) return indexText
-  return String(index + 1)
-}
-
-function getGroupItems(group) {
-  if (group == null) return []
-  if (typeof group == 'object') {
-    const items = group['items']
-    if (Array.isArray(items)) return items
-    const children = group['children']
-    if (Array.isArray(children)) return children
-  }
-  return []
-}
-
-function getItemText(item) {
-  const name = getValue(item, 'name')
-  if (name.length > 0) return name
-  const text = getValue(item, 'text')
-  if (text.length > 0) return text
-  return String(item)
-}
-
-function selectGroup(groupIndex) {
-  switchGroup(groupIndex, true)
-}
-
-function switchGroup(groupIndex, forceEmit) {
+function switchGroup(groupIndex : number, forceEmit : boolean) : void {
   if (groups.value.length == 0) return
   let nextIndex = groupIndex
   if (nextIndex < 0) nextIndex = 0
   if (nextIndex >= groups.value.length) nextIndex = groups.value.length - 1
   if (!forceEmit && activeIndex.value == nextIndex) return
   activeIndex.value = nextIndex
-  scrollIntoView.value = 'i-index-list-group-' + String(nextIndex)
-  emit('change', {
+  scrollIntoView.value = 'i-index-list-group-' + (nextIndex).toString()
+  const payload : IIndexChangePayload = {
     groupIndex: nextIndex,
     index: getGroupTitle(groups.value[nextIndex], nextIndex),
-  })
-}
-
-function handleBarTouchStart(event) {
-  if (groups.value.length == 0) return
-  setBarRectFromEventTarget(event)
-  if (barHeight.value > 0) {
-    updateGroupByTouch(event)
-    return
   }
-  refreshBarRect(event, true)
+  emit('change', payload)
 }
 
-function handleBarTouchMove(event) {
-  if (groups.value.length == 0) return
-  if (barHeight.value > 0) {
-    updateGroupByTouch(event)
-    return
+function readTouchY(event : UniTouchEvent) : number {
+  if (event.touches.length > 0) return event.touches[0].clientY
+  if (event.changedTouches.length > 0) return event.changedTouches[0].clientY
+  return NaN
+}
+
+function normalizeRectPoint(first : any | null, fallback : any | null) : number {
+  if (first != null) {
+    const firstValue = parseFloat(first.toString())
+    if (!isNaN(firstValue)) return firstValue
   }
-  refreshBarRect(event, true)
-}
-
-function refreshBarRect(event, shouldUpdate) {
-  setBarRectFromEventTarget(event)
-  if (barHeight.value > 0) {
-    if (shouldUpdate) updateGroupByTouch(event)
-    return
+  if (fallback != null) {
+    const fallbackValue = parseFloat(fallback.toString())
+    if (!isNaN(fallbackValue)) return fallbackValue
   }
-  uni
-    .createSelectorQuery()
-    .select('#' + barId)
-    .boundingClientRect((rect) => {
-      if (rect != null) {
-        barTop.value = normalizeRectPoint(rect.top, rect.y)
-        barHeight.value = Number(rect.height)
-      }
-      if (shouldUpdate) updateGroupByTouch(event)
-    })
-    .exec()
+  return 0
 }
 
-function setBarRectFromEventTarget(event) {
-  const target = event.currentTarget
-  if (
-    target != null &&
-    target.getBoundingClientRect != null &&
-    typeof target.getBoundingClientRect == 'function'
-  ) {
-    const rect = target.getBoundingClientRect()
-    barTop.value = normalizeRectPoint(rect.top, rect.y)
-    barHeight.value = Number(rect.height)
-  }
-}
-
-function updateGroupByTouch(event) {
+function updateGroupByTouch(event : UniTouchEvent) : void {
   const y = readTouchY(event)
   if (isNaN(y) || barHeight.value <= 0 || groups.value.length == 0) return
 
@@ -293,27 +299,45 @@ function updateGroupByTouch(event) {
   switchGroup(nextIndex, false)
 }
 
-function readTouchY(event) {
-  let point = null
-  if (event.touches != null && event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
+function refreshBarRect(event : UniTouchEvent, shouldUpdate : boolean) : void {
+  uni
+    .createSelectorQuery()
+    .select('#' + barId)
+    .boundingClientRect((rect : any | null) : void => {
+      if (rect != null && typeof rect == 'object') {
+        const object = rect as UTSJSONObject
+        barTop.value = normalizeRectPoint(object['top'], object['y'])
+        barHeight.value = normalizeRectPoint(object['height'], 0)
+      }
+      if (shouldUpdate) updateGroupByTouch(event)
+    })
+    .exec()
+}
+
+function selectGroup(groupIndex : number) : void {
+  switchGroup(groupIndex, true)
+}
+
+function handleBarTouchStart(event : UniTouchEvent) : void {
+  if (groups.value.length == 0) return
+  if (barHeight.value > 0) {
+    updateGroupByTouch(event)
+    return
   }
-  if (point == null) return NaN
-  return Number(point.clientY)
+  refreshBarRect(event, true)
 }
 
-function normalizeRectPoint(first, fallback) {
-  const firstValue = Number(first)
-  if (!isNaN(firstValue)) return firstValue
-  const fallbackValue = Number(fallback)
-  if (!isNaN(fallbackValue)) return fallbackValue
-  return 0
+function handleBarTouchMove(event : UniTouchEvent) : void {
+  if (groups.value.length == 0) return
+  if (barHeight.value > 0) {
+    updateGroupByTouch(event)
+    return
+  }
+  refreshBarRect(event, true)
 }
 
-function selectItem(group, groupIndex, item, itemIndex) {
-  const payload = {
+function selectItem(group : IIndexGroup, groupIndex : number, item : any | null, itemIndex : number) : void {
+  const payload : IIndexSelectPayload = {
     groupIndex,
     itemIndex,
     index: getGroupTitle(group, groupIndex),

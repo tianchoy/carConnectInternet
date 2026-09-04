@@ -45,42 +45,43 @@
           <text class="i-datetime-picker__loading-text">加载中...</text>
         </view>
 
-        <view class="i-datetime-picker__body">
-          <view v-if="showDateColumn" class="i-datetime-picker__item-wrap">
-            <text class="i-datetime-picker__label">{{ dateLabel }}</text>
-            <picker
-              mode="date"
-              :value="datePickerValue"
-              :start="startDate"
-              :end="endDate"
-              :fields="dateFields"
-              :disabled="disabled || loading"
-              @change="handleDateChange"
-            >
-              <view class="i-datetime-picker__item">
-                <text class="i-datetime-picker__value">{{
-                  datePickerValue
-                }}</text>
-              </view>
-            </picker>
-          </view>
+        <picker-view
+          class="i-datetime-picker__columns"
+          :style="columnsStyle"
+          :value="wheelIndexes"
+          :indicator-style="indicatorStyle"
+          @change="handleWheelChange"
+        >
+        <picker-view-column v-if="showYearColumn" class="i-datetime-picker__column">
+            <view v-for="item in yearOptions" :key="item.value" class="i-datetime-picker__item" :style="itemStyle">
+              <text class="i-datetime-picker__value">{{ item.text }}</text>
+            </view>
+          </picker-view-column>
 
-          <view v-if="showTimeColumn" class="i-datetime-picker__item-wrap">
-            <text class="i-datetime-picker__label">{{ timeLabel }}</text>
-            <picker
-              mode="time"
-              :value="currentTime"
-              :start="startTime"
-              :end="endTime"
-              :disabled="disabled || loading"
-              @change="handleTimeChange"
-            >
-              <view class="i-datetime-picker__item">
-                <text class="i-datetime-picker__value">{{ currentTime }}</text>
-              </view>
-            </picker>
-          </view>
-        </view>
+          <picker-view-column v-if="showMonthColumn" class="i-datetime-picker__column">
+            <view v-for="item in monthOptions" :key="item.value" class="i-datetime-picker__item" :style="itemStyle">
+              <text class="i-datetime-picker__value">{{ item.text }}</text>
+            </view>
+          </picker-view-column>
+
+          <picker-view-column v-if="showDayColumn" class="i-datetime-picker__column">
+            <view v-for="item in dayOptions" :key="item.value" class="i-datetime-picker__item" :style="itemStyle">
+              <text class="i-datetime-picker__value">{{ item.text }}</text>
+            </view>
+          </picker-view-column>
+
+          <picker-view-column v-if="showHourColumn" class="i-datetime-picker__column">
+            <view v-for="item in hourOptions" :key="item.value" class="i-datetime-picker__item" :style="itemStyle">
+              <text class="i-datetime-picker__value">{{ item.text }}</text>
+            </view>
+          </picker-view-column>
+
+          <picker-view-column v-if="showMinuteColumn" class="i-datetime-picker__column">
+            <view v-for="item in minuteOptions" :key="item.value" class="i-datetime-picker__item" :style="itemStyle">
+              <text class="i-datetime-picker__value">{{ item.text }}</text>
+            </view>
+          </picker-view-column>
+        </picker-view>
       </view>
     </view>
   </view>
@@ -225,208 +226,322 @@ const emit = defineEmits([
   'update:time',
 ])
 
+type IDatetimePickerEvent = {
+  value : any,
+  date : string,
+  time : string,
+  timestamp : number,
+  mode : string,
+}
+
+function padNumber(value : any) : string {
+  const numberValue = parseFloat((value).toString())
+  return numberValue < 10 ? '0' + (numberValue).toString() : (numberValue).toString()
+}
+
+function formatDate(timestamp : number) : string {
+  const date = new Date(timestamp)
+  return (
+    (date.getFullYear()).toString() +
+    '-' +
+    padNumber(date.getMonth() + 1) +
+    '-' +
+    padNumber(date.getDate())
+  )
+}
+
+function formatTime(timestamp : number) : string {
+  const date = new Date(timestamp)
+  return padNumber(date.getHours()) + ':' + padNumber(date.getMinutes())
+}
+
+function validHour(value : any) : number {
+  const numberValue = parseFloat((value).toString())
+  if (numberValue < 0) return 0
+  if (numberValue > 23) return 23
+  return numberValue
+}
+
+function validMinute(value : any) : number {
+  const numberValue = parseFloat((value).toString())
+  if (numberValue < 0) return 0
+  if (numberValue > 59) return 59
+  return numberValue
+}
+
+function timeToMinutes(value : string) : number {
+  return parseFloat((value.substring(0, 2)).toString()) * 60 + parseFloat((value.substring(3, 5)).toString())
+}
+
+function normalizeTime(value : string) : string {
+  if (value.length >= 5) return value.substring(0, 5)
+  return '00:00'
+}
+
+function dateTimeToTimestamp(dateText : string, timeText : string) : number {
+  const year = parseFloat((dateText.substring(0, 4)).toString())
+  const month = parseFloat((dateText.substring(5, 7)).toString()) - 1
+  const day = parseFloat((dateText.substring(8, 10)).toString())
+  const hour = parseFloat((timeText.substring(0, 2)).toString())
+  const minute = parseFloat((timeText.substring(3, 5)).toString())
+  return new Date(year, month, day, hour, minute, 0).getTime()
+}
+
+function minDateValue() : number {
+  if (props.minDate > 0) return props.minDate
+  const now = new Date()
+  return new Date(now.getFullYear() - 10, now.getMonth(), now.getDate(), 0, 0, 0).getTime()
+}
+
+function maxDateValue() : number {
+  if (props.maxDate > 0) return props.maxDate
+  const now = new Date()
+  return new Date(now.getFullYear() + 10, now.getMonth(), now.getDate(), 23, 59, 59).getTime()
+}
+
+function formatSize(value : any) : string {
+  const text = (value).toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
 
 
 const opened = ref(props.show)
 const currentDate = ref(props.date)
 const currentTime = ref(props.time)
 
-const normalizedMode = computed(() => {
+function boundaryStartTime() : string {
+  if (currentDate.value == formatDate(minDateValue())) return formatTime(minDateValue())
+  return '00:00'
+}
+
+function boundaryEndTime() : string {
+  if (currentDate.value == formatDate(maxDateValue())) return formatTime(maxDateValue())
+  return '23:59'
+}
+
+const normalizedMode = computed(() : string => {
   if (props.mode == 'date') return 'date'
   if (props.mode == 'time') return 'time'
   if (props.mode == 'year-month') return 'year-month'
   return 'datetime'
 })
 
-const showDateColumn = computed(() => normalizedMode.value != 'time')
-const showTimeColumn = computed(() => normalizedMode.value == 'datetime' || normalizedMode.value == 'time')
+type IWheelOption = {
+  value : number,
+  text : string,
+}
 
-const dateFields = computed(() => {
-  if (normalizedMode.value == 'year-month') return 'month'
-  return 'day'
+function datePart(value : string, index : number, fallback : number) : number {
+  const parts = value.split(/[- :]/)
+  if (parts.length <= index) return fallback
+  const parsed = parseFloat(parts[index])
+  return isNaN(parsed) ? fallback : parsed
+}
+
+function optionRange(start : number, end : number, suffix : string, pad : boolean = false) : Array<IWheelOption> {
+  const result : Array<IWheelOption> = []
+  for (let value = start; value <= end; value++) {
+    const text = pad ? padNumber(value) : value.toString()
+    result.push({ value, text: text + suffix })
+  }
+  return result
+}
+
+function dateFromParts(year : number, month : number, day : number, hour : number, minute : number) : string {
+  return year.toString() + '-' + padNumber(month) + '-' + padNumber(day) + ' ' + padNumber(hour) + ':' + padNumber(minute)
+}
+
+function daysInMonth(year : number, month : number) : number {
+  return new Date(year, month, 0).getDate()
+}
+
+function selectedYear() : number {
+  return datePart(currentDate.value, 0, new Date().getFullYear())
+}
+
+function selectedMonth() : number {
+  return datePart(currentDate.value, 1, new Date().getMonth() + 1)
+}
+
+function selectedDay() : number {
+  return datePart(currentDate.value, 2, new Date().getDate())
+}
+
+function selectedHour() : number {
+  return datePart(currentTime.value, 0, 0)
+}
+
+function selectedMinute() : number {
+  return datePart(currentTime.value, 1, 0)
+}
+
+function minDateParts() : Date {
+  return new Date(minDateValue())
+}
+
+function maxDateParts() : Date {
+  return new Date(maxDateValue())
+}
+
+const showYearColumn = computed(() : boolean => normalizedMode.value != 'time')
+const showMonthColumn = computed(() : boolean => normalizedMode.value != 'time')
+const showDayColumn = computed(() : boolean => normalizedMode.value == 'datetime' || normalizedMode.value == 'date')
+const showHourColumn = computed(() : boolean => normalizedMode.value == 'datetime' || normalizedMode.value == 'time')
+const showMinuteColumn = computed(() : boolean => normalizedMode.value == 'datetime' || normalizedMode.value == 'time')
+
+const yearOptions = computed(() : Array<IWheelOption> => {
+  const minYear = minDateParts().getFullYear()
+  const maxYear = maxDateParts().getFullYear()
+  return optionRange(minYear, maxYear, '年')
 })
 
-const datePickerValue = computed(() => {
-  if (normalizedMode.value == 'year-month') return currentDate.value.substring(0, 7)
-  return currentDate.value
+const columnsStyle = computed(() : string => {
+  return 'width:100%;height:220px;'
 })
 
-const startDate = computed(() => {
-  return formatDate(minDateValue())
+const indicatorStyle = computed(() : string => {
+  return 'height:44px;background-color:transparent;border-top:1px solid #eef0f4;border-bottom:1px solid #eef0f4;'
 })
 
-const endDate = computed(() => {
-  return formatDate(maxDateValue())
+const itemStyle = computed(() : string => {
+  return 'height:44px;'
 })
 
-const startTime = computed(() => {
-  if (normalizedMode.value != 'time') return boundaryStartTime()
-  return padNumber(validHour(props.minHour)) + ':' + padNumber(validMinute(props.minMinute))
+const monthOptions = computed(() : Array<IWheelOption> => {
+  let firstMonth = 1
+  let lastMonth = 12
+  const minDate = minDateParts()
+  const maxDate = maxDateParts()
+  if (selectedYear() == minDate.getFullYear()) firstMonth = minDate.getMonth() + 1
+  if (selectedYear() == maxDate.getFullYear()) lastMonth = maxDate.getMonth() + 1
+  return optionRange(firstMonth, lastMonth, '月')
 })
 
-const endTime = computed(() => {
-  if (normalizedMode.value != 'time') return boundaryEndTime()
-  return padNumber(validHour(props.maxHour)) + ':' + padNumber(validMinute(props.maxMinute))
+const dayOptions = computed(() : Array<IWheelOption> => {
+  let firstDay = 1
+  let lastDay = daysInMonth(selectedYear(), selectedMonth())
+  const minDate = minDateParts()
+  const maxDate = maxDateParts()
+  if (selectedYear() == minDate.getFullYear() && selectedMonth() == minDate.getMonth() + 1) firstDay = minDate.getDate()
+  if (selectedYear() == maxDate.getFullYear() && selectedMonth() == maxDate.getMonth() + 1) lastDay = maxDate.getDate()
+  if (firstDay > lastDay) firstDay = lastDay
+  return optionRange(firstDay, lastDay, '日')
 })
 
-const displayValue = computed(() => {
+function hourRange() : Array<number> {
+  let firstHour = 0
+  let lastHour = 23
+  if (normalizedMode.value == 'time') {
+    firstHour = validHour(props.minHour)
+    lastHour = validHour(props.maxHour)
+  } else {
+    const timestampDate = dateTimeToTimestamp(currentDate.value, currentTime.value)
+    if (formatDate(timestampDate) == formatDate(minDateValue())) firstHour = new Date(minDateValue()).getHours()
+    if (formatDate(timestampDate) == formatDate(maxDateValue())) lastHour = new Date(maxDateValue()).getHours()
+  }
+  return [firstHour, lastHour]
+}
+
+const hourOptions = computed(() : Array<IWheelOption> => {
+  const range = hourRange()
+  return optionRange(range[0], range[1], '时', true)
+})
+
+function minuteRange() : Array<number> {
+  let firstMinute = 0
+  let lastMinute = 59
+  const range = hourRange()
+  const hour = selectedHour()
+  if (normalizedMode.value == 'time') {
+    if (hour == range[0]) firstMinute = validMinute(props.minMinute)
+    if (hour == range[1]) lastMinute = validMinute(props.maxMinute)
+  } else {
+    const timestampDate = dateTimeToTimestamp(currentDate.value, currentTime.value)
+    if (formatDate(timestampDate) == formatDate(minDateValue()) && hour == new Date(minDateValue()).getHours()) {
+      firstMinute = new Date(minDateValue()).getMinutes()
+    }
+    if (formatDate(timestampDate) == formatDate(maxDateValue()) && hour == new Date(maxDateValue()).getHours()) {
+      lastMinute = new Date(maxDateValue()).getMinutes()
+    }
+  }
+  return [firstMinute, lastMinute]
+}
+
+const minuteOptions = computed(() : Array<IWheelOption> => {
+  const range = minuteRange()
+  return optionRange(range[0], range[1], '分', true)
+})
+
+const wheelIndexes = ref<Array<number>>([])
+
+function indexOfOption(options : Array<IWheelOption>, value : number) : number {
+  for (let index = 0; index < options.length; index++) {
+    if (options[index].value == value) return index
+  }
+  return 0
+}
+
+function syncWheelIndexes() : void {
+  const indexes : Array<number> = []
+  if (showYearColumn.value) indexes.push(indexOfOption(yearOptions.value, selectedYear()))
+  if (showMonthColumn.value) indexes.push(indexOfOption(monthOptions.value, selectedMonth()))
+  if (showDayColumn.value) indexes.push(indexOfOption(dayOptions.value, selectedDay()))
+  if (showHourColumn.value) indexes.push(indexOfOption(hourOptions.value, selectedHour()))
+  if (showMinuteColumn.value) indexes.push(indexOfOption(minuteOptions.value, selectedMinute()))
+  wheelIndexes.value = indexes
+}
+
+function selectedOptionValue(options : Array<IWheelOption>, index : number, fallback : number) : number {
+  if (options.length == 0) return fallback
+  let safeIndex = index
+  if (safeIndex < 0) safeIndex = 0
+  if (safeIndex >= options.length) safeIndex = options.length - 1
+  return options[safeIndex].value
+}
+
+function wheelIndexAt(values : Array<any | null>, index : number) : number {
+  if (values.length <= index || values[index] == null) return 0
+  const result = parseFloat(values[index].toString())
+  if (isNaN(result) || result < 0) return 0
+  return Math.floor(result)
+}
+
+const displayValue = computed(() : string => {
   if (normalizedMode.value == 'time') return currentTime.value
   if (normalizedMode.value == 'date') return currentDate.value
   if (normalizedMode.value == 'year-month') return currentDate.value.substring(0, 7)
   return currentDate.value + ' ' + currentTime.value
 })
 
-const panelStyle = computed(() => {
+const panelStyle = computed(() : string => {
   const radius = formatSize(props.round)
   return 'border-radius:' + radius + ' ' + radius + ' 0 0;'
 })
 
-watch(
-  () => props.show,
-  (nextValue) => {
-    if (opened.value == nextValue) return
-    opened.value = nextValue
-    if (nextValue) {
-      syncFromProps()
-      emit('open')
-    } else {
-      emit('close')
-    }
-  },
-)
-
-watch(
-  () => props.modelValue,
-  () => {
-    syncFromProps()
-  },
-)
-
-watch(
-  () => props.date,
-  () => {
-    syncFromProps()
-  },
-)
-
-watch(
-  () => props.time,
-  () => {
-    syncFromProps()
-  },
-)
-
-watch(
-  () => props.minDate,
-  () => {
-    clampCurrent()
-  },
-)
-
-watch(
-  () => props.maxDate,
-  () => {
-    clampCurrent()
-  },
-)
-
-syncFromProps()
-
-function openByTrigger() {
-  if (props.disabled) return
-  open()
+function currentTimestamp() : number {
+  return dateTimeToTimestamp(currentDate.value, currentTime.value)
 }
 
-function open() {
-  if (opened.value) return
-  syncFromProps()
-  opened.value = true
-  emit('open')
-  emit('update:show', true)
+function clampTime(value : string) : string {
+  const text = normalizeTime(value)
+  const current = timeToMinutes(text)
+  const minValue = validHour(props.minHour) * 60 + validMinute(props.minMinute)
+  const maxValue = validHour(props.maxHour) * 60 + validMinute(props.maxMinute)
+  let nextValue = current
+  if (nextValue < minValue) nextValue = minValue
+  if (nextValue > maxValue) nextValue = maxValue
+  return padNumber(Math.floor(nextValue / 60)) + ':' + padNumber(nextValue % 60)
 }
 
-function close() {
-  if (!opened.value) return
-  opened.value = false
-  emit('close')
-  emit('update:show', false)
+function outputValue() : any {
+  if (normalizedMode.value == 'time') return currentTime.value
+  return currentTimestamp()
 }
 
-function cancel() {
-  emit('cancel', buildEvent())
-  close()
-}
-
-function confirm() {
-  const event = buildEvent()
-  emit('confirm', event)
-  emitValue()
-  close()
-}
-
-function handleOverlayClick() {
-  if (!props.closeOnMask) return
-  close()
-}
-
-function handleDateChange(event) {
-  const value = String(event.detail.value)
-  if (normalizedMode.value == 'year-month') {
-    currentDate.value = value + '-01'
-  } else {
-    currentDate.value = value
-  }
-  clampCurrent()
-  emit('update:date', currentDate.value)
-  emit('change', buildEvent())
-  if (!props.showToolbar) emitValue()
-}
-
-function handleTimeChange(event) {
-  currentTime.value = String(event.detail.value)
-  clampCurrent()
-  emit('update:time', currentTime.value)
-  emit('change', buildEvent())
-  if (!props.showToolbar) emitValue()
-}
-
-function syncFromProps() {
-  const modelText = String(props.modelValue)
-  if (modelText.length > 0) {
-    applyValue(props.modelValue)
-  } else {
-    currentDate.value = props.date
-    currentTime.value = props.time
-  }
-  clampCurrent()
-}
-
-function applyValue(value) {
-  if (normalizedMode.value == 'time') {
-    currentTime.value = normalizeTime(String(value))
-    return
-  }
-
-  const numberValue = Number(value)
-  if (!isNaN(numberValue) && numberValue > 0) {
-    currentDate.value = formatDate(numberValue)
-    currentTime.value = formatTime(numberValue)
-    return
-  }
-
-  const text = String(value)
-  if (text.length >= 10) currentDate.value = text.substring(0, 10)
-  if (text.length >= 16) currentTime.value = text.substring(11, 16)
-}
-
-function emitValue() {
-  const event = buildEvent()
-  emit('update:modelValue', event.value)
-  emit('update:date', currentDate.value)
-  emit('update:time', currentTime.value)
-}
-
-function buildEvent() {
+function buildEvent() : IDatetimePickerEvent {
   return {
     value: outputValue(),
     date: currentDate.value,
@@ -436,12 +551,41 @@ function buildEvent() {
   }
 }
 
-function outputValue() {
-  if (normalizedMode.value == 'time') return currentTime.value
-  return currentTimestamp()
+function emitValue() : void {
+  const event = buildEvent()
+  emit('update:modelValue', event.value)
+  emit('update:date', currentDate.value)
+  emit('update:time', currentTime.value)
 }
 
-function clampCurrent() {
+function applyValue(value : any) : void {
+  if (normalizedMode.value == 'time') {
+    currentTime.value = normalizeTime((value).toString())
+    return
+  }
+
+  if (typeof value == 'number') {
+    if (value > 0) {
+      currentDate.value = formatDate(value)
+      currentTime.value = formatTime(value)
+    }
+    return
+  }
+
+  const text = (value).toString()
+  if (/^\d+$/.test(text)) {
+    const timestamp = parseFloat(text)
+    if (!isNaN(timestamp) && timestamp > 0) {
+      currentDate.value = formatDate(timestamp)
+      currentTime.value = formatTime(timestamp)
+      return
+    }
+  }
+  if (text.length >= 10) currentDate.value = text.substring(0, 10)
+  if (text.length >= 16) currentTime.value = text.substring(11, 16)
+}
+
+function clampCurrent() : void {
   if (normalizedMode.value == 'time') {
     currentTime.value = clampTime(currentTime.value)
     return
@@ -456,103 +600,166 @@ function clampCurrent() {
   currentTime.value = formatTime(timestamp)
 }
 
-function currentTimestamp() {
-  return dateTimeToTimestamp(currentDate.value, currentTime.value)
-}
-
-function dateTimeToTimestamp(dateText, timeText) {
-  const year = Number(dateText.substring(0, 4))
-  const month = Number(dateText.substring(5, 7)) - 1
-  const day = Number(dateText.substring(8, 10))
-  const hour = Number(timeText.substring(0, 2))
-  const minute = Number(timeText.substring(3, 5))
-  return new Date(year, month, day, hour, minute, 0).getTime()
-}
-
-function minDateValue() {
-  if (props.minDate > 0) return props.minDate
-  const now = new Date()
-  return new Date(now.getFullYear() - 10, now.getMonth(), now.getDate(), 0, 0, 0).getTime()
-}
-
-function maxDateValue() {
-  if (props.maxDate > 0) return props.maxDate
-  const now = new Date()
-  return new Date(now.getFullYear() + 10, now.getMonth(), now.getDate(), 23, 59, 59).getTime()
-}
-
-function boundaryStartTime() {
-  if (currentDate.value == formatDate(minDateValue())) return formatTime(minDateValue())
-  return '00:00'
-}
-
-function boundaryEndTime() {
-  if (currentDate.value == formatDate(maxDateValue())) return formatTime(maxDateValue())
-  return '23:59'
-}
-
-function clampTime(value) {
-  const text = normalizeTime(value)
-  const current = timeToMinutes(text)
-  const minValue = validHour(props.minHour) * 60 + validMinute(props.minMinute)
-  const maxValue = validHour(props.maxHour) * 60 + validMinute(props.maxMinute)
-  let nextValue = current
-  if (nextValue < minValue) nextValue = minValue
-  if (nextValue > maxValue) nextValue = maxValue
-  return padNumber(Math.floor(nextValue / 60)) + ':' + padNumber(nextValue % 60)
-}
-
-function timeToMinutes(value) {
-  return Number(value.substring(0, 2)) * 60 + Number(value.substring(3, 5))
-}
-
-function normalizeTime(value) {
-  if (value.length >= 5) return value.substring(0, 5)
-  return '00:00'
-}
-
-function formatDate(timestamp) {
-  const date = new Date(timestamp)
-  return (
-    String(date.getFullYear()) +
-    '-' +
-    padNumber(date.getMonth() + 1) +
-    '-' +
-    padNumber(date.getDate())
-  )
-}
-
-function formatTime(timestamp) {
-  const date = new Date(timestamp)
-  return padNumber(date.getHours()) + ':' + padNumber(date.getMinutes())
-}
-
-function validHour(value) {
-  const numberValue = Number(value)
-  if (numberValue < 0) return 0
-  if (numberValue > 23) return 23
-  return numberValue
-}
-
-function validMinute(value) {
-  const numberValue = Number(value)
-  if (numberValue < 0) return 0
-  if (numberValue > 59) return 59
-  return numberValue
-}
-
-function padNumber(value) {
-  const numberValue = Number(value)
-  return numberValue < 10 ? '0' + String(numberValue) : String(numberValue)
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
+function syncFromProps() : void {
+  const modelText = (props.modelValue).toString()
+  if (modelText.length > 0) {
+    applyValue(props.modelValue)
+  } else {
+    currentDate.value = props.date
+    currentTime.value = props.time
   }
-  return text + 'px'
+  clampCurrent()
+  syncWheelIndexes()
 }
+
+function open() : void {
+  if (opened.value) return
+  syncFromProps()
+  opened.value = true
+  emit('open')
+  emit('update:show', true)
+}
+
+function openByTrigger() : void {
+  if (props.disabled) return
+  open()
+}
+
+function close() : void {
+  if (!opened.value) return
+  opened.value = false
+  emit('close')
+  emit('update:show', false)
+}
+
+function cancel() : void {
+  emit('cancel', buildEvent())
+  close()
+}
+
+function confirm() : void {
+  const event = buildEvent()
+  emit('confirm', event)
+  emitValue()
+  close()
+}
+
+function handleOverlayClick() : void {
+  if (!props.closeOnMask) return
+  close()
+}
+
+function handleWheelChange(event : any) : void {
+  if (props.disabled || props.loading || event == null || typeof event != 'object') return
+  const detail = (event as UTSJSONObject)['detail']
+  if (detail == null || typeof detail != 'object') return
+  const rawValues = (detail as UTSJSONObject)['value']
+  if (rawValues == null || !Array.isArray(rawValues)) return
+  const values = rawValues as Array<any | null>
+
+  // Keep the option lists from before the change. Year/month changes alter the
+  // dependent columns, so the received indexes must be mapped before updating state.
+  const previousYearOptions = yearOptions.value
+  const previousMonthOptions = monthOptions.value
+  const previousDayOptions = dayOptions.value
+  const previousHourOptions = hourOptions.value
+  const previousMinuteOptions = minuteOptions.value
+  let valueIndex = 0
+  let year = selectedYear()
+  let month = selectedMonth()
+  let day = selectedDay()
+  let hour = selectedHour()
+  let minute = selectedMinute()
+
+  if (showYearColumn.value) {
+    year = selectedOptionValue(previousYearOptions, wheelIndexAt(values, valueIndex), year)
+    valueIndex++
+  }
+  if (showMonthColumn.value) {
+    month = selectedOptionValue(previousMonthOptions, wheelIndexAt(values, valueIndex), month)
+    valueIndex++
+  }
+  if (showDayColumn.value) {
+    day = selectedOptionValue(previousDayOptions, wheelIndexAt(values, valueIndex), day)
+    valueIndex++
+  }
+  if (showHourColumn.value) {
+    hour = selectedOptionValue(previousHourOptions, wheelIndexAt(values, valueIndex), hour)
+    valueIndex++
+  }
+  if (showMinuteColumn.value) {
+    minute = selectedOptionValue(previousMinuteOptions, wheelIndexAt(values, valueIndex), minute)
+    valueIndex++
+  }
+
+  const minDate = minDateParts()
+  const maxDate = maxDateParts()
+  const minMonth = year == minDate.getFullYear() ? minDate.getMonth() + 1 : 1
+  const maxMonth = year == maxDate.getFullYear() ? maxDate.getMonth() + 1 : 12
+  if (month < minMonth) month = minMonth
+  if (month > maxMonth) month = maxMonth
+  const maxDay = daysInMonth(year, month)
+  if (day < 1) day = 1
+  if (day > maxDay) day = maxDay
+
+  currentDate.value = dateFromParts(year, month, day, hour, minute).split(' ')[0]
+  currentTime.value = padNumber(hour) + ':' + padNumber(minute)
+  clampCurrent()
+  syncWheelIndexes()
+  emit('change', buildEvent())
+  if (!props.showToolbar) emitValue()
+}
+
+watch(
+  () : boolean => props.show,
+  (nextValue : boolean) : void => {
+    if (opened.value == nextValue) return
+    opened.value = nextValue
+    if (nextValue) {
+      syncFromProps()
+      emit('open')
+    } else {
+      emit('close')
+    }
+  },
+)
+
+watch(
+  () : any => props.modelValue,
+  () : void => {
+    syncFromProps()
+  },
+)
+
+watch(
+  () : string => props.date,
+  () : void => {
+    syncFromProps()
+  },
+)
+
+watch(
+  () : string => props.time,
+  () : void => {
+    syncFromProps()
+  },
+)
+
+watch(
+  () : number => props.minDate,
+  () : void => {
+    clampCurrent()
+  },
+)
+
+watch(
+  () : number => props.maxDate,
+  () : void => {
+    clampCurrent()
+  },
+)
+
+syncFromProps()
 
 defineExpose({
   open,
@@ -662,33 +869,26 @@ defineExpose({
   line-height: 22px;
 }
 
-.i-datetime-picker__body {
-  padding: 16px;
+.i-datetime-picker__columns {
+  width: 100%;
+  height: 220px;
 }
 
-.i-datetime-picker__item-wrap {
-  margin-bottom: 12px;
-}
-
-.i-datetime-picker__label {
-  margin-bottom: 8px;
-  color: #909399;
-  font-size: 13px;
-  line-height: 20px;
+.i-datetime-picker__column {
+  flex: 1;
+  height: 100%;
 }
 
 .i-datetime-picker__item {
-  height: 44px;
-  padding: 0 12px;
-  border-radius: 8px;
-  background-color: #f5f7fa;
+  width: 100%;
+  align-items: center;
   justify-content: center;
 }
 
 .i-datetime-picker__value {
-  color: #303133;
+  color: #606266;
   font-size: 15px;
-  font-weight: 600;
-  line-height: 22px;
+  line-height: 44px;
+  text-align: center;
 }
 </style>

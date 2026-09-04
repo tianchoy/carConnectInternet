@@ -1,18 +1,17 @@
 <template>
   <view class="i-grid" :style="gridStyle">
     <view
-      v-for="(item, index) in gridItems"
-      :key="index.toString() + '-' + getItemText(item)"
+      v-for="(item, index) in items"
+      :key="(index).toString() + '-' + getItemText(item)"
       :class="
         selected == index
           ? 'i-grid__item i-grid__item--active'
           : 'i-grid__item'
       "
-      :style="getItemStyle(index, item as any)"
+      :style="getItemStyle(index, item)"
       :hover-class="isLink ? 'i-grid__item--hover' : 'none'"
       @click="select(item, index)"
     >
-      <!-- 支持图片图标 -->
       <image
         v-if="getItemImage(item).length > 0"
         class="i-grid__image"
@@ -20,7 +19,6 @@
         :style="getImageStyle(item)"
         mode="aspectFit"
       />
-      <!-- 支持文字图标（如字体图标） -->
       <text
         v-else-if="getItemIcon(item).length > 0"
         class="i-grid__icon"
@@ -41,10 +39,7 @@ defineOptions({ name: 'i-grid' })
 
 /**
  * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
- * - items: 宫格数据源；支持字符串数组，也支持对象数组，对象可提供 text、icon、image、name、iconColor、textColor、bgColor、url 等字段。
- *   - name: 项目唯一标识，用于事件回调中识别具体项目（可选）
- *   - icon: 字体图标名称（如：''）
- *   - image: 图片图标URL（如：'/static/icon.png'），优先级高于 icon
+ * - items: 宫格数据源；支持字符串数组，也支持对象数组，对象可提供 text、icon、iconColor、textColor、bgColor、url 等字段。
  * - col: 每行显示几列，依据 DCloud uni-app x 宫格规范的 col；常用 2、3、4、5。
  * - itemHeight: 每个宫格项目高度，数字会自动转为 px。
  * - itemBgColor: 统一设置每个宫格项目背景色；单个 item.bgColor 优先级更高。
@@ -54,7 +49,7 @@ defineOptions({ name: 'i-grid' })
  * - textColor: 统一文字颜色；单个 item.textColor 优先级更高。
  * - fontSize: 文字大小，数字会自动转为 px。
  * - iconSize: 图标大小，数字会自动转为 px。
- * - imageSize: 图片图标大小，数字会自动转为 px（宽高一致）。
+ * - imageSize: 图片大小，数字会自动转为 px。
  * - showBorder: 是否显示宫格分割线。
  * - borderColor: 分割线颜色。
  * - round: 整体圆角，数字会自动转为 px。
@@ -127,91 +122,34 @@ const props = defineProps({
 
 /**
  * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
- * - select: 点击某个宫格项目时触发，参数包含 index、text、name、icon、image、url。
- * - change: 选中项变化时触发，参数同 select。
- * - click: 点击某个宫格项目时触发，参数同 select。
+ * - select: 点击某个宫格项目时触发，参数为传入的原始项目。
+ * - change: 选中项变化时触发，参数为传入的原始项目。
+ * - click: 点击某个宫格项目时触发，参数为传入的原始项目。
  * - loadmore: 保留的加载更多事件，便于列表型场景扩展。
  */
-const emit = defineEmits(['select', 'change', 'click', 'loadmore'])
+const emit = defineEmits<{
+  (event: 'select', payload: any): void
+  (event: 'change', payload: any): void
+  (event: 'click', payload: any): void
+  (event: 'loadmore', count: number): void
+}>()
 
-function valueText(value: any): string {
-  if (typeof value == 'string') return value
-  if (typeof value == 'number' || typeof value == 'boolean') return value.toString()
-  return ''
-}
-
-function formatSize(value: string | number): string {
+function formatSize(value : any) : string {
   const text = value.toString()
   if (
     text.indexOf('px') >= 0 ||
     text.indexOf('rpx') >= 0 ||
     text.indexOf('%') >= 0 ||
     text == 'auto'
-  ) {
+  )
     return text
-  }
   return text + 'px'
 }
 
-function itemValue(item: any, keyName: string): string {
-  if (item == null || typeof item != 'object') return ''
-  const values = item as UTSJSONObject
-  const value = values[keyName]
-  if (value == null) return ''
-  return valueText(value as any)
-}
-
-function getItemText(item: any): string {
-  const text = itemValue(item, 'text')
-  if (text.length > 0) return text
-  return valueText(item)
-}
-
-function getItemIcon(item: any): string {
-  return itemValue(item, 'icon')
-}
-
-function getItemImage(item: any): string {
-  return itemValue(item, 'image')
-}
-
-function getItemName(item: any): string {
-  return itemValue(item, 'name')
-}
-
-function getItemBgColor(item: any): string {
-  const color = itemValue(item, 'bgColor')
-  if (color.length > 0) return color
-  return props.itemBgColor
-}
-
-function getItemIconColor(item: any): string {
-  const color = itemValue(item, 'iconColor')
-  if (color.length > 0) return color
-  return props.iconColor
-}
-
-function getItemTextColor(item: any): string {
-  const color = itemValue(item, 'textColor')
-  if (color.length > 0) return color
-  return props.textColor
-}
-
-function getItemUrl(item: any): string {
-  return itemValue(item, 'url')
-}
-
-const bgColor = computed(() => {
-  return props.bgColor
-})
-const gridItems = computed((): Array<any> => {
-  const items = props.items
-  if (items == null) return [] as Array<any>
-  return items as Array<any>
-})
+const bgColor = computed(() : string => props.bgColor)
 const selected = ref(-1)
 
-const gridStyle = computed(() => {
+const gridStyle = computed(() : string => {
   return (
     'width:' +
     props.width +
@@ -223,20 +161,72 @@ const gridStyle = computed(() => {
   )
 })
 
-function getColumns() {
+function itemValue(item : any | null, keyName : string) : string {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const serialized = JSON.stringify(item)
+    const object = JSON.parse(serialized) as UTSJSONObject
+    const value = object[keyName]
+    if (value == null) return ''
+    return value.toString()
+  }
+  return ''
+}
+
+function getItemText(item : any | null) : string {
+  const text = itemValue(item, 'text')
+  if (text.length > 0) return text
+  if (item == null) return ''
+  return item.toString()
+}
+
+function getItemIcon(item : any | null) : string {
+  return itemValue(item, 'icon')
+}
+
+function getItemImage(item : any | null) : string {
+  return itemValue(item, 'image')
+}
+
+function getItemBgColor(item : any | null) : string {
+  const color = itemValue(item, 'bgColor')
+  if (color.length > 0) return color
+  return props.itemBgColor
+}
+
+function getItemIconColor(item : any | null) : string {
+  const color = itemValue(item, 'iconColor')
+  if (color.length > 0) return color
+  return props.iconColor
+}
+
+function getItemTextColor(item : any | null) : string {
+  const color = itemValue(item, 'textColor')
+  if (color.length > 0) return color
+  return props.textColor
+}
+
+function getItemUrl(item : any | null) : string {
+  return itemValue(item, 'url')
+}
+
+function getColumns() : number {
   if (props.col <= 1) return 1
   if (props.col >= 6) return 6
   return props.col
 }
 
-function getRows(): number {
-  const columns = getColumns()
+function getItemCount() : number {
   const items = props.items
-  if (items == null) return 0
-  return Math.ceil(items.length / columns)
+  return items == null ? 0 : items.length
 }
 
-function getItemWidth() {
+function getRows() : number {
+  const columns = getColumns()
+  return Math.ceil(getItemCount() / columns)
+}
+
+function getItemWidth() : string {
   const columns = getColumns()
   if (columns == 1) return '100%'
   if (columns == 2) return '50%'
@@ -246,7 +236,7 @@ function getItemWidth() {
   return '16.6667%'
 }
 
-function getItemStyle(index: number, item: any): string {
+function getItemStyle(index : number, item : any | null) : string {
   const columns = getColumns()
   const row = Math.floor(index / columns)
   const colIndex = index % columns
@@ -277,7 +267,7 @@ function getItemStyle(index: number, item: any): string {
   return style
 }
 
-function getIconStyle(item: any): string {
+function getIconStyle(item : any | null) : string {
   return (
     'color:' +
     getItemIconColor(item) +
@@ -289,36 +279,24 @@ function getIconStyle(item: any): string {
   )
 }
 
-function getImageStyle(item: any): string {
+function getImageStyle(item : any | null) : string {
   const size = formatSize(props.imageSize)
   return 'width:' + size + ';height:' + size + ';'
 }
 
-function getTextStyle(item: any): string {
+function getTextStyle(item : any | null) : string {
   return 'color:' + getItemTextColor(item) + ';font-size:' + formatSize(props.fontSize) + ';'
 }
 
-function buildPayload(item: any, index: number): UTSJSONObject {
-  return {
-    index,
-    name: getItemName(item),
-    text: getItemText(item),
-    icon: getItemIcon(item),
-    image: getItemImage(item),
-    url: getItemUrl(item),
-  }
-}
-
-function select(item: any, index: number): void {
+function select(item : any | null, index : number) : void {
   selected.value = index
-  const payload = buildPayload(item, index)
-  emit('select', payload)
-  emit('change', payload)
-  emit('click', payload)
+  emit('select', item)
+  emit('change', item)
+  emit('click', item)
 }
 
-function loadMore(): void {
-  emit('loadmore', gridItems.value.length)
+function loadMore() : void {
+  emit('loadmore', getItemCount())
 }
 </script>
 
@@ -346,7 +324,6 @@ function loadMore(): void {
 
 .i-grid__image {
   margin-bottom: 8px;
-  
 }
 
 .i-grid__icon {

@@ -253,6 +253,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         signalRssi.value = null;
         signalSat.value = null;
         let retry = retryCount;
+        common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:333", "loadData", data, retryCount);
         const tryLoad = (attempt) => {
           return common_vendor.__awaiter(this, void 0, void 0, function* () {
             var e_1, _a;
@@ -276,7 +277,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     const latitude = item.getNumber("latitude", 0);
                     const longitude = item.getNumber("longitude", 0);
                     if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
-                      common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:361", "位置信息缺失", item);
+                      common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:362", "位置信息缺失", item);
                       utils_toast.showAppToast({
                         title: "位置信息缺失",
                         icon: "none"
@@ -286,7 +287,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     const lat = parseFloat(latitude.toString());
                     const lng = parseFloat(longitude.toString());
                     if (isNaN(lat) || isNaN(lng)) {
-                      common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:374", "经纬度格式错误", latitude, longitude);
+                      common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:375", "经纬度格式错误", latitude, longitude);
                       return false;
                     }
                     let convertedLat = lat;
@@ -296,7 +297,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                       convertedLat = coord.lat;
                       convertedLng = coord.lng;
                     } catch (transformError) {
-                      common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:386", "坐标转换失败:", transformError);
+                      common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:387", "坐标转换失败:", transformError);
                     }
                     center.latitude = convertedLat;
                     center.longitude = convertedLng;
@@ -322,7 +323,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     if (signalRssi.value != null) {
                       const signalExp = getSignalDetail(signalRssi.value).experience;
                       if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                        common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:429", `设备 ${imei.value} 信号较弱: ${signalRssi.value}dBm`);
+                        common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:430", `设备 ${imei.value} 信号较弱: ${signalRssi.value}dBm`);
                       }
                     }
                   }
@@ -343,10 +344,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               }
               return true;
             } catch (error) {
-              common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:443", `第${attempt}次加载设备数据失败:`, error);
+              common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:444", `第${attempt}次加载设备数据失败:`, error);
               if (attempt < retry) {
                 const delayMs = Math.pow(2, attempt) * 1e3;
-                common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:449", `等待${delayMs / 1e3}秒后重试...`);
+                common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:450", `等待${delayMs / 1e3}秒后重试...`);
                 yield delay(delayMs);
                 return false;
               } else {
@@ -513,7 +514,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:694", "操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:695", "操作失败:", error);
           utils_toast.showAppToast({
             title: "操作失败，请重试",
             icon: "none"
@@ -545,7 +546,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const addr = yield utils_getAdress.getAddress(center.latitude, center.longitude);
           address.value = addr.result.formatted_address;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:730", "获取地址信息失败:", error);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:731", "获取地址信息失败:", error);
         }
       });
     };
@@ -633,7 +634,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "获取设备详情失败", icon: "none" });
           }
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:827", "设备id获取失败");
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:828", "设备id获取失败");
         }
       });
     };
@@ -658,17 +659,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     });
     common_vendor.onShow(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:861", "页面显示，检查自动刷新状态");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:862", "页面显示，检查自动刷新状态");
       if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
         setupAutoRefresh(currentTime.value);
       }
     });
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:870", "页面隐藏时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:871", "页面隐藏时停止自动刷新");
       stopAutoRefresh();
     });
     common_vendor.onUnmounted(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:875", "页面卸载时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:876", "页面卸载时停止自动刷新");
       stopAutoRefresh();
     });
     return (_ctx, _cache) => {
@@ -720,38 +721,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, !common_vendor.unref(address) ? {
         t: common_vendor.o(refreshAdress, "45")
       } : {}, {
-        v: common_vendor.unref(signalRssi) != null
-      }, common_vendor.unref(signalRssi) != null ? {
-        w: getMobileSignalBarClass(0, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
-        x: getMobileSignalBarClass(1, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
-        y: getMobileSignalBarClass(2, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
-        z: getMobileSignalBarClass(3, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
-        A: getMobileSignalBarClass(4, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
-        B: common_vendor.t(getSignalDetail(common_vendor.unref(signalRssi)).experience),
-        C: getSignalDetail(common_vendor.unref(signalRssi)).color,
-        D: common_vendor.t(common_vendor.unref(signalRssi)),
-        E: getSignalDetail(common_vendor.unref(signalRssi)).color
-      } : {}, {
-        F: common_vendor.unref(signalSat) != null
-      }, common_vendor.unref(signalSat) != null ? {
-        G: common_assets._imports_0$1,
-        H: common_vendor.t(common_vendor.unref(signalSat))
-      } : {}, {
-        I: common_vendor.unref(carVoltage)
-      }, common_vendor.unref(carVoltage) ? {
-        J: common_assets._imports_1$1,
-        K: common_vendor.t(common_vendor.unref(carVoltage))
-      } : {}, {
-        L: common_vendor.unref(batteryPercent)
-      }, common_vendor.unref(batteryPercent) ? {
-        M: common_assets._imports_2$1,
-        N: common_vendor.t(common_vendor.unref(batteryPercent)),
-        O: getBatteryColor(common_vendor.unref(batteryPercent))
-      } : {}, {
-        P: common_vendor.o(($event) => {
+        v: getMobileSignalBarClass(0, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
+        w: getMobileSignalBarClass(1, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
+        x: getMobileSignalBarClass(2, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
+        y: getMobileSignalBarClass(3, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
+        z: getMobileSignalBarClass(4, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
+        A: common_vendor.t(getSignalDetail(common_vendor.unref(signalRssi)).experience),
+        B: getSignalDetail(common_vendor.unref(signalRssi)).color,
+        C: common_vendor.t(common_vendor.unref(signalRssi)),
+        D: getSignalDetail(common_vendor.unref(signalRssi)).color,
+        E: common_assets._imports_0$1,
+        F: common_vendor.t(common_vendor.unref(signalSat) || 0),
+        G: common_assets._imports_1$1,
+        H: common_vendor.t(common_vendor.unref(carVoltage) || 0),
+        I: common_assets._imports_2$1,
+        J: common_vendor.t(common_vendor.unref(batteryPercent) || 0),
+        K: getBatteryColor(common_vendor.unref(batteryPercent)),
+        L: common_vendor.o(($event) => {
           return handleGridClick($event);
-        }, "d5"),
-        Q: common_vendor.p({
+        }, "ff"),
+        M: common_vendor.p({
           items: common_vendor.unref(baseList),
           col: 5,
           itemHeight: "88",
@@ -761,23 +750,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#606266",
           showBorder: true
         }),
-        R: common_vendor.o(filterNonLatin, "91"),
-        S: common_vendor.o(($event) => {
+        N: common_vendor.o(filterNonLatin, "b9"),
+        O: common_vendor.o(($event) => {
           return common_vendor.isRef(psw) ? psw.value = $event : null;
-        }, "5f"),
-        T: common_vendor.p({
+        }, "e0"),
+        P: common_vendor.p({
           placeholder: "请输入密码",
           clearable: true,
           password: true,
           modelValue: common_vendor.unref(psw)
         }),
-        U: common_vendor.o(confirm, "40"),
-        V: common_vendor.p({
+        Q: common_vendor.o(confirm, "6a"),
+        R: common_vendor.p({
           show: common_vendor.unref(popupRef),
           title: common_vendor.unref(modalTitle)
         }),
-        W: `${_ctx.u_s_b_h}px`,
-        X: `${_ctx.u_s_a_i_b}px`
+        S: `${_ctx.u_s_b_h}px`,
+        T: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

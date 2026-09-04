@@ -2263,9 +2263,6 @@ function isRef(r2) {
 function ref(value) {
   return createRef(value, false);
 }
-function shallowRef(value) {
-  return createRef(value, true);
-}
 function createRef(rawValue, shallow) {
   if (isRef(rawValue)) {
     return rawValue;
@@ -2311,27 +2308,6 @@ const shallowUnwrapHandlers = {
 };
 function proxyRefs(objectWithRefs) {
   return isReactive(objectWithRefs) ? objectWithRefs : new Proxy(objectWithRefs, shallowUnwrapHandlers);
-}
-class CustomRefImpl {
-  constructor(factory) {
-    this.dep = void 0;
-    this.__v_isRef = true;
-    const { get: get2, set: set2 } = factory(
-      () => trackRefValue(this),
-      () => triggerRefValue(this)
-    );
-    this._get = get2;
-    this._set = set2;
-  }
-  get value() {
-    return this._get();
-  }
-  set value(newVal) {
-    this._set(newVal);
-  }
-}
-function customRef(factory) {
-  return new CustomRefImpl(factory);
 }
 const stack = [];
 function pushWarningContext(vnode) {
@@ -3002,13 +2978,6 @@ function resolve(registry, name) {
 }
 function watchEffect(effect2, options) {
   return doWatch(effect2, null, options);
-}
-function watchSyncEffect(effect2, options) {
-  return doWatch(
-    effect2,
-    null,
-    extend({}, options, { flush: "sync" })
-  );
 }
 const INITIAL_WATCHER_VALUE = {};
 function watch(source, cb, options) {
@@ -3752,13 +3721,6 @@ function normalizePropsOrEmits(props) {
     (normalized, p2) => (normalized[p2] = null, normalized),
     {}
   ) : props;
-}
-function mergeModels(a2, b2) {
-  if (!a2 || !b2)
-    return a2 || b2;
-  if (isArray(a2) && isArray(b2))
-    return a2.concat(b2);
-  return extend({}, normalizePropsOrEmits(a2), normalizePropsOrEmits(b2));
 }
 function createDuplicateChecker() {
   const cache = /* @__PURE__ */ Object.create(null);
@@ -5132,58 +5094,6 @@ const computed = (getterOrOptions, debugOptions) => {
   }
   return c2;
 };
-function useModel(props, name, options = EMPTY_OBJ) {
-  const i2 = getCurrentInstance();
-  if (!i2) {
-    warn$1(`useModel() called without active instance.`);
-    return ref();
-  }
-  if (!i2.propsOptions[0][name]) {
-    warn$1(`useModel() called with prop "${name}" which is not declared.`);
-    return ref();
-  }
-  const camelizedName = camelize(name);
-  const hyphenatedName = hyphenate(name);
-  const res = customRef((track2, trigger2) => {
-    let localValue;
-    watchSyncEffect(() => {
-      const propValue = props[name];
-      if (hasChanged(localValue, propValue)) {
-        localValue = propValue;
-        trigger2();
-      }
-    });
-    return {
-      get() {
-        track2();
-        return options.get ? options.get(localValue) : localValue;
-      },
-      set(value) {
-        const rawProps = i2.vnode.props;
-        if (!(rawProps && // check if parent has passed v-model
-        (name in rawProps || camelizedName in rawProps || hyphenatedName in rawProps) && (`onUpdate:${name}` in rawProps || `onUpdate:${camelizedName}` in rawProps || `onUpdate:${hyphenatedName}` in rawProps)) && hasChanged(value, localValue)) {
-          localValue = value;
-          trigger2();
-        }
-        i2.emit(`update:${name}`, options.set ? options.set(value) : value);
-      }
-    };
-  });
-  const modifierKey = name === "modelValue" ? "modelModifiers" : `${name}Modifiers`;
-  res[Symbol.iterator] = () => {
-    let i22 = 0;
-    return {
-      next() {
-        if (i22 < 2) {
-          return { value: i22++ ? props[modifierKey] || {} : res, done: false };
-        } else {
-          return { done: true };
-        }
-      }
-    };
-  };
-  return res;
-}
 const version = "3.4.21";
 const warn = warn$1;
 function unwrapper(target) {
@@ -10472,27 +10382,6 @@ function __values(o2) {
     };
   throw new TypeError(s2 ? "Object is not iterable." : "Symbol.iterator is not defined.");
 }
-function __read(o2, n2) {
-  var m2 = typeof Symbol === "function" && o2[Symbol.iterator];
-  if (!m2)
-    return o2;
-  var i2 = m2.call(o2), r2, ar = [], e2;
-  try {
-    while ((n2 === void 0 || n2-- > 0) && !(r2 = i2.next()).done)
-      ar.push(r2.value);
-  } catch (error) {
-    e2 = { error };
-  } finally {
-    try {
-      if (r2 && !r2.done && (m2 = i2["return"]))
-        m2.call(i2);
-    } finally {
-      if (e2)
-        throw e2.error;
-    }
-  }
-  return ar;
-}
 typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
   var e2 = new Error(message);
   return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
@@ -10569,9 +10458,6 @@ const pages = [
     style: new UTSJSONObject({
       navigationBarTitleText: "轨迹回放"
     })
-  }),
-  new UTSJSONObject({
-    path: "uni_modules/lime-action-sheet/pages/index"
   }),
   new UTSJSONObject({
     path: "pages/vehicleTracking/vehicleTracking",
@@ -14194,7 +14080,6 @@ const onPullDownRefresh = /* @__PURE__ */ createLifeCycleHook(
 exports.UTS = UTS;
 exports.UTSJSONObject = UTSJSONObject;
 exports.__awaiter = __awaiter;
-exports.__read = __read;
 exports.__values = __values;
 exports._export_sfc = _export_sfc;
 exports.computed = computed;
@@ -14203,17 +14088,13 @@ exports.defineComponent = defineComponent;
 exports.e = e;
 exports.f = f$1;
 exports.gei = gei;
-exports.getCurrentInstance = getCurrentInstance;
 exports.index = index;
-exports.inject = inject;
 exports.isRef = isRef;
-exports.mergeModels = mergeModels;
 exports.n = n$1;
 exports.nextTick$1 = nextTick$1;
 exports.normalizeStyle = normalizeStyle$1;
 exports.o = o$1;
 exports.onActivated = onActivated;
-exports.onBeforeUnmount = onBeforeUnmount;
 exports.onDeactivated = onDeactivated;
 exports.onHide = onHide;
 exports.onLoad = onLoad;
@@ -14224,7 +14105,6 @@ exports.onShow = onShow;
 exports.onUnload = onUnload;
 exports.onUnmounted = onUnmounted;
 exports.p = p$1;
-exports.provide = provide;
 exports.pvhc = pvhc;
 exports.r = r$1;
 exports.reactive = reactive;
@@ -14232,12 +14112,9 @@ exports.ref = ref;
 exports.resolveComponent = resolveComponent;
 exports.s = s$1;
 exports.sei = sei;
-exports.shallowRef = shallowRef;
 exports.sr = sr;
 exports.t = t$1;
-exports.toRaw = toRaw;
 exports.unref = unref;
-exports.useModel = useModel;
 exports.watch = watch;
 exports.watchEffect = watchEffect;
 exports.wx$1 = wx$1;

@@ -5,7 +5,7 @@
     <view class="i-dropdown__bar" :style="barStyle">
       <view
         v-for="(menu, menuIndex) in menus"
-        :key="String(menuIndex) + '-' + getMenuTitle(menu, menuIndex)"
+        :key="(menuIndex).toString() + '-' + getMenuTitle(menu, menuIndex)"
         :class="getMenuClass(menu, menuIndex)"
         @click="toggle(menuIndex)"
       >
@@ -41,7 +41,7 @@
       <view v-if="activeOptions.length > 0" class="i-dropdown__options">
         <view
           v-for="(option, optionIndex) in activeOptions"
-          :key="String(optionIndex) + '-' + getOptionText(option)"
+          :key="(optionIndex).toString() + '-' + getOptionText(option)"
           :class="getOptionClass(option)"
           @click="select(option, optionIndex)"
         >
@@ -134,289 +134,367 @@ const props = defineProps({
  * - select: 选择选项时触发，返回 { menuIndex, optionIndex, text, value, keyName, item }。
  * - click: 点击菜单栏时触发，返回 { index, keyName }。
  */
-const emit = defineEmits([
-  'change',
-  'update:modelValue',
-  'update:value',
-  'open',
-  'close',
-  'select',
-  'click',
-])
+const emit = defineEmits<{
+  (event: 'change', index: number, keyName: string, status: boolean, payload?: any): void
+  (event: 'update:modelValue', value: number): void
+  (event: 'update:value', value: string): void
+  (event: 'open', payload: any): void
+  (event: 'close', index: number): void
+  (event: 'select', payload: any): void
+  (event: 'click', payload: any): void
+}>()
 
 
 
 
-const bgColor = computed(() => {
-  return props.bgColor
-})
-const selectedValues = ref(splitValue())
+type IDropdownOption = {
+  name : string,
+  text : string,
+  title : string,
+  value : string,
+  icon : string,
+  disabled : boolean,
+  raw : any,
+}
+
+type IDropdownMenu = {
+  title : string,
+  keyName : string,
+  prefiicon : string,
+  icon : string,
+  activeIcon : string,
+  fontColor : string,
+  activeFontColor : string,
+  isBtn : boolean,
+  color : string,
+  contentText : string,
+  description : string,
+  closeText : string,
+  buttonText : string,
+  options : Array<IDropdownOption>,
+}
+
+type IDropdownSelectPayload = {
+  menuIndex : number,
+  optionIndex : number,
+  text : string,
+  value : string,
+  keyName : string,
+  item : any,
+}
+
+function objectText(object : UTSJSONObject, keyName : string) : string {
+  const value = object[keyName]
+  return value == null ? '' : value.toString()
+}
+
+function objectBoolean(object : UTSJSONObject, keyName : string) : boolean {
+  const value = object[keyName]
+  if (value == null) return false
+  return value == true || value.toString() == 'true'
+}
+
+function normalizeOption(raw : any | null) : IDropdownOption | null {
+  if (raw == null) return null
+  if (typeof raw != 'object') {
+    const text = raw.toString()
+    return { name: text, text: '', title: '', value: text, icon: '', disabled: false, raw }
+  }
+  const object = raw as UTSJSONObject
+  return {
+    name: objectText(object, 'name'),
+    text: objectText(object, 'text'),
+    title: objectText(object, 'title'),
+    value: objectText(object, 'value'),
+    icon: objectText(object, 'icon'),
+    disabled: objectBoolean(object, 'disabled'),
+    raw,
+  }
+}
+
+function normalizeOptions(value : Array<any | null> | null) : Array<IDropdownOption> {
+  const result : Array<IDropdownOption> = []
+  if (value == null) return result
+  for (let i = 0; i < value.length; i++) {
+    const option = normalizeOption(value[i])
+    if (option != null) result.push(option)
+  }
+  return result
+}
+
+function normalizeMenu(raw : any | null, index : number) : IDropdownMenu | null {
+  if (raw == null) return null
+  if (typeof raw != 'object') {
+    return {
+      title: raw.toString(), keyName: index.toString(), prefiicon: '', icon: '', activeIcon: '',
+      fontColor: '', activeFontColor: '', isBtn: false, color: '', contentText: '',
+      description: '', closeText: '', buttonText: '', options: [],
+    }
+  }
+  const object = raw as UTSJSONObject
+  const rawOptions = object['options']
+  const options = rawOptions != null && Array.isArray(rawOptions)
+    ? normalizeOptions(rawOptions as Array<any | null>)
+    : []
+  return {
+    title: objectText(object, 'title'),
+    keyName: objectText(object, 'keyName'),
+    prefiicon: objectText(object, 'prefiicon'),
+    icon: objectText(object, 'icon'),
+    activeIcon: objectText(object, 'activeIcon'),
+    fontColor: objectText(object, 'fontColor'),
+    activeFontColor: objectText(object, 'activeFontColor'),
+    isBtn: objectBoolean(object, 'isBtn'),
+    color: objectText(object, 'color'),
+    contentText: objectText(object, 'contentText'),
+    description: objectText(object, 'description'),
+    closeText: objectText(object, 'closeText'),
+    buttonText: objectText(object, 'buttonText'),
+    options,
+  }
+}
+
+function normalizeMenus(value : Array<any | null> | null) : Array<IDropdownMenu> {
+  const result : Array<IDropdownMenu> = []
+  if (value == null) return result
+  for (let i = 0; i < value.length; i++) {
+    const menu = normalizeMenu(value[i], i)
+    if (menu != null) result.push(menu)
+  }
+  return result
+}
+
+function splitValue() : Array<string> {
+  const text = (props.value).toString()
+  if (text.length == 0) return []
+  return text.split(',')
+}
+
+function formatWidth(value : string) : string {
+  if (value == 'auto') return '100%'
+  return value
+}
+
+function formatSize(value : any) : string {
+  const text = (value).toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function iconText(icon : string, fallback : string) : string {
+  if (icon == 'arrow-down-s-fill' || icon == 'arrow-down' || icon == 'down') return '▾'
+  if (icon == 'arrow-up-s-fill' || icon == 'arrow-up' || icon == 'up') return '▴'
+  if (icon == 'check' || icon == 'checkbox-circle-fill') return '✓'
+  if (icon == 'filter' || icon == 'equalizer-line') return '筛'
+  if (icon == 'sort' || icon == 'sort-desc' || icon == 'sort-asc') return '↕'
+  if (icon == 'price') return '¥'
+  return icon.length == 0 ? fallback : icon
+}
+
+const bgColor = computed(() : string => props.bgColor)
+const selectedValues = ref<Array<string>>(splitValue())
 const activeIndex = ref(props.modelValue)
 const buttonActiveIndex = ref(-1)
 
-const menus = computed(() => {
-  if (props.menus.length > 0) return props.menus
-  return [
-    {
-      title: '筛选',
-      keyName: 'filter',
-      options: props.items,
-    },
-  ]
+const menus = computed(() : Array<IDropdownMenu> => {
+  const provided = normalizeMenus(props.menus)
+  if (provided.length > 0) return provided
+  return [{
+    title: '筛选', keyName: 'filter', prefiicon: '', icon: '', activeIcon: '',
+    fontColor: '', activeFontColor: '', isBtn: false, color: '', contentText: '',
+    description: '', closeText: '', buttonText: '', options: normalizeOptions(props.items),
+  }]
 })
 
-const activeOptions = computed(() => {
-  if (activeIndex.value < 0) return []
-  const menu = menus.value[activeIndex.value]
-  if (menu == null) return []
-  if (typeof menu == 'object') {
-    const options = menu['options']
-    if (Array.isArray(options)) return options
-  }
-  return []
-})
+function getActiveMenu() : IDropdownMenu | null {
+  if (activeIndex.value < 0 || activeIndex.value >= menus.value.length) return null
+  return menus.value[activeIndex.value]
+}
 
-const activeContentText = computed(() => {
+function getMenuOptions(menu : IDropdownMenu | null) : Array<IDropdownOption> {
+  return menu == null ? [] : menu.options
+}
+
+const activeOptions = computed(() : Array<IDropdownOption> => getMenuOptions(getActiveMenu()))
+
+const activeContentText = computed(() : string => {
   const menu = getActiveMenu()
-  const contentText = itemValue(menu, 'contentText')
-  if (contentText.length > 0) return contentText
-  return itemValue(menu, 'description')
+  if (menu == null) return ''
+  return menu.contentText.length > 0 ? menu.contentText : menu.description
 })
 
-const activeCloseText = computed(() => {
+const activeCloseText = computed(() : string => {
   const menu = getActiveMenu()
-  const closeText = itemValue(menu, 'closeText')
-  if (closeText.length > 0) return closeText
-  return itemValue(menu, 'buttonText')
+  if (menu == null) return ''
+  return menu.closeText.length > 0 ? menu.closeText : menu.buttonText
 })
 
-const activeFontColorValue = computed(() => {
+const activeFontColorValue = computed(() : string => {
   const menu = getActiveMenu()
-  const menuActiveColor = itemValue(menu, 'activeFontColor')
-  if (menuActiveColor.length > 0) return menuActiveColor
+  if (menu != null && menu.activeFontColor.length > 0) return menu.activeFontColor
   return props.activeColor
 })
 
-const barBackgroundColor = computed(() => {
+const barBackgroundColor = computed(() : string => {
   if (props.color.length > 0) return props.color
   if (bgColor.value.length > 0) return bgColor.value
   return '#ffffff'
 })
 
-const resolvedHeight = computed(() => formatSize(props.height))
+const resolvedHeight = computed(() : string => formatSize(props.height))
 
-const placeholderStyle = computed(() => {
-  return 'height:' + resolvedHeight.value + ';'
+function calcPanelTop() : string {
+  return 'calc(' + formatSize(props.offsetTop) + ' + ' + resolvedHeight.value + ')'
+}
+
+const placeholderStyle = computed(() : string => 'height:' + resolvedHeight.value + ';')
+
+const wrapStyle = computed(() : string => {
+  let style = 'width:' + formatWidth(props.width) + ';'
+  if (props.position != 'fixed') style += 'z-index:' + (parseFloat((props.zIndex).toString()) + 2).toString() + ';'
+  return style
 })
 
-const wrapStyle = computed(() => {
-  if (props.position == 'fixed') {
-    return 'width:' + formatWidth(props.width) + ';'
-  }
-  return 'width:' + formatWidth(props.width) + ';z-index:' + String(Number(props.zIndex) + 2) + ';'
-})
-
-const barStyle = computed(() => {
-  let style = 'height:' + resolvedHeight.value + ';background-color:' + barBackgroundColor.value + ';z-index:' + String(Number(props.zIndex) + 2) + ';'
+const barStyle = computed(() : string => {
+  let style = 'height:' + resolvedHeight.value + ';background-color:' + barBackgroundColor.value + ';z-index:' + (parseFloat((props.zIndex).toString()) + 2).toString() + ';'
   if (props.position == 'fixed' && activeIndex.value >= 0) {
     style += 'position:fixed;left:0;right:0;top:' + formatSize(props.offsetTop) + ';width:' + formatWidth(props.width) + ';'
   }
   return style
 })
 
-const maskStyle = computed(() => {
-  let style = 'z-index:' + String(Number(props.zIndex)) + ';'
-  if (props.position == 'fixed') {
-    style += 'position:fixed;top:' + calcPanelTop() + ';'
-  } else {
-    style += 'position:absolute;top:' + resolvedHeight.value + ';'
-  }
+const maskStyle = computed(() : string => {
+  let style = 'z-index:' + (parseFloat((props.zIndex).toString())).toString() + ';'
+  style += props.position == 'fixed'
+    ? 'position:fixed;top:' + calcPanelTop() + ';'
+    : 'position:absolute;top:' + resolvedHeight.value + ';'
   return style
 })
 
-const panelStyle = computed(() => {
+const panelStyle = computed(() : string => {
   const menu = getActiveMenu()
-  const panelColor = itemValue(menu, 'color')
-  let style = 'z-index:' + String(Number(props.zIndex) + 1) + ';background-color:' + (panelColor.length > 0 ? panelColor : '#ffffff') + ';'
-  if (props.position == 'fixed') {
-    style += 'position:fixed;top:' + calcPanelTop() + ';left:0;right:0;width:' + formatWidth(props.width) + ';'
-  } else {
-    style += 'position:absolute;top:' + resolvedHeight.value + ';left:0;right:0;'
-  }
+  const panelColor = menu == null ? '' : menu.color
+  let style = 'z-index:' + (parseFloat((props.zIndex).toString()) + 1).toString() + ';background-color:' + (panelColor.length > 0 ? panelColor : '#ffffff') + ';'
+  style += props.position == 'fixed'
+    ? 'position:fixed;top:' + calcPanelTop() + ';left:0;right:0;width:' + formatWidth(props.width) + ';'
+    : 'position:absolute;top:' + resolvedHeight.value + ';left:0;right:0;'
   return style
 })
 
-watch(
-  () => props.value,
-  () => {
-    selectedValues.value = splitValue()
-  },
-)
-
-watch(
-  () => props.modelValue,
-  (value) => {
-    activeIndex.value = value
-  },
-)
-
-function splitValue() {
-  const text = String(props.value)
-  if (text.length == 0) return []
-  return text.split(',')
+function getMenuTitle(menu : IDropdownMenu, index : number) : string {
+  return menu.title.length > 0 ? menu.title : '菜单' + (index + 1).toString()
 }
 
-function itemValue(item, keyName) {
-  if (item == null) return ''
-  if (typeof item == 'object') {
-    const value = item[keyName]
-    if (value == null) return ''
-    return String(value)
-  }
-  if (keyName == 'title' || keyName == 'text' || keyName == 'name' || keyName == 'value') {
-    return String(item)
-  }
-  return ''
+function getMenuKeyName(menu : IDropdownMenu, index : number) : string {
+  return menu.keyName.length > 0 ? menu.keyName : index.toString()
 }
 
-function getActiveMenu() {
-  if (activeIndex.value < 0) return null
-  return menus.value[activeIndex.value]
+function getOptionText(option : IDropdownOption) : string {
+  if (option.name.length > 0) return option.name
+  if (option.text.length > 0) return option.text
+  return option.title
 }
 
-function getMenuTitle(menu, index) {
-  const title = itemValue(menu, 'title')
-  if (title.length > 0) return title
-  return '菜单' + String(index + 1)
+function getOptionValue(option : IDropdownOption) : string {
+  return option.value.length > 0 ? option.value : getOptionText(option)
 }
 
-function getMenuKeyName(menu, index) {
-  const keyName = itemValue(menu, 'keyName')
-  if (keyName.length > 0) return keyName
-  return String(index)
-}
-
-function getMenuOptions(menu) {
-  if (menu == null) return []
-  if (typeof menu == 'object') {
-    const options = menu['options']
-    if (Array.isArray(options)) return options
-  }
-  return []
-}
-
-function getMenuLabel(menu, index) {
+function getMenuLabel(menu : IDropdownMenu, index : number) : string {
   const value = selectedValues.value[index]
-  if (value != null && String(value).length > 0) {
-    const options = getMenuOptions(menu)
-    for (let i = 0; i < options.length; i++) {
-      const option = options[i]
-      if (getOptionValue(option) == String(value)) return getOptionText(option)
+  if (value != null && value.length > 0) {
+    for (let i = 0; i < menu.options.length; i++) {
+      const option = menu.options[i]
+      if (getOptionValue(option) == value) return getOptionText(option)
     }
   }
   return getMenuTitle(menu, index)
 }
 
-function getMenuPrefiicon(menu) {
-  const icon = itemValue(menu, 'prefiicon')
-  if (icon.length > 0) return icon
-  return ''
+function getMenuPrefiicon(menu : IDropdownMenu) : string {
+  return menu.prefiicon
 }
 
-function getMenuArrow(menu, index) {
-  if (itemValue(menu, 'isBtn') == 'true') {
-    const icon = itemValue(menu, activeIndex.value == index || buttonActiveIndex.value == index ? 'activeIcon' : 'icon')
-    return iconText(icon, '')
+function getMenuArrow(menu : IDropdownMenu, index : number) : string {
+  if (menu.isBtn) {
+    return iconText(activeIndex.value == index || buttonActiveIndex.value == index ? menu.activeIcon : menu.icon, '')
   }
-  const activeIcon = itemValue(menu, 'activeIcon')
-  const icon = itemValue(menu, 'icon')
-  if (activeIndex.value == index && activeIcon.length > 0) return iconText(activeIcon, '▴')
-  if (icon.length > 0) return iconText(icon, '▾')
+  if (activeIndex.value == index && menu.activeIcon.length > 0) return iconText(menu.activeIcon, '▴')
+  if (menu.icon.length > 0) return iconText(menu.icon, '▾')
   return activeIndex.value == index ? '▴' : '▾'
 }
 
-function getMenuClass(menu, index) {
+function getMenuClass(menu : IDropdownMenu, index : number) : string {
   let className = 'i-dropdown__menu'
   if (props.disabled) className += ' i-dropdown__menu--disabled'
   if (activeIndex.value == index || buttonActiveIndex.value == index) className += ' i-dropdown__menu--active'
-  if (itemValue(menu, 'isBtn') == 'true') className += ' i-dropdown__menu--button'
+  if (menu.isBtn) className += ' i-dropdown__menu--button'
   return className
 }
 
-function getMenuTextClass(index) {
+function getMenuTextClass(index : number) : string {
   return activeIndex.value == index || buttonActiveIndex.value == index
     ? 'i-dropdown__menu-text i-dropdown__menu-text--active'
     : 'i-dropdown__menu-text'
 }
 
-function getMenuTextStyle(menu, index) {
-  const fontColor = itemValue(menu, 'fontColor')
-  const activeFontColor = itemValue(menu, 'activeFontColor')
-  let color = props.inactiveColor
-  if (fontColor.length > 0) color = fontColor
+function getMenuTextStyle(menu : IDropdownMenu, index : number) : string {
+  let color = menu.fontColor.length > 0 ? menu.fontColor : props.inactiveColor
   if (activeIndex.value == index || buttonActiveIndex.value == index) {
-    color = activeFontColor.length > 0 ? activeFontColor : props.activeColor
+    color = menu.activeFontColor.length > 0 ? menu.activeFontColor : props.activeColor
   }
   return 'color:' + color + ';'
 }
 
-function getOptionText(option) {
-  const name = itemValue(option, 'name')
-  if (name.length > 0) return name
-  const text = itemValue(option, 'text')
-  if (text.length > 0) return text
-  return itemValue(option, 'title')
+function getOptionIcon(option : IDropdownOption) : string {
+  return option.icon.length == 0 ? '' : iconText(option.icon, option.icon)
 }
 
-function getOptionValue(option) {
-  const value = itemValue(option, 'value')
-  if (value.length > 0) return value
-  return getOptionText(option)
+function isOptionActive(option : IDropdownOption) : boolean {
+  if (activeIndex.value < 0) return false
+  const value = selectedValues.value[activeIndex.value]
+  return value != null && value == getOptionValue(option)
 }
 
-function getOptionIcon(option) {
-  const icon = itemValue(option, 'icon')
-  if (icon.length == 0) return ''
-  return iconText(icon, icon)
-}
-
-function getOptionClass(option) {
+function getOptionClass(option : IDropdownOption) : string {
   let className = 'i-dropdown__option'
   if (isOptionActive(option)) className += ' i-dropdown__option--active'
-  if (itemValue(option, 'disabled') == 'true') className += ' i-dropdown__option--disabled'
+  if (option.disabled) className += ' i-dropdown__option--disabled'
   return className
 }
 
-function getOptionTextClass(option) {
+function getOptionTextClass(option : IDropdownOption) : string {
   return isOptionActive(option)
     ? 'i-dropdown__option-text i-dropdown__option-text--active'
     : 'i-dropdown__option-text'
 }
 
-function getOptionTextStyle(option) {
-  if (itemValue(option, 'disabled') == 'true') return 'color:#c8c9cc;'
+function getOptionTextStyle(option : IDropdownOption) : string {
+  if (option.disabled) return 'color:#c8c9cc;'
   return 'color:' + (isOptionActive(option) ? activeFontColorValue.value : props.inactiveColor) + ';'
 }
 
-function isOptionActive(option) {
-  if (activeIndex.value < 0) return false
-  const value = selectedValues.value[activeIndex.value]
-  return String(value) == getOptionValue(option)
+function close(emitChangeEvent : boolean = true) : void {
+  if (activeIndex.value < 0 || activeIndex.value >= menus.value.length) return
+  const closedIndex = activeIndex.value
+  const menu = menus.value[closedIndex]
+  const keyName = getMenuKeyName(menu, closedIndex)
+  activeIndex.value = -1
+  emit('update:modelValue', -1)
+  emit('close', closedIndex)
+  if (emitChangeEvent) emit('change', closedIndex, keyName, false)
 }
 
-function toggle(index) {
-  if (props.disabled) return
+function toggle(index : number) : void {
+  if (props.disabled || index < 0 || index >= menus.value.length) return
   const menu = menus.value[index]
   const keyName = getMenuKeyName(menu, index)
   emit('click', { index, keyName })
-
-  if (itemValue(menu, 'isBtn') == 'true') {
+  if (menu.isBtn) {
     if (activeIndex.value >= 0) close(false)
     buttonActiveIndex.value = index
     emit('change', index, keyName, true)
     return
   }
-
   if (activeIndex.value == index) {
     close()
     return
@@ -428,44 +506,26 @@ function toggle(index) {
   emit('change', index, keyName, true)
 }
 
-function close(emitChangeEvent = true) {
-  if (activeIndex.value < 0) return
-  const closedIndex = activeIndex.value
-  const menu = menus.value[closedIndex]
-  const keyName = getMenuKeyName(menu, closedIndex)
-  activeIndex.value = -1
-  emit('update:modelValue', -1)
-  emit('close', closedIndex)
-  if (emitChangeEvent) emit('change', closedIndex, keyName, false)
+function handleOverlayClick() : void {
+  if (props.closeOnMask) close()
 }
 
-function handleOverlayClick() {
-  if (!props.closeOnMask) return
+function closePanel() : void {
   close()
 }
 
-function closePanel() {
-  close()
-}
-
-function select(option, optionIndex) {
-  if (activeIndex.value < 0) return
-  if (itemValue(option, 'disabled') == 'true') return
-
+function select(option : IDropdownOption, optionIndex : number) : void {
+  if (activeIndex.value < 0 || activeIndex.value >= menus.value.length || option.disabled) return
   const menuIndex = activeIndex.value
   const menu = menus.value[menuIndex]
   const keyName = getMenuKeyName(menu, menuIndex)
-  const values = selectedValues.value.slice(0)
+  const values : Array<string> = selectedValues.value.slice(0)
+  while (values.length <= menuIndex) values.push('')
   values[menuIndex] = getOptionValue(option)
   selectedValues.value = values
-
-  const payload = {
-    menuIndex,
-    optionIndex,
-    text: getOptionText(option),
-    value: getOptionValue(option),
-    keyName,
-    item: option,
+  const payload : IDropdownSelectPayload = {
+    menuIndex, optionIndex, text: getOptionText(option), value: getOptionValue(option),
+    keyName, item: option.raw,
   }
   emit('select', payload)
   emit('change', menuIndex, keyName, false, payload)
@@ -473,34 +533,19 @@ function select(option, optionIndex) {
   close(false)
 }
 
-function calcPanelTop() {
-  return 'calc(' + formatSize(props.offsetTop) + ' + ' + resolvedHeight.value + ')'
-}
+watch(
+  () : any => props.value,
+  () : void => {
+    selectedValues.value = splitValue()
+  },
+)
 
-function formatWidth(value) {
-  if (value == 'auto') return '100%'
-  return value
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
-
-function iconText(icon, fallback) {
-  if (icon == 'arrow-down-s-fill' || icon == 'arrow-down' || icon == 'down') return '▾'
-  if (icon == 'arrow-up-s-fill' || icon == 'arrow-up' || icon == 'up') return '▴'
-  if (icon == 'check' || icon == 'checkbox-circle-fill') return '✓'
-  if (icon == 'filter' || icon == 'equalizer-line') return '筛'
-  if (icon == 'sort' || icon == 'sort-desc') return '↕'
-  if (icon == 'sort-asc') return '↕'
-  if (icon == 'price') return '¥'
-  if (icon.length == 0) return fallback
-  return icon
-}
+watch(
+  () : number => props.modelValue,
+  (value : number) : void => {
+    activeIndex.value = value
+  },
+)
 
 defineExpose({ close, open: toggle })
 </script>

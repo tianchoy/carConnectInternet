@@ -38,20 +38,22 @@ open class GenUniModulesIUiXComponentsIEmptyIEmpty : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
-            fun formatSize(value: Any): String {
+            fun gen_formatSize_fn(value: Any): String {
                 val text = value.toString()
                 if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
                     return text
                 }
                 return text + "px"
             }
-            fun formatBoxSize(value: Any): String {
+            val formatSize = ::gen_formatSize_fn
+            fun gen_formatBoxSize_fn(value: Any): String {
                 val text = value.toString()
                 if (text.indexOf(" ") >= 0) {
                     return text
                 }
                 return formatSize(value)
             }
+            val formatBoxSize = ::gen_formatBoxSize_fn
             val bgColor = computed(fun(): String {
                 return props.bgColor
             }

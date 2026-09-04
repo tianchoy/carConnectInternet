@@ -119,24 +119,26 @@ const props = defineProps({
  * - update:modelValue/update:value: 同步开关值。
  * - change: 打开或关闭时触发，参数为 activeValue 或 inactiveValue。
  */
-const emit = defineEmits(['update:modelValue', 'update:value', 'change'])
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: any): void
+  (event: 'update:value', value: any): void
+  (event: 'change', value: any): void
+}>()
 
-function initialValue(): any {
+function initialValue() : any {
   if (props.modelValue.toString().length > 0) return props.modelValue
   return props.value
 }
 
-function formatSize(value: any): string {
+function formatSize(value : any) : string {
   const text = value.toString()
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
   return text + 'px'
 }
 
-function numericSize(value: any, fallback: number): number {
+function numericSize(value : any, fallback : number) : number {
   const text = value.toString().replace('px', '').replace('rpx', '').replace('%', '')
-  const numberValue = parseFloat(text)
+  const numberValue = parseFloat(text.toString())
   if (isNaN(numberValue)) return fallback
   return numberValue
 }
@@ -144,7 +146,7 @@ function numericSize(value: any, fallback: number): number {
 const current = ref(initialValue())
 
 const checked = computed(() => {
-  return current.value.toString() == props.activeValue.toString()
+  return (current.value).toString() == (props.activeValue).toString()
 })
 
 const switchClass = computed(() => {
@@ -201,20 +203,20 @@ const loadingStyle = computed(() => {
 })
 
 watch(
-  (): any => props.modelValue,
-  (): void => {
+  () : any => props.modelValue,
+  () : void => {
     current.value = initialValue()
   },
 )
 
 watch(
-  (): any => props.value,
-  (): void => {
+  () : any => props.value,
+  () : void => {
     current.value = initialValue()
   },
 )
 
-function toggle() {
+function toggle() : void {
   if (props.disabled || props.loading) return
   const nextValue = checked.value ? props.inactiveValue : props.activeValue
   if (!props.asyncChange) current.value = nextValue

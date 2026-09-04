@@ -71,9 +71,20 @@ const props = defineProps({
 const emit = defineEmits(['click', 'longpress', 'change', 'update:offset'])
 
 
-const bgColor = computed(() => {
-  return props.bgColor
-})
+function numericSize(value : any) : number {
+  const text = (value).toString()
+  const numberValue = parseFloat((text.replace('px', '').replace('rpx', '').replace('%', '')).toString())
+  if (isNaN(numberValue)) return 0
+  return numberValue
+}
+
+function formatSize(value : any) : string {
+  const text = (value).toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+const bgColor = computed(() : string => props.bgColor)
 const x = ref(0)
 const y = ref(0)
 const startClientX = ref(0)
@@ -85,123 +96,41 @@ const moved = ref(false)
 const windowWidth = ref(375)
 const windowHeight = ref(667)
 
-const fabStyle = computed(() => {
-  const bg = bgColor.value.length > 0 ? bgColor.value : '#1296f7'
-  const transition = moving.value ? '0ms' : String(props.duration) + 'ms'
-  return (
-    'left:' +
-    String(Math.round(x.value)) +
-    'px;top:' +
-    String(Math.round(y.value)) +
-    'px;width:' +
-    formatSize(props.width) +
-    ';height:' +
-    formatSize(props.height) +
-    ';border-radius:' +
-    formatSize(props.round) +
-    ';background:' +
-    bg +
-    ';z-index:' +
-    String(props.zIndex) +
-    ';transition-duration:' +
-    transition +
-    ';'
-  )
-})
-
-const iconStyle = computed(() => {
-  return (
-    'color:' +
-    props.color +
-    ';width:' +
-    formatSize(props.width) +
-    ';height:' +
-    formatSize(props.height) +
-    ';line-height:' +
-    formatSize(props.height) +
-    ';'
-  )
-})
-
-const plusLineStyle = computed(() => {
-  return 'background-color:' + props.color + ';'
-})
-
-watch(
-  () => props.offset,
-  () => {
-    applyOffset()
-  },
-)
-
-onMounted(() => {
-  refreshWindowInfo()
-  nextTick(() => {
-    applyOffset()
-  })
-})
-
-function refreshWindowInfo() {
-  if (typeof window != 'undefined') {
-    windowWidth.value = Number(window.innerWidth)
-    windowHeight.value = Number(window.innerHeight)
-    return
-  }
+function refreshWindowInfo() : void {
   const info = uni.getWindowInfo()
-  windowWidth.value = Number(info.windowWidth)
-  windowHeight.value = Number(info.windowHeight)
+  windowWidth.value = parseFloat((info.windowWidth).toString())
+  windowHeight.value = parseFloat((info.windowHeight).toString())
 }
 
-function applyOffset() {
-  refreshWindowInfo()
-  const next = resolveOffset(props.offset)
-  x.value = next[0]
-  y.value = next[1]
-}
-
-function resolveOffset(value) {
-  const first = offsetValue(value, 0)
-  const second = offsetValue(value, 1)
-  const widthValue = numericSize(props.width)
-  const heightValue = numericSize(props.height)
-
-  if (first == -1 && second == -1) return [rightX(widthValue), bottomY(heightValue)]
-  if (first == -2 && second == -2) return [leftX(), bottomY(heightValue)]
-  if (first == -3 && second == -3) return [leftX(), topY()]
-  if (first == -4 && second == -4) return [rightX(widthValue), topY()]
-  if (first == -5 && second == -5) return [centerX(widthValue), bottomY(heightValue)]
-
-  return [clampX(first, widthValue), clampY(second, heightValue)]
-}
-
-function offsetValue(value, index): number {
+function offsetValue(value : Array<any | null> | null, index : number) : number {
   if (value == null || value.length <= index) return 0
-  const numberValue = Number(value[index])
-  if (isNaN(numberValue)) return 0
-  return numberValue
+  const item = value[index]
+  if (item == null) return 0
+  const numberValue = parseFloat(item.toString())
+  return isNaN(numberValue) ? 0 : numberValue
 }
 
-function leftX(): number {
-  return Number(props.threshold)
+function leftX() : number {
+  return props.threshold
 }
 
-function rightX(widthValue: number): number {
-  return windowWidth.value - widthValue - Number(props.threshold)
+function rightX(widthValue : number) : number {
+  return windowWidth.value - widthValue - props.threshold
 }
 
-function centerX(widthValue: number): number {
+function centerX(widthValue : number) : number {
   return (windowWidth.value - widthValue) / 2
 }
 
-function topY(): number {
-  return Number(props.thresholdTop)
+function topY() : number {
+  return props.thresholdTop
 }
 
-function bottomY(heightValue: number): number {
-  return windowHeight.value - heightValue - Number(props.thresholdBottom)
+function bottomY(heightValue : number) : number {
+  return windowHeight.value - heightValue - props.thresholdBottom
 }
 
-function clampX(value: number, widthValue: number): number {
+function clampX(value : number, widthValue : number) : number {
   const min = leftX()
   const max = rightX(widthValue)
   if (value < min) return min
@@ -209,7 +138,7 @@ function clampX(value: number, widthValue: number): number {
   return value
 }
 
-function clampY(value: number, heightValue: number): number {
+function clampY(value : number, heightValue : number) : number {
   const min = topY()
   const max = bottomY(heightValue)
   if (value < min) return min
@@ -217,7 +146,56 @@ function clampY(value: number, heightValue: number): number {
   return value
 }
 
-function handleTouchStart(event) {
+function resolveOffset(value : Array<any | null> | null) : Array<number> {
+  const first = offsetValue(value, 0)
+  const second = offsetValue(value, 1)
+  const widthValue = numericSize(props.width)
+  const heightValue = numericSize(props.height)
+  if (first == -1 && second == -1) return [rightX(widthValue), bottomY(heightValue)]
+  if (first == -2 && second == -2) return [leftX(), bottomY(heightValue)]
+  if (first == -3 && second == -3) return [leftX(), topY()]
+  if (first == -4 && second == -4) return [rightX(widthValue), topY()]
+  if (first == -5 && second == -5) return [centerX(widthValue), bottomY(heightValue)]
+  return [clampX(first, widthValue), clampY(second, heightValue)]
+}
+
+function applyOffset() : void {
+  refreshWindowInfo()
+  const next = resolveOffset(props.offset)
+  x.value = next[0]
+  y.value = next[1]
+}
+
+function readTouch(event : UniTouchEvent) : Array<number> {
+  if (event.touches.length == 0) return [0, 0]
+  const point = event.touches[0]
+  return [point.clientX, point.clientY]
+}
+
+function emitOffset() : void {
+  const value : Array<number> = [Math.round(x.value), Math.round(y.value)]
+  emit('change', value)
+  emit('update:offset', value)
+}
+
+const fabStyle = computed(() : string => {
+  const bg = bgColor.value.length > 0 ? bgColor.value : '#1296f7'
+  const transition = moving.value ? '0ms' : (props.duration).toString() + 'ms'
+  return 'left:' + (Math.round(x.value)).toString() + 'px;top:' +
+    (Math.round(y.value)).toString() + 'px;width:' + formatSize(props.width) +
+    ';height:' + formatSize(props.height) + ';border-radius:' + formatSize(props.round) +
+    ';background:' + bg + ';z-index:' + (props.zIndex).toString() +
+    ';transition-duration:' + transition + ';'
+})
+
+const iconStyle = computed(() : string => {
+  return 'color:' + props.color + ';width:' + formatSize(props.width) +
+    ';height:' + formatSize(props.height) + ';line-height:' + formatSize(props.height) + ';'
+})
+
+const plusLineStyle = computed(() : string => 'background-color:' + props.color + ';')
+
+function handleTouchStart(event : UniTouchEvent) : void {
   if (props.disabled) return
   refreshWindowInfo()
   const point = readTouch(event)
@@ -229,72 +207,52 @@ function handleTouchStart(event) {
   moved.value = false
 }
 
-function handleTouchMove(event) {
+function handleTouchMove(event : UniTouchEvent) : void {
   if (props.disabled) return
   const point = readTouch(event)
   const widthValue = numericSize(props.width)
   const heightValue = numericSize(props.height)
-  const nextX = clampX(startX.value + point[0] - startClientX.value, widthValue)
-  const nextY = clampY(startY.value + point[1] - startClientY.value, heightValue)
-  x.value = nextX
-  y.value = nextY
+  x.value = clampX(startX.value + point[0] - startClientX.value, widthValue)
+  y.value = clampY(startY.value + point[1] - startClientY.value, heightValue)
   moved.value = true
   emitOffset()
 }
 
-function handleTouchEnd() {
+function handleTouchEnd() : void {
   if (props.disabled) return
   moving.value = false
   if (props.adsorption) {
     const widthValue = numericSize(props.width)
-    const middle = windowWidth.value / 2
     const center = x.value + widthValue / 2
-    x.value = center < middle ? leftX() : rightX(widthValue)
+    x.value = center < windowWidth.value / 2 ? leftX() : rightX(widthValue)
   }
   emitOffset()
-  setTimeout(() => {
+  setTimeout(() : void => {
     moved.value = false
   }, 120)
 }
 
-function handleClick() {
-  if (moved.value) return
-  emit('click')
+function handleClick() : void {
+  if (!moved.value) emit('click')
 }
 
-function handleLongPress() {
+function handleLongPress() : void {
   emit('longpress')
 }
 
-function emitOffset() {
-  const value = [Math.round(x.value), Math.round(y.value)]
-  emit('change', value)
-  emit('update:offset', value)
-}
+watch(
+  () : Array<any | null> | null => props.offset,
+  () : void => {
+    applyOffset()
+  },
+)
 
-function readTouch(event) {
-  let point = null
-  if (event.touches != null && event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
-  }
-  if (point == null) return [0, 0]
-  return [Number(point.clientX), Number(point.clientY)]
-}
-
-function numericSize(value): number {
-  const text = String(value)
-  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
-  if (isNaN(numberValue)) return 0
-  return numberValue
-}
-
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
-}
+onMounted(() : void => {
+  refreshWindowInfo()
+  nextTick(() : void => {
+    applyOffset()
+  })
+})
 
 defineExpose({ applyOffset })
 </script>

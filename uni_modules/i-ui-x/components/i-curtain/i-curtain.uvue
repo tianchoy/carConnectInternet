@@ -82,79 +82,7 @@ const props = defineProps({
  */
 const emit = defineEmits(['open', 'close', 'update:show'])
 
-
-
-
-
-
-const bgColor = computed(() => {
-  return props.bgColor
-})
-const opened = ref(props.show)
-
-const rootStyle = computed(() => {
-  return 'z-index:' + String(props.zIndex) + ';'
-})
-
-const overlayComputedStyle = computed(() => {
-  let style = 'background-color:rgba(0,0,0,' + String(props.overlayOpacity) + ');'
-  style = style + stringifyStyle(props.overlayStyle)
-  return style
-})
-
-const panelStyle = computed(() => {
-  let style = 'background-color:' + bgColor.value + ';'
-  style = style + safeAreaStyle()
-  if (String(props.width).length > 0) style = style + 'width:' + formatSize(props.width) + ';'
-  if (String(props.height).length > 0) style = style + 'height:' + formatSize(props.height) + ';'
-  style = style + stringifyStyle(props.customStyle)
-  return style
-})
-
-const closeClass = computed(() => {
-  const classes = ['i-curtain__close']
-  classes.push('i-curtain__close--' + normalizeClosePos())
-  return classes.join(' ')
-})
-
-const closeStyle = computed(() => {
-  return 'color:' + props.closeIconColor + ';font-size:' + formatSize(props.closeIconSize) + ';'
-})
-
-const closeIconText = computed(() => {
-  if (props.closeIcon == 'close' || props.closeIcon == 'close-circle') return '×'
-  return props.closeIcon
-})
-
-watch(
-  () => props.show,
-  (nextValue) => {
-    if (opened.value == nextValue) return
-    opened.value = nextValue
-    emit(nextValue ? 'open' : 'close')
-  },
-)
-
-function open() {
-  if (opened.value) return
-  opened.value = true
-  emit('open')
-  emit('update:show', true)
-}
-
-function close() {
-  if (!opened.value) return
-  opened.value = false
-  emit('close')
-  emit('update:show', false)
-}
-
-function handleOverlayClick() {
-  if (!props.closeOnMask) return
-  close()
-}
-
-function normalizeClosePos(): string {
+function normalizeClosePos() : string {
   const value = props.closeIconPos
   if (
     value == 'top-left' ||
@@ -172,27 +100,94 @@ function normalizeClosePos(): string {
   return 'outset-bottom-center'
 }
 
-function safeAreaStyle(): string {
+function safeAreaStyle() : string {
   let style = ''
   if (props.safeTop) style = style + 'padding-top:env(safe-area-inset-top);'
   if (props.safeBottom) style = style + 'padding-bottom:env(safe-area-inset-bottom);'
   return style
 }
 
-function stringifyStyle(value): string {
+function stringifyStyle(value : any) : string {
   if (value == null) return ''
-  const text = String(value)
+  const text = (value).toString()
   if (text == '[object Object]') return ''
   if (text.length == 0) return ''
   return text.endsWith(';') ? text : text + ';'
 }
 
-function formatSize(value): string {
-  const text = String(value)
+function formatSize(value : any) : string {
+  const text = (value).toString()
   if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
     return text
   }
   return text + 'px'
+}
+
+const bgColor = computed(() : string => {
+  return props.bgColor
+})
+const opened = ref(props.show)
+
+const rootStyle = computed(() : string => {
+  return 'z-index:' + (props.zIndex).toString() + ';'
+})
+
+const overlayComputedStyle = computed(() : string => {
+  let style = 'background-color:rgba(0,0,0,' + (props.overlayOpacity).toString() + ');'
+  style = style + stringifyStyle(props.overlayStyle)
+  return style
+})
+
+const panelStyle = computed(() : string => {
+  let style = 'background-color:' + bgColor.value + ';'
+  style = style + safeAreaStyle()
+  if ((props.width).toString().length > 0) style = style + 'width:' + formatSize(props.width) + ';'
+  if ((props.height).toString().length > 0) style = style + 'height:' + formatSize(props.height) + ';'
+  style = style + stringifyStyle(props.customStyle)
+  return style
+})
+
+const closeClass = computed(() : string => {
+  const classes = ['i-curtain__close']
+  classes.push('i-curtain__close--' + normalizeClosePos())
+  return classes.join(' ')
+})
+
+const closeStyle = computed(() : string => {
+  return 'color:' + props.closeIconColor + ';font-size:' + formatSize(props.closeIconSize) + ';'
+})
+
+const closeIconText = computed(() : string => {
+  if (props.closeIcon == 'close' || props.closeIcon == 'close-circle') return '×'
+  return props.closeIcon
+})
+
+watch(
+  () : boolean => props.show,
+  (nextValue : boolean) : void => {
+    if (opened.value == nextValue) return
+    opened.value = nextValue
+    emit(nextValue ? 'open' : 'close')
+  },
+)
+
+function open() : void {
+  if (opened.value) return
+  opened.value = true
+  emit('open')
+  emit('update:show', true)
+}
+
+function close() : void {
+  if (!opened.value) return
+  opened.value = false
+  emit('close')
+  emit('update:show', false)
+}
+
+function handleOverlayClick() : void {
+  if (!props.closeOnMask) return
+  close()
 }
 
 defineExpose({

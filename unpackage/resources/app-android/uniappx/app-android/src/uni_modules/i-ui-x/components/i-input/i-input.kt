@@ -14,16 +14,16 @@ import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
     constructor(__ins: ComponentInternalInstance) : super(__ins) {}
-    open var modelValue: String by `$props`
-    open var value: String by `$props`
+    open var modelValue: Any by `$props`
+    open var value: Any by `$props`
     open var type: String by `$props`
-    open var height: String by `$props`
+    open var height: Any by `$props`
     open var disabled: Boolean by `$props`
     open var disabledColor: String by `$props`
     open var clearable: Boolean by `$props`
     open var password: Boolean by `$props`
     open var showPasswordToggle: Boolean by `$props`
-    open var maxlength: Number by `$props`
+    open var maxlength: Any by `$props`
     open var placeholder: String by `$props`
     open var placeholderClass: String by `$props`
     open var placeholderStyle: String by `$props`
@@ -31,15 +31,16 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
     open var confirmType: String by `$props`
     open var confirmHold: Boolean by `$props`
     open var focus: Boolean by `$props`
-    open var cursor: Number by `$props`
-    open var cursorSpacing: Number by `$props`
-    open var selectionStart: Number by `$props`
-    open var selectionEnd: Number by `$props`
+    open var cursor: Any by `$props`
+    open var cursorSpacing: Any by `$props`
+    open var selectionStart: Any by `$props`
+    open var selectionEnd: Any by `$props`
     open var adjustPosition: Boolean by `$props`
     open var inputAlign: String by `$props`
-    open var fontSize: String by `$props`
+    open var fontSize: Any by `$props`
     open var color: String by `$props`
     open var prefiicon: String by `$props`
+    open var prefixIcon: String by `$props`
     open var prefiiconStyle: String by `$props`
     open var suffiicon: String by `$props`
     open var suffiiconStyle: String by `$props`
@@ -71,41 +72,33 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
                 __ins.emit(event, *do_not_transform_spread)
             }
             fun gen_initialValue_fn(): String {
-                val modelValue = props.modelValue as String
+                val modelValue = props.modelValue.toString()
                 if (modelValue.length > 0) {
                     return modelValue
                 }
-                return props.value as String
+                return props.value.toString()
             }
             val initialValue = ::gen_initialValue_fn
-            fun gen_formatSize_fn(value: String): String {
-                if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("%") >= 0) {
-                    return value
+            fun gen_formatSize_fn(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+                    return text
                 }
-                return value + "px"
+                return text + "px"
             }
             val formatSize = ::gen_formatSize_fn
+            fun gen_emitValue_fn(value: String): Unit {
+                emit("update:modelValue", value)
+                emit("update:value", value)
+                emit("input", value)
+                emit("change", value)
+            }
+            val emitValue = ::gen_emitValue_fn
             val inputBgColor = computed(fun(): String {
                 return props.bgColor
             }
             )
             val current = ref(initialValue())
-            watch(fun(): String {
-                return props.modelValue
-            }
-            , fun(){
-                current.value = props.modelValue
-            }
-            )
-            watch(fun(): String {
-                return props.value
-            }
-            , fun(){
-                if (props.modelValue.length == 0) {
-                    current.value = props.value
-                }
-            }
-            )
             val focused = ref(false)
             val passwordVisible = ref(props.password)
             val wrapClass = computed(fun(): String {
@@ -156,15 +149,22 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
                 return "color:#c0c4cc;"
             }
             )
-            fun gen_emitValue_fn(value: String) {
-                emit("update:modelValue", value)
-                emit("update:value", value)
-                emit("input", value)
-                emit("change", value)
+            watch(fun(): Any {
+                return props.modelValue
             }
-            val emitValue = ::gen_emitValue_fn
-            fun gen_handleInput_fn(event: UniInputEvent) {
-                val nextValue = event.detail.value
+            , fun(): Unit {
+                current.value = initialValue()
+            }
+            )
+            watch(fun(): Any {
+                return props.value
+            }
+            , fun(): Unit {
+                current.value = initialValue()
+            }
+            )
+            fun gen_handleInput_fn(event: UniInputEvent): Unit {
+                val nextValue = event.detail.value.toString()
                 if (props.readonly) {
                     current.value = initialValue()
                     return
@@ -173,45 +173,62 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
                 emitValue(nextValue)
             }
             val handleInput = ::gen_handleInput_fn
-            fun gen_handleFocus_fn(event: UniInputFocusEvent) {
+            fun gen_handleFocus_fn(event: Any): Unit {
                 focused.value = true
                 emit("focus", event)
             }
             val handleFocus = ::gen_handleFocus_fn
-            fun gen_handleBlur_fn(event: UniInputBlurEvent) {
+            fun gen_handleBlur_fn(event: Any): Unit {
                 focused.value = false
                 emit("blur", event)
             }
             val handleBlur = ::gen_handleBlur_fn
-            fun gen_handleConfirm_fn(event: UniInputConfirmEvent) {
-                emit("confirm", event.detail.value)
+            fun gen_handleConfirm_fn(event: Any): Unit {
+                if (event == null || UTSAndroid.`typeof`(event) != "object") {
+                    return
+                }
+                val eventObject = event as UTSJSONObject
+                val detail = eventObject["detail"]
+                if (detail == null || UTSAndroid.`typeof`(detail) != "object") {
+                    return
+                }
+                val value = (detail as UTSJSONObject)["value"]
+                emit("confirm", if (value == null) {
+                    ""
+                } else {
+                    value.toString()
+                }
+                )
             }
             val handleConfirm = ::gen_handleConfirm_fn
-            fun gen_handleKeyboardHeightChange_fn(event: UniInputKeyboardHeightChangeEvent) {
+            fun gen_handleKeyboardHeightChange_fn(event: Any): Unit {
                 emit("keyboardheightchange", event)
             }
             val handleKeyboardHeightChange = ::gen_handleKeyboardHeightChange_fn
-            fun gen_clear_fn() {
+            fun gen_clear_fn(): Unit {
                 current.value = ""
                 emitValue("")
                 emit("clear")
             }
             val clear = ::gen_clear_fn
-            fun gen_togglePassword_fn() {
+            fun gen_togglePassword_fn(): Unit {
                 passwordVisible.value = !passwordVisible.value
             }
             val togglePassword = ::gen_togglePassword_fn
             __expose(_uM("setFormatter" to fun() {}))
             return fun(): Any? {
-                val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
                 return _cE("view", _uM("class" to _nC(wrapClass.value), "style" to _nS(wrapStyle.value)), _uA(
                     renderSlot(_ctx.`$slots`, "prefix", _uO(), fun(): UTSArray<Any> {
                         return _uA(
-                            if (isTrue(_ctx.prefiicon.length > 0 || _ctx.prefix.length > 0)) {
+                            if (isTrue(_ctx.prefiicon.length > 0 || _ctx.prefixIcon.length > 0 || _ctx.prefix.length > 0)) {
                                 _cE("text", _uM("key" to 0, "class" to "i-input__prefix", "style" to _nS(_ctx.prefiiconStyle)), _tD(if (_ctx.prefix.length > 0) {
                                     _ctx.prefix
                                 } else {
-                                    _ctx.prefiicon
+                                    if (_ctx.prefixIcon.length > 0) {
+                                        _ctx.prefixIcon
+                                    } else {
+                                        _ctx.prefiicon
+                                    }
                                 }), 5)
                             } else {
                                 _cC("v-if", true)
@@ -219,7 +236,7 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
                         )
                     }
                     ),
-                    _cE("input", _uM("class" to "i-input__field", "style" to _nS(fieldStyle.value), "type" to _ctx.type, "value" to current.value, "placeholder" to _ctx.placeholder, "placeholder-class" to _ctx.placeholderClass, "placeholder-style" to placeholderStyleText.value, "password" to passwordVisible.value, "disabled" to _ctx.disabled, "maxlength" to _ctx.maxlength, "confirm-type" to _ctx.confirmType, "confirm-hold" to _ctx.confirmHold, "inputmode" to _ctx.inputmode, "focus" to _ctx.focus, "cursor" to _ctx.cursor, "cursor-spacing" to _ctx.cursorSpacing, "selection-start" to _ctx.selectionStart, "selection-end" to _ctx.selectionEnd, "adjust-position" to _ctx.adjustPosition, "onInput" to handleInput, "onFocus" to handleFocus, "onBlur" to handleBlur, "onConfirm" to handleConfirm, "onKeyboardheightchange" to handleKeyboardHeightChange), null, 44, _uA(
+                    _cE("input", _uM("class" to "i-input__field", "style" to _nS(fieldStyle.value), "type" to _ctx.type, "value" to current.value, "placeholder" to _ctx.placeholder, "placeholder-class" to _ctx.placeholderClass, "placeholder-style" to placeholderStyleText.value, "password" to passwordVisible.value, "disabled" to _ctx.disabled, "maxlength" to parseFloat(_ctx.maxlength.toString()), "confirm-type" to _ctx.confirmType, "confirm-hold" to _ctx.confirmHold, "inputmode" to _ctx.inputmode, "focus" to _ctx.focus, "cursor" to parseFloat(_ctx.cursor.toString()), "cursor-spacing" to parseFloat(_ctx.cursorSpacing.toString()), "selection-start" to parseFloat(_ctx.selectionStart.toString()), "selection-end" to parseFloat(_ctx.selectionEnd.toString()), "adjust-position" to _ctx.adjustPosition, "onInput" to handleInput, "onFocus" to handleFocus, "onBlur" to handleBlur, "onConfirm" to handleConfirm, "onKeyboardheightchange" to handleKeyboardHeightChange), null, 44, _uA(
                         "type",
                         "value",
                         "placeholder",
@@ -261,13 +278,11 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
                         _ctx.password
                     }
                     )) {
-                        _cV(_component_i_icon, _uM("key" to 2, "class" to "i-input__eye", "onClick" to togglePassword, "name" to if (passwordVisible.value) {
-                            "../../../../static/eye-close.png"
+                        _cE("text", _uM("key" to 2, "class" to "i-input__eye", "onClick" to togglePassword), _tD(if (passwordVisible.value) {
+                            "show"
                         } else {
-                            "../../../../static/eye-open.png"
-                        }, "size" to "24"), null, 8, _uA(
-                            "name"
-                        ))
+                            "hide"
+                        }), 1)
                     } else {
                         _cC("v-if", true)
                     }
@@ -298,7 +313,34 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
         var emits: Map<String, Any?> = _uM("update:modelValue" to null, "update:value" to null, "input" to null, "change" to null, "focus" to null, "blur" to null, "confirm" to null, "keyboardheightchange" to null, "clear" to null)
-        var props = _nP(_uM("modelValue" to _uM("type" to "String", "default" to ""), "value" to _uM("type" to "String", "default" to ""), "type" to _uM("type" to "String", "default" to "text"), "height" to _uM("type" to "String", "default" to "40px"), "disabled" to _uM("type" to "Boolean", "default" to false), "disabledColor" to _uM("type" to "String", "default" to "#f5f7fa"), "clearable" to _uM("type" to "Boolean", "default" to false), "password" to _uM("type" to "Boolean", "default" to false), "showPasswordToggle" to _uM("type" to "Boolean", "default" to true), "maxlength" to _uM("type" to "Number", "default" to -1), "placeholder" to _uM("type" to "String", "default" to ""), "placeholderClass" to _uM("type" to "String", "default" to "input-placeholder"), "placeholderStyle" to _uM("type" to "String", "default" to ""), "showWordLimit" to _uM("type" to "Boolean", "default" to false), "confirmType" to _uM("type" to "String", "default" to "done"), "confirmHold" to _uM("type" to "Boolean", "default" to false), "focus" to _uM("type" to "Boolean", "default" to false), "cursor" to _uM("type" to "Number", "default" to -1), "cursorSpacing" to _uM("type" to "Number", "default" to 30), "selectionStart" to _uM("type" to "Number", "default" to -1), "selectionEnd" to _uM("type" to "Number", "default" to -1), "adjustPosition" to _uM("type" to "Boolean", "default" to true), "inputAlign" to _uM("type" to "String", "default" to "left"), "fontSize" to _uM("type" to "String", "default" to "15px"), "color" to _uM("type" to "String", "default" to "#303133"), "prefiicon" to _uM("type" to "String", "default" to ""), "prefiiconStyle" to _uM("type" to "String", "default" to ""), "suffiicon" to _uM("type" to "String", "default" to ""), "suffiiconStyle" to _uM("type" to "String", "default" to ""), "border" to _uM("type" to "String", "default" to "surround"), "readonly" to _uM("type" to "Boolean", "default" to false), "shape" to _uM("type" to "String", "default" to "square"), "customStyle" to _uM("type" to "String", "default" to ""), "round" to _uM("type" to "String", "default" to "4px"), "borderColor" to _uM("type" to "String", "default" to "#e5e5e5"), "bgColor" to _uM("type" to "String", "default" to "#ffffff"), "inputmode" to _uM("type" to "String", "default" to "text"), "prefix" to _uM("type" to "String", "default" to "")))
+        var props = _nP(_uM("modelValue" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to ""), "value" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to ""), "type" to _uM("type" to "String", "default" to "text"), "height" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to "40px"), "disabled" to _uM("type" to "Boolean", "default" to false), "disabledColor" to _uM("type" to "String", "default" to "#f5f7fa"), "clearable" to _uM("type" to "Boolean", "default" to false), "password" to _uM("type" to "Boolean", "default" to false), "showPasswordToggle" to _uM("type" to "Boolean", "default" to true), "maxlength" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to -1), "placeholder" to _uM("type" to "String", "default" to ""), "placeholderClass" to _uM("type" to "String", "default" to "input-placeholder"), "placeholderStyle" to _uM("type" to "String", "default" to ""), "showWordLimit" to _uM("type" to "Boolean", "default" to false), "confirmType" to _uM("type" to "String", "default" to "done"), "confirmHold" to _uM("type" to "Boolean", "default" to false), "focus" to _uM("type" to "Boolean", "default" to false), "cursor" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to -1), "cursorSpacing" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to 30), "selectionStart" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to -1), "selectionEnd" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to -1), "adjustPosition" to _uM("type" to "Boolean", "default" to true), "inputAlign" to _uM("type" to "String", "default" to "left"), "fontSize" to _uM("type" to _uA(
+            "String",
+            "Number"
+        ), "default" to "15px"), "color" to _uM("type" to "String", "default" to "#303133"), "prefiicon" to _uM("type" to "String", "default" to ""), "prefixIcon" to _uM("type" to "String", "default" to ""), "prefiiconStyle" to _uM("type" to "String", "default" to ""), "suffiicon" to _uM("type" to "String", "default" to ""), "suffiiconStyle" to _uM("type" to "String", "default" to ""), "border" to _uM("type" to "String", "default" to "surround"), "readonly" to _uM("type" to "Boolean", "default" to false), "shape" to _uM("type" to "String", "default" to "square"), "customStyle" to _uM("type" to "String", "default" to ""), "round" to _uM("type" to "String", "default" to "4px"), "borderColor" to _uM("type" to "String", "default" to "#e5e5e5"), "bgColor" to _uM("type" to "String", "default" to "#ffffff"), "inputmode" to _uM("type" to "String", "default" to "text"), "prefix" to _uM("type" to "String", "default" to "")))
         var propsNeedCastKeys = _uA(
             "modelValue",
             "value",
@@ -326,6 +368,7 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
             "fontSize",
             "color",
             "prefiicon",
+            "prefixIcon",
             "prefiiconStyle",
             "suffiicon",
             "suffiiconStyle",

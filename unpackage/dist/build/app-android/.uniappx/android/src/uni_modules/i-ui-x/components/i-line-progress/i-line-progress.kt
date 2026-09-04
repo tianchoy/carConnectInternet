@@ -41,21 +41,25 @@ open class GenUniModulesIUiXComponentsILineProgressILineProgress : VueComponent 
                 return Math.round(current.value)
             }
             )
-            fun gen_step_fn(delta: Number) {
+            watch(fun(): Number {
+                return props.percent
+            }
+            , fun(nextValue: Number): Unit {
+                current.value = nextValue
+            }
+            )
+            fun gen_step_fn(delta: Number): Unit {
                 current.value = Math.min(100, Math.max(0, current.value + delta))
                 emit("change", current.value)
                 emit("update:percent", current.value)
             }
             val step = ::gen_step_fn
-            fun gen_emitClick_fn() {
+            fun gen_emitClick_fn(): Unit {
                 emit("click", current.value)
             }
             val emitClick = ::gen_emitClick_fn
             return fun(): Any? {
                 return _cE("view", _uM("class" to "i-card", "onClick" to emitClick), _uA(
-                    _cE("view", _uM("class" to "i-track", "style" to _nS("height:" + _ctx.height + "px;background-color:" + _ctx.inactiveColor)), _uA(
-                        _cE("view", _uM("class" to "i-fill", "style" to _nS("width:" + normalized.value + "%;background-color:" + _ctx.activeColor)), null, 4)
-                    ), 4),
                     _cE("view", _uM("class" to "i-row i-head"), _uA(
                         _cE("text", _uM("class" to "i-title"), _tD(_ctx.title), 1),
                         if (isTrue(_ctx.showText)) {
@@ -63,6 +67,31 @@ open class GenUniModulesIUiXComponentsILineProgressILineProgress : VueComponent 
                         } else {
                             _cC("v-if", true)
                         }
+                    )),
+                    _cE("view", _uM("class" to "i-track", "style" to _nS("height:" + _ctx.height + "px;background-color:" + _ctx.inactiveColor)), _uA(
+                        _cE("view", _uM("class" to "i-fill", "style" to _nS("width:" + normalized.value + "%;background-color:" + _ctx.activeColor)), null, 4)
+                    ), 4),
+                    _cE("view", _uM("class" to "i-row"), _uA(
+                        _cE("view", _uM("class" to "i-btn", "onClick" to withModifiers(fun(){
+                            step(-15)
+                        }
+                        , _uA(
+                            "stop"
+                        ))), _uA(
+                            _cE("text", _uM("class" to "i-btn-text"), "减少")
+                        ), 8, _uA(
+                            "onClick"
+                        )),
+                        _cE("view", _uM("class" to "i-btn", "onClick" to withModifiers(fun(){
+                            step(15)
+                        }
+                        , _uA(
+                            "stop"
+                        ))), _uA(
+                            _cE("text", _uM("class" to "i-btn-text"), "增加")
+                        ), 8, _uA(
+                            "onClick"
+                        ))
                     ))
                 ))
             }
@@ -75,12 +104,12 @@ open class GenUniModulesIUiXComponentsILineProgressILineProgress : VueComponent 
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("i-card" to _pS(_uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between")), "i-title" to _pS(_uM("color" to "#303133", "fontSize" to 15, "fontWeight" to 600, "lineHeight" to "22px")), "i-muted" to _pS(_uM("color" to "#909399", "fontSize" to 12, "lineHeight" to "18px")), "i-row" to _pS(_uM("flexDirection" to "row", "alignItems" to "center", "flexWrap" to "wrap")), "i-btn" to _pS(_uM("minHeight" to 34, "marginTop" to 10, "marginRight" to 8, "paddingTop" to 0, "paddingRight" to 12, "paddingBottom" to 0, "paddingLeft" to 12, "borderTopLeftRadius" to 6, "borderTopRightRadius" to 6, "borderBottomRightRadius" to 6, "borderBottomLeftRadius" to 6, "backgroundColor" to "#ecf5ff", "alignItems" to "center", "justifyContent" to "center")), "i-btn--plain" to _pS(_uM("backgroundColor" to "#f5f7fa")), "i-btn--danger" to _pS(_uM("backgroundColor" to "#fef0f0")), "i-btn-text" to _pS(_uM("color" to "#2979ff", "fontSize" to 13, "lineHeight" to "18px")), "i-danger" to _pS(_uM("color" to "#f56c6c")), "i-head" to _pS(_uM("justifyContent" to "space-between")), "i-track" to _pS(_uM("borderTopLeftRadius" to 999, "borderTopRightRadius" to 999, "borderBottomRightRadius" to 999, "borderBottomLeftRadius" to 999, "flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "marginRight" to 5, "overflow" to "hidden")), "i-fill" to _pS(_uM("height" to "100%", "borderTopLeftRadius" to 999, "borderTopRightRadius" to 999, "borderBottomRightRadius" to 999, "borderBottomLeftRadius" to 999)))
+                return _uM("i-card" to _pS(_uM("paddingTop" to 14, "paddingRight" to 14, "paddingBottom" to 14, "paddingLeft" to 14, "borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8, "backgroundColor" to "#ffffff")), "i-title" to _pS(_uM("color" to "#303133", "fontSize" to 15, "fontWeight" to 600, "lineHeight" to "22px")), "i-muted" to _pS(_uM("marginTop" to 4, "color" to "#909399", "fontSize" to 12, "lineHeight" to "18px")), "i-row" to _pS(_uM("flexDirection" to "row", "alignItems" to "center", "flexWrap" to "wrap")), "i-btn" to _pS(_uM("minHeight" to 34, "marginTop" to 10, "marginRight" to 8, "paddingTop" to 0, "paddingRight" to 12, "paddingBottom" to 0, "paddingLeft" to 12, "borderTopLeftRadius" to 6, "borderTopRightRadius" to 6, "borderBottomRightRadius" to 6, "borderBottomLeftRadius" to 6, "backgroundColor" to "#ecf5ff", "alignItems" to "center", "justifyContent" to "center")), "i-btn--plain" to _pS(_uM("backgroundColor" to "#f5f7fa")), "i-btn--danger" to _pS(_uM("backgroundColor" to "#fef0f0")), "i-btn-text" to _pS(_uM("color" to "#2979ff", "fontSize" to 13, "lineHeight" to "18px")), "i-danger" to _pS(_uM("color" to "#f56c6c")), "i-head" to _pS(_uM("justifyContent" to "space-between")), "i-track" to _pS(_uM("marginTop" to 12, "borderTopLeftRadius" to 999, "borderTopRightRadius" to 999, "borderBottomRightRadius" to 999, "borderBottomLeftRadius" to 999, "overflow" to "hidden")), "i-fill" to _pS(_uM("height" to "100%", "borderTopLeftRadius" to 999, "borderTopRightRadius" to 999, "borderBottomRightRadius" to 999, "borderBottomLeftRadius" to 999)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
         var emits: Map<String, Any?> = _uM("click" to null, "change" to null, "update:percent" to null)
-        var props = _nP(_uM("percent" to _uM("type" to "Number", "default" to 45), "title" to _uM("type" to "String", "default" to ""), "activeColor" to _uM("type" to "String", "default" to "#19be6b"), "inactiveColor" to _uM("type" to "String", "default" to "#ebeef5"), "height" to _uM("type" to "Number", "default" to 8), "showText" to _uM("type" to "Boolean", "default" to true)))
+        var props = _nP(_uM("percent" to _uM("type" to "Number", "default" to 45), "title" to _uM("type" to "String", "default" to "上传进度"), "activeColor" to _uM("type" to "String", "default" to "#19be6b"), "inactiveColor" to _uM("type" to "String", "default" to "#ebeef5"), "height" to _uM("type" to "Number", "default" to 8), "showText" to _uM("type" to "Boolean", "default" to true)))
         var propsNeedCastKeys = _uA(
             "percent",
             "title",

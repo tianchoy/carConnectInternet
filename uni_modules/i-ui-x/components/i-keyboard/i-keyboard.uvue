@@ -197,40 +197,54 @@ const props = defineProps({
  * - update:value: 兼容旧版 value 同步。
  * - update:modelShow: 同步键盘打开状态。
  */
-const emit = defineEmits([
-  'change',
-  'input',
-  'delete',
-  'clear',
-  'confirm',
-  'cancel',
-  'update:modelValue',
-  'update:value',
-  'update:modelShow',
-])
+const emit = defineEmits<{
+  (event: 'change', value: string): void
+  (event: 'input', value: string): void
+  (event: 'delete', value: string): void
+  (event: 'clear'): void
+  (event: 'confirm', value: string): void
+  (event: 'cancel', value: string): void
+  (event: 'update:modelValue', value: string): void
+  (event: 'update:value', value: string): void
+  (event: 'update:modelShow', value: boolean): void
+}>()
 
+function initialValue() : string {
+  if (props.modelValue.length > 0) return props.modelValue
+  return props.value
+}
 
-const bgColor = computed(() => {
+function parseColor(value : string) : string {
+  if (value == 'primary') return '#3c9cff'
+  if (value == 'success') return '#5ac725'
+  if (value == 'warning') return '#f9ae3d'
+  if (value == 'error' || value == 'danger') return '#f56c6c'
+  if (value == 'info') return '#f5f7fa'
+  if (value.length == 0 || value == 'transparent') return 'transparent'
+  return value
+}
+
+const bgColor = computed(() : string => {
   return props.bgColor
 })
 const opened = ref(props.modelShow)
 const current = ref(initialValue())
-const numberKeys = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9'])
+const numberKeys = ref<Array<string>>(['1', '2', '3', '4', '5', '6', '7', '8', '9'])
 
-const resolvedMaxLen = computed(() => {
+const resolvedMaxLen = computed(() : number => {
   if (props.maxlength > 0) return props.maxlength
   return props.maxLen
 })
 
-const resolvedTitle = computed(() => {
+const resolvedTitle = computed(() : string => {
   return props.title.length > 0 ? props.title : '安全键盘请放心输入'
 })
 
-const resolvedColor = computed(() => {
+const resolvedColor = computed(() : string => {
   return props.color.length > 0 ? parseColor(props.color) : '#3c9cff'
 })
 
-const displayText = computed(() => {
+const displayText = computed(() : string => {
   if (current.value.length == 0) return props.placeholder
   if (props.mode == 'password') {
     let text = ''
@@ -240,63 +254,76 @@ const displayText = computed(() => {
   return current.value
 })
 
-const panelStyle = computed(() => {
+const panelStyle = computed(() : string => {
   return 'background-color:' + parseColor(bgColor.value) + ';'
 })
 
-const keyStyle = computed(() => {
+const keyStyle = computed(() : string => {
   return 'background-color:' + parseColor(props.btnColor) + ';'
 })
 
-const confirmStyle = computed(() => {
+const confirmStyle = computed(() : string => {
   return 'background-color:' + resolvedColor.value + ';'
 })
 
-const primaryTextStyle = computed(() => {
+const primaryTextStyle = computed(() : string => {
   return 'color:' + resolvedColor.value + ';'
 })
 
-const fontTextStyle = computed(() => {
+const fontTextStyle = computed(() : string => {
   return 'color:' + props.fontColor + ';'
 })
 
 watch(
-  () => props.modelShow,
-  (value) => {
+  () : boolean => props.modelShow,
+  (value : boolean) : void => {
     opened.value = value
   },
 )
 
 watch(
-  () => props.modelValue,
-  (value) => {
+  () : string => props.modelValue,
+  (value : string) : void => {
     current.value = value
   },
 )
 
 watch(
-  () => props.value,
-  (value) => {
+  () : string => props.value,
+  (value : string) : void => {
     if (props.modelValue.length == 0) current.value = value
   },
 )
 
-function initialValue() {
-  if (props.modelValue.length > 0) return props.modelValue
-  return props.value
+function emitValue() : void {
+  emit('change', current.value)
+  emit('input', current.value)
+  emit('update:modelValue', current.value)
+  emit('update:value', current.value)
 }
 
-function open() {
+function isAllowedByMax(value : string) : boolean {
+  if (props.mode == 'password') return true
+  if (props.max <= 0) return true
+  if (value.length == 0 || value == '0.' || value.substring(value.length - 1) == '.') {
+    return true
+  }
+  const numberValue = parseFloat(value)
+  if (isNaN(numberValue)) return false
+  return numberValue <= props.max
+}
+
+function open() : void {
   opened.value = true
   emit('update:modelShow', true)
 }
 
-function close() {
+function close() : void {
   opened.value = false
   emit('update:modelShow', false)
 }
 
-function press(key) {
+function press(key : string) : void {
   let nextValue = current.value
 
   if (key == '.') {
@@ -317,7 +344,7 @@ function press(key) {
   emitValue()
 }
 
-function backspace() {
+function backspace() : void {
   if (current.value.length > 0) {
     current.value = current.value.substring(0, current.value.length - 1)
   }
@@ -325,51 +352,24 @@ function backspace() {
   emitValue()
 }
 
-function clear() {
+function clear() : void {
   current.value = ''
   emit('clear')
   emitValue()
 }
 
-function confirm() {
+function confirm() : void {
   emit('confirm', current.value)
   if (!props.hold) close()
 }
 
-function cancel() {
+function cancel() : void {
   emit('cancel', current.value)
   close()
 }
 
-function noop() {}
+function noop() : void {}
 
-function emitValue() {
-  emit('change', current.value)
-  emit('input', current.value)
-  emit('update:modelValue', current.value)
-  emit('update:value', current.value)
-}
-
-function isAllowedByMax(value) {
-  if (props.mode == 'password') return true
-  if (props.max <= 0) return true
-  if (value.length == 0 || value == '0.' || value.substring(value.length - 1) == '.') {
-    return true
-  }
-  const numberValue = Number(value)
-  if (isNaN(numberValue)) return false
-  return numberValue <= props.max
-}
-
-function parseColor(value) {
-  if (value == 'primary') return '#3c9cff'
-  if (value == 'success') return '#5ac725'
-  if (value == 'warning') return '#f9ae3d'
-  if (value == 'error' || value == 'danger') return '#f56c6c'
-  if (value == 'info') return '#f5f7fa'
-  if (value.length == 0 || value == 'transparent') return 'transparent'
-  return value
-}
 </script>
 
 <style>

@@ -21,7 +21,7 @@
         >
           <view
             v-for="(item, index) in normalizedList"
-            :id="'i-slider-menu-side-' + String(index)"
+            :id="'i-slider-menu-side-' + (index).toString()"
             :key="itemKey(item, index)"
             :class="menuItemClass(item, index)"
             :style="menuItemStyle(item, index)"
@@ -86,7 +86,7 @@
         >
           <view
             v-for="(item, index) in normalizedList"
-            :id="'i-slider-menu-section-' + String(index)"
+            :id="'i-slider-menu-section-' + (index).toString()"
             :key="'content-' + itemKey(item, index)"
             :class="contentItemClass(item, index)"
           >
@@ -152,7 +152,7 @@
         >
           <view
             v-for="(item, index) in normalizedList"
-            :id="'i-slider-menu-section-' + String(index)"
+            :id="'i-slider-menu-section-' + (index).toString()"
             :key="'content-right-' + itemKey(item, index)"
             :class="contentItemClass(item, index)"
           >
@@ -218,7 +218,7 @@
         >
           <view
             v-for="(item, index) in normalizedList"
-            :id="'i-slider-menu-side-' + String(index)"
+            :id="'i-slider-menu-side-' + (index).toString()"
             :key="'right-' + itemKey(item, index)"
             :class="menuItemClass(item, index)"
             :style="menuItemStyle(item, index)"
@@ -331,26 +331,149 @@ const props = defineProps({
  * - change: 手动切换时触发，返回 { id, index, item }。
  * - update:modelValue: 同步当前选中项 id。
  */
-const emit = defineEmits(['change', 'update:modelValue'])
+const emit = defineEmits<{
+  (event: 'change', value: UTSJSONObject): void
+  (event: 'update:modelValue', value: string): void
+}>()
 
-const normalizedList = computed(() => {
-  if (props.list.length > 0) return props.list
-  return [
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text == 'auto' || text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function formatWidth(value : any) : string {
+  if (value == 'auto') return '100%'
+  return formatSize(value)
+}
+
+function parseSizeValue(value : any) : number {
+  const text = value.toString().replace('px', '').replace('rpx', '').replace('%', '')
+  const size = parseFloat(text.toString())
+  return Number.isNaN(size) ? 0 : size
+}
+
+function itemField(item : any | null, keyName : string) : string {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = (item as UTSJSONObject)[keyName]
+    if (value != null) return value.toString()
+  }
+  return ''
+}
+
+function itemId(item : any | null, index : number) : string {
+  const id = itemField(item, 'id')
+  if (id.length > 0) return id
+  const value = itemField(item, 'value')
+  if (value.length > 0) return value
+  return index.toString()
+}
+
+function itemLabel(item : any | null, index : number) : string {
+  const text = itemField(item, 'text')
+  if (text.length > 0) return text
+  const label = itemField(item, 'label')
+  if (label.length > 0) return label
+  const title = itemField(item, 'title')
+  if (title.length > 0) return title
+  const name = itemField(item, 'name')
+  if (name.length > 0) return name
+  if (item != null && typeof item != 'object') return item.toString()
+  return '菜单' + (index + 1).toString()
+}
+
+function itemDesc(item : any | null, index : number) : string {
+  const desc = itemField(item, 'desc')
+  if (desc.length > 0) return desc
+  const description = itemField(item, 'description')
+  if (description.length > 0) return description
+  return itemLabel(item, index) + ' 的内容区域'
+}
+
+function itemIcon(item : any | null) : string {
+  return itemField(item, 'icon')
+}
+
+function itemShortText(item : any | null, index : number) : string {
+  const icon = itemIcon(item)
+  if (icon.length > 0) return icon
+  const label = itemLabel(item, index)
+  if (label.length == 0) return (index + 1).toString()
+  return label.substring(0, 1)
+}
+
+function itemKey(item : any | null, index : number) : string {
+  return itemId(item, index) + '-' + index.toString()
+}
+
+function isItemDisabled(item : any | null) : boolean {
+  if (item != null && typeof item == 'object') return (item as UTSJSONObject)['disabled'] == true
+  return false
+}
+
+function contentSectionId(index : number) : string {
+  return 'i-slider-menu-section-' + index.toString()
+}
+
+function sideSectionId(index : number) : string {
+  return 'i-slider-menu-side-' + index.toString()
+}
+
+function readTouchY(event : UniTouchEvent) : number {
+  let point : any | null = null
+  if (event.touches.length > 0) point = event.touches[0]
+  else if (event.changedTouches.length > 0) point = event.changedTouches[0]
+  if (point == null) return NaN
+  const object = point as UTSJSONObject
+  const pageY = object['pageY']
+  if (pageY != null) return parseFloat(pageY.toString())
+  const clientY = object['clientY']
+  return clientY == null ? NaN : parseFloat(clientY.toString())
+}
+
+function stringifyStyle(value : any) : string {
+  if (value == null) return ''
+  if (typeof value == 'object') return ''
+  const text = value.toString()
+  if (text.length == 0 || text == '[object Object]') return ''
+  return text.endsWith(';') ? text : text + ';'
+}
+
+function safeMenuList() : Array<any | null> {
+  const list = props.list
+  if (list != null && list.length > 0) return list
+  const defaults : Array<any | null> = [
     { id: 'jiangxi', text: '江西省1', icon: '☁', desc: '江西省内容' },
     { id: 'anhui', text: '安徽2', icon: '▣', desc: '安徽内容' },
     { id: 'fujian', text: '福建3', icon: '◆', desc: '福建内容' },
     { id: 'beijing', text: '北京4', icon: '▥', desc: '北京内容' },
   ]
+  return defaults
+}
+
+const normalizedList = computed(() : Array<any | null> => {
+  return safeMenuList()
 })
+
+function resolveInitialIndex() : number {
+  const expected = props.modelValue.toString()
+  if (expected.length > 0) {
+    for (let i = 0; i < normalizedList.value.length; i++) {
+      if (itemId(normalizedList.value[i], i) == expected) return i
+    }
+  }
+  return normalizedList.value.length > 0 ? 0 : -1
+}
 
 const menuOpened = ref(true)
 const currentIndex = ref(resolveInitialIndex())
-const scrollIntoView = ref('i-slider-menu-section-' + String(currentIndex.value))
-const sideScrollIntoView = ref('i-slider-menu-side-' + String(currentIndex.value))
+const scrollIntoView = ref('i-slider-menu-section-' + (currentIndex.value).toString())
+const sideScrollIntoView = ref('i-slider-menu-side-' + (currentIndex.value).toString())
 const syncingFromContentScroll = ref(false)
 const contentAtBottom = ref(false)
 const lastContentTouchY = ref(0)
-const pageScrollTarget = ref(Number(props.pageScrollTop))
+const pageScrollTarget = ref(parseFloat((props.pageScrollTop).toString()))
 
 const normalizedMenuPosition = computed(() => {
   return props.menuPosition == 'right' ? 'right' : 'left'
@@ -366,7 +489,7 @@ const itemActiveColorValue = computed(() => {
 
 const heightText = computed(() => formatSize(props.height))
 
-const currentItem = computed(() => {
+const currentItem = computed(() : any | null => {
   if (currentIndex.value < 0 || currentIndex.value >= normalizedList.value.length) return null
   return normalizedList.value[currentIndex.value]
 })
@@ -419,8 +542,8 @@ const contentStyle = computed(() => {
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  () : string => props.modelValue,
+  () : void => {
     const index = resolveInitialIndex()
     currentIndex.value = index
     sideScrollIntoView.value = sideSectionId(index)
@@ -433,9 +556,9 @@ watch(
 )
 
 watch(
-  () => props.pageScrollTop,
-  (nextValue) => {
-    const value = Number(nextValue)
+  () : number => props.pageScrollTop,
+  (nextValue : number) : void => {
+    const value = parseFloat((nextValue).toString())
     if (!isNaN(value)) pageScrollTarget.value = value
   },
 )
@@ -444,7 +567,7 @@ function toggleMenu() {
   menuOpened.value = !menuOpened.value
 }
 
-function selectMenu(item, index) {
+function selectMenu(item : any | null, index : number) {
   if (isItemDisabled(item)) return
   currentIndex.value = index
   scrollIntoView.value = contentSectionId(index)
@@ -454,14 +577,14 @@ function selectMenu(item, index) {
   emit('change', { id, index, item })
 }
 
-function onContentScroll(event) {
+function onContentScroll(event : UniScrollEvent) : void {
   if (props.layoutMode != 'scroll') return
   const count = normalizedList.value.length
   if (count <= 0) return
 
   const detail = event.detail
-  const scrollTop = Number(detail.scrollTop)
-  const scrollHeight = Number(detail.scrollHeight)
+  const scrollTop = parseFloat((detail.scrollTop).toString())
+  const scrollHeight = parseFloat((detail.scrollHeight).toString())
   const viewportHeight = parseSizeValue(props.height)
   const maxScrollTop = Math.max(scrollHeight - viewportHeight, 0)
   contentAtBottom.value = maxScrollTop > 0 && scrollTop >= maxScrollTop - 2
@@ -486,12 +609,12 @@ function onContentScroll(event) {
   emit('change', { id, index, item })
 }
 
-function handleContentTouchStart(event) {
+function handleContentTouchStart(event : UniTouchEvent) : void {
   lastContentTouchY.value = readTouchY(event)
-  pageScrollTarget.value = Number(props.pageScrollTop)
+  pageScrollTarget.value = parseFloat((props.pageScrollTop).toString())
 }
 
-function handleContentTouchMove(event) {
+function handleContentTouchMove(event : UniTouchEvent) : void {
   if (!props.pageScrollOnBottom || props.layoutMode != 'scroll') return
   if (!contentAtBottom.value) return
   const currentY = readTouchY(event)
@@ -499,7 +622,7 @@ function handleContentTouchMove(event) {
   const delta = lastContentTouchY.value - currentY
   lastContentTouchY.value = currentY
   if (delta <= 0) return
-  const pageTop = Number(props.pageScrollTop)
+  const pageTop = parseFloat((props.pageScrollTop).toString())
   const baseTop = Math.max(isNaN(pageTop) ? 0 : pageTop, pageScrollTarget.value)
   const nextTop = baseTop + delta
   pageScrollTarget.value = nextTop
@@ -509,85 +632,16 @@ function handleContentTouchMove(event) {
   })
 }
 
-function handleContentTouchEnd() {
+function handleContentTouchEnd() : void {
   lastContentTouchY.value = 0
-  pageScrollTarget.value = Number(props.pageScrollTop)
+  pageScrollTarget.value = parseFloat((props.pageScrollTop).toString())
 }
 
-function resolveInitialIndex(): number {
-  const expected = String(props.modelValue)
-  if (expected.length > 0) {
-    for (let i = 0; i < normalizedList.value.length; i++) {
-      if (itemId(normalizedList.value[i], i) == expected) return i
-    }
-  }
-  return normalizedList.value.length > 0 ? 0 : -1
+function isActive(item : any | null, index : number): boolean {
+  return currentIndex.value == index || itemId(item, index) == (props.modelValue).toString()
 }
 
-function isActive(item, index): boolean {
-  return currentIndex.value == index || itemId(item, index) == String(props.modelValue)
-}
-
-function isItemDisabled(item): boolean {
-  if (item != null && typeof item == 'object') return item['disabled'] == true
-  return false
-}
-
-function itemId(item, index): string {
-  const id = itemField(item, 'id')
-  if (id.length > 0) return id
-  const value = itemField(item, 'value')
-  if (value.length > 0) return value
-  return String(index)
-}
-
-function itemLabel(item, index): string {
-  const text = itemField(item, 'text')
-  if (text.length > 0) return text
-  const label = itemField(item, 'label')
-  if (label.length > 0) return label
-  const title = itemField(item, 'title')
-  if (title.length > 0) return title
-  const name = itemField(item, 'name')
-  if (name.length > 0) return name
-  if (item != null && typeof item != 'object') return String(item)
-  return '菜单' + String(index + 1)
-}
-
-function itemDesc(item, index): string {
-  const desc = itemField(item, 'desc')
-  if (desc.length > 0) return desc
-  const description = itemField(item, 'description')
-  if (description.length > 0) return description
-  return itemLabel(item, index) + ' 的内容区域'
-}
-
-function itemIcon(item): string {
-  return itemField(item, 'icon')
-}
-
-function itemShortText(item, index): string {
-  const icon = itemIcon(item)
-  if (icon.length > 0) return icon
-  const label = itemLabel(item, index)
-  if (label.length == 0) return String(index + 1)
-  return label.substring(0, 1)
-}
-
-function itemField(item, keyName): string {
-  if (item == null) return ''
-  if (typeof item == 'object') {
-    const value = item[keyName]
-    if (value != null) return String(value)
-  }
-  return ''
-}
-
-function itemKey(item, index): string {
-  return itemId(item, index) + '-' + String(index)
-}
-
-function menuItemClass(item, index): string {
+function menuItemClass(item : any | null, index : number): string {
   const classes = ['i-slider-menu__menu-item']
   if (isActive(item, index)) classes.push('i-slider-menu__menu-item--active')
   if (!menuOpened.value) classes.push('i-slider-menu__menu-item--collapsed')
@@ -595,13 +649,13 @@ function menuItemClass(item, index): string {
   return classes.join(' ')
 }
 
-function contentItemClass(item, index): string {
+function contentItemClass(item : any | null, index : number): string {
   const classes = ['i-slider-menu__content-item']
   if (isActive(item, index)) classes.push('i-slider-menu__content-item--active')
   return classes.join(' ')
 }
 
-function menuItemStyle(item, index): string {
+function menuItemStyle(item : any | null, index : number): string {
   let style = 'height:' + formatSize(props.itemHeight) + ';'
   if (isActive(item, index)) {
     style += 'background-color:rgba(41,121,255,0.12);'
@@ -610,91 +664,16 @@ function menuItemStyle(item, index): string {
   return style
 }
 
-function menuTextStyle(item, index): string {
+function menuTextStyle(item : any | null, index : number): string {
   const color = isActive(item, index) ? activeColorValue.value : props.textColor
   return 'color:' + color + ';font-size:' + formatSize(props.fontSize) + ';'
 }
 
-function contentItemTextStyle(item, index): string {
+function contentItemTextStyle(item : any | null, index : number): string {
   const color = isActive(item, index) ? itemActiveColorValue.value : props.itemTextColor
   return 'color:' + color + ';'
 }
 
-function formatWidth(value): string {
-  if (value == 'auto') return '100%'
-  return formatSize(value)
-}
-
-function formatSize(value): string {
-  const text = String(value)
-  if (
-    text == 'auto' ||
-    text.indexOf('px') >= 0 ||
-    text.indexOf('rpx') >= 0 ||
-    text.indexOf('%') >= 0
-  ) {
-    return text
-  }
-  return text + 'px'
-}
-
-function parseSizeValue(value): number {
-  const text = String(value)
-    .replace('px', '')
-    .replace('rpx', '')
-    .replace('%', '')
-  const size = Number(text)
-  return Number.isNaN(size) ? 0 : size
-}
-
-function readTouchY(event): number {
-  let point = null
-  if (event.touches != null && event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
-  }
-  if (point == null) return NaN
-  if (point.pageY != null) return Number(point.pageY)
-  if (point.clientY != null) return Number(point.clientY)
-  return NaN
-}
-
-function contentSectionId(index): string {
-  return 'i-slider-menu-section-' + String(index)
-}
-
-function sideSectionId(index): string {
-  return 'i-slider-menu-side-' + String(index)
-}
-
-function stringifyStyle(value): string {
-  if (value == null) return ''
-  if (typeof value == 'object') {
-    let style = ''
-    const keys = Object.keys(value)
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i]
-      const cssKey = camelToKebab(key)
-      style += cssKey + ':' + String(value[key]) + ';'
-    }
-    return style
-  }
-  const text = String(value)
-  if (text.length == 0 || text == '[object Object]') return ''
-  return text.endsWith(';') ? text : text + ';'
-}
-
-function camelToKebab(value): string {
-  let result = ''
-  for (let i = 0; i < value.length; i++) {
-    const char = value.charAt(i)
-    const lower = char.toLowerCase()
-    if (char != lower && i > 0) result += '-'
-    result += lower
-  }
-  return result
-}
 </script>
 
 <style>

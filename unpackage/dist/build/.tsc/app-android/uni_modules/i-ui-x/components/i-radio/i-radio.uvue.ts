@@ -114,22 +114,19 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
-function formatSize(value: any): string {
+function formatSize(value : any) : string {
   const text = value.toString()
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
   return text + 'px'
 }
 
-const checked = computed(() => {
+const checked = computed(() : boolean => {
   if (props.checked) return true
-  const modelValueText = props.modelValue.toString()
-  const value = modelValueText.length > 0 ? props.modelValue : props.value
-  return value.toString() == props.name.toString()
+  const value = (props.modelValue).toString().length > 0 ? props.modelValue : props.value
+  return (value).toString() == (props.name).toString()
 })
 
-const wrapClass = computed(() => {
+const wrapClass = computed(() : string => {
   const classes = ['i-radio']
   if (props.placement == 'column') classes.push('i-radio--column')
   if (props.iconPlacement == 'right') classes.push('i-radio--right')
@@ -141,14 +138,14 @@ const wrapClass = computed(() => {
   return classes.join(' ')
 })
 
-const labelClass = computed(() => {
+const labelClass = computed(() : string => {
   const classes = ['i-radio__label']
   if (props.placement == 'column') classes.push('i-radio__label--column')
   if (props.shape == 'button') classes.push('i-radio__label--button')
   return classes.join(' ')
 })
 
-const boxStyle = computed(() => {
+const boxStyle = computed(() : string => {
   const circle = props.shape == 'circle' || props.shape == 'dot'
   return (
     'width:' +
@@ -165,21 +162,26 @@ const boxStyle = computed(() => {
   )
 })
 
-const dotStyle = computed(() => {
-  return 'background-color:' + props.activeColor + ';'
+const dotStyle = computed(() : string => {
+  const fontSize = props.shape == 'check' ? formatSize(parseFloat((props.iconSize).toString()) + 2) : formatSize(props.iconSize)
+  return (
+    'background-color:' +
+    props.activeColor +
+    ';color:' +
+    props.iconColor +
+    ';font-size:' +
+    fontSize +
+    ';'
+  )
 })
 
-const checkStyle = computed(() => {
-  return 'background-color:' + props.activeColor + ';color:' + props.iconColor + ';font-size:' + formatSize(parseFloat(props.iconSize.toString()) + 2) + ';'
-})
-
-const labelStyle = computed(() => {
+const labelStyle = computed(() : string => {
   let color = props.labelColor
   if (checked.value && props.activeLabelColor.length > 0) color = props.activeLabelColor
   return 'color:' + color + ';font-size:' + formatSize(props.labelSize) + ';'
 })
 
-function select() {
+function select() : void {
   if (props.disabled) return
   emit('change', props.name)
   emit('update:modelValue', props.name)
@@ -187,7 +189,7 @@ function select() {
   emit('update:checked', true)
 }
 
-function selectByLabel() {
+function selectByLabel() : void {
   if (props.labelDisabled) return
   select()
 }
@@ -217,7 +219,7 @@ return (): any | null => {
               ? _cE("text", _uM({
                   key: 1,
                   class: "i-radio__check",
-                  style: _nS(checkStyle.value)
+                  style: _nS(dotStyle.value)
                 }), "✓", 4 /* STYLE */)
               : _cC("v-if", true)
           ], 4 /* STYLE */)

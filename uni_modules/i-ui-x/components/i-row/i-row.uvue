@@ -37,53 +37,38 @@ const props = defineProps({
 
 const emit = defineEmits([])
 
-const rowClass = computed(() => {
+function normalizeJustify(value : string) : string {
+  if (value == 'between') return 'space-between'
+  if (value == 'around') return 'space-around'
+  if (value == 'evenly') return 'space-evenly'
+  if (value == 'start' || value == 'center' || value == 'end' || value == 'space-between' || value == 'space-around' || value == 'space-evenly') return value
+  return 'start'
+}
+
+function normalizeAlign(value : string) : string {
+  if (value == 'middle') return 'center'
+  if (value == 'top' || value == 'center' || value == 'bottom' || value == 'stretch') return value
+  return 'top'
+}
+
+const rowClass = computed(() : string => {
   const classes = [
     'i-row',
     'i-row--align-' + normalizeAlign(props.align),
     'i-row--justify-' + normalizeJustify(props.justify),
   ]
   if (!props.wrap) classes.push('i-row--nowrap')
-  if (Number(props.gutter) > 0) classes.push('i-row--gutter')
+  if (parseFloat((props.gutter).toString()) > 0) classes.push('i-row--gutter')
   return classes.join(' ')
 })
 
-const rowStyle = computed(() => {
-  const gutter = Number(props.gutter)
+const rowStyle = computed(() : string => {
+  const gutter = parseFloat((props.gutter).toString())
   if (gutter <= 0) return ''
   const half = gutter / 2
   return 'margin-left:-' + half + 'px;margin-right:-' + half + 'px;'
 })
 
-function normalizeJustify(value) {
-  const text = String(value)
-  if (text == 'between') return 'space-between'
-  if (text == 'around') return 'space-around'
-  if (text == 'evenly') return 'space-evenly'
-  if (
-    text == 'start' ||
-    text == 'center' ||
-    text == 'end' ||
-    text == 'space-between' ||
-    text == 'space-around' ||
-    text == 'space-evenly'
-  )
-    return text
-  return 'start'
-}
-
-function normalizeAlign(value) {
-  const text = String(value)
-  if (text == 'middle') return 'center'
-  if (
-    text == 'top' ||
-    text == 'center' ||
-    text == 'bottom' ||
-    text == 'stretch'
-  )
-    return text
-  return 'top'
-}
 </script>
 
 <style>

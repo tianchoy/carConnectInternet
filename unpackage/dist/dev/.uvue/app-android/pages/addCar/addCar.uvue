@@ -104,12 +104,14 @@ const __sfc__ = defineComponent({
         const scanCode = () => {
             if (isRequestingCameraPermission.value || isNavigatingToScanner.value)
                 return;
+            // 微信小程序由扫码页 onLoad 统一查询并请求 scope.camera，确保首次进入时弹出授权框。
+            // App 保留原有系统相机权限申请流程。
             isRequestingCameraPermission.value = true;
             ensureCameraPermission(handleCameraPermission);
         };
         // 扫码结果事件处理
         const handleScanResult = (data: ScanResultData) => {
-            console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:159");
+            console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:168");
             if (data.result.length == 15) {
                 carInfo.value.imei = '0' + data.result.slice(4, 15);
                 return;
@@ -130,7 +132,7 @@ const __sfc__ = defineComponent({
         const selectIcon = (item: CarIconItem) => {
             const name = item.getString('name', '');
             const text = item.getString('text', '');
-            console.log(name, " at pages/addCar/addCar.uvue:182");
+            console.log(name, " at pages/addCar/addCar.uvue:191");
             carInfo.value.deviceType = name;
             carInfo.value.deviceTypeValue = text;
             carIconSelectorVisible.value = false;
@@ -163,26 +165,26 @@ const __sfc__ = defineComponent({
         };
         // ===== 提交表单 =====
         const submit = async (): Promise<void> => {
-            console.log('=== 开始提交设备 ===', " at pages/addCar/addCar.uvue:219");
+            console.log('=== 开始提交设备 ===', " at pages/addCar/addCar.uvue:228");
             try {
                 // 表单验证
                 if (!validateForm())
                     return;
-                console.log('✅ 表单验证通过', " at pages/addCar/addCar.uvue:224");
+                console.log('✅ 表单验证通过', " at pages/addCar/addCar.uvue:233");
                 loading.value = true;
                 uni.showLoading({
                     title: '添加中...',
                     mask: true
                 });
-                const submitData = { __$originalPosition: new UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 232, 10),
+                const submitData = { __$originalPosition: new UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 241, 10),
                     deviceName: carInfo.value.deviceName,
                     imei: carInfo.value.imei,
                     carType: carInfo.value.deviceType,
                     plateNo: carInfo.value.plateNo
                 } as UTSJSONObject;
-                console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:239");
+                console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:248");
                 const res = await addDevice(submitData);
-                console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:242");
+                console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:251");
                 uni.hideLoading();
                 loading.value = false;
                 if (res.code == 200) {
@@ -206,7 +208,7 @@ const __sfc__ = defineComponent({
                 }
             }
             catch (error: any) {
-                console.error('❌ 添加设备失败:', error, " at pages/addCar/addCar.uvue:269");
+                console.error('❌ 添加设备失败:', error, " at pages/addCar/addCar.uvue:278");
                 uni.hideLoading();
                 loading.value = false;
                 showAppToast({

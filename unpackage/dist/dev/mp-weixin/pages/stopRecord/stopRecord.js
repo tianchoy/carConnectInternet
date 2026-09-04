@@ -10,20 +10,18 @@ const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
-  const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
-  const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
+  const _easycom_i_datetime_picker_1 = common_vendor.resolveComponent("i-datetime-picker");
   const _easycom_i_empty_1 = common_vendor.resolveComponent("i-empty");
   const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
-  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_i_empty_1 + _easycom_app_toast_1)();
+  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_i_datetime_picker_1 + _easycom_i_empty_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
-const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js";
-const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
+const _easycom_i_datetime_picker = () => "../../uni_modules/i-ui-x/components/i-datetime-picker/i-datetime-picker.js";
 const _easycom_i_empty = () => "../../uni_modules/i-ui-x/components/i-empty/i-empty.js";
 const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_i_empty + _easycom_app_toast)();
+  (_easycom_custom_navBar + _easycom_i_icon + _easycom_i_datetime_picker + _easycom_i_empty + _easycom_app_toast)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "stopRecord",
@@ -34,7 +32,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const pickerTitle = common_vendor.ref("选择开始时间");
     const startTime = common_vendor.ref("");
     const endTime = common_vendor.ref("");
+    const currentPickerValue = common_vendor.computed(() => {
+      return currentPickerType.value === "start" ? startTime.value : endTime.value;
+    });
     const imei = common_vendor.ref("");
+    common_vendor.ref("");
     const carStopDetail = common_vendor.ref([]);
     const sortedCarStopDetail = common_vendor.computed(() => {
       const sorted = carStopDetail.value.slice();
@@ -54,8 +56,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const initDateTime = () => {
       const now = /* @__PURE__ */ new Date();
-      endTime.value = utils_formateTime.formatTimes(now.getTime());
-      startTime.value = utils_formateTime.formatTimes(now.getTime() - 36e5 * 24);
+      endTime.value = utils_formateTime.formatTimesToMinute(now.getTime());
+      startTime.value = utils_formateTime.formatTimesToMinute(now.getTime() - 36e5 * 24);
     };
     const loadStopData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -90,7 +92,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           carStopDetail.value = stopsWithAddress;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:131", "获取停车数据失败:", error);
+          common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:135", "获取停车数据失败:", error);
           utils_toast.showAppToast({ title: "数据加载失败", icon: "none" });
         } finally {
           common_vendor.index.hideLoading();
@@ -106,7 +108,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       pickerTitle.value = type === "start" ? "选择开始时间" : "选择结束时间";
       showDateTimePicker.value = true;
     };
-    const onConfirm = (value) => {
+    const onConfirm = (event = null) => {
+      const eventObject = event;
+      const timestampValue = eventObject["timestamp"];
+      const timestamp = timestampValue == null ? 0 : parseFloat(timestampValue.toString());
+      if (!isFinite(timestamp) || timestamp <= 0)
+        return null;
+      const value = utils_formateTime.formatTimesToMinute(timestamp);
       if (currentPickerType.value === "start") {
         startTime.value = value;
       } else {
@@ -117,6 +125,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const onCancel = () => {
       showDateTimePicker.value = false;
+    };
+    const onPickerShowChange = (value) => {
+      showDateTimePicker.value = value;
     };
     const calculateDuration = (diff) => {
       const hours = Math.floor(diff / (1e3 * 60 * 60));
@@ -167,31 +178,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "/static/xiangxia.png",
           fontSize: "15"
         }),
-        k: common_vendor.o(onConfirm, "a3"),
-        l: common_vendor.o(onCancel, "d4"),
-        m: common_vendor.p({
-          ["confirm-btn"]: "确认",
-          ["cancel-btn"]: "取消",
+        k: common_vendor.o(onConfirm, "ca"),
+        l: common_vendor.o(onCancel, "1a"),
+        m: common_vendor.o(onPickerShowChange, "68"),
+        n: common_vendor.p({
+          show: showDateTimePicker.value,
+          ["model-value"]: currentPickerValue.value,
+          mode: "datetime",
           title: pickerTitle.value,
-          mode: 63
+          ["cancel-text"]: "取消",
+          ["confirm-text"]: "确认"
         }),
-        n: common_vendor.o(($event) => {
-          return showDateTimePicker.value = $event;
-        }, "62"),
-        o: common_vendor.p({
-          position: "bottom",
-          closeable: false,
-          modelValue: showDateTimePicker.value
-        }),
-        p: sortedCarStopDetail.value.length == 0
+        o: sortedCarStopDetail.value.length == 0
       }, sortedCarStopDetail.value.length == 0 ? {
-        q: common_vendor.p({
+        p: common_vendor.p({
           text: "当前时间暂无停车数据",
           showButton: false,
           description: ""
         })
       } : {
-        r: common_vendor.f(sortedCarStopDetail.value, (item, index, i0) => {
+        q: common_vendor.f(sortedCarStopDetail.value, (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.startTime),
             b: common_vendor.t(item.endTime),
@@ -207,13 +213,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: index
           });
         }),
-        s: common_assets._imports_0$2,
-        t: common_assets._imports_1$2,
-        v: common_assets._imports_2$2,
-        w: common_assets._imports_3$1
+        r: common_assets._imports_0$2,
+        s: common_assets._imports_1$2,
+        t: common_assets._imports_2$2,
+        v: common_assets._imports_3$1
       }, {
-        x: `${_ctx.u_s_b_h}px`,
-        y: `${_ctx.u_s_a_i_b}px`
+        w: `${_ctx.u_s_b_h}px`,
+        x: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

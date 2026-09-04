@@ -80,27 +80,50 @@ const props = defineProps({
  * - right/rightClick: 点击右侧区域时触发，rightClick 兼容 DCloud uni-app x 事件命名。
  * - click: 点击标题区域时触发，返回 title。
  */
-const emit = defineEmits(['left', 'right', 'leftClick', 'rightClick', 'click'])
+const emit = defineEmits<{
+  (event: 'left'): void
+  (event: 'right'): void
+  (event: 'leftClick'): void
+  (event: 'rightClick'): void
+  (event: 'click', title: string): void
+}>()
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function numericSize(value : any) : number {
+  const text = value.toString()
+  const numberValue = parseFloat(text.replace('px', '').replace('rpx', '').replace('%', ''))
+  if (isNaN(numberValue)) return 0
+  return numberValue
+}
+
+function getStatusBarHeight() : number {
+  const info = uni.getWindowInfo()
+  return parseFloat(info.statusBarHeight.toString())
+}
 
 
 
-
-const bgColor = computed(() => {
+const bgColor = computed(() : string => {
   return props.bgColor
 })
 const statusBarHeight = ref(getStatusBarHeight())
 
-const navbarStyle = computed(() => {
-  let style = 'background-color:' + bgColor.value + ';z-index:' + String(props.zIndex) + ';'
+const navbarStyle = computed(() : string => {
+  let style = 'background-color:' + bgColor.value + ';z-index:' + (props.zIndex).toString() + ';'
   if (props.border) style += 'border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:#ebeef5;'
   return style
 })
-const innerStyle = computed(() => 'height:' + formatSize(props.height) + ';')
-const safeAreaStyle = computed(() => 'height:' + String(statusBarHeight.value) + 'px;')
-const placeholderStyle = computed(() => {
-  return 'height:' + String(numericSize(props.height) + (props.safeTop ? statusBarHeight.value : 0)) + 'px;'
+const innerStyle = computed(() : string => 'height:' + formatSize(props.height) + ';')
+const safeAreaStyle = computed(() : string => 'height:' + statusBarHeight.value.toString() + 'px;')
+const placeholderStyle = computed(() : string => {
+  return 'height:' + (numericSize(props.height) + (props.safeTop ? statusBarHeight.value : 0)).toString() + 'px;'
 })
-const computedTitleStyle = computed(() => {
+const computedTitleStyle = computed(() : string => {
   return (
     'color:' +
     props.titleColor +
@@ -110,48 +133,28 @@ const computedTitleStyle = computed(() => {
     props.titleStyle
   )
 })
-const sideStyle = computed(() => 'color:' + props.textColor + ';')
-const leftIconStyle = computed(() => {
+const sideStyle = computed(() : string => 'color:' + props.textColor + ';')
+const leftIconStyle = computed(() : string => {
   const color = props.leftIconColor.length > 0 ? props.leftIconColor : props.textColor
   return 'color:' + color + ';font-size:' + formatSize(props.leftIconSize) + ';'
 })
-const rightIconStyle = computed(() => {
+const rightIconStyle = computed(() : string => {
   const color = props.rightIconColor.length > 0 ? props.rightIconColor : props.textColor
   return 'color:' + color + ';font-size:' + formatSize(props.rightIconSize) + ';'
 })
 
-function handleLeftClick() {
+function handleLeftClick() : void {
   emit('left')
   emit('leftClick')
   if (!props.autoBack) return
   uni.navigateBack({ delta: 1 })
 }
 
-function handleRightClick() {
+function handleRightClick() : void {
   emit('right')
   emit('rightClick')
 }
 
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
-}
-
-function numericSize(value): number {
-  const text = String(value)
-  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
-  if (isNaN(numberValue)) return 0
-  return numberValue
-}
-
-function getStatusBarHeight(): number {
-  if (uni.getWindowInfo != null) {
-    const info = uni.getWindowInfo()
-    return Number(info.statusBarHeight)
-  }
-  return 0
-}
 </script>
 
 <style>

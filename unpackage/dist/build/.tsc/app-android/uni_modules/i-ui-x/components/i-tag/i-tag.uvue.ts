@@ -95,7 +95,7 @@ name: 'i-tag',
     default: '',
   },
 },
-  emits: ["click", "close"],
+  emits: ['click', 'close'],
   setup(__props) {
 const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
@@ -138,13 +138,19 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('rem') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
 const bgColor = computed(() => {
   return props.bgColor
 })
 const closeClicking = ref(false)
 
 const contentText = computed(() => {
-  return props.text.toString()
+  return (props.text).toString()
 })
 
 const normalizedType = computed(() => {
@@ -181,8 +187,8 @@ const computedTextColor = computed(() => {
 })
 
 const computedIconSize = computed(() => {
-  if (props.iconSize.toString().length > 0) return props.iconSize
-  if (props.fontSize.toString().length > 0) return props.fontSize
+  if ((props.iconSize).toString().length > 0) return props.iconSize
+  if ((props.fontSize).toString().length > 0) return props.fontSize
   if (props.size == 'xs' || props.size == 'mini') return 11
   if (props.size == 's' || props.size == 'small') return 12
   if (props.size == 'g' || props.size == 'large') return 15
@@ -194,7 +200,7 @@ const closeText = computed(() => {
   return props.closeIcon
 })
 
-const normalizedSize = computed(() => {
+const normalizedSize = computed(() : string => {
   if (props.size == 'xs' || props.size == 'mini') return 'xs'
   if (props.size == 's' || props.size == 'small') return 'small'
   if (props.size == 'm' || props.size == 'normal' || props.size == 'n') return 'normal'
@@ -202,14 +208,33 @@ const normalizedSize = computed(() => {
   return props.size
 })
 
-const isCustomRound = computed(() => {
+const isCustomRound = computed(() : boolean => {
   if (typeof props.round == 'boolean') return false
   return props.round.toString().length > 0
 })
 
-const isRound = computed(() => {
+const isRound = computed(() : boolean => {
   if (typeof props.round == 'boolean') return props.round
   return props.round.toString().length > 0
+})
+
+const shadowStyle = computed(() : string => {
+  const value = props.shadow
+  const text = value.toString()
+  if (text.length == 0 || text == 'none') return ''
+  if (Array.isArray(value)) {
+    const list = value as Array<any | null>
+    if (list.length >= 4) {
+      const first = list[0]
+      const second = list[1]
+      const third = list[2]
+      const fourth = list[3]
+      if (first != null && second != null && third != null && fourth != null) {
+        return 'box-shadow:' + formatSize(first) + ' ' + formatSize(second) + ' ' + formatSize(third) + ' ' + fourth.toString() + ';'
+      }
+    }
+  }
+  return 'box-shadow:0 ' + formatSize(value) + ' ' + formatSize(parseFloat(value.toString()) * 2) + ' rgba(0,0,0,0.12);'
 })
 
 const tagClass = computed(() => {
@@ -238,55 +263,21 @@ const closeClass = computed(() => {
   return classes.join(' ')
 })
 
-function formatSize(value: any): string {
-  const text = value.toString()
-  if (
-    text.indexOf('px') >= 0 ||
-    text.indexOf('rpx') >= 0 ||
-    text.indexOf('rem') >= 0 ||
-    text.indexOf('%') >= 0
-  ) {
-    return text
-  }
-  return text + 'px'
-}
-
-const shadowStyle = computed(() => {
-  const value = props.shadow
-  const text = value.toString()
-  if (text.length == 0 || text == 'none') return ''
-  if (Array.isArray(value) && value.length >= 4) {
-    const shadowValues = value as Array<any>
-    return (
-      'box-shadow:' +
-      formatSize(shadowValues[0]) +
-      ' ' +
-      formatSize(shadowValues[1]) +
-      ' ' +
-      formatSize(shadowValues[2]) +
-      ' ' +
-      shadowValues[3].toString() +
-      ';'
-    )
-  }
-  return 'box-shadow:0 ' + formatSize(value) + ' ' + formatSize(parseFloat(value.toString()) * 2) + ' rgba(0,0,0,0.12);'
-})
-
 const tagStyle = computed(() => {
   let style = ''
-  if (props.width.toString().length > 0) style = style + 'width:' + formatSize(props.width) + ';'
-  if (props.height.toString().length > 0) style = style + 'height:' + formatSize(props.height) + ';'
+  if ((props.width).toString().length > 0) style = style + 'width:' + formatSize(props.width) + ';'
+  if ((props.height).toString().length > 0) style = style + 'height:' + formatSize(props.height) + ';'
   if (props.borderWidth != 1) style = style + 'border-width:' + formatSize(props.borderWidth) + ';'
   if (isCustomRound.value) style = style + 'border-radius:' + formatSize(props.round) + ';'
   if (props.linear.length >= 3) {
     style =
       style +
       'background:linear-gradient(' +
-      props.linear[0].toString() +
+      (props.linear[0]).toString() +
       ',' +
-      props.linear[1].toString() +
+      (props.linear[1]).toString() +
       ',' +
-      props.linear[2].toString() +
+      (props.linear[2]).toString() +
       ');border-color:transparent;'
   } else if (bgColor.value.length > 0) {
     style = style + 'background-color:' + bgColor.value + ';'
@@ -302,7 +293,7 @@ const tagStyle = computed(() => {
 
 const textStyle = computed(() => {
   let style = 'color:' + computedTextColor.value + ';'
-  if (props.fontSize.toString().length > 0) {
+  if ((props.fontSize).toString().length > 0) {
     style = style + 'font-size:' + formatSize(props.fontSize) + ';'
   }
   return style
@@ -312,13 +303,13 @@ const closeStyle = computed(() => {
   return 'color:' + computedTextColor.value + ';'
 })
 
-function handleClick(event: any): void {
+function handleClick() {
   if (closeClicking.value) {
     closeClicking.value = false
     return
   }
   if (props.disabled) return
-  emit('click', event)
+  emit('click', contentText.value)
 }
 
 function handleClose() {
@@ -338,7 +329,7 @@ const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
   return _cE("view", _uM({
     class: _nC(tagClass.value),
     style: _nS(tagStyle.value),
-    onClick: withModifiers(handleClick, ["stop"])
+    onClick: handleClick
   }), [
     _ctx.icon.length > 0
       ? _cV(_component_i_icon, _uM({

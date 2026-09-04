@@ -28,7 +28,16 @@ open class GenPagesStopRecordStopRecord : BasePage {
             val pickerTitle = ref("选择开始时间")
             val startTime = ref("")
             val endTime = ref("")
+            val currentPickerValue = computed(fun(): String {
+                return if (currentPickerType.value === "start") {
+                    startTime.value
+                } else {
+                    endTime.value
+                }
+            }
+            )
             val imei = ref<String?>("")
+            val currentDateTime = ref("")
             val carStopDetail = ref(_uA<StopRecord>())
             val sortedCarStopDetail = computed(fun(): UTSArray<StopRecord> {
                 val sorted = carStopDetail.value.slice()
@@ -59,11 +68,13 @@ open class GenPagesStopRecordStopRecord : BasePage {
                 val now = Date()
                 endTime.value = formatTimes(now.getTime())
                 startTime.value = formatTimes(now.getTime() - 86400000)
+                console.log("当前时间戳:", now.getTime(), " at pages/stopRecord/stopRecord.uvue:102")
+                console.log("格式化后:", formatTimes(now.getTime()), " at pages/stopRecord/stopRecord.uvue:103")
             }
             val loadStopData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 104, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 110, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             val trackData = res.data
@@ -89,7 +100,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
                             carStopDetail.value = stopsWithAddress
                         }
                          catch (error: Throwable) {
-                            console.error("获取停车数据失败:", error, " at pages/stopRecord/stopRecord.uvue:131")
+                            console.error("获取停车数据失败:", error, " at pages/stopRecord/stopRecord.uvue:137")
                             showAppToast(ShowToastOptions(title = "数据加载失败", icon = "none"))
                         }
                          finally {
@@ -111,7 +122,12 @@ open class GenPagesStopRecordStopRecord : BasePage {
                 }
                 showDateTimePicker.value = true
             }
-            val onConfirm = fun(value: String){
+            val onConfirm = fun(event: UTSJSONObject): Unit {
+                val timestamp = event.getNumber("timestamp", 0)
+                if (!isFinite(timestamp) || timestamp <= 0) {
+                    return
+                }
+                val value = formatTimes(timestamp)
                 if (currentPickerType.value === "start") {
                     startTime.value = value
                 } else {
@@ -122,6 +138,9 @@ open class GenPagesStopRecordStopRecord : BasePage {
             }
             val onCancel = fun(){
                 showDateTimePicker.value = false
+            }
+            val onPickerShowChange = fun(value: Boolean){
+                showDateTimePicker.value = value
             }
             val calculateDuration = fun(diff: Number): String {
                 val hours = Math.floor(diff / 3600000)
@@ -135,8 +154,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
-                val _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker", GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePickerClass)
-                val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
+                val _component_i_datetime_picker = resolveEasyComponent("i-datetime-picker", GenUniModulesIUiXComponentsIDatetimePickerIDatetimePickerClass)
                 val _component_i_empty = resolveEasyComponent("i-empty", GenUniModulesIUiXComponentsIEmptyIEmptyClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 return _cE(Fragment, null, _uA(
@@ -173,19 +191,15 @@ open class GenPagesStopRecordStopRecord : BasePage {
                                     ))
                                 ))
                             )),
-                            _cV(_component_l_popup, _uM("modelValue" to showDateTimePicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
-                                showDateTimePicker.value = `$event`
-                            }
-                            , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
-                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
-                                        "title"
-                                    ))
+                                    _cE("view")
                                 )
                             }
                             ), "_" to 1), 8, _uA(
-                                "modelValue",
-                                "onUpdate:modelValue"
+                                "show",
+                                "model-value",
+                                "title"
                             ))
                         )),
                         _cE("scroll-view", _uM("class" to "content-box", "scroll-y" to "true"), _uA(

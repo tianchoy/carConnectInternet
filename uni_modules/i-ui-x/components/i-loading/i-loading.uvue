@@ -92,55 +92,7 @@ const props = defineProps({
 
 const emit = defineEmits([])
 
-const wrapClass = computed(() => {
-  const classes = ['i-loading']
-  if (props.vertical) classes.push('i-loading--vertical')
-  return classes.join(' ')
-})
-
-const textClass = computed(() => {
-  const classes = ['i-loading__text']
-  if (props.vertical) classes.push('i-loading__text--vertical')
-  return classes.join(' ')
-})
-
-const contentText = computed(() => {
-  if (props.label.length > 0) return props.label
-  if (props.text.length > 0) return props.text
-  return '加载中...'
-})
-
-const resolvedIconSize = computed(() => {
-  const size = String(props.size)
-  if (size == 'mini') return '16'
-  if (size == 'normal') return '21'
-  if (size == 'large') return '30'
-  if (size.length > 0) return size
-  return String(props.iconSize)
-})
-
-const resolvedTextSize = computed(() => {
-  return formatSize(props.textSize)
-})
-
-const resolvedIconColor = computed(() => {
-  if (props.color.length > 0) return resolveColor(props.color)
-  if (props.type.length > 0) return resolveColor(props.type)
-  return '#8b8b8b'
-})
-
-const textStyle = computed(() => {
-  let style = 'font-size:' + resolvedTextSize.value + ';'
-  const textColor = props.textColor.length > 0 ? props.textColor : props.color
-  if (textColor.length > 0) {
-    style = style + 'color:' + resolveColor(textColor) + ';'
-  } else if (props.type.length > 0) {
-    style = style + 'color:' + resolveColor(props.type) + ';'
-  }
-  return style
-})
-
-function resolveColor(value): string {
+function resolveColor(value : string) : string {
   if (value == 'primary') return '#2979ff'
   if (value == 'success') return '#19be6b'
   if (value == 'warning') return '#ff9900'
@@ -149,8 +101,8 @@ function resolveColor(value): string {
   return value
 }
 
-function formatSize(value): string {
-  const text = String(value)
+function formatSize(value : any) : string {
+  const text = value.toString()
   if (
     text.indexOf('px') >= 0 ||
     text.indexOf('rpx') >= 0 ||
@@ -161,6 +113,54 @@ function formatSize(value): string {
   }
   return text + 'px'
 }
+
+const wrapClass = computed(() : string => {
+  const classes = ['i-loading']
+  if (props.vertical) classes.push('i-loading--vertical')
+  return classes.join(' ')
+})
+
+const textClass = computed(() : string => {
+  const classes = ['i-loading__text']
+  if (props.vertical) classes.push('i-loading__text--vertical')
+  return classes.join(' ')
+})
+
+const contentText = computed(() : string => {
+  if (props.label.length > 0) return props.label
+  if (props.text.length > 0) return props.text
+  return '加载中...'
+})
+
+const resolvedIconSize = computed(() : string => {
+  const size = (props.size).toString()
+  if (size == 'mini') return '16'
+  if (size == 'normal') return '21'
+  if (size == 'large') return '30'
+  if (size.length > 0) return size
+  return (props.iconSize).toString()
+})
+
+const resolvedTextSize = computed(() : string => {
+  return formatSize(props.textSize)
+})
+
+const resolvedIconColor = computed(() : string => {
+  if (props.color.length > 0) return resolveColor(props.color)
+  if (props.type.length > 0) return resolveColor(props.type)
+  return '#8b8b8b'
+})
+
+const textStyle = computed(() : string => {
+  let style = 'font-size:' + resolvedTextSize.value + ';'
+  const textColor = props.textColor.length > 0 ? props.textColor : props.color
+  if (textColor.length > 0) {
+    style = style + 'color:' + resolveColor(textColor) + ';'
+  } else if (props.type.length > 0) {
+    style = style + 'color:' + resolveColor(props.type) + ';'
+  }
+  return style
+})
 </script>
 
 <style>

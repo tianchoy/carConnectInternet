@@ -2,7 +2,7 @@
   <view
     v-if="visible && currentMask"
     class="i-toast__mask"
-    :style="'z-index:' + String(Number(currentZIndex) - 1)"
+    :style="'z-index:' + (parseFloat((currentZIndex).toString()) - 1).toString()"
   ></view>
   <view
     v-if="visible"
@@ -73,12 +73,51 @@ const currentCustomStyle = ref(props.customStyle)
 const loadingAngle = ref(0)
 let loadingTimer = 0
 
+function normalizePosition(value : any) : string {
+  if (value == 'top' || value == 'bottom') return value.toString()
+  return 'center'
+}
+
+function resolveBgColor() : string {
+  if (currentType.value == 'primary') return '#2979ff'
+  if (currentType.value == 'success') return '#19be6b'
+  if (currentType.value == 'warning') return '#ff9900'
+  if (currentType.value == 'error') return '#fa3534'
+  return 'rgba(0, 0, 0, 0.78)'
+}
+
+function isImagePath(value : any) : boolean {
+  const text = value.toString()
+  return text.indexOf('/') >= 0 || text.indexOf('http') == 0
+}
+
+function setToastOption(options : UTSJSONObject, keyName : string) : void {
+  const value = options[keyName]
+  if (value == null) return
+  if (keyName == 'zIndex') currentZIndex.value = value
+  if (keyName == 'loading') currentLoading.value = value == true
+  if (keyName == 'title') currentTitle.value = value.toString()
+  if (keyName == 'icon') currentIcon.value = value.toString()
+  if (keyName == 'type') currentType.value = value.toString()
+  if (keyName == 'mask') currentMask.value = value == true
+  if (keyName == 'position') currentPosition.value = value.toString()
+  if (keyName == 'duration') currentDuration.value = value
+  if (keyName == 'fill') currentFill.value = value == true
+  if (keyName == 'customStyle') currentCustomStyle.value = value
+}
+
+function normalizeAngle(value : number) : number {
+  let angle = value % 360
+  if (angle < 0) angle = angle + 360
+  return angle
+}
+
 const toastClass = computed(() => {
   return 'i-toast i-toast--' + normalizePosition(currentPosition.value)
 })
 
 const toastStyle = computed(() => {
-  let style = 'z-index:' + String(currentZIndex.value) + ';'
+  let style = 'z-index:' + (currentZIndex.value).toString() + ';'
   style += 'background-color:' + resolveBgColor() + ';'
   if (typeof currentCustomStyle.value == 'string') style += currentCustomStyle.value
   return style
@@ -105,69 +144,10 @@ const isImageIcon = computed(() => {
 })
 
 const loadingStyle = computed(() => {
-  return 'transform:rotate(' + String(loadingAngle.value) + 'deg);'
+  return 'transform:rotate(' + (loadingAngle.value).toString() + 'deg);'
 })
 
-onUnmounted(() => {
-  clearTimeout(timer.value)
-  stopLoadingAnimation()
-})
-
-function open(options) {
-  applyOptions(options, '')
-  showToast()
-}
-
-function close() {
-  clearTimeout(timer.value)
-  stopLoadingAnimation()
-  visible.value = false
-}
-
-function primary(options) {
-  applyOptions(options, 'primary')
-  showToast()
-}
-
-function success(options) {
-  applyOptions(options, 'success')
-  showToast()
-}
-
-function error(options) {
-  applyOptions(options, 'error')
-  showToast()
-}
-
-function warning(options) {
-  applyOptions(options, 'warning')
-  showToast()
-}
-
-function showLoading(options) {
-  applyOptions(options, 'default')
-  currentLoading.value = true
-  if (currentTitle.value.length == 0) currentTitle.value = '加载中'
-  showToast()
-}
-
-function showToast() {
-  clearTimeout(timer.value)
-  visible.value = true
-  if (currentLoading.value) {
-    startLoadingAnimation()
-  } else {
-    stopLoadingAnimation()
-  }
-  const duration = Number(currentDuration.value)
-  if (duration > 0) {
-    timer.value = setTimeout(() => {
-      close()
-    }, duration)
-  }
-}
-
-function applyOptions(options, forcedType) {
+function applyToastOptions(options : any, forcedType : string) : void {
   currentZIndex.value = props.zIndex
   currentLoading.value = props.loading
   currentTitle.value = props.title
@@ -185,40 +165,24 @@ function applyOptions(options, forcedType) {
     return
   }
   if (typeof options == 'object') {
-    setValue(options, 'zIndex')
-    setValue(options, 'loading')
-    setValue(options, 'title')
-    setValue(options, 'icon')
-    setValue(options, 'type')
-    setValue(options, 'mask')
-    setValue(options, 'position')
-    setValue(options, 'duration')
-    setValue(options, 'fill')
-    setValue(options, 'customStyle')
+    const object = options as UTSJSONObject
+    setToastOption(object, 'zIndex')
+    setToastOption(object, 'loading')
+    setToastOption(object, 'title')
+    setToastOption(object, 'icon')
+    setToastOption(object, 'type')
+    setToastOption(object, 'mask')
+    setToastOption(object, 'position')
+    setToastOption(object, 'duration')
+    setToastOption(object, 'fill')
+    setToastOption(object, 'customStyle')
   }
-}
-
-function setValue(options, keyName) {
-  const value = options[keyName]
-  if (value == null) return
-  if (keyName == 'zIndex') currentZIndex.value = value
-  if (keyName == 'loading') currentLoading.value = value == true
-  if (keyName == 'title') currentTitle.value = String(value)
-  if (keyName == 'icon') currentIcon.value = String(value)
-  if (keyName == 'type') currentType.value = String(value)
-  if (keyName == 'mask') currentMask.value = value == true
-  if (keyName == 'position') currentPosition.value = String(value)
-  if (keyName == 'duration') currentDuration.value = value
-  if (keyName == 'fill') currentFill.value = value == true
-  if (keyName == 'customStyle') currentCustomStyle.value = value
 }
 
 function startLoadingAnimation() {
   if (loadingTimer > 0) return
   loadingTimer = setInterval(() => {
-    let angle = (loadingAngle.value + 24) % 360
-    if (angle < 0) angle = angle + 360
-    loadingAngle.value = angle
+    loadingAngle.value = normalizeAngle(loadingAngle.value + 24)
   }, 50)
 }
 
@@ -230,23 +194,61 @@ function stopLoadingAnimation() {
   loadingAngle.value = 0
 }
 
-function normalizePosition(value) {
-  if (value == 'top' || value == 'bottom') return value
-  return 'center'
+function close() : void {
+  clearTimeout(timer.value)
+  stopLoadingAnimation()
+  visible.value = false
 }
 
-function resolveBgColor() {
-  if (currentType.value == 'primary') return '#2979ff'
-  if (currentType.value == 'success') return '#19be6b'
-  if (currentType.value == 'warning') return '#ff9900'
-  if (currentType.value == 'error') return '#fa3534'
-  return 'rgba(0, 0, 0, 0.78)'
+function showToast() : void {
+  clearTimeout(timer.value)
+  visible.value = true
+  if (currentLoading.value) startLoadingAnimation()
+  else stopLoadingAnimation()
+  const duration = parseFloat(currentDuration.value.toString())
+  if (duration > 0) {
+    timer.value = setTimeout(() : void => {
+      close()
+    }, duration)
+  }
 }
 
-function isImagePath(value) {
-  const text = String(value)
-  return text.indexOf('/') >= 0 || text.indexOf('http') == 0
+function open(options : any) : void {
+  applyToastOptions(options, '')
+  showToast()
 }
+
+function primary(options : any) : void {
+  applyToastOptions(options, 'primary')
+  showToast()
+}
+
+function success(options : any) : void {
+  applyToastOptions(options, 'success')
+  showToast()
+}
+
+function error(options : any) : void {
+  applyToastOptions(options, 'error')
+  showToast()
+}
+
+function warning(options : any) : void {
+  applyToastOptions(options, 'warning')
+  showToast()
+}
+
+function showLoading(options : any) : void {
+  applyToastOptions(options, 'default')
+  currentLoading.value = true
+  if (currentTitle.value.length == 0) currentTitle.value = '加载中'
+  showToast()
+}
+
+onUnmounted(() : void => {
+  clearTimeout(timer.value)
+  stopLoadingAnimation()
+})
 
 defineExpose({
   open,
@@ -271,7 +273,10 @@ defineExpose({
 
 .i-toast {
   position: fixed;
-  align-self: center;
+  left: 50px;
+  right: 50px;
+  min-width: 96px;
+  min-height: 44px;
   padding: 10px 16px;
   border-radius: 8px;
   flex-direction: row;

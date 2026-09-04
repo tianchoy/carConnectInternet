@@ -108,43 +108,63 @@ const props = defineProps({
  * - change: 用户选择评分时触发，参数为评分值。
  * - update:value/update:modelValue: 双向绑定同步。
  */
-const emit = defineEmits(['change', 'update:value', 'update:modelValue'])
+const emit = defineEmits<{
+  (event: 'change', value: number): void
+  (event: 'update:value', value: number): void
+  (event: 'update:modelValue', value: number): void
+}>()
 
-const countNumber = computed(() => {
-  const value = Number(props.count)
+const countNumber = computed(() : number => {
+  const value = parseFloat((props.count).toString())
   return value > 0 ? value : 5
 })
 
+function initialValue() : any {
+  if (props.modelValue.toString().length > 0) return props.modelValue
+  return props.value
+}
+
+function normalizeValue(value : any) : number {
+  let nextValue = parseFloat(value.toString())
+  const minValue = parseFloat(props.minCount.toString())
+  if (isNaN(nextValue)) nextValue = minValue
+  if (nextValue < minValue) nextValue = minValue
+  if (nextValue > countNumber.value) nextValue = countNumber.value
+  if (!props.allowHalf) nextValue = Math.round(nextValue)
+  return nextValue
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0) return text
+  return text + 'px'
+}
+
 const current = ref(normalizeValue(initialValue()))
 
-const countList = computed(() => {
-  const list = []
+const countList = computed(() : Array<number> => {
+  const list : Array<number> = []
   for (let i = 1; i <= countNumber.value; i++) list.push(i)
   return list
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  () : any => props.modelValue,
+  () : void => {
     current.value = normalizeValue(initialValue())
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  () : any => props.value,
+  () : void => {
     current.value = normalizeValue(initialValue())
   },
 )
 
-function initialValue() {
-  if (String(props.modelValue).length > 0) return props.modelValue
-  return props.value
-}
-
-function select(value) {
+function select(value : number) : void {
   if (props.disabled || props.readonly || !props.touchable) return
-  let nextValue = Number(value)
+  let nextValue = parseFloat((value).toString())
   if (props.allowHalf && Math.ceil(current.value) == value && current.value == value) {
     nextValue = value - 0.5
   }
@@ -155,17 +175,7 @@ function select(value) {
   emit('update:modelValue', nextValue)
 }
 
-function normalizeValue(value) {
-  let nextValue = Number(value)
-  if (isNaN(nextValue)) nextValue = Number(props.minCount)
-  const minValue = Number(props.minCount)
-  if (nextValue < minValue) nextValue = minValue
-  if (nextValue > countNumber.value) nextValue = countNumber.value
-  if (!props.allowHalf) nextValue = Math.round(nextValue)
-  return nextValue
-}
-
-function starStyle(index) {
+function starStyle(index : number) : string {
   const color = props.disabled
     ? props.disabledColor
     : index <= current.value
@@ -177,15 +187,15 @@ function starStyle(index) {
     ';font-size:' +
     formatSize(props.size) +
     ';line-height:' +
-    formatSize(Number(props.size) + 4) +
+    formatSize(parseFloat((props.size).toString()) + 4) +
     ';margin-right:' +
     formatSize(props.gutter) +
     ';'
   )
 }
 
-function starText(index) {
-  if (props.showText && index > countNumber.value) return String(current.value)
+function starText(index : number) : string {
+  if (props.showText && index > countNumber.value) return (current.value).toString()
   const active = index <= current.value
   const half = props.allowHalf && current.value + 0.5 == index
   const iconName = active || half ? props.activeIcon : props.inactiveIcon
@@ -195,11 +205,6 @@ function starText(index) {
   return active ? '★' : '☆'
 }
 
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0) return text
-  return text + 'px'
-}
 </script>
 
 <style>

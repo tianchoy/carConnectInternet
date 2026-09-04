@@ -13,11 +13,11 @@
 					<i-icon name="/static/xiangxia.png" fontSize="15" @click="showPicker('end')"></i-icon>
 				</view>
 			</view>
-			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
-				<l-date-time-picker confirm-btn="确认" cancel-btn="取消" :title="pickerTitle" :mode="63"
-					@confirm="onConfirm" @cancel="onCancel">
-				</l-date-time-picker>
-			</l-popup>
+			<i-datetime-picker :show="showDateTimePicker" :model-value="currentPickerValue" mode="datetime"
+				:title="pickerTitle" cancel-text="取消" confirm-text="确认" @confirm="onConfirm"
+				@cancel="onCancel" @update:show="onPickerShowChange">
+				<template #trigger><view></view></template>
+			</i-datetime-picker>
 		</view>
 
 		<view class="summary-panel">
@@ -71,7 +71,7 @@
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
-	import { formatTimes, parseLocalDateTime } from '../../utils/formateTime.uts'
+	import { formatTimesToMinute, parseLocalDateTime } from '../../utils/formateTime.uts'
 	// import { getAddress } from '../../utils/getAdress.uts'
 
 	type GroupType = { date : string; trips : Array<UTSJSONObject>; totalDistance : number; }
@@ -91,6 +91,9 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	const startTime = ref('')
 	const endTime = ref('')
+	const currentPickerValue = computed(() : string => {
+		return currentPickerType.value === 'start' ? startTime.value : endTime.value
+	})
 	const imei = ref<string | null>('')
 
 	// 计算属性：按日期分组的行程数据
@@ -154,9 +157,9 @@ import { showAppToast } from '../../utils/toast.uts'
 	// 初始化时间
 	const initDateTime = () => {
 		const now = new Date()
-		endTime.value = formatTimes(now.getTime())
+		endTime.value = formatTimesToMinute(now.getTime())
 		// 开始时间默认为当前时间前1天
-		startTime.value = formatTimes(now.getTime() - 3600000 * 24)
+		startTime.value = formatTimesToMinute(now.getTime() - 3600000 * 24)
 	}
 
 
@@ -277,7 +280,12 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 	// 确认选择时间
-	const onConfirm = (value : string) => {
+	const onConfirm = (event : any) => {
+		const eventObject = event as UTSJSONObject
+		const timestampValue = eventObject['timestamp']
+		const timestamp = timestampValue == null ? 0 : parseFloat(timestampValue.toString())
+		if (!isFinite(timestamp) || timestamp <= 0) return
+		const value = formatTimesToMinute(timestamp)
 		if (currentPickerType.value === 'start') {
 			startTime.value = value
 		} else {
@@ -290,6 +298,10 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	const onCancel = () => {
 		showDateTimePicker.value = false
+	}
+
+	const onPickerShowChange = (value : boolean) => {
+		showDateTimePicker.value = value
 	}
 </script>
 
@@ -319,8 +331,9 @@ import { showAppToast } from '../../utils/toast.uts'
 
 				.date-box {
 					display: flex;
+					flex: 1;
 					flex-direction: row;
-					justify-content: center;
+					justify-content: space-between;
 					align-items: center;
 
 					.Date {

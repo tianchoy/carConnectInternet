@@ -11,7 +11,7 @@
         <view class="i-notice-bar__column-track" :style="columnTrackStyle">
           <text
             v-for="(item, index) in textList"
-            :key="String(index) + item"
+            :key="(index).toString() + item"
             class="i-notice-bar__column-text"
             :style="textStyle"
           >
@@ -106,10 +106,13 @@ const props = defineProps({
  * - click: 点击通告文字或通知栏时触发，参数为当前显示的公告文本。
  * - close: mode 为 closable 时点击关闭图标触发。
  */
-const emit = defineEmits(['click', 'close'])
+const emit = defineEmits<{
+  (event: 'click', text: string): void
+  (event: 'close'): void
+}>()
 
 
-const bgColor = computed(() => {
+const bgColor = computed(() : string => {
   return props.bgColor
 })
 const visible = ref(true)
@@ -130,33 +133,41 @@ function toNumber(value: any, fallback: number): number {
   return isNaN(parsed) ? fallback : parsed
 }
 
-function getTextList(): string[] {
-  return props.text as string[]
+function getTextList() : Array<string> {
+  const result : Array<string> = []
+  const list = props.text
+  if (list == null) return result
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
+    if (item != null) result.push(item.toString())
+  }
+  return result
 }
 
-const textList = computed(() => {
+const textList = computed(() : Array<string> => {
   return getTextList()
 })
 
-const displayText = computed(() => {
+const displayText = computed(() : string => {
   return textList.value.join('    ')
 })
 
-const currentText = computed(() => {
+const currentText = computed(() : string => {
   const list = textList.value
   if (list.length == 0) return ''
   const index = currentIndex.value >= list.length ? 0 : currentIndex.value
-  return list[index]
+  const value = list[index]
+  return value == null ? '' : value
 })
 
-const iconText = computed(() => {
+const iconText = computed(() : string => {
   if (props.icon == 'volume') return '!'
   if (props.icon == 'bell') return '!'
   if (props.icon == 'info') return 'i'
   return props.icon
 })
 
-const noticeStyle = computed(() => {
+const noticeStyle = computed(() : string => {
   const styles: string[] = [
     'background-color:' + bgColor.value,
   ]
@@ -165,7 +176,7 @@ const noticeStyle = computed(() => {
   return styles.join(';')
 })
 
-const textStyle = computed(() => {
+const textStyle = computed(() : string => {
   return [
     'color:' + props.color,
     'font-size:' + addUnit(props.fontSize),
@@ -173,36 +184,36 @@ const textStyle = computed(() => {
   ].join(';')
 })
 
-const rowTextStyle = computed(() => {
+const rowTextStyle = computed(() : string => {
   return textStyle.value
 })
 
-const columnTrackStyle = computed(() => {
+const columnTrackStyle = computed(() : string => {
   return (
     'transform:translateY(-' +
-    String(currentIndex.value * 40) +
+    (currentIndex.value * 40).toString() +
     'px);transition-duration:260ms;'
   )
 })
 
-function stopTimer() {
+function stopTimer() : void {
   if (timer.value != 0) {
     clearInterval(timer.value)
     timer.value = 0
   }
 }
 
-function startTimer() {
+function startTimer() : void {
   stopTimer()
   if (props.direction != 'column') return
   const list = textList.value
   if (list.length < 2) return
-  timer.value = setInterval(() => {
+  timer.value = setInterval(() : void => {
     currentIndex.value = (currentIndex.value + 1) % list.length
   }, toNumber(props.duration, 2000))
 }
 
-function navigateByType() {
+function navigateByType() : void {
   if (props.url == '') return
   if (props.linkType == 'redirectTo') {
     uni.redirectTo({ url: props.url })
@@ -219,43 +230,43 @@ function navigateByType() {
   uni.navigateTo({ url: props.url })
 }
 
-function handleClick() {
+function handleClick() : void {
   emit('click', currentText.value)
   navigateByType()
 }
 
-function handleClose() {
+function handleClose() : void {
   visible.value = false
   emit('close')
 }
 
 watch(
-  () => props.direction,
-  () => {
+  () : string => props.direction,
+  () : void => {
     startTimer()
   },
 )
 
 watch(
-  () => props.duration,
-  () => {
+  () : any => props.duration,
+  () : void => {
     startTimer()
   },
 )
 
 watch(
-  () => props.text,
-  () => {
+  () : Array<any | null> | null => props.text,
+  () : void => {
     currentIndex.value = 0
     startTimer()
   },
 )
 
-onMounted(() => {
+onMounted(() : void => {
   startTimer()
 })
 
-onUnmounted(() => {
+onUnmounted(() : void => {
   stopTimer()
 })
 </script>

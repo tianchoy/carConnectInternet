@@ -16,7 +16,7 @@
       @transition="handleTransition"
       @animationfinish="handleAnimationFinish"
     >
-      <swiper-item v-for="(item, index) in items" :key="index">
+      <swiper-item v-for="(item, index) in safeItems" :key="index">
         <view
           :class="itemClass(index)"
           :style="itemStyle(index)"
@@ -26,7 +26,7 @@
             <image
               v-if="isImageItem(item)"
               class="i-swiper__image"
-              :src="String(item)"
+              :src="(item).toString()"
               mode="aspectFill"
             ></image>
             <view v-else class="i-swiper__content">
@@ -55,11 +55,11 @@
       v-if="showDot && vertical"
       name="dotV"
       :current="currentIndex"
-      :len="items.length"
+      :len="safeItems.length"
     >
       <view class="i-swiper__dots i-swiper__dots--vertical" :style="dotWrapStyle">
         <view
-          v-for="(_, index) in items"
+          v-for="(_, index) in safeItems"
           :key="index"
           :class="dotClass(index)"
           :style="dotStyle(index)"
@@ -72,11 +72,11 @@
       v-if="showDot && !vertical"
       name="dot"
       :current="currentIndex"
-      :len="items.length"
+      :len="safeItems.length"
     >
       <view class="i-swiper__dots" :style="dotWrapStyle">
         <view
-          v-for="(_, index) in items"
+          v-for="(_, index) in safeItems"
           :key="index"
           :class="dotClass(index)"
           :style="dotStyle(index)"
@@ -152,21 +152,74 @@ const props = defineProps({
  * - dragLastEnd: 进入最后视图或最后视图被点击时触发。
  * - transition/animationfinish: 原生 swiper 事件透传。
  */
-const emit = defineEmits([
-  'update:modelValue',
-  'update:value',
-  'change',
-  'click',
-  'dragLastEnd',
-  'transition',
-  'animationfinish',
-])
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: number): void
+  (event: 'update:value', value: number): void
+  (event: 'change', value: number): void
+  (event: 'click', value: number): void
+  (event: 'dragLastEnd'): void
+  (event: 'transition', value: any): void
+  (event: 'animationfinish', value: any): void
+}>()
+
+const safeItems = computed(() : Array<any | null> => {
+  const items = props.items
+  if (items != null) return items
+  const empty : Array<any | null> = []
+  return empty
+})
+
+function normalizeIndex(index : number) : number {
+  if (safeItems.value.length == 0) return 0
+  if (index < 0) return 0
+  if (index >= safeItems.value.length) return safeItems.value.length - 1
+  return index
+}
+
+function initialIndex() : number {
+  if (props.current >= 0) return normalizeIndex(props.current)
+  if (props.value >= 0) return normalizeIndex(props.value)
+  return normalizeIndex(props.modelValue)
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('vh') >= 0 || text.indexOf('vw') >= 0) {
+    const numberValue = parseFloat(text.replace('vh', '').replace('vw', '').toString())
+    return (isNaN(numberValue) ? 0 : numberValue).toString() + 'px'
+  }
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
 
 
 const bgColor = computed(() => {
   return props.bgColor
 })
 const currentIndex = ref(initialIndex())
+
+function syncExternalIndex() : void {
+  currentIndex.value = initialIndex()
+}
+
+function setCurrent(index : number) : void {
+  const nextIndex = normalizeIndex(index)
+  currentIndex.value = nextIndex
+  emit('update:modelValue', nextIndex)
+  emit('update:value', nextIndex)
+  emit('change', nextIndex)
+}
+
+function itemGap(index : number) : string {
+  if (props.space <= 0) return '0px'
+  if (props.model.length == 0) return '0px'
+  return Math.round(props.space / 2).toString() + 'px'
+}
+
+function itemColor(index : number) : string {
+  const colors : Array<string> = ['#1989fa', '#16a34a', '#7c3aed', '#f59e0b', '#ef4444']
+  return colors[index % colors.length]
+}
 
 const autoPlayEnabled = computed(() => {
   return props.autoPlay || props.autoplay
@@ -183,7 +236,7 @@ const playInterval = computed(() => {
 
 const sideMargin = computed(() => {
   if (props.spaceOffset <= 0) return '0px'
-  return String(props.spaceOffset) + 'px'
+  return (props.spaceOffset).toString() + 'px'
 })
 
 const wrapStyle = computed(() => {
@@ -213,54 +266,49 @@ const contentDescStyle = computed(() => {
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  () : number => props.modelValue,
+  () : void => {
     syncExternalIndex()
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  () : number => props.value,
+  () : void => {
     syncExternalIndex()
   },
 )
 
 watch(
-  () => props.current,
-  () => {
+  () : number => props.current,
+  () : void => {
     syncExternalIndex()
   },
 )
 
-function initialIndex(): number {
-  if (props.current >= 0) return normalizeIndex(props.current)
-  if (props.value >= 0) return normalizeIndex(props.value)
-  return normalizeIndex(props.modelValue)
-}
-
-function syncExternalIndex() {
-  currentIndex.value = initialIndex()
-}
-
-function handleChange(event) {
-  const nextIndex = Number(event.detail.current)
-  if (props.showLastView && nextIndex >= props.items.length) {
+function handleChange(event : any) {
+  if (event == null || typeof event != 'object') return
+  const detail = (event as UTSJSONObject)['detail']
+  if (detail == null || typeof detail != 'object') return
+  const current = (detail as UTSJSONObject)['current']
+  if (current == null) return
+  const nextIndex = parseFloat(current.toString())
+  if (props.showLastView && nextIndex >= safeItems.value.length) {
     emit('dragLastEnd')
     return
   }
   setCurrent(nextIndex)
 }
 
-function handleTransition(event) {
+function handleTransition(event : any) {
   emit('transition', event)
 }
 
-function handleAnimationFinish(event) {
+function handleAnimationFinish(event : any) {
   emit('animationfinish', event)
 }
 
-function handleClick(index) {
+function handleClick(index : number) {
   emit('click', index)
 }
 
@@ -268,21 +316,13 @@ function handleLastClick() {
   emit('dragLastEnd')
 }
 
-function setCurrent(index: number) {
-  const nextIndex = normalizeIndex(index)
-  currentIndex.value = nextIndex
-  emit('update:modelValue', nextIndex)
-  emit('update:value', nextIndex)
-  emit('change', nextIndex)
-}
-
 function to(index: number) {
   setCurrent(index)
 }
 
 function next() {
-  if (props.items.length == 0) return
-  if (currentIndex.value >= props.items.length - 1) {
+  if (safeItems.value.length == 0) return
+  if (currentIndex.value >= safeItems.value.length - 1) {
     if (loop.value) {
       setCurrent(0)
     } else {
@@ -294,29 +334,22 @@ function next() {
 }
 
 function prev() {
-  if (props.items.length == 0) return
+  if (safeItems.value.length == 0) return
   if (currentIndex.value <= 0) {
-    setCurrent(loop.value ? props.items.length - 1 : 0)
+    setCurrent(loop.value ? safeItems.value.length - 1 : 0)
   } else {
     setCurrent(currentIndex.value - 1)
   }
 }
 
-function normalizeIndex(index: number): number {
-  if (props.items.length == 0) return 0
-  if (index < 0) return 0
-  if (index >= props.items.length) return props.items.length - 1
-  return index
-}
-
-function itemClass(index) {
+function itemClass(index : number) {
   const classes = ['i-swiper__item']
   if (index == currentIndex.value) classes.push('i-swiper__item--active')
   if (props.model.length > 0) classes.push('i-swiper__item--' + props.model)
   return classes.join(' ')
 }
 
-function itemStyle(index) {
+function itemStyle(index : number) {
   let style =
     'height:' +
     formatSize(props.height) +
@@ -335,29 +368,18 @@ function itemStyle(index) {
   return style
 }
 
-function itemGap(index): string {
-  if (props.space <= 0) return '0px'
-  if (props.model.length == 0) return '0px'
-  return String(Math.round(props.space / 2)) + 'px'
-}
-
-function itemColor(index): string {
-  const colors = ['#1989fa', '#16a34a', '#7c3aed', '#f59e0b', '#ef4444']
-  return colors[index % colors.length]
-}
-
-function dotClass(index) {
+function dotClass(index : number) {
   const classes = ['i-swiper__dot']
   if (props.vertical) classes.push('i-swiper__dot--vertical')
   if (index == currentIndex.value) classes.push('i-swiper__dot--active')
   return classes.join(' ')
 }
 
-function dotStyle(index) {
-  const width = index == currentIndex.value ? Number(props.dotSize) * 3 : Number(props.dotSize)
+function dotStyle(index : number) {
+  const width = index == currentIndex.value ? parseFloat((props.dotSize).toString()) * 3 : parseFloat((props.dotSize).toString())
   return (
     'width:' +
-    formatSize(String(width)) +
+    formatSize((width).toString()) +
     ';height:' +
     formatSize(props.dotSize) +
     ';border-radius:' +
@@ -368,8 +390,9 @@ function dotStyle(index) {
   )
 }
 
-function isImageItem(item): boolean {
-  const text = String(item)
+function isImageItem(item : any | null): boolean {
+  if (item == null) return false
+  const text = item.toString()
   return (
     text.indexOf('http://') == 0 ||
     text.indexOf('https://') == 0 ||
@@ -381,30 +404,14 @@ function isImageItem(item): boolean {
   )
 }
 
-function itemTitle(item, index): string {
-  const text = String(item)
+function itemTitle(item : any | null, index : number): string {
+  const text = item == null ? '' : item.toString()
   if (text.length > 0) return text
-  return 'Swiper ' + String(index + 1)
+  return 'Swiper ' + (index + 1).toString()
 }
 
-function itemDesc(item, index): string {
-  return '第 ' + String(index + 1) + ' 张'
-}
-
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('vh') >= 0 || text.indexOf('vw') >= 0) {
-    const numberValue = Number(text.replace('vh', '').replace('vw', ''))
-    return (isNaN(numberValue) ? 0 : numberValue) + 'px'
-  }
-  if (
-    text.indexOf('px') >= 0 ||
-    text.indexOf('rpx') >= 0 ||
-    text.indexOf('%') >= 0
-  ) {
-    return text
-  }
-  return text + 'px'
+function itemDesc(item : any | null, index : number): string {
+  return '第 ' + (index + 1).toString() + ' 张'
 }
 
 defineExpose({

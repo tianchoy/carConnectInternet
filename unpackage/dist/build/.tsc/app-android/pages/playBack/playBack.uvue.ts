@@ -3,13 +3,12 @@ import _easycom_sub_navBar from '@/components/sub-navBar/sub-navBar.uvue'
 import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_i_slider from '@/uni_modules/i-ui-x/components/i-slider/i-slider.uvue'
-import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.uvue'
-import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
+import _easycom_i_datetime_picker from '@/uni_modules/i-ui-x/components/i-datetime-picker/i-datetime-picker.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { showAppToast } from '../../utils/toast.uts'
-	import { ref, reactive, onMounted, watch } from 'vue'
+	import { ref, reactive, onMounted, watch, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
-	import { formatTimes, normalizeLocalDateTime, parseLocalDateTime } from '../../utils/formateTime.uts'
+	import { formatTimesToMinute, normalizeLocalDateTime, parseLocalDateTime } from '../../utils/formateTime.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -87,7 +86,7 @@ const center = reactive({
 
 	const isPlaying = ref(false)
 	const isTrackPlayable = ref(false)
-	const playbackSpeed = ref(5)
+	const playbackSpeed = ref(1)
 	const totalDistance = ref(0)
 	const currentSpeed = ref(0)
 	const currentTime = ref('')
@@ -98,13 +97,16 @@ const center = reactive({
 	let replaySessionId = 0
 
 	function formatPlaybackTime(timestamp : number) : string {
-		return formatTimes(timestamp) ?? ''
+		return formatTimesToMinute(timestamp) ?? ''
 	}
 	const now = new Date()
-	const initialEndTime = formatTimes(now.getTime())
-	const initialStartTime = formatTimes(now.getTime() - 3600000 * 6)
+	const initialEndTime = formatTimesToMinute(now.getTime())
+	const initialStartTime = formatTimesToMinute(now.getTime() - 3600000 * 6)
 	const startTime = ref(initialStartTime)
 	const endTime = ref(initialEndTime)
+	const currentPickerValue = computed(() : string => {
+		return currentPickerType.value == 'start' ? startTime.value : endTime.value
+	})
 
 	function normalizePlaybackTime(value : string, fallback : string) : string {
 		const milliseconds = parseLocalDateTime(value)
@@ -605,7 +607,7 @@ const center = reactive({
 			imei: imei.value,
 			startTime: startTime.value.replace(/\//g, '-'),
 			endTime: endTime.value.replace(/\//g, '-'),
-			minParkTime: 2,
+			minParkTime: 1,
 			withStop: false,
 			withPos: true,
 			withTrip: false,
@@ -713,9 +715,12 @@ const center = reactive({
 		}
 	}
 
-	// 确认选择时间
-	function onConfirm(value : string) {
-		const formattedValue = normalizeDateTime(value)
+	function onConfirm(event : any) : void {
+		const eventObject = event as UTSJSONObject
+		const timestampValue = eventObject['timestamp']
+		const timestamp = timestampValue == null ? 0 : parseFloat(timestampValue.toString())
+		if (!isFinite(timestamp) || timestamp <= 0) return
+		const formattedValue = formatPlaybackTime(timestamp)
 
 		if (currentPickerType.value == 'start') {
 			setPlaybackTimeRange(formattedValue, endTime.value ?? '')
@@ -731,11 +736,15 @@ const center = reactive({
 		showDateTimePicker.value = false
 	}
 
+	function onPickerShowChange(value : boolean) {
+		showDateTimePicker.value = value
+	}
+
 	// 重置回放
 
 	function applyPlaybackSpeed(value : number) : void {
 		if (!isFinite(value)) return
-		playbackSpeed.value = Math.min(50, Math.max(5, value))
+		playbackSpeed.value = Math.min(30, Math.max(1, value))
 		if (!isPlaying.value) return
 
 		const timer = playbackTimer
@@ -800,8 +809,7 @@ const _component_sub_navBar = resolveEasyComponent("sub-navBar",_easycom_sub_nav
 const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
 const _component_i_button = resolveEasyComponent("i-button",_easycom_i_button)
 const _component_i_slider = resolveEasyComponent("i-slider",_easycom_i_slider)
-const _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker",_easycom_l_date_time_picker)
-const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
+const _component_i_datetime_picker = resolveEasyComponent("i-datetime-picker",_easycom_i_datetime_picker)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
   return _cE(Fragment, null, [
@@ -884,9 +892,9 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cV(_component_i_slider, _uM({
               modelValue: playbackSpeed.value,
               "onUpdate:modelValue": $event => {(playbackSpeed).value = $event},
-              min: 5,
-              max: 50,
-              step: 5,
+              min: 1,
+              max: 30,
+              step: 1,
               onChange: setPlaybackSpeedFromValue
             }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
           ]),
@@ -906,25 +914,22 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cE("text", _uM({ class: "info-label" }), "里程")
           ])
         ]),
-        _cV(_component_l_popup, _uM({
-          modelValue: showDateTimePicker.value,
-          "onUpdate:modelValue": $event => {(showDateTimePicker).value = $event},
-          position: "bottom",
-          closeable: false
+        _cV(_component_i_datetime_picker, _uM({
+          show: showDateTimePicker.value,
+          "model-value": currentPickerValue.value,
+          mode: "datetime",
+          title: pickerTitle.value,
+          "cancel-text": "取消",
+          "confirm-text": "确认",
+          onConfirm: onConfirm,
+          onCancel: onCancel,
+          "onUpdate:show": onPickerShowChange
         }), _uM({
-          default: withSlotCtx((): any[] => [
-            _cV(_component_l_date_time_picker, _uM({
-              "confirm-btn": "确认",
-              "cancel-btn": "取消",
-              title: pickerTitle.value,
-              mode: 63,
-              format: "YYYY-MM-DD HH:mm:ss",
-              onConfirm: onConfirm,
-              onCancel: onCancel
-            }), null, 8 /* PROPS */, ["title"])
+          trigger: withSlotCtx((): any[] => [
+            _cE("view")
           ]),
           _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+        }), 8 /* PROPS */, ["show", "model-value", "title"])
       ])
     ]),
     _cV(_component_app_toast)

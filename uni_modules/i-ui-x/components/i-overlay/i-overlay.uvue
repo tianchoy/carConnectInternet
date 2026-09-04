@@ -43,35 +43,41 @@ const props = defineProps({
  * - cancel: 用户取消操作时触发。
  * - update:show: 同步 show 可见状态。
  */
-const emit = defineEmits(['open', 'close', 'confirm', 'cancel', 'update:show'])
+const emit = defineEmits<{
+  (event: 'open'): void
+  (event: 'close'): void
+  (event: 'confirm'): void
+  (event: 'cancel'): void
+  (event: 'update:show', value: boolean): void
+}>()
 
 const opened = ref(props.show)
 
 watch(
-  () => props.show,
-  (nextValue) => {
+  () : boolean => props.show,
+  (nextValue : boolean) : void => {
     opened.value = nextValue
   },
 )
 
-function open() {
+function open() : void {
   opened.value = true
   emit('open')
   emit('update:show', true)
 }
 
-function close() {
+function close() : void {
   opened.value = false
   emit('close')
   emit('update:show', false)
 }
 
-function confirm() {
+function confirm() : void {
   emit('confirm')
   close()
 }
 
-function cancel() {
+function cancel() : void {
   emit('cancel')
   close()
 }

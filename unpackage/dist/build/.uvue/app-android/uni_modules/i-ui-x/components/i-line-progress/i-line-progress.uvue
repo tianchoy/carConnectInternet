@@ -1,16 +1,16 @@
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 const __sfc__ = defineComponent({
     __name: 'i-line-progress',
     name: 'i-line-progress',
     props: {
         percent: { type: Number, default: 45 },
-        title: { type: String, default: '' },
+        title: { type: String, default: '上传进度' },
         activeColor: { type: String, default: '#19be6b' },
         inactiveColor: { type: String, default: '#ebeef5' },
         height: { type: Number, default: 8 },
         showText: { type: Boolean, default: true },
     },
-    emits: ['click', 'change', 'update:percent'],
+    emits: ["click", "change", "update:percent"],
     setup(__props) {
         const __ins = getCurrentInstance()!;
         const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
@@ -42,12 +42,15 @@ const __sfc__ = defineComponent({
                 return 100;
             return Math.round(current.value);
         });
-        function step(delta: number) {
+        watch((): number => props.percent, (nextValue: number): void => {
+            current.value = nextValue;
+        });
+        function step(delta: number): void {
             current.value = Math.min(100, Math.max(0, current.value + delta));
             emit('change', current.value);
             emit('update:percent', current.value);
         }
-        function emitClick() {
+        function emitClick(): void {
             emit('click', current.value);
         }
         return (): any | null => {
@@ -55,6 +58,15 @@ const __sfc__ = defineComponent({
                 class: "i-card",
                 onClick: emitClick
             }), [
+                _cE("view", _uM({ class: "i-row i-head" }), [
+                    _cE("text", _uM({ class: "i-title" }), _tD(_ctx.title), 1 /* TEXT */),
+                    isTrue(_ctx.showText)
+                        ? _cE("text", _uM({
+                            key: 0,
+                            class: "i-muted"
+                        }), _tD(normalized.value) + "%", 1 /* TEXT */)
+                        : _cC("v-if", true)
+                ]),
                 _cE("view", _uM({
                     class: "i-track",
                     style: _nS('height:' + _ctx.height + 'px;background-color:' + _ctx.inactiveColor)
@@ -64,14 +76,19 @@ const __sfc__ = defineComponent({
                         style: _nS('width:' + normalized.value + '%;background-color:' + _ctx.activeColor)
                     }), null, 4 /* STYLE */)
                 ], 4 /* STYLE */),
-                _cE("view", _uM({ class: "i-row i-head" }), [
-                    _cE("text", _uM({ class: "i-title" }), _tD(_ctx.title), 1 /* TEXT */),
-                    isTrue(_ctx.showText)
-                        ? _cE("text", _uM({
-                            key: 0,
-                            class: "i-muted"
-                        }), _tD(normalized.value) + "%", 1 /* TEXT */)
-                        : _cC("v-if", true)
+                _cE("view", _uM({ class: "i-row" }), [
+                    _cE("view", _uM({
+                        class: "i-btn",
+                        onClick: withModifiers(() => { step(-15); }, ["stop"])
+                    }), [
+                        _cE("text", _uM({ class: "i-btn-text" }), "减少")
+                    ], 8 /* PROPS */, ["onClick"]),
+                    _cE("view", _uM({
+                        class: "i-btn",
+                        onClick: withModifiers(() => { step(15); }, ["stop"])
+                    }), [
+                        _cE("text", _uM({ class: "i-btn-text" }), "增加")
+                    ], 8 /* PROPS */, ["onClick"])
                 ])
             ]);
         };
@@ -79,4 +96,4 @@ const __sfc__ = defineComponent({
 });
 export default __sfc__;
 export type ILineProgressComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesIUiXComponentsILineProgressILineProgressStyles = [_uM([["i-card", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]]))], ["i-title", _pS(_uM([["color", "#303133"], ["fontSize", 15], ["fontWeight", 600], ["lineHeight", "22px"]]))], ["i-muted", _pS(_uM([["color", "#909399"], ["fontSize", 12], ["lineHeight", "18px"]]))], ["i-row", _pS(_uM([["flexDirection", "row"], ["alignItems", "center"], ["flexWrap", "wrap"]]))], ["i-btn", _pS(_uM([["minHeight", 34], ["marginTop", 10], ["marginRight", 8], ["paddingTop", 0], ["paddingRight", 12], ["paddingBottom", 0], ["paddingLeft", 12], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["backgroundColor", "#ecf5ff"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-btn--plain", _pS(_uM([["backgroundColor", "#f5f7fa"]]))], ["i-btn--danger", _pS(_uM([["backgroundColor", "#fef0f0"]]))], ["i-btn-text", _pS(_uM([["color", "#2979ff"], ["fontSize", 13], ["lineHeight", "18px"]]))], ["i-danger", _pS(_uM([["color", "#f56c6c"]]))], ["i-head", _pS(_uM([["justifyContent", "space-between"]]))], ["i-track", _pS(_uM([["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["marginRight", 5], ["overflow", "hidden"]]))], ["i-fill", _pS(_uM([["height", "100%"], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999]]))]])];
+const GenUniModulesIUiXComponentsILineProgressILineProgressStyles = [_uM([["i-card", _pS(_uM([["paddingTop", 14], ["paddingRight", 14], ["paddingBottom", 14], ["paddingLeft", 14], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8], ["backgroundColor", "#ffffff"]]))], ["i-title", _pS(_uM([["color", "#303133"], ["fontSize", 15], ["fontWeight", 600], ["lineHeight", "22px"]]))], ["i-muted", _pS(_uM([["marginTop", 4], ["color", "#909399"], ["fontSize", 12], ["lineHeight", "18px"]]))], ["i-row", _pS(_uM([["flexDirection", "row"], ["alignItems", "center"], ["flexWrap", "wrap"]]))], ["i-btn", _pS(_uM([["minHeight", 34], ["marginTop", 10], ["marginRight", 8], ["paddingTop", 0], ["paddingRight", 12], ["paddingBottom", 0], ["paddingLeft", 12], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["backgroundColor", "#ecf5ff"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-btn--plain", _pS(_uM([["backgroundColor", "#f5f7fa"]]))], ["i-btn--danger", _pS(_uM([["backgroundColor", "#fef0f0"]]))], ["i-btn-text", _pS(_uM([["color", "#2979ff"], ["fontSize", 13], ["lineHeight", "18px"]]))], ["i-danger", _pS(_uM([["color", "#f56c6c"]]))], ["i-head", _pS(_uM([["justifyContent", "space-between"]]))], ["i-track", _pS(_uM([["marginTop", 12], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999], ["overflow", "hidden"]]))], ["i-fill", _pS(_uM([["height", "100%"], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999]]))]])];

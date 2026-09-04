@@ -4,7 +4,7 @@ import _easycom_i_checkbox from '@/uni_modules/i-ui-x/components/i-checkbox/i-ch
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 	import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { userAgreement, privacyPolicy } from '../../utils/legal.uts'
@@ -12,16 +12,17 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 	import { resetTokenExpiredState } from '../../api/http.uts'
 	import { PostWechatlogin, login, personalPasswordLogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 	import { saveSmsRegisterContext } from '../../services/auth/sms-register-context.uts'
+	// Uni Verify 一键登录暂时停用；保留原调用代码，后续可取消注释恢复。
 
-	import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
+	// import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
 
 
-	type PersonalLoginForm = { __$originalPosition?: UTSSourceMapPosition<"PersonalLoginForm", "pages/login/login.uvue", 189, 7>;
+	type PersonalLoginForm = { __$originalPosition?: UTSSourceMapPosition<"PersonalLoginForm", "pages/login/login.uvue", 194, 7>;
 		username: string
 		password: string
 	}
 
-	type EnterpriseLoginForm = { __$originalPosition?: UTSSourceMapPosition<"EnterpriseLoginForm", "pages/login/login.uvue", 194, 7>;
+	type EnterpriseLoginForm = { __$originalPosition?: UTSSourceMapPosition<"EnterpriseLoginForm", "pages/login/login.uvue", 199, 7>;
 		username: string
 		password: string
 	}
@@ -54,7 +55,10 @@ const _cache = __ins.renderCache;
 	const smsSending = ref(false)
 	const smsSubmitting = ref(false)
 	let smsCooldownTimer: number | null = null
+	// Uni Verify 一键登录暂时停用；保留原实现，后续可取消注释恢复。
+	/*
 	const nativeLoginLoading = ref(false)
+	*/
 
 	const isPersonalPasswordLoginReady = computed<boolean>(() => {
 		return personalForm.value.username != '' && personalForm.value.password != ''
@@ -78,7 +82,7 @@ const _cache = __ins.renderCache;
 		try {
 			return uni.getDeviceInfo().deviceId ?? ''
 		} catch (error) {
-			console.warn('获取登录设备标识失败:', error, " at pages/login/login.uvue:243")
+			console.warn('获取登录设备标识失败:', error, " at pages/login/login.uvue:251")
 			return ''
 		}
 	}
@@ -249,6 +253,7 @@ const _cache = __ins.renderCache;
 		}
 	}
 
+	/*
 	const startUniVerifyLogin = async (): Promise<void> => {
 
 		if (!ensureAgreementAccepted() || nativeLoginLoading.value) return
@@ -259,7 +264,7 @@ const _cache = __ins.renderCache;
 				const appVersion = uni.getAppBaseInfo().appVersion ?? ''
 				if (appVersion != '') clientVersion = appVersion
 			} catch (error) {
-				console.warn('获取应用版本失败，使用默认版本号:', error, " at pages/login/login.uvue:424")
+				console.warn('获取应用版本失败，使用默认版本号:', error)
 			}
 			const result = await loginByUniVerify(clientVersion, getLoginDeviceId())
 			if (result.ok) {
@@ -274,7 +279,7 @@ const _cache = __ins.renderCache;
 		}
 
 	}
-
+	*/
 	// 默认页面不展示微信登录入口，保留现有小程序登录实现供后续需求恢复。
 	const loginBt = (): void => {
 		if (!docState.value) {
@@ -334,12 +339,12 @@ const _cache = __ins.renderCache;
 		try {
 			const rawAccount = uni.getStorageSync('savedEnterpriseAccount')
 			if (rawAccount == null || rawAccount == '') return
-			const account = typeof rawAccount == 'string' ? UTSAndroid.consoleDebugError(JSON.parse(rawAccount), " at pages/login/login.uvue:499") as UTSJSONObject : rawAccount as UTSJSONObject
+			const account = typeof rawAccount == 'string' ? UTSAndroid.consoleDebugError(JSON.parse(rawAccount), " at pages/login/login.uvue:508") as UTSJSONObject : rawAccount as UTSJSONObject
 			enterpriseForm.value.username = account.getString('username', '')
 			enterpriseForm.value.password = account.getString('password', '')
 			rememberPassword.value = enterpriseForm.value.username != '' || enterpriseForm.value.password != ''
 		} catch (error) {
-			console.warn('加载保存的企业账号失败:', error, " at pages/login/login.uvue:504")
+			console.warn('加载保存的企业账号失败:', error, " at pages/login/login.uvue:513")
 		}
 	}
 
@@ -399,12 +404,14 @@ const _cache = __ins.renderCache;
 		showAppModal({ title: '隐私政策', content: privacyPolicy, showCancel: false })
 	}
 
-	onMounted(() => {
-
-		prefetchUniVerify()
-
-	})
-
+	/*
+	 * 页面挂载时预取 Uni Verify 号码；当前暂时停用，后续可取消注释恢复。
+	 * onMounted(() => {
+	 *
+	 * 	prefetchUniVerify()
+	 *
+	 * })
+	 */
 	onUnmounted(() => {
 		stopSmsCooldown()
 	})
@@ -594,6 +601,16 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
         }), 8 /* PROPS */, ["loading", "disabled"])
       ]),
       _cE("view", _uM({ class: "page-actions" }), [
+        isTrue(!smsLoginMode.value)
+          ? _cE("view", _uM({
+              key: 0,
+              class: "action-item",
+              onClick: gotoIndex
+            }), [
+              _cE("text", _uM({ class: "action-link" }), "暂不登录"),
+              _cE("text", _uM({ class: "action-arrow" }), "›")
+            ])
+          : _cC("v-if", true),
         _cE("view", _uM({
           class: "action-item",
           onClick: toggleLoginMode
@@ -603,7 +620,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
         ]),
         isTrue(!smsLoginMode.value)
           ? _cE("view", _uM({
-              key: 0,
+              key: 1,
               class: "action-item",
               onClick: goRegister
             }), [
@@ -613,7 +630,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
           : _cC("v-if", true),
         isTrue(!smsLoginMode.value)
           ? _cE("view", _uM({
-              key: 1,
+              key: 2,
               class: "action-item",
               onClick: goForgotPassword
             }), [

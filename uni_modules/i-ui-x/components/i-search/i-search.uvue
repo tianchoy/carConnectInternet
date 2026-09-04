@@ -1,7 +1,7 @@
 <template>
   <view class="i-search" :style="wrapStyle" @click="handleDisabledClick">
     <slot name="label">
-      <text v-if="label.length > 0" class="i-search__label">{{ label }}</text>
+      <text v-if="labelText.length > 0" class="i-search__label">{{ labelText }}</text>
     </slot>
     <view
       v-if="searchIcon !== false"
@@ -35,7 +35,7 @@
       :placeholder-style="'color:' + placeholderColor + ';'"
       :disabled="disabled"
       :focus="focus"
-      :maxlength="Number(maxlength)"
+      :maxlength="parseFloat((maxlength).toString())"
       @input="handleInput"
       @confirm="handleSearch"
       @focus="handleFocus"
@@ -50,7 +50,7 @@
     </text>
     <slot name="right"></slot>
     <view
-      v-if="showAction"
+      v-if="actionVisible"
       class="i-search__action"
       :style="actionStyle"
       @click="custom"
@@ -199,41 +199,61 @@ const props = defineProps({
  * - click: disabled 为 true 时点击输入框触发。
  * - clickIcon: 点击左侧图标时触发。
  */
-const emit = defineEmits([
-  'update:modelValue',
-  'update:value',
-  'input',
-  'change',
-  'search',
-  'custom',
-  'blur',
-  'focus',
-  'clear',
-  'click',
-  'clickIcon',
-])
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: string): void
+  (event: 'update:value', value: string): void
+  (event: 'input', value: string): void
+  (event: 'change', value: string): void
+  (event: 'search', value: string): void
+  (event: 'custom', value: string): void
+  (event: 'blur', value: any): void
+  (event: 'focus', value: any): void
+  (event: 'clear'): void
+  (event: 'click'): void
+  (event: 'clickIcon'): void
+}>()
+
+function initialValue() : string {
+  const modelValue = props.modelValue.toString()
+  return modelValue.length > 0 ? modelValue : props.value.toString()
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0) return text
+  return text + 'rpx'
+}
+
+function emitValue(value : string) : void {
+  emit('update:modelValue', value)
+  emit('update:value', value)
+  emit('input', value)
+  emit('change', value)
+}
 
 
-const bgColor = computed(() => {
+const bgColor = computed(() : string => {
   return props.bgColor
 })
 const current = ref(initialValue())
 const actionVisible = ref(props.showAction)
 
-const clearEnabled = computed(() => {
+const labelText = computed(() : string => props.label.toString())
+
+const clearEnabled = computed(() : boolean => {
   return props.clearabled || props.clearable
 })
 
-const iconText = computed(() => {
-  if (String(props.searchIcon) == 'scan') return '▣'
-  return String(props.searchIcon)
+const iconText = computed(() : string => {
+  if ((props.searchIcon).toString() == 'scan') return '▣'
+  return (props.searchIcon).toString()
 })
 
-const isSearchIcon = computed(() => {
-  return String(props.searchIcon) == 'search' || String(props.searchIcon).length == 0
+const isSearchIcon = computed(() : boolean => {
+  return (props.searchIcon).toString() == 'search' || (props.searchIcon).toString().length == 0
 })
 
-const wrapStyle = computed(() => {
+const wrapStyle = computed(() : string => {
   const height = formatSize(props.height)
   const radius = props.shape == 'square' ? '8px' : height
   let style =
@@ -255,7 +275,7 @@ const wrapStyle = computed(() => {
   return style
 })
 
-const fieldStyle = computed(() => {
+const fieldStyle = computed(() : string => {
   return (
     'color:' +
     props.color +
@@ -266,7 +286,7 @@ const fieldStyle = computed(() => {
   )
 })
 
-const iconStyle = computed(() => {
+const iconStyle = computed(() : string => {
   const size = formatSize(props.searchIconSize)
   return (
     'width:' +
@@ -277,93 +297,76 @@ const iconStyle = computed(() => {
   )
 })
 
-const iconCircleStyle = computed(() => {
+const iconCircleStyle = computed(() : string => {
   return 'border-color:' + props.searchIconColor + ';'
 })
 
-const iconHandleStyle = computed(() => {
+const iconHandleStyle = computed(() : string => {
   return 'background-color:' + props.searchIconColor + ';'
 })
 
-const iconTextStyle = computed(() => {
+const iconTextStyle = computed(() : string => {
   return 'color:' + props.searchIconColor + ';font-size:' + formatSize(props.searchIconSize) + ';'
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  () : any => props.modelValue,
+  () : void => {
     current.value = initialValue()
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  () : any => props.value,
+  () : void => {
     current.value = initialValue()
   },
 )
 
 watch(
-  () => props.showAction,
-  (nextValue) => {
+  () : boolean => props.showAction,
+  (nextValue : boolean) : void => {
     actionVisible.value = nextValue
   },
 )
 
-function initialValue() {
-  if (String(props.modelValue).length > 0) return String(props.modelValue)
-  return String(props.value)
-}
-
-function handleInput(event) {
-  const nextValue = String(event.detail.value)
+function handleInput(event : UniInputEvent) : void {
+  const nextValue = (event.detail.value).toString()
   current.value = nextValue
   emitValue(nextValue)
 }
 
-function emitValue(value) {
-  emit('update:modelValue', value)
-  emit('update:value', value)
-  emit('input', value)
-  emit('change', value)
-}
-
-function handleSearch() {
+function handleSearch() : void {
   emit('search', current.value)
 }
 
-function custom() {
+function custom() : void {
   emit('custom', current.value)
   if (props.animation) actionVisible.value = false
 }
 
-function handleFocus(event) {
+function handleFocus(event : any) : void {
   emit('focus', event)
 }
 
-function handleBlur(event) {
+function handleBlur(event : any) : void {
   emit('blur', event)
 }
 
-function clear() {
+function clear() : void {
   current.value = ''
   emitValue('')
   emit('clear')
 }
 
-function handleDisabledClick() {
+function handleDisabledClick() : void {
   if (props.disabled) emit('click')
 }
 
-function clickIcon() {
+function clickIcon() : void {
   emit('clickIcon')
 }
 
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0) return text
-  return text + 'rpx'
-}
 </script>
 
 <style>

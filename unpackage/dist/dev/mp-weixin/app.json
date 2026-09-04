@@ -11,7 +11,6 @@
     "pages/carInfoDetail/carInfoDetail",
     "pages/addCar/addCar",
     "pages/playBack/playBack",
-    "uni_modules/lime-action-sheet/pages/index",
     "pages/vehicleTracking/vehicleTracking",
     "pages/mileageRecord/mileageRecord",
     "pages/stopRecord/stopRecord",

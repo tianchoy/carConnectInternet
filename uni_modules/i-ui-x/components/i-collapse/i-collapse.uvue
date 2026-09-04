@@ -41,6 +41,12 @@ import { computed, ref, watch } from 'vue'
 
 defineOptions({ name: 'i-collapse' })
 
+type ICollapseDefaultItem = {
+  title: string
+  name: string
+  content: string
+}
+
 /**
  * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Collapse 文档，并保留 items 便于无子组件时演示。
  * - value: 当前展开面板的 name 数组；accordion 为 true 时只保留一个展开项。
@@ -59,25 +65,23 @@ const props = defineProps({
   border: { type: Boolean, default: true },
   items: {
     type: Array,
-    default() {
-      return [
-        {
-          title: '文档指南',
-          name: 'Docs guide',
-          content: '从安装、配置到平台差异说明，帮助你快速接入组件。',
-        },
-        {
-          title: '组件全面',
-          name: 'Variety components',
-          content: '基础、表单、反馈、布局和导航组件均可按需使用。',
-        },
-        {
-          title: '众多利器',
-          name: 'Numerous tools',
-          content: '内置常用交互状态和事件回传，便于快速开发页面。',
-        },
-      ]
-    },
+    default: () : Array<ICollapseDefaultItem> => [
+      {
+        title: '文档指南',
+        name: 'Docs guide',
+        content: '从安装、配置到平台差异说明，帮助你快速接入组件。',
+      },
+      {
+        title: '组件全面',
+        name: 'Variety components',
+        content: '基础、表单、反馈、布局和导航组件均可按需使用。',
+      },
+      {
+        title: '众多利器',
+        name: 'Numerous tools',
+        content: '内置常用交互状态和事件回传，便于快速开发页面。',
+      },
+    ],
   },
 })
 
@@ -90,34 +94,57 @@ const props = defineProps({
  */
 const emit = defineEmits(['change', 'open', 'close', 'update:value'])
 
-const activeNames = ref(normalizeNames(props.value))
-
-const collapseClass = computed(() => {
-  const classes = ['i-collapse']
-  if (props.border) classes.push('i-collapse--border')
-  return classes.join(' ')
-})
-
-watch(
-  () => props.value,
-  (nextValue) => {
-    activeNames.value = normalizeNames(nextValue)
-  },
-)
-
-function toggle(item, index) {
-  if (itemDisabled(item)) return
-  const name = itemName(item, index)
-  const exists = hasName(name)
-  if (exists) {
-    close(name)
-    return
+function normalizeNames(value : Array<any | null> | null) : Array<string> {
+  const result : Array<string> = []
+  if (value != null) {
+    for (let i = 0; i < value.length; i++) {
+      const item = value[i]
+      if (item != null) result.push(item.toString())
+    }
   }
-  open(name)
+  if (props.accordion && result.length > 1) return [result[0]]
+  return result
 }
 
-function open(name: string = '') {
-  const target = name.length > 0 ? name : itemName(props.items[0], 0)
+function safeItems() : Array<any | null> {
+  const items = props.items
+  return items == null ? [] : items
+}
+
+function itemField(item : any | null, keyName : string) : string {
+  if (item != null && typeof item == 'object') {
+    const object = item as UTSJSONObject
+    const value = object[keyName]
+    if (value != null) return value.toString()
+  }
+  if (typeof item == 'string') return item
+  return ''
+}
+
+function itemName(item : any | null, index : number) : string {
+  const value = itemField(item, 'name')
+  return value.length > 0 ? value : index.toString()
+}
+
+const activeNames = ref<Array<string>>(normalizeNames(props.value))
+
+function hasName(name : string) : boolean {
+  return activeNames.value.indexOf(name) >= 0
+}
+
+function emitChange() : void {
+  const next : Array<string> = activeNames.value.slice(0)
+  emit('change', next)
+  emit('update:value', next)
+}
+
+function open(name : string = '') : void {
+  let target = name
+  if (target.length == 0) {
+    const items = safeItems()
+    if (items.length == 0) return
+    target = itemName(items[0], 0)
+  }
   if (target.length == 0) return
   if (props.accordion) {
     activeNames.value = [target]
@@ -128,132 +155,116 @@ function open(name: string = '') {
   emit('open', target)
 }
 
-function close(name: string = '') {
-  const target = name.length > 0 ? name : activeNames.value[0]
-  const next: string[] = []
-  activeNames.value.forEach((item) => {
+function close(name : string = '') : void {
+  let target = name
+  if (target.length == 0) {
+    if (activeNames.value.length == 0) return
+    target = activeNames.value[0]
+  }
+  const next : Array<string> = []
+  for (let i = 0; i < activeNames.value.length; i++) {
+    const item = activeNames.value[i]
     if (item != target) next.push(item)
-  })
+  }
   activeNames.value = next
   emitChange()
   emit('close', target)
 }
 
-function emitChange() {
-  const next = activeNames.value.slice()
-  emit('change', next)
-  emit('update:value', next)
+function itemDisabled(item : any | null) : boolean {
+  if (item != null && typeof item == 'object') {
+    return (item as UTSJSONObject)['disabled'] == true
+  }
+  return false
 }
 
-function isActive(item, index): boolean {
+function toggle(item : any | null, index : number) : void {
+  if (itemDisabled(item)) return
+  const name = itemName(item, index)
+  if (hasName(name)) {
+    close(name)
+    return
+  }
+  open(name)
+}
+
+function isActive(item : any | null, index : number) : boolean {
   return hasName(itemName(item, index))
 }
 
-function hasName(name: string): boolean {
-  return activeNames.value.indexOf(name) >= 0
+function itemKey(item : any | null, index : number) : string {
+  return itemName(item, index) + '-' + (index).toString()
 }
 
-function normalizeNames(value): string[] {
-  const result: string[] = []
-  if (Array.isArray(value)) {
-    value.forEach((item) => {
-      result.push(String(item))
-    })
-  } else if (value != null && String(value).length > 0) {
-    result.push(String(value))
-  }
-  if (props.accordion && result.length > 1) return [result[0]]
-  return result
-}
-
-function itemKey(item, index): string {
-  return itemName(item, index) + '-' + String(index)
-}
-
-function itemName(item, index): string {
-  const value = itemField(item, 'name')
-  return value.length > 0 ? value : String(index)
-}
-
-function itemTitle(item, index): string {
+function itemTitle(item : any | null, index : number) : string {
   const value = itemField(item, 'title')
-  return value.length > 0 ? value : '折叠面板 ' + String(index + 1)
+  return value.length > 0 ? value : '折叠面板 ' + (index + 1).toString()
 }
 
-function itemValue(item): string {
+function itemValue(item : any | null) : string {
   return itemField(item, 'value')
 }
 
-function itemLabel(item): string {
+function itemLabel(item : any | null) : string {
   return itemField(item, 'label')
 }
 
-function itemIcon(item): string {
+function itemIcon(item : any | null) : string {
   return itemField(item, 'icon')
 }
 
-function itemContent(item): string {
+function itemContent(item : any | null) : string {
   const content = itemField(item, 'content')
   return content.length > 0 ? content : '折叠面板内容'
 }
 
-function itemDisabled(item): boolean {
-  if (item != null && typeof item == 'object') return item['disabled'] == true
-  return false
-}
-
-function itemIsLink(item): boolean {
-  if (item != null && typeof item == 'object' && item['isLink'] != null) {
-    return item['isLink'] == true
+function itemIsLink(item : any | null) : boolean {
+  if (item != null && typeof item == 'object') {
+    const value = (item as UTSJSONObject)['isLink']
+    if (value != null) return value == true
   }
   return true
 }
 
-function itemClickable(item): boolean {
-  if (item != null && typeof item == 'object' && item['clickable'] != null) {
-    return item['clickable'] == true
+function itemClickable(item : any | null) : boolean {
+  if (item != null && typeof item == 'object') {
+    const value = (item as UTSJSONObject)['clickable']
+    if (value != null) return value == true
   }
   return true
 }
 
-function itemBorder(item): boolean {
-  if (item != null && typeof item == 'object' && item['border'] != null) {
-    return item['border'] == true
+function itemBorder(item : any | null) : boolean {
+  if (item != null && typeof item == 'object') {
+    const value = (item as UTSJSONObject)['border']
+    if (value != null) return value == true
   }
   return true
 }
 
-function itemAlign(item): string {
+function itemAlign(item : any | null) : string {
   const align = itemField(item, 'align')
   return align.length > 0 ? align : 'left'
 }
 
-function itemDuration(item): number {
-  if (item != null && typeof item == 'object' && item['duration'] != null) {
-    return Number(item['duration'])
+function itemDuration(item : any | null) : number {
+  if (item != null && typeof item == 'object') {
+    const value = (item as UTSJSONObject)['duration']
+    if (value != null) return parseFloat(value.toString())
   }
   return 300
 }
 
-function itemField(item, keyName): string {
-  if (item != null && typeof item == 'object') {
-    const value = item[keyName]
-    if (value != null) return String(value)
-  }
-  if (typeof item == 'string') return item
-  return ''
-}
-
-function itemClass(item, index): string {
-  const classes = ['i-collapse__item']
+function itemClass(item : any | null, index : number) : string {
+  const classes : Array<string> = ['i-collapse__item']
   if (itemBorder(item)) classes.push('i-collapse__item--border')
-  if (index >= props.items.length - 1) classes.push('i-collapse__item--last')
+  if (index >= safeItems().length - 1) classes.push('i-collapse__item--last')
   if (isActive(item, index)) classes.push('i-collapse__item--active')
   return classes.join(' ')
 }
 
-function itemHeadClass(item): string {
-  const classes = ['i-collapse__head']
+function itemHeadClass(item : any | null) : string {
+  const classes : Array<string> = ['i-collapse__head']
   if (itemDisabled(item)) classes.push('i-collapse__head--disabled')
   if (itemClickable(item) && !itemDisabled(item)) classes.push('i-collapse__head--clickable')
   if (itemAlign(item) == 'center') classes.push('i-collapse__head--center')
@@ -261,22 +272,35 @@ function itemHeadClass(item): string {
   return classes.join(' ')
 }
 
-function titleClass(item): string {
-  const classes = ['i-collapse__title']
+function titleClass(item : any | null) : string {
+  const classes : Array<string> = ['i-collapse__title']
   if (itemDisabled(item)) classes.push('i-collapse__title--disabled')
   return classes.join(' ')
 }
 
-function arrowClass(item, index): string {
-  const classes = ['i-collapse__arrow']
+function arrowClass(item : any | null, index : number) : string {
+  const classes : Array<string> = ['i-collapse__arrow']
   if (isActive(item, index)) classes.push('i-collapse__arrow--active')
   if (itemDisabled(item)) classes.push('i-collapse__arrow--disabled')
   return classes.join(' ')
 }
 
-function bodyStyle(item): string {
+function bodyStyle(item : any | null) : string {
   return ''
 }
+
+const collapseClass = computed(() : string => {
+  const classes : Array<string> = ['i-collapse']
+  if (props.border) classes.push('i-collapse--border')
+  return classes.join(' ')
+})
+
+watch(
+  () : Array<any | null> | null => props.value,
+  (nextValue : Array<any | null> | null) : void => {
+    activeNames.value = normalizeNames(nextValue)
+  },
+)
 
 defineExpose({
   open,

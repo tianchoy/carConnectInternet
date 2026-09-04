@@ -62,17 +62,35 @@ const props = defineProps({
   avatarShape: { type: String, default: 'circle' },
 })
 
-const rowCount = computed(() => {
-  const count = Number(props.rows)
+function arrayValue(source : any, index : number) : any | null {
+  if (Array.isArray(source)) {
+    const list = source as Array<any | null>
+    if (index < list.length) return list[index]
+    if (list.length > 0) return list[list.length - 1]
+  }
+  return source
+}
+
+function formatSize(value : any | null) : string {
+  if (value == null) return '0px'
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+const rowCount = computed(() : number => {
+  const count = parseFloat((props.rows).toString())
   if (isNaN(count) || count < 0) return 0
   return Math.floor(count)
 })
 
-const titleStyle = computed(() => {
+const titleStyle = computed(() : string => {
   return 'width:' + formatSize(props.titleWidth) + ';height:' + formatSize(props.titleHeight) + ';'
 })
 
-const avatarStyle = computed(() => {
+const avatarStyle = computed(() : string => {
   let style = 'width:' + formatSize(props.avatarSize) + ';height:' + formatSize(props.avatarSize) + ';'
   if (props.avatarShape == 'circle') {
     style = style + 'border-radius:999px;'
@@ -82,7 +100,7 @@ const avatarStyle = computed(() => {
   return style
 })
 
-function rowStyle(index: number): string {
+function rowStyle(index : number) : string {
   return (
     'width:' +
     formatSize(arrayValue(props.rowsWidth, index)) +
@@ -90,22 +108,6 @@ function rowStyle(index: number): string {
     formatSize(arrayValue(props.rowsHeight, index)) +
     ';'
   )
-}
-
-function arrayValue(source, index: number) {
-  if (Array.isArray(source)) {
-    if (index < source.length) return source[index]
-    if (source.length > 0) return source[source.length - 1]
-  }
-  return source
-}
-
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
 }
 </script>
 

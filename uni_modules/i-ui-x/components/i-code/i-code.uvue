@@ -10,7 +10,7 @@
       :disabled="disabled"
       :focus="inputFocus"
       :confirm-type="confirmType"
-      :cursor-spacing="Number(cursorSpacing)"
+      :cursor-spacing="parseFloat((cursorSpacing).toString())"
       @input="handleInput"
       @focus="handleFocus"
       @blur="handleBlur"
@@ -184,112 +184,107 @@ const emit = defineEmits([
   'clear',
 ])
 
-
-const bgColor = computed(() => {
-  return props.bgColor
-})
-const current = ref(initialValue())
-const inputFocus = ref(props.autoFocus || props.focus)
-const confirmedValue = ref('')
-const breathStep = ref(0)
-let breathForward = true
-let breathTimer = 0
-
-const effectiveMaxlength = computed(() => {
-  if (props.length > 0) return props.length
-  return props.maxlength > 0 ? props.maxlength : 4
-})
-
-const useSystemKeyboard = computed(() => {
-  return props.useSysKeyborad && props.useSysKeyboard
-})
-
-const wrapClass = computed(() => {
-  const classes = ['i-code']
-  if (props.disabled) classes.push('i-code--disabled')
-  return classes.join(' ')
-})
-
-const wrapStyle = computed(() => {
-  return 'height:' + formatSize(props.height) + ';'
-})
-
-const textStyle = computed(() => {
-  const color = props.skin == 'fill' ? '#ffffff' : activeColor()
-  return 'color:' + color + ';font-size:' + formatSize(props.fontSize) + ';'
-})
-
-const breathEnabled = computed(() => {
-  return !props.disabled && inputFocus.value && current.value.length < effectiveMaxlength.value
-})
-
-const breathOpacity = computed(() => {
-  return 0.45 + (breathStep.value / 12) * 0.55
-})
-
-const breathScale = computed(() => {
-  return 1 + (breathStep.value / 12) * 0.35
-})
-
-watch(
-  () => props.modelValue,
-  () => {
-    syncExternalValue()
-  },
-)
-
-watch(
-  () => props.value,
-  () => {
-    syncExternalValue()
-  },
-)
-
-watch(
-  () => props.focus,
-  (nextValue) => {
-    inputFocus.value = nextValue
-  },
-)
-
-watch(
-  () => breathEnabled.value,
-  (nextValue) => {
-    if (nextValue) {
-      startBreath()
-    } else {
-      stopBreath()
-    }
-  },
-)
-
-onMounted(() => {
-  if (breathEnabled.value) startBreath()
-})
-
-onUnmounted(() => {
-  stopBreath()
-})
-
-function initialValue() {
+function initialValue() : string {
   if (props.modelValue.length > 0) return props.modelValue
   return props.value
 }
 
-function normalizeValue(value) {
-  let text = String(value)
+function activeColor() : string {
+  return props.fontColor.length > 0 ? props.fontColor : '#1989fa'
+}
+
+function outlineColor() : string {
+  if (props.borderColor.length > 0) return props.borderColor
+  return activeColor()
+}
+
+function formatSize(value : any | null) : string {
+  if (value == null) return '0px'
+  const text = value.toString()
+  if (text.indexOf('vh') >= 0 || text.indexOf('vw') >= 0) {
+    const numberValue = parseFloat(text.replace('vh', '').replace('vw', ''))
+    return (isNaN(numberValue) ? 0 : numberValue) + 'px'
+  }
+  if (
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('%') >= 0
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+
+const bgColor = computed(() : string => {
+  return props.bgColor
+})
+const current = ref<string>(initialValue())
+const inputFocus = ref<boolean>(props.autoFocus || props.focus)
+const confirmedValue = ref<string>('')
+const breathStep = ref<number>(0)
+let breathForward = true
+let breathTimer = 0
+
+const effectiveMaxlength = computed(() : number => {
+  if (props.length > 0) return props.length
+  return props.maxlength > 0 ? props.maxlength : 4
+})
+
+const useSystemKeyboard = computed(() : boolean => {
+  return props.useSysKeyborad && props.useSysKeyboard
+})
+
+const wrapClass = computed(() : string => {
+  const classes : Array<string> = ['i-code']
+  if (props.disabled) classes.push('i-code--disabled')
+  return classes.join(' ')
+})
+
+const wrapStyle = computed(() : string => {
+  return 'height:' + formatSize(props.height) + ';'
+})
+
+const textStyle = computed(() : string => {
+  const color = props.skin == 'fill' ? '#ffffff' : activeColor()
+  return 'color:' + color + ';font-size:' + formatSize(props.fontSize) + ';'
+})
+
+const breathEnabled = computed(() : boolean => {
+  return !props.disabled && inputFocus.value && current.value.length < effectiveMaxlength.value
+})
+
+const breathOpacity = computed(() : number => {
+  return 0.45 + (breathStep.value / 12) * 0.55
+})
+
+const breathScale = computed(() : number => {
+  return 1 + (breathStep.value / 12) * 0.35
+})
+
+function normalizeValue(value : string) : string {
+  let text = value
   if (text.length > effectiveMaxlength.value) {
     text = text.substring(0, effectiveMaxlength.value)
   }
   return text
 }
 
-function syncExternalValue() {
+function checkConfirm(nextValue : string) : void {
+  if (nextValue.length >= effectiveMaxlength.value && confirmedValue.value != nextValue) {
+    confirmedValue.value = nextValue
+    emit('confirm', nextValue)
+  }
+  if (nextValue.length < effectiveMaxlength.value) {
+    confirmedValue.value = ''
+  }
+}
+
+function syncExternalValue() : void {
   current.value = normalizeValue(initialValue())
   checkConfirm(current.value)
 }
 
-function handleTap() {
+function handleTap() : void {
   if (props.disabled) return
   emit('click')
   if (useSystemKeyboard.value) {
@@ -297,29 +292,7 @@ function handleTap() {
   }
 }
 
-function handleInput(event) {
-  setValue(String(event.detail.value))
-}
-
-function handleFocus(event) {
-  inputFocus.value = true
-  emit('focus', event)
-}
-
-function handleBlur(event) {
-  inputFocus.value = false
-  emit('blur', event)
-}
-
-function handleConfirm() {
-  emit('confirm', current.value)
-}
-
-function handleKeyboardHeightChange(event) {
-  emit('keyboardheightchange', event)
-}
-
-function setValue(value) {
+function updateCodeValue(value : string) : void {
   if (props.disabled) return
   const nextValue = normalizeValue(value)
   current.value = nextValue
@@ -330,27 +303,39 @@ function setValue(value) {
   checkConfirm(nextValue)
 }
 
-function checkConfirm(nextValue) {
-  if (nextValue.length >= effectiveMaxlength.value && confirmedValue.value != nextValue) {
-    confirmedValue.value = nextValue
-    emit('confirm', nextValue)
-  }
-  if (nextValue.length < effectiveMaxlength.value) {
-    confirmedValue.value = ''
-  }
+function handleInput(event : UniInputEvent) : void {
+  updateCodeValue(event.detail.value)
 }
 
-function insert(value) {
+function handleFocus(event : any) : void {
+  inputFocus.value = true
+  emit('focus', event)
+}
+
+function handleBlur(event : any) : void {
+  inputFocus.value = false
+  emit('blur', event)
+}
+
+function handleConfirm() : void {
+  emit('confirm', current.value)
+}
+
+function handleKeyboardHeightChange(event : any) : void {
+  emit('keyboardheightchange', event)
+}
+
+function insert(value : any | null) : void {
   if (current.value.length >= effectiveMaxlength.value) return
-  setValue(current.value + String(value))
+  updateCodeValue(current.value + (value == null ? '' : value.toString()))
 }
 
-function backspace() {
+function backspace() : void {
   if (current.value.length == 0) return
-  setValue(current.value.substring(0, current.value.length - 1))
+  updateCodeValue(current.value.substring(0, current.value.length - 1))
 }
 
-function clear() {
+function clear() : void {
   current.value = ''
   confirmedValue.value = ''
   emit('update:modelValue', '')
@@ -360,17 +345,30 @@ function clear() {
   emit('clear')
 }
 
-function focusInput() {
+function focusInput() : void {
   if (!useSystemKeyboard.value || props.disabled) return
   inputFocus.value = true
 }
 
-function blurInput() {
+function blurInput() : void {
   inputFocus.value = false
 }
 
-function boxClass(index) {
-  const classes = ['i-code__box']
+function getChar(index : number) : string {
+  return current.value.substring(index - 1, index)
+}
+
+function isInputSlot(index : number) : boolean {
+  return (
+    !props.disabled &&
+    inputFocus.value &&
+    index == current.value.length + 1 &&
+    current.value.length < effectiveMaxlength.value
+  )
+}
+
+function boxClass(index : number) : string {
+  const classes : Array<string> = ['i-code__box']
   if (getChar(index).length > 0) classes.push('i-code__box--filled')
   if (isInputSlot(index)) {
     classes.push('i-code__box--active')
@@ -378,25 +376,25 @@ function boxClass(index) {
   return classes.join(' ')
 }
 
-function placeholderClass(index, shape) {
-  const classes = shape == 'line' ? ['i-code__line'] : ['i-code__dot']
+function placeholderClass(index : number, shape : string) : string {
+  const classes : Array<string> = shape == 'line' ? ['i-code__line'] : ['i-code__dot']
   if (isInputSlot(index)) {
     classes.push(shape == 'line' ? 'i-code__line--active' : 'i-code__dot--active')
   }
   return classes.join(' ')
 }
 
-function placeholderStyle(index, shape) {
+function placeholderStyle(index : number, shape : string) : string {
   if (!isInputSlot(index)) return ''
-  const opacity = String(breathOpacity.value)
-  const scale = String(breathScale.value)
+  const opacity = (breathOpacity.value).toString()
+  const scale = (breathScale.value).toString()
   if (shape == 'line') {
     return 'opacity:' + opacity + ';transform:scaleX(' + scale + ');'
   }
   return 'opacity:' + opacity + ';transform:scale(' + scale + ');'
 }
 
-function boxStyle(index) {
+function boxStyle(index : number) : string {
   const filled = getChar(index).length > 0
   const active = filled || isInputSlot(index)
   let style =
@@ -422,20 +420,7 @@ function boxStyle(index) {
   return style
 }
 
-function getChar(index) {
-  return current.value.substring(index - 1, index)
-}
-
-function isInputSlot(index) {
-  return (
-    !props.disabled &&
-    inputFocus.value &&
-    index == current.value.length + 1 &&
-    current.value.length < effectiveMaxlength.value
-  )
-}
-
-function startBreath() {
+function startBreath() : void {
   if (breathTimer > 0) return
   breathTimer = setInterval(() => {
     if (breathForward) {
@@ -454,7 +439,7 @@ function startBreath() {
   }, 80)
 }
 
-function stopBreath() {
+function stopBreath() : void {
   if (breathTimer > 0) {
     clearInterval(breathTimer)
     breathTimer = 0
@@ -463,37 +448,52 @@ function stopBreath() {
   breathForward = true
 }
 
-function activeColor() {
-  return props.fontColor.length > 0 ? props.fontColor : '#1989fa'
-}
+watch(
+  () : string => props.modelValue,
+  () : void => {
+    syncExternalValue()
+  },
+)
 
-function outlineColor() {
-  if (props.borderColor.length > 0) return props.borderColor
-  return activeColor()
-}
+watch(
+  () : string => props.value,
+  () : void => {
+    syncExternalValue()
+  },
+)
 
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('vh') >= 0 || text.indexOf('vw') >= 0) {
-    const numberValue = Number(text.replace('vh', '').replace('vw', ''))
-    return (isNaN(numberValue) ? 0 : numberValue) + 'px'
-  }
-  if (
-    text.indexOf('px') >= 0 ||
-    text.indexOf('rpx') >= 0 ||
-    text.indexOf('%') >= 0
-  ) {
-    return text
-  }
-  return text + 'px'
-}
+watch(
+  () : boolean => props.focus,
+  (nextValue : boolean) : void => {
+    inputFocus.value = nextValue
+  },
+)
+
+watch(
+  () : boolean => breathEnabled.value,
+  (nextValue : boolean) : void => {
+    if (nextValue) {
+      startBreath()
+    } else {
+      stopBreath()
+    }
+  },
+)
+
+onMounted(() : void => {
+  if (breathEnabled.value) startBreath()
+})
+
+onUnmounted(() : void => {
+  stopBreath()
+})
 
 defineExpose({
   insert,
   backspace,
   clear,
-  focus: focusInput,
-  blur: blurInput,
+  focusInput,
+  blurInput,
 })
 </script>
 

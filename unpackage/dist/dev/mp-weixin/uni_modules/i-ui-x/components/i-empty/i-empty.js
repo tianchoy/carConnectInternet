@@ -19,13 +19,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   var __emit = _a.emit;
   const props = __props;
   const emit = __emit;
-  function formatSize(value) {
+  function formatSize(value = null) {
     const text = value.toString();
     if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
       return text;
     return text + "px";
   }
-  function formatBoxSize(value) {
+  function formatBoxSize(value = null) {
     const text = value.toString();
     if (text.indexOf(" ") >= 0)
       return text;

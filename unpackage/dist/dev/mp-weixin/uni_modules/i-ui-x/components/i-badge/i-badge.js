@@ -67,17 +67,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   var __emit = _a.emit;
   const props = __props;
   const emit = __emit;
+  const bgColor = common_vendor.computed(() => {
+    return props.bgColor;
+  });
   function hasNumberValue() {
-    if (props.value != null && props.value.toString().length > 0)
-      return true;
-    return props.count > 0 || props.showZero;
+    return props.value.toString().length > 0 || props.count > 0 || props.showZero;
   }
   function effectiveCount() {
-    if (props.value != null && props.value.toString().length > 0) {
-      if (typeof props.value == "number")
-        return props.value;
-      return parseFloat(props.value);
-    }
+    if (props.value.toString().length > 0)
+      return parseFloat(props.value.toString());
     return props.count;
   }
   function getMaxCount() {
@@ -86,8 +84,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return props.max;
   }
   function effectiveBgColor() {
-    if (props.bgColor.length > 0)
-      return props.bgColor;
+    if (bgColor.value.length > 0)
+      return bgColor.value;
     return props.type;
   }
   function effectiveFontColor() {
@@ -96,7 +94,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return props.fontColor;
   }
   function normalizeTheme(value) {
-    const text = value;
+    const text = value.toString();
     if (text == "danger")
       return "error";
     if (text == "error" || text == "primary" || text == "success" || text == "warning" || text == "info")
@@ -104,7 +102,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return "custom";
   }
   function parseColor(value) {
-    const text = value;
+    const text = value.toString();
     if (text == "white")
       return "#ffffff";
     if (text == "black")
@@ -122,7 +120,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return text;
   }
   function normalizePosition(value) {
-    const text = value;
+    const text = value.toString();
     if (text == "rightTop")
       return "right";
     if (text == "leftTop")
@@ -140,11 +138,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     if (offset == null || offset.length <= index)
       return 0;
     const value = offset[index];
-    if (typeof value == "number")
-      return value;
-    if (typeof value == "string")
-      return parseFloat(value);
-    return 0;
+    if (value == null)
+      return 0;
+    return parseFloat(value.toString());
   }
   function positionStyle() {
     const x = getOffset(0);
@@ -169,9 +165,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return text;
     return text + "px";
   }
-  common_vendor.computed(() => {
-    return props.bgColor;
-  });
   const showBadge = common_vendor.computed(() => {
     if (props.hidden)
       return false;
@@ -230,9 +223,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   });
   const badgeStyle = common_vendor.computed(() => {
     let style = positionStyle();
-    const bgColor = parseColor(effectiveBgColor());
-    if (bgColor.length > 0)
-      style = style + "background-color:" + bgColor + ";";
+    const bgColor2 = parseColor(effectiveBgColor());
+    if (bgColor2.length > 0)
+      style = style + "background-color:" + bgColor2 + ";";
     return style;
   });
   const badgeTextStyle = common_vendor.computed(() => {

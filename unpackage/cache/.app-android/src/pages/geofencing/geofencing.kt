@@ -944,10 +944,6 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 }
             }
             val getDeviceDisplayName = ::gen_getDeviceDisplayName_fn
-            fun gen_closeEditDialog_fn(): Unit {
-                editDialogPopup.value?.`$callMethod`("close")
-            }
-            val closeEditDialog = ::gen_closeEditDialog_fn
             fun gen_getSelectedFenceName_fn(): String {
                 val fence = selectedFence.value
                 return if (fence != null) {
@@ -967,10 +963,10 @@ open class GenPagesGeofencingGeofencing : BasePage {
             fun gen_deleteSelectedFence_fn(): Unit {
                 showFenceModal.value?.`$callMethod`("close")
                 val fence = selectedFence.value
-                console.log("删除电子围栏", fence, " at pages/geofencing/geofencing.uvue:1206")
+                console.log("删除电子围栏", fence, " at pages/geofencing/geofencing.uvue:1202")
                 if (fence != null) {
                     val fenceId = fence.getString("id", "")
-                    console.log("删除电子围栏ID", fenceId, " at pages/geofencing/geofencing.uvue:1210")
+                    console.log("删除电子围栏ID", fenceId, " at pages/geofencing/geofencing.uvue:1206")
                     if (fenceId !== "") {
                         deleteFence(fenceId)
                     } else {
@@ -1044,7 +1040,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 ) + "围栏" + (fenceList.value.length + 1)
                 editDialogPopup.value?.`$callMethod`("open")
             }
-            val clearDrawing = fun(){
+            fun gen_clearDrawing_fn(): Unit {
                 isDrawing.value = false
                 points.value = _uA()
                 circleCenter.value = null
@@ -1055,10 +1051,23 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 updateMarkers()
                 renderFencesOnMap()
             }
+            val clearDrawing = ::gen_clearDrawing_fn
+            fun gen_closeEditDialog_fn(): Unit {
+                editDialogPopup.value?.`$callMethod`("close")
+                if (editingFence.value == null) {
+                    clearDrawing()
+                }
+            }
+            val closeEditDialog = ::gen_closeEditDialog_fn
             onLoad(fun(option){
+                console.log("加载参数", option, " at pages/geofencing/geofencing.uvue:1356")
                 connectionStatus.value = option["connectionStatus"]
                 imei.value = option["imei"]
-                currentCar.value = option["plateNo"]
+                currentCar.value = if (isTruthy(option["plateNo"])) {
+                    option["plateNo"]
+                } else {
+                    option["deviceName"]
+                }
                 deptId.value = option["deptId"]
                 carType.value = option["carType"]
                 deviceName.value = option["deviceName"]

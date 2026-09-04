@@ -39,19 +39,11 @@ const emit = defineEmits(['click', 'change', 'end'])
 const current = ref(props.startVal)
 const timer = ref(0)
 
-const display = computed(() => {
-  return Number(current.value).toFixed(props.decimals)
+const display = computed(() : string => {
+  return parseFloat((current.value).toString()).toFixed(props.decimals)
 })
 
-onMounted(() => {
-  restart()
-})
-
-onUnmounted(() => {
-  clearInterval(timer.value)
-})
-
-function restart() {
+function restart() : void {
   clearInterval(timer.value)
   current.value = props.startVal
   emit('click', current.value)
@@ -69,6 +61,14 @@ function restart() {
     }
   }, 40)
 }
+
+onMounted(() : void => {
+  restart()
+})
+
+onUnmounted(() : void => {
+  clearInterval(timer.value)
+})
 </script>
 <style>
 .i-card {

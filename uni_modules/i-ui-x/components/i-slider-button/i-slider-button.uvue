@@ -130,27 +130,114 @@ const props = defineProps({
  * - reset: 重置滑动按钮时触发。
  * - update:modelValue/update:value: 同步成功状态。
  */
-const emit = defineEmits([
-  'change',
-  'success',
-  'reset',
-  'update:modelValue',
-  'update:value',
-  'confirm',
-])
+const emit = defineEmits<{
+  (event: 'change', value: number): void
+  (event: 'success'): void
+  (event: 'reset'): void
+  (event: 'update:modelValue', value: boolean): void
+  (event: 'update:value', value: boolean): void
+  (event: 'confirm'): void
+}>()
 
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
 
-const bgColor = computed(() => {
+function numericSize(value : any, fallback : number) : number {
+  const text = value.toString()
+  const numberValue = parseFloat(text.replace('px', '').replace('rpx', '').replace('%', '').toString())
+  if (isNaN(numberValue)) return fallback
+  return numberValue
+}
+
+const bgColor = computed(() : string => {
   return props.bgColor
 })
 const successed = ref(props.modelValue || props.value)
 const progress = ref(successed.value ? 1 : 0)
-const buttonId = 'i-slider-button-' + String(Math.floor(Math.random() * 1000000))
+const buttonId = 'i-slider-button-' + (Math.floor(Math.random() * 1000000)).toString()
 const buttonRectLeft = ref(0)
 const buttonRectWidth = ref(0)
 const touching = ref(false)
 
-const wrapStyle = computed(() => {
+function readTouchX(event : UniTouchEvent) : number {
+  let point : any | null = null
+  if (event.touches.length > 0) point = event.touches[0]
+  else if (event.changedTouches.length > 0) point = event.changedTouches[0]
+  if (point == null) return NaN
+  const object = point as UTSJSONObject
+  const clientX = object['clientX']
+  if (clientX != null) {
+    const value = parseFloat(clientX.toString())
+    if (!isNaN(value)) return value
+  }
+  const pageX = object['pageX']
+  if (pageX != null) {
+    const value = parseFloat(pageX.toString())
+    if (!isNaN(value)) return value
+  }
+  const x = object['x']
+  return x == null ? NaN : parseFloat(x.toString())
+}
+
+function updateProgressByTouch(event : UniTouchEvent) : void {
+  const x = readTouchX(event)
+  if (isNaN(x) || buttonRectWidth.value <= 0) return
+  let nextProgress = (x - buttonRectLeft.value) / buttonRectWidth.value
+  if (nextProgress < 0) nextProgress = 0
+  if (nextProgress > 1) nextProgress = 1
+  progress.value = nextProgress
+  emit('change', progress.value)
+}
+
+function setButtonRect(rect : any | null) : void {
+  if (rect == null || typeof rect != 'object') return
+  const object = rect as UTSJSONObject
+  const left = object['left']
+  const x = object['x']
+  const leftValue = left == null ? NaN : parseFloat(left.toString())
+  const xValue = x == null ? 0 : parseFloat(x.toString())
+  buttonRectLeft.value = isNaN(leftValue) ? xValue : leftValue
+  const width = object['width']
+  buttonRectWidth.value = width == null ? 0 : parseFloat(width.toString())
+}
+
+function refreshButtonRect(event : UniTouchEvent, shouldUpdate : boolean) : void {
+  uni
+    .createSelectorQuery()
+    .select('#' + buttonId)
+    .boundingClientRect((rect : any | null) : void => {
+      setButtonRect(rect)
+      if (shouldUpdate) updateProgressByTouch(event)
+    })
+    .exec()
+}
+
+function reset() : void {
+  successed.value = false
+  progress.value = 0
+  emit('reset')
+  emit('update:modelValue', false)
+  emit('update:value', false)
+}
+
+function markSuccess() : void {
+  successed.value = true
+  progress.value = 1
+  emit('success')
+  emit('confirm')
+  emit('update:modelValue', true)
+  emit('update:value', true)
+  if (props.autoReset) {
+    setTimeout(() : void => {
+      reset()
+    }, props.resetDelay)
+  }
+}
+
+const wrapStyle = computed(() : string => {
   return (
     'width:' +
     formatSize(props.width) +
@@ -164,14 +251,14 @@ const wrapStyle = computed(() => {
   )
 })
 
-const railStyle = computed(() => {
+const railStyle = computed(() : string => {
   const thumbSize = numericSize(props.height, 45) - 8
   const percent = progress.value * 100
   const followOffset = thumbSize * (1 - progress.value)
   const width =
     progress.value <= 0
       ? '0%'
-      : 'calc(' + String(percent) + '% + ' + formatSize(followOffset) + ')'
+      : 'calc(' + (percent).toString() + '% + ' + formatSize(followOffset) + ')'
   return (
     'width:' +
     width +
@@ -182,12 +269,12 @@ const railStyle = computed(() => {
     ';background-color:' +
     props.railColor +
     ';z-index:' +
-    String(props.railIndex) +
+    (props.railIndex).toString() +
     ';'
   )
 })
 
-const textStyle = computed(() => {
+const textStyle = computed(() : string => {
   return (
     'color:' +
     (successed.value ? props.activeTextColor : props.textColor) +
@@ -201,12 +288,12 @@ const textStyle = computed(() => {
   )
 })
 
-const currentText = computed(() => {
+const currentText = computed(() : string => {
   if (!successed.value) return props.text
   return props.doneText.length > 0 ? props.doneText : props.successText
 })
 
-const thumbStyle = computed(() => {
+const thumbStyle = computed(() : string => {
   const size = numericSize(props.height, 45) - 8
   const offset = progress.value * 100
   const marginLeft = 0 - size * progress.value
@@ -218,14 +305,14 @@ const thumbStyle = computed(() => {
     ';border-radius:' +
     formatSize(size) +
     ';top:4px;left:' +
-    String(offset) +
+    (offset).toString() +
     '%;margin-left:' +
     formatSize(marginLeft) +
     ';'
   )
 })
 
-const thumbIconStyle = computed(() => {
+const thumbIconStyle = computed(() : string => {
   return (
     'color:' +
     props.railColor +
@@ -238,33 +325,33 @@ const thumbIconStyle = computed(() => {
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  () : boolean => props.modelValue,
+  () : void => {
     successed.value = props.modelValue
     progress.value = successed.value ? 1 : 0
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  () : boolean => props.value,
+  () : void => {
     successed.value = props.value
     progress.value = successed.value ? 1 : 0
   },
 )
 
-function handleTouchStart(event) {
+function handleTouchStart(event : UniTouchEvent) : void {
   if (props.disabled || successed.value) return
   touching.value = true
   refreshButtonRect(event, true)
 }
 
-function handleTouchMove(event) {
+function handleTouchMove(event : UniTouchEvent) : void {
   if (props.disabled || successed.value || !touching.value) return
   updateProgressByTouch(event)
 }
 
-function handleTouchEnd(event) {
+function handleTouchEnd(event : UniTouchEvent) : void {
   if (!touching.value) return
   updateProgressByTouch(event)
   touching.value = false
@@ -273,124 +360,6 @@ function handleTouchEnd(event) {
   } else {
     reset()
   }
-}
-
-function refreshButtonRect(event, shouldUpdate) {
-  const element = uni.getElementById(buttonId)
-  if (
-    element != null &&
-    element.getBoundingClientRect != null &&
-    typeof element.getBoundingClientRect == 'function'
-  ) {
-    const rect = element.getBoundingClientRect()
-    setButtonRect(rect)
-    if (shouldUpdate) updateProgressByTouch(event)
-    return
-  }
-  if (
-    element != null &&
-    element.getBoundingClientRectAsync != null &&
-    typeof element.getBoundingClientRectAsync == 'function'
-  ) {
-    element
-      .getBoundingClientRectAsync()
-      .then((rect) => {
-        setButtonRect(rect)
-        if (shouldUpdate) updateProgressByTouch(event)
-      })
-      .catch(() => {
-        refreshButtonRectBySelector(event, shouldUpdate)
-      })
-    return
-  }
-  refreshButtonRectBySelector(event, shouldUpdate)
-}
-
-function refreshButtonRectBySelector(event, shouldUpdate) {
-  uni
-    .createSelectorQuery()
-    .select('#' + buttonId)
-    .boundingClientRect((rect) => {
-      setButtonRect(rect)
-      if (shouldUpdate) updateProgressByTouch(event)
-    })
-    .exec()
-}
-
-function setButtonRect(rect) {
-  if (rect == null) return
-  buttonRectLeft.value = normalizeRectPoint(rect.left, rect.x)
-  buttonRectWidth.value = Number(rect.width)
-}
-
-function updateProgressByTouch(event) {
-  const x = readTouchX(event)
-  if (isNaN(x) || buttonRectWidth.value <= 0) return
-  let nextProgress = (x - buttonRectLeft.value) / buttonRectWidth.value
-  if (nextProgress < 0) nextProgress = 0
-  if (nextProgress > 1) nextProgress = 1
-  progress.value = nextProgress
-  emit('change', progress.value)
-}
-
-function markSuccess() {
-  successed.value = true
-  progress.value = 1
-  emit('success')
-  emit('confirm')
-  emit('update:modelValue', true)
-  emit('update:value', true)
-  if (props.autoReset) {
-    setTimeout(() => {
-      reset()
-    }, props.resetDelay)
-  }
-}
-
-function reset() {
-  successed.value = false
-  progress.value = 0
-  emit('reset')
-  emit('update:modelValue', false)
-  emit('update:value', false)
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
-
-function numericSize(value, fallback) {
-  const text = String(value)
-  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
-  if (isNaN(numberValue)) return fallback
-  return numberValue
-}
-
-function readTouchX(event) {
-  let point = null
-  if (event.touches != null && event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
-  }
-  if (point == null) return NaN
-  const clientX = Number(point.clientX)
-  if (!isNaN(clientX)) return clientX
-  const pageX = Number(point.pageX)
-  if (!isNaN(pageX)) return pageX
-  return Number(point.x)
-}
-
-function normalizeRectPoint(first, fallback) {
-  const firstValue = Number(first)
-  if (!isNaN(firstValue)) return firstValue
-  const fallbackValue = Number(fallback)
-  if (!isNaN(fallbackValue)) return fallbackValue
-  return 0
 }
 
 defineExpose({ reset })

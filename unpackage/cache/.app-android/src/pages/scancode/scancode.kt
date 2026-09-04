@@ -44,7 +44,7 @@ open class GenPagesScancodeScancode : BasePage {
                 }
                 pendingBack.value = false
                 clearBackTimer()
-                console.log("扫码页已释放相机，返回添加设备页", " at pages/scancode/scancode.uvue:48")
+                console.log("扫码页已释放相机，返回添加设备页", " at pages/scancode/scancode.uvue:153")
                 uni_navigateBack(NavigateBackOptions(delta = 1))
             }
             val requestBack = fun(){
@@ -59,7 +59,7 @@ open class GenPagesScancodeScancode : BasePage {
                 , 1200)
             }
             val handleCameraInitDone = fun(){
-                console.log("扫码摄像头初始化完成", " at pages/scancode/scancode.uvue:62")
+                console.log("扫码摄像头初始化完成", " at pages/scancode/scancode.uvue:167")
             }
             val handleScan = fun(e: UniCameraScanCodeEvent){
                 if (hasFinished.value || !scanFunctionIsUseable.value) {
@@ -76,35 +76,35 @@ open class GenPagesScancodeScancode : BasePage {
                 hasFinished.value = true
                 scanFunctionIsUseable.value = false
                 uni_vibrateLong(VibrateLongOptions())
-                console.log("扫码结果:", result, " at pages/scancode/scancode.uvue:75")
+                console.log("扫码结果:", result, " at pages/scancode/scancode.uvue:180")
                 uni_setStorageSync("scanCodeResult", result)
                 showAppToast(ShowToastOptions(title = "扫码成功", icon = "success", duration = 500))
                 requestBack()
             }
             val handleCameraStop = fun(){
-                console.warn("扫码摄像头已停止", " at pages/scancode/scancode.uvue:86")
+                console.warn("扫码摄像头已停止", " at pages/scancode/scancode.uvue:191")
                 if (pendingBack.value) {
-                    console.log("等待相机资源释放完成后返回添加设备页", " at pages/scancode/scancode.uvue:88")
+                    console.log("等待相机资源释放完成后返回添加设备页", " at pages/scancode/scancode.uvue:193")
                     return
                 }
-                console.warn("摄像头停止但扫码页仍保持打开，等待用户返回或重试", " at pages/scancode/scancode.uvue:91")
+                console.warn("摄像头停止但扫码页仍保持打开，等待用户返回或重试", " at pages/scancode/scancode.uvue:196")
             }
             val handleCameraError = fun(e: UniCameraErrorEvent){
                 if (hasFinished.value) {
                     return
                 }
                 hasFinished.value = true
-                console.error("摄像头初始化失败:", e.detail, " at pages/scancode/scancode.uvue:97")
+                console.error("摄像头初始化失败:", e.detail, " at pages/scancode/scancode.uvue:202")
                 showAppToast(ShowToastOptions(title = "摄像头初始化失败，请检查相机权限", icon = "none", duration = 500))
                 requestBack()
             }
             onHide(fun(){
-                console.log("扫码页隐藏", " at pages/scancode/scancode.uvue:107")
+                console.log("扫码页隐藏", " at pages/scancode/scancode.uvue:212")
                 releaseCamera()
             }
             )
             onUnload(fun(){
-                console.log("扫码页卸载", " at pages/scancode/scancode.uvue:112")
+                console.log("扫码页卸载", " at pages/scancode/scancode.uvue:217")
                 clearBackTimer()
                 releaseCamera()
             }

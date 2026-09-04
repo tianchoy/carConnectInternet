@@ -56,25 +56,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
 }, emits: [], setup(__props, _a) {
   _a.emit;
   const props = __props;
-  function formatSize(value) {
+  function formatSize(value = null) {
     const text = value.toString();
-    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
       return text;
-    }
     return text + "px";
   }
   function normalizeIdName(name) {
+    const allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
     let result = "";
     for (let i = 0; i < name.length; i++) {
       const char = name.charAt(i);
-      const isNumber = char >= "0" && char <= "9";
-      const isUpper = char >= "A" && char <= "Z";
-      const isLower = char >= "a" && char <= "z";
-      if (isNumber || isUpper || isLower || char == "-" || char == "_") {
-        result = result + char;
-      } else {
-        result = result + "-";
-      }
+      result += allowed.indexOf(char) >= 0 ? char : "-";
     }
     return result;
   }

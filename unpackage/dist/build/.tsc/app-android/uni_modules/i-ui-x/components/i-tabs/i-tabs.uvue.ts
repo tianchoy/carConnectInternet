@@ -1,7 +1,5 @@
 import { computed, ref, watch } from 'vue'
 
-type TabPayload = { index: number, name: string, value: string, item: any }
-
 
 const __sfc__ = defineComponent({
   __name: 'i-tabs',
@@ -9,8 +7,18 @@ name: 'i-tabs',
   props: {
   value: { type: [String, Number], default: '' },
   current: { type: Number, default: -1 },
-  list: { type: Array, default() { return [] } },
-  items: { type: Array, default() { return ['关注', '推荐', '热榜', '本地'] } },
+  list: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  items: {
+    type: Array,
+    default() {
+      return ['关注', '推荐', '热榜', '本地']
+    },
+  },
   scrollable: { type: Boolean, default: false },
   activeColor: { type: String, default: '#2979ff' },
   inactiveColor: { type: String, default: '#606266' },
@@ -22,7 +30,7 @@ name: 'i-tabs',
   showBar: { type: Boolean, default: true },
   disabled: { type: Boolean, default: false },
 },
-  emits: ['click', 'change', 'select', 'update:value', 'update:current'],
+  emits: ["click", "change", "select", "update:value", "update:current"],
   setup(__props) {
 const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
@@ -30,147 +38,194 @@ const _cache = __ins.renderCache;
 
 
 
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Tabs 标签页。
+ * - value: 当前选中值；优先匹配 item.value，其次匹配 item.name/text。
+ * - current: 当前选中索引；传入 >=0 时优先作为受控索引。
+ * - list: 标签数组；对象项支持 name、text、value、badge、disabled。
+ * - items: list 的兼容别名，旧 demo 可继续使用。
+ * - scrollable: 标签较多时是否横向滚动。
+ * - activeColor: 选中态文字和指示条颜色。
+ * - inactiveColor: 未选中文字颜色。
+ * - bgColor: 容器背景色。
+ * - lineWidth: 指示条宽度。
+ * - lineHeight: 指示条高度。
+ * - fontSize: 标签文字字号。
+ * - itemWidth: 每个标签宽度；auto 时自适应。
+ * - showBar: 是否显示底部指示条。
+ * - disabled: 是否整体禁用点击。
+ */
 const props = __props
 
+/**
+ * Emits 说明：用于同步标签切换。
+ * - click: 点击标签时触发，返回 { index, name, value, item }。
+ * - change: 选中标签变化时触发，参数同 click。
+ * - select: 选中标签时触发，参数同 click。
+ * - update:value: 同步当前 value。
+ * - update:current: 同步当前索引。
+ */
 function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
-function formatSize(value: string | number): string {
+function formatSize(value : any) : string {
   const text = value.toString()
   if (text == 'auto' || text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
   return text + 'px'
 }
 
-function numericSize(value: string | number): number {
-  const text = value.toString().replace('px', '').replace('rpx', '').replace('%', '')
-  const parsed = parseFloat(text)
-  return isNaN(parsed) ? 0 : Number.from(parsed)
+function numericSize(value : any) : number {
+  const text = value.toString()
+  const numberValue = parseFloat(text.replace('px', '').replace('rpx', '').replace('%', '').toString())
+  if (isNaN(numberValue)) return 0
+  return numberValue
 }
 
-function configuredList(): Array<any> {
-  const configured = props.list as Array<any>
-  if (configured != null && configured.length > 0) return configured
-  const fallback = props.items as Array<any>
-  return fallback != null ? fallback : [] as Array<any>
-}
 
-function itemValue(item: any, keyName: string): string {
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const list = computed(() : Array<any | null> => {
+  const source = props.list
+  if (source != null && source.length > 0) return source
+  const items = props.items
+  if (items != null) return items
+  const empty : Array<any | null> = []
+  return empty
+})
+
+function itemValue(item : any | null, keyName : string) : string {
   if (item == null) return ''
-
   if (typeof item == 'object') {
-    return (item as UTSJSONObject).getString(keyName, '')
+    const value = (item as UTSJSONObject)[keyName]
+    if (value == null) return ''
+    return value.toString()
   }
-
-
-
-
-
-
-
   if (keyName == 'name' || keyName == 'text' || keyName == 'value') return item.toString()
   return ''
 }
 
-function itemBoolean(item: any, keyName: string): boolean {
-  if (item == null || typeof item != 'object') return false
-
-  return (item as UTSJSONObject).getBoolean(keyName, false)
-
-
-
-
-
-}
-
-function getItemName(item: any): string {
+function getItemName(item : any | null) : string {
   const name = itemValue(item, 'name')
-  return name.length > 0 ? name : itemValue(item, 'text')
+  if (name.length > 0) return name
+  return itemValue(item, 'text')
 }
 
-function getItemValue(item: any): string {
+function getItemValue(item : any | null) : string {
   const value = itemValue(item, 'value')
-  return value.length > 0 ? value : getItemName(item)
+  if (value.length > 0) return value
+  return getItemName(item)
 }
 
-function isItemDisabled(item: any): boolean {
-  return itemBoolean(item, 'disabled')
-}
-
-function isItemDot(item: any): boolean {
-  return itemBoolean(item, 'dot')
-}
-
-function getItemBadge(item: any): string {
-  return itemValue(item, 'badge')
-}
-
-function resolveScrollableItemWidth(): number {
-  const size = numericSize(props.itemWidth)
-  return size > 0 ? size : 92
-}
-
-function resolveIndex(): number {
+function resolveIndex() : number {
   if (props.current >= 0) return props.current
   const expected = props.value.toString()
-  const items = configuredList()
-  for (let index = 0; index < items.length; index++) {
-    const item = items[index]
-    if (getItemValue(item) == expected || getItemName(item) == expected) return index
+  for (let i = 0; i < list.value.length; i++) {
+    const item = list.value[i]
+    if (getItemValue(item) == expected || getItemName(item) == expected) return i
   }
   return 0
 }
 
-function getItemStyle(index: number): string {
-  if (props.scrollable) return 'width:' + resolveScrollableItemWidth().toString() + 'px;'
+const currentIndex = ref(resolveIndex())
+const scrollIntoView = ref('i-tabs-item-' + (currentIndex.value).toString())
+
+function resolveScrollableItemWidth() : number {
+  const size = numericSize(props.itemWidth)
+  if (size > 0) return size
+  return 92
+}
+
+const navStyle = computed(() => {
+  if (!props.scrollable) return ''
+  return 'width:' + (resolveScrollableItemWidth() * list.value.length).toString() + 'px;'
+})
+
+function getItemStyle(index : number) {
+  if (props.scrollable) return 'width:' + (resolveScrollableItemWidth()).toString() + 'px;'
   const width = formatSize(props.itemWidth)
-  return width == 'auto' ? '' : 'width:' + width + ';'
+  if (width == 'auto') return ''
+  return 'width:' + width + ';'
 }
 
-function buildPayload(item: any, index: number): TabPayload {
-  return { index, name: getItemName(item), value: getItemValue(item), item }
+const barStyle = computed(() => {
+  return (
+    'width:' +
+    formatSize(props.lineWidth) +
+    ';height:' +
+    formatSize(props.lineHeight) +
+    ';background-color:' +
+    props.activeColor +
+    ';'
+  )
+})
+
+watch(
+  () : any => props.value,
+  () : void => {
+    currentIndex.value = resolveIndex()
+    scrollIntoView.value = 'i-tabs-item-' + (currentIndex.value).toString()
+  },
+)
+
+watch(
+  () : number => props.current,
+  () : void => {
+    currentIndex.value = resolveIndex()
+    scrollIntoView.value = 'i-tabs-item-' + (currentIndex.value).toString()
+  },
+)
+
+function isItemDisabled(item : any | null) : boolean {
+  if (item == null) return false
+  if (typeof item == 'object') return (item as UTSJSONObject)['disabled'] == true
+  return false
 }
 
-const bgColor = computed<string>(() : string => props.bgColor)
-const list = computed<Array<any>>(() : Array<any> => configuredList())
-const currentIndex = ref<number>(resolveIndex())
-const scrollIntoView = ref<string>('i-tabs-item-' + currentIndex.value.toString())
+function isItemDot(item : any | null) : boolean {
+  if (item == null) return false
+  if (typeof item == 'object') return (item as UTSJSONObject)['dot'] == true
+  return false
+}
 
-function getItemClass(item: any, index: number): string {
+function getItemBadge(item : any | null) : string {
+  return itemValue(item, 'badge')
+}
+
+function buildPayload(item : any | null, index : number) : UTSJSONObject {
+  return {
+    index,
+    name: getItemName(item),
+    value: getItemValue(item),
+    item,
+  }
+}
+
+function getItemClass(item : any | null, index : number) : string {
   let className = currentIndex.value == index ? 'i-tabs__item i-tabs__item--active' : 'i-tabs__item'
   if (isItemDisabled(item)) className += ' i-tabs__item--disabled'
   return className
 }
 
-function getTextStyle(item: any, index: number): string {
+function getTextStyle(item : any | null, index : number) : string {
   const color = currentIndex.value == index ? props.activeColor : props.inactiveColor
-  return 'font-size:' + formatSize(props.fontSize) + ';color:' + (isItemDisabled(item) ? '#c8c9cc' : color) + ';'
+  const realColor = isItemDisabled(item) ? '#c8c9cc' : color
+  return 'font-size:' + formatSize(props.fontSize) + ';color:' + realColor + ';'
 }
 
-function select(item: any, index: number): void {
+function select(item : any | null, index : number) : void {
   if (props.disabled || isItemDisabled(item)) return
   const payload = buildPayload(item, index)
   emit('click', payload)
   if (currentIndex.value == index) return
   currentIndex.value = index
-  scrollIntoView.value = 'i-tabs-item-' + index.toString()
+  scrollIntoView.value = 'i-tabs-item-' + (index).toString()
   emit('select', payload)
   emit('change', payload)
   emit('update:value', payload.value)
   emit('update:current', index)
 }
-
-const navStyle = computed<string>(() : string => props.scrollable ? 'width:' + (resolveScrollableItemWidth() * list.value.length).toString() + 'px;' : '')
-const barStyle = computed<string>(() : string => 'width:' + formatSize(props.lineWidth) + ';height:' + formatSize(props.lineHeight) + ';background-color:' + props.activeColor + ';')
-
-watch(() : string | number => props.value, () : void => {
-  currentIndex.value = resolveIndex()
-  scrollIntoView.value = 'i-tabs-item-' + currentIndex.value.toString()
-})
-watch(() : number => props.current, () : void => {
-  currentIndex.value = resolveIndex()
-  scrollIntoView.value = 'i-tabs-item-' + currentIndex.value.toString()
-})
 
 return (): any | null => {
 
@@ -191,15 +246,19 @@ return (): any | null => {
       }), [
         _cE(Fragment, null, RenderHelpers.renderList(list.value, (item, index, __index, _cached): any => {
           return _cE("view", _uM({
-            id: 'i-tabs-item-' + index.toString(),
-            key: index.toString() + '-' + getItemName(item),
+            id: 'i-tabs-item-' + (index).toString(),
+            key: (index).toString() + '-' + getItemName(item),
             class: _nC(getItemClass(item, index)),
             style: _nS(getItemStyle(index)),
             onClick: () => {select(item, index)}
           }), [
             _cE("view", _uM({ class: "i-tabs__text-wrap" }), [
               _cE("text", _uM({
-                class: _nC(currentIndex.value == index ? 'i-tabs__text i-tabs__text--active' : 'i-tabs__text'),
+                class: _nC(
+                currentIndex.value == index
+                  ? 'i-tabs__text i-tabs__text--active'
+                  : 'i-tabs__text'
+              ),
                 style: _nS(getTextStyle(item, index))
               }), _tD(getItemName(item)), 7 /* TEXT, CLASS, STYLE */),
               getItemBadge(item).length > 0

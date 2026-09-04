@@ -84,19 +84,24 @@ function close(index: number = -1) {
   })
 }
 
-function handleItemChange(index, payload) {
-  if (payload != null && payload['open'] == true) {
+function handleItemChange(index : number, payload : any) : void {
+  if (payload == null || typeof payload != 'object') return
+  const object = payload as UTSJSONObject
+  const isOpen = object['open'] == true
+  const rawDirection = object['direction']
+  const direction = rawDirection == null ? '' : rawDirection.toString()
+  if (isOpen) {
     openedIndex.value = index
-    openedDirection.value = String(payload['direction'])
+    openedDirection.value = direction
   }
   emit('change', {
     index,
-    direction: payload == null ? '' : String(payload['direction']),
-    open: payload == null ? false : payload['open'] == true,
+    direction,
+    open: isOpen,
   })
 }
 
-function handleAction(itemIndex, actionIndex, action) {
+function handleAction(itemIndex : number, actionIndex : number, action : any | null) : void {
   emit('select', {
     itemIndex,
     actionIndex,
@@ -105,56 +110,57 @@ function handleAction(itemIndex, actionIndex, action) {
   close(itemIndex)
 }
 
-function itemKey(item, index): string {
-  return itemTitle(item, index) + '-' + String(index)
-}
-
-function actionKey(action, index): string {
-  return actionText(action, index) + '-' + String(index)
-}
-
-function itemValue(item, keyName): string {
+function itemValue(item : any | null, keyName : string): string {
   if (item != null && typeof item == 'object') {
-    const value = item[keyName]
-    if (value != null) return String(value)
+    const value = (item as UTSJSONObject)[keyName]
+    if (value != null) return (value).toString()
   }
   return ''
 }
 
-function itemTitle(item, index): string {
+function itemTitle(item : any | null, index : number): string {
   const title = itemValue(item, 'title')
   if (title.length > 0) return title
   const text = itemValue(item, 'text')
   if (text.length > 0) return text
-  return '滑动单元格 ' + String(index + 1)
+  return '滑动单元格 ' + (index + 1).toString()
 }
 
-function itemDesc(item): string {
+function itemDesc(item : any | null): string {
   const desc = itemValue(item, 'desc')
   return desc.length > 0 ? desc : '左滑显示右侧操作菜单'
 }
 
-function itemActions(item): any[] {
+function itemActions(item : any | null) : Array<any | null> {
   if (item != null && typeof item == 'object') {
-    const actions = item['actions']
-    if (Array.isArray(actions)) return actions
+    const actions = (item as UTSJSONObject)['actions']
+    if (actions != null && Array.isArray(actions)) return actions as Array<any | null>
   }
-  return ['删除']
+  const defaults : Array<any | null> = ['删除']
+  return defaults
 }
 
-function actionText(action, index): string {
+function actionText(action : any | null, index : number): string {
   if (action != null && typeof action == 'object') {
-    const text = action['text']
-    if (text != null) return String(text)
+    const text = (action as UTSJSONObject)['text']
+    if (text != null) return (text).toString()
   }
   if (typeof action == 'string') return action
-  return '操作' + String(index + 1)
+  return '操作' + (index + 1).toString()
 }
 
-function actionColor(action, index): string {
+function itemKey(item : any | null, index : number) : string {
+  return itemTitle(item, index) + '-' + index.toString()
+}
+
+function actionKey(action : any | null, index : number) : string {
+  return actionText(action, index) + '-' + index.toString()
+}
+
+function actionColor(action : any | null, index : number): string {
   if (action != null && typeof action == 'object') {
-    const color = action['color']
-    if (color != null) return String(color)
+    const color = (action as UTSJSONObject)['color']
+    if (color != null) return (color).toString()
   }
   return index == 0 ? '#3c9cff' : '#f56c6c'
 }

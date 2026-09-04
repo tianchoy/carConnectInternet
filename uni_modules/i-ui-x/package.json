@@ -2,7 +2,7 @@
   "id": "i-ui-x",
   "name": "i-ui-x",
   "displayName": "I UI X UniAppX 组件库",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "基于 DCloud uni-app x 规范开发的轻量级 UniAppX 组件库，提供基础、表单、数据、反馈、布局、导航和其他常用组件。",
   "keywords": [
     "组件库",

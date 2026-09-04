@@ -48,20 +48,20 @@ const emit = defineEmits(['click', 'change', 'update:value'])
 const current = ref(props.value)
 
 const formatted = computed(() => {
-  const fixed = Number(current.value).toFixed(props.decimals)
+  const fixed = parseFloat((current.value).toString()).toFixed(props.decimals)
   const parts = fixed.split('.')
   const intPart = props.separator ? parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',') : parts[0]
   return props.prefix + intPart + (parts.length > 1 ? '.' + parts[1] : '') + props.suffix
 })
 
 watch(
-  () => props.value,
-  (nextValue) => {
+  () : number => props.value,
+  (nextValue : number) : void => {
     current.value = nextValue
   },
 )
 
-function step(delta) {
+function step(delta : number) : void {
   current.value = current.value + delta
   emit('change', current.value)
   emit('update:value', current.value)

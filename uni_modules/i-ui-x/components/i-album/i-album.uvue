@@ -96,18 +96,55 @@ const props = defineProps({
  * - show-all: 点击超出提示时兼容旧版触发，参数为全部图片。
  * - albumWidth: 组件宽度估算值，便于外部文字对齐。
  */
-const emit = defineEmits(['preview', 'show-all', 'albumWidth'])
+const emit = defineEmits<{
+  preview: [value: string]
+  'show-all': [value: Array<any | null>]
+  albumWidth: [value: string]
+}>()
 
-const dataImages = computed(() => {
-  return props.urls.length > 0 ? props.urls : props.images
+function safeImageList(value : Array<any | null> | null) : Array<any | null> {
+  if (value == null) return []
+  return value
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function imageUrl(item : any | null) : string {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const object = item as UTSJSONObject
+    if (props.keyName.length > 0) {
+      const namedValue = object[props.keyName]
+      if (namedValue != null) return namedValue.toString()
+    }
+    const urlValue = object['url']
+    if (urlValue != null) return urlValue.toString()
+  }
+  return item.toString()
+}
+
+function imageKey(item : any | null, index : number) : string {
+  return imageUrl(item) + '-' + index.toString()
+}
+
+const dataImages = computed(() : Array<any | null> => {
+  const urls = safeImageList(props.urls)
+  if (urls.length > 0) return urls
+  return safeImageList(props.images)
 })
 
-const visibleImages = computed(() => {
-  return dataImages.value.slice(0, Number(props.maxCount))
+const visibleImages = computed(() : Array<any | null> => {
+  return dataImages.value.slice(0, parseFloat((props.maxCount).toString()))
 })
 
 const moreCount = computed(() => {
-  const count = dataImages.value.length - Number(props.maxCount)
+  const count = dataImages.value.length - parseFloat((props.maxCount).toString())
   return count > 0 ? count : 0
 })
 
@@ -137,7 +174,15 @@ const itemStyle = computed(() => {
   )
 })
 
-function preview(index) {
+function imageUrls() : Array<string> {
+  const list : Array<string> = []
+  for (let i = 0; i < dataImages.value.length; i++) {
+    list.push(imageUrl(dataImages.value[i]))
+  }
+  return list
+}
+
+function preview(index : number) : void {
   const url = imageUrl(visibleImages.value[index])
   emit('preview', url)
   if (moreCount.value > 0 && index == visibleImages.value.length - 1) {
@@ -148,38 +193,6 @@ function preview(index) {
     urls: imageUrls(),
     current: url,
   })
-}
-
-function imageUrls() {
-  const list = []
-  for (let i = 0; i < dataImages.value.length; i++) {
-    list.push(imageUrl(dataImages.value[i]))
-  }
-  return list
-}
-
-function imageUrl(item) {
-  if (typeof item == 'object' && props.keyName.length > 0) {
-    const value = item[props.keyName]
-    if (value != null) return String(value)
-  }
-  if (typeof item == 'object') {
-    const value = item['url']
-    if (value != null) return String(value)
-  }
-  return String(item)
-}
-
-function imageKey(item, index) {
-  return imageUrl(item) + '-' + String(index)
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
 }
 
 </script>

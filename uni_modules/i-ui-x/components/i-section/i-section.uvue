@@ -16,14 +16,14 @@
         </text>
       </slot>
     </view>
-    <view v-if="hasDefault" class="i-section__body">
+    <view class="i-section__body">
       <slot></slot>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
-import { computed, useSlots } from 'vue'
+import { computed } from 'vue'
 
 defineOptions({ name: 'i-section' })
 
@@ -60,49 +60,50 @@ const props = defineProps({
  * - click: 点击分区时触发。
  * - more: 点击右侧更多文字时触发。
  */
-const emit = defineEmits(['click', 'more'])
+const emit = defineEmits<{
+  (event: 'click'): void
+  (event: 'more'): void
+}>()
 
-const bgColor = computed(() => {
-  return props.bgColor
-})
-const slots = useSlots()
-const hasDefault = computed(() => slots.default != null)
-
-const sectionStyle = computed(() => {
-  return 'background-color:' + bgColor.value + ';padding:' + formatBoxSize(props.padding) + ';'
-})
-
-const lineStyle = computed(() => {
-  return 'background-color:' + props.lineColor + ';'
-})
-
-const titleStyle = computed(() => {
-  return 'color:' + props.titleColor + ';font-weight:' + (props.bold ? '700' : '400') + ';'
-})
-
-const descriptionStyle = computed(() => {
-  return 'color:' + props.descriptionColor + ';'
-})
-
-function handleClick() {
-  if (!props.clickable) return
-  emit('click')
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
 }
 
-function handleMore() {
-  emit('more')
-}
-
-function formatBoxSize(value): string {
-  const text = String(value)
+function formatBoxSize(value : any) : string {
+  const text = value.toString()
   if (text.indexOf(' ') >= 0) return text
   return formatSize(value)
 }
 
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
+const bgColor = computed(() : string => {
+  return props.bgColor
+})
+
+const sectionStyle = computed(() : string => {
+  return 'background-color:' + bgColor.value + ';padding:' + formatBoxSize(props.padding) + ';'
+})
+
+const lineStyle = computed(() : string => {
+  return 'background-color:' + props.lineColor + ';'
+})
+
+const titleStyle = computed(() : string => {
+  return 'color:' + props.titleColor + ';font-weight:' + (props.bold ? '700' : '400') + ';'
+})
+
+const descriptionStyle = computed(() : string => {
+  return 'color:' + props.descriptionColor + ';'
+})
+
+function handleClick() : void {
+  if (!props.clickable) return
+  emit('click')
+}
+
+function handleMore() : void {
+  emit('more')
 }
 </script>
 

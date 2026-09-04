@@ -2,11 +2,11 @@
   <view :class="wrapClass" :style="wrapStyle">
     <slot name="prefix">
       <text
-        v-if="prefiicon.length > 0 || prefix.length > 0"
+        v-if="prefiicon.length > 0 || prefixIcon.length > 0 || prefix.length > 0"
         class="i-input__prefix"
         :style="prefiiconStyle"
       >
-        {{ prefix.length > 0 ? prefix : prefiicon }}
+        {{ prefix.length > 0 ? prefix : (prefixIcon.length > 0 ? prefixIcon : prefiicon) }}
       </text>
     </slot>
     <input
@@ -19,15 +19,15 @@
       :placeholder-style="placeholderStyleText"
       :password="passwordVisible"
       :disabled="disabled"
-      :maxlength="maxlength"
+      :maxlength="parseFloat((maxlength).toString())"
       :confirm-type="confirmType"
       :confirm-hold="confirmHold"
       :inputmode="inputmode"
       :focus="focus"
-      :cursor="cursor"
-      :cursor-spacing="cursorSpacing"
-      :selection-start="selectionStart"
-      :selection-end="selectionEnd"
+      :cursor="parseFloat((cursor).toString())"
+      :cursor-spacing="parseFloat((cursorSpacing).toString())"
+      :selection-start="parseFloat((selectionStart).toString())"
+      :selection-end="parseFloat((selectionEnd).toString())"
       :adjust-position="adjustPosition"
       @input="handleInput"
       @focus="handleFocus"
@@ -45,14 +45,13 @@
     >
       ×
     </text>
-    <i-icon
+    <text
       v-if="password && showPasswordToggle"
       class="i-input__eye"
       @click="togglePassword"
-      :name="passwordVisible ? '../../../../static/eye-close.png' : '../../../../static/eye-open.png'"
-      size="24"
     >
-    </i-icon>
+      {{ passwordVisible ? "show" : "hide" }}
+    </text>
     <slot name="suffix">
       <text
         v-if="suffiicon.length > 0"
@@ -84,17 +83,17 @@ defineOptions({ name: 'i-input' })
  * - showWordLimit: 是否显示字数统计。
  * - confirmType/confirmHold/focus/cursor/cursorSpacing/selectionStart/selectionEnd/adjustPosition: 原生 input 行为透传。
  * - inputAlign/fontSize/color: 输入文本样式。
- * - prefiicon/suffiicon: 前后图标文本，也可用 prefix/suffix slot 自定义。
+ * - prefiicon/prefixIcon/suffiicon: 前后图标文本，也可用 prefix/suffix slot 自定义。
  * - border/shape/round/borderColor/bgColor/customStyle: 外观样式。
  * - formatter: UniAppX 小程序端不传函数，保留 setFormatter 方法入口。
  */
 const props = defineProps({
   modelValue: {
-    type: String,
+    type: [String, Number],
     default: '',
   },
   value: {
-    type: String,
+    type: [String, Number],
     default: '',
   },
   type: {
@@ -102,7 +101,7 @@ const props = defineProps({
     default: 'text',
   },
   height: {
-    type: String,
+    type: [String, Number],
     default: '40px',
   },
   disabled: {
@@ -126,7 +125,7 @@ const props = defineProps({
     default: true,
   },
   maxlength: {
-    type: Number,
+    type: [String, Number],
     default: -1,
   },
   placeholder: {
@@ -158,19 +157,19 @@ const props = defineProps({
     default: false,
   },
   cursor: {
-    type: Number,
+    type: [String, Number],
     default: -1,
   },
   cursorSpacing: {
-    type: Number,
+    type: [String, Number],
     default: 30,
   },
   selectionStart: {
-    type: Number,
+    type: [String, Number],
     default: -1,
   },
   selectionEnd: {
-    type: Number,
+    type: [String, Number],
     default: -1,
   },
   adjustPosition: {
@@ -182,7 +181,7 @@ const props = defineProps({
     default: 'left',
   },
   fontSize: {
-    type: String,
+    type: [String, Number],
     default: '15px',
   },
   color: {
@@ -190,6 +189,10 @@ const props = defineProps({
     default: '#303133',
   },
   prefiicon: {
+    type: String,
+    default: '',
+  },
+  prefixIcon: {
     type: String,
     default: '',
   },
@@ -250,54 +253,47 @@ const props = defineProps({
  * - focus/blur/confirm/keyboardheightchange: 原生事件透传。
  * - clear: 点击清空控件时触发。
  */
-const emit = defineEmits([
-  'update:modelValue',
-  'update:value',
-  'input',
-  'change',
-  'focus',
-  'blur',
-  'confirm',
-  'keyboardheightchange',
-  'clear',
-])
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: string): void
+  (event: 'update:value', value: string): void
+  (event: 'input', value: string): void
+  (event: 'change', value: string): void
+  (event: 'focus', payload: any): void
+  (event: 'blur', payload: any): void
+  (event: 'confirm', value: string): void
+  (event: 'keyboardheightchange', payload: any): void
+  (event: 'clear'): void
+}>()
 
-function initialValue(): string {
-  const modelValue = props.modelValue as string
+function initialValue() : string {
+  const modelValue = props.modelValue.toString()
   if (modelValue.length > 0) return modelValue
-  return props.value as string
+  return props.value.toString()
 }
 
-function formatSize(value: string): string {
-  if (value.indexOf('px') >= 0 || value.indexOf('rpx') >= 0 || value.indexOf('%') >= 0) {
-    return value
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
   }
-  return value + 'px'
+  return text + 'px'
 }
 
-const inputBgColor = computed(() => {
+function emitValue(value : string) : void {
+  emit('update:modelValue', value)
+  emit('update:value', value)
+  emit('input', value)
+  emit('change', value)
+}
+
+const inputBgColor = computed(() : string => {
   return props.bgColor
 })
 const current = ref(initialValue())
-
-watch(
-  () : string => props.modelValue,
-  () => {
-    current.value = props.modelValue
-  },
-)
-
-watch(
-  () : string => props.value,
-  () => {
-    if (props.modelValue.length == 0) current.value = props.value
-  },
-)
-
 const focused = ref(false)
 const passwordVisible = ref(props.password)
 
-const wrapClass = computed(() => {
+const wrapClass = computed(() : string => {
   const classes = ['i-input']
   if (props.disabled) classes.push('i-input--disabled')
   if (focused.value && !props.disabled) classes.push('i-input--focus')
@@ -305,7 +301,7 @@ const wrapClass = computed(() => {
   return classes.join(' ')
 })
 
-const wrapStyle = computed(() => {
+const wrapStyle = computed(() : string => {
   let style =
     'min-height:' +
     formatSize(props.height) +
@@ -329,7 +325,7 @@ const wrapStyle = computed(() => {
   return style + props.customStyle
 })
 
-const fieldStyle = computed(() => {
+const fieldStyle = computed(() : string => {
   return (
     'height:' +
     formatSize(props.height) +
@@ -343,20 +339,27 @@ const fieldStyle = computed(() => {
   )
 })
 
-const placeholderStyleText = computed(() => {
+const placeholderStyleText = computed(() : string => {
   if (props.placeholderStyle.length > 0) return props.placeholderStyle
   return 'color:#c0c4cc;'
 })
 
-function emitValue(value: string) {
-  emit('update:modelValue', value)
-  emit('update:value', value)
-  emit('input', value)
-  emit('change', value)
-}
+watch(
+  () : any => props.modelValue,
+  () : void => {
+    current.value = initialValue()
+  },
+)
 
-function handleInput(event: UniInputEvent) {
-  const nextValue = event.detail.value
+watch(
+  () : any => props.value,
+  () : void => {
+    current.value = initialValue()
+  },
+)
+
+function handleInput(event : UniInputEvent) : void {
+  const nextValue = (event.detail.value).toString()
   if (props.readonly) {
     current.value = initialValue()
     return
@@ -365,31 +368,36 @@ function handleInput(event: UniInputEvent) {
   emitValue(nextValue)
 }
 
-function handleFocus(event: UniInputFocusEvent) {
+function handleFocus(event : any) : void {
   focused.value = true
   emit('focus', event)
 }
 
-function handleBlur(event: UniInputBlurEvent) {
+function handleBlur(event : any) : void {
   focused.value = false
   emit('blur', event)
 }
 
-function handleConfirm(event: UniInputConfirmEvent) {
-  emit('confirm', event.detail.value)
+function handleConfirm(event : any) : void {
+  if (event == null || typeof event != 'object') return
+  const eventObject = event as UTSJSONObject
+  const detail = eventObject['detail']
+  if (detail == null || typeof detail != 'object') return
+  const value = (detail as UTSJSONObject)['value']
+  emit('confirm', value == null ? '' : value.toString())
 }
 
-function handleKeyboardHeightChange(event: UniInputKeyboardHeightChangeEvent) {
+function handleKeyboardHeightChange(event : any) : void {
   emit('keyboardheightchange', event)
 }
 
-function clear() {
+function clear() : void {
   current.value = ''
   emitValue('')
   emit('clear')
 }
 
-function togglePassword() {
+function togglePassword() : void {
   passwordVisible.value = !passwordVisible.value
 }
 

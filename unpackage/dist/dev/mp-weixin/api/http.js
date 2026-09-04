@@ -123,6 +123,19 @@ class RequestFailure extends common_vendor.UTS.UTSType {
 }
 const BASE_URL = "https://gpsapp.zdiot.cn";
 const CLIENT_ID = "428a8310cd442757ae699df5d894f051";
+const DEFAULT_TIME_ZONE = "UTC";
+function getDeviceTimeZone() {
+  let timeZone = "";
+  try {
+    const resolved = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (resolved != null)
+      timeZone = resolved.toString();
+  } catch (error) {
+    common_vendor.index.__f__("warn", "at api/http.uts:53", "获取微信时区失败", error);
+  }
+  const normalizedTimeZone = timeZone.trim();
+  return normalizedTimeZone.length > 0 ? normalizedTimeZone : DEFAULT_TIME_ZONE;
+}
 let isHandlingTokenExpired = false;
 function resetTokenExpiredState() {
   isHandlingTokenExpired = false;
@@ -131,7 +144,7 @@ function handleTokenExpired() {
   if (isHandlingTokenExpired)
     return null;
   isHandlingTokenExpired = true;
-  common_vendor.index.__f__("log", "at api/http.uts:53", "检测到token过期，执行跳转登录页逻辑");
+  common_vendor.index.__f__("log", "at api/http.uts:88", "检测到token过期，执行跳转登录页逻辑");
   common_vendor.index.removeStorageSync("token");
   services_push.clearPushSessionState();
   utils_toast.showAppToast({
@@ -140,14 +153,14 @@ function handleTokenExpired() {
     duration: 2e3
   });
   setTimeout(() => {
-    common_vendor.index.__f__("log", "at api/http.uts:68", "正在跳转到登录页...");
+    common_vendor.index.__f__("log", "at api/http.uts:103", "正在跳转到登录页...");
     common_vendor.index.redirectTo({
       url: "/pages/login/login",
       success: () => {
-        common_vendor.index.__f__("log", "at api/http.uts:72", "跳转登录页成功");
+        common_vendor.index.__f__("log", "at api/http.uts:107", "跳转登录页成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at api/http.uts:75", "跳转登录页失败:", err);
+        common_vendor.index.__f__("log", "at api/http.uts:110", "跳转登录页失败:", err);
         common_vendor.index.reLaunch({
           url: "/pages/login/login"
         });
@@ -158,11 +171,13 @@ function handleTokenExpired() {
 function requestInterceptor(config) {
   const token = common_vendor.index.getStorageSync("token");
   const authorization = "Bearer " + (token != null ? token.toString() : "");
+  const timeZone = getDeviceTimeZone();
   if (config.header == null) {
     config.header = new common_vendor.UTSJSONObject({});
   }
   config.header["Authorization"] = authorization;
   config.header["clientId"] = CLIENT_ID;
+  config.header["x-time-zone"] = timeZone;
   return config;
 }
 function responseInterceptor(response, config) {
@@ -170,7 +185,7 @@ function responseInterceptor(response, config) {
 }
 function logHttpError(error) {
   const detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (error.data != null ? error.data.toString() : "");
-  common_vendor.index.__f__("error", "at api/http.uts:127", "[HttpRequest] " + detail);
+  common_vendor.index.__f__("error", "at api/http.uts:165", "[HttpRequest] " + detail);
 }
 function errorHandler(error, config) {
   if (config.showLoading != false) {

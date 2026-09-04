@@ -85,36 +85,62 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   var __emit = _a.emit;
   const props = __props;
   const emit = __emit;
-  function formatSize(value) {
+  function formatSize(value = null) {
+    if (value == null)
+      return "0px";
     const text = value.toString();
     if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
       return text;
     }
     return text + "px";
   }
-  function valueText(value = null) {
-    if (typeof value == "string")
-      return value;
-    if (typeof value == "number" || typeof value == "boolean")
-      return value.toString();
-    return "";
+  function selectedValue() {
+    const modelValue = props.modelValue;
+    if (modelValue != null && modelValue.toString().length > 0)
+      return modelValue;
+    return props.value;
+  }
+  function nameText() {
+    const name = props.name;
+    return name == null ? "" : name.toString();
   }
   function isChecked() {
     if (props.checked)
       return true;
-    const modelValue = props.modelValue;
-    const value = valueText(modelValue).length > 0 ? modelValue : props.value;
+    const value = selectedValue();
+    if (value == null)
+      return false;
     if (Array.isArray(value)) {
-      const names = value;
-      for (let i = 0; i < names.length; i++) {
-        if (valueText(names[i]) == valueText(props.name))
+      const list = value;
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i];
+        if (item != null && item.toString() == nameText())
           return true;
       }
       return false;
     }
     if (typeof value == "boolean")
       return value;
-    return valueText(value) == valueText(props.name);
+    return value.toString() == nameText();
+  }
+  function buildValue(nextChecked, previousChecked) {
+    const value = selectedValue();
+    if (value != null && Array.isArray(value)) {
+      const list = value.slice(0);
+      if (nextChecked && !previousChecked)
+        list.push(props.name);
+      if (!nextChecked && previousChecked) {
+        const nextList = [];
+        for (let i = 0; i < list.length; i++) {
+          const item = list[i];
+          if (item == null || item.toString() != nameText())
+            nextList.push(item);
+        }
+        return nextList;
+      }
+      return list;
+    }
+    return nextChecked;
   }
   const internalChecked = common_vendor.ref(isChecked());
   const checked = common_vendor.computed(() => {
@@ -161,42 +187,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       color = props.activeLabelColor;
     return "color:" + color + ";font-size:" + formatSize(props.labelSize) + ";";
   });
-  common_vendor.watch(() => {
-    return props.modelValue;
-  }, () => {
-    internalChecked.value = isChecked();
-  });
-  common_vendor.watch(() => {
-    return props.value;
-  }, () => {
-    internalChecked.value = isChecked();
-  });
-  common_vendor.watch(() => {
-    return props.checked;
-  }, () => {
-    internalChecked.value = isChecked();
-  });
-  function buildValue(nextChecked, previousChecked) {
-    const modelValue = props.modelValue;
-    const value = valueText(modelValue).length > 0 ? modelValue : props.value;
-    if (Array.isArray(value)) {
-      const list = value;
-      const nextList = list.slice(0);
-      const exists = previousChecked;
-      if (nextChecked && !exists)
-        nextList.push(props.name);
-      if (!nextChecked && exists) {
-        const filtered = [];
-        for (let i = 0; i < nextList.length; i++) {
-          if (valueText(nextList[i]) != valueText(props.name))
-            filtered.push(nextList[i]);
-        }
-        return filtered;
-      }
-      return nextList;
-    }
-    return nextChecked;
-  }
   function updateChecked(nextChecked) {
     const previousChecked = checked.value;
     internalChecked.value = nextChecked;
@@ -216,6 +206,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return null;
     toggle();
   }
+  common_vendor.watch(() => {
+    return props.modelValue;
+  }, () => {
+    internalChecked.value = isChecked();
+  });
+  common_vendor.watch(() => {
+    return props.value;
+  }, () => {
+    internalChecked.value = isChecked();
+  });
+  common_vendor.watch(() => {
+    return props.checked;
+  }, () => {
+    internalChecked.value = isChecked();
+  });
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = common_vendor.e({

@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="uts">
-import { computed, nextTick, onMounted, ref, useSlots } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 
 defineOptions({ name: 'i-swipe-action-item' })
 
@@ -58,10 +58,11 @@ const props = defineProps({
  * Emits 说明：对齐文档事件。
  * - change: 组件打开或关闭时触发，返回 open 与 direction。
  */
-const emit = defineEmits(['change'])
+const emit = defineEmits<{
+  (event: 'change', value: UTSJSONObject): void
+}>()
 
-const slots = useSlots()
-const itemId = 'i-swipe-action-item-' + String(Math.floor(Math.random() * 1000000))
+const itemId = 'i-swipe-action-item-' + (Math.floor(Math.random() * 1000000)).toString()
 const leftId = itemId + '-left'
 const rightId = itemId + '-right'
 const direction = ref('')
@@ -72,11 +73,11 @@ const touching = ref(false)
 const measuredLeftWidth = ref(60)
 const measuredRightWidth = ref(120)
 
-const hasLeftSlot = computed(() => slots['left'] != null)
-const hasRightSlot = computed(() => slots['right'] != null)
+const hasLeftSlot = computed(() : boolean => true)
+const hasRightSlot = computed(() : boolean => true)
 
 const contentStyle = computed(() => {
-  return 'transform:translateX(' + String(offset.value) + 'px);'
+  return 'transform:translateX(' + (offset.value).toString() + 'px);'
 })
 
 const leftActionStyle = computed(() => {
@@ -89,7 +90,76 @@ const rightActionStyle = computed(() => {
   return 'opacity:0;'
 })
 
-function handleTouchStart(event) {
+function getLeftWidth() : number {
+  if (props.leftWidth > 0) return props.leftWidth
+  return measuredLeftWidth.value
+}
+
+function getRightWidth() : number {
+  if (props.rightWidth > 0) return props.rightWidth
+  return measuredRightWidth.value
+}
+
+function readTouchX(event : UniTouchEvent) : number {
+  let point : any | null = null
+  if (event.touches.length > 0) point = event.touches[0]
+  else if (event.changedTouches.length > 0) point = event.changedTouches[0]
+  if (point == null) return NaN
+  const object = point as UTSJSONObject
+  const clientX = object['clientX']
+  if (clientX != null) {
+    const value = parseFloat(clientX.toString())
+    if (!isNaN(value)) return value
+  }
+  const pageX = object['pageX']
+  if (pageX != null) {
+    const value = parseFloat(pageX.toString())
+    if (!isNaN(value)) return value
+  }
+  const x = object['x']
+  return x == null ? NaN : parseFloat(x.toString())
+}
+
+function refreshWidths() : void {
+  uni
+    .createSelectorQuery()
+    .select('#' + leftId)
+    .boundingClientRect((rect : any | null) : void => {
+      if (rect != null && typeof rect == 'object') {
+        const width = (rect as UTSJSONObject)['width']
+        if (width != null && parseFloat(width.toString()) > 0) measuredLeftWidth.value = parseFloat(width.toString())
+      }
+    })
+    .select('#' + rightId)
+    .boundingClientRect((rect : any | null) : void => {
+      if (rect != null && typeof rect == 'object') {
+        const width = (rect as UTSJSONObject)['width']
+        if (width != null && parseFloat(width.toString()) > 0) measuredRightWidth.value = parseFloat(width.toString())
+      }
+    })
+    .exec()
+}
+
+function close() : void {
+  offset.value = 0
+  const previous = direction.value
+  direction.value = ''
+  emit('change', { open: false, direction: previous })
+}
+
+function open(nextDirection : string = 'right') : void {
+  if (props.disabled) return
+  if (nextDirection == 'left' && hasLeftSlot.value) {
+    offset.value = getLeftWidth()
+    direction.value = 'left'
+  } else if (hasRightSlot.value) {
+    offset.value = 0 - getRightWidth()
+    direction.value = 'right'
+  }
+  emit('change', { open: direction.value.length > 0, direction: direction.value })
+}
+
+function handleTouchStart(event : UniTouchEvent) : void {
   if (props.disabled) return
   touching.value = true
   startX.value = readTouchX(event)
@@ -97,7 +167,7 @@ function handleTouchStart(event) {
   refreshWidths()
 }
 
-function handleTouchMove(event) {
+function handleTouchMove(event : UniTouchEvent) : void {
   if (props.disabled || !touching.value) return
   const currentX = readTouchX(event)
   if (isNaN(currentX) || isNaN(startX.value)) return
@@ -109,7 +179,7 @@ function handleTouchMove(event) {
   offset.value = next
 }
 
-function handleTouchEnd() {
+function handleTouchEnd() : void {
   if (!touching.value) return
   touching.value = false
   const maxLeft = hasLeftSlot.value ? getLeftWidth() : 0
@@ -125,76 +195,8 @@ function handleTouchEnd() {
   close()
 }
 
-function handleContentClick() {
+function handleContentClick() : void {
   if (props.closeOnClick && direction.value.length > 0) close()
-}
-
-function open(nextDirection: string = 'right') {
-  if (props.disabled) return
-  if (nextDirection == 'left' && hasLeftSlot.value) {
-    offset.value = getLeftWidth()
-    direction.value = 'left'
-  } else if (hasRightSlot.value) {
-    offset.value = 0 - getRightWidth()
-    direction.value = 'right'
-  }
-  emit('change', {
-    open: direction.value.length > 0,
-    direction: direction.value,
-  })
-}
-
-function close() {
-  offset.value = 0
-  const previous = direction.value
-  direction.value = ''
-  emit('change', {
-    open: false,
-    direction: previous,
-  })
-}
-
-function refreshWidths() {
-  uni
-    .createSelectorQuery()
-    .select('#' + leftId)
-    .boundingClientRect((rect) => {
-      if (rect != null && rect.width != null && Number(rect.width) > 0) {
-        measuredLeftWidth.value = Number(rect.width)
-      }
-    })
-    .select('#' + rightId)
-    .boundingClientRect((rect) => {
-      if (rect != null && rect.width != null && Number(rect.width) > 0) {
-        measuredRightWidth.value = Number(rect.width)
-      }
-    })
-    .exec()
-}
-
-function getLeftWidth(): number {
-  if (props.leftWidth > 0) return props.leftWidth
-  return measuredLeftWidth.value
-}
-
-function getRightWidth(): number {
-  if (props.rightWidth > 0) return props.rightWidth
-  return measuredRightWidth.value
-}
-
-function readTouchX(event): number {
-  let point = null
-  if (event.touches != null && event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
-  }
-  if (point == null) return NaN
-  const clientX = Number(point.clientX)
-  if (!isNaN(clientX)) return clientX
-  const pageX = Number(point.pageX)
-  if (!isNaN(pageX)) return pageX
-  return Number(point.x)
 }
 
 defineExpose({
@@ -202,8 +204,8 @@ defineExpose({
   close,
 })
 
-onMounted(() => {
-  nextTick(() => {
+onMounted(() : void => {
+  nextTick(() : void => {
     refreshWidths()
   })
 })

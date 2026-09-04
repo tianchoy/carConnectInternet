@@ -8,40 +8,18 @@ const _easycom_i_icon = () => "../i-icon/i-icon.js";
 if (!Math) {
   _easycom_i_icon();
 }
-class ActionPayload extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          index: { type: Number, optional: false },
-          item: { type: "Any", optional: false },
-          name: { type: String, optional: false },
-          value: { type: String, optional: false }
-        };
-      },
-      name: "ActionPayload"
-    };
-  }
-  constructor(options, metadata = ActionPayload.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.index = this.__props__.index;
-    this.item = this.__props__.item;
-    this.name = this.__props__.name;
-    this.value = this.__props__.value;
-    delete this.__props__;
-  }
-}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ name: "i-action-sheet" }, { __name: "i-action-sheet", props: {
   show: { type: Boolean, default: false },
   title: { type: String, default: "" },
   titleStyle: { type: [String, Object], default: "" },
   closeable: { type: Boolean, default: false },
   description: { type: String, default: "" },
-  actions: { type: Array, default() {
-    return [];
-  } },
+  actions: {
+    type: Array,
+    default() {
+      return [];
+    }
+  },
   cancelText: { type: String, default: "" },
   closeOnClickAction: { type: Boolean, default: true },
   safeBottom: { type: Boolean, default: true },
@@ -57,45 +35,79 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   showMessageCard: { type: Boolean, default: false },
   appParameter: { type: String, default: "" },
   customStyle: { type: [String, Object], default: "" }
-}, emits: ["select", "close", "getuserinfo", "contact", "getphonenumber", "chooseavatar", "error", "launchapp", "opensetting", "update:show"], setup(__props, _a) {
+}, emits: [
+  "select",
+  "close",
+  "getuserinfo",
+  "contact",
+  "getphonenumber",
+  "chooseavatar",
+  "error",
+  "launchapp",
+  "opensetting",
+  "update:show"
+], setup(__props, _a) {
   var __expose = _a.expose, __emit = _a.emit;
   const props = __props;
   const emit = __emit;
-  function formatSize(value) {
+  const innerShow = common_vendor.ref(props.show);
+  function formatSize(value = null) {
     const text = value.toString();
     if (text.length == 0)
       return "0px";
-    if (text.indexOf("vh") >= 0 || text.indexOf("vw") >= 0) {
-      const parsed = parseFloat(text.replace("vh", "").replace("vw", ""));
-      return (isNaN(parsed) ? 0 : Number.from(parsed)).toString() + "px";
+    if (text.indexOf("vh") > -1 || text.indexOf("vw") > -1) {
+      const numberValue = parseFloat(text.replace("vh", "").replace("vw", ""));
+      return (isNaN(numberValue) ? 0 : numberValue) + "px";
     }
-    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
+    if (text.indexOf("px") > -1 || text.indexOf("rpx") > -1 || text.indexOf("%") > -1) {
       return text;
+    }
     return text + "px";
   }
+  const titleStyleText = common_vendor.computed(() => {
+    if (typeof props.titleStyle == "string")
+      return props.titleStyle;
+    return "";
+  });
+  const panelStyle = common_vendor.computed(() => {
+    let style = "";
+    style += "border-top-left-radius:" + formatSize(props.round) + ";";
+    style += "border-top-right-radius:" + formatSize(props.round) + ";";
+    if (props.height.toString().length > 0) {
+      style += "height:" + formatSize(props.height) + ";";
+    }
+    if (typeof props.customStyle == "string") {
+      style += props.customStyle;
+    }
+    return style;
+  });
+  common_vendor.watch(() => {
+    return props.show;
+  }, (value) => {
+    innerShow.value = value;
+  });
   function itemValue(item = null, keyName) {
     if (item == null)
       return "";
     if (typeof item == "object") {
-      const value = item[keyName];
-      return value == null ? "" : value.toString();
+      const object = item;
+      const value = object[keyName];
+      if (value == null)
+        return "";
+      return value.toString();
     }
     if (keyName == "name" || keyName == "value")
       return item.toString();
     return "";
-  }
-  function itemBoolean(item = null, keyName) {
-    if (item == null || typeof item != "object")
-      return false;
-    const value = item[keyName];
-    return value === true || value === 1 || value === "1" || value === "true";
   }
   function getActionText(item = null) {
     return itemValue(item, "name");
   }
   function getActionValue(item = null) {
     const value = itemValue(item, "value");
-    return value.length > 0 ? value : getActionText(item);
+    if (value.length > 0)
+      return value;
+    return getActionText(item);
   }
   function getSubname(item = null) {
     return itemValue(item, "subname");
@@ -105,36 +117,48 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   }
   function getActionColor(item = null) {
     const color = itemValue(item, "color");
-    return color.length > 0 ? color : "#303133";
+    if (color.length > 0)
+      return color;
+    return "#303133";
   }
   function isDisabled(item = null) {
-    return itemBoolean(item, "disabled");
+    if (item == null)
+      return false;
+    if (typeof item == "object") {
+      const object = item;
+      return object["disabled"] == true;
+    }
+    return false;
   }
   function isLoading(item = null) {
-    return itemBoolean(item, "loading");
+    if (item == null)
+      return false;
+    if (typeof item == "object") {
+      const object = item;
+      return object["loading"] == true;
+    }
+    return false;
   }
   function getItemColor(item = null) {
-    return isDisabled(item) ? "#b8b8b8" : getActionColor(item);
+    if (isDisabled(item))
+      return "#b8b8b8";
+    return getActionColor(item);
   }
   function getActionOpenType(item = null) {
     const itemOpenType = itemValue(item, "openType");
-    return itemOpenType.length > 0 ? itemOpenType : props.openType;
+    if (itemOpenType.length > 0)
+      return itemOpenType;
+    return props.openType;
   }
   function getItemClass(item = null) {
-    if (isDisabled(item))
+    if (isDisabled(item)) {
       return "i-action-sheet__item i-action-sheet__item--disabled";
-    return isLoading(item) ? "i-action-sheet__item i-action-sheet__item--loading" : "i-action-sheet__item";
+    }
+    if (isLoading(item)) {
+      return "i-action-sheet__item i-action-sheet__item--loading";
+    }
+    return "i-action-sheet__item";
   }
-  function buildPayload(item = null, index) {
-    return new ActionPayload({ index, item, name: getActionText(item), value: getActionValue(item) });
-  }
-  const actionItems = common_vendor.computed(() => {
-    const actions = props.actions;
-    if (actions == null)
-      return [];
-    return actions;
-  });
-  const innerShow = common_vendor.ref(props.show);
   function open() {
     if (innerShow.value)
       return null;
@@ -155,8 +179,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     emit("update:show", false);
   }
   function handleOverlayClick() {
-    if (props.closeOnMask)
-      closeByUser();
+    if (!props.closeOnMask)
+      return null;
+    closeByUser();
+  }
+  function buildPayload(item = null, index) {
+    return new common_vendor.UTSJSONObject({
+      index,
+      item,
+      name: getActionText(item),
+      value: getActionValue(item)
+    });
   }
   function handleSelect(item = null, index) {
     if (isDisabled(item) || isLoading(item))
@@ -168,22 +201,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   function handleOpenEvent(name, event = null) {
     emit(name, event);
   }
-  const titleStyleText = common_vendor.computed(() => {
-    return typeof props.titleStyle == "string" ? props.titleStyle : "";
-  });
-  const panelStyle = common_vendor.computed(() => {
-    let style = "border-top-left-radius:" + formatSize(props.round) + ";border-top-right-radius:" + formatSize(props.round) + ";";
-    if (props.height.toString().length > 0)
-      style += "height:" + formatSize(props.height) + ";";
-    if (typeof props.customStyle == "string")
-      style += props.customStyle;
-    return style;
-  });
-  common_vendor.watch(() => {
-    return props.show;
-  }, (value) => {
-    innerShow.value = value;
-  });
   __expose({ open, close: closeByUser });
   return (_ctx, _cache) => {
     "raw js";
@@ -191,13 +208,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       a: common_vendor.o(open, "e6"),
       b: innerShow.value
     }, innerShow.value ? {
-      c: common_vendor.o(handleOverlayClick, "11")
+      c: common_vendor.o(handleOverlayClick, "6b")
     } : {}, {
       d: innerShow.value
     }, innerShow.value ? common_vendor.e({
       e: __props.closeable
     }, __props.closeable ? {
-      f: common_vendor.o(closeByUser, "a4")
+      f: common_vendor.o(closeByUser, "33")
     } : {}, {
       g: __props.title.length > 0 || __props.description.length > 0
     }, __props.title.length > 0 || __props.description.length > 0 ? common_vendor.e({
@@ -210,7 +227,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     }, __props.description.length > 0 ? {
       l: common_vendor.t(__props.description)
     } : {}) : {}, {
-      m: common_vendor.f(actionItems.value, (item, index, i0) => {
+      m: common_vendor.f(__props.actions, (item, index, i0) => {
         return common_vendor.e({
           a: getActionIcon(item).length > 0
         }, getActionIcon(item).length > 0 ? {
@@ -270,7 +287,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       v: __props.cancelText.length > 0
     }, __props.cancelText.length > 0 ? {
       w: common_vendor.t(__props.cancelText),
-      x: common_vendor.o(closeByUser, "50")
+      x: common_vendor.o(closeByUser, "89")
     } : {}, {
       y: props.safeBottom
     }, props.safeBottom ? {} : {}, {

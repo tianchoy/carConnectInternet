@@ -1,14 +1,13 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
-import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.uvue'
-import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
+import _easycom_i_datetime_picker from '@/uni_modules/i-ui-x/components/i-datetime-picker/i-datetime-picker.uvue'
 import _easycom_i_empty from '@/uni_modules/i-ui-x/components/i-empty/i-empty.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
-	import { formatTimes, parseLocalDateTime } from '../../utils/formateTime.uts'
+	import { formatTimesToMinute, parseLocalDateTime } from '../../utils/formateTime.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -31,7 +30,11 @@ const carStatus = ref('在线')
 
 	const startTime = ref('')
 	const endTime = ref('')
+	const currentPickerValue = computed(() : string => {
+		return currentPickerType.value === 'start' ? startTime.value : endTime.value
+	})
 	const imei = ref<string | null>('')
+	const currentDateTime = ref('')
 	const carStopDetail = ref<Array<StopRecord>>([])
 	const getStopNumber = (item: UTSJSONObject, key: string): number => item.getNumber(key, 0)
 	const getStopText = (item: UTSJSONObject, key: string): string => item.getString(key, '')
@@ -55,9 +58,9 @@ const carStatus = ref('在线')
 
 	const initDateTime = () => {
 		const now = new Date()
-		endTime.value = formatTimes(now.getTime())
+		endTime.value = formatTimesToMinute(now.getTime())
 		// 开始时间默认为当前时间前24小时
-		startTime.value = formatTimes(now.getTime() - 3600000 * 24)
+		startTime.value = formatTimesToMinute(now.getTime() - 3600000 * 24)
 	}
 
 	const loadStopData = async () : Promise<void> => {
@@ -112,7 +115,12 @@ const carStatus = ref('在线')
 	}
 
 	// 确认选择时间
-	const onConfirm = (value : string) => {
+	const onConfirm = (event : any) : void => {
+		const eventObject = event as UTSJSONObject
+		const timestampValue = eventObject['timestamp']
+		const timestamp = timestampValue == null ? 0 : parseFloat(timestampValue.toString())
+		if (!isFinite(timestamp) || timestamp <= 0) return
+		const value = formatTimesToMinute(timestamp)
 		if (currentPickerType.value === 'start') {
 			startTime.value = value
 		} else {
@@ -124,6 +132,10 @@ const carStatus = ref('在线')
 
 	const onCancel = () => {
 		showDateTimePicker.value = false
+	}
+
+	const onPickerShowChange = (value : boolean) => {
+		showDateTimePicker.value = value
 	}
 
 	const calculateDuration = (diff:number) : string => {
@@ -146,8 +158,7 @@ return (): any | null => {
 
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
 const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
-const _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker",_easycom_l_date_time_picker)
-const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
+const _component_i_datetime_picker = resolveEasyComponent("i-datetime-picker",_easycom_i_datetime_picker)
 const _component_i_empty = resolveEasyComponent("i-empty",_easycom_i_empty)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
@@ -190,24 +201,22 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             }), null, 8 /* PROPS */, ["onClick"])
           ])
         ]),
-        _cV(_component_l_popup, _uM({
-          modelValue: showDateTimePicker.value,
-          "onUpdate:modelValue": $event => {(showDateTimePicker).value = $event},
-          position: "bottom",
-          closeable: false
+        _cV(_component_i_datetime_picker, _uM({
+          show: showDateTimePicker.value,
+          "model-value": currentPickerValue.value,
+          mode: "datetime",
+          title: pickerTitle.value,
+          "cancel-text": "取消",
+          "confirm-text": "确认",
+          onConfirm: onConfirm,
+          onCancel: onCancel,
+          "onUpdate:show": onPickerShowChange
         }), _uM({
-          default: withSlotCtx((): any[] => [
-            _cV(_component_l_date_time_picker, _uM({
-              "confirm-btn": "确认",
-              "cancel-btn": "取消",
-              title: pickerTitle.value,
-              mode: 63,
-              onConfirm: onConfirm,
-              onCancel: onCancel
-            }), null, 8 /* PROPS */, ["title"])
+          trigger: withSlotCtx((): any[] => [
+            _cE("view")
           ]),
           _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+        }), 8 /* PROPS */, ["show", "model-value", "title"])
       ]),
       _cE("scroll-view", _uM({
         class: "content-box",

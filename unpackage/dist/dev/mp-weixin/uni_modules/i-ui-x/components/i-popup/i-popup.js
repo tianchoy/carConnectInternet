@@ -78,27 +78,36 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   const touching = common_vendor.ref(false);
   let closeTimer = 0;
   let lazyTimer = 0;
+  const rootStyle = common_vendor.computed(() => {
+    return "z-index:" + props.zIndex.toString() + ";";
+  });
   const drawerPosition = common_vendor.computed(() => {
     if (props.position.length > 0)
       return props.position;
     return props.mode;
   });
   const normalizedMode = common_vendor.computed(() => {
-    if (drawerPosition.value == "left" || drawerPosition.value == "right" || drawerPosition.value == "top" || drawerPosition.value == "center") {
+    if (drawerPosition.value == "left" || drawerPosition.value == "right" || drawerPosition.value == "top" || drawerPosition.value == "center")
       return drawerPosition.value;
-    }
     return "bottom";
   });
+  function isVerticalMode() {
+    return normalizedMode.value == "top" || normalizedMode.value == "bottom";
+  }
   function shouldCoverCenter() {
-    return props.widthCoverCenter && (normalizedMode.value == "top" || normalizedMode.value == "bottom") && props.width.toString().length > 0;
+    return props.widthCoverCenter && isVerticalMode() && props.width.toString().length > 0;
+  }
+  function formatSize(value = null) {
+    const text = value.toString();
+    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
+      return text;
+    return text + "px";
   }
   function stringifyStyle(value = null) {
     if (value == null)
       return "";
     const text = value.toString();
-    if (text == "[object Object]")
-      return "";
-    if (text.length == 0)
+    if (text == "[object Object]" || text.length == 0)
       return "";
     return text.endsWith(";") ? text : text + ";";
   }
@@ -108,102 +117,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return text;
     return text + "ms";
   }
-  function formatSize(value = null) {
-    const text = value.toString();
-    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-      return text;
-    }
-    return text + "px";
+  function animationDuration() {
+    const text = props.duration.toString();
+    if (text.indexOf("ms") >= 0)
+      return parseFloat(text.replace("ms", ""));
+    if (text.indexOf("s") >= 0)
+      return parseFloat(text.replace("s", "")) * 1e3;
+    const duration = parseFloat(text);
+    return isNaN(duration) ? 300 : duration;
   }
-  const rootStyle = common_vendor.computed(() => {
-    return "z-index:" + props.zIndex.toString() + ";";
-  });
-  const panelClass = common_vendor.computed(() => {
-    const classes = ["i-popup__panel"];
-    classes.push("i-popup__panel--" + normalizedMode.value);
-    if (shouldCoverCenter())
-      classes.push("i-popup__panel--cover-center");
-    return classes.join(" ");
-  });
-  const overlayComputedStyle = common_vendor.computed(() => {
-    let bgColor2 = "rgba(0,0,0," + props.overlayOpacity.toString() + ")";
-    if (props.overflayBgColor.length > 0)
-      bgColor2 = props.overflayBgColor;
-    let style = "background-color:" + bgColor2 + ";";
-    style = style + "opacity:" + (active.value ? "1" : "0") + ";";
-    style = style + "transition-duration:" + formatMs(props.duration) + ";";
-    style = style + stringifyStyle(props.overlayStyle);
-    return style;
-  });
-  const titleStyleText = common_vendor.computed(() => {
-    return stringifyStyle(props.titleStyle);
-  });
-  function marginStyle() {
-    const margin = formatSize(props.margin);
-    if (margin == "0px")
-      return "";
-    return "margin:" + margin + ";";
-  }
-  function sizeStyle() {
-    let style = "";
-    const size = props.size.toString();
-    if (normalizedMode.value == "left" || normalizedMode.value == "right") {
-      if (props.width.toString().length > 0) {
-        style = style + "width:" + formatSize(props.width) + ";";
-      } else if (size.length > 0) {
-        style = style + "width:" + formatSize(size) + ";";
-      }
-    } else if (normalizedMode.value == "top" || normalizedMode.value == "bottom") {
-      if (props.width.toString().length == 0 && !shouldCoverCenter()) {
-        style = style + "width:100%;";
-      }
-      if (props.height.toString().length > 0) {
-        style = style + "height:" + formatSize(props.height) + ";";
-      } else if (size.length > 0) {
-        style = style + "height:" + formatSize(size) + ";";
-      }
-      if (props.width.toString().length > 0)
-        style = style + "width:" + formatSize(props.width) + ";";
-    } else {
-      if (props.width.toString().length > 0)
-        style = style + "width:" + formatSize(props.width) + ";";
-      if (props.height.toString().length > 0)
-        style = style + "height:" + formatSize(props.height) + ";";
-    }
-    if (normalizedMode.value == "top") {
-      if (props.navbarHeight > 0)
-        style = style + "top:" + props.navbarHeight.toString() + "px;";
-      if (props.offsetTop.toString().length > 0)
-        style = style + "top:" + formatSize(props.offsetTop) + ";";
-    }
-    if (normalizedMode.value == "bottom" && props.offsetBottom.toString().length > 0) {
-      style = style + "bottom:" + formatSize(props.offsetBottom) + ";";
-    }
-    return style;
-  }
-  function roundStyle() {
-    const round = formatSize(props.round);
-    if (normalizedMode.value == "top")
-      return "border-radius:0 0 " + round + " " + round + ";";
-    if (normalizedMode.value == "bottom")
-      return "border-radius:" + round + " " + round + " 0 0;";
-    if (normalizedMode.value == "left")
-      return "border-radius:0 " + round + " " + round + " 0;";
-    if (normalizedMode.value == "right")
-      return "border-radius:" + round + " 0 0 " + round + ";";
-    if (normalizedMode.value == "center")
-      return "border-radius:" + round + ";";
-    return "";
-  }
-  function safeAreaStyle() {
-    let style = "";
-    if (props.safeTop && normalizedMode.value == "top") {
-      style = style + "padding-top:env(safe-area-inset-top);";
-    }
-    if (props.safeBottom && normalizedMode.value == "bottom") {
-      style = style + "padding-bottom:env(safe-area-inset-bottom);";
-    }
-    return style;
+  function normalizeClosePos() {
+    if (props.closeIconPos == "top-left" || props.closeIconPos == "bottom-left" || props.closeIconPos == "bottom-right")
+      return props.closeIconPos;
+    return "top-right";
   }
   function transformStyle() {
     const x = offsetX.value.toString();
@@ -226,6 +152,85 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return "transform:translateX(" + (active.value ? x + "px" : "100%") + ");";
     return "";
   }
+  function marginStyle() {
+    const margin = formatSize(props.margin);
+    return margin == "0px" ? "" : "margin:" + margin + ";";
+  }
+  function sizeStyle() {
+    let style = "";
+    const size = props.size.toString();
+    if (normalizedMode.value == "left" || normalizedMode.value == "right") {
+      if (props.width.toString().length > 0)
+        style += "width:" + formatSize(props.width) + ";";
+      else if (size.length > 0)
+        style += "width:" + formatSize(size) + ";";
+    } else if (normalizedMode.value == "top" || normalizedMode.value == "bottom") {
+      if (props.width.toString().length == 0 && !shouldCoverCenter())
+        style += "width:100%;";
+      if (props.height.toString().length > 0)
+        style += "height:" + formatSize(props.height) + ";";
+      else if (size.length > 0)
+        style += "height:" + formatSize(size) + ";";
+      if (props.width.toString().length > 0)
+        style += "width:" + formatSize(props.width) + ";";
+    } else {
+      if (props.width.toString().length > 0)
+        style += "width:" + formatSize(props.width) + ";";
+      if (props.height.toString().length > 0)
+        style += "height:" + formatSize(props.height) + ";";
+    }
+    if (normalizedMode.value == "top") {
+      if (props.navbarHeight > 0)
+        style += "top:" + props.navbarHeight.toString() + "px;";
+      if (props.offsetTop.toString().length > 0)
+        style += "top:" + formatSize(props.offsetTop) + ";";
+    }
+    if (normalizedMode.value == "bottom" && props.offsetBottom.toString().length > 0)
+      style += "bottom:" + formatSize(props.offsetBottom) + ";";
+    return style;
+  }
+  function roundStyle() {
+    const round = formatSize(props.round);
+    if (normalizedMode.value == "top")
+      return "border-radius:0 0 " + round + " " + round + ";";
+    if (normalizedMode.value == "bottom")
+      return "border-radius:" + round + " " + round + " 0 0;";
+    if (normalizedMode.value == "left")
+      return "border-radius:0 " + round + " " + round + " 0;";
+    if (normalizedMode.value == "right")
+      return "border-radius:" + round + " 0 0 " + round + ";";
+    if (normalizedMode.value == "center")
+      return "border-radius:" + round + ";";
+    return "";
+  }
+  function safeAreaStyle() {
+    let style = "";
+    if (props.safeTop && normalizedMode.value == "top")
+      style += "padding-top:env(safe-area-inset-top);";
+    if (props.safeBottom && normalizedMode.value == "bottom")
+      style += "padding-bottom:env(safe-area-inset-bottom);";
+    return style;
+  }
+  const panelClass = common_vendor.computed(() => {
+    const classes = ["i-popup__panel"];
+    classes.push("i-popup__panel--" + normalizedMode.value);
+    if (shouldCoverCenter())
+      classes.push("i-popup__panel--cover-center");
+    return classes.join(" ");
+  });
+  const overlayComputedStyle = common_vendor.computed(() => {
+    let bgColor2 = "rgba(0,0,0," + props.overlayOpacity.toString() + ")";
+    if (props.overflayBgColor.length > 0)
+      bgColor2 = props.overflayBgColor;
+    let style = "background-color:" + bgColor2 + ";";
+    style = style + "opacity:" + (active.value ? "1" : "0") + ";";
+    style = style + "transition-duration:" + formatMs(props.duration) + ";";
+    style = style + stringifyStyle(props.overlayStyle);
+    return style;
+  });
+  const titleStyleText = common_vendor.computed(() => {
+    return stringifyStyle(props.titleStyle);
+  });
   const panelStyle = common_vendor.computed(() => {
     let style = "background-color:" + bgColor.value + ";";
     style = style + "transition-duration:" + formatMs(props.duration) + ";";
@@ -262,11 +267,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   });
   const closeClass = common_vendor.computed(() => {
     const classes = ["i-popup__close"];
-    let position = "top-right";
-    if (props.closeIconPos == "top-left" || props.closeIconPos == "bottom-left" || props.closeIconPos == "bottom-right") {
-      position = props.closeIconPos;
-    }
-    classes.push("i-popup__close--" + position);
+    classes.push("i-popup__close--" + normalizeClosePos());
     return classes.join(" ");
   });
   const closeStyle = common_vendor.computed(() => {
@@ -277,7 +278,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return "×";
     return props.closeIcon;
   });
-  const clearTimers = () => {
+  function clearTimers() {
     if (closeTimer > 0) {
       clearTimeout(closeTimer);
       closeTimer = 0;
@@ -286,24 +287,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       clearTimeout(lazyTimer);
       lazyTimer = 0;
     }
-  };
-  const resetOffset = () => {
+  }
+  function resetOffset() {
     offsetX.value = 0;
     offsetY.value = 0;
     touching.value = false;
-  };
-  const animationDuration = () => {
-    const text = props.duration.toString();
-    if (text.indexOf("ms") >= 0)
-      return parseFloat(text.replace("ms", ""));
-    if (text.indexOf("s") >= 0)
-      return parseFloat(text.replace("s", "")) * 1e3;
-    const duration = parseFloat(text);
-    if (isNaN(duration))
-      return 300;
-    return duration;
-  };
-  const openPanel = (shouldEmitUpdate) => {
+  }
+  function openPanel(shouldEmitUpdate) {
     if (props.disabled)
       return null;
     if (opened.value && active.value)
@@ -326,8 +316,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       if (shouldEmitUpdate)
         emit("update:show", true);
     }, 20);
-  };
-  const closePanel = (shouldEmitUpdate) => {
+  }
+  function closePanel(shouldEmitUpdate) {
     if (!opened.value && !active.value)
       return null;
     clearTimers();
@@ -343,16 +333,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       if (shouldEmitUpdate)
         emit("update:show", false);
     }, animationDuration());
-  };
-  common_vendor.watch(() => {
-    return props.show;
-  }, (nextValue) => {
-    if (nextValue) {
-      openPanel(false);
-    } else {
-      closePanel(false);
-    }
-  });
+  }
   function open() {
     openPanel(true);
   }
@@ -375,45 +356,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     emit("confirm");
     close();
   }
-  const readTouchX = (event) => {
-    let point = null;
-    if (event.touches.length > 0) {
-      point = event.touches[0];
-    } else if (event.changedTouches.length > 0) {
-      point = event.changedTouches[0];
-    }
-    if (point == null)
-      return 0;
-    return point.clientX;
-  };
-  const readTouchY = (event) => {
-    let point = null;
-    if (event.touches.length > 0) {
-      point = event.touches[0];
-    } else if (event.changedTouches.length > 0) {
-      point = event.changedTouches[0];
-    }
-    if (point == null)
-      return 0;
-    return point.clientY;
-  };
-  const handleTouchStart = (event) => {
+  function readTouchX(event) {
+    if (event.touches.length > 0)
+      return event.touches[0].clientX;
+    if (event.changedTouches.length > 0)
+      return event.changedTouches[0].clientX;
+    return 0;
+  }
+  function readTouchY(event) {
+    if (event.touches.length > 0)
+      return event.touches[0].clientY;
+    if (event.changedTouches.length > 0)
+      return event.changedTouches[0].clientY;
+    return 0;
+  }
+  function handleTouchStart(event) {
     if (!props.swipeClose)
       return null;
     touching.value = true;
     startX.value = readTouchX(event);
     startY.value = readTouchY(event);
-  };
+  }
+  function handleContentTouchStart(event) {
+    if (props.swipeClose && props.contentDraggable)
+      handleTouchStart(event);
+  }
   function handleHandleTouchStart(event) {
     handleTouchStart(event);
   }
   function handleTouchMove(event) {
     if (!props.swipeClose || !touching.value)
       return null;
-    const currentX = readTouchX(event);
-    const currentY = readTouchY(event);
-    const deltaX = currentX - startX.value;
-    const deltaY = currentY - startY.value;
+    const deltaX = readTouchX(event) - startX.value;
+    const deltaY = readTouchY(event) - startY.value;
     if (normalizedMode.value == "bottom" && deltaY > 0)
       offsetY.value = deltaY;
     if (normalizedMode.value == "top" && deltaY < 0)
@@ -436,6 +411,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     }
     resetOffset();
   }
+  function handleContentTouchMove(event) {
+    if (!props.contentDraggable)
+      return null;
+    handleTouchMove(event);
+  }
+  function handleContentTouchEnd() {
+    if (!props.contentDraggable)
+      return null;
+    handleTouchEnd();
+  }
+  common_vendor.watch(() => {
+    return props.show;
+  }, (nextValue) => {
+    if (nextValue)
+      openPanel(false);
+    else
+      closePanel(false);
+  });
   __expose({
     open,
     close
@@ -453,10 +446,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     } : {}, {
       f: __props.swipeClose && __props.swipeHandle
     }, __props.swipeClose && __props.swipeHandle ? {
-      g: common_vendor.o(handleHandleTouchStart, "cb"),
-      h: common_vendor.o(handleTouchMove, "9f"),
-      i: common_vendor.o(handleTouchEnd, "96"),
-      j: common_vendor.o(handleTouchEnd, "32")
+      g: common_vendor.o(handleHandleTouchStart, "29"),
+      h: common_vendor.o(handleTouchMove, "61"),
+      i: common_vendor.o(handleTouchEnd, "d8"),
+      j: common_vendor.o(handleTouchEnd, "8f")
     } : {}, {
       k: normalizedMode.value == "bottom"
     }, normalizedMode.value == "bottom" ? {} : {}, {
@@ -468,9 +461,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       o: __props.showClose
     }, __props.showClose ? {
       p: common_vendor.t(closeIconText.value),
-      q: common_vendor.s(closeStyle.value),
-      r: common_vendor.n(closeClass.value),
-      s: common_vendor.o(close, "f8")
+      q: common_vendor.n(closeClass.value),
+      r: common_vendor.s(closeStyle.value),
+      s: common_vendor.o(close, "8e")
     } : {}, {
       t: __props.disabledScroll
     }, __props.disabledScroll ? common_vendor.e({
@@ -487,31 +480,35 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       A: __props.showCancel
     }, __props.showCancel ? {
       B: common_vendor.t(cancelTextValue.value),
-      C: common_vendor.o(cancel, "e4")
+      C: common_vendor.o(cancel, "3f")
     } : {}, {
       D: common_vendor.t(confirmTextValue.value),
       E: common_vendor.s(confirmTextStyle.value),
       F: common_vendor.n(__props.disabledConfirm ? "i-popup__footer-button i-popup__footer-button--confirm i-popup__footer-button--disabled" : "i-popup__footer-button i-popup__footer-button--confirm"),
-      G: common_vendor.o(confirm, "47"),
+      G: common_vendor.o(confirm, "32"),
       H: common_vendor.s(footerStyle.value)
     }) : {}, {
       I: __props.closeable && !__props.showClose
     }, __props.closeable && !__props.showClose ? {
       J: common_vendor.t(closeIconText.value),
-      K: common_vendor.s(closeStyle.value),
-      L: common_vendor.n(closeClass.value),
-      M: common_vendor.o(close, "49")
+      K: common_vendor.n(closeClass.value),
+      L: common_vendor.s(closeStyle.value),
+      M: common_vendor.o(close, "78")
     } : {}, {
       N: common_vendor.n(panelClass.value),
       O: common_vendor.s(panelStyle.value),
       P: common_vendor.o(() => {
       }, "63"),
-      Q: common_vendor.s(rootStyle.value)
+      Q: common_vendor.o(handleContentTouchStart, "d0"),
+      R: common_vendor.o(handleContentTouchMove, "d2"),
+      S: common_vendor.o(handleContentTouchEnd, "1a"),
+      T: common_vendor.o(handleContentTouchEnd, "fc"),
+      U: common_vendor.s(rootStyle.value)
     }) : {}, {
-      R: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      S: `${_ctx.u_s_b_h}px`,
-      T: `${_ctx.u_s_a_i_b}px`,
-      U: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      V: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      W: `${_ctx.u_s_b_h}px`,
+      X: `${_ctx.u_s_a_i_b}px`,
+      Y: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     });
     return __returned__;
   };

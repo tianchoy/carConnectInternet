@@ -73,9 +73,6 @@
 			}
 		},
 		{
-			"path": "uni_modules/lime-action-sheet/pages/index"
-		},
-		{
 			"path": "pages/vehicleTracking/vehicleTracking",
 			"style": {
 				"navigationBarTitleText": "车辆跟踪"

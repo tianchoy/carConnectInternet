@@ -14,7 +14,6 @@ if (!Math) {
   "./pages/carInfoDetail/carInfoDetail.js";
   "./pages/addCar/addCar.js";
   "./pages/playBack/playBack.js";
-  "./uni_modules/lime-action-sheet/pages/index.js";
   "./pages/vehicleTracking/vehicleTracking.js";
   "./pages/mileageRecord/mileageRecord.js";
   "./pages/stopRecord/stopRecord.js";

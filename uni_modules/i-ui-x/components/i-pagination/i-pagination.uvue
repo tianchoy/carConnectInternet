@@ -12,7 +12,7 @@
       <view
         v-else
         v-for="item in pageList"
-        :key="String(item)"
+        :key="(item).toString()"
         :class="currentPage == item ? 'i-pagination__num i-pagination__num--active' : 'i-pagination__num'"
         :style="currentPage == item ? activeStyle : inactivePageStyle"
         @click="setPage(item)"
@@ -68,27 +68,38 @@ const props = defineProps({
  * - prev/next: 点击上一页/下一页成功后触发。
  * - update:page/update:current: 同步当前页码。
  */
-const emit = defineEmits(['change', 'prev', 'next', 'update:page', 'update:current'])
+const emit = defineEmits<{
+  (event: 'change', page: number): void
+  (event: 'prev', page: number): void
+  (event: 'next', page: number): void
+  (event: 'update:page', page: number): void
+  (event: 'update:current', page: number): void
+}>()
 
-const bgColor = computed(() => {
+function initialPage() : number {
+  if (props.current > 0) return props.current
+  return props.page
+}
+
+const bgColor = computed(() : string => {
   return props.bgColor
 })
 const currentPage = ref(initialPage())
 
-const totalPages = computed(() => {
+const totalPages = computed(() : number => {
   if (props.pageCount > 0) return props.pageCount
   const size = props.pageSize <= 0 ? 10 : props.pageSize
   const count = Math.ceil(props.total / size)
   return count <= 0 ? 1 : count
 })
-const prevDisabled = computed(() => props.disabled || currentPage.value <= 1)
-const nextDisabled = computed(() => props.disabled || currentPage.value >= totalPages.value)
-const wrapStyle = computed(() => 'background-color:' + bgColor.value + ';')
-const activeStyle = computed(() => 'background-color:' + props.activeColor + ';')
-const inactivePageStyle = computed(() => 'background-color:#f5f7fa;')
-const inactiveTextStyle = computed(() => 'color:' + props.inactiveColor + ';')
-const pageList = computed(() => {
-  const list = []
+const prevDisabled = computed(() : boolean => props.disabled || currentPage.value <= 1)
+const nextDisabled = computed(() : boolean => props.disabled || currentPage.value >= totalPages.value)
+const wrapStyle = computed(() : string => 'background-color:' + bgColor.value + ';')
+const activeStyle = computed(() : string => 'background-color:' + props.activeColor + ';')
+const inactivePageStyle = computed(() : string => 'background-color:#f5f7fa;')
+const inactiveTextStyle = computed(() : string => 'color:' + props.inactiveColor + ';')
+const pageList = computed(() : Array<number> => {
+  const list : Array<number> = []
   const max = props.maxPageButtons <= 0 ? 5 : props.maxPageButtons
   const half = Math.floor(max / 2)
   let start = currentPage.value - half
@@ -102,14 +113,16 @@ const pageList = computed(() => {
   return list
 })
 
-watch(() => props.page, () => currentPage.value = initialPage())
-watch(() => props.current, () => currentPage.value = initialPage())
+watch(
+  () : number => props.page,
+  () : void => { currentPage.value = initialPage() },
+)
+watch(
+  () : number => props.current,
+  () : void => { currentPage.value = initialPage() },
+)
 
-function initialPage(): number {
-  if (props.current > 0) return props.current
-  return props.page
-}
-function setPage(page: number) {
+function setPage(page : number) : void {
   if (props.disabled) return
   const nextPage = Math.max(1, Math.min(totalPages.value, page))
   if (nextPage == currentPage.value) return
@@ -118,12 +131,12 @@ function setPage(page: number) {
   emit('update:page', currentPage.value)
   emit('update:current', currentPage.value)
 }
-function prev() {
+function prev() : void {
   if (prevDisabled.value) return
   setPage(currentPage.value - 1)
   emit('prev', currentPage.value)
 }
-function next() {
+function next() : void {
   if (nextDisabled.value) return
   setPage(currentPage.value + 1)
   emit('next', currentPage.value)

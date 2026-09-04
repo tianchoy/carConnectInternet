@@ -11,21 +11,19 @@ if (!Array) {
   const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
   const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
   const _easycom_i_slider_1 = common_vendor.resolveComponent("i-slider");
-  const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
-  const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
+  const _easycom_i_datetime_picker_1 = common_vendor.resolveComponent("i-datetime-picker");
   const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
-  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_button_1 + _easycom_i_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_app_toast_1)();
+  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_button_1 + _easycom_i_slider_1 + _easycom_i_datetime_picker_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_sub_navBar = () => "../../components/sub-navBar/sub-navBar.js";
 const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
 const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-button.js";
 const _easycom_i_slider = () => "../../uni_modules/i-ui-x/components/i-slider/i-slider.js";
-const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js";
-const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
+const _easycom_i_datetime_picker = () => "../../uni_modules/i-ui-x/components/i-datetime-picker/i-datetime-picker.js";
 const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_button + _easycom_i_slider + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_app_toast)();
+  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_button + _easycom_i_slider + _easycom_i_datetime_picker + _easycom_app_toast)();
 }
 class TrackPoint extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -151,7 +149,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const polyline = common_vendor.ref([]);
     const isPlaying = common_vendor.ref(false);
     const isTrackPlayable = common_vendor.ref(false);
-    const playbackSpeed = common_vendor.ref(5);
+    const playbackSpeed = common_vendor.ref(1);
     const totalDistance = common_vendor.ref(0);
     const currentSpeed = common_vendor.ref(0);
     const currentTime = common_vendor.ref("");
@@ -162,13 +160,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     let replaySessionId = 0;
     function formatPlaybackTime(timestamp) {
       var _a;
-      return (_a = utils_formateTime.formatTimes(timestamp)) !== null && _a !== void 0 ? _a : "";
+      return (_a = utils_formateTime.formatTimesToMinute(timestamp)) !== null && _a !== void 0 ? _a : "";
     }
     const now = /* @__PURE__ */ new Date();
-    const initialEndTime = utils_formateTime.formatTimes(now.getTime());
-    const initialStartTime = utils_formateTime.formatTimes(now.getTime() - 36e5 * 6);
+    const initialEndTime = utils_formateTime.formatTimesToMinute(now.getTime());
+    const initialStartTime = utils_formateTime.formatTimesToMinute(now.getTime() - 36e5 * 6);
     const startTime = common_vendor.ref(initialStartTime);
     const endTime = common_vendor.ref(initialEndTime);
+    const currentPickerValue = common_vendor.computed(() => {
+      return currentPickerType.value == "start" ? startTime.value : endTime.value;
+    });
     function normalizePlaybackTime(value, fallback) {
       const milliseconds = utils_formateTime.parseLocalDateTime(value);
       return milliseconds == null ? fallback : formatPlaybackTime(milliseconds);
@@ -206,7 +207,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:205", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:208", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -536,7 +537,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           imei: imei.value,
           startTime: startTime.value.replace(/\//g, "-"),
           endTime: endTime.value.replace(/\//g, "-"),
-          minParkTime: 2,
+          minParkTime: 1,
           withStop: false,
           withPos: true,
           withTrip: false
@@ -567,7 +568,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:691", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:694", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -636,9 +637,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         startPlayback();
       }
     }
-    function onConfirm(value) {
+    function onConfirm(event = null) {
       var _a, _b;
-      const formattedValue = normalizeDateTime(value);
+      const eventObject = event;
+      const timestampValue = eventObject["timestamp"];
+      const timestamp = timestampValue == null ? 0 : parseFloat(timestampValue.toString());
+      if (!isFinite(timestamp) || timestamp <= 0)
+        return null;
+      const formattedValue = formatPlaybackTime(timestamp);
       if (currentPickerType.value == "start") {
         setPlaybackTimeRange(formattedValue, (_a = endTime.value) !== null && _a !== void 0 ? _a : "");
       } else {
@@ -651,10 +657,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function onCancel() {
       showDateTimePicker.value = false;
     }
+    function onPickerShowChange(value) {
+      showDateTimePicker.value = value;
+    }
     function applyPlaybackSpeed(value) {
       if (!isFinite(value))
         return null;
-      playbackSpeed.value = Math.min(50, Math.max(5, value));
+      playbackSpeed.value = Math.min(30, Math.max(1, value));
       if (!isPlaying.value)
         return null;
       const timer = playbackTimer;
@@ -681,7 +690,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
       sTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
       eTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:820", sTime.value, eTime.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:830", sTime.value, eTime.value);
       const routeStartTime = resolveRouteDateTime(sTime.value);
       const routeEndTime = resolveRouteDateTime(eTime.value);
       if (routeStartTime != null && routeEndTime != null) {
@@ -767,34 +776,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return playbackSpeed.value = $event;
         }, "8d"),
         z: common_vendor.p({
-          min: 5,
-          max: 50,
-          step: 5,
+          min: 1,
+          max: 30,
+          step: 1,
           modelValue: playbackSpeed.value
         }),
         A: common_vendor.t(playbackSpeed.value),
         B: common_vendor.t(currentTime.value),
         C: common_vendor.t(currentSpeed.value),
         D: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        E: common_vendor.o(onConfirm, "74"),
-        F: common_vendor.o(onCancel, "f1"),
-        G: common_vendor.p({
-          ["confirm-btn"]: "确认",
-          ["cancel-btn"]: "取消",
+        E: common_vendor.o(onConfirm, "9f"),
+        F: common_vendor.o(onCancel, "8e"),
+        G: common_vendor.o(onPickerShowChange, "3e"),
+        H: common_vendor.p({
+          show: showDateTimePicker.value,
+          ["model-value"]: currentPickerValue.value,
+          mode: "datetime",
           title: pickerTitle.value,
-          mode: 63,
-          format: "YYYY-MM-DD HH:mm:ss"
+          ["cancel-text"]: "取消",
+          ["confirm-text"]: "确认"
         }),
-        H: common_vendor.o(($event) => {
-          return showDateTimePicker.value = $event;
-        }, "22"),
-        I: common_vendor.p({
-          position: "bottom",
-          closeable: false,
-          modelValue: showDateTimePicker.value
-        }),
-        J: `${_ctx.u_s_b_h}px`,
-        K: `${_ctx.u_s_a_i_b}px`
+        I: `${_ctx.u_s_b_h}px`,
+        J: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

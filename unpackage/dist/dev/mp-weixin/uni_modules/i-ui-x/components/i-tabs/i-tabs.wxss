@@ -1,28 +1,75 @@
 :host{display:flex;flex-direction:column}
 
-.i-tabs { border-radius: 8px; overflow: hidden;
+.i-tabs {
+  border-radius: 8px;
+  overflow: hidden;
 }
-.i-tabs__scroll { width: 100%;
+.i-tabs__scroll {
+  width: 100%;
 }
-.i-tabs__nav { min-height: 44px; flex-direction: row; align-items: center;
+.i-tabs__nav {
+  min-height: 44px;
+  flex-direction: row;
+  align-items: center;
 }
-.i-tabs__item { min-width: 72px; min-height: 44px; padding: 0 16px; align-items: center; justify-content: center; box-sizing: border-box; overflow: visible;
+.i-tabs__item {
+  min-width: 72px;
+  min-height: 44px;
+  padding: 0 16px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: visible;
 }
-.i-tabs__item--active { background-color: #ffffff;
+.i-tabs__item--active {
+  background-color: #ffffff;
 }
-.i-tabs__item--disabled { opacity: 0.55;
+.i-tabs__item--disabled {
+  opacity: 0.55;
 }
-.i-tabs__text-wrap { position: relative; flex-direction: row; align-items: center; justify-content: center; overflow: visible;
+.i-tabs__text-wrap {
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
 }
-.i-tabs__text { color: #606266; line-height: 20px;
+.i-tabs__text {
+  color: #606266;
+  line-height: 20px;
 }
-.i-tabs__text--active { color: #2979ff; font-weight: 600;
+.i-tabs__text--active {
+  color: #2979ff;
+  font-weight: 600;
 }
-.i-tabs__bar { margin-top: 5px; border-radius: 999px;
+.i-tabs__bar {
+  margin-top: 5px;
+  border-radius: 999px;
 }
-.i-tabs__badge { position: absolute; right: -20px; top: -9px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background-color: #f56c6c; align-items: center; justify-content: center; box-sizing: border-box;
+.i-tabs__badge {
+  position: absolute;
+  right: -20px;
+  top: -9px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background-color: #f56c6c;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
-.i-tabs__badge-text { color: #ffffff; font-size: 10px; line-height: 14px;
+.i-tabs__badge-text {
+  color: #ffffff;
+  font-size: 10px;
+  line-height: 14px;
 }
-.i-tabs__dot { position: absolute; right: -9px; top: -5px; width: 7px; height: 7px; border-radius: 4px; background-color: #f56c6c;
+.i-tabs__dot {
+  position: absolute;
+  right: -9px;
+  top: -5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 4px;
+  background-color: #f56c6c;
 }

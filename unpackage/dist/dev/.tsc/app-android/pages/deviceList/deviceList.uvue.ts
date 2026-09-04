@@ -131,10 +131,9 @@ const mapScale = ref(4)
 			if (from) {
 				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 143, 11),  pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
-				console.log('获取设备列表:', res, " at pages/deviceList/deviceList.uvue:145")
 				const list = (res.code == 200 && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
 				if (list == null || !Array.isArray(list)) {
-					console.warn('获取设备列表返回异常:', res, " at pages/deviceList/deviceList.uvue:148")
+					console.warn('获取设备列表返回异常:', res, " at pages/deviceList/deviceList.uvue:147")
 					originalDeviceList.value = []
 					markers.value = []
 					return
@@ -145,7 +144,7 @@ const mapScale = ref(4)
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
 			updateMarkers(originalDeviceList.value)
 		} catch (err) {
-			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:159")
+			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:158")
 			originalDeviceList.value = []
 			markers.value = []
 			showAppToast({ title: '获取设备列表失败', icon: 'none' })
@@ -172,14 +171,14 @@ const mapScale = ref(4)
 
 	// 订阅消息
 	const subMsg = () => {
-		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:186")
+		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:185")
 		uni.requestSubscribeMessage({
 			tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
 			success: (res) => {
-				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:190")
+				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:189")
 			},
 			fail: (err) => {
-				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:193")
+				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:192")
 			}
 		})
 	}
@@ -195,7 +194,7 @@ const mapScale = ref(4)
 		const markerId = detail != null ? detail['markerId'] : null
 		const selectedDevice = originalDeviceList.value.find((device: UTSJSONObject) => device['deviceId'] == markerId)
 		if (selectedDevice == null) {
-			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:209")
+			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:208")
 			return
 		}
 		const imeiValue = (selectedDevice['imei'] as string | null) ?? ''

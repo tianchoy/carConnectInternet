@@ -248,94 +248,23 @@ const props = defineProps({
  * - click: 点击可交互单元格时触发，参数包含 name、title、value、label、desc、url。
  * - update:show: 对齐 cell 事件命名；点击时派发 false，便于外层弹层/面板关闭。
  */
-const emit = defineEmits(['click', 'update:show'])
+type ICellClickEvent = {
+  name: string
+  title: string
+  value: string
+  label: string
+  desc: string
+  url: string
+}
 
-const hasAvatar = computed(() => {
-  return props.icon.length > 0
-})
+const emit = defineEmits<{
+  (event: 'click', payload: ICellClickEvent): void
+  (event: 'update:show', value: boolean): void
+}>()
 
-const showArrow = computed(() => {
-  if (props.disabled) return false
-  if (props.arrow || props.isLink || props.clickable) return true
-  if (props.url.length > 0) return true
-  return props.link
-})
-
-const canClick = computed(() => {
-  if (props.disabled) return false
-  return props.clickable || props.isLink || props.arrow || props.link || props.url.length > 0
-})
-
-const rightText = computed(() => {
-  if (props.value.length > 0) return props.value
-  return props.label
-})
-
-const descText = computed(() => {
-  if (props.desc.length > 0) return props.desc
-  if (props.value.length > 0) return props.label
-  return ''
-})
-
-const resolvedIconColor = computed(() => {
-  if (props.iconColor.length > 0) return props.iconColor
-  return '#2979ff'
-})
-
-const cellClass = computed(() => {
-  const classes = ['i-cell']
-  if (props.card) classes.push('i-cell--card')
-  else classes.push('i-cell--plain')
-  if (canClick.value) classes.push('i-cell--clickable')
-  if (props.disabled) classes.push('i-cell--disabled')
-  if (props.showBottomBorder) classes.push('i-cell--border')
-  if (props.bottomBorderInsert) classes.push('i-cell--border-insert')
-  return classes.join(' ')
-})
-
-const cellStyle = computed(() => {
-  let style = ''
-  if (props.minHeight != 'auto') style = style + 'min-height:' + formatSize(props.minHeight) + ';'
-  style = style + 'background-color:' + normalizeColor(props.color) + ';'
-  style = style + 'padding:' + spacingValue(props.padding, ['12', '0']) + ';'
-  if (props.margin.length > 0) style = style + 'margin:' + spacingValue(props.margin, []) + ';'
-  if (props.card) style = style + 'border-radius:' + formatSize(cardRound.value) + ';'
-  if (props.showBottomBorder) {
-    const borderColor = props.bottomBorderColor.length > 0 ? props.bottomBorderColor : '#eef0f4'
-    style = style + 'border-bottom-color:' + borderColor + ';'
-  }
-  if (props.customStyle.length > 0) style = style + props.customStyle
-  return style
-})
-
-const cardRound = computed(() => {
-  if (props.round.length > 0) return props.round
-  return '8'
-})
-
-const avatarStyle = computed(() => {
-  const size = formatSize(props.leftSize)
-  return 'width:' + size + ';height:' + size + ';border-radius:' + formatSize(props.avatarRound) + ';'
-})
-
-const titleStyle = computed(() => {
-  return 'font-size:' + formatSize(props.titleSize) + ';color:' + normalizeColor(props.titleColor) + ';'
-})
-
-const descStyle = computed(() => {
-  return 'font-size:12px;color:#909399;'
-})
-
-const labelStyle = computed(() => {
-  return 'font-size:' + formatSize(props.labelSize) + ';color:' + normalizeColor(props.labelColor) + ';'
-})
-
-const rightStyle = computed(() => {
-  return 'width:' + formatSize(props.rightWidth) + ';'
-})
-
-function formatSize(value): string {
-  const text = String(value)
+function formatSize(value : any | null) : string {
+  if (value == null) return '0px'
+  const text = value.toString()
   if (
     text == 'auto' ||
     text.indexOf('px') >= 0 ||
@@ -348,7 +277,7 @@ function formatSize(value): string {
   return text + 'px'
 }
 
-function normalizeColor(value): string {
+function normalizeColor(value : string) : string {
   if (value == 'white') return '#ffffff'
   if (value == 'black') return '#303133'
   if (value == 'primary') return '#2979ff'
@@ -359,8 +288,12 @@ function normalizeColor(value): string {
   return value
 }
 
-function spacingValue(value, fallback): string {
-  const source = value.length > 0 ? value : fallback
+function spacingValue(
+  value : Array<any | null> | null,
+  fallback : Array<any | null>,
+) : string {
+  const safeValue : Array<any | null> = value == null ? [] : value
+  const source : Array<any | null> = safeValue.length > 0 ? safeValue : fallback
   if (source.length == 0) return '0px'
   if (source.length == 1) return formatSize(source[0])
   if (source.length == 2) return formatSize(source[1]) + ' ' + formatSize(source[0])
@@ -378,10 +311,95 @@ function spacingValue(value, fallback): string {
   )
 }
 
-function handleClick() {
+const hasAvatar = computed(() : boolean => {
+  return props.icon.length > 0
+})
+
+const showArrow = computed(() : boolean => {
+  if (props.disabled) return false
+  if (props.arrow || props.isLink || props.clickable) return true
+  if (props.url.length > 0) return true
+  return props.link
+})
+
+const canClick = computed(() : boolean => {
+  if (props.disabled) return false
+  return props.clickable || props.isLink || props.arrow || props.link || props.url.length > 0
+})
+
+const rightText = computed(() : string => {
+  if (props.value.length > 0) return props.value
+  return props.label
+})
+
+const descText = computed(() : string => {
+  if (props.desc.length > 0) return props.desc
+  if (props.value.length > 0) return props.label
+  return ''
+})
+
+const resolvedIconColor = computed(() : string => {
+  if (props.iconColor.length > 0) return props.iconColor
+  return '#2979ff'
+})
+
+const cellClass = computed(() : string => {
+  const classes : Array<string> = ['i-cell']
+  if (props.card) classes.push('i-cell--card')
+  else classes.push('i-cell--plain')
+  if (canClick.value) classes.push('i-cell--clickable')
+  if (props.disabled) classes.push('i-cell--disabled')
+  if (props.showBottomBorder) classes.push('i-cell--border')
+  if (props.bottomBorderInsert) classes.push('i-cell--border-insert')
+  return classes.join(' ')
+})
+
+const cardRound = computed(() : string => {
+  if (props.round.length > 0) return props.round
+  return '8'
+})
+
+const cellStyle = computed(() : string => {
+  let style = ''
+  if (props.minHeight != 'auto') style = style + 'min-height:' + formatSize(props.minHeight) + ';'
+  style = style + 'background-color:' + normalizeColor(props.color) + ';'
+  style = style + 'padding:' + spacingValue(props.padding, ['12', '0']) + ';'
+  const margin : Array<any | null> = props.margin == null ? [] : props.margin
+  if (margin.length > 0) style = style + 'margin:' + spacingValue(margin, []) + ';'
+  if (props.card) style = style + 'border-radius:' + formatSize(cardRound.value) + ';'
+  if (props.showBottomBorder) {
+    const borderColor = props.bottomBorderColor.length > 0 ? props.bottomBorderColor : '#eef0f4'
+    style = style + 'border-bottom-color:' + borderColor + ';'
+  }
+  if (props.customStyle.length > 0) style = style + props.customStyle
+  return style
+})
+
+const avatarStyle = computed(() : string => {
+  const size = formatSize(props.leftSize)
+  return 'width:' + size + ';height:' + size + ';border-radius:' + formatSize(props.avatarRound) + ';'
+})
+
+const titleStyle = computed(() : string => {
+  return 'font-size:' + formatSize(props.titleSize) + ';color:' + normalizeColor(props.titleColor) + ';'
+})
+
+const descStyle = computed(() : string => {
+  return 'font-size:12px;color:#909399;'
+})
+
+const labelStyle = computed(() : string => {
+  return 'font-size:' + formatSize(props.labelSize) + ';color:' + normalizeColor(props.labelColor) + ';'
+})
+
+const rightStyle = computed(() : string => {
+  return 'width:' + formatSize(props.rightWidth) + ';'
+})
+
+function handleClick() : void {
   if (!canClick.value) return
 
-  const payload = {
+  const payload : ICellClickEvent = {
     name: props.name,
     title: props.title,
     value: rightText.value,
@@ -395,7 +413,7 @@ function handleClick() {
   if (props.url.length == 0) return
   uni.navigateTo({
     url: props.url,
-    fail: () => {
+    fail: () : void => {
       uni.switchTab({
         url: props.url,
       })

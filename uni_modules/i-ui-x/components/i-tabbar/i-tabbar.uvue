@@ -3,7 +3,7 @@
     <view :class="fixed ? 'i-tabbar i-tabbar--fixed' : 'i-tabbar'" :style="barStyle">
       <view
         v-for="(item, index) in list"
-        :key="String(index) + '-' + getItemText(item)"
+        :key="(index).toString() + '-' + getItemText(item)"
         :class="isDisabled(item) ? 'i-tabbar__item i-tabbar__item--disabled' : 'i-tabbar__item'"
         @click="select(item, index)"
       >
@@ -96,7 +96,19 @@ const props = defineProps({
  * - update:value: 同步当前 value。
  * - update:current: 同步当前索引。
  */
-const emit = defineEmits(['click', 'change', 'select', 'update:value', 'update:current'])
+const emit = defineEmits<{
+  (event: 'click', value: UTSJSONObject): void
+  (event: 'change', value: UTSJSONObject): void
+  (event: 'select', value: UTSJSONObject): void
+  (event: 'update:value', value: string): void
+  (event: 'update:current', value: number): void
+}>()
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
 
 
 
@@ -104,10 +116,47 @@ const emit = defineEmits(['click', 'change', 'select', 'update:value', 'update:c
 const bgColor = computed(() => {
   return props.bgColor
 })
-const list = computed(() => {
-  if (props.list.length > 0) return props.list
-  return props.items
+const list = computed(() : Array<any | null> => {
+  const source = props.list
+  if (source != null && source.length > 0) return source
+  const items = props.items
+  if (items != null) return items
+  const empty : Array<any | null> = []
+  return empty
 })
+
+function itemValue(item : any | null, keyName : string) : string {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = (item as UTSJSONObject)[keyName]
+    if (value == null) return ''
+    return value.toString()
+  }
+  if (keyName == 'text' || keyName == 'name' || keyName == 'value') return item.toString()
+  return ''
+}
+
+function getItemText(item : any | null) : string {
+  const text = itemValue(item, 'text')
+  if (text.length > 0) return text
+  return itemValue(item, 'name')
+}
+
+function getItemValue(item : any | null) : string {
+  const value = itemValue(item, 'value')
+  if (value.length > 0) return value
+  return getItemText(item)
+}
+
+function resolveIndex() : number {
+  if (props.current >= 0) return props.current
+  const expected = props.value.toString()
+  for (let i = 0; i < list.value.length; i++) {
+    const item = list.value[i]
+    if (getItemValue(item) == expected || getItemText(item) == expected) return i
+  }
+  return 0
+}
 
 const currentIndex = ref(resolveIndex())
 
@@ -118,7 +167,7 @@ const barStyle = computed(() => {
     ';background-color:' +
     bgColor.value +
     ';z-index:' +
-    String(props.zIndex) +
+    (props.zIndex).toString() +
     ';'
   if (props.safeBottom) style += 'padding-bottom:env(safe-area-inset-bottom);'
   if (props.border) {
@@ -131,75 +180,42 @@ const placeholderStyle = computed(() => {
 })
 
 watch(
-  () => props.value,
-  () => {
+  () : any => props.value,
+  () : void => {
     currentIndex.value = resolveIndex()
   },
 )
 
 watch(
-  () => props.current,
-  () => {
+  () : number => props.current,
+  () : void => {
     currentIndex.value = resolveIndex()
   },
 )
 
-function itemValue(item, keyName) {
-  if (item == null) return ''
-  if (typeof item == 'object') {
-    const value = item[keyName]
-    if (value == null) return ''
-    return String(value)
-  }
-  if (keyName == 'text' || keyName == 'name' || keyName == 'value') return String(item)
-  return ''
-}
-
-function getItemText(item) {
-  const text = itemValue(item, 'text')
-  if (text.length > 0) return text
-  return itemValue(item, 'name')
-}
-
-function getItemValue(item) {
-  const value = itemValue(item, 'value')
-  if (value.length > 0) return value
-  return getItemText(item)
-}
-
-function getItemIcon(item) {
+function getItemIcon(item : any | null) : string {
   const icon = itemValue(item, 'icon')
   if (icon.length > 0) return icon
   return '•'
 }
 
-function getItemBadge(item) {
+function getItemBadge(item : any | null) : string {
   return itemValue(item, 'badge')
 }
 
-function isDisabled(item) {
+function isDisabled(item : any | null) : boolean {
   if (item == null) return false
-  if (typeof item == 'object') return item['disabled'] == true
+  if (typeof item == 'object') return (item as UTSJSONObject)['disabled'] == true
   return false
 }
 
-function isItemDot(item) {
+function isItemDot(item : any | null) : boolean {
   if (item == null) return false
-  if (typeof item == 'object') return item['dot'] == true
+  if (typeof item == 'object') return (item as UTSJSONObject)['dot'] == true
   return false
 }
 
-function resolveIndex() {
-  if (props.current >= 0) return props.current
-  const expected = String(props.value)
-  for (let i = 0; i < list.value.length; i++) {
-    const item = list.value[i]
-    if (getItemValue(item) == expected || getItemText(item) == expected) return i
-  }
-  return 0
-}
-
-function buildPayload(item, index) {
+function buildPayload(item : any | null, index : number) : UTSJSONObject {
   return {
     index,
     text: getItemText(item),
@@ -208,23 +224,17 @@ function buildPayload(item, index) {
   }
 }
 
-function getIconStyle(item, index) {
+function getIconStyle(item : any | null, index : number) : string {
   const color = isDisabled(item) ? '#c8c9cc' : (currentIndex.value == index ? props.activeColor : props.inactiveColor)
   return 'color:' + color + ';font-size:' + formatSize(props.iconSize) + ';'
 }
 
-function getTextStyle(item, index) {
+function getTextStyle(item : any | null, index : number) : string {
   const color = isDisabled(item) ? '#c8c9cc' : (currentIndex.value == index ? props.activeColor : props.inactiveColor)
   return 'color:' + color + ';font-size:' + formatSize(props.fontSize) + ';'
 }
 
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
-}
-
-function select(item, index) {
+function select(item : any | null, index : number) : void {
   if (props.disabled || isDisabled(item)) return
   const payload = buildPayload(item, index)
   emit('click', payload)

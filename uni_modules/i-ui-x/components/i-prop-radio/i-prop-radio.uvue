@@ -52,42 +52,47 @@ const props = defineProps({
  * - change: 当前选择变化时触发，参数为选中的枚举值。
  * - update:modelValue/update:value: 支持 v-model 和 value 双向同步。
  */
-const emit = defineEmits(['change', 'update:modelValue', 'update:value'])
+const emit = defineEmits<{
+  (event: 'change', value: any): void
+  (event: 'update:modelValue', value: any): void
+  (event: 'update:value', value: any): void
+}>()
 
-const currentValue = computed(() => {
-  if (String(props.modelValue).length > 0) return props.modelValue
+function optionValue(item : string) : string {
+  return item == '__empty__' ? '' : item
+}
+
+function optionLabel(item : string) : string {
+  return item == '__empty__' ? 'none' : item
+}
+
+const currentValue = computed(() : any => {
+  if ((props.modelValue).toString().length > 0) return props.modelValue
   return props.value
 })
 
-const optionList = computed(() => {
+const optionList = computed(() : Array<string> => {
   const source = props.options.split(',')
-  const result = []
+  const result : Array<string> = []
   for (let i = 0; i < source.length; i++) {
-    const item = source[i].trim()
+    const raw = source[i]
+    if (raw == null) continue
+    const item = raw.trim()
     if (item.length > 0) result.push(item)
   }
   return result
 })
 
-function select(value: any) {
+function select(value : any) : void {
   emit('update:modelValue', value)
   emit('update:value', value)
   emit('change', value)
 }
 
-function isActive(item: string): boolean {
-  return String(optionValue(item)) == String(currentValue.value)
+function isActive(item : string) : boolean {
+  return (optionValue(item)).toString() == (currentValue.value).toString()
 }
 
-function optionValue(item: string): string {
-  if (item == '__empty__') return ''
-  return item
-}
-
-function optionLabel(item: string): string {
-  if (item == '__empty__') return 'none'
-  return item
-}
 </script>
 
 <style>

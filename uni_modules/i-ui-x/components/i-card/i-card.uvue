@@ -118,28 +118,58 @@ const props = defineProps({
 const emit = defineEmits(['click', 'headerClick', 'bodyClick', 'footerClick'])
 const slots = useSlots()
 
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'rpx'
+}
+
+function formatBoxSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf(' ') >= 0) return text
+  return formatSize(value)
+}
+
+function stringifyStyle(value : any | null) : string {
+  if (value == null) return ''
+  const text = value.toString()
+  if (text == '[object Object]' || text.length == 0) return ''
+  return text
+}
+
+function areaStyle(customStyle : any | null) : string {
+  let value = ''
+  if (props.padding.toString().length > 0) {
+    value = value + 'padding:' + formatBoxSize(props.padding) + ';'
+  }
+  value = value + stringifyStyle(customStyle)
+  return value
+}
+
 const hasHeader = computed(() => {
-  return slots.header != null
+  return slots['header'] != null
 })
 
 const hasFooter = computed(() => {
-  return slots.footer != null
+  return slots['footer'] != null
 })
 
 const titleText = computed(() => {
-  return String(props.title)
+  return (props.title).toString()
 })
 
 const subTitleText = computed(() => {
-  return String(props.subTitle)
+  return (props.subTitle).toString()
 })
 
 const extraText = computed(() => {
-  return String(props.extra)
+  return (props.extra).toString()
 })
 
 const thumbText = computed(() => {
-  return String(props.thumb)
+  return (props.thumb).toString()
 })
 
 const showHeaderArea = computed(() => {
@@ -188,20 +218,11 @@ const thumbStyle = computed(() => {
   let value = 'width:' + formatSize(props.thumbWidth) + ';height:' + formatSize(props.thumbWidth) + ';'
   if (props.thumbCircle) {
     value = value + 'border-radius:999px;'
-  } else if (String(props.thumbRadius).length > 0) {
+  } else if ((props.thumbRadius).toString().length > 0) {
     value = value + 'border-radius:' + formatSize(props.thumbRadius) + ';'
   }
   return value
 })
-
-function areaStyle(customStyle): string {
-  let value = ''
-  if (String(props.padding).length > 0) {
-    value = value + 'padding:' + formatBoxSize(props.padding) + ';'
-  }
-  value = value + stringifyStyle(customStyle)
-  return value
-}
 
 function handleClick() {
   emit('click', props.index)
@@ -222,26 +243,6 @@ function handleFooterClick() {
   emit('click', props.index)
 }
 
-function stringifyStyle(value): string {
-  if (value == null) return ''
-  const text = String(value)
-  if (text == '[object Object]' || text.length == 0) return ''
-  return text
-}
-
-function formatBoxSize(value): string {
-  const text = String(value)
-  if (text.indexOf(' ') >= 0) return text
-  return formatSize(value)
-}
-
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'rpx'
-}
 </script>
 
 <style>

@@ -34,6 +34,14 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             val pickerTitle = ref("选择开始时间")
             val startTime = ref("")
             val endTime = ref("")
+            val currentPickerValue = computed(fun(): String {
+                return if (currentPickerType.value === "start") {
+                    startTime.value
+                } else {
+                    endTime.value
+                }
+            }
+            )
             val imei = ref<String?>("")
             val groupedTrips = computed<UTSArray<GroupType>>(fun(): UTSArray<GroupType> {
                 val dateGroups: UTSArray<DateTripGroup> = _uA()
@@ -135,8 +143,8 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             )
             val initDateTime = fun(){
                 val now = Date()
-                endTime.value = formatTimes(now.getTime())
-                startTime.value = formatTimes(now.getTime() - 86400000)
+                endTime.value = formatTimesToMinute(now.getTime())
+                startTime.value = formatTimesToMinute(now.getTime() - 86400000)
             }
             val processTripData = fun(data: UTSJSONObject): Unit {
                 val trips = data.getArray<UTSJSONObject>("trips")
@@ -231,7 +239,18 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                 }
                 showDateTimePicker.value = true
             }
-            val onConfirm = fun(value: String){
+            val onConfirm = fun(event: Any){
+                val eventObject = event as UTSJSONObject
+                val timestampValue = eventObject["timestamp"]
+                val timestamp = if (timestampValue == null) {
+                    0
+                } else {
+                    parseFloat(timestampValue.toString())
+                }
+                if (!isFinite(timestamp) || timestamp <= 0) {
+                    return
+                }
+                val value = formatTimesToMinute(timestamp)
                 if (currentPickerType.value === "start") {
                     startTime.value = value
                 } else {
@@ -243,11 +262,13 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             val onCancel = fun(){
                 showDateTimePicker.value = false
             }
+            val onPickerShowChange = fun(value: Boolean){
+                showDateTimePicker.value = value
+            }
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
-                val _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker", GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePickerClass)
-                val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
+                val _component_i_datetime_picker = resolveEasyComponent("i-datetime-picker", GenUniModulesIUiXComponentsIDatetimePickerIDatetimePickerClass)
                 val _component_i_empty = resolveEasyComponent("i-empty", GenUniModulesIUiXComponentsIEmptyIEmptyClass)
                 val _component_i_tag = resolveEasyComponent("i-tag", GenUniModulesIUiXComponentsITagITagClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
@@ -285,19 +306,15 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                                     ))
                                 ))
                             )),
-                            _cV(_component_l_popup, _uM("modelValue" to showDateTimePicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
-                                showDateTimePicker.value = `$event`
-                            }
-                            , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
-                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
-                                        "title"
-                                    ))
+                                    _cE("view")
                                 )
                             }
                             ), "_" to 1), 8, _uA(
-                                "modelValue",
-                                "onUpdate:modelValue"
+                                "show",
+                                "model-value",
+                                "title"
                             ))
                         )),
                         _cE("view", _uM("class" to "summary-panel"), _uA(
@@ -369,7 +386,7 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa", "paddingBottom" to "20rpx")), "tools-panel" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "borderTopWidth" to "1rpx", "borderRightWidth" to "1rpx", "borderBottomWidth" to "1rpx", "borderLeftWidth" to "1rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#69c2f1", "borderRightColor" to "#69c2f1", "borderBottomColor" to "#69c2f1", "borderLeftColor" to "#69c2f1", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "Datetime-box" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "date-box" to _uM(".container .tools-panel .Datetime-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "Date" to _uM(".container .tools-panel .Datetime-box .date-box " to _uM("fontSize" to "25rpx", "borderTopLeftRadius" to "5rpx", "borderTopRightRadius" to "5rpx", "borderBottomRightRadius" to "5rpx", "borderBottomLeftRadius" to "5rpx", "color" to "#333333")), "summary-panel" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-around", "backgroundColor" to "#ffffff", "marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "15rpx", "borderTopRightRadius" to "15rpx", "borderBottomRightRadius" to "15rpx", "borderBottomLeftRadius" to "15rpx", "boxShadow" to "0 2rpx 10rpx rgba(0, 0, 0, 0.05)")), "summary-item" to _uM(".container .summary-panel " to _uM("display" to "flex", "flexDirection" to "column", "alignItems" to "center")), "label" to _uM(".container .summary-panel .summary-item " to _uM("fontSize" to "24rpx", "color" to "#999999", "marginBottom" to "10rpx")), "value" to _uM(".container .summary-panel .summary-item " to _uM("fontSize" to "28rpx", "color" to "#333333", "fontWeight" to "bold")), "content" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "marginTop" to 0, "marginRight" to "20rpx", "marginBottom" to "20%", "marginLeft" to "20rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "trip-list" to _uM(".container .content " to _uM("width" to "100%", "paddingBottom" to "20rpx")), "trip-group" to _uM(".container .content .trip-list " to _uM("paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "15rpx", "borderTopRightRadius" to "15rpx", "borderBottomRightRadius" to "15rpx", "borderBottomLeftRadius" to "15rpx")), "group-header" to _uM(".container .content .trip-list .trip-group " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "15rpx", "paddingRight" to 0, "paddingBottom" to "15rpx", "paddingLeft" to 0)), "group-header-title" to _uM(".container .content .trip-list .trip-group .group-header " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "group-date" to _uM(".container .content .trip-list .trip-group .group-header " to _uM("fontSize" to "30rpx", "color" to "#333333", "marginRight" to "30rpx")), "group-separator" to _uM(".container .content .trip-list .trip-group " to _uM("height" to "1rpx", "backgroundColor" to "#eeeeee", "marginTop" to "10rpx", "marginRight" to 0, "marginBottom" to "10rpx", "marginLeft" to 0)), "trip-item" to _uM(".container .content .trip-list .trip-group " to _uM("display" to "flex", "paddingTop" to "25rpx", "paddingRight" to 0, "paddingBottom" to "25rpx", "paddingLeft" to 0, "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f5f5f5")), "trip-index" to _uM(".container .content .trip-list .trip-group .trip-item " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "paddingTop" to "5rpx")), "icon" to _uM(".container .content .trip-list .trip-group .trip-item .trip-index " to _uM("width" to "40rpx", "height" to "40rpx", "backgroundColor" to "#1296db", "color" to "#ffffff", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "display" to "flex", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "24rpx", "marginRight" to "20rpx")), "trip-distance-time" to _uM(".container .content .trip-list .trip-group .trip-item .trip-index " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "trip-content" to _uM(".container .content .trip-list .trip-group .trip-item " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "icons" to _uM(".container .content .trip-list .trip-group .trip-item .trip-content .trip-locations " to _uM("width" to "50rpx", "height" to "50rpx")))
+                return _uM("container" to _pS(_uM("height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa", "paddingBottom" to "20rpx")), "tools-panel" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "borderTopWidth" to "1rpx", "borderRightWidth" to "1rpx", "borderBottomWidth" to "1rpx", "borderLeftWidth" to "1rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#69c2f1", "borderRightColor" to "#69c2f1", "borderBottomColor" to "#69c2f1", "borderLeftColor" to "#69c2f1", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "Datetime-box" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "date-box" to _uM(".container .tools-panel .Datetime-box " to _uM("display" to "flex", "flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "Date" to _uM(".container .tools-panel .Datetime-box .date-box " to _uM("fontSize" to "25rpx", "borderTopLeftRadius" to "5rpx", "borderTopRightRadius" to "5rpx", "borderBottomRightRadius" to "5rpx", "borderBottomLeftRadius" to "5rpx", "color" to "#333333")), "summary-panel" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-around", "backgroundColor" to "#ffffff", "marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "15rpx", "borderTopRightRadius" to "15rpx", "borderBottomRightRadius" to "15rpx", "borderBottomLeftRadius" to "15rpx", "boxShadow" to "0 2rpx 10rpx rgba(0, 0, 0, 0.05)")), "summary-item" to _uM(".container .summary-panel " to _uM("display" to "flex", "flexDirection" to "column", "alignItems" to "center")), "label" to _uM(".container .summary-panel .summary-item " to _uM("fontSize" to "24rpx", "color" to "#999999", "marginBottom" to "10rpx")), "value" to _uM(".container .summary-panel .summary-item " to _uM("fontSize" to "28rpx", "color" to "#333333", "fontWeight" to "bold")), "content" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "marginTop" to 0, "marginRight" to "20rpx", "marginBottom" to "20%", "marginLeft" to "20rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "trip-list" to _uM(".container .content " to _uM("width" to "100%", "paddingBottom" to "20rpx")), "trip-group" to _uM(".container .content .trip-list " to _uM("paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "15rpx", "borderTopRightRadius" to "15rpx", "borderBottomRightRadius" to "15rpx", "borderBottomLeftRadius" to "15rpx")), "group-header" to _uM(".container .content .trip-list .trip-group " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "15rpx", "paddingRight" to 0, "paddingBottom" to "15rpx", "paddingLeft" to 0)), "group-header-title" to _uM(".container .content .trip-list .trip-group .group-header " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "group-date" to _uM(".container .content .trip-list .trip-group .group-header " to _uM("fontSize" to "30rpx", "color" to "#333333", "marginRight" to "30rpx")), "group-separator" to _uM(".container .content .trip-list .trip-group " to _uM("height" to "1rpx", "backgroundColor" to "#eeeeee", "marginTop" to "10rpx", "marginRight" to 0, "marginBottom" to "10rpx", "marginLeft" to 0)), "trip-item" to _uM(".container .content .trip-list .trip-group " to _uM("display" to "flex", "paddingTop" to "25rpx", "paddingRight" to 0, "paddingBottom" to "25rpx", "paddingLeft" to 0, "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f5f5f5")), "trip-index" to _uM(".container .content .trip-list .trip-group .trip-item " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "paddingTop" to "5rpx")), "icon" to _uM(".container .content .trip-list .trip-group .trip-item .trip-index " to _uM("width" to "40rpx", "height" to "40rpx", "backgroundColor" to "#1296db", "color" to "#ffffff", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "display" to "flex", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "24rpx", "marginRight" to "20rpx")), "trip-distance-time" to _uM(".container .content .trip-list .trip-group .trip-item .trip-index " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "trip-content" to _uM(".container .content .trip-list .trip-group .trip-item " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "icons" to _uM(".container .content .trip-list .trip-group .trip-item .trip-content .trip-locations " to _uM("width" to "50rpx", "height" to "50rpx")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

@@ -68,8 +68,8 @@
           :disabled="disabled"
           activeColor="#ff4d4f"
           backgroundColor="#eef0f4"
-          @changing="handleRgbChanging('r', $event)"
-          @change="handleRgbChange('r', $event)"
+          @changing="handleRedChanging"
+          @change="handleRedChange"
         />
         <text class="i-color-picker__rgb-value">{{ redValue }}</text>
       </view>
@@ -87,8 +87,8 @@
           :disabled="disabled"
           activeColor="#19be6b"
           backgroundColor="#eef0f4"
-          @changing="handleRgbChanging('g', $event)"
-          @change="handleRgbChange('g', $event)"
+          @changing="handleGreenChanging"
+          @change="handleGreenChange"
         />
         <text class="i-color-picker__rgb-value">{{ greenValue }}</text>
       </view>
@@ -106,8 +106,8 @@
           :disabled="disabled"
           activeColor="#2979ff"
           backgroundColor="#eef0f4"
-          @changing="handleRgbChanging('b', $event)"
-          @change="handleRgbChange('b', $event)"
+          @changing="handleBlueChanging"
+          @change="handleBlueChange"
         />
         <text class="i-color-picker__rgb-value">{{ blueValue }}</text>
       </view>
@@ -288,30 +288,264 @@ const props = defineProps({
  */
 const emit = defineEmits(['change', 'input', 'update:value', 'update:modelValue', 'mode-change'])
 
-const activeMode = ref(normalizeSelectMode(props.selectMode))
-const hue = ref(210)
-const saturation = ref(72)
-const brightness = ref(88)
+type IParsedColor = {
+  hex: string
+  alpha: number
+}
+
+type IRecommendedColor = {
+  value: string
+}
+
+type IRecommendedRow = {
+  key: string
+  colors: Array<IRecommendedColor>
+}
+
+function clamp(value : number, min : number, max : number) : number {
+  return Math.max(min, Math.min(max, value))
+}
+
+function toHex(value : number) : string {
+  const text = Math.round(clamp(value, 0, 255)).toString(16)
+  return text.length == 1 ? '0' + text : text
+}
+
+function rgbToHex(r : number, g : number, b : number) : string {
+  return '#' + toHex(r) + toHex(g) + toHex(b)
+}
+
+function normalizeHex(value : any | null) : string {
+  if (value == null) return ''
+  let text = value.toString().replace(' ', '').replace(' ', '').trim()
+  if (text.indexOf('#') != 0) text = '#' + text
+  if (text.length == 4) {
+    text =
+      '#' +
+      text.charAt(1) +
+      text.charAt(1) +
+      text.charAt(2) +
+      text.charAt(2) +
+      text.charAt(3) +
+      text.charAt(3)
+  }
+  if (text.length != 7) return ''
+  return text.toLowerCase()
+}
+
+function semanticToHex(value : string) : string {
+  if (value == 'primary') return '#2979ff'
+  if (value == 'success') return '#19be6b'
+  if (value == 'warning') return '#ff9900'
+  if (value == 'danger' || value == 'error') return '#fa3534'
+  if (value == 'info') return '#909399'
+  return ''
+}
+
+function parseCssColor(value : any | null) : IParsedColor {
+  if (value == null) return { hex: '', alpha: -1 }
+  const text = value.toString().replace(' ', '').replace(' ', '').trim().toLowerCase()
+  if (text == 'transparent') return { hex: '#ffffff', alpha: 0 }
+  if (text.indexOf('rgb(') != 0 && text.indexOf('rgba(') != 0) return { hex: '', alpha: -1 }
+  const start = text.indexOf('(')
+  const end = text.indexOf(')')
+  if (start < 0 || end <= start) return { hex: '', alpha: -1 }
+  const parts : Array<string> = text.substring(start + 1, end).split(',')
+  if (parts.length < 3) return { hex: '', alpha: -1 }
+  const red = Math.round(clamp(parseFloat(parts[0]), 0, 255))
+  const green = Math.round(clamp(parseFloat(parts[1]), 0, 255))
+  const blue = Math.round(clamp(parseFloat(parts[2]), 0, 255))
+  let alpha = -1
+  if (parts.length > 3) alpha = clamp(parseFloat(parts[3]), 0, 1)
+  return { hex: rgbToHex(red, green, blue), alpha: alpha }
+}
+
+function normalizeToHex(value : any | null) : string {
+  if (value == null) return ''
+  const parsed = parseCssColor(value)
+  if (parsed.hex.length > 0) return parsed.hex
+  const text = value.toString()
+  const semantic = semanticToHex(text)
+  if (semantic.length > 0) return semantic
+  return normalizeHex(text)
+}
+
+function hsvToRgb(h : number, s : number, v : number) : Array<number> {
+  const hh = ((h % 360) + 360) % 360
+  const ss = clamp(s, 0, 100) / 100
+  const vv = clamp(v, 0, 100) / 100
+  const c = vv * ss
+  const x = c * (1 - Math.abs(((hh / 60) % 2) - 1))
+  const m = vv - c
+  let r = 0
+  let g = 0
+  let b = 0
+  if (hh < 60) {
+    r = c
+    g = x
+  } else if (hh < 120) {
+    r = x
+    g = c
+  } else if (hh < 180) {
+    g = c
+    b = x
+  } else if (hh < 240) {
+    g = x
+    b = c
+  } else if (hh < 300) {
+    r = x
+    b = c
+  } else {
+    r = c
+    b = x
+  }
+  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)]
+}
+
+function hsvToHex(h : number, s : number, v : number) : string {
+  const rgb = hsvToRgb(h, s, v)
+  return rgbToHex(rgb[0], rgb[1], rgb[2])
+}
+
+function hexToRgb(hex : any | null) : Array<number> {
+  const text = normalizeHex(hex)
+  if (text.length == 0) return [0, 0, 0]
+  return [
+    parseInt(text.substring(1, 3), 16),
+    parseInt(text.substring(3, 5), 16),
+    parseInt(text.substring(5, 7), 16),
+  ]
+}
+
+function hexToHsv(hex : any | null) : Array<number> {
+  const rgb = hexToRgb(hex)
+  const r = rgb[0] / 255
+  const g = rgb[1] / 255
+  const b = rgb[2] / 255
+  const max = Math.max(r, Math.max(g, b))
+  const min = Math.min(r, Math.min(g, b))
+  const delta = max - min
+  let nextHue = 0
+  if (delta != 0) {
+    if (max == r) nextHue = 60 * (((g - b) / delta) % 6)
+    else if (max == g) nextHue = 60 * ((b - r) / delta + 2)
+    else nextHue = 60 * ((r - g) / delta + 4)
+  }
+  if (nextHue < 0) nextHue = nextHue + 360
+  const nextSaturation = max == 0 ? 0 : (delta / max) * 100
+  return [Math.round(nextHue), Math.round(nextSaturation), Math.round(max * 100)]
+}
+
+function hslToRgb(h : number, s : number, l : number) : Array<number> {
+  const hh = ((h % 360) + 360) % 360
+  const ss = clamp(s, 0, 100) / 100
+  const ll = clamp(l, 0, 100) / 100
+  const c = (1 - Math.abs(2 * ll - 1)) * ss
+  const x = c * (1 - Math.abs(((hh / 60) % 2) - 1))
+  const m = ll - c / 2
+  let r = 0
+  let g = 0
+  let b = 0
+  if (hh < 60) {
+    r = c
+    g = x
+  } else if (hh < 120) {
+    r = x
+    g = c
+  } else if (hh < 180) {
+    g = c
+    b = x
+  } else if (hh < 240) {
+    g = x
+    b = c
+  } else if (hh < 300) {
+    r = x
+    b = c
+  } else {
+    r = c
+    b = x
+  }
+  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)]
+}
+
+function hslToHex(h : number, s : number, l : number) : string {
+  const rgb = hslToRgb(h, s, l)
+  return rgbToHex(rgb[0], rgb[1], rgb[2])
+}
+
+function hexToHsl(hex : any | null) : Array<number> {
+  const rgb = hexToRgb(hex)
+  const r = rgb[0] / 255
+  const g = rgb[1] / 255
+  const b = rgb[2] / 255
+  const max = Math.max(r, Math.max(g, b))
+  const min = Math.min(r, Math.min(g, b))
+  const delta = max - min
+  let nextHue = 0
+  if (delta != 0) {
+    if (max == r) nextHue = 60 * (((g - b) / delta) % 6)
+    else if (max == g) nextHue = 60 * ((b - r) / delta + 2)
+    else nextHue = 60 * ((r - g) / delta + 4)
+  }
+  if (nextHue < 0) nextHue = nextHue + 360
+  const nextLightness = (max + min) / 2
+  const nextSaturation = delta == 0 ? 0 : delta / (1 - Math.abs(2 * nextLightness - 1))
+  return [Math.round(nextHue), Math.round(nextSaturation * 100), Math.round(nextLightness * 100)]
+}
+
+function formatSize(value : any | null) : string {
+  if (value == null) return '0px'
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function normalizeSelectMode(value : any | null) : string {
+  if (value == null) return 'spectrum'
+  const text = value.toString().toLowerCase()
+  if (text == 'rgb') return 'rgb'
+  if (text == 'card' || text == 'palette' || text == 'color-card') return 'card'
+  return 'spectrum'
+}
+
+function normalizeColorItem(item : any | null) : string {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = (item as UTSJSONObject)['value']
+    if (value != null) return normalizeToHex(value)
+  }
+  return normalizeToHex(item)
+}
+
+function safeColorItems(value : Array<any | null> | null) : Array<any | null> {
+  if (value == null) return []
+  return value
+}
+
+const activeMode = ref<string>(normalizeSelectMode(props.selectMode))
+const hue = ref<number>(210)
+const saturation = ref<number>(72)
+const brightness = ref<number>(88)
 const colorHex = ref(
   normalizeToHex(props.value).length > 0 ? normalizeToHex(props.value) : '#2979ff',
 )
-const spectrumX = ref(50)
-const spectrumY = ref(50)
-const alphaPercent = ref(Math.round(props.alpha * 100))
-const selectedCardColor = ref('')
-const hexInput = ref('')
-const panelRows = ref(18)
-const panelColumns = ref(18)
-const cardRows = ref(10)
-const cardColumns = ref(12)
+const spectrumX = ref<number>(50)
+const spectrumY = ref<number>(50)
+const alphaPercent = ref<number>(Math.round(props.alpha * 100))
+const selectedCardColor = ref<string>('')
+const hexInput = ref<string>('')
+const panelRows = ref<number>(18)
+const panelColumns = ref<number>(18)
+const cardRows = ref<number>(10)
+const cardColumns = ref<number>(12)
 const panelId =
-  'i-color-picker-panel-' + String(Date.now()) + '-' + String(Math.round(Math.random() * 100000))
-const panelRectLeft = ref(0)
-const panelRectTop = ref(0)
-const panelRectWidth = ref(0)
-const panelRectHeight = ref(0)
+  'i-color-picker-panel-' + (Date.now()).toString() + '-' + (Math.round(Math.random() * 100000)).toString()
+const panelRectLeft = ref<number>(0)
+const panelRectTop = ref<number>(0)
+const panelRectWidth = ref<number>(0)
+const panelRectHeight = ref<number>(0)
 
-const defaultColors = ref([
+const defaultColors = ref<Array<string>>([
   '#ff1d1d',
   '#ff8a00',
   '#ffd21e',
@@ -332,31 +566,31 @@ const defaultColors = ref([
   '#4fc3bd',
 ])
 
-const modeText = computed(() => {
+const modeText = computed(() : string => {
   return props.mode.toUpperCase() + ' ▾'
 })
 
-const currentHex = computed(() => {
+const currentHex = computed(() : string => {
   return colorHex.value
 })
 
-const currentHsl = computed(() => {
+const currentHsl = computed(() : Array<number> => {
   return hexToHsl(currentHex.value)
 })
 
-const redValue = computed(() => {
+const redValue = computed(() : number => {
   return hexToRgb(currentHex.value)[0]
 })
 
-const greenValue = computed(() => {
+const greenValue = computed(() : number => {
   return hexToRgb(currentHex.value)[1]
 })
 
-const blueValue = computed(() => {
+const blueValue = computed(() : number => {
   return hexToRgb(currentHex.value)[2]
 })
 
-const outputValue = computed(() => {
+const outputValue = computed(() : string => {
   if (!props.showAlpha || alphaPercent.value >= 100) return currentHex.value
   const rgb = hexToRgb(currentHex.value)
   return (
@@ -372,35 +606,36 @@ const outputValue = computed(() => {
   )
 })
 
-const panelStyle = computed(() => {
+const panelStyle = computed(() : string => {
   return 'height:' + formatSize(props.panelHeight) + ';background-color:#ffffff;'
 })
 
-const indicatorStyle = computed(() => {
+const indicatorStyle = computed(() : string => {
   return 'left:' + spectrumX.value + '%;top:' + spectrumY.value + '%;'
 })
 
-const panelRowStyle = computed(() => {
+const panelRowStyle = computed(() : string => {
   return (
     'height:' +
-    Number(String(props.panelHeight).replace('px', '').replace('rpx', '')) / panelRows.value +
+    parseFloat(((props.panelHeight).toString().replace('px', '').replace('rpx', '')).toString()) / panelRows.value +
     'px;'
   )
 })
 
-const alphaTrackStyle = computed(() => {
+const alphaTrackStyle = computed(() : string => {
   return 'background:linear-gradient(to right,rgba(255,255,255,0),' + currentHex.value + ');'
 })
 
-const previewStyle = computed(() => {
+const previewStyle = computed(() : string => {
   return 'background-color:' + outputValue.value + ';'
 })
 
-const recommendedList = computed(() => {
-  const list = []
-  if (props.colors.length > 0) {
-    for (let i = 0; i < props.colors.length; i++) {
-      const item = props.colors[i]
+const recommendedList = computed(() : Array<IRecommendedColor> => {
+  const list : Array<IRecommendedColor> = []
+  const colors = safeColorItems(props.colors)
+  if (colors.length > 0) {
+    for (let i = 0; i < colors.length; i++) {
+      const item = colors[i]
       const text = normalizeColorItem(item)
       if (text.length > 0) list.push({ value: text })
     }
@@ -412,428 +647,47 @@ const recommendedList = computed(() => {
   return list
 })
 
-const recommendRowList = computed(() => {
+const recommendRowList = computed(() : Array<IRecommendedRow> => {
   const list = recommendedList.value
   const rows = 2
   const columns = Math.ceil(list.length / rows)
-  const result = []
+  const result : Array<IRecommendedRow> = []
   for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
-    const rowColors = []
+    const rowColors : Array<IRecommendedColor> = []
     for (let columnIndex = 0; columnIndex < columns; columnIndex++) {
       const index = rowIndex * columns + columnIndex
       if (index < list.length) rowColors.push(list[index])
     }
     if (rowColors.length > 0) {
-      result.push({ key: String(rowIndex), colors: rowColors })
+      result.push({ key: (rowIndex).toString(), colors: rowColors })
     }
   }
   return result
 })
 
-watch(
-  () => props.value,
-  (nextValue) => {
-    applyColor(nextValue, false)
-  },
-)
-
-watch(
-  () => props.alpha,
-  (nextValue) => {
-    alphaPercent.value = clamp(Math.round(nextValue * 100), 0, 100)
-  },
-)
-
-watch(
-  () => props.selectMode,
-  (nextValue) => {
-    activeMode.value = normalizeSelectMode(nextValue)
-  },
-)
-
-applyColor(props.value, false)
-
-function setActiveMode(value) {
-  if (props.disabled) return
-  const nextMode = normalizeSelectMode(value)
-  if (activeMode.value == nextMode) return
-  activeMode.value = nextMode
-  emit('mode-change', nextMode)
+function syncHexInput() : void {
+  hexInput.value = currentHex.value.replace('#', '# ')
 }
 
-function handleHueChanging(event) {
-  if (props.disabled) return
-  selectedCardColor.value = ''
-  hue.value = Number(event.detail.value)
-  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
-  emitInput()
+function emitInput() : void {
+  syncHexInput()
+  emit('input', outputValue.value)
 }
 
-function handleHueChange(event) {
-  if (props.disabled) return
-  selectedCardColor.value = ''
-  hue.value = Number(event.detail.value)
-  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
-  commit()
+function commit() : void {
+  syncHexInput()
+  emit('input', outputValue.value)
+  emit('change', outputValue.value)
+  emit('update:value', outputValue.value)
+  emit('update:modelValue', outputValue.value)
 }
 
-function handleAlphaChanging(event) {
-  if (props.disabled) return
-  alphaPercent.value = Number(event.detail.value)
-  emitInput()
-}
-
-function handleAlphaChange(event) {
-  if (props.disabled) return
-  alphaPercent.value = Number(event.detail.value)
-  commit()
-}
-
-function handleSaturationChanging(event) {
-  if (props.disabled) return
-  selectedCardColor.value = ''
-  saturation.value = Number(event.detail.value)
-  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
-  emitInput()
-}
-
-function handleSaturationChange(event) {
-  if (props.disabled) return
-  selectedCardColor.value = ''
-  saturation.value = Number(event.detail.value)
-  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
-  commit()
-}
-
-function handleBrightnessChanging(event) {
-  if (props.disabled) return
-  selectedCardColor.value = ''
-  brightness.value = Number(event.detail.value)
-  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
-  emitInput()
-}
-
-function handleBrightnessChange(event) {
-  if (props.disabled) return
-  selectedCardColor.value = ''
-  brightness.value = Number(event.detail.value)
-  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
-  commit()
-}
-
-function handleRgbChanging(channel, event) {
-  if (props.disabled) return
-  updateRgbValue(channel, Number(event.detail.value))
-  emitInput()
-}
-
-function handleRgbChange(channel, event) {
-  if (props.disabled) return
-  updateRgbValue(channel, Number(event.detail.value))
-  commit()
-}
-
-function handleHexInput(event) {
-  if (props.disabled) return
-  selectedCardColor.value = ''
-  hexInput.value = event.detail.value
-  const normalized = normalizeHex(hexInput.value)
-  if (normalized.length > 0) {
-    applyColor(normalized, false)
-    emitInput()
-  }
-}
-
-function commitHexInput() {
-  selectedCardColor.value = ''
-  const normalized = normalizeHex(hexInput.value)
-  if (normalized.length > 0) {
-    applyColor(normalized, false)
-    commit()
-  }
-}
-
-function selectColor(value) {
-  if (props.disabled) return
-  selectedCardColor.value = ''
-  applyColor(value, true)
-}
-
-function selectCardCell(row, column) {
-  if (props.disabled) return
-  const color = getCardColor(row, column)
-  selectedCardColor.value = color
-  applyColor(color, true)
-}
-
-function selectPanelCell(column, row) {
-  if (props.disabled) return
-  selectedCardColor.value = ''
-  const ratioX = (Number(column) - 1) / (panelColumns.value - 1)
-  const ratioY = (Number(row) - 1) / (panelRows.value - 1)
-  updateSpectrumValue(ratioX, ratioY)
-  commit()
-}
-
-function getPanelCellStyle(row, column) {
-  const rowNumber = Number(row)
-  const columnNumber = Number(column)
-  const hueValue =
-    panelRows.value <= 1 ? 0 : Math.round(((rowNumber - 1) / (panelRows.value - 1)) * 360)
-  const lightnessValue =
-    panelColumns.value <= 1
-      ? 50
-      : Math.round(98 - ((columnNumber - 1) / (panelColumns.value - 1)) * 96)
-  return 'background-color:' + hslToHex(hueValue, 100, lightnessValue) + ';'
-}
-
-function handlePanelTouchStart(event) {
-  updatePanelByTouch(event)
-  emitInput()
-}
-
-function handlePanelTouchMove(event) {
-  updatePanelByTouch(event)
-  emitInput()
-}
-
-function handlePanelTouchEnd() {
-  commit()
-}
-
-function handlePanelClick(event) {
-  updatePanelByEvent(event)
-  commit()
-}
-
-function updatePanelByTouch(event) {
-  if (props.disabled) return
-  const touch = event.touches != null && event.touches.length > 0 ? event.touches[0] : null
-  if (touch == null) return
-  updatePanelByPoint(event, touch)
-  refreshPanelRect(event, touch, true)
-}
-
-function updatePanelByEvent(event) {
-  if (props.disabled) return
-  updatePanelByPoint(event, event)
-  refreshPanelRect(event, event, true)
-}
-
-function updatePanelByPoint(event, point) {
-  selectedCardColor.value = ''
-  const rect = getPanelRect(event)
-  const width = rect[2] <= 0 ? 1 : rect[2]
-  const height = rect[3] <= 0 ? 1 : rect[3]
-  let x = readPointValue(point, 'offsetX')
-  let y = readPointValue(point, 'offsetY')
-  if (isNaN(x)) x = readPointValue(event, 'offsetX')
-  if (isNaN(y)) y = readPointValue(event, 'offsetY')
-  if (isLocalPoint(x, y, width, height)) {
-    updateSpectrumValue(x / width, y / height)
-    return
-  }
-
-  x = readPointValue(point, 'clientX')
-  y = readPointValue(point, 'clientY')
-  if (isNaN(x)) x = readPointValue(event, 'clientX')
-  if (isNaN(y)) y = readPointValue(event, 'clientY')
-  if (isAbsolutePoint(x, y)) {
-    if (isLikelyLocalPoint(x, y, width, height, rect)) {
-      updateSpectrumValue(x / width, y / height)
-      return
-    }
-    updateSpectrumValue((x - rect[0]) / width, (y - rect[1]) / height)
-    return
-  }
-
-  x = readPointValue(point, 'screenX')
-  y = readPointValue(point, 'screenY')
-  if (isNaN(x)) x = readPointValue(event, 'screenX')
-  if (isNaN(y)) y = readPointValue(event, 'screenY')
-  if (isAbsolutePoint(x, y)) {
-    updateSpectrumValue((x - rect[0]) / width, (y - rect[1]) / height)
-    return
-  }
-
-  x = readPointValue(point, 'pageX')
-  y = readPointValue(point, 'pageY')
-  if (isNaN(x)) x = readPointValue(event, 'pageX')
-  if (isNaN(y)) y = readPointValue(event, 'pageY')
-  if (isAbsolutePoint(x, y)) {
-    updateSpectrumValue((x - rect[0]) / width, (y - rect[1]) / height)
-    return
-  }
-
-  x = readPointValue(point, 'x')
-  y = readPointValue(point, 'y')
-  if (isNaN(x)) x = readPointValue(event, 'x')
-  if (isNaN(y)) y = readPointValue(event, 'y')
-  if (isLocalPoint(x, y, width, height)) {
-    updateSpectrumValue(x / width, y / height)
-    return
-  }
-  if (isAbsolutePoint(x, y)) updateSpectrumValue((x - rect[0]) / width, (y - rect[1]) / height)
-}
-
-function updateSpectrumValue(ratioX, ratioY) {
-  const nextX = clamp(ratioX, 0, 1)
-  const nextY = clamp(ratioY, 0, 1)
-  const nextHue = Math.round(nextY * 360)
-  const nextLightness = Math.round(100 - nextX * 100)
-  applyColor(hslToHex(nextHue, 100, nextLightness), false)
-  spectrumX.value = Math.round(nextX * 100)
-  spectrumY.value = Math.round(nextY * 100)
-}
-
-function isCardCellActive(row, column) {
-  return selectedCardColor.value == getCardColor(row, column)
-}
-
-function getCardColor(row, column) {
-  const greyList = [
-    '#f1f1f1',
-    '#dcdcdc',
-    '#c8c8c8',
-    '#b3b3b3',
-    '#9e9e9e',
-    '#898989',
-    '#747474',
-    '#5f5f5f',
-    '#4a4a4a',
-    '#333333',
-    '#191919',
-    '#000000',
-  ]
-  const hueList = [178, 202, 232, 258, 282, 310, 334, 358, 22, 47, 72, 100]
-  if (Number(row) == 1) return greyList[Number(column) - 1]
-  const lightnessList = [16, 24, 32, 42, 52, 62, 72, 82, 92]
-  const saturationList = [96, 94, 90, 86, 78, 66, 52, 34, 18]
-  const index = Number(row) - 2
-  return hslToHex(hueList[Number(column) - 1], saturationList[index], lightnessList[index])
-}
-
-function updateRgbValue(channel, value) {
-  selectedCardColor.value = ''
-  const rgb = hexToRgb(currentHex.value)
-  if (channel == 'r') rgb[0] = Math.round(clamp(value, 0, 255))
-  if (channel == 'g') rgb[1] = Math.round(clamp(value, 0, 255))
-  if (channel == 'b') rgb[2] = Math.round(clamp(value, 0, 255))
-  applyColor(rgbToHex(rgb[0], rgb[1], rgb[2]), false)
-}
-
-function getPanelRect(event) {
-  if (panelRectWidth.value > 0 && panelRectHeight.value > 0) {
-    return [panelRectLeft.value, panelRectTop.value, panelRectWidth.value, panelRectHeight.value]
-  }
-  const target = event.currentTarget
-  if (
-    target != null &&
-    target.getBoundingClientRect != null &&
-    typeof target.getBoundingClientRect == 'function'
-  ) {
-    const rect = target.getBoundingClientRect()
-    return [
-      normalizeRectPoint(rect.left, rect.x),
-      normalizeRectPoint(rect.top, rect.y),
-      Number(rect.width),
-      Number(rect.height),
-    ]
-  }
-  return [0, 0, 320, Number(String(props.panelHeight).replace('px', '').replace('rpx', ''))]
-}
-
-function refreshPanelRect(event, point, shouldUpdate) {
-  const element = uni.getElementById(panelId)
-  if (
-    element != null &&
-    element.getBoundingClientRect != null &&
-    typeof element.getBoundingClientRect == 'function'
-  ) {
-    const rect = element.getBoundingClientRect()
-    setPanelRect(rect)
-    if (shouldUpdate) updatePanelByPoint(event, point)
-    return
-  }
-  if (
-    element != null &&
-    element.getBoundingClientRectAsync != null &&
-    typeof element.getBoundingClientRectAsync == 'function'
-  ) {
-    element
-      .getBoundingClientRectAsync()
-      .then((rect) => {
-        setPanelRect(rect)
-        if (shouldUpdate) updatePanelByPoint(event, point)
-      })
-      .catch(() => {
-        refreshPanelRectBySelector(event, point, shouldUpdate)
-      })
-    return
-  }
-
-  refreshPanelRectBySelector(event, point, shouldUpdate)
-}
-
-function refreshPanelRectBySelector(event, point, shouldUpdate) {
-  uni
-    .createSelectorQuery()
-    .select('#' + panelId)
-    .boundingClientRect((rect) => {
-      setPanelRect(rect)
-      if (shouldUpdate) updatePanelByPoint(event, point)
-    })
-    .exec()
-}
-
-function setPanelRect(rect) {
-  if (rect == null) return
-  panelRectLeft.value = normalizeRectPoint(rect.left, rect.x)
-  panelRectTop.value = normalizeRectPoint(rect.top, rect.y)
-  panelRectWidth.value = Number(rect.width)
-  panelRectHeight.value = Number(rect.height)
-}
-
-function normalizeRectPoint(first, fallback) {
-  const firstValue = Number(first)
-  if (!isNaN(firstValue)) return firstValue
-  const fallbackValue = Number(fallback)
-  if (!isNaN(fallbackValue)) return fallbackValue
-  return 0
-}
-
-function isLocalPoint(x, y, width, height) {
-  if (isNaN(x) || isNaN(y)) return false
-  return x >= 0 && y >= 0 && x <= width && y <= height
-}
-
-function isLikelyLocalPoint(x, y, width, height, rect) {
-  if (!isLocalPoint(x, y, width, height)) return false
-  if (rect[0] == 0 && rect[1] == 0) return true
-  const absoluteLocalX = x - rect[0]
-  const absoluteLocalY = y - rect[1]
-  if (!isLocalPoint(absoluteLocalX, absoluteLocalY, width, height)) return true
-  return false
-}
-
-function isAbsolutePoint(x, y) {
-  return !isNaN(x) && !isNaN(y)
-}
-
-function readPointValue(point, key) {
-  if (point == null) return NaN
-  let value = point[key]
-  if (value == null && point.detail != null) value = point.detail[key]
-  if (value == null) return NaN
-  return Number(value)
-}
-
-function getSpectrumPosition(hex) {
+function getSpectrumPosition(hex : any | null) : Array<number> {
   const hsl = hexToHsl(hex)
   return [Math.round(100 - hsl[2]), Math.round((hsl[0] / 360) * 100)]
 }
 
-function applyColor(value, shouldCommit) {
+function applyColor(value : any | null, shouldCommit : boolean) : void {
   const parsed = parseCssColor(value)
   const hex = parsed.hex.length > 0 ? parsed.hex : normalizeToHex(value)
   if (hex.length == 0) return
@@ -850,244 +704,291 @@ function applyColor(value, shouldCommit) {
   if (shouldCommit) commit()
 }
 
-function emitInput() {
-  syncHexInput()
-  emit('input', outputValue.value)
+watch(
+  () : string => props.value,
+  (nextValue : string) : void => {
+    applyColor(nextValue, false)
+  },
+)
+
+watch(
+  () : number => props.alpha,
+  (nextValue : number) : void => {
+    alphaPercent.value = clamp(Math.round(nextValue * 100), 0, 100)
+  },
+)
+
+watch(
+  () : string => props.selectMode,
+  (nextValue : string) : void => {
+    activeMode.value = normalizeSelectMode(nextValue)
+  },
+)
+
+applyColor(props.value, false)
+
+function setActiveMode(value : any | null) : void {
+  if (props.disabled) return
+  const nextMode = normalizeSelectMode(value)
+  if (activeMode.value == nextMode) return
+  activeMode.value = nextMode
+  emit('mode-change', nextMode)
 }
 
-function commit() {
-  syncHexInput()
-  emit('input', outputValue.value)
-  emit('change', outputValue.value)
-  emit('update:value', outputValue.value)
-  emit('update:modelValue', outputValue.value)
+function handleHueChanging(event : UniSliderChangeEvent) : void {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  hue.value = parseFloat((event.detail.value).toString())
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  emitInput()
 }
 
-function syncHexInput() {
-  hexInput.value = currentHex.value.replace('#', '# ')
+function handleHueChange(event : UniSliderChangeEvent) : void {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  hue.value = parseFloat((event.detail.value).toString())
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  commit()
 }
 
-function normalizeColorItem(item) {
-  const text = String(item)
-  if (text.indexOf('#') == 0) return normalizeToHex(text)
-  if (text.indexOf('value') >= 0 && text.indexOf('#') >= 0) {
-    const start = text.indexOf('#')
-    return normalizeToHex(text.substring(start, start + 7))
-  }
-  return normalizeToHex(text)
+function handleAlphaChanging(event : UniSliderChangeEvent) : void {
+  if (props.disabled) return
+  alphaPercent.value = parseFloat((event.detail.value).toString())
+  emitInput()
 }
 
-function normalizeToHex(value) {
-  const parsed = parseCssColor(value)
-  if (parsed.hex.length > 0) return parsed.hex
-  const semantic = semanticToHex(String(value))
-  if (semantic.length > 0) return semantic
-  return normalizeHex(String(value))
+function handleAlphaChange(event : UniSliderChangeEvent) : void {
+  if (props.disabled) return
+  alphaPercent.value = parseFloat((event.detail.value).toString())
+  commit()
 }
 
-function parseCssColor(value) {
-  const text = String(value).replace(' ', '').replace(' ', '').trim().toLowerCase()
-  if (text == 'transparent') return { hex: '#ffffff', alpha: 0 }
-  if (text.indexOf('rgb(') != 0 && text.indexOf('rgba(') != 0) return { hex: '', alpha: -1 }
-  const start = text.indexOf('(')
-  const end = text.indexOf(')')
-  if (start < 0 || end <= start) return { hex: '', alpha: -1 }
-  const parts = text.substring(start + 1, end).split(',')
-  if (parts.length < 3) return { hex: '', alpha: -1 }
-  const red = Math.round(clamp(Number(parts[0]), 0, 255))
-  const green = Math.round(clamp(Number(parts[1]), 0, 255))
-  const blue = Math.round(clamp(Number(parts[2]), 0, 255))
-  let alpha = -1
-  if (parts.length > 3) alpha = clamp(Number(parts[3]), 0, 1)
-  return { hex: rgbToHex(red, green, blue), alpha: alpha }
+function handleSaturationChanging(event : UniSliderChangeEvent) : void {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  saturation.value = parseFloat((event.detail.value).toString())
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  emitInput()
 }
 
-function semanticToHex(value) {
-  if (value == 'primary') return '#2979ff'
-  if (value == 'success') return '#19be6b'
-  if (value == 'warning') return '#ff9900'
-  if (value == 'danger' || value == 'error') return '#fa3534'
-  if (value == 'info') return '#909399'
-  return ''
+function handleSaturationChange(event : UniSliderChangeEvent) : void {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  saturation.value = parseFloat((event.detail.value).toString())
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  commit()
 }
 
-function normalizeHex(value) {
-  let text = String(value).replace(' ', '').replace(' ', '').trim()
-  if (text.indexOf('#') != 0) text = '#' + text
-  if (text.length == 4) {
-    text =
-      '#' +
-      text.charAt(1) +
-      text.charAt(1) +
-      text.charAt(2) +
-      text.charAt(2) +
-      text.charAt(3) +
-      text.charAt(3)
-  }
-  if (text.length != 7) return ''
-  return text.toLowerCase()
+function handleBrightnessChanging(event : UniSliderChangeEvent) : void {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  brightness.value = parseFloat((event.detail.value).toString())
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  emitInput()
 }
 
-function hsvToHex(h, s, v) {
-  const rgb = hsvToRgb(h, s, v)
-  return '#' + toHex(rgb[0]) + toHex(rgb[1]) + toHex(rgb[2])
+function handleBrightnessChange(event : UniSliderChangeEvent) : void {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  brightness.value = parseFloat((event.detail.value).toString())
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  commit()
 }
 
-function rgbToHex(r, g, b) {
-  return '#' + toHex(r) + toHex(g) + toHex(b)
+function updateRgbValue(channel : string, value : number) : void {
+  selectedCardColor.value = ''
+  const rgb = hexToRgb(currentHex.value)
+  if (channel == 'r') rgb[0] = Math.round(clamp(value, 0, 255))
+  if (channel == 'g') rgb[1] = Math.round(clamp(value, 0, 255))
+  if (channel == 'b') rgb[2] = Math.round(clamp(value, 0, 255))
+  applyColor(rgbToHex(rgb[0], rgb[1], rgb[2]), false)
 }
 
-function hsvToRgb(h, s, v) {
-  const hh = ((h % 360) + 360) % 360
-  const ss = clamp(s, 0, 100) / 100
-  const vv = clamp(v, 0, 100) / 100
-  const c = vv * ss
-  const x = c * (1 - Math.abs(((hh / 60) % 2) - 1))
-  const m = vv - c
-  let r = 0
-  let g = 0
-  let b = 0
-  if (hh < 60) {
-    r = c
-    g = x
-    b = 0
-  } else if (hh < 120) {
-    r = x
-    g = c
-    b = 0
-  } else if (hh < 180) {
-    r = 0
-    g = c
-    b = x
-  } else if (hh < 240) {
-    r = 0
-    g = x
-    b = c
-  } else if (hh < 300) {
-    r = x
-    g = 0
-    b = c
-  } else {
-    r = c
-    g = 0
-    b = x
-  }
-  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)]
-}
-
-function hexToRgb(hex) {
-  const text = normalizeHex(hex)
-  if (text.length == 0) return [0, 0, 0]
-  return [
-    parseInt(text.substring(1, 3), 16),
-    parseInt(text.substring(3, 5), 16),
-    parseInt(text.substring(5, 7), 16),
+function getCardColor(row : number, column : number) : string {
+  const greyList : Array<string> = [
+    '#f1f1f1',
+    '#dcdcdc',
+    '#c8c8c8',
+    '#b3b3b3',
+    '#9e9e9e',
+    '#898989',
+    '#747474',
+    '#5f5f5f',
+    '#4a4a4a',
+    '#333333',
+    '#191919',
+    '#000000',
   ]
+  const hueList : Array<number> = [178, 202, 232, 258, 282, 310, 334, 358, 22, 47, 72, 100]
+  if (row == 1) return greyList[column - 1]
+  const lightnessList : Array<number> = [16, 24, 32, 42, 52, 62, 72, 82, 92]
+  const saturationList : Array<number> = [96, 94, 90, 86, 78, 66, 52, 34, 18]
+  const index = row - 2
+  return hslToHex(hueList[column - 1], saturationList[index], lightnessList[index])
 }
 
-function hexToHsv(hex) {
-  const rgb = hexToRgb(hex)
-  const r = rgb[0] / 255
-  const g = rgb[1] / 255
-  const b = rgb[2] / 255
-  const max = Math.max(r, Math.max(g, b))
-  const min = Math.min(r, Math.min(g, b))
-  const delta = max - min
-  let nextHue = 0
-  if (delta != 0) {
-    if (max == r) nextHue = 60 * (((g - b) / delta) % 6)
-    else if (max == g) nextHue = 60 * ((b - r) / delta + 2)
-    else nextHue = 60 * ((r - g) / delta + 4)
+function updateSpectrumValue(ratioX : number, ratioY : number) : void {
+  const nextX = clamp(ratioX, 0, 1)
+  const nextY = clamp(ratioY, 0, 1)
+  const nextHue = Math.round(nextY * 360)
+  const nextLightness = Math.round(100 - nextX * 100)
+  applyColor(hslToHex(nextHue, 100, nextLightness), false)
+  spectrumX.value = Math.round(nextX * 100)
+  spectrumY.value = Math.round(nextY * 100)
+}
+
+function handleRgbChanging(channel : string, event : UniSliderChangeEvent) : void {
+  if (props.disabled) return
+  updateRgbValue(channel, parseFloat((event.detail.value).toString()))
+  emitInput()
+}
+
+function handleRgbChange(channel : string, event : UniSliderChangeEvent) : void {
+  if (props.disabled) return
+  updateRgbValue(channel, parseFloat((event.detail.value).toString()))
+  commit()
+}
+
+function handleRedChanging(event : UniSliderChangeEvent) : void {
+  handleRgbChanging('r', event)
+}
+
+function handleRedChange(event : UniSliderChangeEvent) : void {
+  handleRgbChange('r', event)
+}
+
+function handleGreenChanging(event : UniSliderChangeEvent) : void {
+  handleRgbChanging('g', event)
+}
+
+function handleGreenChange(event : UniSliderChangeEvent) : void {
+  handleRgbChange('g', event)
+}
+
+function handleBlueChanging(event : UniSliderChangeEvent) : void {
+  handleRgbChanging('b', event)
+}
+
+function handleBlueChange(event : UniSliderChangeEvent) : void {
+  handleRgbChange('b', event)
+}
+
+function handleHexInput(event : UniInputEvent) : void {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  hexInput.value = event.detail.value
+  const normalized = normalizeHex(hexInput.value)
+  if (normalized.length > 0) {
+    applyColor(normalized, false)
+    emitInput()
   }
-  if (nextHue < 0) nextHue = nextHue + 360
-  const nextSaturation = max == 0 ? 0 : (delta / max) * 100
-  return [Math.round(nextHue), Math.round(nextSaturation), Math.round(max * 100)]
 }
 
-function hslToHex(h, s, l) {
-  const rgb = hslToRgb(h, s, l)
-  return '#' + toHex(rgb[0]) + toHex(rgb[1]) + toHex(rgb[2])
-}
-
-function hslToRgb(h, s, l) {
-  const hh = ((h % 360) + 360) % 360
-  const ss = clamp(s, 0, 100) / 100
-  const ll = clamp(l, 0, 100) / 100
-  const c = (1 - Math.abs(2 * ll - 1)) * ss
-  const x = c * (1 - Math.abs(((hh / 60) % 2) - 1))
-  const m = ll - c / 2
-  let r = 0
-  let g = 0
-  let b = 0
-  if (hh < 60) {
-    r = c
-    g = x
-    b = 0
-  } else if (hh < 120) {
-    r = x
-    g = c
-    b = 0
-  } else if (hh < 180) {
-    r = 0
-    g = c
-    b = x
-  } else if (hh < 240) {
-    r = 0
-    g = x
-    b = c
-  } else if (hh < 300) {
-    r = x
-    g = 0
-    b = c
-  } else {
-    r = c
-    g = 0
-    b = x
+function commitHexInput() : void {
+  selectedCardColor.value = ''
+  const normalized = normalizeHex(hexInput.value)
+  if (normalized.length > 0) {
+    applyColor(normalized, false)
+    commit()
   }
-  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)]
 }
 
-function hexToHsl(hex) {
-  const rgb = hexToRgb(hex)
-  const r = rgb[0] / 255
-  const g = rgb[1] / 255
-  const b = rgb[2] / 255
-  const max = Math.max(r, Math.max(g, b))
-  const min = Math.min(r, Math.min(g, b))
-  const delta = max - min
-  let nextHue = 0
-  if (delta != 0) {
-    if (max == r) nextHue = 60 * (((g - b) / delta) % 6)
-    else if (max == g) nextHue = 60 * ((b - r) / delta + 2)
-    else nextHue = 60 * ((r - g) / delta + 4)
-  }
-  if (nextHue < 0) nextHue = nextHue + 360
-  const nextLightness = (max + min) / 2
-  const nextSaturation = delta == 0 ? 0 : delta / (1 - Math.abs(2 * nextLightness - 1))
-  return [Math.round(nextHue), Math.round(nextSaturation * 100), Math.round(nextLightness * 100)]
+function selectColor(value : string) : void {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  applyColor(value, true)
 }
 
-function toHex(value) {
-  const text = clamp(value, 0, 255).toString(16)
-  return text.length == 1 ? '0' + text : text
+function selectCardCell(row : number, column : number) : void {
+  if (props.disabled) return
+  const color = getCardColor(row, column)
+  selectedCardColor.value = color
+  applyColor(color, true)
 }
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value))
+function selectPanelCell(column : number, row : number) : void {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  const ratioX = (column - 1) / (panelColumns.value - 1)
+  const ratioY = (row - 1) / (panelRows.value - 1)
+  updateSpectrumValue(ratioX, ratioY)
+  commit()
 }
 
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
+function getPanelCellStyle(row : number, column : number) : string {
+  const rowNumber = row
+  const columnNumber = column
+  const hueValue =
+    panelRows.value <= 1 ? 0 : Math.round(((rowNumber - 1) / (panelRows.value - 1)) * 360)
+  const lightnessValue =
+    panelColumns.value <= 1
+      ? 50
+      : Math.round(98 - ((columnNumber - 1) / (panelColumns.value - 1)) * 96)
+  return 'background-color:' + hslToHex(hueValue, 100, lightnessValue) + ';'
 }
 
-function normalizeSelectMode(value) {
-  const text = String(value).toLowerCase()
-  if (text == 'rgb') return 'rgb'
-  if (text == 'card' || text == 'palette' || text == 'color-card') return 'card'
-  return 'spectrum'
+function refreshPanelRect() : void {
+  const element = uni.getElementById(panelId)
+  if (element == null) return
+  const rect = element.getBoundingClientRect()
+  panelRectLeft.value = rect.left
+  panelRectTop.value = rect.top
+  panelRectWidth.value = rect.width
+  panelRectHeight.value = rect.height
 }
+
+function panelHeightNumber() : number {
+  const value = props.panelHeight
+  if (value == null) return 260
+  const height = parseFloat(value.toString().replace('px', '').replace('rpx', ''))
+  return isNaN(height) || height <= 0 ? 260 : height
+}
+
+function updatePanelByClientPoint(clientX : number, clientY : number) : void {
+  selectedCardColor.value = ''
+  refreshPanelRect()
+  const width = panelRectWidth.value > 0 ? panelRectWidth.value : 320
+  const height = panelRectHeight.value > 0 ? panelRectHeight.value : panelHeightNumber()
+  updateSpectrumValue(
+    (clientX - panelRectLeft.value) / width,
+    (clientY - panelRectTop.value) / height,
+  )
+}
+
+function updatePanelByTouch(event : UniTouchEvent) : void {
+  if (props.disabled || event.touches.length == 0) return
+  const touch = event.touches[0]
+  updatePanelByClientPoint(touch.clientX, touch.clientY)
+}
+
+function updatePanelByEvent(event : UniPointerEvent) : void {
+  if (props.disabled) return
+  updatePanelByClientPoint(event.clientX, event.clientY)
+}
+
+function handlePanelTouchStart(event : UniTouchEvent) : void {
+  updatePanelByTouch(event)
+  emitInput()
+}
+
+function handlePanelTouchMove(event : UniTouchEvent) : void {
+  updatePanelByTouch(event)
+  emitInput()
+}
+
+function handlePanelTouchEnd() : void {
+  commit()
+}
+
+function handlePanelClick(event : UniPointerEvent) : void {
+  updatePanelByEvent(event)
+  commit()
+}
+
+function isCardCellActive(row : number, column : number) : boolean {
+  return selectedCardColor.value == getCardColor(row, column)
+}
+
 </script>
 
 <style>

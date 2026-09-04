@@ -54,29 +54,25 @@ const props = defineProps({
  */
 const emit = defineEmits(['click', 'retry'])
 
-
-function formatSize(value: string | number): string {
-  const text = value.toString()
+function formatSize(value : any) : string {
+  const text = (value).toString()
   if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
   return text + 'px'
 }
 
-function formatBoxSize(value: string | number): string {
-  const text = value.toString()
+function formatBoxSize(value : any) : string {
+  const text = (value).toString()
   if (text.indexOf(' ') >= 0) return text
   return formatSize(value)
 }
 
-const bgColor = computed(() => {
-  return props.bgColor
-})
-const wrapStyle = computed(() => 'padding:' + formatBoxSize(props.padding) + ';background-color:' + bgColor.value + ';')
-const iconStyle = computed(() => 'font-size:' + formatSize(props.iconSize) + ';color:' + props.iconColor + ';')
-const textStyle = computed(() => 'color:' + props.textColor + ';')
-const descStyle = computed(() => 'color:' + props.descriptionColor + ';')
-const buttonStyle = computed(() => 'background-color:' + props.buttonColor + ';')
-const buttonTextStyle = computed(() => 'color:' + props.buttonTextColor + ';')
-
+const bgColor = computed(() : string => props.bgColor)
+const wrapStyle = computed(() : string => 'padding:' + formatBoxSize(props.padding) + ';background-color:' + bgColor.value + ';')
+const iconStyle = computed(() : string => 'font-size:' + formatSize(props.iconSize) + ';color:' + props.iconColor + ';')
+const textStyle = computed(() : string => 'color:' + props.textColor + ';')
+const descStyle = computed(() : string => 'color:' + props.descriptionColor + ';')
+const buttonStyle = computed(() : string => 'background-color:' + props.buttonColor + ';')
+const buttonTextStyle = computed(() : string => 'color:' + props.buttonTextColor + ';')
 </script>
 
 <style>

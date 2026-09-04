@@ -68,17 +68,22 @@ const props = defineProps({
  */
 const emit = defineEmits(['change', 'open', 'close'])
 
-const opened = ref(false)
+type ICollapseItemState = {
+  name: any | null
+  open: boolean
+}
 
-const itemClass = computed(() => {
-  const classes = ['i-collapse-item']
+const opened = ref<boolean>(false)
+
+const itemClass = computed(() : string => {
+  const classes : Array<string> = ['i-collapse-item']
   if (props.border) classes.push('i-collapse-item--border')
   if (opened.value) classes.push('i-collapse-item--active')
   return classes.join(' ')
 })
 
-const headClass = computed(() => {
-  const classes = ['i-collapse-item__head']
+const headClass = computed(() : string => {
+  const classes : Array<string> = ['i-collapse-item__head']
   if (props.disabled) classes.push('i-collapse-item__head--disabled')
   if (props.clickable && !props.disabled) classes.push('i-collapse-item__head--clickable')
   if (props.align == 'center') classes.push('i-collapse-item__head--center')
@@ -86,53 +91,53 @@ const headClass = computed(() => {
   return classes.join(' ')
 })
 
-const titleClass = computed(() => {
-  const classes = ['i-collapse-item__title']
+const titleClass = computed(() : string => {
+  const classes : Array<string> = ['i-collapse-item__title']
   if (props.disabled) classes.push('i-collapse-item__title--disabled')
   return classes.join(' ')
 })
 
-const arrowClass = computed(() => {
-  const classes = ['i-collapse-item__arrow']
+const arrowClass = computed(() : string => {
+  const classes : Array<string> = ['i-collapse-item__arrow']
   if (opened.value) classes.push('i-collapse-item__arrow--active')
   if (props.disabled) classes.push('i-collapse-item__arrow--disabled')
   return classes.join(' ')
 })
 
-const bodyStyle = computed(() => {
+const bodyStyle = computed(() : string => {
   return ''
 })
 
-function toggle() {
-  if (props.disabled || !props.clickable) return
-  if (opened.value) {
-    close()
+function emitState(eventName : string) : void {
+  const payload : ICollapseItemState = {
+    name: props.name,
+    open: opened.value,
+  }
+  emit('change', payload)
+  if (eventName == 'open') {
+    emit('open', props.name)
   } else {
-    open()
+    emit('close', props.name)
   }
 }
 
-function open() {
+function open() : void {
   if (props.disabled) return
   opened.value = true
   emitState('open')
 }
 
-function close() {
+function close() : void {
   opened.value = false
   emitState('close')
 }
 
-function emitState(name: string) {
-  const payload = {
-    name: props.name,
-    open: opened.value,
-  }
-  emit('change', payload)
-  if (name == 'open') {
-    emit('open', props.name)
+function toggle() : void {
+  if (props.disabled || !props.clickable) return
+  if (opened.value) {
+    close()
   } else {
-    emit('close', props.name)
+    open()
   }
 }
 

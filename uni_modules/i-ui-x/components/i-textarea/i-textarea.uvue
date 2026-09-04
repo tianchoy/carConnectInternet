@@ -7,17 +7,17 @@
       :placeholder="placeholder"
       :placeholder-class="placeholderClass"
       :placeholder-style="placeholderStyle"
-      :maxlength="Number(maxlength)"
+      :maxlength="parseFloat((maxlength).toString())"
       :disabled="disabled"
       :confirm-type="confirmType"
       :focus="focus"
       :auto-height="autoHeight"
       :fixed="fixed"
-      :cursor-spacing="Number(cursorSpacing)"
-      :cursor="Number(cursor)"
+      :cursor-spacing="parseFloat((cursorSpacing).toString())"
+      :cursor="parseFloat((cursor).toString())"
       :show-confirm-bar="showConfirmBar"
-      :selection-start="Number(selectionStart)"
-      :selection-end="Number(selectionEnd)"
+      :selection-start="parseFloat((selectionStart).toString())"
+      :selection-end="parseFloat((selectionEnd).toString())"
       :adjust-position="adjustPosition"
       :disable-default-padding="disableDefaultPadding"
       :hold-keyboard="holdKeyboard"
@@ -185,6 +185,17 @@ const emit = defineEmits([
   'keyboardheightchange',
 ])
 
+function initialValue() : string {
+  if (props.modelValue.length > 0) return props.modelValue
+  return props.value
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
 
 const textareaBgColor = computed(() => {
   return props.bgColor
@@ -226,60 +237,47 @@ const fieldStyle = computed(() => {
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  () : string => props.modelValue,
+  () : void => {
     current.value = initialValue()
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  () : string => props.value,
+  () : void => {
     current.value = initialValue()
   },
 )
 
-function initialValue() {
-  if (props.modelValue.length > 0) return props.modelValue
-  return props.value
-}
-
-function handleInput(event) {
-  const nextValue = String(event.detail.value)
+function handleInput(event : UniInputEvent) {
+  const nextValue = (event.detail.value).toString()
   current.value = nextValue
   emit('update:modelValue', nextValue)
   emit('update:value', nextValue)
   emit('input', nextValue)
 }
 
-function handleFocus(event) {
+function handleFocus(event : any) {
   focused.value = true
   emit('focus', event)
 }
 
-function handleBlur(event) {
+function handleBlur(event : any) {
   focused.value = false
   emit('blur', event)
 }
 
-function handleLineChange(event) {
+function handleLineChange(event : any) {
   emit('linechange', event)
 }
 
-function handleConfirm(event) {
+function handleConfirm(event : any) {
   emit('confirm', event)
 }
 
-function handleKeyboardHeightChange(event) {
+function handleKeyboardHeightChange(event : any) {
   emit('keyboardheightchange', event)
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
 }
 
 defineExpose({

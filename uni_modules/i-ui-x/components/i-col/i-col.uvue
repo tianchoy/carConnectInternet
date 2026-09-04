@@ -42,11 +42,32 @@ const props = defineProps({
 
 const emit = defineEmits([])
 
-const colClass = computed(() => {
-  return 'i-col i-col--span-' + String(clampGrid(props.span))
+function clampGrid(value : any | null) : number {
+  if (value == null) return 0
+  const number = Math.floor(parseFloat(value.toString()))
+  if (number <= 0) return 0
+  if (number >= 24) return 24
+  return number
+}
+
+function gridPercent(value : number) : string {
+  if (value <= 0) return '0%'
+  if (value >= 24) return '100%'
+  return ((value / 24) * 100).toFixed(4) + '%'
+}
+
+function formatSize(value : any | null) : string {
+  if (value == null) return '0px'
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+const colClass = computed(() : string => {
+  return 'i-col i-col--span-' + clampGrid(props.span).toString()
 })
 
-const colStyle = computed(() => {
+const colStyle = computed(() : string => {
   const span = clampGrid(props.span)
   const offset = clampGrid(props.offset)
   const push = clampGrid(props.push)
@@ -57,29 +78,12 @@ const colStyle = computed(() => {
   if (push > 0 || pull > 0) style = style + 'position:relative;'
   if (push > 0) style = style + 'left:' + gridPercent(push) + ';'
   if (pull > 0) style = style + 'right:' + gridPercent(pull) + ';'
-  if (String(props.padding).length > 0)
-    style = style + 'padding:' + formatSize(props.padding) + ';'
+  const padding = props.padding
+  if (padding != null && padding.toString().length > 0) {
+    style = style + 'padding:' + formatSize(padding) + ';'
+  }
   return style
 })
-
-function clampGrid(value) {
-  const number = Math.floor(Number(value))
-  if (number <= 0) return 0
-  if (number >= 24) return 24
-  return number
-}
-
-function gridPercent(value) {
-  if (value <= 0) return '0%'
-  if (value >= 24) return '100%'
-  return ((value / 24) * 100).toFixed(4) + '%'
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
-}
 </script>
 
 <style>

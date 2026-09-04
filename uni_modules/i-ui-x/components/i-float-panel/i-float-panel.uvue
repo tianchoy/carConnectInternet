@@ -101,106 +101,94 @@ const emit = defineEmits(['change', 'move'])
 
 
 
-const bgColor = computed(() => {
-  return props.bgColor
-})
+function screenHeight() : number {
+  const info = uni.getSystemInfoSync()
+  const height = parseFloat((info.windowHeight).toString())
+  if (isNaN(height) || height <= 0) return 667
+  return height
+}
+
+function normalizeAnchorValue(value : any) : number {
+  const text = (value).toString()
+  if (text.indexOf('%') >= 0) {
+    const percent = parseFloat((text.replace('%', '')).toString())
+    if (isNaN(percent)) return props.height
+    return Math.round((percent / 100) * screenHeight())
+  }
+  const numberValue = parseFloat((value).toString())
+  if (isNaN(numberValue)) return props.height
+  return numberValue
+}
+
+function normalizedAnchors() : Array<number> {
+  const list : Array<number> = []
+  const anchors = props.anchors
+  if (anchors != null) {
+    for (let i = 0; i < anchors.length; i++) {
+      const anchor = anchors[i]
+      if (anchor != null) list.push(normalizeAnchorValue(anchor))
+    }
+  }
+  if (list.length == 0) list.push(props.height)
+  list.sort((a : number, b : number) : number => a - b)
+  return list
+}
+
+function normalizeAnchorIndex(index : number) : number {
+  const listLength = normalizedAnchors().length
+  if (index < 0) return 0
+  if (index >= listLength) return listLength - 1
+  return index
+}
+
+function anchorHeight(index : number) : number {
+  const list = normalizedAnchors()
+  return list[normalizeAnchorIndex(index)]
+}
+
+function formatMs(value : any) : string {
+  const text = (value).toString()
+  if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0) return text
+  return text + 'ms'
+}
+
+function formatSize(value : any) : string {
+  const text = (value).toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+const bgColor = computed(() : string => props.bgColor)
 const currentIndex = ref(normalizeAnchorIndex(props.defaultAnchor))
 const currentHeight = ref(anchorHeight(currentIndex.value))
 const startY = ref(0)
 const startHeight = ref(0)
 const dragging = ref(false)
 
-const rootStyle = computed(() => {
-  return 'z-index:' + String(props.zIndex) + ';'
-})
-
-const overlayClass = computed(() => {
-  return props.overlayFade ? 'i-float-panel__overlay i-float-panel__overlay--fade' : 'i-float-panel__overlay'
-})
-
-const overlayComputedStyle = computed(() => {
-  return 'background-color:rgba(0,0,0,' + String(props.overlayOpacity) + ');'
-})
-
-const panelStyle = computed(() => {
-  let style = 'height:' + formatSize(currentHeight.value) + ';'
-  style = style + 'background-color:' + bgColor.value + ';'
-  style = style + 'transition-duration:' + (dragging.value ? '0ms' : formatMs(props.duration)) + ';'
-  style = style + 'transition-property:' + (dragging.value ? 'none' : 'height') + ';'
-  if (props.safeBottom) {
-    style = style + 'padding-bottom:env(safe-area-inset-bottom);'
-  }
-  return style
-})
-
-watch(
-  () => props.defaultAnchor,
-  (nextValue) => {
-    toAnchor(nextValue)
-  },
-)
-
-watch(
-  () => props.height,
-  () => {
-    currentHeight.value = anchorHeight(currentIndex.value)
-  },
-)
-
-watch(
-  () => props.anchors,
-  () => {
-    currentIndex.value = normalizeAnchorIndex(currentIndex.value)
-    currentHeight.value = anchorHeight(currentIndex.value)
-  },
-)
-
-function handleContentTouchStart(event) {
-  if (!props.contentDraggable) return
-  handleTouchStart(event)
+function clampHeight(value : number) : number {
+  const list = normalizedAnchors()
+  const minValue = list[0]
+  const maxValue = list[list.length - 1]
+  if (value < minValue) return minValue
+  if (value > maxValue) return maxValue
+  return value
 }
 
-function handleHandleTouchStart(event) {
-  handleTouchStart(event)
+function readTouchY(event : UniTouchEvent) : number {
+  if (event.touches.length == 0) return 0
+  return event.touches[0].clientY
 }
 
-function handleTouchStart(event) {
-  dragging.value = true
-  startY.value = readTouchY(event)
-  startHeight.value = currentHeight.value
-}
-
-function handleTouchMove(event) {
-  if (!dragging.value) return
-  const deltaY = readTouchY(event) - startY.value
-  currentHeight.value = clampHeight(startHeight.value - deltaY)
-  emit('move', {
-    height: currentHeight.value,
-  })
-}
-
-function handleTouchEnd() {
-  if (!dragging.value) return
-  dragging.value = false
-  snapToNearestAnchor()
-}
-
-function handleOverlayClick() {
-  if (!props.closeOnMask) return
-  toAnchor(0)
-}
-
-function toAnchor(index: number) {
+function toAnchor(index : number) : void {
   const nextIndex = normalizeAnchorIndex(index)
   currentIndex.value = nextIndex
   currentHeight.value = anchorHeight(nextIndex)
-  emit('change', {
-    index: nextIndex,
-    height: currentHeight.value,
-  })
+  emit('change', { index: nextIndex, height: currentHeight.value })
 }
 
-function snapToNearestAnchor() {
+function snapToNearestAnchor() : void {
   const heights = normalizedAnchors()
   let nearestIndex = 0
   let nearestDistance = Math.abs(currentHeight.value - heights[0])
@@ -214,84 +202,73 @@ function snapToNearestAnchor() {
   toAnchor(nearestIndex)
 }
 
-function normalizedAnchors() {
-  const list = []
-  if (props.anchors.length > 0) {
-    for (let i = 0; i < props.anchors.length; i++) {
-      list.push(normalizeAnchorValue(props.anchors[i]))
-    }
-  }
-  if (list.length == 0) list.push(props.height)
-  list.sort((a, b) => a - b)
-  return list
+const rootStyle = computed(() : string => 'z-index:' + (props.zIndex).toString() + ';')
+const overlayClass = computed(() : string => {
+  return props.overlayFade ? 'i-float-panel__overlay i-float-panel__overlay--fade' : 'i-float-panel__overlay'
+})
+const overlayComputedStyle = computed(() : string => {
+  return 'background-color:rgba(0,0,0,' + (props.overlayOpacity).toString() + ');'
+})
+const panelStyle = computed(() : string => {
+  let style = 'height:' + formatSize(currentHeight.value) + ';background-color:' + bgColor.value + ';'
+  style += 'transition-duration:' + (dragging.value ? '0ms' : formatMs(props.duration)) + ';'
+  style += 'transition-property:' + (dragging.value ? 'none' : 'height') + ';'
+  if (props.safeBottom) style += 'padding-bottom:env(safe-area-inset-bottom);'
+  return style
+})
+
+function handleTouchStart(event : UniTouchEvent) : void {
+  dragging.value = true
+  startY.value = readTouchY(event)
+  startHeight.value = currentHeight.value
 }
 
-function anchorHeight(index: number): number {
-  const list = normalizedAnchors()
-  return list[normalizeAnchorIndex(index)]
+function handleContentTouchStart(event : UniTouchEvent) : void {
+  if (props.contentDraggable) handleTouchStart(event)
 }
 
-function normalizeAnchorIndex(index: number): number {
-  const listLength = props.anchors.length > 0 ? props.anchors.length : 1
-  if (index < 0) return 0
-  if (index >= listLength) return listLength - 1
-  return index
+function handleHandleTouchStart(event : UniTouchEvent) : void {
+  handleTouchStart(event)
 }
 
-function normalizeAnchorValue(value): number {
-  const text = String(value)
-  if (text.indexOf('%') >= 0) {
-    const percent = Number(text.replace('%', ''))
-    if (isNaN(percent)) return props.height
-    return Math.round((percent / 100) * screenHeight())
-  }
-  const numberValue = Number(value)
-  if (isNaN(numberValue)) return props.height
-  return numberValue
+function handleTouchMove(event : UniTouchEvent) : void {
+  if (!dragging.value) return
+  const deltaY = readTouchY(event) - startY.value
+  currentHeight.value = clampHeight(startHeight.value - deltaY)
+  emit('move', { height: currentHeight.value })
 }
 
-function clampHeight(value: number): number {
-  const list = normalizedAnchors()
-  const minValue = list[0]
-  const maxValue = list[list.length - 1]
-  if (value < minValue) return minValue
-  if (value > maxValue) return maxValue
-  return value
+function handleTouchEnd() : void {
+  if (!dragging.value) return
+  dragging.value = false
+  snapToNearestAnchor()
 }
 
-function screenHeight(): number {
-  const info = uni.getSystemInfoSync()
-  const height = Number(info.windowHeight)
-  if (isNaN(height) || height <= 0) return 667
-  return height
+function handleOverlayClick() : void {
+  if (props.closeOnMask) toAnchor(0)
 }
 
-function readTouchY(event): number {
-  let point = null
-  if (event.touches != null && event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
-  }
-  if (point == null) return 0
-  const clientY = Number(point.clientY)
-  if (!isNaN(clientY)) return clientY
-  return Number(point.pageY)
-}
+watch(
+  () : number => props.defaultAnchor,
+  (nextValue : number) : void => {
+    toAnchor(nextValue)
+  },
+)
 
-function formatMs(value): string {
-  const text = String(value)
-  if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0) return text
-  return text + 'ms'
-}
+watch(
+  () : number => props.height,
+  () : void => {
+    currentHeight.value = anchorHeight(currentIndex.value)
+  },
+)
 
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
+watch(
+  () : Array<any | null> | null => props.anchors,
+  () : void => {
+    currentIndex.value = normalizeAnchorIndex(currentIndex.value)
+    currentHeight.value = anchorHeight(currentIndex.value)
+  },
+)
 
 defineExpose({
   toAnchor,

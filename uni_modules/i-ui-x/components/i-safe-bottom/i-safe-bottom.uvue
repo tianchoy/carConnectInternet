@@ -22,10 +22,16 @@ const props = defineProps({
 
 
 
-const bgColor = computed(() => {
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+const bgColor = computed(() : string => {
   return props.bgColor
 })
-const safeBottomStyle = computed(() => {
+const safeBottomStyle = computed(() : string => {
   const extraHeight = formatSize(props.height)
   const height = props.safeBottom
     ? 'calc(env(safe-area-inset-bottom) + ' + extraHeight + ')'
@@ -34,13 +40,6 @@ const safeBottomStyle = computed(() => {
   return 'height:' + height + ';background-color:' + bgColor.value + ';'
 })
 
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
 </script>
 
 <style>

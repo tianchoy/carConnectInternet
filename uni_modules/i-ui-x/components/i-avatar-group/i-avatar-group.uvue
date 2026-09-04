@@ -35,8 +35,9 @@ const props = defineProps({
  */
 const emit = defineEmits(['select', 'change'])
 
-function select(item, index) {
-  const payload = String(index) + ':' + String(item)
+function select(item : any | null, index : number) : void {
+  const itemText = item == null ? '' : item.toString()
+  const payload = index.toString() + ':' + itemText
   emit('select', payload)
   emit('change', payload)
 }

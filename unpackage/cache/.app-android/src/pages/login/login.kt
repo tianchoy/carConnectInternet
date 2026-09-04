@@ -37,7 +37,6 @@ open class GenPagesLoginLogin : BasePage {
             val smsSending = ref(false)
             val smsSubmitting = ref(false)
             var smsCooldownTimer: Number? = null
-            val nativeLoginLoading = ref(false)
             val isPersonalPasswordLoginReady = computed<Boolean>(fun(): Boolean {
                 return personalForm.value.username != "" && personalForm.value.password != ""
             }
@@ -257,16 +256,15 @@ open class GenPagesLoginLogin : BasePage {
                     smsCooldown.value = 0
                 }
             }
+            val gotoIndex = fun(): Unit {
+                uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))
+            }
             val gotoAgreement = fun(): Unit {
                 showAppModal(AppModalOptions(title = "用户协议", content = userAgreement, showCancel = false))
             }
             val gotoPrivacy = fun(): Unit {
                 showAppModal(AppModalOptions(title = "隐私政策", content = privacyPolicy, showCancel = false))
             }
-            onMounted(fun(){
-                prefetchUniVerify()
-            }
-            )
             onUnmounted(fun(){
                 stopSmsCooldown()
             }
@@ -367,6 +365,15 @@ open class GenPagesLoginLogin : BasePage {
                             ))
                         )),
                         _cE("view", _uM("class" to "page-actions"), _uA(
+                            if (isTrue(!smsLoginMode.value)) {
+                                _cE("view", _uM("key" to 0, "class" to "action-item", "onClick" to gotoIndex), _uA(
+                                    _cE("text", _uM("class" to "action-link"), "暂不登录"),
+                                    _cE("text", _uM("class" to "action-arrow"), "›")
+                                ))
+                            } else {
+                                _cC("v-if", true)
+                            }
+                            ,
                             _cE("view", _uM("class" to "action-item", "onClick" to toggleLoginMode), _uA(
                                 _cE("text", _uM("class" to "action-link"), _tD(if (smsLoginMode.value) {
                                     "密码登录"
@@ -377,7 +384,7 @@ open class GenPagesLoginLogin : BasePage {
                                 _cE("text", _uM("class" to "action-arrow"), "›")
                             )),
                             if (isTrue(!smsLoginMode.value)) {
-                                _cE("view", _uM("key" to 0, "class" to "action-item", "onClick" to goRegister), _uA(
+                                _cE("view", _uM("key" to 1, "class" to "action-item", "onClick" to goRegister), _uA(
                                     _cE("text", _uM("class" to "action-link"), "注册账号"),
                                     _cE("text", _uM("class" to "action-arrow"), "›")
                                 ))
@@ -386,7 +393,7 @@ open class GenPagesLoginLogin : BasePage {
                             }
                             ,
                             if (isTrue(!smsLoginMode.value)) {
-                                _cE("view", _uM("key" to 1, "class" to "action-item", "onClick" to goForgotPassword), _uA(
+                                _cE("view", _uM("key" to 2, "class" to "action-item", "onClick" to goForgotPassword), _uA(
                                     _cE("text", _uM("class" to "action-link"), "忘记密码"),
                                     _cE("text", _uM("class" to "action-arrow"), "›")
                                 ))

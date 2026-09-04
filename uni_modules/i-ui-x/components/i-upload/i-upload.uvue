@@ -204,11 +204,84 @@ const emit = defineEmits([
   'choose',
 ])
 
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function initialFiles() : Array<any | null> {
+  const fileList = props.fileList
+  if (fileList != null && fileList.length > 0) return fileList
+  if (Array.isArray(props.modelValue)) return props.modelValue as Array<any | null>
+  if (Array.isArray(props.value)) return props.value as Array<any | null>
+  const empty : Array<any | null> = []
+  return empty
+}
+
+function fileUrl(file : any | null) : string {
+  if (file == null) return ''
+  if (typeof file == 'object') {
+    const value = (file as UTSJSONObject)['url']
+    if (value != null) return value.toString()
+  }
+  return file.toString()
+}
+
+function fileName(file : any | null) : string {
+  if (file != null && typeof file == 'object') {
+    const value = (file as UTSJSONObject)['name']
+    if (value != null) return value.toString()
+  }
+  return fileUrl(file)
+}
+
+function fileStatus(file : any | null) : string {
+  if (!props.showProgress) return ''
+  if (file != null && typeof file == 'object') {
+    const value = (file as UTSJSONObject)['status']
+    if (value != null) return value.toString()
+  }
+  return ''
+}
+
+function fileDeletable(file : any | null) : boolean {
+  if (file != null && typeof file == 'object') {
+    const value = (file as UTSJSONObject)['deletable']
+    if (value == false) return false
+  }
+  return true
+}
+
+function fileKey(file : any | null, index : number) : string {
+  return fileUrl(file) + '-' + index.toString()
+}
+
+function isImage(file : any | null) : boolean {
+  const url = fileUrl(file)
+  return url.indexOf('.png') >= 0 || url.indexOf('.jpg') >= 0 || url.indexOf('.jpeg') >= 0 || url.indexOf('.webp') >= 0 || url.indexOf('/static/') >= 0 || url.indexOf('tmp') >= 0
+}
+
 const currentFiles = ref(initialFiles())
 
+function syncFiles(files : Array<any | null>) : void {
+  emit('update:modelValue', files)
+  emit('update:value', files)
+  emit('change', files)
+}
+
+function imageUrls() : Array<string> {
+  const list : Array<string> = []
+  for (let i = 0; i < currentFiles.value.length; i++) {
+    const file = currentFiles.value[i]
+    if (isImage(file)) list.push(fileUrl(file))
+  }
+  return list
+}
+
 const fileStyle = computed(() => {
-  const width = String(props.width).length > 0 ? props.width : 104
-  const height = String(props.height).length > 0 ? props.height : 104
+  const width = (props.width).toString().length > 0 ? props.width : 104
+  const height = (props.height).toString().length > 0 ? props.height : 104
   const gutter = formatSize(props.gutter)
   return (
     'width:' +
@@ -236,51 +309,60 @@ const uploadIconStyle = computed(() => {
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  () : any | null => props.modelValue,
+  () : void => {
     currentFiles.value = initialFiles()
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  () : any | null => props.value,
+  () : void => {
     currentFiles.value = initialFiles()
   },
 )
 
 watch(
-  () => props.fileList,
-  () => {
+  () : Array<any | null> | null => props.fileList,
+  () : void => {
     currentFiles.value = initialFiles()
   },
 )
-
-function initialFiles() {
-  if (props.fileList.length > 0) return props.fileList
-  if (Array.isArray(props.modelValue) && props.modelValue.length > 0) return props.modelValue
-  if (Array.isArray(props.value)) return props.value
-  return []
-}
 
 function choose() {
   if (props.disabled) return
   emit('choose')
   const remain = props.maxCount - currentFiles.value.length
   if (remain <= 0) return
+  const sizeTypes : Array<string> = []
+  const rawSizeTypes = props.sizeType
+  if (rawSizeTypes != null) {
+    for (let i = 0; i < rawSizeTypes.length; i++) {
+      const value = rawSizeTypes[i]
+      if (value != null) sizeTypes.push(value.toString())
+    }
+  }
+  const sourceTypes : Array<string> = []
+  const rawSourceTypes = props.capture
+  if (rawSourceTypes != null) {
+    for (let i = 0; i < rawSourceTypes.length; i++) {
+      const value = rawSourceTypes[i]
+      if (value != null) sourceTypes.push(value.toString())
+    }
+  }
   uni.chooseImage({
     count: props.multiple ? remain : 1,
-    sizeType: props.sizeType,
-    sourceType: props.capture,
+    sizeType: sizeTypes,
+    sourceType: sourceTypes,
     success: (res) => {
-      const files = []
+      const files : Array<any | null> = []
       for (let i = 0; i < res.tempFilePaths.length; i++) {
-        const file = {
+        const file : UTSJSONObject = {
           type: 'image',
           url: res.tempFilePaths[i],
           status: 'success',
           message: '',
-          name: 'image-' + String(i),
+          name: 'image-' + (i).toString(),
         }
         files.push(file)
       }
@@ -298,7 +380,7 @@ function choose() {
   })
 }
 
-function preview(index) {
+function preview(index : number) {
   const file = currentFiles.value[index]
   const url = fileUrl(file)
   emit('clickPreview', { name: props.name, index, file: url })
@@ -309,9 +391,9 @@ function preview(index) {
   })
 }
 
-function remove(index) {
+function remove(index : number) {
   const file = currentFiles.value[index]
-  const nextFiles = []
+  const nextFiles : Array<any | null> = []
   for (let i = 0; i < currentFiles.value.length; i++) {
     if (i != index) nextFiles.push(currentFiles.value[i])
   }
@@ -322,77 +404,6 @@ function remove(index) {
   emit('remove', event)
 }
 
-function syncFiles(files) {
-  emit('update:modelValue', files)
-  emit('update:value', files)
-  emit('change', files)
-}
-
-function imageUrls() {
-  const list = []
-  for (let i = 0; i < currentFiles.value.length; i++) {
-    const file = currentFiles.value[i]
-    if (isImage(file)) list.push(fileUrl(file))
-  }
-  return list
-}
-
-function isImage(file) {
-  const url = fileUrl(file)
-  return (
-    url.indexOf('.png') >= 0 ||
-    url.indexOf('.jpg') >= 0 ||
-    url.indexOf('.jpeg') >= 0 ||
-    url.indexOf('.webp') >= 0 ||
-    url.indexOf('/static/') >= 0 ||
-    url.indexOf('tmp') >= 0
-  )
-}
-
-function fileUrl(file) {
-  if (typeof file == 'object') {
-    const value = file['url']
-    if (value != null) return String(value)
-  }
-  return String(file)
-}
-
-function fileName(file) {
-  if (typeof file == 'object') {
-    const value = file['name']
-    if (value != null) return String(value)
-  }
-  return fileUrl(file)
-}
-
-function fileStatus(file) {
-  if (!props.showProgress) return ''
-  if (typeof file == 'object') {
-    const value = file['status']
-    if (value != null) return String(value)
-  }
-  return ''
-}
-
-function fileDeletable(file) {
-  if (typeof file == 'object') {
-    const value = file['deletable']
-    if (value == false) return false
-  }
-  return true
-}
-
-function fileKey(file, index) {
-  return fileUrl(file) + '-' + String(index)
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
 </script>
 
 <style>

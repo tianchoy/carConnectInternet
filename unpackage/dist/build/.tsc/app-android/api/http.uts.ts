@@ -2,6 +2,7 @@ import { clearPushSessionState } from '../services/push.uts'
 import { showAppToast } from '../utils/toast.uts'
 
 import AndroidLog from 'android.util.Log'
+import TimeZone from 'java.util.TimeZone'
 
 // 定义类型
 type RequestOptions = {
@@ -36,9 +37,43 @@ type RequestFailure = {
     data?: any
 }
 
-// const BASE_URL = 'https://car.zdiot.cn:18443/api'
 const BASE_URL = 'https://gpsapp.zdiot.cn'
 const CLIENT_ID = '428a8310cd442757ae699df5d894f051'
+const DEFAULT_TIME_ZONE = 'UTC'
+
+// 获取设备当前时区，返回 IANA 时区标识。每次请求时读取，支持用户运行中修改系统时区。
+function getDeviceTimeZone(): string {
+    let timeZone = ''
+
+
+
+
+
+
+
+
+
+
+
+    try {
+        timeZone = TimeZone.getDefault().getID()
+    } catch (error) {
+        console.warn('获取安卓时区失败', error)
+    }
+
+
+
+
+
+
+
+
+
+
+
+    const normalizedTimeZone = timeZone.trim()
+    return normalizedTimeZone.length > 0 ? normalizedTimeZone : DEFAULT_TIME_ZONE
+}
 
 // 处理token过期的函数
 let isHandlingTokenExpired = false
@@ -86,6 +121,8 @@ export function handleTokenExpired(): void {
 function requestInterceptor(config: RequestOptions): RequestOptions {
     const token = uni.getStorageSync('token')
     const authorization = 'Bearer ' + (token != null ? token.toString() : '')
+    const timeZone = getDeviceTimeZone()
+
 
 
 
@@ -101,6 +138,7 @@ function requestInterceptor(config: RequestOptions): RequestOptions {
     }
     config.header!.set('Authorization', authorization)
     config.header!.set('clientId', CLIENT_ID)
+    config.header!.set('x-time-zone', timeZone)
 
 
     // 显示加载中

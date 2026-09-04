@@ -196,45 +196,111 @@ const props = defineProps({
  * - open/close: 下拉列表展开或收起时触发。
  * - clear: 点击清除按钮时触发。
  */
-const emit = defineEmits([
-  'update:modelValue',
-  'update:value',
-  'change',
-  'open',
-  'close',
-  'clear',
-])
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: any): void
+  (event: 'update:value', value: any): void
+  (event: 'change', value: any): void
+  (event: 'open'): void
+  (event: 'close'): void
+  (event: 'clear'): void
+}>()
 
+function initialValue() : any {
+  if (props.modelValue.toString().length > 0) return props.modelValue
+  return props.value
+}
 
-const selectBgColor = computed(() => {
+function resolveDataList() : Array<any | null> {
+  const list = props.list
+  if (list != null && list.length > 0) return list
+  const options = props.options
+  if (options != null) return options
+  const empty : Array<any | null> = []
+  return empty
+}
+
+function optionText(item : any | null) : string {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = (item as UTSJSONObject)['text']
+    if (value != null) return value.toString()
+  }
+  return item.toString()
+}
+
+function optionValue(item : any | null) : any {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = (item as UTSJSONObject)['value']
+    if (value != null) return value
+  }
+  return item
+}
+
+function optionDisabled(item : any | null) : boolean {
+  if (item == null) return false
+  if (typeof item == 'object') {
+    const value = (item as UTSJSONObject)['disabled']
+    return value == true
+  }
+  return false
+}
+
+function optionKey(item : any | null, index : number) : string {
+  return optionValue(item).toString() + '-' + index.toString()
+}
+
+function optionClass(item : any | null) : string {
+  const classes : Array<string> = ['i-select__item']
+  if (optionDisabled(item)) classes.push('i-select__item--disabled')
+  return classes.join(' ')
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+const selectBgColor = computed(() : string => {
   return props.bgColor
 })
 const opened = ref(false)
-const current = ref(initialValue())
+const current = ref<any>(initialValue())
 
-const dataList = computed(() => {
-  return props.list.length > 0 ? props.list : props.options
+function optionTextClass(item : any | null) : string {
+  const classes : Array<string> = ['i-select__item-text']
+  if (optionValue(item).toString() == current.value.toString()) {
+    classes.push('i-select__item-text--active')
+  }
+  return classes.join(' ')
+}
+
+const dataList = computed(() : Array<any | null> => {
+  return resolveDataList()
 })
 
-const hasValue = computed(() => String(current.value).length > 0)
+const hasValue = computed(() : boolean => current.value.toString().length > 0)
 
-const selectedText = computed(() => {
+const selectedText = computed(() : string => {
   for (let i = 0; i < dataList.value.length; i++) {
     const item = dataList.value[i]
-    if (String(optionValue(item)) == String(current.value)) return optionText(item)
+    if ((optionValue(item)).toString() == (current.value).toString()) return optionText(item)
   }
-  return String(current.value)
+  return (current.value).toString()
 })
 
-const wrapClass = computed(() => {
-  const classes = ['i-select']
+const wrapClass = computed(() : string => {
+  const classes : Array<string> = ['i-select']
   if (props.block) classes.push('i-select--block')
   if (props.disabled) classes.push('i-select--disabled')
   return classes.join(' ')
 })
 
-const valueClass = computed(() => {
-  const classes = ['i-select__value']
+const valueClass = computed(() : string => {
+  const classes : Array<string> = ['i-select__value']
   if (!hasValue.value) classes.push('i-select__value--placeholder')
   if (props.wrap) classes.push('i-select__value--wrap')
   if (props.align == 'center') classes.push('i-select__value--center')
@@ -242,7 +308,7 @@ const valueClass = computed(() => {
   return classes.join(' ')
 })
 
-const triggerStyle = computed(() => {
+const triggerStyle = computed(() : string => {
   let style =
     'background-color:' +
     (props.disabled ? props.disabledColor : selectBgColor.value) +
@@ -264,44 +330,40 @@ const triggerStyle = computed(() => {
   return style + props.customStyle
 })
 
-const inputStyleText = computed(() => {
+const inputStyleText = computed(() : string => {
   if (!hasValue.value && props.placeholderStyle.length > 0) {
     return props.placeholderStyle + props.inputStyle
   }
   return props.inputStyle
 })
 
-const listStyle = computed(() => {
-  if (String(props.height).length == 0) return ''
+const listStyle = computed(() : string => {
+  if ((props.height).toString().length == 0) return ''
   return 'max-height:' + formatSize(props.height) + ';'
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  () : any => props.modelValue,
+  () : void => {
     current.value = initialValue()
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  () : any => props.value,
+  () : void => {
     current.value = initialValue()
   },
 )
 
-function initialValue() {
-  if (String(props.modelValue).length > 0) return props.modelValue
-  return props.value
-}
-
-function toggle() {
+function toggle() : void {
   if (props.disabled) return
   opened.value = !opened.value
-  emit(opened.value ? 'open' : 'close')
+  if (opened.value) emit('open')
+  else emit('close')
 }
 
-function selectOption(item) {
+function selectOption(item : any | null) : void {
   if (optionDisabled(item)) return
   const nextValue = optionValue(item)
   current.value = nextValue
@@ -312,7 +374,7 @@ function selectOption(item) {
   emit('close')
 }
 
-function clear() {
+function clear() : void {
   current.value = ''
   emit('update:modelValue', '')
   emit('update:value', '')
@@ -320,55 +382,6 @@ function clear() {
   emit('change', '')
 }
 
-function optionText(item) {
-  if (typeof item == 'object') {
-    const value = item['text']
-    if (value != null) return String(value)
-  }
-  return String(item)
-}
-
-function optionValue(item) {
-  if (typeof item == 'object') {
-    const value = item['value']
-    if (value != null) return value
-  }
-  return item
-}
-
-function optionDisabled(item) {
-  if (typeof item == 'object') {
-    const value = item['disabled']
-    return value == true
-  }
-  return false
-}
-
-function optionKey(item, index) {
-  return String(optionValue(item)) + '-' + String(index)
-}
-
-function optionClass(item) {
-  const classes = ['i-select__item']
-  if (optionDisabled(item)) classes.push('i-select__item--disabled')
-  return classes.join(' ')
-}
-
-function optionTextClass(item) {
-  const classes = ['i-select__item-text']
-  if (String(optionValue(item)) == String(current.value)) {
-    classes.push('i-select__item-text--active')
-  }
-  return classes.join(' ')
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
 </script>
 
 <style>

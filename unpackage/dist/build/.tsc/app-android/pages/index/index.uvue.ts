@@ -1,7 +1,6 @@
 import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_i_line_progress from '@/uni_modules/i-ui-x/components/i-line-progress/i-line-progress.uvue'
-import _easycom_l_picker from '@/uni_modules/lime-picker/components/l-picker/l-picker.uvue'
-import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
+import _easycom_i_picker from '@/uni_modules/i-ui-x/components/i-picker/i-picker.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import _imports_0 from '../../static/exit.png'
@@ -25,7 +24,6 @@ import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
 import { getDeviceIcon } from '../../utils/cars'
-import type { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerValue } from '@/uni_modules/lime-picker'
 
 import AndroidLog from 'android.util.Log'
 
@@ -70,6 +68,15 @@ type DeviceDetailState = {
     lastUpdateTime: string
 }
 
+type IPickerOption = {
+    text: string
+    value: string
+    disabled: boolean
+}
+
+type IPickerColumns = Array<Array<IPickerOption>>
+
+// 处理车辆列表显示 - 返回 picker 选项
 type SavedDevice = {
     name: string
     deviceName: string
@@ -122,7 +129,7 @@ const navBarHeight = ref(44)
 const deviceList = ref<Array<Device>>([])
 // picker 相关变量
 const showPicker = ref(false)
-const pickerValues = ref<PickerValue[]>([])
+const pickerValue = ref('')
 const currentCarImei = ref('')
 const currentCarDeptId = ref('')
 const currentCarDeviceId = ref('')
@@ -145,10 +152,17 @@ const deviceDetail = ref<DeviceDetailState>({
 const markers = ref([] as Marker[])
 const lastUpdateTime = ref('--:--:--')
 const devicePosInfo = ref<UTSJSONObject | null>(null)
+let devicePositionRequestId = 0
 const devicePositionUpdateTime = computed<string>(() => {
     const position = devicePosInfo.value
     return position != null ? position.getString('positionUpdateTime', '暂无位置') : '暂无位置'
 })
+
+const isValidDeviceCoordinate = (latitude: number, longitude: number): boolean => {
+    return !isNaN(latitude) && !isNaN(longitude) &&
+        latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 &&
+        !(latitude == 0 && longitude == 0)
+}
 
 // 本地存储key
 const SELECTED_DEVICE_STORAGE_KEY: string = 'selected_device_info'
@@ -169,17 +183,14 @@ const safeDeviceDetail = computed<DeviceDetailState>(() => {
 })
 
 
-// 处理车辆列表显示 - 返回 picker 选项
-const pickerColumns = computed<PickerColumn[]>(() => {
-    return [deviceList.value.map((device): PickerColumnItem => {
+const pickerColumns = computed<IPickerColumns>(() => {
+    return [deviceList.value.map((device): IPickerOption => {
         const displayName = device.deviceName || device.name || device.imei || '未命名设备'
         const statusText = device.connectionStatus == 'online' ? '在线' : '离线'
         return {
-            id: device.imei,
-            label: `${displayName} (${statusText})`,
+            text: `${displayName} (${statusText})`,
             value: device.imei || device.deviceId,
-            disabled: false,
-            children: null
+            disabled: false
         }
     })]
 })
@@ -187,6 +198,10 @@ const pickerColumns = computed<PickerColumn[]>(() => {
 // 关闭 picker
 const closePicker = () => {
     showPicker.value = false
+}
+
+const onPickerShowChange = (value: boolean) => {
+    showPicker.value = value
 }
 
 // 初始化尺寸数据
@@ -373,7 +388,7 @@ const handlePicker = () => {
     const selectedDevice = deviceList.value[selectedIndex]
     if (selectedDevice == null) return
 
-    pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId]
+    pickerValue.value = selectedDevice.imei || selectedDevice.deviceId
     showPicker.value = true
 }
 
@@ -427,21 +442,25 @@ async function centerOnUserLocation() {
 
 function getUserLocation() {
     uni.getLocation({
-        type: 'gcj02',
+        type: 'wgs84',
         provider:'system',
         success: (res) => {
             console.log('用户当前位置:', res)
 
             AndroidLog.i('用户当前位置:', JSON.stringify(res))
 
-            userLocation.latitude = res.latitude
-            userLocation.longitude = res.longitude
+            const convertedCoord = CoordTransform.wgs84ToTencent(res.latitude, res.longitude)
+            userLocation.latitude = convertedCoord.lat
+            userLocation.longitude = convertedCoord.lng
             hasUserLocation.value = true
             if (!hasDevice.value) {
                 centerOnUserLocation()
             }
         },
         fail: (err) => {
+
+            AndroidLog.i('用户当前位置:', JSON.stringify(err))
+
             console.error('获取用户当前位置失败:', err.errMsg, err)
         }
     })
@@ -502,7 +521,7 @@ const clearCurrentCar = (): void => {
     currentCarConnectionStatus.value = ''
     currentCarCarType.value = ''
     currentCarPlateNo.value = ''
-    pickerValues.value = []
+    pickerValue.value = ''
     deviceDetail.value = {
         deviceStatus: {
             batteryPercent: 0,
@@ -593,9 +612,15 @@ const centerMapOnDevice = async (latitude: number, longitude: number): Promise<v
 
 // 加载设备位置
 const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
+    const requestId = ++devicePositionRequestId
     positionState.value = 'loading'
+    // 切换设备或刷新位置时先移除旧设备标记，但不重置地图中心。
+    markers.value = []
+    devicePosInfo.value = null
     try {
         const res = await getDevicePos(data)
+        if (requestId != devicePositionRequestId) return false
+
         const positions = res.data
         if (res.code != 200 || positions == null || positions.length == 0) {
             console.warn('获取设备位置失败:', data.getString('deviceId', ''), res.code)
@@ -608,12 +633,11 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
 
         const lat = position.getNumber('latitude', 0)
         const lng = position.getNumber('longitude', 0)
-        const isValidCoordinate = !isNaN(lat) && !isNaN(lng) &&
-            lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 &&
-            !(lat == 0 && lng == 0)
+        const isValidCoordinate = isValidDeviceCoordinate(lat, lng)
 
         if (!isValidCoordinate) {
             console.error('经纬度格式错误', position.getString('latitude', ''), position.getString('longitude', ''))
+            markers.value = []
             positionState.value = 'invalid'
             showAppToast({
                 title: '定位数据异常',
@@ -644,6 +668,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
         console.log('标记点更新完成:', data.getString('deviceId', ''), convertedCoord.lat, convertedCoord.lng)
         return true
     } catch (error) {
+        if (requestId != devicePositionRequestId) return false
         console.error('加载设备位置失败', error)
         positionState.value = 'failed'
         showAppToast({
@@ -680,19 +705,13 @@ const loadDeviceData = async (device: Device) => {
 }
 
 // 处理选择车辆确认
-const handlePickerConfirm = (e: PickerConfirmEvent) => {
+const handlePickerConfirm = (event: UTSJSONObject) => {
     showPicker.value = false
 
-    const selectedValue = e.values.length > 0 ? e.values[0].toString() : ''
+    const indexs = event.getArray<number>('indexs') ?? []
     let selectedIndex = -1
-    if (selectedValue != '') {
-        selectedIndex = deviceList.value.findIndex(device =>
-            device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue
-        )
-    }
-
-    if (selectedIndex < 0 && e.indexs.length > 0) {
-        const eventIndex = e.indexs[0]
+    if (indexs.length > 0) {
+        const eventIndex = indexs[0]
         if (eventIndex >= 0 && eventIndex < deviceList.value.length) {
             selectedIndex = eventIndex
         }
@@ -730,11 +749,9 @@ const handlePickerConfirm = (e: PickerConfirmEvent) => {
     currentCarConnectionStatus.value = selectedDevice.connectionStatus
     currentCarCarType.value = selectedDevice.carType
     currentCarPlateNo.value = selectedDevice.plateNo
-    center.latitude = selectedDevice.latitude
-    center.longitude = selectedDevice.longitude
 
     saveSelectedDeviceIndex(selectedIndex)
-    pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId]
+    pickerValue.value = selectedDevice.imei || selectedDevice.deviceId
     saveSelectedDevice(selectedDevice)
 
     uni.showLoading({
@@ -853,10 +870,8 @@ const loadDeviceList = async () => {
                 currentCarConnectionStatus.value = device.connectionStatus
                 currentCarCarType.value = device.carType
                 currentCarPlateNo.value = device.plateNo
-                center.latitude = device.latitude
-                center.longitude = device.longitude
 
-                pickerValues.value = [device.imei != '' ? device.imei : device.deviceId]
+                pickerValue.value = device.imei != '' ? device.imei : device.deviceId
 
                 await loadDeviceDetail(device.deviceId);
                 await loadDevicePos({
@@ -1198,8 +1213,7 @@ return (): any | null => {
 const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
 const _component_i_line_progress = resolveEasyComponent("i-line-progress",_easycom_i_line_progress)
 const _component_map = resolveComponent("map")
-const _component_l_picker = resolveEasyComponent("l-picker",_easycom_l_picker)
-const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
+const _component_i_picker = resolveEasyComponent("i-picker",_easycom_i_picker)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal)
 
@@ -1542,26 +1556,18 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
           ])
         ])
       ]),
-      _cV(_component_l_popup, _uM({
-        modelValue: showPicker.value,
-        "onUpdate:modelValue": $event => {(showPicker).value = $event},
-        position: "bottom",
-        closeable: false,
-        "safe-area-inset-bottom": true
-      }), _uM({
-        default: withSlotCtx((): any[] => [
-          _cV(_component_l_picker, _uM({
-            modelValue: pickerValues.value,
-            "onUpdate:modelValue": $event => {(pickerValues).value = $event},
-            "cancel-btn": "取消",
-            "confirm-btn": "确认",
-            columns: pickerColumns.value,
-            onCancel: closePicker,
-            onConfirm: handlePickerConfirm
-          }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "columns"])
-        ]),
-        _: 1 /* STABLE */
-      }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+      _cV(_component_i_picker, _uM({
+        show: showPicker.value,
+        "model-value": pickerValue.value,
+        columns: pickerColumns.value,
+        "cancel-text": "取消",
+        "confirm-text": "确认",
+        "close-on-mask": false,
+        "show-input": false,
+        onCancel: closePicker,
+        onConfirm: handlePickerConfirm,
+        "onUpdate:show": onPickerShowChange
+      }), null, 8 /* PROPS */, ["show", "model-value", "columns"])
     ]),
     _cV(_component_app_toast),
     _cV(_component_app_modal)

@@ -17,7 +17,7 @@
         type="digit"
         :value="displayValue"
         :disabled="disabled || disabledInput || !inputable"
-        :cursor-spacing="Number(cursorSpacing)"
+        :cursor-spacing="parseFloat((cursorSpacing).toString())"
         @input="handleInput"
         @focus="handleFocus"
         @blur="handleBlur"
@@ -170,48 +170,84 @@ const props = defineProps({
  * - overlimit: 超出 min/max 或按钮禁用时触发，参数为 plus/minus。
  * - focus/blur: 输入框聚焦和失焦。
  */
-const emit = defineEmits([
-  'update:modelValue',
-  'update:value',
-  'change',
-  'plus',
-  'minus',
-  'overlimit',
-  'focus',
-  'blur',
-])
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: number): void
+  (event: 'update:value', value: number): void
+  (event: 'change', payload: any): void
+  (event: 'plus'): void
+  (event: 'minus'): void
+  (event: 'overlimit', action: string): void
+  (event: 'focus', payload: any): void
+  (event: 'blur', payload: any): void
+}>()
 
+type INumberBoxChangePayload = {
+  value : number,
+  name : string,
+}
 
-const bgColor = computed(() => {
+function initialValue() : any {
+  if (props.modelValue.toString().length > 0) return props.modelValue
+  return props.value
+}
+
+function normalizeValue(value : any) : number {
+  let nextValue = parseFloat(value.toString())
+  const minValue = parseFloat(props.min.toString())
+  const maxValue = parseFloat(props.max.toString())
+  if (isNaN(nextValue)) nextValue = minValue
+  if (nextValue < minValue) nextValue = minValue
+  if (nextValue > maxValue) nextValue = maxValue
+  if (props.integer) nextValue = Math.round(nextValue)
+  const decimal = parseFloat(props.decimalLength.toString())
+  if (decimal >= 0) nextValue = parseFloat(nextValue.toFixed(decimal))
+  return nextValue
+}
+
+function formatNumber(value : number) : string {
+  const decimal = parseFloat(props.decimalLength.toString())
+  if (decimal >= 0) return value.toFixed(decimal)
+  return value.toString()
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+const bgColor = computed(() : string => {
   return props.bgColor
 })
 const current = ref(normalizeValue(initialValue()))
 
-const displayValue = computed(() => {
+const displayValue = computed(() : string => {
   return formatNumber(current.value)
 })
 
-const minusDisabled = computed(() => {
-  return props.disabled || props.disableMinus || current.value <= Number(props.min)
+const minusDisabled = computed(() : boolean => {
+  return props.disabled || props.disableMinus || current.value <= parseFloat((props.min).toString())
 })
 
-const plusDisabled = computed(() => {
-  return props.disabled || props.disablePlus || current.value >= Number(props.max)
+const plusDisabled = computed(() : boolean => {
+  return props.disabled || props.disablePlus || current.value >= parseFloat((props.max).toString())
 })
 
-const minusClass = computed(() => {
+const minusClass = computed(() : string => {
   return minusDisabled.value
     ? 'i-number-box__btn i-number-box__btn--disabled'
     : 'i-number-box__btn'
 })
 
-const plusClass = computed(() => {
+const plusClass = computed(() : string => {
   return plusDisabled.value
     ? 'i-number-box__btn i-number-box__btn--disabled'
     : 'i-number-box__btn'
 })
 
-const buttonStyle = computed(() => {
+const buttonStyle = computed(() : string => {
   const disabled = props.disabled
   return (
     'width:' +
@@ -226,7 +262,7 @@ const buttonStyle = computed(() => {
   )
 })
 
-const inputStyle = computed(() => {
+const inputStyle = computed(() : string => {
   return (
     'width:' +
     formatSize(props.inputWidth) +
@@ -244,7 +280,7 @@ const inputStyle = computed(() => {
   )
 })
 
-const iconStyle = computed(() => {
+const iconStyle = computed(() : string => {
   return (
     'color:' +
     props.color +
@@ -256,89 +292,60 @@ const iconStyle = computed(() => {
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  () : any => props.modelValue,
+  () : void => {
     current.value = normalizeValue(initialValue())
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  () : any => props.value,
+  () : void => {
     current.value = normalizeValue(initialValue())
   },
 )
 
-function initialValue() {
-  if (String(props.modelValue).length > 0) return props.modelValue
-  return props.value
+function setValue(value : number) : void {
+  const nextValue = normalizeValue(value)
+  if (!props.asyncChange) current.value = nextValue
+  const payload : INumberBoxChangePayload = { value: nextValue, name: props.name.toString() }
+  emit('change', payload)
+  emit('update:modelValue', nextValue)
+  emit('update:value', nextValue)
 }
 
-function minus() {
+function minus() : void {
   if (minusDisabled.value) {
     emit('overlimit', 'minus')
     return
   }
   emit('minus')
-  setValue(current.value - Number(props.step))
+  setValue(current.value - parseFloat((props.step).toString()))
 }
 
-function plus() {
+function plus() : void {
   if (plusDisabled.value) {
     emit('overlimit', 'plus')
     return
   }
   emit('plus')
-  setValue(current.value + Number(props.step))
+  setValue(current.value + parseFloat((props.step).toString()))
 }
 
-function handleInput(event) {
-  const rawValue = Number(event.detail.value)
+function handleInput(event : UniInputEvent) : void {
+  const rawValue = parseFloat((event.detail.value).toString())
   if (isNaN(rawValue)) return
   setValue(rawValue)
 }
 
-function setValue(value) {
-  const nextValue = normalizeValue(value)
-  if (!props.asyncChange) current.value = nextValue
-  const event = { value: nextValue, name: props.name }
-  emit('change', event)
-  emit('update:modelValue', nextValue)
-  emit('update:value', nextValue)
-}
-
-function normalizeValue(value) {
-  let nextValue = Number(value)
-  if (isNaN(nextValue)) nextValue = Number(props.min)
-  if (nextValue < Number(props.min)) nextValue = Number(props.min)
-  if (nextValue > Number(props.max)) nextValue = Number(props.max)
-  if (props.integer) nextValue = Math.round(nextValue)
-  const decimal = Number(props.decimalLength)
-  if (decimal >= 0) nextValue = Number(nextValue.toFixed(decimal))
-  return nextValue
-}
-
-function formatNumber(value) {
-  const decimal = Number(props.decimalLength)
-  if (decimal >= 0) return Number(value).toFixed(decimal)
-  return String(value)
-}
-
-function handleFocus(event) {
+function handleFocus(event : any) : void {
   emit('focus', event)
 }
 
-function handleBlur(event) {
+function handleBlur(event : any) : void {
   emit('blur', event)
 }
 
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
 </script>
 
 <style>

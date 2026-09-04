@@ -100,7 +100,38 @@ const props = defineProps({
   },
 })
 
-const apiDocs = [
+type IApiPropDoc = {
+  name: string
+  type: string
+  defaultValue: string
+  desc: string
+}
+
+type IApiMemberDoc = {
+  name: string
+  desc: string
+}
+
+type IApiComponentDoc = {
+  name: string
+  props: Array<IApiPropDoc>
+  events: Array<IApiMemberDoc>
+  slots: Array<IApiMemberDoc>
+  methods: Array<IApiMemberDoc>
+}
+
+function mergeApiDocs(parts : Array<Array<IApiComponentDoc>>) : Array<IApiComponentDoc> {
+  const result : Array<IApiComponentDoc> = []
+  for (let partIndex = 0; partIndex < parts.length; partIndex++) {
+    const part = parts[partIndex]
+    for (let itemIndex = 0; itemIndex < part.length; itemIndex++) {
+      result.push(part[itemIndex])
+    }
+  }
+  return result
+}
+
+const apiDocsPart0 : Array<IApiComponentDoc> = [
   {
     "name": "i-action-sheet",
     "props": [
@@ -686,7 +717,10 @@ const apiDocs = [
     ],
     "slots": [],
     "methods": []
-  },
+  }
+]
+
+const apiDocsPart1 : Array<IApiComponentDoc> = [
   {
     "name": "i-badge",
     "props": [
@@ -1970,7 +2004,10 @@ const apiDocs = [
     ],
     "slots": [],
     "methods": []
-  },
+  }
+]
+
+const apiDocsPart2 : Array<IApiComponentDoc> = [
   {
     "name": "i-code",
     "props": [
@@ -2616,7 +2653,10 @@ const apiDocs = [
     ],
     "slots": [],
     "methods": []
-  },
+  }
+]
+
+const apiDocsPart3 : Array<IApiComponentDoc> = [
   {
     "name": "i-countdown",
     "props": [
@@ -3543,7 +3583,10 @@ const apiDocs = [
       }
     ],
     "methods": []
-  },
+  }
+]
+
+const apiDocsPart4 : Array<IApiComponentDoc> = [
   {
     "name": "i-fab",
     "props": [
@@ -4396,7 +4439,10 @@ const apiDocs = [
       }
     ],
     "methods": []
-  },
+  }
+]
+
+const apiDocsPart5 : Array<IApiComponentDoc> = [
   {
     "name": "i-index-list",
     "props": [
@@ -5212,7 +5258,10 @@ const apiDocs = [
     ],
     "slots": [],
     "methods": []
-  },
+  }
+]
+
+const apiDocsPart6 : Array<IApiComponentDoc> = [
   {
     "name": "i-loading",
     "props": [
@@ -6222,7 +6271,10 @@ const apiDocs = [
       }
     ],
     "methods": []
-  },
+  }
+]
+
+const apiDocsPart7 : Array<IApiComponentDoc> = [
   {
     "name": "i-overlay",
     "props": [
@@ -7411,7 +7463,10 @@ const apiDocs = [
       }
     ],
     "methods": []
-  },
+  }
+]
+
+const apiDocsPart8 : Array<IApiComponentDoc> = [
   {
     "name": "i-rate",
     "props": [
@@ -8189,7 +8244,10 @@ const apiDocs = [
         "desc": "确认当前选择、裁剪或签名结果。"
       }
     ]
-  },
+  }
+]
+
+const apiDocsPart9 : Array<IApiComponentDoc> = [
   {
     "name": "i-skeleton",
     "props": [
@@ -9045,7 +9103,10 @@ const apiDocs = [
     ],
     "slots": [],
     "methods": []
-  },
+  }
+]
+
+const apiDocsPart10 : Array<IApiComponentDoc> = [
   {
     "name": "i-swipe-action",
     "props": [
@@ -10108,7 +10169,10 @@ const apiDocs = [
       }
     ],
     "methods": []
-  },
+  }
+]
+
+const apiDocsPart11 : Array<IApiComponentDoc> = [
   {
     "name": "i-text",
     "props": [
@@ -10836,30 +10900,35 @@ const apiDocs = [
   }
 ]
 
+const apiDocs = mergeApiDocs([apiDocsPart0, apiDocsPart1, apiDocsPart2, apiDocsPart3, apiDocsPart4, apiDocsPart5, apiDocsPart6, apiDocsPart7, apiDocsPart8, apiDocsPart9, apiDocsPart10, apiDocsPart11])
+
 const requestedText = computed(() => {
   if (props.names.length > 0) return props.names
   return props.components.length > 0 ? props.components : props.component
 })
 
-const currentDocs = computed(() => {
-  const source = requestedText.value
-  if (source.length == 0) return []
-  const names = source.split(',')
-  const result = []
-  for (let i = 0; i < names.length; i++) {
-    const name = names[i].trim()
-    const doc = findDoc(name)
-    if (doc != null) result.push(doc)
-  }
-  return result
-})
-
-function findDoc(name) {
+function findDoc(name : string) : IApiComponentDoc | null {
   for (let i = 0; i < apiDocs.length; i++) {
     if (apiDocs[i].name == name) return apiDocs[i]
   }
   return null
 }
+
+const currentDocs = computed(() : Array<IApiComponentDoc> => {
+  const source = requestedText.value
+  if (source.length == 0) return []
+  const names = source.split(',')
+  const result : Array<IApiComponentDoc> = []
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i].trim()
+    const doc = findDoc(name)
+    if (doc != null) {
+      const safeDoc : IApiComponentDoc = doc
+      result.push(safeDoc)
+    }
+  }
+  return result
+})
 </script>
 
 <style>

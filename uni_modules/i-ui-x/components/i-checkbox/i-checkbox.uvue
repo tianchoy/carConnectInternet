@@ -127,7 +127,8 @@ const props = defineProps({
  */
 const emit = defineEmits(['change', 'update:modelValue', 'update:value', 'update:checked'])
 
-function formatSize(value: string | number): string {
+function formatSize(value : any | null) : string {
+  if (value == null) return '0px'
   const text = value.toString()
   if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
     return text
@@ -135,35 +136,59 @@ function formatSize(value: string | number): string {
   return text + 'px'
 }
 
-function valueText(value: any): string {
-  if (typeof value == 'string') return value
-  if (typeof value == 'number' || typeof value == 'boolean') return value.toString()
-  return ''
+function selectedValue() : any | null {
+  const modelValue = props.modelValue
+  if (modelValue != null && modelValue.toString().length > 0) return modelValue
+  return props.value
 }
 
-function isChecked(): boolean {
+function nameText() : string {
+  const name = props.name
+  return name == null ? '' : name.toString()
+}
+
+function isChecked() : boolean {
   if (props.checked) return true
-  const modelValue = props.modelValue
-  const value = valueText(modelValue).length > 0 ? modelValue : props.value
+  const value = selectedValue()
+  if (value == null) return false
   if (Array.isArray(value)) {
-    const names = value as Array<any>
-    for (let i = 0; i < names.length; i++) {
-      if (valueText(names[i]) == valueText(props.name)) return true
+    const list = value as Array<any | null>
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i]
+      if (item != null && item.toString() == nameText()) return true
     }
     return false
   }
   if (typeof value == 'boolean') return value
-  return valueText(value) == valueText(props.name)
+  return value.toString() == nameText()
+}
+
+function buildValue(nextChecked : boolean, previousChecked : boolean) : any {
+  const value = selectedValue()
+  if (value != null && Array.isArray(value)) {
+    const list : Array<any | null> = (value as Array<any | null>).slice(0)
+    if (nextChecked && !previousChecked) list.push(props.name)
+    if (!nextChecked && previousChecked) {
+      const nextList : Array<any | null> = []
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i]
+        if (item == null || item.toString() != nameText()) nextList.push(item)
+      }
+      return nextList
+    }
+    return list
+  }
+  return nextChecked
 }
 
 const internalChecked = ref<boolean>(isChecked())
 
-const checked = computed((): boolean => {
+const checked = computed(() : boolean => {
   return internalChecked.value
 })
 
-const wrapClass = computed(() => {
-  const classes = ['i-checkbox']
+const wrapClass = computed(() : string => {
+  const classes : Array<string> = ['i-checkbox']
   if (props.placement == 'column') classes.push('i-checkbox--column')
   if (props.iconPlacement == 'right') classes.push('i-checkbox--right')
   if (props.shape == 'button') classes.push('i-checkbox--button')
@@ -178,13 +203,13 @@ const wrapClass = computed(() => {
   return classes.join(' ')
 })
 
-const labelClass = computed(() => {
-  const classes = ['i-checkbox__label']
+const labelClass = computed(() : string => {
+  const classes : Array<string> = ['i-checkbox__label']
   if (props.shape == 'button') classes.push('i-checkbox__label--button')
   return classes.join(' ')
 })
 
-const boxStyle = computed(() => {
+const boxStyle = computed(() : string => {
   return (
     'width:' +
     formatSize(props.size) +
@@ -200,15 +225,35 @@ const boxStyle = computed(() => {
   )
 })
 
-const markStyle = computed(() => {
+const markStyle = computed(() : string => {
   return 'color:' + props.iconColor + ';font-size:' + formatSize(props.iconSize) + ';'
 })
 
-const labelStyle = computed(() => {
+const labelStyle = computed(() : string => {
   let color = props.labelColor
   if (checked.value && props.activeLabelColor.length > 0) color = props.activeLabelColor
   return 'color:' + color + ';font-size:' + formatSize(props.labelSize) + ';'
 })
+
+function updateChecked(nextChecked : boolean) : void {
+  const previousChecked = checked.value
+  internalChecked.value = nextChecked
+  const nextValue = buildValue(nextChecked, previousChecked)
+  emit('update:checked', nextChecked)
+  emit('update:modelValue', nextValue)
+  emit('update:value', nextValue)
+  emit('change', nextValue)
+}
+
+function toggle() : void {
+  if (props.disabled) return
+  updateChecked(!checked.value)
+}
+
+function toggleByLabel() : void {
+  if (props.labelDisabled) return
+  toggle()
+}
 
 watch(
   () : any => props.modelValue,
@@ -230,47 +275,6 @@ watch(
     internalChecked.value = isChecked()
   },
 )
-
-function buildValue(nextChecked: boolean, previousChecked: boolean): any {
-  const modelValue = props.modelValue
-  const value = valueText(modelValue).length > 0 ? modelValue : props.value
-  if (Array.isArray(value)) {
-    const list = value as Array<any>
-    const nextList = list.slice(0)
-    const exists = previousChecked
-    if (nextChecked && !exists) nextList.push(props.name)
-    if (!nextChecked && exists) {
-      const filtered = [] as Array<any>
-      for (let i = 0; i < nextList.length; i++) {
-        if (valueText(nextList[i]) != valueText(props.name)) filtered.push(nextList[i])
-      }
-      return filtered
-    }
-    return nextList
-  }
-  return nextChecked
-}
-
-function updateChecked(nextChecked: boolean): void {
-  const previousChecked = checked.value
-  internalChecked.value = nextChecked
-  const nextValue = buildValue(nextChecked, previousChecked)
-  emit('update:checked', nextChecked)
-  emit('update:modelValue', nextValue)
-  emit('update:value', nextValue)
-  emit('change', nextValue)
-}
-
-function toggle(): void {
-  if (props.disabled) return
-  updateChecked(!checked.value)
-}
-
-function toggleByLabel(): void {
-  if (props.labelDisabled) return
-  toggle()
-}
-
 </script>
 
 <style>

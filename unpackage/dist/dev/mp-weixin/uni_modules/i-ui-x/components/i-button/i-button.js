@@ -144,11 +144,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   const lastClickTime = common_vendor.ref(0);
   const loadingAngle = common_vendor.ref(0);
   let loadingTimer = 0;
-  function formatSize(value) {
+  function normalizeAngle(value) {
+    let angle = value % 360;
+    if (angle < 0)
+      angle = angle + 360;
+    return angle;
+  }
+  function formatSize(value = null) {
     const text = value.toString();
     if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
       return text;
     return text + "px";
+  }
+  function startLoading() {
+    if (loadingTimer > 0)
+      return null;
+    loadingTimer = setInterval(() => {
+      loadingAngle.value = normalizeAngle(loadingAngle.value + 24);
+    }, 50);
+  }
+  function stopLoading() {
+    if (loadingTimer > 0) {
+      clearInterval(loadingTimer);
+      loadingTimer = 0;
+    }
+    loadingAngle.value = 0;
   }
   const normalizedType = common_vendor.computed(() => {
     if (props.type == "danger")
@@ -156,25 +176,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return props.type;
   });
   const contentText = common_vendor.computed(() => {
-    if (props.text == null)
-      return "";
-    return props.text.toString();
+    return props.text.toString().length > 0 ? props.text.toString() : "";
   });
   const computedHoverClass = common_vendor.computed(() => {
     if (props.disabled || props.loading)
       return "none";
     return props.hoverClass;
-  });
-  function normalizeNumber(value) {
-    if (typeof value == "number")
-      return value;
-    return Number.from(parseFloat(value));
-  }
-  const hoverStartTimeValue = common_vendor.computed(() => {
-    return normalizeNumber(props.hoverStartTime);
-  });
-  const hoverStayTimeValue = common_vendor.computed(() => {
-    return normalizeNumber(props.hoverStayTime);
   });
   const useNativeButton = common_vendor.computed(() => {
     return props.openType.length > 0 || props.formType.length > 0;
@@ -260,23 +267,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     const size = formatSize(props.loadingSize);
     return "width:" + size + ";height:" + size + ";transform:rotate(" + loadingAngle.value.toString() + "deg);";
   });
-  function startLoading() {
-    if (loadingTimer > 0)
-      return null;
-    loadingTimer = setInterval(() => {
-      let angle = (loadingAngle.value + 24) % 360;
-      if (angle < 0)
-        angle = angle + 360;
-      loadingAngle.value = angle;
-    }, 50);
-  }
-  function stopLoading() {
-    if (loadingTimer > 0) {
-      clearInterval(loadingTimer);
-      loadingTimer = 0;
-    }
-    loadingAngle.value = 0;
-  }
   common_vendor.watch(() => {
     return props.loading;
   }, (nextValue) => {
@@ -296,8 +286,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   function canClick() {
     if (props.disabled || props.loading)
       return false;
-    const wait = normalizeNumber(props.throttleTime);
-    if (wait <= 0 || isNaN(wait))
+    const wait = parseFloat(props.throttleTime.toString());
+    if (wait <= 0)
       return true;
     const now = Date.now();
     if (now - lastClickTime.value < wait)
@@ -371,8 +361,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       z: __props.appParameter,
       A: computedHoverClass.value,
       B: __props.hoverStopPropagation,
-      C: hoverStartTimeValue.value,
-      D: hoverStayTimeValue.value,
+      C: parseFloat(__props.hoverStartTime.toString()),
+      D: parseFloat(__props.hoverStayTime.toString()),
       E: __props.lang,
       F: __props.sessionFrom,
       G: __props.sendMessageTitle,
@@ -380,13 +370,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       I: __props.sendMessageImg,
       J: __props.showMessageCard,
       K: __props.dataName,
-      L: common_vendor.o(handleClick, "ba"),
-      M: common_vendor.o(handleGetPhoneNumber, "2d"),
-      N: common_vendor.o(handleGetUserInfo, "76"),
-      O: common_vendor.o(handleError, "29"),
-      P: common_vendor.o(handleOpenSetting, "d5"),
-      Q: common_vendor.o(handleLaunchApp, "d5"),
-      R: common_vendor.o(handleAgreePrivacyAuthorization, "e9")
+      L: common_vendor.o(handleClick, "10"),
+      M: common_vendor.o(handleGetPhoneNumber, "9d"),
+      N: common_vendor.o(handleGetUserInfo, "51"),
+      O: common_vendor.o(handleError, "8d"),
+      P: common_vendor.o(handleOpenSetting, "b8"),
+      Q: common_vendor.o(handleLaunchApp, "4e"),
+      R: common_vendor.o(handleAgreePrivacyAuthorization, "05")
     }) : common_vendor.e({
       S: __props.loading
     }, __props.loading ? {
@@ -422,10 +412,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       }),
       am: computedHoverClass.value,
       an: __props.hoverStopPropagation,
-      ao: hoverStartTimeValue.value,
-      ap: hoverStayTimeValue.value,
+      ao: parseFloat(__props.hoverStartTime.toString()),
+      ap: parseFloat(__props.hoverStayTime.toString()),
       aq: __props.dataName,
-      ar: common_vendor.o(handleClick, "8a")
+      ar: common_vendor.o(handleClick, "28")
     }));
     return __returned__;
   };

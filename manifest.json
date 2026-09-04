@@ -2,8 +2,8 @@
 	"name": "中导物联",
 	"appid": "__UNI__662B0B4",
 	"description": "",
-	"versionName": "1.0.1",
-	"versionCode": "101",
+	"versionName": "1.0.2",
+	"versionCode": "102",
 	"uni-app-x": {
 		"styleIsolationVersion": "2"
 	},
@@ -95,6 +95,11 @@
 		}
 	},
 	"app-plus": {
+		"permissions": {
+			"scope.userLocation": {
+				"desc": "您的地理位置将用于定位功能"
+			}
+		},
 		"distribute": {
 			"android": {
 				"permissions": [

@@ -12,12 +12,14 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
+import android.util.Log as AndroidLog
 import io.dcloud.uniapp.extapi.getLocation as uni_getLocation
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.hideTabBar as uni_hideTabBar
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
+import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
@@ -74,6 +76,7 @@ open class GenPagesIndexIndex : BasePage {
             val markers = ref(_uA<Marker>())
             val lastUpdateTime = ref("--:--:--")
             val devicePosInfo = ref<UTSJSONObject?>(null)
+            var devicePositionRequestId: Number = 0
             val devicePositionUpdateTime = computed<String>(fun(): String {
                 val position = devicePosInfo.value
                 return if (position != null) {
@@ -83,6 +86,9 @@ open class GenPagesIndexIndex : BasePage {
                 }
             }
             )
+            val isValidDeviceCoordinate = fun(latitude: Number, longitude: Number): Boolean {
+                return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0)
+            }
             val SELECTED_DEVICE_STORAGE_KEY: String = "selected_device_info"
             val SELECTED_DEVICE_INDEX_STORAGE_KEY: String = "selected_device_index"
             val safeDeviceDetail = computed<DeviceDetailState>(fun(): DeviceDetailState {
@@ -111,7 +117,7 @@ open class GenPagesIndexIndex : BasePage {
                         } else {
                             "离线"
                         }
-                        return PickerColumnItem(id = null, label = "" + displayName + " (" + statusText + ")", value = if (device.imei != "") {
+                        return PickerColumnItem(id = device.imei, label = "" + displayName + " (" + statusText + ")", value = if (device.imei != "") {
                             device.imei
                         } else {
                             device.deviceId
@@ -144,7 +150,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val saveSelectedDevice = fun(device: Device){
                 try {
-                    val deviceInfo: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 374, 15), "name" to if (device.deviceName != "") {
+                    val deviceInfo: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 388, 15), "name" to if (device.deviceName != "") {
                         device.deviceName
                     } else {
                         if (device.name != "") {
@@ -169,10 +175,10 @@ open class GenPagesIndexIndex : BasePage {
                     }
                     , "deptId" to device.deptId, "deviceId" to device.deviceId, "iccid" to device.iccid, "simMerchant" to device.simMerchant, "connectionStatus" to device.connectionStatus, "carType" to device.carType, "plateNo" to device.plateNo, "latitude" to device.latitude, "longitude" to device.longitude)
                     uni_setStorageSync(SELECTED_DEVICE_STORAGE_KEY, JSON.stringify(deviceInfo))
-                    console.log("保存选中设备成功:", deviceInfo, " at pages/index/index.uvue:389")
+                    console.log("保存选中设备成功:", deviceInfo, " at pages/index/index.uvue:403")
                 }
                  catch (error: Throwable) {
-                    console.error("保存选中设备失败:", error, " at pages/index/index.uvue:391")
+                    console.error("保存选中设备失败:", error, " at pages/index/index.uvue:405")
                 }
             }
             val decodeSavedDevice = fun(raw: Any): SavedDevice? {
@@ -182,7 +188,7 @@ open class GenPagesIndexIndex : BasePage {
                 var data: UTSJSONObject? = null
                 if (UTSAndroid.`typeof`(raw) == "string") {
                     try {
-                        data = UTSAndroid.consoleDebugError(JSON.parse(raw as String), " at pages/index/index.uvue:415") as UTSJSONObject
+                        data = UTSAndroid.consoleDebugError(JSON.parse(raw as String), " at pages/index/index.uvue:429") as UTSJSONObject
                     } catch (error: Throwable) {
                         return null
                     }
@@ -214,17 +220,17 @@ open class GenPagesIndexIndex : BasePage {
                     return decodeSavedDevice(rawDevice)
                 }
                  catch (error: Throwable) {
-                    console.error("获取保存设备失败:", error, " at pages/index/index.uvue:451")
+                    console.error("获取保存设备失败:", error, " at pages/index/index.uvue:465")
                 }
                 return null
             }
             val clearSavedSelectedDevice = fun(){
                 try {
                     uni_removeStorageSync(SELECTED_DEVICE_STORAGE_KEY)
-                    console.log("清除保存设备成功", " at pages/index/index.uvue:460")
+                    console.log("清除保存设备成功", " at pages/index/index.uvue:474")
                 }
                  catch (error: Throwable) {
-                    console.error("清除保存设备失败:", error, " at pages/index/index.uvue:462")
+                    console.error("清除保存设备失败:", error, " at pages/index/index.uvue:476")
                 }
             }
             val saveSelectedDeviceIndex = fun(index: Number){
@@ -232,7 +238,7 @@ open class GenPagesIndexIndex : BasePage {
                     uni_setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index)
                 }
                  catch (error: Throwable) {
-                    console.error("保存选中设备索引失败:", error, " at pages/index/index.uvue:471")
+                    console.error("保存选中设备索引失败:", error, " at pages/index/index.uvue:485")
                 }
             }
             val getSavedSelectedDeviceIndex = fun(): Number? {
@@ -248,7 +254,7 @@ open class GenPagesIndexIndex : BasePage {
                     }
                 }
                  catch (error: Throwable) {
-                    console.error("获取保存设备索引失败:", error, " at pages/index/index.uvue:484")
+                    console.error("获取保存设备索引失败:", error, " at pages/index/index.uvue:498")
                 }
                 return null
             }
@@ -257,7 +263,7 @@ open class GenPagesIndexIndex : BasePage {
                     uni_removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY)
                 }
                  catch (error: Throwable) {
-                    console.error("清除保存设备索引失败:", error, " at pages/index/index.uvue:494")
+                    console.error("清除保存设备索引失败:", error, " at pages/index/index.uvue:508")
                 }
             }
             val findDeviceIndex = fun(imei: String, deviceId: String): Number {
@@ -362,17 +368,20 @@ open class GenPagesIndexIndex : BasePage {
             }
             val centerOnUserLocation = ::gen_centerOnUserLocation_fn
             fun gen_getUserLocation_fn() {
-                uni_getLocation(GetLocationOptions(type = "gcj02", success = fun(res){
-                    console.log("用户当前位置:", res, " at pages/index/index.uvue:611")
-                    userLocation.latitude = res.latitude
-                    userLocation.longitude = res.longitude
+                uni_getLocation(GetLocationOptions(type = "wgs84", provider = "system", success = fun(res){
+                    console.log("用户当前位置:", res, " at pages/index/index.uvue:626")
+                    AndroidLog.i("用户当前位置:", JSON.stringify(res))
+                    val convertedCoord = CoordTransform.wgs84ToTencent(res.latitude, res.longitude)
+                    userLocation.latitude = convertedCoord.lat
+                    userLocation.longitude = convertedCoord.lng
                     hasUserLocation.value = true
                     if (!hasDevice.value) {
                         centerOnUserLocation()
                     }
                 }
                 , fail = fun(err){
-                    console.error("获取用户当前位置失败:", err.errMsg, err, " at pages/index/index.uvue:620")
+                    AndroidLog.i("用户当前位置:", JSON.stringify(err))
+                    console.error("获取用户当前位置失败:", err.errMsg, err, " at pages/index/index.uvue:642")
                 }
                 ))
             }
@@ -383,7 +392,7 @@ open class GenPagesIndexIndex : BasePage {
                             val res = await(getDeviceDetail(deviceId))
                             val detail = res.data
                             if (res.code != 200 || detail == null) {
-                                console.error("加载设备详情失败:", res.msg, " at pages/index/index.uvue:631")
+                                console.error("加载设备详情失败:", res.msg, " at pages/index/index.uvue:653")
                                 return@w1
                             }
                             if (detail != null) {
@@ -399,7 +408,7 @@ open class GenPagesIndexIndex : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载设备详情失败", error, " at pages/index/index.uvue:653")
+                            console.error("加载设备详情失败", error, " at pages/index/index.uvue:675")
                         }
                 })
             }
@@ -461,7 +470,7 @@ open class GenPagesIndexIndex : BasePage {
                                 return@w1
                             }
                             if (res.code != 200) {
-                                console.error("加载轨迹失败:", res.msg, " at pages/index/index.uvue:739")
+                                console.error("加载轨迹失败:", res.msg, " at pages/index/index.uvue:761")
                                 clearTripData()
                                 return@w1
                             }
@@ -476,7 +485,7 @@ open class GenPagesIndexIndex : BasePage {
                             if (requestId != trackRequestId) {
                                 return@w1
                             }
-                            console.error("加载轨迹失败", error, " at pages/index/index.uvue:752")
+                            console.error("加载轨迹失败", error, " at pages/index/index.uvue:774")
                             clearTripData()
                         }
                 })
@@ -494,12 +503,18 @@ open class GenPagesIndexIndex : BasePage {
             }
             val loadDevicePos = fun(data: UTSJSONObject): UTSPromise<Boolean> {
                 return wrapUTSPromise(suspend w1@{
+                        val requestId = ++devicePositionRequestId
                         positionState.value = "loading"
+                        markers.value = _uA()
+                        devicePosInfo.value = null
                         try {
                             val res = await(getDevicePos(data))
+                            if (requestId != devicePositionRequestId) {
+                                return@w1 false
+                            }
                             val positions = res.data
                             if (res.code != 200 || positions == null || positions.length == 0) {
-                                console.warn("获取设备位置失败:", data.getString("deviceId", ""), res.code, " at pages/index/index.uvue:776")
+                                console.warn("获取设备位置失败:", data.getString("deviceId", ""), res.code, " at pages/index/index.uvue:804")
                                 positionState.value = "empty"
                                 return@w1 false
                             }
@@ -507,9 +522,10 @@ open class GenPagesIndexIndex : BasePage {
                             devicePosInfo.value = position
                             val lat = position.getNumber("latitude", 0)
                             val lng = position.getNumber("longitude", 0)
-                            val isValidCoordinate = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0)
+                            val isValidCoordinate = isValidDeviceCoordinate(lat, lng)
                             if (!isValidCoordinate) {
-                                console.error("经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""), " at pages/index/index.uvue:791")
+                                console.error("经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""), " at pages/index/index.uvue:817")
+                                markers.value = _uA()
                                 positionState.value = "invalid"
                                 showAppToast(ShowToastOptions(title = "定位数据异常", icon = "none"))
                                 return@w1 false
@@ -524,13 +540,16 @@ open class GenPagesIndexIndex : BasePage {
                                 await(centerMapOnDevice(convertedCoord.lat, convertedCoord.lng))
                             }
                              catch (mapError: Throwable) {
-                                console.error("刷新地图视图失败", mapError, " at pages/index/index.uvue:817")
+                                console.error("刷新地图视图失败", mapError, " at pages/index/index.uvue:844")
                             }
-                            console.log("标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng, " at pages/index/index.uvue:819")
+                            console.log("标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng, " at pages/index/index.uvue:846")
                             return@w1 true
                         }
                          catch (error: Throwable) {
-                            console.error("加载设备位置失败", error, " at pages/index/index.uvue:822")
+                            if (requestId != devicePositionRequestId) {
+                                return@w1 false
+                            }
+                            console.error("加载设备位置失败", error, " at pages/index/index.uvue:850")
                             positionState.value = "failed"
                             showAppToast(ShowToastOptions(title = "定位失败，请重试", icon = "none"))
                             return@w1 false
@@ -539,7 +558,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val loadDeviceData = fun(device: Device): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log("开始加载设备数据:", device, " at pages/index/index.uvue:834")
+                        console.log("开始加载设备数据:", device, " at pages/index/index.uvue:862")
                         try {
                             await(loadDeviceDetail(device.deviceId))
                             await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.imei != "") {
@@ -557,7 +576,7 @@ open class GenPagesIndexIndex : BasePage {
                             showAppToast(ShowToastOptions(title = "切换成功", icon = "none"))
                         }
                          catch (error: Throwable) {
-                            console.error("切换车辆失败", error, " at pages/index/index.uvue:847")
+                            console.error("切换车辆失败", error, " at pages/index/index.uvue:875")
                             showAppToast(ShowToastOptions(title = "切换失败，请重试", icon = "none"))
                         }
                          finally {
@@ -601,7 +620,8 @@ open class GenPagesIndexIndex : BasePage {
                     return
                 }
                 if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-                    console.log("选择的设备与当前设备相同，不重复加载", " at pages/index/index.uvue:893")
+                    console.log("选择的设备111:", selectedDevice.imei, selectedDevice.deviceId, currentCarImei.value, currentCarDeviceId.value, " at pages/index/index.uvue:921")
+                    console.log("选择的设备与当前设备相同，不重复加载", " at pages/index/index.uvue:922")
                     return
                 }
                 val deviceName = if (selectedDevice.deviceName != "") {
@@ -626,8 +646,6 @@ open class GenPagesIndexIndex : BasePage {
                 currentCarConnectionStatus.value = selectedDevice.connectionStatus
                 currentCarCarType.value = selectedDevice.carType
                 currentCarPlateNo.value = selectedDevice.plateNo
-                center.latitude = selectedDevice.latitude
-                center.longitude = selectedDevice.longitude
                 saveSelectedDeviceIndex(selectedIndex)
                 pickerValues.value = _uA(
                     if (selectedDevice.imei != "") {
@@ -655,7 +673,7 @@ open class GenPagesIndexIndex : BasePage {
                                 , icon = "none"))
                                 return@w1
                             }
-                            console.log("加载车辆列表返回:", res.data, " at pages/index/index.uvue:937")
+                            console.log("加载车辆列表返回:", res.data, " at pages/index/index.uvue:964")
                             val pageData = res.data
                             if (pageData == null) {
                                 userDeviceList.value = _uA()
@@ -717,7 +735,7 @@ open class GenPagesIndexIndex : BasePage {
                                     selectedIdx = 0
                                     saveSelectedDevice(selectedDevice)
                                     saveSelectedDeviceIndex(0)
-                                    console.log("使用第一个设备作为默认:", selectedDevice?.deviceName, " at pages/index/index.uvue:1014")
+                                    console.log("使用第一个设备作为默认:", selectedDevice?.deviceName, " at pages/index/index.uvue:1041")
                                 }
                                 if (selectedDevice != null) {
                                     val device = selectedDevice
@@ -743,8 +761,6 @@ open class GenPagesIndexIndex : BasePage {
                                     currentCarConnectionStatus.value = device.connectionStatus
                                     currentCarCarType.value = device.carType
                                     currentCarPlateNo.value = device.plateNo
-                                    center.latitude = device.latitude
-                                    center.longitude = device.longitude
                                     pickerValues.value = _uA(
                                         if (device.imei != "") {
                                             device.imei
@@ -779,7 +795,7 @@ open class GenPagesIndexIndex : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败", error, " at pages/index/index.uvue:1058")
+                            console.error("加载车辆列表失败", error, " at pages/index/index.uvue:1083")
                             showAppToast(ShowToastOptions(title = "加载失败，请下拉重试", icon = "none"))
                         }
                 })
@@ -803,7 +819,7 @@ open class GenPagesIndexIndex : BasePage {
                             await(loadDevicePos(_uO("deviceId" to currentCarDeviceId.value, "deviceids" to currentCarImei.value)))
                         }
                          catch (error: Throwable) {
-                            console.error("刷新位置失败", error, " at pages/index/index.uvue:1095")
+                            console.error("刷新位置失败", error, " at pages/index/index.uvue:1120")
                             showAppToast(ShowToastOptions(title = "刷新失败", icon = "none"))
                         }
                          finally {
@@ -841,7 +857,7 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude, fail = fun(err){
                     if (err.errMsg.indexOf("locked") < 0) {
-                        console.error("跳转轨迹详情失败:", err, " at pages/index/index.uvue:1139")
+                        console.error("跳转轨迹详情失败:", err, " at pages/index/index.uvue:1164")
                     }
                 }
                 ))
@@ -867,7 +883,7 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 uni_navigateTo(NavigateToOptions(url = "/pages/addCar/addCar", fail = fun(err){
                     if (err.errMsg.indexOf("locked") < 0) {
-                        console.error("跳转添加设备失败:", err, " at pages/index/index.uvue:1167")
+                        console.error("跳转添加设备失败:", err, " at pages/index/index.uvue:1192")
                     }
                 }
                 ))
@@ -921,7 +937,7 @@ open class GenPagesIndexIndex : BasePage {
                     iccid = iccid.substring(0, iccid.length - 1)
                 }
                 needRefresh.value = true
-                console.log("iccid", iccid, " at pages/index/index.uvue:1258")
+                console.log("iccid", iccid, " at pages/index/index.uvue:1283")
                 needRefresh.value = false
                 showAppToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none", duration = 2000, mask = true))
             }
@@ -935,7 +951,7 @@ open class GenPagesIndexIndex : BasePage {
             fun gen_unbindCurrentDevice_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         val result = await(delDevice(currentCarDeviceId.value))
-                        console.log("解绑设备结果:", result, " at pages/index/index.uvue:1281")
+                        console.log("解绑设备结果:", result, " at pages/index/index.uvue:1306")
                         if (result.code == 200) {
                             showAppToast(ShowToastOptions(title = "解绑成功", icon = "none"))
                             clearSavedSelectedDevice()
@@ -957,6 +973,38 @@ open class GenPagesIndexIndex : BasePage {
                 showAppModal(AppModalOptions(title = "解绑车辆", content = "确定解绑当前车辆吗？", success = fun(res: AppModalSuccess): Unit {
                     if (res.confirm) {
                         unbindCurrentDevice()
+                    }
+                }
+                ))
+            }
+            fun gen_performLogout_fn(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        await(unbindPushDeviceOnLogout())
+                        val res = await(logout())
+                        if (res.code == 200) {
+                            clearSavedSelectedDevice()
+                            clearSavedSelectedDeviceIndex()
+                            uni_removeStorageSync("token")
+                            clearPushSessionState()
+                            uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
+                        } else {
+                            showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                res.msg
+                            } else {
+                                "退出账户失败"
+                            }
+                            ))
+                        }
+                })
+            }
+            val performLogout = ::gen_performLogout_fn
+            val logout__1 = fun(): Unit {
+                if (!isLogin()) {
+                    return
+                }
+                showAppModal(AppModalOptions(title = "退出登录", content = "确定退出登录吗？", success = fun(res: AppModalSuccess): Unit {
+                    if (res.confirm) {
+                        performLogout()
                     }
                 }
                 ))
@@ -1094,7 +1142,7 @@ open class GenPagesIndexIndex : BasePage {
                                     )),
                                     _cE("view", _uM("class" to "map-container"), _uA(
                                         if (isTrue(isMapReady.value)) {
-                                            _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center.latitude, "longitude" to center.longitude, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to false, "markers" to markers.value), null, 8, _uA(
+                                            _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center.latitude, "longitude" to center.longitude, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to false, "markers" to markers.value), null, 8, _uA(
                                                 "latitude",
                                                 "longitude",
                                                 "scale",
@@ -1216,8 +1264,12 @@ open class GenPagesIndexIndex : BasePage {
                                             _cE("image", _uM("src" to default__6, "mode" to "aspectFit", "class" to "icon-image")),
                                             _cE("text", _uM("class" to "item-title"), "在线客服")
                                         )),
-                                        _cE("view", _uM("class" to "service-item", "onClick" to unbindDevice), _uA(
+                                        _cE("view", _uM("class" to "service-item", "onClick" to logout__1), _uA(
                                             _cE("image", _uM("src" to default__7, "mode" to "aspectFit", "class" to "icon-image")),
+                                            _cE("text", _uM("class" to "item-title", "style" to _nS(_uM("color" to "#EE793A"))), "退出登录", 4)
+                                        )),
+                                        _cE("view", _uM("class" to "service-item", "onClick" to unbindDevice), _uA(
+                                            _cE("image", _uM("src" to default__8, "mode" to "aspectFit", "class" to "icon-image")),
                                             _cE("text", _uM("class" to "item-title", "style" to _nS(_uM("color" to "#d81e06"))), "删除设备", 4)
                                         ))
                                     ))
@@ -1256,7 +1308,7 @@ open class GenPagesIndexIndex : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#E6F9E6", "backgroundImage" to "linear-gradient(to right, #E6F9E6, #E0F0FF)")), "page-bg" to _uM(".container " to _uM("paddingTop" to 0, "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx")), "loading-container" to _uM(".container .page-bg " to _uM("position" to "fixed", "top" to "50%", "left" to "50%", "transform" to "translate(-50%, -50%)", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "zIndex" to 999)), "loading-text" to _uM(".container .page-bg .loading-container " to _uM("marginTop" to "20rpx", "fontSize" to "28rpx", "color" to "#666666")), "device-car" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "current-car" to _uM(".container .page-bg .top .device-car " to _uM("position" to "relative", "display" to "flex", "flexDirection" to "row", "alignItems" to "flex-end")), "car-id" to _uM(".container .page-bg .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "position" to "relative")), "login" to _uM(".container .page-bg .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "paddingRight" to "10rpx")), "nav-tools" to _uM(".container .page-bg .top .device-car " to _uM("display" to "flex", "flexShrink" to 0, "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "nav-tool-spacing" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("flexShrink" to 0, "marginLeft" to "30rpx")), "nav-tool-add" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("display" to "flex", "width" to "40rpx", "height" to "40rpx", "alignItems" to "center", "justifyContent" to "center")), "nav-tool-add-image" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("width" to "36rpx", "height" to "36rpx")), "exit" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "rgba(0,0,0,0.05)", "transitionProperty" to "all", "transitionDuration" to "0.2s", "transitionTimingFunction" to "ease", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%")), "exit-icon" to _uM(".container .page-bg .top .device-car .nav-tools .exit " to _uM("width" to "40rpx", "height" to "40rpx")), "device-info" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "column", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx", "width" to "50%")), "info" to _uM(".container .page-bg .top .device-info .info+" to _uM("marginTop" to "16rpx"), ".container .page-bg .top .device-info " to _uM("fontSize" to "26rpx", "color" to "#333333")), "banner-image" to _uM(".container .page-bg .top " to _uM("width" to "100%", "height" to "300rpx")), "car-state" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0, "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx")), "state-item" to _uM(".container .page-bg .top .car-state .state-item+" to _uM("marginLeft" to "20rpx"), ".container .page-bg .top .car-state " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx")), "state-label" to _uM(".container .page-bg .top .car-state .state-item " to _uM("fontSize" to "24rpx", "color" to "#999999")), "state-value" to _uM(".container .page-bg .top .car-state .state-item " to _uM("marginTop" to "12rpx", "fontSize" to "25rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .page-bg .top .car-state .state-item .online" to _uM("color" to "#07C160")), "map-box" to _uM(".container .page-bg .content " to _uM("width" to "100%", "height" to "400rpx", "marginTop" to "10rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0, "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden", "boxShadow" to "0 4rpx 20rpx rgba(0, 0, 0, 0.08)")), "map-header" to _uM(".container .page-bg .content .map-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "map-title" to _uM(".container .page-bg .content .map-box .map-header " to _uM("flexShrink" to 0, "fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "map-refresh-wrap" to _uM(".container .page-bg .content .map-box .map-header " to _uM("display" to "flex", "flexShrink" to 0, "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "map-refresh" to _uM(".container .page-bg .content .map-box .map-header .map-refresh-wrap " to _uM("fontSize" to "26rpx", "lineHeight" to "42rpx", "color" to "#07C160", "whiteSpace" to "nowrap")), "map-container" to _uM(".container .page-bg .content .map-box " to _uM("position" to "relative", "height" to "300rpx")), "map-status" to _uM(".container .page-bg .content .map-box .map-container " to _uM("position" to "absolute", "left" to "24rpx", "right" to "24rpx", "bottom" to "24rpx", "paddingTop" to "16rpx", "paddingRight" to "20rpx", "paddingBottom" to "16rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "12rpx", "borderTopRightRadius" to "12rpx", "borderBottomRightRadius" to "12rpx", "borderBottomLeftRadius" to "12rpx", "backgroundColor" to "rgba(0,0,0,0.68)", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "map-status-text" to _uM(".container .page-bg .content .map-box .map-container .map-status " to _uM("color" to "#ffffff", "fontSize" to "24rpx")), "map-status-retry" to _uM(".container .page-bg .content .map-box .map-container .map-status " to _uM("flexShrink" to 0, "marginLeft" to "20rpx", "color" to "#8de39b", "fontSize" to "24rpx")), "mile-record" to _uM(".container .page-bg .content " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden", "boxShadow" to "0 4rpx 20rpx rgba(0, 0, 0, 0.08)")), "record-header" to _uM(".container .page-bg .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "record-title" to _uM(".container .page-bg .content .mile-record .record-header " to _uM("flexShrink" to 0, "fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "record-desc-wrap" to _uM(".container .page-bg .content .mile-record .record-header " to _uM("display" to "flex", "flexShrink" to 0, "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "record-desc" to _uM(".container .page-bg .content .mile-record .record-header .record-desc-wrap " to _uM("fontSize" to "26rpx", "lineHeight" to "42rpx", "color" to "#07C160", "whiteSpace" to "nowrap")), "ring-container" to _uM(".container .page-bg .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-around", "paddingTop" to "30rpx", "paddingRight" to "20rpx", "paddingBottom" to "30rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#edf7ff", "borderTopLeftRadius" to "24rpx", "borderTopRightRadius" to "24rpx", "borderBottomRightRadius" to "24rpx", "borderBottomLeftRadius" to "24rpx", "marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx")), "ring-item" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "relative", "width" to "250rpx", "height" to "250rpx", "display" to "flex", "alignItems" to "center", "justifyContent" to "center")), "ring-bg" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "250rpx", "height" to "250rpx", "zIndex" to 2)), "ring-quarter" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "125rpx", "height" to "125rpx", "overflow" to "hidden")), "ring-quarter--top-left" to _uM(".container .page-bg .content .mile-record " to _uM("top" to 0, "left" to 0)), "ring-quarter--top-right" to _uM(".container .page-bg .content .mile-record " to _uM("top" to 0, "right" to 0)), "ring-quarter--bottom-right" to _uM(".container .page-bg .content .mile-record " to _uM("right" to 0, "bottom" to 0)), "ring-quarter--bottom-left" to _uM(".container .page-bg .content .mile-record " to _uM("bottom" to 0, "left" to 0)), "ring-stroke" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "250rpx", "height" to "250rpx", "boxSizing" to "border-box", "borderTopWidth" to "16rpx", "borderRightWidth" to "16rpx", "borderBottomWidth" to "16rpx", "borderLeftWidth" to "16rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to 999, "borderTopRightRadius" to 999, "borderBottomRightRadius" to 999, "borderBottomLeftRadius" to 999), ".container .page-bg .content .mile-record .ring-quarter--top-left " to _uM("top" to 0, "left" to 0), ".container .page-bg .content .mile-record .ring-quarter--top-right " to _uM("top" to 0, "right" to 0), ".container .page-bg .content .mile-record .ring-quarter--bottom-right " to _uM("right" to 0, "bottom" to 0), ".container .page-bg .content .mile-record .ring-quarter--bottom-left " to _uM("bottom" to 0, "left" to 0)), "ring-stroke--track" to _uM(".container .page-bg .content .mile-record " to _uM("borderTopColor" to "#dceaf3", "borderRightColor" to "#dceaf3", "borderBottomColor" to "#dceaf3", "borderLeftColor" to "#dceaf3", "borderTopWidth" to "5rpx", "borderRightWidth" to "5rpx", "borderBottomWidth" to "5rpx", "borderLeftWidth" to "5rpx")), "ring-stroke--active" to _uM(".container .page-bg .content .mile-record " to _uM("borderTopColor" to "#4cd964", "borderRightColor" to "#4cd964", "borderBottomColor" to "#4cd964", "borderLeftColor" to "#4cd964"), ".container .page-bg .content .mile-record .ring-bg.orange " to _uM("borderTopColor" to "#ff9500", "borderRightColor" to "#ff9500", "borderBottomColor" to "#ff9500", "borderLeftColor" to "#ff9500")), "ring-text" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "relative", "zIndex" to 10)), "num" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "45rpx", "fontWeight" to "bold", "color" to "#333333", "textAlign" to "center")), "unit" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "20rpx", "color" to "#666666", "textAlign" to "right")), "label" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "25rpx", "color" to "#666666", "marginTop" to "12rpx", "textAlign" to "center")), "device-list" to _uM(".container .page-bg .content " to _uM("display" to "flex", "flexDirection" to "column", "marginTop" to "40rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0)), "device-item" to _uM(".container .page-bg .content .device-list .device-item+" to _uM("marginTop" to "30rpx"), ".container .page-bg .content .device-list " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "item-label" to _uM(".container .page-bg .content .device-list .device-item " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center")), "icon" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("width" to "80rpx", "height" to "80rpx", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "paddingTop" to "18rpx", "paddingRight" to "18rpx", "paddingBottom" to "18rpx", "paddingLeft" to "18rpx"), ".container .page-bg .content .device-list .device-item .item-label .icon-device" to _uM("backgroundColor" to "#f0f9f0"), ".container .page-bg .content .device-list .device-item .item-label .icon-car" to _uM("backgroundColor" to "#f3f8fb"), ".container .page-bg .content .device-list .device-item .item-label .icon-fence" to _uM("backgroundColor" to "#f1f7f4")), "icon-image" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("width" to "45rpx", "height" to "45rpx"), ".container .page-bg .content .service .service-content .service-item " to _uM("width" to "60rpx", "height" to "60rpx")), "item-info" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("marginLeft" to "20rpx")), "item-title" to _uM(".container .page-bg .content .device-list .device-item .item-label .item-info " to _uM("fontSize" to "28rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .page-bg .content .service .service-content .service-item " to _uM("marginTop" to "10rpx", "fontSize" to "25rpx", "color" to "#222222")), "item-desc" to _uM(".container .page-bg .content .device-list .device-item .item-label .item-info " to _uM("color" to "#cccccc", "fontSize" to "24rpx", "marginTop" to "10rpx")), "service" to _uM(".container .page-bg .content " to _uM("display" to "flex", "flexDirection" to "column", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#ffffff", "marginBottom" to "30rpx")), "service-header" to _uM(".container .page-bg .content .service " to _uM("fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0", "marginBottom" to "30rpx")), "service-content" to _uM(".container .page-bg .content .service " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx")), "service-item" to _uM(".container .page-bg .content .service .service-content " to _uM("display" to "flex", "flexDirection" to "column", "alignItems" to "center")), "@TRANSITION" to _uM("exit" to _uM("property" to "all", "duration" to "0.2s", "timingFunction" to "ease")))
+                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#E6F9E6", "backgroundImage" to "linear-gradient(to right, #E6F9E6, #E0F0FF)")), "page-bg" to _uM(".container " to _uM("paddingTop" to 0, "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx")), "loading-container" to _uM(".container .page-bg " to _uM("position" to "fixed", "top" to "50%", "left" to "50%", "transform" to "translate(-50%, -50%)", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "zIndex" to 999)), "loading-text" to _uM(".container .page-bg .loading-container " to _uM("marginTop" to "20rpx", "fontSize" to "28rpx", "color" to "#666666")), "device-car" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "current-car" to _uM(".container .page-bg .top .device-car " to _uM("position" to "relative", "display" to "flex", "flexDirection" to "row", "alignItems" to "flex-end")), "car-id" to _uM(".container .page-bg .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "position" to "relative")), "login" to _uM(".container .page-bg .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "paddingRight" to "10rpx")), "nav-tools" to _uM(".container .page-bg .top .device-car " to _uM("display" to "flex", "flexShrink" to 0, "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "nav-tool-spacing" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("flexShrink" to 0, "marginLeft" to "30rpx")), "nav-tool-add" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("display" to "flex", "width" to "40rpx", "height" to "40rpx", "alignItems" to "center", "justifyContent" to "center")), "nav-tool-add-image" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("width" to "36rpx", "height" to "36rpx")), "exit" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "rgba(0,0,0,0.05)", "transitionProperty" to "all", "transitionDuration" to "0.2s", "transitionTimingFunction" to "ease", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%")), "exit-icon" to _uM(".container .page-bg .top .device-car .nav-tools .exit " to _uM("width" to "40rpx", "height" to "40rpx")), "device-info" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "column", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx", "width" to "50%")), "info" to _uM(".container .page-bg .top .device-info .info+" to _uM("marginTop" to "16rpx"), ".container .page-bg .top .device-info " to _uM("fontSize" to "26rpx", "color" to "#333333")), "banner-image" to _uM(".container .page-bg .top " to _uM("width" to "100%", "height" to "300rpx")), "car-state" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0, "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx")), "state-item" to _uM(".container .page-bg .top .car-state .state-item+" to _uM("marginLeft" to "20rpx"), ".container .page-bg .top .car-state " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx")), "state-label" to _uM(".container .page-bg .top .car-state .state-item " to _uM("fontSize" to "24rpx", "color" to "#999999")), "state-value" to _uM(".container .page-bg .top .car-state .state-item " to _uM("marginTop" to "12rpx", "fontSize" to "25rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .page-bg .top .car-state .state-item .online" to _uM("color" to "#07C160")), "map-box" to _uM(".container .page-bg .content " to _uM("width" to "100%", "height" to "400rpx", "marginTop" to "10rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0, "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden")), "map-header" to _uM(".container .page-bg .content .map-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "map-title" to _uM(".container .page-bg .content .map-box .map-header " to _uM("flexShrink" to 0, "fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "map-refresh-wrap" to _uM(".container .page-bg .content .map-box .map-header " to _uM("display" to "flex", "flexShrink" to 0, "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "map-refresh" to _uM(".container .page-bg .content .map-box .map-header .map-refresh-wrap " to _uM("fontSize" to "26rpx", "lineHeight" to "42rpx", "color" to "#07C160", "whiteSpace" to "nowrap")), "map-container" to _uM(".container .page-bg .content .map-box " to _uM("position" to "relative", "height" to "300rpx")), "map-status" to _uM(".container .page-bg .content .map-box .map-container " to _uM("position" to "absolute", "left" to "24rpx", "right" to "24rpx", "bottom" to "24rpx", "paddingTop" to "16rpx", "paddingRight" to "20rpx", "paddingBottom" to "16rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "12rpx", "borderTopRightRadius" to "12rpx", "borderBottomRightRadius" to "12rpx", "borderBottomLeftRadius" to "12rpx", "backgroundColor" to "rgba(0,0,0,0.68)", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "map-status-text" to _uM(".container .page-bg .content .map-box .map-container .map-status " to _uM("color" to "#ffffff", "fontSize" to "24rpx")), "map-status-retry" to _uM(".container .page-bg .content .map-box .map-container .map-status " to _uM("flexShrink" to 0, "marginLeft" to "20rpx", "color" to "#8de39b", "fontSize" to "24rpx")), "mile-record" to _uM(".container .page-bg .content " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden", "boxShadow" to "0 4rpx 20rpx rgba(0, 0, 0, 0.08)")), "record-header" to _uM(".container .page-bg .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "record-title" to _uM(".container .page-bg .content .mile-record .record-header " to _uM("flexShrink" to 0, "fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "record-desc-wrap" to _uM(".container .page-bg .content .mile-record .record-header " to _uM("display" to "flex", "flexShrink" to 0, "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "record-desc" to _uM(".container .page-bg .content .mile-record .record-header .record-desc-wrap " to _uM("fontSize" to "26rpx", "lineHeight" to "42rpx", "color" to "#07C160", "whiteSpace" to "nowrap")), "ring-container" to _uM(".container .page-bg .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-around", "paddingTop" to "30rpx", "paddingRight" to "20rpx", "paddingBottom" to "30rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#edf7ff", "borderTopLeftRadius" to "24rpx", "borderTopRightRadius" to "24rpx", "borderBottomRightRadius" to "24rpx", "borderBottomLeftRadius" to "24rpx", "marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx")), "ring-item" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "relative", "width" to "250rpx", "height" to "250rpx", "display" to "flex", "alignItems" to "center", "justifyContent" to "center")), "ring-bg" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "250rpx", "height" to "250rpx", "zIndex" to 2)), "ring-quarter" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "126rpx", "height" to "126rpx", "overflow" to "hidden")), "ring-quarter--top-left" to _uM(".container .page-bg .content .mile-record " to _uM("top" to 0, "left" to 0)), "ring-quarter--top-right" to _uM(".container .page-bg .content .mile-record " to _uM("top" to 0, "right" to 0)), "ring-quarter--bottom-right" to _uM(".container .page-bg .content .mile-record " to _uM("right" to 0, "bottom" to 0)), "ring-quarter--bottom-left" to _uM(".container .page-bg .content .mile-record " to _uM("bottom" to 0, "left" to 0)), "ring-stroke" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "250rpx", "height" to "250rpx", "boxSizing" to "border-box", "borderTopWidth" to "16rpx", "borderRightWidth" to "16rpx", "borderBottomWidth" to "16rpx", "borderLeftWidth" to "16rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to 999, "borderTopRightRadius" to 999, "borderBottomRightRadius" to 999, "borderBottomLeftRadius" to 999), ".container .page-bg .content .mile-record .ring-quarter--top-left " to _uM("top" to 0, "left" to 0), ".container .page-bg .content .mile-record .ring-quarter--top-right " to _uM("top" to 0, "right" to 0), ".container .page-bg .content .mile-record .ring-quarter--bottom-right " to _uM("right" to 0, "bottom" to 0), ".container .page-bg .content .mile-record .ring-quarter--bottom-left " to _uM("bottom" to 0, "left" to 0)), "ring-stroke--track" to _uM(".container .page-bg .content .mile-record " to _uM("borderTopColor" to "#dceaf3", "borderRightColor" to "#dceaf3", "borderBottomColor" to "#dceaf3", "borderLeftColor" to "#dceaf3", "borderTopWidth" to "5rpx", "borderRightWidth" to "5rpx", "borderBottomWidth" to "5rpx", "borderLeftWidth" to "5rpx")), "ring-stroke--active" to _uM(".container .page-bg .content .mile-record " to _uM("borderTopColor" to "#4cd964", "borderRightColor" to "#4cd964", "borderBottomColor" to "#4cd964", "borderLeftColor" to "#4cd964"), ".container .page-bg .content .mile-record .ring-bg.orange " to _uM("borderTopColor" to "#ff9500", "borderRightColor" to "#ff9500", "borderBottomColor" to "#ff9500", "borderLeftColor" to "#ff9500")), "ring-text" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "relative", "zIndex" to 10)), "num" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "45rpx", "fontWeight" to "bold", "color" to "#333333", "textAlign" to "center")), "unit" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "20rpx", "color" to "#666666", "textAlign" to "right")), "label" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "25rpx", "color" to "#666666", "marginTop" to "12rpx", "textAlign" to "center")), "device-list" to _uM(".container .page-bg .content " to _uM("display" to "flex", "flexDirection" to "column", "marginTop" to "40rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0)), "device-item" to _uM(".container .page-bg .content .device-list .device-item+" to _uM("marginTop" to "30rpx"), ".container .page-bg .content .device-list " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "item-label" to _uM(".container .page-bg .content .device-list .device-item " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center")), "icon" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("width" to "80rpx", "height" to "80rpx", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "paddingTop" to "18rpx", "paddingRight" to "18rpx", "paddingBottom" to "18rpx", "paddingLeft" to "18rpx"), ".container .page-bg .content .device-list .device-item .item-label .icon-device" to _uM("backgroundColor" to "#f0f9f0"), ".container .page-bg .content .device-list .device-item .item-label .icon-car" to _uM("backgroundColor" to "#f3f8fb"), ".container .page-bg .content .device-list .device-item .item-label .icon-fence" to _uM("backgroundColor" to "#f1f7f4")), "icon-image" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("width" to "45rpx", "height" to "45rpx"), ".container .page-bg .content .service .service-content .service-item " to _uM("width" to "60rpx", "height" to "60rpx")), "item-info" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("marginLeft" to "20rpx")), "item-title" to _uM(".container .page-bg .content .device-list .device-item .item-label .item-info " to _uM("fontSize" to "28rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .page-bg .content .service .service-content .service-item " to _uM("marginTop" to "10rpx", "fontSize" to "25rpx", "color" to "#222222")), "item-desc" to _uM(".container .page-bg .content .device-list .device-item .item-label .item-info " to _uM("color" to "#cccccc", "fontSize" to "24rpx", "marginTop" to "10rpx")), "service" to _uM(".container .page-bg .content " to _uM("display" to "flex", "flexDirection" to "column", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#ffffff", "marginBottom" to "30rpx")), "service-header" to _uM(".container .page-bg .content .service " to _uM("fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0", "marginBottom" to "30rpx")), "service-content" to _uM(".container .page-bg .content .service " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx")), "service-item" to _uM(".container .page-bg .content .service .service-content " to _uM("display" to "flex", "flexDirection" to "column", "alignItems" to "center")), "@TRANSITION" to _uM("exit" to _uM("property" to "all", "duration" to "0.2s", "timingFunction" to "ease")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

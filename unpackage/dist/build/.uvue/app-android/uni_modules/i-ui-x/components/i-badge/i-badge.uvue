@@ -90,17 +90,15 @@ const __sfc__ = defineComponent({
         function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
             __ins.emit(event, ...do_not_transform_spread);
         }
+        const bgColor = computed((): string => {
+            return props.bgColor;
+        });
         function hasNumberValue(): boolean {
-            if (props.value != null && props.value.toString().length > 0)
-                return true;
-            return props.count > 0 || props.showZero;
+            return (props.value).toString().length > 0 || props.count > 0 || props.showZero;
         }
         function effectiveCount(): number {
-            if (props.value != null && props.value.toString().length > 0) {
-                if (typeof props.value == 'number')
-                    return props.value as number;
-                return parseFloat(props.value as string);
-            }
+            if ((props.value).toString().length > 0)
+                return parseFloat((props.value).toString());
             return props.count;
         }
         function getMaxCount(): number {
@@ -109,8 +107,8 @@ const __sfc__ = defineComponent({
             return props.max;
         }
         function effectiveBgColor(): string {
-            if (props.bgColor.length > 0)
-                return props.bgColor;
+            if (bgColor.value.length > 0)
+                return bgColor.value;
             return props.type;
         }
         function effectiveFontColor(): string {
@@ -119,7 +117,7 @@ const __sfc__ = defineComponent({
             return props.fontColor;
         }
         function normalizeTheme(value: string): string {
-            const text = value;
+            const text = (value).toString();
             if (text == 'danger')
                 return 'error';
             if (text == 'error' ||
@@ -131,7 +129,7 @@ const __sfc__ = defineComponent({
             return 'custom';
         }
         function parseColor(value: string): string {
-            const text = value;
+            const text = (value).toString();
             if (text == 'white')
                 return '#ffffff';
             if (text == 'black')
@@ -149,7 +147,7 @@ const __sfc__ = defineComponent({
             return text;
         }
         function normalizePosition(value: string): string {
-            const text = value;
+            const text = (value).toString();
             if (text == 'rightTop')
                 return 'right';
             if (text == 'leftTop')
@@ -171,12 +169,10 @@ const __sfc__ = defineComponent({
             const offset = props.offset;
             if (offset == null || offset.length <= index)
                 return 0;
-            const value = offset[index] as number | string | null;
-            if (typeof value == 'number')
-                return value as number;
-            if (typeof value == 'string')
-                return parseFloat(value as string);
-            return 0;
+            const value = offset[index];
+            if (value == null)
+                return 0;
+            return parseFloat(value.toString());
         }
         function positionStyle(): string {
             const x = getOffset(0);
@@ -196,14 +192,11 @@ const __sfc__ = defineComponent({
             return 'right:' + (edge - x) + 'px;top:' + (edge + y) + 'px;';
         }
         function formatSize(value: string | number): string {
-            const text = value.toString();
+            const text = (value).toString();
             if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0)
                 return text;
             return text + 'px';
         }
-        const bgColor = computed((): string => {
-            return props.bgColor;
-        });
         const showBadge = computed((): boolean => {
             if (props.hidden)
                 return false;
@@ -223,7 +216,7 @@ const __sfc__ = defineComponent({
             const max = getMaxCount();
             if (value > max)
                 return max + '+';
-            return value.toString(10);
+            return (value).toString(10);
         });
         const dot = computed((): boolean => {
             if (props.label.length > 0)

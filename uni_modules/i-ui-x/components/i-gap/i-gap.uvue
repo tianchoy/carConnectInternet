@@ -21,11 +21,18 @@ const props = defineProps({
   marginBottom: { type: [String, Number], default: 0 },
 })
 
+function formatSize(value : any): string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
 
-const bgColor = computed(() => {
+const bgColor = computed(() : string => {
   return props.bgColor
 })
-const gapStyle = computed(() => {
+const gapStyle = computed(() : string => {
   return (
     'height:' +
     formatSize(props.height) +
@@ -38,14 +45,6 @@ const gapStyle = computed(() => {
     ';'
   )
 })
-
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
 </script>
 
 <style>

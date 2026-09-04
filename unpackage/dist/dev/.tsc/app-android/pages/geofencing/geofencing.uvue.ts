@@ -1033,10 +1033,6 @@ const imei = ref<string | null>(null)
 		return deviceName ? deviceName : device.getString('plateNo', '')
 	}
 
-	function closeEditDialog() : void {
-		editDialogPopup.value?.$callMethod('close')
-	}
-
 	function getSelectedFenceName() : string {
 		const fence = selectedFence.value
 		return fence != null ? fence.getString('name', '') : ''
@@ -1052,11 +1048,11 @@ const imei = ref<string | null>(null)
 	function deleteSelectedFence(): void {
 		showFenceModal.value?.$callMethod('close')
 		const fence = selectedFence.value;
-		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1206");
+		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1202");
 
 		if (fence != null) {
 			const fenceId = fence.getString('id', '');
-			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1210");
+			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1206");
 
 			if (fenceId !== '') {
 				deleteFence(fenceId);
@@ -1183,7 +1179,7 @@ const imei = ref<string | null>(null)
 	}
 
 	// 重置绘制
-	const clearDrawing = () => {
+	function clearDrawing() : void {
 		isDrawing.value = false
 		points.value = []
 		circleCenter.value = null
@@ -1197,10 +1193,19 @@ const imei = ref<string | null>(null)
 
 		renderFencesOnMap(); // 重新渲染（空列表时触发清空逻辑）
 	}
+
+	function closeEditDialog() : void {
+		editDialogPopup.value?.$callMethod('close')
+		// 当新增电子围栏时，清空绘制的电子围栏
+		if (editingFence.value == null) {
+			clearDrawing()
+		}
+	}
 	onLoad((option) => {
+		console.log('加载参数', option, " at pages/geofencing/geofencing.uvue:1356")
 		connectionStatus.value = option.connectionStatus
 		imei.value = option.imei
-		currentCar.value = option.plateNo
+		currentCar.value = option.plateNo || option.deviceName
 		deptId.value = option.deptId
 		carType.value = option.carType
 		deviceName.value = option.deviceName

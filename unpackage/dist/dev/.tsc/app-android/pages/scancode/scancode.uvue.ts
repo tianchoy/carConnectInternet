@@ -1,6 +1,95 @@
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { ref } from 'vue'
 	import { showAppToast } from '../../utils/toast.uts'
+	import { showAppModal } from '../../utils/modal.uts'
+
+	// ===== 微信小程序：先检查权限，未授权时主动请求后再显示 camera =====
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// ===== App：保留原有 camera 组件事件和资源释放逻辑 =====
 
 	
 const __sfc__ = defineComponent({
@@ -32,7 +121,7 @@ const _cache = __ins.renderCache;
 		if (!pendingBack.value) return
 		pendingBack.value = false
 		clearBackTimer()
-		console.log('扫码页已释放相机，返回添加设备页', " at pages/scancode/scancode.uvue:48")
+		console.log('扫码页已释放相机，返回添加设备页', " at pages/scancode/scancode.uvue:153")
 		uni.navigateBack({ delta: 1 })
 	}
 
@@ -46,7 +135,7 @@ const _cache = __ins.renderCache;
 	}
 
 	const handleCameraInitDone = () => {
-		console.log('扫码摄像头初始化完成', " at pages/scancode/scancode.uvue:62")
+		console.log('扫码摄像头初始化完成', " at pages/scancode/scancode.uvue:167")
 	}
 
 	const handleScan = (e : UniCameraScanCodeEvent) => {
@@ -59,7 +148,7 @@ const _cache = __ins.renderCache;
 		hasFinished.value = true
 		scanFunctionIsUseable.value = false
 		uni.vibrateLong({})
-		console.log('扫码结果:', result, " at pages/scancode/scancode.uvue:75")
+		console.log('扫码结果:', result, " at pages/scancode/scancode.uvue:180")
 		uni.setStorageSync('scanCodeResult', result)
 		showAppToast({
 			title: '扫码成功',
@@ -70,18 +159,18 @@ const _cache = __ins.renderCache;
 	}
 
 	const handleCameraStop = () => {
-		console.warn('扫码摄像头已停止', " at pages/scancode/scancode.uvue:86")
+		console.warn('扫码摄像头已停止', " at pages/scancode/scancode.uvue:191")
 		if (pendingBack.value) {
-			console.log('等待相机资源释放完成后返回添加设备页', " at pages/scancode/scancode.uvue:88")
+			console.log('等待相机资源释放完成后返回添加设备页', " at pages/scancode/scancode.uvue:193")
 			return
 		}
-		console.warn('摄像头停止但扫码页仍保持打开，等待用户返回或重试', " at pages/scancode/scancode.uvue:91")
+		console.warn('摄像头停止但扫码页仍保持打开，等待用户返回或重试', " at pages/scancode/scancode.uvue:196")
 	}
 
 	const handleCameraError = (e : UniCameraErrorEvent) => {
 		if (hasFinished.value) return
 		hasFinished.value = true
-		console.error('摄像头初始化失败:', e.detail, " at pages/scancode/scancode.uvue:97")
+		console.error('摄像头初始化失败:', e.detail, " at pages/scancode/scancode.uvue:202")
 		showAppToast({
 			title: '摄像头初始化失败，请检查相机权限',
 			icon: 'none',
@@ -91,15 +180,16 @@ const _cache = __ins.renderCache;
 	}
 
 	onHide(() => {
-		console.log('扫码页隐藏', " at pages/scancode/scancode.uvue:107")
+		console.log('扫码页隐藏', " at pages/scancode/scancode.uvue:212")
 		releaseCamera()
 	})
 
 	onUnload(() => {
-		console.log('扫码页卸载', " at pages/scancode/scancode.uvue:112")
+		console.log('扫码页卸载', " at pages/scancode/scancode.uvue:217")
 		clearBackTimer()
 		releaseCamera()
 	})
+
 
 return (): any | null => {
 

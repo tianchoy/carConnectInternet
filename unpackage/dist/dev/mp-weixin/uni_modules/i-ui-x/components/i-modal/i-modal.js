@@ -10,55 +10,53 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   showCancelButton: { type: Boolean, default: false },
   confirmColor: { type: String, default: "#2979ff" },
   cancelColor: { type: String, default: "#606266" },
-  duration: { type: Number, default: 200 },
+  duration: { type: [String, Number], default: 200 },
   buttonReverse: { type: Boolean, default: false },
   zoom: { type: Boolean, default: true },
-  zIndex: { type: Number, default: 10075 },
+  zIndex: { type: [String, Number], default: 10075 },
   asyncClose: { type: Boolean, default: false },
   closeable: { type: Boolean, default: false },
   closeOnMask: { type: Boolean, default: false },
-  negativeTop: { type: String, default: "0px" },
-  width: { type: String, default: "320px" },
+  negativeTop: { type: [String, Number], default: 0 },
+  width: { type: [String, Number], default: "320px" },
   confirmButtonShape: { type: String, default: "100px" },
-  round: { type: String, default: "6px" },
+  round: { type: [String, Number], default: "6px" },
   buttonModel: { type: String, default: "text" },
   buttonRadius: { type: String, default: "100px" },
   confirmBgColor: { type: String, default: "" },
   cancelBgColor: { type: String, default: "" },
-  customStyle: { type: String, default: "" }
+  customStyle: { type: [String, Object], default: "" }
 }, emits: ["confirm", "cancel", "close", "update:show"], setup(__props, _a) {
   var __expose = _a.expose, __emit = _a.emit;
   const props = __props;
   const emit = __emit;
-  function formatMs(value) {
-    return value.toString() + "ms";
+  function formatMs(value = null) {
+    const text = value.toString();
+    if (text.indexOf("ms") >= 0 || text.indexOf("s") >= 0)
+      return text;
+    return text + "ms";
   }
-  function formatSize(value) {
-    if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("%") >= 0) {
-      return value;
+  function formatSize(value = null) {
+    const text = value.toString();
+    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+      return text;
     }
-    return value + "px";
+    return text + "px";
   }
-  function stringifyStyle(value) {
-    if (value.length == 0)
+  function stringifyStyle(value = null) {
+    if (value == null)
       return "";
-    return value.endsWith(";") ? value : value + ";";
-  }
-  function animationDuration() {
-    return props.duration;
+    const text = value.toString();
+    if (text == "[object Object]" || text.length == 0)
+      return "";
+    return text.endsWith(";") ? text : text + ";";
   }
   const opened = common_vendor.ref(props.show);
   const active = common_vendor.ref(props.show);
   const loading = common_vendor.ref(false);
   let closeTimer = 0;
   const maskStyle = common_vendor.computed(() => {
-    return "z-index:" + props.zIndex.toString() + ";opacity:" + (props.show || active.value ? "1" : "0") + ";transition-duration:" + formatMs(props.duration) + ";";
-  });
-  const visibleMaskStyle = common_vendor.computed(() => {
-    if (props.show && !opened.value) {
-      return "z-index:" + props.zIndex.toString() + ";opacity:1;transition-duration:" + formatMs(props.duration) + ";";
-    }
-    return maskStyle.value;
+    return "z-index:" + props.zIndex.toString() + ";opacity:" + (active.value ? "1" : "0") + ";transition-duration:" + formatMs(props.duration) + ";";
   });
   const modalClass = common_vendor.computed(() => {
     const classes = ["i-modal"];
@@ -69,15 +67,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     style = style + "border-radius:" + formatSize(props.round) + ";";
     style = style + "transition-duration:" + formatMs(props.duration) + ";";
     const top = formatSize(props.negativeTop);
-    const scaleValue = props.zoom ? props.show || active.value ? "1" : "0.86" : "1";
+    const scaleValue = props.zoom ? active.value ? "1" : "0.86" : "1";
     const translateValue = top != "0px" ? "-" + top : "0px";
-    style = style + "opacity:" + (props.show || active.value ? "1" : "0") + ";";
+    style = style + "opacity:" + (active.value ? "1" : "0") + ";";
     style = style + "transform:translateY(" + translateValue + ") scale(" + scaleValue + ");";
     style = style + stringifyStyle(props.customStyle);
     return style;
-  });
-  const visibleModalStyle = common_vendor.computed(() => {
-    return modalStyle.value;
   });
   const confirmButtonClass = common_vendor.computed(() => {
     const classes = ["i-modal__button", "i-modal__button--confirm"];
@@ -120,6 +115,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       clearTimeout(closeTimer);
       closeTimer = 0;
     }
+  }
+  function animationDuration() {
+    const text = props.duration.toString();
+    if (text.indexOf("ms") >= 0)
+      return parseFloat(text.replace("ms", "").toString());
+    if (text.indexOf("s") >= 0)
+      return parseFloat(text.replace("s", "").toString()) * 1e3;
+    const duration = parseFloat(text.toString());
+    if (isNaN(duration))
+      return 200;
+    return duration;
   }
   function openPanel() {
     clearCloseTimer();
@@ -170,6 +176,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     emit("close");
     closePanel(true);
   }
+  common_vendor.watch(() => {
+    return props.show;
+  }, (nextValue) => {
+    if (nextValue) {
+      openPanel();
+    } else {
+      closePanel(false);
+    }
+  });
   __expose({
     open,
     close
@@ -177,11 +192,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = common_vendor.e({
-      a: __props.show || opened.value
-    }, __props.show || opened.value ? common_vendor.e({
+      a: opened.value
+    }, opened.value ? common_vendor.e({
       b: __props.closeable
     }, __props.closeable ? {
-      c: common_vendor.o(closeByIcon, "ad")
+      c: common_vendor.o(closeByIcon, "53")
     } : {}, {
       d: __props.title.length > 0
     }, __props.title.length > 0 ? {
@@ -196,7 +211,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       j: common_vendor.s(confirmTextStyle.value),
       k: common_vendor.n(confirmButtonClass.value),
       l: common_vendor.s(confirmButtonStyle.value),
-      m: common_vendor.o(confirm, "d2")
+      m: common_vendor.o(confirm, "b7")
     } : {}, {
       n: __props.showCancelButton
     }, __props.showCancelButton ? {
@@ -204,7 +219,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       p: common_vendor.s(cancelTextStyle.value),
       q: common_vendor.n(cancelButtonClass.value),
       r: common_vendor.s(cancelButtonStyle.value),
-      s: common_vendor.o(cancel, "6b")
+      s: common_vendor.o(cancel, "f9")
     } : {}) : common_vendor.e({
       t: __props.showCancelButton
     }, __props.showCancelButton ? {
@@ -212,7 +227,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       w: common_vendor.s(cancelTextStyle.value),
       x: common_vendor.n(cancelButtonClass.value),
       y: common_vendor.s(cancelButtonStyle.value),
-      z: common_vendor.o(cancel, "46")
+      z: common_vendor.o(cancel, "62")
     } : {}, {
       A: __props.showConfirmButton
     }, __props.showConfirmButton ? {
@@ -220,20 +235,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       C: common_vendor.s(confirmTextStyle.value),
       D: common_vendor.n(confirmButtonClass.value),
       E: common_vendor.s(confirmButtonStyle.value),
-      F: common_vendor.o(confirm, "32")
+      F: common_vendor.o(confirm, "a6")
     } : {}), {
       G: common_vendor.n(__props.buttonModel == "button" ? "i-modal__footer--button" : ""),
       H: common_vendor.n(modalClass.value),
-      I: common_vendor.s(visibleModalStyle.value),
+      I: common_vendor.s(modalStyle.value),
       J: common_vendor.o(() => {
-      }, "34"),
+      }, "ee"),
       K: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      L: common_vendor.s(visibleMaskStyle.value),
+      L: common_vendor.s(maskStyle.value),
       M: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
-      N: common_vendor.o(handleOverlayClick, "d7"),
+      N: common_vendor.o(handleOverlayClick, "a9"),
       O: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     }) : {});
     return __returned__;

@@ -43,31 +43,16 @@ const remain = ref(props.time)
 const running = ref(false)
 const timer = ref(0)
 
-const display = computed(() => {
+const display = computed(() : string => {
   const h = Math.floor(remain.value / 3600)
   const m = Math.floor((remain.value % 3600) / 60)
   const s = remain.value % 60
-  const mm = m < 10 ? '0' + m : String(m)
-  const ss = s < 10 ? '0' + s : String(s)
-  return h > 0 ? (h < 10 ? '0' + h : String(h)) + ':' + mm + ':' + ss : mm + ':' + ss
+  const mm = m < 10 ? '0' + m : (m).toString()
+  const ss = s < 10 ? '0' + s : (s).toString()
+  return h > 0 ? (h < 10 ? '0' + h : (h).toString()) + ':' + mm + ':' + ss : mm + ':' + ss
 })
 
-watch(
-  () => props.time,
-  (nextValue) => {
-    remain.value = nextValue
-  },
-)
-
-onMounted(() => {
-  if (props.autoStart) start()
-})
-
-onUnmounted(() => {
-  clearInterval(timer.value)
-})
-
-function start() {
+function start() : void {
   if (running.value) return
   running.value = true
   emit('start', remain.value)
@@ -84,24 +69,39 @@ function start() {
   }, 1000)
 }
 
-function pause() {
+function pause() : void {
   clearInterval(timer.value)
   running.value = false
   emit('pause', remain.value)
 }
 
-function toggle() {
+function toggle() : void {
   if (running.value) pause()
   else start()
 }
 
-function reset() {
+function reset() : void {
   clearInterval(timer.value)
   running.value = false
   remain.value = props.time
   emit('reset', remain.value)
   emit('change', remain.value)
 }
+
+watch(
+  () : number => props.time,
+  (nextValue : number) : void => {
+    remain.value = nextValue
+  },
+)
+
+onMounted(() : void => {
+  if (props.autoStart) start()
+})
+
+onUnmounted(() : void => {
+  clearInterval(timer.value)
+})
 </script>
 <style>
 .i-card {

@@ -12,22 +12,26 @@ import _imports_4 from '../../static/dzwl.png'
 import _imports_5 from '../../static/msg.png'
 import _imports_6 from '../../static/pay.png'
 import _imports_7 from '../../static/online.png'
-import _imports_8 from '../../static/del.png'
+import _imports_8 from '../../static/logout.png'
+import _imports_9 from '../../static/del.png'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { clearPushSessionState } from '../../services/push.uts'
 import { unbindPushDeviceOnLogout } from '../../services/push-binding.uts'
-import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
+import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
 import { getDeviceIcon } from '../../utils/cars'
 import type { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerValue } from '@/uni_modules/lime-picker'
 
+import AndroidLog from 'android.util.Log'
 
-type Device = { __$originalPosition?: UTSSourceMapPosition<"Device", "pages/index/index.uvue", 221, 6>;
+
+
+type Device = { __$originalPosition?: UTSSourceMapPosition<"Device", "pages/index/index.uvue", 228, 6>;
     name: string,
     deviceName: string,
     value: string,
@@ -44,29 +48,29 @@ type Device = { __$originalPosition?: UTSSourceMapPosition<"Device", "pages/inde
 }
 
 //// 响应式数据
-type MapCenter = { __$originalPosition?: UTSSourceMapPosition<"MapCenter", "pages/index/index.uvue", 238, 6>;
+type MapCenter = { __$originalPosition?: UTSSourceMapPosition<"MapCenter", "pages/index/index.uvue", 245, 6>;
     latitude: number
     longitude: number
 }
 
-type UserDeviceListData = { __$originalPosition?: UTSSourceMapPosition<"UserDeviceListData", "pages/index/index.uvue", 254, 6>;
+type UserDeviceListData = { __$originalPosition?: UTSSourceMapPosition<"UserDeviceListData", "pages/index/index.uvue", 261, 6>;
     list: Array<UTSJSONObject>
 }
 
 type PositionState = 'loading' | 'available' | 'empty' | 'invalid' | 'failed'
-type DeviceStatus = { __$originalPosition?: UTSSourceMapPosition<"DeviceStatus", "pages/index/index.uvue", 288, 6>;
+type DeviceStatus = { __$originalPosition?: UTSSourceMapPosition<"DeviceStatus", "pages/index/index.uvue", 295, 6>;
     batteryPercent: number
     voltage: number
     signalStrength: number
 }
 
-type DeviceDetailState = { __$originalPosition?: UTSSourceMapPosition<"DeviceDetailState", "pages/index/index.uvue", 294, 6>;
+type DeviceDetailState = { __$originalPosition?: UTSSourceMapPosition<"DeviceDetailState", "pages/index/index.uvue", 301, 6>;
     deviceStatus: DeviceStatus
     connectionStatus: string
     lastUpdateTime: string
 }
 
-type SavedDevice = { __$originalPosition?: UTSSourceMapPosition<"SavedDevice", "pages/index/index.uvue", 395, 6>;
+type SavedDevice = { __$originalPosition?: UTSSourceMapPosition<"SavedDevice", "pages/index/index.uvue", 409, 6>;
     name: string
     deviceName: string
     imei: string
@@ -141,10 +145,17 @@ const deviceDetail = ref<DeviceDetailState>({
 const markers = ref([] as Marker[])
 const lastUpdateTime = ref('--:--:--')
 const devicePosInfo = ref<UTSJSONObject | null>(null)
+let devicePositionRequestId = 0
 const devicePositionUpdateTime = computed<string>(() => {
     const position = devicePosInfo.value
     return position != null ? position.getString('positionUpdateTime', '暂无位置') : '暂无位置'
 })
+
+const isValidDeviceCoordinate = (latitude: number, longitude: number): boolean => {
+    return !isNaN(latitude) && !isNaN(longitude) &&
+        latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 &&
+        !(latitude == 0 && longitude == 0)
+}
 
 // 本地存储key
 const SELECTED_DEVICE_STORAGE_KEY: string = 'selected_device_info'
@@ -171,7 +182,7 @@ const pickerColumns = computed<PickerColumn[]>(() => {
         const displayName = device.deviceName || device.name || device.imei || '未命名设备'
         const statusText = device.connectionStatus == 'online' ? '在线' : '离线'
         return {
-            id: null,
+            id: device.imei,
             label: `${displayName} (${statusText})`,
             value: device.imei || device.deviceId,
             disabled: false,
@@ -203,7 +214,7 @@ const delay = (ms: number): Promise<void> => {
 // 保存选中的设备信息
 const saveSelectedDevice = (device: Device) => {
     try {
-        const deviceInfo = {__$originalPosition: new UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 374, 15),
+        const deviceInfo = {__$originalPosition: new UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 388, 15),
             name: device.deviceName || device.name || device.imei,
             deviceName: device.deviceName || device.name || device.imei,
             imei: device.imei || device.value,
@@ -218,9 +229,9 @@ const saveSelectedDevice = (device: Device) => {
             longitude: device.longitude
         }
         uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, JSON.stringify(deviceInfo))
-        console.log('保存选中设备成功:', deviceInfo, " at pages/index/index.uvue:389")
+        console.log('保存选中设备成功:', deviceInfo, " at pages/index/index.uvue:403")
     } catch (error) {
-        console.error('保存选中设备失败:', error, " at pages/index/index.uvue:391")
+        console.error('保存选中设备失败:', error, " at pages/index/index.uvue:405")
     }
 }
 
@@ -229,7 +240,7 @@ const decodeSavedDevice = (raw: any): SavedDevice | null => {
     let data: UTSJSONObject | null = null
     if (typeof raw == 'string') {
         try {
-            data = UTSAndroid.consoleDebugError(JSON.parse(raw), " at pages/index/index.uvue:415") as UTSJSONObject
+            data = UTSAndroid.consoleDebugError(JSON.parse(raw), " at pages/index/index.uvue:429") as UTSJSONObject
         } catch (error) {
             return null
         }
@@ -265,7 +276,7 @@ const getSavedSelectedDevice = (): SavedDevice | null => {
         if (rawDevice == null) return null
         return decodeSavedDevice(rawDevice)
     } catch (error) {
-        console.error('获取保存设备失败:', error, " at pages/index/index.uvue:451")
+        console.error('获取保存设备失败:', error, " at pages/index/index.uvue:465")
     }
     return null
 }
@@ -274,9 +285,9 @@ const getSavedSelectedDevice = (): SavedDevice | null => {
 const clearSavedSelectedDevice = () => {
     try {
         uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY)
-        console.log('清除保存设备成功', " at pages/index/index.uvue:460")
+        console.log('清除保存设备成功', " at pages/index/index.uvue:474")
     } catch (error) {
-        console.error('清除保存设备失败:', error, " at pages/index/index.uvue:462")
+        console.error('清除保存设备失败:', error, " at pages/index/index.uvue:476")
     }
 }
 
@@ -285,7 +296,7 @@ const saveSelectedDeviceIndex = (index: number) => {
     try {
         uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index)
     } catch (error) {
-        console.error('保存选中设备索引失败:', error, " at pages/index/index.uvue:471")
+        console.error('保存选中设备索引失败:', error, " at pages/index/index.uvue:485")
     }
 }
 
@@ -298,7 +309,7 @@ const getSavedSelectedDeviceIndex = (): number | null => {
             return isNaN(index) || index < 0 ? null : index
         }
     } catch (error) {
-        console.error('获取保存设备索引失败:', error, " at pages/index/index.uvue:484")
+        console.error('获取保存设备索引失败:', error, " at pages/index/index.uvue:498")
     }
     return null
 }
@@ -308,7 +319,7 @@ const clearSavedSelectedDeviceIndex = () => {
     try {
         uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY)
     } catch (error) {
-        console.error('清除保存设备索引失败:', error, " at pages/index/index.uvue:494")
+        console.error('清除保存设备索引失败:', error, " at pages/index/index.uvue:508")
     }
 }
 
@@ -423,18 +434,26 @@ async function centerOnUserLocation() {
 
 function getUserLocation() {
     uni.getLocation({
-        type: 'gcj02',
+        type: 'wgs84',
+        provider:'system',
         success: (res) => {
-            console.log('用户当前位置:', res, " at pages/index/index.uvue:611")
-            userLocation.latitude = res.latitude
-            userLocation.longitude = res.longitude
+            console.log('用户当前位置:', res, " at pages/index/index.uvue:626")
+
+            AndroidLog.i('用户当前位置:', JSON.stringify(res))
+
+            const convertedCoord = CoordTransform.wgs84ToTencent(res.latitude, res.longitude)
+            userLocation.latitude = convertedCoord.lat
+            userLocation.longitude = convertedCoord.lng
             hasUserLocation.value = true
             if (!hasDevice.value) {
                 centerOnUserLocation()
             }
         },
         fail: (err) => {
-            console.error('获取用户当前位置失败:', err.errMsg, err, " at pages/index/index.uvue:620")
+
+            AndroidLog.i('用户当前位置:', JSON.stringify(err))
+
+            console.error('获取用户当前位置失败:', err.errMsg, err, " at pages/index/index.uvue:642")
         }
     })
 }
@@ -445,7 +464,7 @@ const loadDeviceDetail = async (deviceId: string) => {
         const res = await getDeviceDetail(deviceId)
         const detail = res.data
         if (res.code != 200 || detail == null) {
-            console.error('加载设备详情失败:', res.msg, " at pages/index/index.uvue:631")
+            console.error('加载设备详情失败:', res.msg, " at pages/index/index.uvue:653")
             return
         }
         if (detail != null) {
@@ -467,7 +486,7 @@ const loadDeviceDetail = async (deviceId: string) => {
             }
         }
     } catch (error) {
-        console.error('加载设备详情失败', error, " at pages/index/index.uvue:653")
+        console.error('加载设备详情失败', error, " at pages/index/index.uvue:675")
     }
 }
 
@@ -553,7 +572,7 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
         if (requestId != trackRequestId) return
 
         if (res.code != 200) {
-            console.error('加载轨迹失败:', res.msg, " at pages/index/index.uvue:739")
+            console.error('加载轨迹失败:', res.msg, " at pages/index/index.uvue:761")
             clearTripData()
             return
         }
@@ -566,7 +585,7 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
         processTripData(trackData)
     } catch (error) {
         if (requestId != trackRequestId) return
-        console.error('加载轨迹失败', error, " at pages/index/index.uvue:752")
+        console.error('加载轨迹失败', error, " at pages/index/index.uvue:774")
         clearTripData()
     }
 }
@@ -585,12 +604,18 @@ const centerMapOnDevice = async (latitude: number, longitude: number): Promise<v
 
 // 加载设备位置
 const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
+    const requestId = ++devicePositionRequestId
     positionState.value = 'loading'
+    // 切换设备或刷新位置时先移除旧设备标记，但不重置地图中心。
+    markers.value = []
+    devicePosInfo.value = null
     try {
         const res = await getDevicePos(data)
+        if (requestId != devicePositionRequestId) return false
+
         const positions = res.data
         if (res.code != 200 || positions == null || positions.length == 0) {
-            console.warn('获取设备位置失败:', data.getString('deviceId', ''), res.code, " at pages/index/index.uvue:776")
+            console.warn('获取设备位置失败:', data.getString('deviceId', ''), res.code, " at pages/index/index.uvue:804")
             positionState.value = 'empty'
             return false
         }
@@ -600,12 +625,11 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
 
         const lat = position.getNumber('latitude', 0)
         const lng = position.getNumber('longitude', 0)
-        const isValidCoordinate = !isNaN(lat) && !isNaN(lng) &&
-            lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 &&
-            !(lat == 0 && lng == 0)
+        const isValidCoordinate = isValidDeviceCoordinate(lat, lng)
 
         if (!isValidCoordinate) {
-            console.error('经纬度格式错误', position.getString('latitude', ''), position.getString('longitude', ''), " at pages/index/index.uvue:791")
+            console.error('经纬度格式错误', position.getString('latitude', ''), position.getString('longitude', ''), " at pages/index/index.uvue:817")
+            markers.value = []
             positionState.value = 'invalid'
             showAppToast({
                 title: '定位数据异常',
@@ -631,12 +655,13 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
             await centerMapOnDevice(convertedCoord.lat, convertedCoord.lng)
         } catch (mapError) {
             // 原生地图视图刷新异常不应覆盖已成功取得的车辆位置。
-            console.error('刷新地图视图失败', mapError, " at pages/index/index.uvue:817")
+            console.error('刷新地图视图失败', mapError, " at pages/index/index.uvue:844")
         }
-        console.log('标记点更新完成:', data.getString('deviceId', ''), convertedCoord.lat, convertedCoord.lng, " at pages/index/index.uvue:819")
+        console.log('标记点更新完成:', data.getString('deviceId', ''), convertedCoord.lat, convertedCoord.lng, " at pages/index/index.uvue:846")
         return true
     } catch (error) {
-        console.error('加载设备位置失败', error, " at pages/index/index.uvue:822")
+        if (requestId != devicePositionRequestId) return false
+        console.error('加载设备位置失败', error, " at pages/index/index.uvue:850")
         positionState.value = 'failed'
         showAppToast({
             title: '定位失败，请重试',
@@ -648,7 +673,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
 
 // 加载设备数据
 const loadDeviceData = async (device: Device) => {
-    console.log('开始加载设备数据:', device, " at pages/index/index.uvue:834")
+    console.log('开始加载设备数据:', device, " at pages/index/index.uvue:862")
     try {
         await loadDeviceDetail(device.deviceId);
         await loadDevicePos({
@@ -661,7 +686,7 @@ const loadDeviceData = async (device: Device) => {
             icon: 'none'
         })
     } catch (error) {
-        console.error('切换车辆失败', error, " at pages/index/index.uvue:847")
+        console.error('切换车辆失败', error, " at pages/index/index.uvue:875")
         showAppToast({
             title: '切换失败，请重试',
             icon: 'none'
@@ -707,7 +732,8 @@ const handlePickerConfirm = (e: PickerConfirmEvent) => {
     }
 
     if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-        console.log('选择的设备与当前设备相同，不重复加载', " at pages/index/index.uvue:893")
+        console.log('选择的设备111:',selectedDevice.imei ,selectedDevice.deviceId,currentCarImei.value,currentCarDeviceId.value, " at pages/index/index.uvue:921")
+        console.log('选择的设备与当前设备相同，不重复加载', " at pages/index/index.uvue:922")
         return
     }
 
@@ -721,8 +747,6 @@ const handlePickerConfirm = (e: PickerConfirmEvent) => {
     currentCarConnectionStatus.value = selectedDevice.connectionStatus
     currentCarCarType.value = selectedDevice.carType
     currentCarPlateNo.value = selectedDevice.plateNo
-    center.latitude = selectedDevice.latitude
-    center.longitude = selectedDevice.longitude
 
     saveSelectedDeviceIndex(selectedIndex)
     pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId]
@@ -751,7 +775,7 @@ const loadDeviceList = async () => {
             })
             return
         }
-        console.log('加载车辆列表返回:', res.data, " at pages/index/index.uvue:937")
+        console.log('加载车辆列表返回:', res.data, " at pages/index/index.uvue:964")
         const pageData = res.data
         if (pageData == null) {
             userDeviceList.value = []
@@ -828,7 +852,7 @@ const loadDeviceList = async () => {
                 // 保存第一个设备作为默认选中
                 saveSelectedDevice(selectedDevice)
                 saveSelectedDeviceIndex(0)
-                console.log('使用第一个设备作为默认:', selectedDevice?.deviceName, " at pages/index/index.uvue:1014")
+                console.log('使用第一个设备作为默认:', selectedDevice?.deviceName, " at pages/index/index.uvue:1041")
             }
 
             if (selectedDevice != null) {
@@ -844,8 +868,6 @@ const loadDeviceList = async () => {
                 currentCarConnectionStatus.value = device.connectionStatus
                 currentCarCarType.value = device.carType
                 currentCarPlateNo.value = device.plateNo
-                center.latitude = device.latitude
-                center.longitude = device.longitude
 
                 pickerValues.value = [device.imei != '' ? device.imei : device.deviceId]
 
@@ -872,7 +894,7 @@ const loadDeviceList = async () => {
             })
         }
     } catch (error) {
-        console.error('加载车辆列表失败', error, " at pages/index/index.uvue:1058")
+        console.error('加载车辆列表失败', error, " at pages/index/index.uvue:1083")
         showAppToast({
             title: '加载失败，请下拉重试',
             icon: 'none'
@@ -909,7 +931,7 @@ const refreshLocation = async () => {
             deviceids: currentCarImei.value
         } as UTSJSONObject)
     } catch (error) {
-        console.error('刷新位置失败', error, " at pages/index/index.uvue:1095")
+        console.error('刷新位置失败', error, " at pages/index/index.uvue:1120")
         showAppToast({
             title: '刷新失败',
             icon: 'none'
@@ -953,7 +975,7 @@ const toRecordDetail = () => {
     uni.navigateTo({
         url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude,
         fail: (err) => {
-            if (err.errMsg.indexOf('locked') < 0) console.error('跳转轨迹详情失败:', err, " at pages/index/index.uvue:1139")
+            if (err.errMsg.indexOf('locked') < 0) console.error('跳转轨迹详情失败:', err, " at pages/index/index.uvue:1164")
         }
     })
 }
@@ -981,7 +1003,7 @@ const toAdd = () => {
     uni.navigateTo({
         url: '/pages/addCar/addCar',
         fail: (err) => {
-            if (err.errMsg.indexOf('locked') < 0) console.error('跳转添加设备失败:', err, " at pages/index/index.uvue:1167")
+            if (err.errMsg.indexOf('locked') < 0) console.error('跳转添加设备失败:', err, " at pages/index/index.uvue:1192")
         }
     })
 }
@@ -1072,7 +1094,7 @@ const toPay = (iccid : string,simMerchant : string) => {
 
 
 
-    console.log('iccid',iccid, " at pages/index/index.uvue:1258")
+    console.log('iccid',iccid, " at pages/index/index.uvue:1283")
     needRefresh.value = false
     showAppToast({
         title: '请在微信小程序中完成充值',
@@ -1095,7 +1117,7 @@ const gotoLogin = () => {
 
 async function unbindCurrentDevice() : Promise<void> {
     const result = await delDevice(currentCarDeviceId.value)
-    console.log('解绑设备结果:', result, " at pages/index/index.uvue:1281")
+    console.log('解绑设备结果:', result, " at pages/index/index.uvue:1306")
     if (result.code == 200) {
         showAppToast({
             title: '解绑成功',
@@ -1128,30 +1150,32 @@ const unbindDevice = () : void => {
     })
 }
 
+async function performLogout(): Promise<void> {
+    await unbindPushDeviceOnLogout()
+    const res = await logoutRequest()
+    if(res.code == 200){
+        clearSavedSelectedDevice()
+        clearSavedSelectedDeviceIndex()
+        uni.removeStorageSync('token')
+        clearPushSessionState()
+        uni.reLaunch({
+            url:'/pages/login/login'
+        })
+    }else{
+        showAppToast({
+            title: res.msg || '退出账户失败'
+        })
+    }
+}
+
 // 退出登录
-const handleExit = () => {
+const logout = (): void => {
     if (!isLogin()) return
     showAppModal({
         title: '退出登录',
         content: '确定退出登录吗？',
-        success: async (res) => {
-            if (res.confirm) {
-                await unbindPushDeviceOnLogout()
-                const res = await logout()
-                if(res.code == 200){
-                    clearSavedSelectedDevice()
-                    clearSavedSelectedDeviceIndex()
-                    uni.removeStorageSync('token')
-                    clearPushSessionState()
-                    uni.reLaunch({
-                        url:'/pages/login/login'
-                    })
-                }else{
-                    showAppToast({
-                        title: res.msg || '退出账户失败'
-                    })
-                }
-            }
+        success: (res: AppModalSuccess): void => {
+            if (res.confirm) void performLogout()
         }
     })
 }
@@ -1233,7 +1257,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                 ? _cE("view", _uM({
                     key: 0,
                     class: "exit",
-                    onClick: handleExit
+                    onClick: logout
                   }), [
                     _cE("image", _uM({
                       src: _imports_0,
@@ -1330,7 +1354,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                     longitude: center.longitude,
                     scale: mapScale.value,
                     style: _nS(_uM({"width":"100%","height":"100%"})),
-                    "show-location": true,
+                    "show-location": false,
                     "enable-traffic": true,
                     "enable-overlooking": true,
                     "enable-building": true,
@@ -1501,10 +1525,24 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
               ]),
               _cE("view", _uM({
                 class: "service-item",
-                onClick: unbindDevice
+                onClick: logout
               }), [
                 _cE("image", _uM({
                   src: _imports_8,
+                  mode: "aspectFit",
+                  class: "icon-image"
+                })),
+                _cE("text", _uM({
+                  class: "item-title",
+                  style: _nS(_uM({"color":"#EE793A"}))
+                }), "退出登录", 4 /* STYLE */)
+              ]),
+              _cE("view", _uM({
+                class: "service-item",
+                onClick: unbindDevice
+              }), [
+                _cE("image", _uM({
+                  src: _imports_9,
                   mode: "aspectFit",
                   class: "icon-image"
                 })),
@@ -1546,4 +1584,4 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
 
 })
 export default __sfc__
-const GenPagesIndexIndexStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#E6F9E6"], ["backgroundImage", "linear-gradient(to right, #E6F9E6, #E0F0FF)"]]))], ["page-bg", _uM([[".container ", _uM([["paddingTop", 0], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"]])]])], ["loading-container", _uM([[".container .page-bg ", _uM([["position", "fixed"], ["top", "50%"], ["left", "50%"], ["transform", "translate(-50%, -50%)"], ["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["zIndex", 999]])]])], ["loading-text", _uM([[".container .page-bg .loading-container ", _uM([["marginTop", "20rpx"], ["fontSize", "28rpx"], ["color", "#666666"]])]])], ["device-car", _uM([[".container .page-bg .top ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["current-car", _uM([[".container .page-bg .top .device-car ", _uM([["position", "relative"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "flex-end"]])]])], ["car-id", _uM([[".container .page-bg .top .device-car .current-car ", _uM([["fontSize", "36rpx"], ["fontWeight", "bold"], ["color", "#000000"], ["textAlign", "center"], ["position", "relative"]])]])], ["login", _uM([[".container .page-bg .top .device-car .current-car ", _uM([["fontSize", "36rpx"], ["fontWeight", "bold"], ["color", "#000000"], ["textAlign", "center"], ["paddingRight", "10rpx"]])]])], ["nav-tools", _uM([[".container .page-bg .top .device-car ", _uM([["display", "flex"], ["flexShrink", 0], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["nav-tool-spacing", _uM([[".container .page-bg .top .device-car .nav-tools ", _uM([["flexShrink", 0], ["marginLeft", "30rpx"]])]])], ["nav-tool-add", _uM([[".container .page-bg .top .device-car .nav-tools ", _uM([["display", "flex"], ["width", "40rpx"], ["height", "40rpx"], ["alignItems", "center"], ["justifyContent", "center"]])]])], ["nav-tool-add-image", _uM([[".container .page-bg .top .device-car .nav-tools ", _uM([["width", "36rpx"], ["height", "36rpx"]])]])], ["exit", _uM([[".container .page-bg .top .device-car .nav-tools ", _uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "10rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "10rpx"], ["backgroundColor", "rgba(0,0,0,0.05)"], ["transitionProperty", "all"], ["transitionDuration", "0.2s"], ["transitionTimingFunction", "ease"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"]])]])], ["exit-icon", _uM([[".container .page-bg .top .device-car .nav-tools .exit ", _uM([["width", "40rpx"], ["height", "40rpx"]])]])], ["device-info", _uM([[".container .page-bg .top ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["width", "50%"]])]])], ["info", _uM([[".container .page-bg .top .device-info .info+", _uM([["marginTop", "16rpx"]])], [".container .page-bg .top .device-info ", _uM([["fontSize", "26rpx"], ["color", "#333333"]])]])], ["banner-image", _uM([[".container .page-bg .top ", _uM([["width", "100%"], ["height", "300rpx"]])]])], ["car-state", _uM([[".container .page-bg .top ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"]])]])], ["state-item", _uM([[".container .page-bg .top .car-state .state-item+", _uM([["marginLeft", "20rpx"]])], [".container .page-bg .top .car-state ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"]])]])], ["state-label", _uM([[".container .page-bg .top .car-state .state-item ", _uM([["fontSize", "24rpx"], ["color", "#999999"]])]])], ["state-value", _uM([[".container .page-bg .top .car-state .state-item ", _uM([["marginTop", "12rpx"], ["fontSize", "25rpx"], ["fontWeight", "bold"], ["color", "#333333"]])], [".container .page-bg .top .car-state .state-item .online", _uM([["color", "#07C160"]])]])], ["map-box", _uM([[".container .page-bg .content ", _uM([["width", "100%"], ["height", "400rpx"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "40rpx"], ["marginLeft", 0], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["display", "flex"], ["flexDirection", "column"], ["overflow", "hidden"], ["boxShadow", "0 4rpx 20rpx rgba(0, 0, 0, 0.08)"]])]])], ["map-header", _uM([[".container .page-bg .content .map-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"]])]])], ["map-title", _uM([[".container .page-bg .content .map-box .map-header ", _uM([["flexShrink", 0], ["fontSize", "32rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["map-refresh-wrap", _uM([[".container .page-bg .content .map-box .map-header ", _uM([["display", "flex"], ["flexShrink", 0], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "8rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "8rpx"], ["paddingLeft", "16rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f9f0"], ["borderTopLeftRadius", "8rpx"], ["borderTopRightRadius", "8rpx"], ["borderBottomRightRadius", "8rpx"], ["borderBottomLeftRadius", "8rpx"]])]])], ["map-refresh", _uM([[".container .page-bg .content .map-box .map-header .map-refresh-wrap ", _uM([["fontSize", "26rpx"], ["lineHeight", "42rpx"], ["color", "#07C160"], ["whiteSpace", "nowrap"]])]])], ["map-container", _uM([[".container .page-bg .content .map-box ", _uM([["position", "relative"], ["height", "300rpx"]])]])], ["map-status", _uM([[".container .page-bg .content .map-box .map-container ", _uM([["position", "absolute"], ["left", "24rpx"], ["right", "24rpx"], ["bottom", "24rpx"], ["paddingTop", "16rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "12rpx"], ["borderTopRightRadius", "12rpx"], ["borderBottomRightRadius", "12rpx"], ["borderBottomLeftRadius", "12rpx"], ["backgroundColor", "rgba(0,0,0,0.68)"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["map-status-text", _uM([[".container .page-bg .content .map-box .map-container .map-status ", _uM([["color", "#ffffff"], ["fontSize", "24rpx"]])]])], ["map-status-retry", _uM([[".container .page-bg .content .map-box .map-container .map-status ", _uM([["flexShrink", 0], ["marginLeft", "20rpx"], ["color", "#8de39b"], ["fontSize", "24rpx"]])]])], ["mile-record", _uM([[".container .page-bg .content ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["display", "flex"], ["flexDirection", "column"], ["overflow", "hidden"], ["boxShadow", "0 4rpx 20rpx rgba(0, 0, 0, 0.08)"]])]])], ["record-header", _uM([[".container .page-bg .content .mile-record ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"]])]])], ["record-title", _uM([[".container .page-bg .content .mile-record .record-header ", _uM([["flexShrink", 0], ["fontSize", "32rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["record-desc-wrap", _uM([[".container .page-bg .content .mile-record .record-header ", _uM([["display", "flex"], ["flexShrink", 0], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "8rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "8rpx"], ["paddingLeft", "16rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f9f0"], ["borderTopLeftRadius", "8rpx"], ["borderTopRightRadius", "8rpx"], ["borderBottomRightRadius", "8rpx"], ["borderBottomLeftRadius", "8rpx"]])]])], ["record-desc", _uM([[".container .page-bg .content .mile-record .record-header .record-desc-wrap ", _uM([["fontSize", "26rpx"], ["lineHeight", "42rpx"], ["color", "#07C160"], ["whiteSpace", "nowrap"]])]])], ["ring-container", _uM([[".container .page-bg .content .mile-record ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-around"], ["paddingTop", "30rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#edf7ff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"]])]])], ["ring-item", _uM([[".container .page-bg .content .mile-record ", _uM([["position", "relative"], ["width", "250rpx"], ["height", "250rpx"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"]])]])], ["ring-bg", _uM([[".container .page-bg .content .mile-record ", _uM([["position", "absolute"], ["width", "250rpx"], ["height", "250rpx"], ["zIndex", 2]])]])], ["ring-quarter", _uM([[".container .page-bg .content .mile-record ", _uM([["position", "absolute"], ["width", "125rpx"], ["height", "125rpx"], ["overflow", "hidden"]])]])], ["ring-quarter--top-left", _uM([[".container .page-bg .content .mile-record ", _uM([["top", 0], ["left", 0]])]])], ["ring-quarter--top-right", _uM([[".container .page-bg .content .mile-record ", _uM([["top", 0], ["right", 0]])]])], ["ring-quarter--bottom-right", _uM([[".container .page-bg .content .mile-record ", _uM([["right", 0], ["bottom", 0]])]])], ["ring-quarter--bottom-left", _uM([[".container .page-bg .content .mile-record ", _uM([["bottom", 0], ["left", 0]])]])], ["ring-stroke", _uM([[".container .page-bg .content .mile-record ", _uM([["position", "absolute"], ["width", "250rpx"], ["height", "250rpx"], ["boxSizing", "border-box"], ["borderTopWidth", "16rpx"], ["borderRightWidth", "16rpx"], ["borderBottomWidth", "16rpx"], ["borderLeftWidth", "16rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999]])], [".container .page-bg .content .mile-record .ring-quarter--top-left ", _uM([["top", 0], ["left", 0]])], [".container .page-bg .content .mile-record .ring-quarter--top-right ", _uM([["top", 0], ["right", 0]])], [".container .page-bg .content .mile-record .ring-quarter--bottom-right ", _uM([["right", 0], ["bottom", 0]])], [".container .page-bg .content .mile-record .ring-quarter--bottom-left ", _uM([["bottom", 0], ["left", 0]])]])], ["ring-stroke--track", _uM([[".container .page-bg .content .mile-record ", _uM([["borderTopColor", "#dceaf3"], ["borderRightColor", "#dceaf3"], ["borderBottomColor", "#dceaf3"], ["borderLeftColor", "#dceaf3"], ["borderTopWidth", "5rpx"], ["borderRightWidth", "5rpx"], ["borderBottomWidth", "5rpx"], ["borderLeftWidth", "5rpx"]])]])], ["ring-stroke--active", _uM([[".container .page-bg .content .mile-record ", _uM([["borderTopColor", "#4cd964"], ["borderRightColor", "#4cd964"], ["borderBottomColor", "#4cd964"], ["borderLeftColor", "#4cd964"]])], [".container .page-bg .content .mile-record .ring-bg.orange ", _uM([["borderTopColor", "#ff9500"], ["borderRightColor", "#ff9500"], ["borderBottomColor", "#ff9500"], ["borderLeftColor", "#ff9500"]])]])], ["ring-text", _uM([[".container .page-bg .content .mile-record ", _uM([["position", "relative"], ["zIndex", 10]])]])], ["num", _uM([[".container .page-bg .content .mile-record ", _uM([["fontSize", "45rpx"], ["fontWeight", "bold"], ["color", "#333333"], ["textAlign", "center"]])]])], ["unit", _uM([[".container .page-bg .content .mile-record ", _uM([["fontSize", "20rpx"], ["color", "#666666"], ["textAlign", "right"]])]])], ["label", _uM([[".container .page-bg .content .mile-record ", _uM([["fontSize", "25rpx"], ["color", "#666666"], ["marginTop", "12rpx"], ["textAlign", "center"]])]])], ["device-list", _uM([[".container .page-bg .content ", _uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", "40rpx"], ["marginRight", 0], ["marginBottom", "40rpx"], ["marginLeft", 0]])]])], ["device-item", _uM([[".container .page-bg .content .device-list .device-item+", _uM([["marginTop", "30rpx"]])], [".container .page-bg .content .device-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["item-label", _uM([[".container .page-bg .content .device-list .device-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["icon", _uM([[".container .page-bg .content .device-list .device-item .item-label ", _uM([["width", "80rpx"], ["height", "80rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["paddingTop", "18rpx"], ["paddingRight", "18rpx"], ["paddingBottom", "18rpx"], ["paddingLeft", "18rpx"]])], [".container .page-bg .content .device-list .device-item .item-label .icon-device", _uM([["backgroundColor", "#f0f9f0"]])], [".container .page-bg .content .device-list .device-item .item-label .icon-car", _uM([["backgroundColor", "#f3f8fb"]])], [".container .page-bg .content .device-list .device-item .item-label .icon-fence", _uM([["backgroundColor", "#f1f7f4"]])]])], ["icon-image", _uM([[".container .page-bg .content .device-list .device-item .item-label ", _uM([["width", "45rpx"], ["height", "45rpx"]])], [".container .page-bg .content .service .service-content .service-item ", _uM([["width", "60rpx"], ["height", "60rpx"]])]])], ["item-info", _uM([[".container .page-bg .content .device-list .device-item .item-label ", _uM([["marginLeft", "20rpx"]])]])], ["item-title", _uM([[".container .page-bg .content .device-list .device-item .item-label .item-info ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#333333"]])], [".container .page-bg .content .service .service-content .service-item ", _uM([["marginTop", "10rpx"], ["fontSize", "25rpx"], ["color", "#222222"]])]])], ["item-desc", _uM([[".container .page-bg .content .device-list .device-item .item-label .item-info ", _uM([["color", "#cccccc"], ["fontSize", "24rpx"], ["marginTop", "10rpx"]])]])], ["service", _uM([[".container .page-bg .content ", _uM([["display", "flex"], ["flexDirection", "column"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#ffffff"], ["marginBottom", "30rpx"]])]])], ["service-header", _uM([[".container .page-bg .content .service ", _uM([["fontSize", "32rpx"], ["fontWeight", "bold"], ["color", "#333333"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"], ["marginBottom", "30rpx"]])]])], ["service-content", _uM([[".container .page-bg .content .service ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"]])]])], ["service-item", _uM([[".container .page-bg .content .service .service-content ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"]])]])], ["@TRANSITION", _uM([["exit", _uM([["property", "all"], ["duration", "0.2s"], ["timingFunction", "ease"]])]])]])]
+const GenPagesIndexIndexStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#E6F9E6"], ["backgroundImage", "linear-gradient(to right, #E6F9E6, #E0F0FF)"]]))], ["page-bg", _uM([[".container ", _uM([["paddingTop", 0], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"]])]])], ["loading-container", _uM([[".container .page-bg ", _uM([["position", "fixed"], ["top", "50%"], ["left", "50%"], ["transform", "translate(-50%, -50%)"], ["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["zIndex", 999]])]])], ["loading-text", _uM([[".container .page-bg .loading-container ", _uM([["marginTop", "20rpx"], ["fontSize", "28rpx"], ["color", "#666666"]])]])], ["device-car", _uM([[".container .page-bg .top ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["current-car", _uM([[".container .page-bg .top .device-car ", _uM([["position", "relative"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "flex-end"]])]])], ["car-id", _uM([[".container .page-bg .top .device-car .current-car ", _uM([["fontSize", "36rpx"], ["fontWeight", "bold"], ["color", "#000000"], ["textAlign", "center"], ["position", "relative"]])]])], ["login", _uM([[".container .page-bg .top .device-car .current-car ", _uM([["fontSize", "36rpx"], ["fontWeight", "bold"], ["color", "#000000"], ["textAlign", "center"], ["paddingRight", "10rpx"]])]])], ["nav-tools", _uM([[".container .page-bg .top .device-car ", _uM([["display", "flex"], ["flexShrink", 0], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["nav-tool-spacing", _uM([[".container .page-bg .top .device-car .nav-tools ", _uM([["flexShrink", 0], ["marginLeft", "30rpx"]])]])], ["nav-tool-add", _uM([[".container .page-bg .top .device-car .nav-tools ", _uM([["display", "flex"], ["width", "40rpx"], ["height", "40rpx"], ["alignItems", "center"], ["justifyContent", "center"]])]])], ["nav-tool-add-image", _uM([[".container .page-bg .top .device-car .nav-tools ", _uM([["width", "36rpx"], ["height", "36rpx"]])]])], ["exit", _uM([[".container .page-bg .top .device-car .nav-tools ", _uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "10rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "10rpx"], ["backgroundColor", "rgba(0,0,0,0.05)"], ["transitionProperty", "all"], ["transitionDuration", "0.2s"], ["transitionTimingFunction", "ease"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"]])]])], ["exit-icon", _uM([[".container .page-bg .top .device-car .nav-tools .exit ", _uM([["width", "40rpx"], ["height", "40rpx"]])]])], ["device-info", _uM([[".container .page-bg .top ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["width", "50%"]])]])], ["info", _uM([[".container .page-bg .top .device-info .info+", _uM([["marginTop", "16rpx"]])], [".container .page-bg .top .device-info ", _uM([["fontSize", "26rpx"], ["color", "#333333"]])]])], ["banner-image", _uM([[".container .page-bg .top ", _uM([["width", "100%"], ["height", "300rpx"]])]])], ["car-state", _uM([[".container .page-bg .top ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"]])]])], ["state-item", _uM([[".container .page-bg .top .car-state .state-item+", _uM([["marginLeft", "20rpx"]])], [".container .page-bg .top .car-state ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"]])]])], ["state-label", _uM([[".container .page-bg .top .car-state .state-item ", _uM([["fontSize", "24rpx"], ["color", "#999999"]])]])], ["state-value", _uM([[".container .page-bg .top .car-state .state-item ", _uM([["marginTop", "12rpx"], ["fontSize", "25rpx"], ["fontWeight", "bold"], ["color", "#333333"]])], [".container .page-bg .top .car-state .state-item .online", _uM([["color", "#07C160"]])]])], ["map-box", _uM([[".container .page-bg .content ", _uM([["width", "100%"], ["height", "400rpx"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "40rpx"], ["marginLeft", 0], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["display", "flex"], ["flexDirection", "column"], ["overflow", "hidden"]])]])], ["map-header", _uM([[".container .page-bg .content .map-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"]])]])], ["map-title", _uM([[".container .page-bg .content .map-box .map-header ", _uM([["flexShrink", 0], ["fontSize", "32rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["map-refresh-wrap", _uM([[".container .page-bg .content .map-box .map-header ", _uM([["display", "flex"], ["flexShrink", 0], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "8rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "8rpx"], ["paddingLeft", "16rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f9f0"], ["borderTopLeftRadius", "8rpx"], ["borderTopRightRadius", "8rpx"], ["borderBottomRightRadius", "8rpx"], ["borderBottomLeftRadius", "8rpx"]])]])], ["map-refresh", _uM([[".container .page-bg .content .map-box .map-header .map-refresh-wrap ", _uM([["fontSize", "26rpx"], ["lineHeight", "42rpx"], ["color", "#07C160"], ["whiteSpace", "nowrap"]])]])], ["map-container", _uM([[".container .page-bg .content .map-box ", _uM([["position", "relative"], ["height", "300rpx"]])]])], ["map-status", _uM([[".container .page-bg .content .map-box .map-container ", _uM([["position", "absolute"], ["left", "24rpx"], ["right", "24rpx"], ["bottom", "24rpx"], ["paddingTop", "16rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "12rpx"], ["borderTopRightRadius", "12rpx"], ["borderBottomRightRadius", "12rpx"], ["borderBottomLeftRadius", "12rpx"], ["backgroundColor", "rgba(0,0,0,0.68)"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["map-status-text", _uM([[".container .page-bg .content .map-box .map-container .map-status ", _uM([["color", "#ffffff"], ["fontSize", "24rpx"]])]])], ["map-status-retry", _uM([[".container .page-bg .content .map-box .map-container .map-status ", _uM([["flexShrink", 0], ["marginLeft", "20rpx"], ["color", "#8de39b"], ["fontSize", "24rpx"]])]])], ["mile-record", _uM([[".container .page-bg .content ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["display", "flex"], ["flexDirection", "column"], ["overflow", "hidden"], ["boxShadow", "0 4rpx 20rpx rgba(0, 0, 0, 0.08)"]])]])], ["record-header", _uM([[".container .page-bg .content .mile-record ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"]])]])], ["record-title", _uM([[".container .page-bg .content .mile-record .record-header ", _uM([["flexShrink", 0], ["fontSize", "32rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["record-desc-wrap", _uM([[".container .page-bg .content .mile-record .record-header ", _uM([["display", "flex"], ["flexShrink", 0], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "8rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "8rpx"], ["paddingLeft", "16rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f9f0"], ["borderTopLeftRadius", "8rpx"], ["borderTopRightRadius", "8rpx"], ["borderBottomRightRadius", "8rpx"], ["borderBottomLeftRadius", "8rpx"]])]])], ["record-desc", _uM([[".container .page-bg .content .mile-record .record-header .record-desc-wrap ", _uM([["fontSize", "26rpx"], ["lineHeight", "42rpx"], ["color", "#07C160"], ["whiteSpace", "nowrap"]])]])], ["ring-container", _uM([[".container .page-bg .content .mile-record ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-around"], ["paddingTop", "30rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#edf7ff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"]])]])], ["ring-item", _uM([[".container .page-bg .content .mile-record ", _uM([["position", "relative"], ["width", "250rpx"], ["height", "250rpx"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"]])]])], ["ring-bg", _uM([[".container .page-bg .content .mile-record ", _uM([["position", "absolute"], ["width", "250rpx"], ["height", "250rpx"], ["zIndex", 2]])]])], ["ring-quarter", _uM([[".container .page-bg .content .mile-record ", _uM([["position", "absolute"], ["width", "126rpx"], ["height", "126rpx"], ["overflow", "hidden"]])]])], ["ring-quarter--top-left", _uM([[".container .page-bg .content .mile-record ", _uM([["top", 0], ["left", 0]])]])], ["ring-quarter--top-right", _uM([[".container .page-bg .content .mile-record ", _uM([["top", 0], ["right", 0]])]])], ["ring-quarter--bottom-right", _uM([[".container .page-bg .content .mile-record ", _uM([["right", 0], ["bottom", 0]])]])], ["ring-quarter--bottom-left", _uM([[".container .page-bg .content .mile-record ", _uM([["bottom", 0], ["left", 0]])]])], ["ring-stroke", _uM([[".container .page-bg .content .mile-record ", _uM([["position", "absolute"], ["width", "250rpx"], ["height", "250rpx"], ["boxSizing", "border-box"], ["borderTopWidth", "16rpx"], ["borderRightWidth", "16rpx"], ["borderBottomWidth", "16rpx"], ["borderLeftWidth", "16rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999]])], [".container .page-bg .content .mile-record .ring-quarter--top-left ", _uM([["top", 0], ["left", 0]])], [".container .page-bg .content .mile-record .ring-quarter--top-right ", _uM([["top", 0], ["right", 0]])], [".container .page-bg .content .mile-record .ring-quarter--bottom-right ", _uM([["right", 0], ["bottom", 0]])], [".container .page-bg .content .mile-record .ring-quarter--bottom-left ", _uM([["bottom", 0], ["left", 0]])]])], ["ring-stroke--track", _uM([[".container .page-bg .content .mile-record ", _uM([["borderTopColor", "#dceaf3"], ["borderRightColor", "#dceaf3"], ["borderBottomColor", "#dceaf3"], ["borderLeftColor", "#dceaf3"], ["borderTopWidth", "5rpx"], ["borderRightWidth", "5rpx"], ["borderBottomWidth", "5rpx"], ["borderLeftWidth", "5rpx"]])]])], ["ring-stroke--active", _uM([[".container .page-bg .content .mile-record ", _uM([["borderTopColor", "#4cd964"], ["borderRightColor", "#4cd964"], ["borderBottomColor", "#4cd964"], ["borderLeftColor", "#4cd964"]])], [".container .page-bg .content .mile-record .ring-bg.orange ", _uM([["borderTopColor", "#ff9500"], ["borderRightColor", "#ff9500"], ["borderBottomColor", "#ff9500"], ["borderLeftColor", "#ff9500"]])]])], ["ring-text", _uM([[".container .page-bg .content .mile-record ", _uM([["position", "relative"], ["zIndex", 10]])]])], ["num", _uM([[".container .page-bg .content .mile-record ", _uM([["fontSize", "45rpx"], ["fontWeight", "bold"], ["color", "#333333"], ["textAlign", "center"]])]])], ["unit", _uM([[".container .page-bg .content .mile-record ", _uM([["fontSize", "20rpx"], ["color", "#666666"], ["textAlign", "right"]])]])], ["label", _uM([[".container .page-bg .content .mile-record ", _uM([["fontSize", "25rpx"], ["color", "#666666"], ["marginTop", "12rpx"], ["textAlign", "center"]])]])], ["device-list", _uM([[".container .page-bg .content ", _uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", "40rpx"], ["marginRight", 0], ["marginBottom", "40rpx"], ["marginLeft", 0]])]])], ["device-item", _uM([[".container .page-bg .content .device-list .device-item+", _uM([["marginTop", "30rpx"]])], [".container .page-bg .content .device-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["item-label", _uM([[".container .page-bg .content .device-list .device-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["icon", _uM([[".container .page-bg .content .device-list .device-item .item-label ", _uM([["width", "80rpx"], ["height", "80rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["paddingTop", "18rpx"], ["paddingRight", "18rpx"], ["paddingBottom", "18rpx"], ["paddingLeft", "18rpx"]])], [".container .page-bg .content .device-list .device-item .item-label .icon-device", _uM([["backgroundColor", "#f0f9f0"]])], [".container .page-bg .content .device-list .device-item .item-label .icon-car", _uM([["backgroundColor", "#f3f8fb"]])], [".container .page-bg .content .device-list .device-item .item-label .icon-fence", _uM([["backgroundColor", "#f1f7f4"]])]])], ["icon-image", _uM([[".container .page-bg .content .device-list .device-item .item-label ", _uM([["width", "45rpx"], ["height", "45rpx"]])], [".container .page-bg .content .service .service-content .service-item ", _uM([["width", "60rpx"], ["height", "60rpx"]])]])], ["item-info", _uM([[".container .page-bg .content .device-list .device-item .item-label ", _uM([["marginLeft", "20rpx"]])]])], ["item-title", _uM([[".container .page-bg .content .device-list .device-item .item-label .item-info ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#333333"]])], [".container .page-bg .content .service .service-content .service-item ", _uM([["marginTop", "10rpx"], ["fontSize", "25rpx"], ["color", "#222222"]])]])], ["item-desc", _uM([[".container .page-bg .content .device-list .device-item .item-label .item-info ", _uM([["color", "#cccccc"], ["fontSize", "24rpx"], ["marginTop", "10rpx"]])]])], ["service", _uM([[".container .page-bg .content ", _uM([["display", "flex"], ["flexDirection", "column"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#ffffff"], ["marginBottom", "30rpx"]])]])], ["service-header", _uM([[".container .page-bg .content .service ", _uM([["fontSize", "32rpx"], ["fontWeight", "bold"], ["color", "#333333"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"], ["marginBottom", "30rpx"]])]])], ["service-content", _uM([[".container .page-bg .content .service ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"]])]])], ["service-item", _uM([[".container .page-bg .content .service .service-content ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"]])]])], ["@TRANSITION", _uM([["exit", _uM([["property", "all"], ["duration", "0.2s"], ["timingFunction", "ease"]])]])]])]

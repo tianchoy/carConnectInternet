@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="uts">
-import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 defineOptions({ name: 'i-sticky' })
 
@@ -42,25 +42,29 @@ const props = defineProps({
  */
 const emit = defineEmits(['fixed', 'unfixed'])
 
+function numericSize(value : any) : number {
+  const text = value.toString()
+  const numberValue = parseFloat(text.replace('px', '').replace('rpx', '').replace('%', '').toString())
+  if (isNaN(numberValue)) return 0
+  return numberValue
+}
+
 
 const bgColor = computed(() => {
   return props.bgColor
 })
-const instance = getCurrentInstance()
-const stickyId = 'i-sticky-' + String(Math.floor(Math.random() * 1000000))
+const stickyId = 'i-sticky-' + (Math.floor(Math.random() * 1000000)).toString()
 const stickyTop = ref(0)
 const stickyLeft = ref(0)
 const stickyWidth = ref(0)
 const stickyHeight = ref(0)
 const viewportHeight = ref(0)
 const hasMeasured = ref(false)
-const internalScrollTop = ref(0)
 const lastFixed = ref(false)
-const measureCount = ref(0)
 const lastMeasuredScrollTop = ref(-1)
 
 const currentScrollTop = computed(() => {
-  return Math.max(props.scrollTop, internalScrollTop.value)
+  return props.scrollTop
 })
 
 const isBottom = computed(() => {
@@ -86,7 +90,7 @@ const fixed = computed(() => {
 
 const placeholderStyle = computed(() => {
   if (!fixed.value || stickyHeight.value <= 0) return ''
-  return 'height:' + String(stickyHeight.value) + 'px;'
+  return 'height:' + (stickyHeight.value).toString() + 'px;'
 })
 
 const stickyStyle = computed(() => {
@@ -97,67 +101,51 @@ const stickyStyle = computed(() => {
       style =
         style +
         'left:' +
-        String(stickyLeft.value) +
+        (stickyLeft.value).toString() +
         'px;width:' +
-        String(stickyWidth.value) +
+        (stickyWidth.value).toString() +
         'px;'
     } else {
       style = style + 'left:0;right:0;width:100%;'
     }
     if (isBottom.value) {
-      style = style + 'bottom:' + String(fixedBottom.value) + 'px;'
+      style = style + 'bottom:' + (fixedBottom.value).toString() + 'px;'
     } else {
-      style = style + 'top:' + String(fixedTop.value) + 'px;'
+      style = style + 'top:' + (fixedTop.value).toString() + 'px;'
     }
   } else if (!props.disabled) {
     style = style + 'position:relative;'
   }
-  if (String(props.zIndex).length > 0) {
-    style = style + 'z-index:' + String(props.zIndex) + ';'
+  if ((props.zIndex).toString().length > 0) {
+    style = style + 'z-index:' + (props.zIndex).toString() + ';'
   }
   return style
 })
 
-function refreshRect() {
-  if (typeof document != 'undefined') {
-    const element = document.getElementById(stickyId)
-    if (element != null) {
-      setRect(element.getBoundingClientRect())
-      return
-    }
+function normalizeRectValue(first : any | null, second : any | null, fallback : number) : number {
+  if (first != null) {
+    const firstValue = parseFloat(first.toString())
+    if (!isNaN(firstValue)) return firstValue
   }
-  if (uni.createSelectorQuery == null) return
-  const query = uni.createSelectorQuery()
-  if (instance != null && instance.proxy != null && query.in != null) {
-    query.in(instance.proxy)
+  if (second != null) {
+    const secondValue = parseFloat(second.toString())
+    if (!isNaN(secondValue)) return secondValue
   }
-  query
-    .select('#' + stickyId)
-    .boundingClientRect((rect) => {
-      setRect(rect)
-    })
-    .exec()
+  return fallback
 }
 
-function setRect(rect) {
+function setRect(rect : any | null) : void {
   if (rect == null) {
     hasMeasured.value = false
-    scheduleMeasureRetry()
     return
   }
-  const realRect = Array.isArray(rect) ? rect[0] : rect
-  if (realRect == null) {
-    hasMeasured.value = false
-    scheduleMeasureRetry()
-    return
-  }
-  const rectTop = normalizeRectValue(realRect.top, realRect.y, 0)
-  const rectLeft = normalizeRectValue(realRect.left, realRect.x, 0)
-  const rectWidth = normalizeRectValue(realRect.width, 0, 0)
-  const rectHeight = normalizeRectValue(realRect.height, 0, 0)
+  const object = rect as NodeInfo
+  const rectTop = normalizeRectValue(object.top, null, 0)
+  const rectLeft = normalizeRectValue(object.left, null, 0)
+  const rectWidth = normalizeRectValue(object.width, null, 0)
+  const rectHeight = normalizeRectValue(object.height, null, 0)
   if (rectHeight <= 0) {
     hasMeasured.value = false
-    scheduleMeasureRetry()
     return
   }
   stickyTop.value = rectTop + currentScrollTop.value
@@ -166,61 +154,40 @@ function setRect(rect) {
   stickyHeight.value = rectHeight
   hasMeasured.value = true
   lastMeasuredScrollTop.value = currentScrollTop.value
-  measureCount.value = 0
 }
 
-function scheduleMeasure() {
-  nextTick(() => {
+function refreshViewportHeight() : void {
+  const info = uni.getWindowInfo()
+  viewportHeight.value = parseFloat(info.windowHeight.toString())
+}
+
+function refreshRect() : void {
+  uni
+    .createSelectorQuery()
+    .select('#' + stickyId)
+    .boundingClientRect((rect : any | null) : void => {
+      setRect(rect)
+    })
+    .exec()
+}
+
+function scheduleMeasure() : void {
+  nextTick(() : void => {
     refreshViewportHeight()
-    updateWindowScrollTop()
     refreshRect()
   })
 }
 
-function scheduleMeasureRetry() {
-  if (measureCount.value >= 12) return
-  measureCount.value = measureCount.value + 1
-  setTimeout(() => {
-    scheduleMeasure()
-  }, 80)
-}
-
-function refreshViewportHeight() {
-  if (typeof window != 'undefined') {
-    viewportHeight.value = Number(window.innerHeight)
-    return
-  }
-  const info = uni.getWindowInfo()
-  viewportHeight.value = Number(info.windowHeight)
-}
-
-function updateWindowScrollTop() {
-  if (typeof window == 'undefined') return
-  internalScrollTop.value = Number(window.scrollY)
-  refreshViewportHeight()
-  if (shouldReMeasure()) {
-    scheduleMeasure()
-  }
-}
-
-function numericSize(value): number {
-  const text = String(value)
-  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
-  if (isNaN(numberValue)) return 0
-  return numberValue
-}
-
-function normalizeRectValue(first, second, fallback): number {
-  const firstValue = Number(first)
-  if (!isNaN(firstValue)) return firstValue
-  const secondValue = Number(second)
-  if (!isNaN(secondValue)) return secondValue
-  return fallback
+function shouldReMeasure() : boolean {
+  if (!hasMeasured.value) return true
+  if (stickyHeight.value <= 0) return true
+  if (stickyWidth.value <= 0) return true
+  return Math.abs(currentScrollTop.value - lastMeasuredScrollTop.value) > 120
 }
 
 watch(
-  () => fixed.value,
-  (value) => {
+  () : boolean => fixed.value,
+  (value : boolean) : void => {
     if (value == lastFixed.value) return
     lastFixed.value = value
     emit(value ? 'fixed' : 'unfixed', props.index)
@@ -228,22 +195,16 @@ watch(
 )
 
 watch(
-  () => [props.disabled, props.position],
-  () => {
-    measureCount.value = 0
+  () : string => props.disabled.toString() + '-' + props.position,
+  () : void => {
     lastMeasuredScrollTop.value = -1
     scheduleMeasure()
   }
 )
 
 watch(
-  () => [
-    props.scrollTop,
-    props.offsetTop,
-    props.offsetBottom,
-    props.customNavHeight,
-  ],
-  () => {
+  () : string => props.scrollTop.toString() + '-' + props.offsetTop.toString() + '-' + props.offsetBottom.toString() + '-' + props.customNavHeight.toString(),
+  () : void => {
     refreshViewportHeight()
     if (shouldReMeasure()) {
       scheduleMeasure()
@@ -251,26 +212,8 @@ watch(
   }
 )
 
-function shouldReMeasure(): boolean {
-  if (!hasMeasured.value) return true
-  if (stickyHeight.value <= 0) return true
-  if (stickyWidth.value <= 0) return true
-  return Math.abs(currentScrollTop.value - lastMeasuredScrollTop.value) > 120
-}
-
-onMounted(() => {
+onMounted(() : void => {
   scheduleMeasure()
-  if (typeof window != 'undefined') {
-    window.addEventListener('scroll', updateWindowScrollTop)
-    window.addEventListener('resize', refreshViewportHeight)
-  }
-})
-
-onUnmounted(() => {
-  if (typeof window != 'undefined') {
-    window.removeEventListener('scroll', updateWindowScrollTop)
-    window.removeEventListener('resize', refreshViewportHeight)
-  }
 })
 </script>
 

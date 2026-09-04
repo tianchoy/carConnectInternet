@@ -1,20 +1,12 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-if (!Array) {
-  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
-  _easycom_i_icon_1();
-}
-const _easycom_i_icon = () => "../i-icon/i-icon.js";
-if (!Math) {
-  _easycom_i_icon();
-}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
   modelValue: {
-    type: String,
+    type: [String, Number],
     default: ""
   },
   value: {
-    type: String,
+    type: [String, Number],
     default: ""
   },
   type: {
@@ -22,7 +14,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     default: "text"
   },
   height: {
-    type: String,
+    type: [String, Number],
     default: "40px"
   },
   disabled: {
@@ -46,7 +38,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     default: true
   },
   maxlength: {
-    type: Number,
+    type: [String, Number],
     default: -1
   },
   placeholder: {
@@ -78,19 +70,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     default: false
   },
   cursor: {
-    type: Number,
+    type: [String, Number],
     default: -1
   },
   cursorSpacing: {
-    type: Number,
+    type: [String, Number],
     default: 30
   },
   selectionStart: {
-    type: Number,
+    type: [String, Number],
     default: -1
   },
   selectionEnd: {
-    type: Number,
+    type: [String, Number],
     default: -1
   },
   adjustPosition: {
@@ -102,7 +94,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     default: "left"
   },
   fontSize: {
-    type: String,
+    type: [String, Number],
     default: "15px"
   },
   color: {
@@ -110,6 +102,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     default: "#303133"
   },
   prefiicon: {
+    type: String,
+    default: ""
+  },
+  prefixIcon: {
     type: String,
     default: ""
   },
@@ -161,47 +157,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     type: String,
     default: ""
   }
-}, emits: [
-  "update:modelValue",
-  "update:value",
-  "input",
-  "change",
-  "focus",
-  "blur",
-  "confirm",
-  "keyboardheightchange",
-  "clear"
-], setup(__props, _a) {
+}, emits: ["update:modelValue", "update:value", "input", "change", "focus", "blur", "confirm", "keyboardheightchange", "clear"], setup(__props, _a) {
   var __expose = _a.expose, __emit = _a.emit;
   const props = __props;
   const emit = __emit;
   function initialValue() {
-    const modelValue = props.modelValue;
+    const modelValue = props.modelValue.toString();
     if (modelValue.length > 0)
       return modelValue;
-    return props.value;
+    return props.value.toString();
   }
-  function formatSize(value) {
-    if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("%") >= 0) {
-      return value;
+  function formatSize(value = null) {
+    const text = value.toString();
+    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+      return text;
     }
-    return value + "px";
+    return text + "px";
+  }
+  function emitValue(value) {
+    emit("update:modelValue", value);
+    emit("update:value", value);
+    emit("input", value);
+    emit("change", value);
   }
   const inputBgColor = common_vendor.computed(() => {
     return props.bgColor;
   });
   const current = common_vendor.ref(initialValue());
-  common_vendor.watch(() => {
-    return props.modelValue;
-  }, () => {
-    current.value = props.modelValue;
-  });
-  common_vendor.watch(() => {
-    return props.value;
-  }, () => {
-    if (props.modelValue.length == 0)
-      current.value = props.value;
-  });
   const focused = common_vendor.ref(false);
   const passwordVisible = common_vendor.ref(props.password);
   const wrapClass = common_vendor.computed(() => {
@@ -232,14 +214,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return props.placeholderStyle;
     return "color:#c0c4cc;";
   });
-  function emitValue(value) {
-    emit("update:modelValue", value);
-    emit("update:value", value);
-    emit("input", value);
-    emit("change", value);
-  }
+  common_vendor.watch(() => {
+    return props.modelValue;
+  }, () => {
+    current.value = initialValue();
+  });
+  common_vendor.watch(() => {
+    return props.value;
+  }, () => {
+    current.value = initialValue();
+  });
   function handleInput(event) {
-    const nextValue = event.detail.value;
+    const nextValue = event.detail.value.toString();
     if (props.readonly) {
       current.value = initialValue();
       return null;
@@ -247,18 +233,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     current.value = nextValue;
     emitValue(nextValue);
   }
-  function handleFocus(event) {
+  function handleFocus(event = null) {
     focused.value = true;
     emit("focus", event);
   }
-  function handleBlur(event) {
+  function handleBlur(event = null) {
     focused.value = false;
     emit("blur", event);
   }
-  function handleConfirm(event) {
-    emit("confirm", event.detail.value);
+  function handleConfirm(event = null) {
+    if (event == null || typeof event != "object")
+      return null;
+    const eventObject = event;
+    const detail = eventObject["detail"];
+    if (detail == null || typeof detail != "object")
+      return null;
+    const value = detail["value"];
+    emit("confirm", value == null ? "" : value.toString());
   }
-  function handleKeyboardHeightChange(event) {
+  function handleKeyboardHeightChange(event = null) {
     emit("keyboardheightchange", event);
   }
   function clear() {
@@ -276,9 +269,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = common_vendor.e({
-      a: __props.prefiicon.length > 0 || __props.prefix.length > 0
-    }, __props.prefiicon.length > 0 || __props.prefix.length > 0 ? {
-      b: common_vendor.t(__props.prefix.length > 0 ? __props.prefix : __props.prefiicon),
+      a: __props.prefiicon.length > 0 || __props.prefixIcon.length > 0 || __props.prefix.length > 0
+    }, __props.prefiicon.length > 0 || __props.prefixIcon.length > 0 || __props.prefix.length > 0 ? {
+      b: common_vendor.t(__props.prefix.length > 0 ? __props.prefix : __props.prefixIcon.length > 0 ? __props.prefixIcon : __props.prefiicon),
       c: common_vendor.s(__props.prefiiconStyle)
     } : {}, {
       d: common_vendor.s(fieldStyle.value),
@@ -289,21 +282,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       i: placeholderStyleText.value,
       j: passwordVisible.value,
       k: __props.disabled,
-      l: __props.maxlength,
+      l: parseFloat(__props.maxlength.toString()),
       m: __props.confirmType,
       n: __props.confirmHold,
       o: __props.inputmode,
       p: __props.focus,
-      q: __props.cursor,
-      r: __props.cursorSpacing,
-      s: __props.selectionStart,
-      t: __props.selectionEnd,
+      q: parseFloat(__props.cursor.toString()),
+      r: parseFloat(__props.cursorSpacing.toString()),
+      s: parseFloat(__props.selectionStart.toString()),
+      t: parseFloat(__props.selectionEnd.toString()),
       v: __props.adjustPosition,
-      w: common_vendor.o(handleInput, "41"),
-      x: common_vendor.o(handleFocus, "1c"),
-      y: common_vendor.o(handleBlur, "c6"),
-      z: common_vendor.o(handleConfirm, "9b"),
-      A: common_vendor.o(handleKeyboardHeightChange, "21"),
+      w: common_vendor.o(handleInput, "ba"),
+      x: common_vendor.o(handleFocus, "da"),
+      y: common_vendor.o(handleBlur, "d7"),
+      z: common_vendor.o(handleConfirm, "97"),
+      A: common_vendor.o(handleKeyboardHeightChange, "90"),
       B: __props.showWordLimit
     }, __props.showWordLimit ? {
       C: common_vendor.t(current.value.length),
@@ -311,16 +304,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     } : {}, {
       E: __props.clearable && current.value.length > 0 && !__props.disabled && !__props.readonly
     }, __props.clearable && current.value.length > 0 && !__props.disabled && !__props.readonly ? {
-      F: common_vendor.o(clear, "5b")
+      F: common_vendor.o(clear, "44")
     } : {}, {
       G: __props.password && __props.showPasswordToggle
     }, __props.password && __props.showPasswordToggle ? {
-      H: common_vendor.o(togglePassword, "2a"),
-      I: common_vendor.p({
-        name: passwordVisible.value ? "../../../../static/eye-close.png" : "../../../../static/eye-open.png",
-        size: "24",
-        class: "i-input__eye"
-      })
+      H: common_vendor.t(passwordVisible.value ? "show" : "hide"),
+      I: common_vendor.o(togglePassword, "fc")
     } : {}, {
       J: __props.suffiicon.length > 0
     }, __props.suffiicon.length > 0 ? {

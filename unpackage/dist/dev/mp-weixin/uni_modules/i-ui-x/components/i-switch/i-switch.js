@@ -88,14 +88,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   }
   function formatSize(value = null) {
     const text = value.toString();
-    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
       return text;
-    }
     return text + "px";
   }
   function numericSize(value = null, fallback) {
     const text = value.toString().replace("px", "").replace("rpx", "").replace("%", "");
-    const numberValue = parseFloat(text);
+    const numberValue = parseFloat(text.toString());
     if (isNaN(numberValue))
       return fallback;
     return numberValue;

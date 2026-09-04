@@ -81,14 +81,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     type: Boolean,
     default: false
   }
-}, emits: [
-  "update:modelValue",
-  "update:value",
-  "change",
-  "changing",
-  "dragStart",
-  "dragEnd"
-], setup(__props, _a) {
+}, emits: ["update:modelValue", "update:value", "change", "changing", "dragStart", "dragEnd"], setup(__props, _a) {
   var __emit = _a.emit;
   const props = __props;
   const emit = __emit;
@@ -110,14 +103,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   function normalizeRange(value = null) {
     let start = props.min;
     let end = props.max;
-    if (Array.isArray(value) && value.length > 1) {
-      start = parseFloat(value[0].toString());
-      end = parseFloat(value[1].toString());
+    if (Array.isArray(value)) {
+      const list = value;
+      if (list.length > 1) {
+        const first = list[0];
+        const second = list[1];
+        if (first != null)
+          start = parseFloat(first.toString());
+        if (second != null)
+          end = parseFloat(second.toString());
+      }
     } else {
       const text = value.toString();
       if (text.indexOf(",") >= 0) {
-        start = parseFloat(text.split(",")[0]);
-        end = parseFloat(text.split(",")[1]);
+        start = parseFloat(text.split(",")[0].toString());
+        end = parseFloat(text.split(",")[1].toString());
       }
     }
     start = normalizeSingle(start);
@@ -126,28 +126,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       start = end;
     return [start, end];
   }
-  function valuePercent(value) {
+  function formatSize(value = null) {
+    const text = value.toString();
+    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
+      return text;
+    return text + "px";
+  }
+  function numericSize(value = null, fallback) {
+    const text = value.toString();
+    const numberValue = parseFloat(text.replace("px", "").replace("rpx", "").replace("%", "").toString());
+    if (isNaN(numberValue))
+      return fallback;
+    return numberValue;
+  }
+  function valuePercent(value = null) {
     const distance = props.max - props.min;
     if (distance <= 0)
       return 0;
-    const percent = (value - props.min) / distance * 100;
+    const percent = (parseFloat(value.toString()) - props.min) / distance * 100;
     if (percent < 0)
       return 0;
     if (percent > 100)
       return 100;
     return percent;
   }
-  function formatSize(value = null) {
-    const text = value.toString();
-    if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-      return text;
-    }
-    return text + "px";
-  }
-  function thumbStyle(value) {
-    const size = parseFloat(props.thumbSize.toString());
-    const halfSize = isNaN(size) ? 10 : size / 2;
-    return "left:" + valuePercent(value).toString() + "%;width:" + formatSize(props.thumbSize) + ";height:" + formatSize(props.thumbSize) + ";margin-left:" + formatSize(0 - halfSize) + ";border:" + props.thumbBorder + ";border-radius:" + props.thumbRadius + ";background-color:" + props.thumbColor + ";";
+  function thumbStyle(value = null) {
+    const size = numericSize(props.thumbSize, 20);
+    return "left:" + valuePercent(value).toString() + "%;width:" + formatSize(props.thumbSize) + ";height:" + formatSize(props.thumbSize) + ";margin-left:" + formatSize(0 - size / 2) + ";border:" + props.thumbBorder + ";border-radius:" + props.thumbRadius + ";background-color:" + props.thumbColor + ";";
   }
   const singleValue = common_vendor.ref(normalizeSingle(initialValue()));
   const rangeStart = common_vendor.ref(normalizeRange(initialValue())[0]);
@@ -157,6 +162,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   const rangeRectLeft = common_vendor.ref(0);
   const rangeRectWidth = common_vendor.ref(0);
   const activeRangeThumb = common_vendor.ref("");
+  function syncFromProps() {
+    singleValue.value = normalizeSingle(initialValue());
+    const values = normalizeRange(initialValue());
+    rangeStart.value = values[0];
+    rangeEnd.value = values[1];
+  }
+  function startDrag() {
+    if (dragging.value)
+      return null;
+    dragging.value = true;
+    emit("dragStart");
+  }
+  function endDrag() {
+    dragging.value = false;
+    emit("dragEnd");
+  }
+  function emitValue(value = null) {
+    emit("update:modelValue", value);
+    emit("update:value", value);
+    emit("change", value);
+  }
+  function normalizeStart(value = null) {
+    let nextValue = normalizeSingle(value);
+    if (props.noCross && nextValue > rangeEnd.value)
+      nextValue = rangeEnd.value;
+    return nextValue;
+  }
+  function normalizeEnd(value = null) {
+    let nextValue = normalizeSingle(value);
+    if (props.noCross && nextValue < rangeStart.value)
+      nextValue = rangeStart.value;
+    return nextValue;
+  }
   const wrapClass = common_vendor.computed(() => {
     const classes = ["i-slider"];
     if (props.vertical)
@@ -184,12 +222,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   const endThumbStyle = common_vendor.computed(() => {
     return thumbStyle(rangeEnd.value);
   });
-  const syncFromProps = () => {
-    singleValue.value = normalizeSingle(initialValue());
-    const values = normalizeRange(initialValue());
-    rangeStart.value = values[0];
-    rangeEnd.value = values[1];
-  };
   common_vendor.watch(() => {
     return props.modelValue;
   }, () => {
@@ -200,33 +232,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   }, () => {
     syncFromProps();
   });
-  function normalizeStart(value) {
-    let nextValue = normalizeSingle(value);
-    if (props.noCross && nextValue > rangeEnd.value)
-      nextValue = rangeEnd.value;
-    return nextValue;
-  }
-  function normalizeEnd(value) {
-    let nextValue = normalizeSingle(value);
-    if (props.noCross && nextValue < rangeStart.value)
-      nextValue = rangeStart.value;
-    return nextValue;
-  }
-  const startDrag = () => {
-    if (dragging.value)
-      return null;
-    dragging.value = true;
-    emit("dragStart");
-  };
-  const endDrag = () => {
-    dragging.value = false;
-    emit("dragEnd");
-  };
-  const emitValue = (value = null) => {
-    emit("update:modelValue", value);
-    emit("update:value", value);
-    emit("change", value);
-  };
   function handleSingleChanging(event) {
     startDrag();
     singleValue.value = normalizeSingle(event.detail.value);
@@ -240,7 +245,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   function normalizeStep(value) {
     const stepValue = props.step <= 0 ? 1 : props.step;
     const nextValue = props.min + Math.round((value - props.min) / stepValue) * stepValue;
-    return normalizeSingle(parseFloat(nextValue.toFixed(6)));
+    return normalizeSingle(parseFloat(nextValue.toFixed(6).toString()));
   }
   function valueFromPoint(x) {
     let percent = (x - rangeRectLeft.value) / rangeRectWidth.value;
@@ -264,7 +269,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       point = event.changedTouches[0];
     if (point == null)
       return NaN;
-    return point.clientX;
+    const object = point;
+    const clientX = object["clientX"];
+    if (clientX != null) {
+      const value = parseFloat(clientX.toString());
+      if (!isNaN(value))
+        return value;
+    }
+    const pageX = object["pageX"];
+    if (pageX != null) {
+      const value = parseFloat(pageX.toString());
+      if (!isNaN(value))
+        return value;
+    }
+    const x = object["x"];
+    return x == null ? NaN : parseFloat(x.toString());
+  }
+  function setRangeRect(rect = null) {
+    if (rect == null || typeof rect != "object")
+      return null;
+    const object = rect;
+    const left = object["left"];
+    const x = object["x"];
+    const leftValue = left == null ? NaN : parseFloat(left.toString());
+    const xValue = x == null ? 0 : parseFloat(x.toString());
+    rangeRectLeft.value = isNaN(leftValue) ? xValue : leftValue;
+    const width = object["width"];
+    rangeRectWidth.value = width == null ? 0 : parseFloat(width.toString());
   }
   function updateRangeByTouch(event, shouldPickThumb) {
     const x = readTouchX(event);
@@ -279,26 +310,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       rangeEnd.value = normalizeEnd(nextValue);
     emit("changing", [rangeStart.value, rangeEnd.value]);
   }
-  function setRangeRect(rect = null) {
-    const rects = rect;
-    if (rects.length == 0)
-      return null;
-    const nodeInfo = rects[0];
-    rangeRectLeft.value = nodeInfo.left != null ? nodeInfo.left : 0;
-    rangeRectWidth.value = nodeInfo.width != null ? nodeInfo.width : 0;
-  }
-  function refreshRangeRect(event, shouldPickThumb, shouldUpdate) {
+  function refreshRangeRect(event, shouldPickThumb) {
     common_vendor.index.createSelectorQuery().select("#" + rangeId).boundingClientRect((rect = null) => {
       setRangeRect(rect);
-      if (shouldUpdate)
-        updateRangeByTouch(event, shouldPickThumb);
+      updateRangeByTouch(event, shouldPickThumb);
     }).exec();
   }
   function handleRangeTouchStart(event) {
     if (props.disabled || props.readonly)
       return null;
     startDrag();
-    refreshRangeRect(event, true, true);
+    refreshRangeRect(event, true);
   }
   function handleRangeTouchMove(event) {
     if (props.disabled || props.readonly || activeRangeThumb.value.length == 0)
