@@ -1,4 +1,0 @@
-// @ts-nocheck
-// export * from './uvue'
-export { raf, doubleRaf, cancelRaf } from './uvue';
-//# sourceMappingURL=index.uts.map

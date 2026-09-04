@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "l-picker": "../../../lime-picker/components/l-picker/l-picker"
-  }
-}

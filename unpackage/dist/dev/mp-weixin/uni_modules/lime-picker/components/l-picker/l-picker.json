@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "l-picker-item": "../l-picker-item/l-picker-item",
-    "l-loading": "../../../lime-loading/components/l-loading/l-loading"
-  }
-}
