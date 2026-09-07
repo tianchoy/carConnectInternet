@@ -7,6 +7,29 @@ export function formatTimes(timestamp: number): string {
     const d = new Date(timestamp);
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
+/** 按日历月份回退，日期超出目标月份时取目标月最后一天。 */
+export function subtractMonths(timestamp: number, months: number): number {
+    const date = new Date(timestamp);
+    const originalDay = date.getDate();
+    date.setDate(1);
+    date.setMonth(date.getMonth() - months);
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    date.setDate(Math.min(originalDay, lastDay));
+    return date.getTime();
+}
+/** 将日期时间限制在指定的本地时间范围内。 */
+export function clampLocalDateTime(timestamp: string, minTimestamp: string, maxTimestamp: string): string {
+    const value = parseLocalDateTime(timestamp);
+    const min = parseLocalDateTime(minTimestamp);
+    const max = parseLocalDateTime(maxTimestamp);
+    if (value == null)
+        return minTimestamp;
+    if (min != null && value < min)
+        return minTimestamp;
+    if (max != null && value > max)
+        return maxTimestamp;
+    return formatTimes(value);
+}
 /**
  * 解析本地日期时间。支持 yyyy-MM-dd、yyyy/MM/dd 及其 HH:mm[:ss] 形式。
  * 不使用 Date 的字符串构造，避免部分 iOS 平台解析失败。

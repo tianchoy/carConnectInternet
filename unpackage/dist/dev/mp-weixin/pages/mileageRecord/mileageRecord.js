@@ -151,6 +151,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       endTime.value = utils_formateTime.formatTimes(now.getTime());
       startTime.value = utils_formateTime.formatTimes(now.getTime() - 36e5 * 24);
     };
+    const pickerValue = common_vendor.computed(() => {
+      return currentPickerType.value == "start" ? startTime.value : endTime.value;
+    });
+    const pickerMinTime = common_vendor.computed(() => {
+      const now = /* @__PURE__ */ new Date();
+      return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime();
+    });
+    const pickerMaxTime = common_vendor.computed(() => {
+      return Date.now();
+    });
     const processTripData = (data) => {
       const trips = data.getArray("trips");
       if (trips != null && trips.length > 0) {
@@ -191,13 +201,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
             return Promise.resolve(null);
           }
-          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:206", "获取里程数据成功:", res);
+          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:226", "获取里程数据成功:", res);
           const trackData = res.data;
           if (trackData != null) {
             processTripData(trackData);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:212", "获取里程数据失败:", e);
+          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:232", "获取里程数据失败:", e);
           utils_toast.showAppToast({
             title: "数据加载失败",
             icon: "none"
@@ -293,13 +303,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "/static/xiangxia.png",
           fontSize: "15"
         }),
-        k: common_vendor.o(onConfirm, "a6"),
-        l: common_vendor.o(onCancel, "d8"),
+        k: common_vendor.o(onConfirm, "68"),
+        l: common_vendor.o(onCancel, "40"),
         m: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           title: pickerTitle.value,
-          mode: 63
+          mode: 63,
+          start: pickerMinTime.value,
+          end: pickerMaxTime.value,
+          value: pickerValue.value
         }),
         n: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;

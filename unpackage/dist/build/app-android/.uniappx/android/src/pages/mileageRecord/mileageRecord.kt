@@ -138,6 +138,23 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                 endTime.value = formatTimes(now.getTime())
                 startTime.value = formatTimes(now.getTime() - 86400000)
             }
+            val pickerValue = computed(fun(): String {
+                return if (currentPickerType.value == "start") {
+                    startTime.value
+                } else {
+                    endTime.value
+                }
+            }
+            )
+            val pickerMinTime = computed(fun(): Number {
+                val now = Date()
+                return Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime()
+            }
+            )
+            val pickerMaxTime = computed(fun(): Number {
+                return Date.now()
+            }
+            )
             val processTripData = fun(data: UTSJSONObject): Unit {
                 val trips = data.getArray<UTSJSONObject>("trips")
                 if (trips != null && trips.length > 0) {
@@ -290,8 +307,11 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                             }
                             , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
-                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
-                                        "title"
+                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "start" to pickerMinTime.value, "end" to pickerMaxTime.value, "value" to pickerValue.value, "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
+                                        "title",
+                                        "start",
+                                        "end",
+                                        "value"
                                     ))
                                 )
                             }

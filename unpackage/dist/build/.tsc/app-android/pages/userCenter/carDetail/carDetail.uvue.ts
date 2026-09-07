@@ -205,7 +205,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
       _cE("view", _uM({ class: "content" }), [
         _cE("view", _uM({ class: "list" }), [
           _cE("text", _uM({ class: "title" }), "设备ID"),
-          _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('deviceId', '')), 1 /* TEXT */)
+          _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('deviceImei', '')), 1 /* TEXT */)
         ]),
         _cE("view", _uM({ class: "list" }), [
           _cE("text", _uM({ class: "title" }), "设备名称"),

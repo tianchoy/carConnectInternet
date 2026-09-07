@@ -11,7 +11,7 @@
 			Icon="/static/edit-pen.png"
 		></custom-navBar>
 		<view class="content">
-			<view class="list"><text class="title">设备ID</text><text class="info">{{ carInfo.getString('deviceId', '') }}</text></view>
+			<view class="list"><text class="title">设备ID</text><text class="info">{{ carInfo.getString('deviceImei', '') }}</text></view>
 			<view class="list">
 				<text class="title">设备名称</text>
 				<text v-if="!isEditing" class="info">{{ carInfo.getString('deviceName', '') }}</text>

@@ -14,7 +14,7 @@
 				</view>
 			</view>
 			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
-				<l-date-time-picker confirm-btn="确认" cancel-btn="取消" :title="pickerTitle" :mode="63"
+				<l-date-time-picker confirm-btn="确认" cancel-btn="取消" :title="pickerTitle" :mode="63" :start="pickerMinTime" :end="pickerMaxTime" :value="pickerValue"
 					@confirm="onConfirm" @cancel="onCancel">
 				</l-date-time-picker>
 			</l-popup>
@@ -96,6 +96,26 @@ import { openLocation } from '../../utils/openLocation.uts'
 		// 开始时间默认为当前时间前24小时
 		startTime.value = formatTimes(now.getTime() - 3600000 * 24)
 	}
+
+
+	const pickerValue = computed(() : string => {
+		return currentPickerType.value == 'start' ? startTime.value : endTime.value
+	})
+
+	const pickerMinTime = computed(() => {
+		const now = new Date()
+		return new Date(
+			now.getFullYear(),
+			now.getMonth() - 6,
+			now.getDate(),
+			0, 0, 0
+		).getTime()
+	})
+
+	// 最大日期（当前时间）
+	const pickerMaxTime = computed(() => {
+		return Date.now()
+	})
 
 	const loadStopData = async () : Promise<void> => {
 		uni.showLoading({

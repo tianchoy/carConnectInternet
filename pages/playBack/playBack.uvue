@@ -55,7 +55,7 @@
 				</view>
 			</view>
 			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
-				<l-date-time-picker confirm-btn="确认" cancel-btn="取消" :title="pickerTitle" :mode="63" format="YYYY-MM-DD HH:mm:ss"
+				<l-date-time-picker confirm-btn="确认" cancel-btn="取消" :start="pickerMinTime" :end="pickerMaxTime" :value="pickerValue" :title="pickerTitle" :mode="63" format="YYYY-MM-DD HH:mm:ss" 
 					@confirm="onConfirm" @cancel="onCancel">
 				</l-date-time-picker>
 			</l-popup>
@@ -161,6 +161,25 @@ import { showAppToast } from '../../utils/toast.uts'
 		const milliseconds = parseLocalDateTime(value)
 		return milliseconds == null ? fallback : formatPlaybackTime(milliseconds)
 	}
+
+	const pickerValue = computed(() : string => {
+		return currentPickerType.value == 'start' ? startTime.value : endTime.value
+	})
+
+	const pickerMinTime = computed(() => {
+		const now = new Date()
+		return new Date(
+			now.getFullYear(),
+			now.getMonth() - 6,
+			now.getDate(),
+			0, 0, 0
+		).getTime()
+	})
+
+	// 最大日期（当前时间）
+	const pickerMaxTime = computed(() => {
+		return Date.now()
+	})
 
 	function getPlaybackDate(value : string) : string {
 		const parts = value.split(' ')
@@ -817,7 +836,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		lng.value = option.lng ?? null
 		sTime.value = option.startTime ?? ''
 		eTime.value = option.endTime ?? ''
-		console.log(sTime.value, eTime.value)
+		console.log('startTime:', sTime.value, 'endTime:', eTime.value)
 		const routeStartTime = resolveRouteDateTime(sTime.value)
 		const routeEndTime = resolveRouteDateTime(eTime.value)
 		if (routeStartTime != null && routeEndTime != null) {

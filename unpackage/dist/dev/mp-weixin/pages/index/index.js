@@ -957,11 +957,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       if (!isCarSelected())
         return null;
+      const timeRange = utils_gettime.getTodayZeroTime();
       common_vendor.index.navigateTo({
-        url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
+        url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude + "&startTime=" + utils_formateTime.formatTimes(timeRange.todayZero) + "&endTime=" + utils_formateTime.formatTimes(timeRange.nowTime),
         fail: (err) => {
           if (err.errMsg.indexOf("locked") < 0)
-            common_vendor.index.__f__("error", "at pages/index/index.uvue:1151", "跳转轨迹详情失败:", err);
+            common_vendor.index.__f__("error", "at pages/index/index.uvue:1152", "跳转轨迹详情失败:", err);
         }
       });
     };
@@ -988,7 +989,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/addCar/addCar",
         fail: (err) => {
           if (err.errMsg.indexOf("locked") < 0)
-            common_vendor.index.__f__("error", "at pages/index/index.uvue:1179", "跳转添加设备失败:", err);
+            common_vendor.index.__f__("error", "at pages/index/index.uvue:1180", "跳转添加设备失败:", err);
         }
       });
     };
@@ -1031,7 +1032,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
         corpId: "ww686122ec6a4db85a",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1226", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1227", res);
         }
       }));
     };
@@ -1050,10 +1051,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1256", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1257", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1259", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1260", "打开小程序失败", res);
           needRefresh.value = false;
           utils_toast.showAppToast({
             title: "打开支付页面失败",
@@ -1073,7 +1074,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function unbindCurrentDevice() {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const result = yield api_request.delDevice(currentCarDeviceId.value);
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:1293", "解绑设备结果:", result);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:1294", "解绑设备结果:", result);
         if (result.code == 200) {
           utils_toast.showAppToast({
             title: "解绑成功",

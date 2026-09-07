@@ -105,6 +105,26 @@ const carStatus = ref('在线')
 	}
 
 
+	const pickerValue = computed(() : string => {
+		return currentPickerType.value == 'start' ? startTime.value : endTime.value
+	})
+
+	const pickerMinTime = computed(() => {
+		const now = new Date()
+		return new Date(
+			now.getFullYear(),
+			now.getMonth() - 6,
+			now.getDate(),
+			0, 0, 0
+		).getTime()
+	})
+
+	// 最大日期（当前时间）
+	const pickerMaxTime = computed(() => {
+		return Date.now()
+	})
+
+
 	// 处理行程数据
 	const processTripData = (data : UTSJSONObject) : void => {
 		const trips = data.getArray<UTSJSONObject>('trips')
@@ -298,9 +318,12 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               "cancel-btn": "取消",
               title: pickerTitle.value,
               mode: 63,
+              start: pickerMinTime.value,
+              end: pickerMaxTime.value,
+              value: pickerValue.value,
               onConfirm: onConfirm,
               onCancel: onCancel
-            }), null, 8 /* PROPS */, ["title"])
+            }), null, 8 /* PROPS */, ["title", "start", "end", "value"])
           ]),
           _: 1 /* STABLE */
         }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])

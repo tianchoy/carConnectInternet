@@ -67,6 +67,23 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 }
             }
             val normalizePlaybackTime = ::gen_normalizePlaybackTime_fn
+            val pickerValue = computed(fun(): String {
+                return if (currentPickerType.value == "start") {
+                    startTime.value
+                } else {
+                    endTime.value
+                }
+            }
+            )
+            val pickerMinTime = computed(fun(): Number {
+                val now = Date()
+                return Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime()
+            }
+            )
+            val pickerMaxTime = computed(fun(): Number {
+                return Date.now()
+            }
+            )
             fun gen_getPlaybackDate_fn(value: String): String {
                 val parts = value.split(" ")
                 return if (parts.length > 1) {
@@ -724,7 +741,10 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             }
                             , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
-                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "format" to "YYYY-MM-DD HH:mm:ss", "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
+                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "start" to unref(pickerMinTime), "end" to unref(pickerMaxTime), "value" to unref(pickerValue), "title" to pickerTitle.value, "mode" to 63, "format" to "YYYY-MM-DD HH:mm:ss", "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
+                                        "start",
+                                        "end",
+                                        "value",
                                         "title"
                                     ))
                                 )

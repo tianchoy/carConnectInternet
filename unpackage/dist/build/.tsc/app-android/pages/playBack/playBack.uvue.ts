@@ -111,6 +111,25 @@ const center = reactive({
 		return milliseconds == null ? fallback : formatPlaybackTime(milliseconds)
 	}
 
+	const pickerValue = computed(() : string => {
+		return currentPickerType.value == 'start' ? startTime.value : endTime.value
+	})
+
+	const pickerMinTime = computed(() => {
+		const now = new Date()
+		return new Date(
+			now.getFullYear(),
+			now.getMonth() - 6,
+			now.getDate(),
+			0, 0, 0
+		).getTime()
+	})
+
+	// 最大日期（当前时间）
+	const pickerMaxTime = computed(() => {
+		return Date.now()
+	})
+
 	function getPlaybackDate(value : string) : string {
 		const parts = value.split(' ')
 		return parts.length > 1 ? parts[0] : value
@@ -916,12 +935,15 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cV(_component_l_date_time_picker, _uM({
               "confirm-btn": "确认",
               "cancel-btn": "取消",
+              start: unref(pickerMinTime),
+              end: unref(pickerMaxTime),
+              value: unref(pickerValue),
               title: pickerTitle.value,
               mode: 63,
               format: "YYYY-MM-DD HH:mm:ss",
               onConfirm: onConfirm,
               onCancel: onCancel
-            }), null, 8 /* PROPS */, ["title"])
+            }), null, 8 /* PROPS */, ["start", "end", "value", "title"])
           ]),
           _: 1 /* STABLE */
         }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])

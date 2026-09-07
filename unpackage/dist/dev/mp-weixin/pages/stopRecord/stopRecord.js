@@ -57,6 +57,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       endTime.value = utils_formateTime.formatTimes(now.getTime());
       startTime.value = utils_formateTime.formatTimes(now.getTime() - 36e5 * 24);
     };
+    const pickerValue = common_vendor.computed(() => {
+      return currentPickerType.value == "start" ? startTime.value : endTime.value;
+    });
+    const pickerMinTime = common_vendor.computed(() => {
+      const now = /* @__PURE__ */ new Date();
+      return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime();
+    });
+    const pickerMaxTime = common_vendor.computed(() => {
+      return Date.now();
+    });
     const loadStopData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
@@ -90,7 +100,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           carStopDetail.value = stopsWithAddress;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:131", "获取停车数据失败:", error);
+          common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:151", "获取停车数据失败:", error);
           utils_toast.showAppToast({ title: "数据加载失败", icon: "none" });
         } finally {
           common_vendor.index.hideLoading();
@@ -167,13 +177,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "/static/xiangxia.png",
           fontSize: "15"
         }),
-        k: common_vendor.o(onConfirm, "a3"),
-        l: common_vendor.o(onCancel, "d4"),
+        k: common_vendor.o(onConfirm, "a9"),
+        l: common_vendor.o(onCancel, "1f"),
         m: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           title: pickerTitle.value,
-          mode: 63
+          mode: 63,
+          start: pickerMinTime.value,
+          end: pickerMaxTime.value,
+          value: pickerValue.value
         }),
         n: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
