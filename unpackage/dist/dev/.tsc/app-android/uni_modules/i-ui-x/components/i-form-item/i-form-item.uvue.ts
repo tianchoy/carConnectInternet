@@ -85,60 +85,52 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
-function formatSize(value: string | number): string {
-  const text = value.toString()
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
+function formatSize(value : any) : string {
+  const text = (value).toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
   return text + 'px'
 }
 
-function normalizeIdName(name: string): string {
+function normalizeIdName(name : string) : string {
+  const allowed = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'
   let result = ''
   for (let i = 0; i < name.length; i++) {
     const char = name.charAt(i)
-    const isNumber = char >= '0' && char <= '9'
-    const isUpper = char >= 'A' && char <= 'Z'
-    const isLower = char >= 'a' && char <= 'z'
-    if (isNumber || isUpper || isLower || char == '-' || char == '_') {
-      result = result + char
-    } else {
-      result = result + '-'
-    }
+    result += allowed.indexOf(char) >= 0 ? char : '-'
   }
   return result
 }
 
-const itemId = computed(() => {
+const itemId = computed(() : string => {
   if (props.scrollId.length > 0) return props.scrollId
   if (props.name.length == 0) return ''
   return props.scrollIdPrefix + normalizeIdName(props.name)
 })
 
-const itemClass = computed(() => {
+const itemClass = computed(() : string => {
   const classes = ['i-form-item']
   if (props.labelDirection == 'horizontal') classes.push('i-form-item--horizontal')
   return classes.join(' ')
 })
 
-const headerClass = computed(() => {
+const headerClass = computed(() : string => {
   const classes = ['i-form-item__header']
   if (props.labelDirection == 'horizontal') classes.push('i-form-item__header--horizontal')
   return classes.join(' ')
 })
 
-const contentClass = computed(() => {
+const contentClass = computed(() : string => {
   const classes = ['i-form-item__content']
   if (props.labelDirection == 'horizontal') classes.push('i-form-item__content--horizontal')
   return classes.join(' ')
 })
 
-const headerStyle = computed(() => {
+const headerStyle = computed(() : string => {
   if (props.labelDirection != 'horizontal') return ''
   return 'width:' + formatSize(props.labelWidth) + ';'
 })
 
-const labelStyle = computed(() => {
+const labelStyle = computed(() : string => {
   return (
     'color:' +
     props.labelFontColor +
@@ -148,10 +140,9 @@ const labelStyle = computed(() => {
   )
 })
 
-const footerStyle = computed(() => {
+const footerStyle = computed(() : string => {
   return 'text-align:' + props.errorAlign + ';'
 })
-
 
 return (): any | null => {
 

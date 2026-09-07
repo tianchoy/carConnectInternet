@@ -62,7 +62,8 @@ open class GenPagesIndexIndex : BasePage {
             val navBarHeight = ref(44)
             val deviceList = ref(_uA<Device>())
             val showPicker = ref(false)
-            val pickerValues = ref(_uA<PickerValue>())
+            val pickerDefaultIndex = ref(_uA<Number>(0))
+            val pickerValue = ref("")
             val currentCarImei = ref("")
             val currentCarDeptId = ref("")
             val currentCarDeviceId = ref("")
@@ -96,9 +97,9 @@ open class GenPagesIndexIndex : BasePage {
                 return DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = detail.deviceStatus.batteryPercent, voltage = detail.deviceStatus.voltage, signalStrength = detail.deviceStatus.signalStrength), connectionStatus = detail.connectionStatus, lastUpdateTime = detail.lastUpdateTime)
             }
             )
-            val pickerColumns = computed<UTSArray<PickerColumn>>(fun(): UTSArray<PickerColumn> {
+            val pickerColumns = computed<IPickerColumns>(fun(): IPickerColumns {
                 return _uA(
-                    deviceList.value.map(fun(device): PickerColumnItem {
+                    deviceList.value.map(fun(device): IPickerOption {
                         val displayName = if (device.deviceName != "") {
                             device.deviceName
                         } else {
@@ -117,12 +118,12 @@ open class GenPagesIndexIndex : BasePage {
                         } else {
                             "离线"
                         }
-                        return PickerColumnItem(id = device.imei, label = "" + displayName + " (" + statusText + ")", value = if (device.imei != "") {
+                        return IPickerOption(text = "" + displayName + " (" + statusText + ")", value = if (device.imei != "") {
                             device.imei
                         } else {
                             device.deviceId
                         }
-                        , disabled = false, children = null)
+                        , disabled = false)
                     }
                     )
                 )
@@ -130,6 +131,9 @@ open class GenPagesIndexIndex : BasePage {
             )
             val closePicker = fun(){
                 showPicker.value = false
+            }
+            val onPickerShowChange = fun(value: Boolean){
+                showPicker.value = value
             }
             val initDimensions = fun(){
                 val systemInfo = uni_getSystemInfoSync()
@@ -150,7 +154,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val saveSelectedDevice = fun(device: Device){
                 try {
-                    val deviceInfo: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 388, 15), "name" to if (device.deviceName != "") {
+                    val deviceInfo: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 397, 15), "name" to if (device.deviceName != "") {
                         device.deviceName
                     } else {
                         if (device.name != "") {
@@ -175,10 +179,10 @@ open class GenPagesIndexIndex : BasePage {
                     }
                     , "deptId" to device.deptId, "deviceId" to device.deviceId, "iccid" to device.iccid, "simMerchant" to device.simMerchant, "connectionStatus" to device.connectionStatus, "carType" to device.carType, "plateNo" to device.plateNo, "latitude" to device.latitude, "longitude" to device.longitude)
                     uni_setStorageSync(SELECTED_DEVICE_STORAGE_KEY, JSON.stringify(deviceInfo))
-                    console.log("保存选中设备成功:", deviceInfo, " at pages/index/index.uvue:403")
+                    console.log("保存选中设备成功:", deviceInfo, " at pages/index/index.uvue:412")
                 }
                  catch (error: Throwable) {
-                    console.error("保存选中设备失败:", error, " at pages/index/index.uvue:405")
+                    console.error("保存选中设备失败:", error, " at pages/index/index.uvue:414")
                 }
             }
             val decodeSavedDevice = fun(raw: Any): SavedDevice? {
@@ -188,7 +192,7 @@ open class GenPagesIndexIndex : BasePage {
                 var data: UTSJSONObject? = null
                 if (UTSAndroid.`typeof`(raw) == "string") {
                     try {
-                        data = UTSAndroid.consoleDebugError(JSON.parse(raw as String), " at pages/index/index.uvue:429") as UTSJSONObject
+                        data = UTSAndroid.consoleDebugError(JSON.parse(raw as String), " at pages/index/index.uvue:438") as UTSJSONObject
                     } catch (error: Throwable) {
                         return null
                     }
@@ -220,17 +224,17 @@ open class GenPagesIndexIndex : BasePage {
                     return decodeSavedDevice(rawDevice)
                 }
                  catch (error: Throwable) {
-                    console.error("获取保存设备失败:", error, " at pages/index/index.uvue:465")
+                    console.error("获取保存设备失败:", error, " at pages/index/index.uvue:474")
                 }
                 return null
             }
             val clearSavedSelectedDevice = fun(){
                 try {
                     uni_removeStorageSync(SELECTED_DEVICE_STORAGE_KEY)
-                    console.log("清除保存设备成功", " at pages/index/index.uvue:474")
+                    console.log("清除保存设备成功", " at pages/index/index.uvue:483")
                 }
                  catch (error: Throwable) {
-                    console.error("清除保存设备失败:", error, " at pages/index/index.uvue:476")
+                    console.error("清除保存设备失败:", error, " at pages/index/index.uvue:485")
                 }
             }
             val saveSelectedDeviceIndex = fun(index: Number){
@@ -238,7 +242,7 @@ open class GenPagesIndexIndex : BasePage {
                     uni_setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index)
                 }
                  catch (error: Throwable) {
-                    console.error("保存选中设备索引失败:", error, " at pages/index/index.uvue:485")
+                    console.error("保存选中设备索引失败:", error, " at pages/index/index.uvue:494")
                 }
             }
             val getSavedSelectedDeviceIndex = fun(): Number? {
@@ -254,7 +258,7 @@ open class GenPagesIndexIndex : BasePage {
                     }
                 }
                  catch (error: Throwable) {
-                    console.error("获取保存设备索引失败:", error, " at pages/index/index.uvue:498")
+                    console.error("获取保存设备索引失败:", error, " at pages/index/index.uvue:507")
                 }
                 return null
             }
@@ -263,7 +267,7 @@ open class GenPagesIndexIndex : BasePage {
                     uni_removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY)
                 }
                  catch (error: Throwable) {
-                    console.error("清除保存设备索引失败:", error, " at pages/index/index.uvue:508")
+                    console.error("清除保存设备索引失败:", error, " at pages/index/index.uvue:517")
                 }
             }
             val findDeviceIndex = fun(imei: String, deviceId: String): Number {
@@ -311,14 +315,18 @@ open class GenPagesIndexIndex : BasePage {
                 if (selectedDevice == null) {
                     return
                 }
-                pickerValues.value = _uA(
-                    if (selectedDevice.imei != "") {
-                        selectedDevice.imei
-                    } else {
-                        selectedDevice.deviceId
-                    }
+                pickerValue.value = if (selectedDevice.imei != "") {
+                    selectedDevice.imei
+                } else {
+                    selectedDevice.deviceId
+                }
+                pickerDefaultIndex.value = _uA(
+                    selectedIndex
                 )
-                showPicker.value = true
+                nextTick(fun(){
+                    showPicker.value = true
+                }
+                )
             }
             val createMarker = fun(id: Number, lat: Number, lng: Number, type: String, title: String?): Marker {
                 val isOnline = currentCarConnectionStatus.value == "online"
@@ -369,7 +377,7 @@ open class GenPagesIndexIndex : BasePage {
             val centerOnUserLocation = ::gen_centerOnUserLocation_fn
             fun gen_getUserLocation_fn() {
                 uni_getLocation(GetLocationOptions(type = "wgs84", provider = "system", success = fun(res){
-                    console.log("用户当前位置:", res, " at pages/index/index.uvue:626")
+                    console.log("用户当前位置:", res, " at pages/index/index.uvue:638")
                     AndroidLog.i("用户当前位置:", JSON.stringify(res))
                     val convertedCoord = CoordTransform.wgs84ToTencent(res.latitude, res.longitude)
                     userLocation.latitude = convertedCoord.lat
@@ -381,7 +389,7 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 , fail = fun(err){
                     AndroidLog.i("用户当前位置:", JSON.stringify(err))
-                    console.error("获取用户当前位置失败:", err.errMsg, err, " at pages/index/index.uvue:642")
+                    console.error("获取用户当前位置失败:", err.errMsg, err, " at pages/index/index.uvue:654")
                 }
                 ))
             }
@@ -392,7 +400,7 @@ open class GenPagesIndexIndex : BasePage {
                             val res = await(getDeviceDetail(deviceId))
                             val detail = res.data
                             if (res.code != 200 || detail == null) {
-                                console.error("加载设备详情失败:", res.msg, " at pages/index/index.uvue:653")
+                                console.error("加载设备详情失败:", res.msg, " at pages/index/index.uvue:665")
                                 return@w1
                             }
                             if (detail != null) {
@@ -408,7 +416,7 @@ open class GenPagesIndexIndex : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载设备详情失败", error, " at pages/index/index.uvue:675")
+                            console.error("加载设备详情失败", error, " at pages/index/index.uvue:687")
                         }
                 })
             }
@@ -432,7 +440,7 @@ open class GenPagesIndexIndex : BasePage {
                 currentCarConnectionStatus.value = ""
                 currentCarCarType.value = ""
                 currentCarPlateNo.value = ""
-                pickerValues.value = _uA()
+                pickerValue.value = ""
                 deviceDetail.value = DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = 0, voltage = 0, signalStrength = 0), connectionStatus = "offline", lastUpdateTime = "")
                 lastUpdateTime.value = "--:--:--"
                 positionState.value = "empty"
@@ -470,7 +478,7 @@ open class GenPagesIndexIndex : BasePage {
                                 return@w1
                             }
                             if (res.code != 200) {
-                                console.error("加载轨迹失败:", res.msg, " at pages/index/index.uvue:761")
+                                console.error("加载轨迹失败:", res.msg, " at pages/index/index.uvue:773")
                                 clearTripData()
                                 return@w1
                             }
@@ -485,7 +493,7 @@ open class GenPagesIndexIndex : BasePage {
                             if (requestId != trackRequestId) {
                                 return@w1
                             }
-                            console.error("加载轨迹失败", error, " at pages/index/index.uvue:774")
+                            console.error("加载轨迹失败", error, " at pages/index/index.uvue:786")
                             clearTripData()
                         }
                 })
@@ -514,7 +522,7 @@ open class GenPagesIndexIndex : BasePage {
                             }
                             val positions = res.data
                             if (res.code != 200 || positions == null || positions.length == 0) {
-                                console.warn("获取设备位置失败:", data.getString("deviceId", ""), res.code, " at pages/index/index.uvue:804")
+                                console.warn("获取设备位置失败:", data.getString("deviceId", ""), res.code, " at pages/index/index.uvue:816")
                                 positionState.value = "empty"
                                 return@w1 false
                             }
@@ -524,7 +532,7 @@ open class GenPagesIndexIndex : BasePage {
                             val lng = position.getNumber("longitude", 0)
                             val isValidCoordinate = isValidDeviceCoordinate(lat, lng)
                             if (!isValidCoordinate) {
-                                console.error("经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""), " at pages/index/index.uvue:817")
+                                console.error("经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""), " at pages/index/index.uvue:829")
                                 markers.value = _uA()
                                 positionState.value = "invalid"
                                 showAppToast(ShowToastOptions(title = "定位数据异常", icon = "none"))
@@ -540,16 +548,16 @@ open class GenPagesIndexIndex : BasePage {
                                 await(centerMapOnDevice(convertedCoord.lat, convertedCoord.lng))
                             }
                              catch (mapError: Throwable) {
-                                console.error("刷新地图视图失败", mapError, " at pages/index/index.uvue:844")
+                                console.error("刷新地图视图失败", mapError, " at pages/index/index.uvue:856")
                             }
-                            console.log("标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng, " at pages/index/index.uvue:846")
+                            console.log("标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng, " at pages/index/index.uvue:858")
                             return@w1 true
                         }
                          catch (error: Throwable) {
                             if (requestId != devicePositionRequestId) {
                                 return@w1 false
                             }
-                            console.error("加载设备位置失败", error, " at pages/index/index.uvue:850")
+                            console.error("加载设备位置失败", error, " at pages/index/index.uvue:862")
                             positionState.value = "failed"
                             showAppToast(ShowToastOptions(title = "定位失败，请重试", icon = "none"))
                             return@w1 false
@@ -558,7 +566,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val loadDeviceData = fun(device: Device): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log("开始加载设备数据:", device, " at pages/index/index.uvue:862")
+                        console.log("开始加载设备数据:", device, " at pages/index/index.uvue:874")
                         try {
                             await(loadDeviceDetail(device.deviceId))
                             await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.imei != "") {
@@ -576,7 +584,7 @@ open class GenPagesIndexIndex : BasePage {
                             showAppToast(ShowToastOptions(title = "切换成功", icon = "none"))
                         }
                          catch (error: Throwable) {
-                            console.error("切换车辆失败", error, " at pages/index/index.uvue:875")
+                            console.error("切换车辆失败", error, " at pages/index/index.uvue:887")
                             showAppToast(ShowToastOptions(title = "切换失败，请重试", icon = "none"))
                         }
                          finally {
@@ -584,22 +592,12 @@ open class GenPagesIndexIndex : BasePage {
                         }
                 })
             }
-            val handlePickerConfirm = fun(e: PickerConfirmEvent){
+            val handlePickerConfirm = fun(event: UTSJSONObject){
                 showPicker.value = false
-                val selectedValue = if (e.values.length > 0) {
-                    e.values[0].toString()
-                } else {
-                    ""
-                }
+                val indexs = event.getArray<Number>("indexs") ?: _uA()
                 var selectedIndex: Number = -1
-                if (selectedValue != "") {
-                    selectedIndex = deviceList.value.findIndex(fun(device): Boolean {
-                        return device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue
-                    }
-                    )
-                }
-                if (selectedIndex < 0 && e.indexs.length > 0) {
-                    val eventIndex = e.indexs[0]
+                if (indexs.length > 0) {
+                    val eventIndex = indexs[0]
                     if (eventIndex >= 0 && eventIndex < deviceList.value.length) {
                         selectedIndex = eventIndex
                     }
@@ -620,8 +618,8 @@ open class GenPagesIndexIndex : BasePage {
                     return
                 }
                 if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-                    console.log("选择的设备111:", selectedDevice.imei, selectedDevice.deviceId, currentCarImei.value, currentCarDeviceId.value, " at pages/index/index.uvue:921")
-                    console.log("选择的设备与当前设备相同，不重复加载", " at pages/index/index.uvue:922")
+                    console.log("选择的设备111:", selectedDevice.imei, selectedDevice.deviceId, currentCarImei.value, currentCarDeviceId.value, " at pages/index/index.uvue:927")
+                    console.log("选择的设备与当前设备相同，不重复加载", " at pages/index/index.uvue:928")
                     return
                 }
                 val deviceName = if (selectedDevice.deviceName != "") {
@@ -647,13 +645,11 @@ open class GenPagesIndexIndex : BasePage {
                 currentCarCarType.value = selectedDevice.carType
                 currentCarPlateNo.value = selectedDevice.plateNo
                 saveSelectedDeviceIndex(selectedIndex)
-                pickerValues.value = _uA(
-                    if (selectedDevice.imei != "") {
-                        selectedDevice.imei
-                    } else {
-                        selectedDevice.deviceId
-                    }
-                )
+                pickerValue.value = if (selectedDevice.imei != "") {
+                    selectedDevice.imei
+                } else {
+                    selectedDevice.deviceId
+                }
                 saveSelectedDevice(selectedDevice)
                 uni_showLoading(ShowLoadingOptions(title = "加载车辆数据...", mask = true))
                 loadDeviceData(selectedDevice)
@@ -673,7 +669,7 @@ open class GenPagesIndexIndex : BasePage {
                                 , icon = "none"))
                                 return@w1
                             }
-                            console.log("加载车辆列表返回:", res.data, " at pages/index/index.uvue:964")
+                            console.log("加载车辆列表返回:", res.data, " at pages/index/index.uvue:970")
                             val pageData = res.data
                             if (pageData == null) {
                                 userDeviceList.value = _uA()
@@ -735,7 +731,7 @@ open class GenPagesIndexIndex : BasePage {
                                     selectedIdx = 0
                                     saveSelectedDevice(selectedDevice)
                                     saveSelectedDeviceIndex(0)
-                                    console.log("使用第一个设备作为默认:", selectedDevice?.deviceName, " at pages/index/index.uvue:1041")
+                                    console.log("使用第一个设备作为默认:", selectedDevice?.deviceName, " at pages/index/index.uvue:1047")
                                 }
                                 if (selectedDevice != null) {
                                     val device = selectedDevice
@@ -761,13 +757,11 @@ open class GenPagesIndexIndex : BasePage {
                                     currentCarConnectionStatus.value = device.connectionStatus
                                     currentCarCarType.value = device.carType
                                     currentCarPlateNo.value = device.plateNo
-                                    pickerValues.value = _uA(
-                                        if (device.imei != "") {
-                                            device.imei
-                                        } else {
-                                            device.deviceId
-                                        }
-                                    )
+                                    pickerValue.value = if (device.imei != "") {
+                                        device.imei
+                                    } else {
+                                        device.deviceId
+                                    }
                                     await(loadDeviceDetail(device.deviceId))
                                     await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.imei != "") {
                                         device.imei
@@ -795,7 +789,7 @@ open class GenPagesIndexIndex : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败", error, " at pages/index/index.uvue:1083")
+                            console.error("加载车辆列表失败", error, " at pages/index/index.uvue:1089")
                             showAppToast(ShowToastOptions(title = "加载失败，请下拉重试", icon = "none"))
                         }
                 })
@@ -819,7 +813,7 @@ open class GenPagesIndexIndex : BasePage {
                             await(loadDevicePos(_uO("deviceId" to currentCarDeviceId.value, "deviceids" to currentCarImei.value)))
                         }
                          catch (error: Throwable) {
-                            console.error("刷新位置失败", error, " at pages/index/index.uvue:1120")
+                            console.error("刷新位置失败", error, " at pages/index/index.uvue:1126")
                             showAppToast(ShowToastOptions(title = "刷新失败", icon = "none"))
                         }
                          finally {
@@ -857,7 +851,7 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude, fail = fun(err){
                     if (err.errMsg.indexOf("locked") < 0) {
-                        console.error("跳转轨迹详情失败:", err, " at pages/index/index.uvue:1164")
+                        console.error("跳转轨迹详情失败:", err, " at pages/index/index.uvue:1170")
                     }
                 }
                 ))
@@ -883,7 +877,7 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 uni_navigateTo(NavigateToOptions(url = "/pages/addCar/addCar", fail = fun(err){
                     if (err.errMsg.indexOf("locked") < 0) {
-                        console.error("跳转添加设备失败:", err, " at pages/index/index.uvue:1192")
+                        console.error("跳转添加设备失败:", err, " at pages/index/index.uvue:1198")
                     }
                 }
                 ))
@@ -937,7 +931,7 @@ open class GenPagesIndexIndex : BasePage {
                     iccid = iccid.substring(0, iccid.length - 1)
                 }
                 needRefresh.value = true
-                console.log("iccid", iccid, " at pages/index/index.uvue:1283")
+                console.log("iccid", iccid, " at pages/index/index.uvue:1289")
                 needRefresh.value = false
                 showAppToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none", duration = 2000, mask = true))
             }
@@ -951,7 +945,7 @@ open class GenPagesIndexIndex : BasePage {
             fun gen_unbindCurrentDevice_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         val result = await(delDevice(currentCarDeviceId.value))
-                        console.log("解绑设备结果:", result, " at pages/index/index.uvue:1306")
+                        console.log("解绑设备结果:", result, " at pages/index/index.uvue:1312")
                         if (result.code == 200) {
                             showAppToast(ShowToastOptions(title = "解绑成功", icon = "none"))
                             clearSavedSelectedDevice()
@@ -1039,8 +1033,7 @@ open class GenPagesIndexIndex : BasePage {
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
                 val _component_i_line_progress = resolveEasyComponent("i-line-progress", GenUniModulesIUiXComponentsILineProgressILineProgressClass)
                 val _component_map = resolveComponent("map")
-                val _component_l_picker = resolveEasyComponent("l-picker", GenUniModulesLimePickerComponentsLPickerLPickerClass)
-                val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
+                val _component_i_picker = resolveEasyComponent("i-picker", GenUniModulesIUiXComponentsIPickerIPickerClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 val _component_app_modal = resolveEasyComponent("app-modal", GenComponentsAppModalAppModalClass)
                 return _cE(Fragment, null, _uA(
@@ -1072,35 +1065,27 @@ open class GenPagesIndexIndex : BasePage {
                                         ))
                                     ))
                                 )),
-                                if (isTrue(if (safeDeviceDetail.value.deviceStatus.batteryPercent != 0) {
-                                    safeDeviceDetail.value.deviceStatus.voltage
-                                } else {
-                                    safeDeviceDetail.value.deviceStatus.batteryPercent
-                                }
-                                )) {
-                                    _cE("view", _uM("key" to 0, "class" to "device-info"), _uA(
-                                        if (isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)) {
-                                            _cV(_component_i_line_progress, _uM("key" to 0, "percent" to safeDeviceDetail.value.deviceStatus.batteryPercent), null, 8, _uA(
-                                                "percent"
-                                            ))
-                                        } else {
-                                            _cC("v-if", true)
-                                        },
-                                        if (isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)) {
-                                            _cE("view", _uM("key" to 1, "class" to "info"), "电量: " + _tD(safeDeviceDetail.value.deviceStatus.batteryPercent) + "%", 1)
-                                        } else {
-                                            _cC("v-if", true)
-                                        },
-                                        if (isTrue(safeDeviceDetail.value.deviceStatus.voltage)) {
-                                            _cE("view", _uM("key" to 2, "class" to "info"), "电压: " + _tD(safeDeviceDetail.value.deviceStatus.voltage) + "V", 1)
-                                        } else {
-                                            _cC("v-if", true)
-                                        }
-                                    ))
-                                } else {
-                                    _cC("v-if", true)
-                                }
-                                ,
+                                _cE("view", _uM("class" to "device-info"), _uA(
+                                    if (isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)) {
+                                        _cV(_component_i_line_progress, _uM("key" to 0, "percent" to safeDeviceDetail.value.deviceStatus.batteryPercent), null, 8, _uA(
+                                            "percent"
+                                        ))
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
+                                    ,
+                                    if (isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)) {
+                                        _cE("view", _uM("key" to 1, "class" to "info"), "电量: " + _tD(safeDeviceDetail.value.deviceStatus.batteryPercent) + "%", 1)
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
+                                    ,
+                                    if (isTrue(safeDeviceDetail.value.deviceStatus.voltage)) {
+                                        _cE("view", _uM("key" to 2, "class" to "info"), "电压: " + _tD(safeDeviceDetail.value.deviceStatus.voltage) + "V", 1)
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
+                                )),
                                 _cE("view", _uM("class" to "banner"), _uA(
                                     _cE("image", _uM("src" to `default`, "mode" to "aspectFit", "class" to "banner-image"))
                                 )),
@@ -1264,37 +1249,28 @@ open class GenPagesIndexIndex : BasePage {
                                             _cE("image", _uM("src" to default__6, "mode" to "aspectFit", "class" to "icon-image")),
                                             _cE("text", _uM("class" to "item-title"), "在线客服")
                                         )),
-                                        _cE("view", _uM("class" to "service-item", "onClick" to logout__1), _uA(
-                                            _cE("image", _uM("src" to default__7, "mode" to "aspectFit", "class" to "icon-image")),
-                                            _cE("text", _uM("class" to "item-title", "style" to _nS(_uM("color" to "#EE793A"))), "退出登录", 4)
-                                        )),
                                         _cE("view", _uM("class" to "service-item", "onClick" to unbindDevice), _uA(
-                                            _cE("image", _uM("src" to default__8, "mode" to "aspectFit", "class" to "icon-image")),
+                                            _cE("image", _uM("src" to default__7, "mode" to "aspectFit", "class" to "icon-image")),
                                             _cE("text", _uM("class" to "item-title", "style" to _nS(_uM("color" to "#d81e06"))), "删除设备", 4)
+                                        )),
+                                        _cE("view", _uM("class" to "service-item", "onClick" to logout__1), _uA(
+                                            _cE("image", _uM("src" to default__8, "mode" to "aspectFit", "class" to "icon-image")),
+                                            _cE("text", _uM("class" to "item-title", "style" to _nS(_uM("color" to "#EE793A"))), "退出登录", 4)
                                         ))
                                     ))
                                 ))
                             ))
                         )),
-                        _cV(_component_l_popup, _uM("modelValue" to showPicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
-                            showPicker.value = `$event`
+                        if (isTrue(showPicker.value)) {
+                            _cV(_component_i_picker, _uM("key" to 0, "show" to showPicker.value, "model-value" to pickerValue.value, "columns" to pickerColumns.value, "default-index" to pickerDefaultIndex.value, "cancel-text" to "取消", "confirm-text" to "确认", "close-on-mask" to false, "show-input" to false, "onCancel" to closePicker, "onConfirm" to handlePickerConfirm, "onUpdate:show" to onPickerShowChange), null, 8, _uA(
+                                "show",
+                                "model-value",
+                                "columns",
+                                "default-index"
+                            ))
+                        } else {
+                            _cC("v-if", true)
                         }
-                        , "position" to "bottom", "closeable" to false, "safe-area-inset-bottom" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                _cV(_component_l_picker, _uM("modelValue" to pickerValues.value, "onUpdate:modelValue" to fun(`$event`: UTSArray<PickerValue>){
-                                    pickerValues.value = `$event`
-                                }
-                                , "cancel-btn" to "取消", "confirm-btn" to "确认", "columns" to pickerColumns.value, "onCancel" to closePicker, "onConfirm" to handlePickerConfirm), null, 8, _uA(
-                                    "modelValue",
-                                    "onUpdate:modelValue",
-                                    "columns"
-                                ))
-                            )
-                        }
-                        ), "_" to 1), 8, _uA(
-                            "modelValue",
-                            "onUpdate:modelValue"
-                        ))
                     )),
                     _cV(_component_app_toast),
                     _cV(_component_app_modal)

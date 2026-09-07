@@ -34,26 +34,25 @@ open class GenUniModulesIUiXComponentsIFormItemIFormItem : VueComponent {
             val _ctx = __ins.proxy as GenUniModulesIUiXComponentsIFormItemIFormItem
             val _cache = __ins.renderCache
             val props = __props
-            fun formatSize(value: Any): String {
+            fun gen_formatSize_fn(value: Any): String {
                 val text = value.toString()
                 if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
                     return text
                 }
                 return text + "px"
             }
+            val formatSize = ::gen_formatSize_fn
             fun gen_normalizeIdName_fn(name: String): String {
+                val allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
                 var result = ""
                 run {
                     var i: Number = 0
                     while(i < name.length){
                         val char = name.charAt(i)
-                        val isNumber = char >= "0" && char <= "9"
-                        val isUpper = char >= "A" && char <= "Z"
-                        val isLower = char >= "a" && char <= "z"
-                        if (isNumber || isUpper || isLower || char == "-" || char == "_") {
-                            result = result + char
+                        result += if (allowed.indexOf(char) >= 0) {
+                            char
                         } else {
-                            result = result + "-"
+                            "-"
                         }
                         i++
                     }

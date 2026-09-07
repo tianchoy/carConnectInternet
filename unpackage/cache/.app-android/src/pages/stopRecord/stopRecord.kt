@@ -39,6 +39,15 @@ open class GenPagesStopRecordStopRecord : BasePage {
             val imei = ref<String?>("")
             val currentDateTime = ref("")
             val carStopDetail = ref(_uA<StopRecord>())
+            val minDate = computed(fun(): Number {
+                val now = Date()
+                return Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime()
+            }
+            )
+            val maxDate = computed(fun(): Number {
+                return Date.now()
+            }
+            )
             val sortedCarStopDetail = computed(fun(): UTSArray<StopRecord> {
                 val sorted = carStopDetail.value.slice()
                 sorted.sort(fun(a: StopRecord, b: StopRecord): Number {
@@ -66,15 +75,13 @@ open class GenPagesStopRecordStopRecord : BasePage {
             )
             val initDateTime = fun(){
                 val now = Date()
-                endTime.value = formatTimes(now.getTime())
-                startTime.value = formatTimes(now.getTime() - 86400000)
-                console.log("当前时间戳:", now.getTime(), " at pages/stopRecord/stopRecord.uvue:102")
-                console.log("格式化后:", formatTimes(now.getTime()), " at pages/stopRecord/stopRecord.uvue:103")
+                endTime.value = formatTimesToMinute(now.getTime())
+                startTime.value = formatTimesToMinute(now.getTime() - 86400000)
             }
             val loadStopData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 110, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 124, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             val trackData = res.data
@@ -100,7 +107,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
                             carStopDetail.value = stopsWithAddress
                         }
                          catch (error: Throwable) {
-                            console.error("获取停车数据失败:", error, " at pages/stopRecord/stopRecord.uvue:137")
+                            console.error("获取停车数据失败:", error, " at pages/stopRecord/stopRecord.uvue:151")
                             showAppToast(ShowToastOptions(title = "数据加载失败", icon = "none"))
                         }
                          finally {
@@ -122,19 +129,22 @@ open class GenPagesStopRecordStopRecord : BasePage {
                 }
                 showDateTimePicker.value = true
             }
+            val getPickerTimestamp = fun(event: UTSJSONObject): Number {
+                return event.getNumber("timestamp", 0)
+            }
             val onConfirm = fun(event: UTSJSONObject): Unit {
-                val timestamp = event.getNumber("timestamp", 0)
-                if (!isFinite(timestamp) || timestamp <= 0) {
+                val timestamp = getPickerTimestamp(event)
+                if (timestamp <= 0) {
                     return
                 }
-                val value = formatTimes(timestamp)
+                val value = formatTimesToMinute(timestamp)
                 if (currentPickerType.value === "start") {
                     startTime.value = value
                 } else {
                     endTime.value = value
                 }
-                loadStopData()
                 showDateTimePicker.value = false
+                loadStopData()
             }
             val onCancel = fun(){
                 showDateTimePicker.value = false
@@ -191,7 +201,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
                                     ))
                                 ))
                             )),
-                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "minDate" to minDate.value, "maxDate" to maxDate.value, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
                                     _cE("view")
                                 )
@@ -199,7 +209,9 @@ open class GenPagesStopRecordStopRecord : BasePage {
                             ), "_" to 1), 8, _uA(
                                 "show",
                                 "model-value",
-                                "title"
+                                "title",
+                                "minDate",
+                                "maxDate"
                             ))
                         )),
                         _cE("scroll-view", _uM("class" to "content-box", "scroll-y" to "true"), _uA(

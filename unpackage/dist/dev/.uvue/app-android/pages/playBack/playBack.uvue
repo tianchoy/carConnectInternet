@@ -8,7 +8,7 @@ import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
 import { showAppToast } from '../../utils/toast.uts';
 import { ref, reactive, onMounted, watch, computed } from 'vue';
 import { getTrackPos } from '../../api/request.uts';
-import { formatTimes, normalizeLocalDateTime, parseLocalDateTime } from '../../utils/formateTime.uts';
+import { formatTimesToMinute, normalizeLocalDateTime, parseLocalDateTime } from '../../utils/formateTime.uts';
 import { getDeviceIcon } from '../../utils/cars';
 // 导入坐标转换插件
 import CoordTransform from '../../utils/coordTransform.uts';
@@ -82,12 +82,21 @@ const __sfc__ = defineComponent({
         let playbackTimer: number | null = null;
         let lastTimestamp = 0;
         let replaySessionId = 0;
+        // 计算最小日期（当前时间前6个月）
+        const minDate = computed((): number => {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime();
+        });
+        // 最大日期（当前时间）
+        const maxDate = computed((): number => {
+            return Date.now();
+        });
         function formatPlaybackTime(timestamp: number): string {
-            return formatTimes(timestamp) ?? '';
+            return formatTimesToMinute(timestamp) ?? '';
         }
         const now = new Date();
-        const initialEndTime = formatTimes(now.getTime());
-        const initialStartTime = formatTimes(now.getTime() - 3600000 * 6);
+        const initialEndTime = formatTimesToMinute(now.getTime());
+        const initialStartTime = formatTimesToMinute(now.getTime() - 3600000 * 6);
         const startTime = ref(initialStartTime);
         const endTime = ref(initialEndTime);
         const currentPickerValue = computed((): string => {
@@ -127,12 +136,12 @@ const __sfc__ = defineComponent({
             if (dateStr == '')
                 return null;
             try {
-                const decoded = (UTSAndroid.consoleDebugError(decodeURIComponent(dateStr), " at pages/playBack/playBack.uvue:204") ?? '').replace(/\+/g, ' ').replace('T', ' ');
+                const decoded = (UTSAndroid.consoleDebugError(decodeURIComponent(dateStr), " at pages/playBack/playBack.uvue:220") ?? '').replace(/\+/g, ' ').replace('T', ' ');
                 const milliseconds = parseLocalDateTime(decoded);
                 return milliseconds == null ? null : formatPlaybackTime(milliseconds);
             }
             catch (error: any) {
-                console.error('解析回放时间失败:', error, " at pages/playBack/playBack.uvue:208");
+                console.error('解析回放时间失败:', error, " at pages/playBack/playBack.uvue:224");
                 return null;
             }
         }
@@ -473,7 +482,7 @@ const __sfc__ = defineComponent({
             const requestId = ++replaySessionId;
             clearTrackDisplay();
             uni.showLoading({ title: '加载中...' });
-            const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 658, 9),
+            const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 674, 9),
                 imei: imei.value,
                 startTime: startTime.value.replace(/\//g, '-'),
                 endTime: endTime.value.replace(/\//g, '-'),
@@ -510,7 +519,7 @@ const __sfc__ = defineComponent({
             catch (error: any) {
                 if (requestId != replaySessionId)
                     return;
-                console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:694");
+                console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:710");
                 showAppToast({ title: '轨迹加载失败', icon: 'none' } as ShowToastOptions);
                 if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
                     showCurrentPosition();
@@ -579,9 +588,13 @@ const __sfc__ = defineComponent({
                 startPlayback();
             }
         }
+        // 从跨端事件对象中读取时间戳，兼容 iOS/Android 的 UTS 对象访问方式
+        function getPickerTimestamp(event: UTSJSONObject): number {
+            return event.getNumber('timestamp', 0);
+        }
         function onConfirm(event: UTSJSONObject): void {
-            const timestamp = event.getNumber('timestamp', 0);
-            if (!isFinite(timestamp) || timestamp <= 0)
+            const timestamp = getPickerTimestamp(event);
+            if (timestamp <= 0)
                 return;
             const formattedValue = formatPlaybackTime(timestamp);
             if (currentPickerType.value == 'start') {
@@ -633,7 +646,7 @@ const __sfc__ = defineComponent({
             lng.value = option["lng"] ?? null;
             sTime.value = option["startTime"] ?? '';
             eTime.value = option["endTime"] ?? '';
-            console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:828");
+            console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:849");
             const routeStartTime = resolveRouteDateTime(sTime.value);
             const routeEndTime = resolveRouteDateTime(eTime.value);
             if (routeStartTime != null && routeEndTime != null) {
@@ -772,6 +785,8 @@ const __sfc__ = defineComponent({
                             "cancel-text": "取消",
                             "confirm-text": "确认",
                             onConfirm: onConfirm,
+                            minDate: minDate.value,
+                            maxDate: maxDate.value,
                             onCancel: onCancel,
                             "onUpdate:show": onPickerShowChange
                         }), _uM({
@@ -779,7 +794,7 @@ const __sfc__ = defineComponent({
                                 _cE("view")
                             ]),
                             _: 1 /* STABLE */
-                        }), 8 /* PROPS */, ["show", "model-value", "title"])
+                        }), 8 /* PROPS */, ["show", "model-value", "title", "minDate", "maxDate"])
                     ])
                 ]),
                 _cV(_component_app_toast)

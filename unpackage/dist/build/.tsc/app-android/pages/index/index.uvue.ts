@@ -11,8 +11,8 @@ import _imports_4 from '../../static/dzwl.png'
 import _imports_5 from '../../static/msg.png'
 import _imports_6 from '../../static/pay.png'
 import _imports_7 from '../../static/online.png'
-import _imports_8 from '../../static/logout.png'
-import _imports_9 from '../../static/del.png'
+import _imports_8 from '../../static/del.png'
+import _imports_9 from '../../static/logout.png'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
@@ -129,6 +129,7 @@ const navBarHeight = ref(44)
 const deviceList = ref<Array<Device>>([])
 // picker 相关变量
 const showPicker = ref(false)
+const pickerDefaultIndex = ref<Array<number>>([0])
 const pickerValue = ref('')
 const currentCarImei = ref('')
 const currentCarDeptId = ref('')
@@ -389,7 +390,10 @@ const handlePicker = () => {
     if (selectedDevice == null) return
 
     pickerValue.value = selectedDevice.imei || selectedDevice.deviceId
-    showPicker.value = true
+    pickerDefaultIndex.value = [selectedIndex]
+    nextTick(() => {
+        showPicker.value = true
+    })
 }
 
 // 创建标记点
@@ -1290,31 +1294,26 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
               ])
             ])
           ]),
-          isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent && safeDeviceDetail.value.deviceStatus.voltage)
-            ? _cE("view", _uM({
-                key: 0,
-                class: "device-info"
-              }), [
-                isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)
-                  ? _cV(_component_i_line_progress, _uM({
-                      key: 0,
-                      percent: safeDeviceDetail.value.deviceStatus.batteryPercent
-                    }), null, 8 /* PROPS */, ["percent"])
-                  : _cC("v-if", true),
-                isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)
-                  ? _cE("view", _uM({
-                      key: 1,
-                      class: "info"
-                    }), "电量: " + _tD(safeDeviceDetail.value.deviceStatus.batteryPercent) + "%", 1 /* TEXT */)
-                  : _cC("v-if", true),
-                isTrue(safeDeviceDetail.value.deviceStatus.voltage)
-                  ? _cE("view", _uM({
-                      key: 2,
-                      class: "info"
-                    }), "电压: " + _tD(safeDeviceDetail.value.deviceStatus.voltage) + "V", 1 /* TEXT */)
-                  : _cC("v-if", true)
-              ])
-            : _cC("v-if", true),
+          _cE("view", _uM({ class: "device-info" }), [
+            isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)
+              ? _cV(_component_i_line_progress, _uM({
+                  key: 0,
+                  percent: safeDeviceDetail.value.deviceStatus.batteryPercent
+                }), null, 8 /* PROPS */, ["percent"])
+              : _cC("v-if", true),
+            isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)
+              ? _cE("view", _uM({
+                  key: 1,
+                  class: "info"
+                }), "电量: " + _tD(safeDeviceDetail.value.deviceStatus.batteryPercent) + "%", 1 /* TEXT */)
+              : _cC("v-if", true),
+            isTrue(safeDeviceDetail.value.deviceStatus.voltage)
+              ? _cE("view", _uM({
+                  key: 2,
+                  class: "info"
+                }), "电压: " + _tD(safeDeviceDetail.value.deviceStatus.voltage) + "V", 1 /* TEXT */)
+              : _cC("v-if", true)
+          ]),
           _cE("view", _uM({ class: "banner" }), [
             _cE("image", _uM({
               src: _imports_1,
@@ -1526,7 +1525,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
               ]),
               _cE("view", _uM({
                 class: "service-item",
-                onClick: logout
+                onClick: unbindDevice
               }), [
                 _cE("image", _uM({
                   src: _imports_8,
@@ -1535,12 +1534,12 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                 })),
                 _cE("text", _uM({
                   class: "item-title",
-                  style: _nS(_uM({"color":"#EE793A"}))
-                }), "退出登录", 4 /* STYLE */)
+                  style: _nS(_uM({"color":"#d81e06"}))
+                }), "删除设备", 4 /* STYLE */)
               ]),
               _cE("view", _uM({
                 class: "service-item",
-                onClick: unbindDevice
+                onClick: logout
               }), [
                 _cE("image", _uM({
                   src: _imports_9,
@@ -1549,25 +1548,29 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                 })),
                 _cE("text", _uM({
                   class: "item-title",
-                  style: _nS(_uM({"color":"#d81e06"}))
-                }), "删除设备", 4 /* STYLE */)
+                  style: _nS(_uM({"color":"#EE793A"}))
+                }), "退出登录", 4 /* STYLE */)
               ])
             ])
           ])
         ])
       ]),
-      _cV(_component_i_picker, _uM({
-        show: showPicker.value,
-        "model-value": pickerValue.value,
-        columns: pickerColumns.value,
-        "cancel-text": "取消",
-        "confirm-text": "确认",
-        "close-on-mask": false,
-        "show-input": false,
-        onCancel: closePicker,
-        onConfirm: handlePickerConfirm,
-        "onUpdate:show": onPickerShowChange
-      }), null, 8 /* PROPS */, ["show", "model-value", "columns"])
+      isTrue(showPicker.value)
+        ? _cV(_component_i_picker, _uM({
+            key: 0,
+            show: showPicker.value,
+            "model-value": pickerValue.value,
+            columns: pickerColumns.value,
+            "default-index": pickerDefaultIndex.value,
+            "cancel-text": "取消",
+            "confirm-text": "确认",
+            "close-on-mask": false,
+            "show-input": false,
+            onCancel: closePicker,
+            onConfirm: handlePickerConfirm,
+            "onUpdate:show": onPickerShowChange
+          }), null, 8 /* PROPS */, ["show", "model-value", "columns", "default-index"])
+        : _cC("v-if", true)
     ]),
     _cV(_component_app_toast),
     _cV(_component_app_modal)

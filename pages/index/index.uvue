@@ -27,7 +27,7 @@
                         </view>
                     </view>
                 </view>
-                <view class="device-info" v-if="safeDeviceDetail.deviceStatus.batteryPercent && safeDeviceDetail.deviceStatus.voltage">
+                <view class="device-info">
                     <i-line-progress v-if="safeDeviceDetail.deviceStatus.batteryPercent" :percent="safeDeviceDetail.deviceStatus.batteryPercent"></i-line-progress>
                     <view class="info" v-if="safeDeviceDetail.deviceStatus.batteryPercent">电量: {{safeDeviceDetail.deviceStatus.batteryPercent}}%</view>
                     <view class="info" v-if="safeDeviceDetail.deviceStatus.voltage">电压: {{safeDeviceDetail.deviceStatus.voltage}}V</view>
@@ -173,22 +173,24 @@
                             <image src="../../static/online.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title">在线客服</text>
                         </view>
-                        <view class="service-item" @click="logout">
-                            <image src="../../static/logout.png" mode="aspectFit" class="icon-image"></image>
-                            <text class="item-title" style="color: #EE793A;">退出登录</text>
-                        </view>
                         <view class="service-item" @click="unbindDevice">
                             <image src="../../static/del.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title" style="color: #d81e06;">删除设备</text>
+                        </view>
+                        <view class="service-item" @click="logout">
+                            <image src="../../static/logout.png" mode="aspectFit" class="icon-image"></image>
+                            <text class="item-title" style="color: #EE793A;">退出登录</text>
                         </view>
                     </view>
                 </view>
             </view>
         </view>
         <i-picker
+            v-if="showPicker"
             :show="showPicker"
             :model-value="pickerValue"
             :columns="pickerColumns"
+            :default-index="pickerDefaultIndex"
             cancel-text="取消"
             confirm-text="确认"
             :close-on-mask="false"
@@ -277,6 +279,7 @@ const navBarHeight = ref(44)
 const deviceList = ref<Array<Device>>([])
 // picker 相关变量
 const showPicker = ref(false)
+const pickerDefaultIndex = ref<Array<number>>([0])
 const pickerValue = ref('')
 const currentCarImei = ref('')
 const currentCarDeptId = ref('')
@@ -573,7 +576,10 @@ const handlePicker = () => {
     if (selectedDevice == null) return
 
     pickerValue.value = selectedDevice.imei || selectedDevice.deviceId
-    showPicker.value = true
+    pickerDefaultIndex.value = [selectedIndex]
+    nextTick(() => {
+        showPicker.value = true
+    })
 }
 
 // 创建标记点

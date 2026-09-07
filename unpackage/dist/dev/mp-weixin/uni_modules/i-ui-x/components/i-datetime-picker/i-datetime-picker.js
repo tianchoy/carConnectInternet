@@ -1,32 +1,5 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-class IDatetimePickerEvent extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          value: { type: "Any", optional: false },
-          date: { type: String, optional: false },
-          time: { type: String, optional: false },
-          timestamp: { type: Number, optional: false },
-          mode: { type: String, optional: false }
-        };
-      },
-      name: "IDatetimePickerEvent"
-    };
-  }
-  constructor(options, metadata = IDatetimePickerEvent.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.value = this.__props__.value;
-    this.date = this.__props__.date;
-    this.time = this.__props__.time;
-    this.timestamp = this.__props__.timestamp;
-    this.mode = this.__props__.mode;
-    delete this.__props__;
-  }
-}
 class IWheelOption extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -215,6 +188,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     }
     return text + "px";
   }
+  function clampTime(value) {
+    const text = normalizeTime(value);
+    const current = timeToMinutes(text);
+    const minValue = validHour(props.minHour) * 60 + validMinute(props.minMinute);
+    const maxValue = validHour(props.maxHour) * 60 + validMinute(props.maxMinute);
+    let nextValue = current;
+    if (nextValue < minValue)
+      nextValue = minValue;
+    if (nextValue > maxValue)
+      nextValue = maxValue;
+    return padNumber(Math.floor(nextValue / 60)) + ":" + padNumber(nextValue % 60);
+  }
   const opened = common_vendor.ref(props.show);
   const currentDate = common_vendor.ref(props.date);
   const currentTime = common_vendor.ref(props.time);
@@ -367,6 +352,114 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return optionRange(range[0], range[1], "分", true);
   });
   const wheelIndexes = common_vendor.ref([]);
+  let wheelSyncGeneration = 0;
+  let wheelReadyGeneration = 0;
+  let wheelInitialized = false;
+  let wheelInternalChange = false;
+  function scheduleFrame(callback) {
+    setTimeout(callback, 16);
+  }
+  function copyWheelIndexes(indexes) {
+    return indexes.slice();
+  }
+  function findChangedWheelIndex(nextIndexes, oldIndexes) {
+    const length = Math.max(nextIndexes.length, oldIndexes.length);
+    for (let index = 0; index < length; index++) {
+      const nextValue = index < nextIndexes.length ? nextIndexes[index] : -1;
+      const oldValue = index < oldIndexes.length ? oldIndexes[index] : -1;
+      if (nextValue != oldValue)
+        return index;
+    }
+    return -1;
+  }
+  function cancelWheelIndexSync() {
+    wheelSyncGeneration++;
+    wheelInternalChange = false;
+  }
+  function cancelWheelReady() {
+    wheelReadyGeneration++;
+  }
+  function scheduleWheelReady() {
+    const generation = ++wheelReadyGeneration;
+    common_vendor.nextTick$1(() => {
+      scheduleFrame(() => {
+        scheduleFrame(() => {
+          scheduleFrame(() => {
+            if (generation != wheelReadyGeneration || !opened.value)
+              return null;
+            wheelInitialized = true;
+            wheelInternalChange = false;
+          });
+        });
+      });
+    });
+  }
+  function syncNativeWheelIndexes(indexes) {
+    const generation = ++wheelSyncGeneration;
+    wheelInternalChange = true;
+    wheelIndexes.value = copyWheelIndexes(indexes);
+    scheduleFrame(() => {
+      if (generation != wheelSyncGeneration)
+        return null;
+      wheelIndexes.value = copyWheelIndexes(indexes);
+      scheduleFrame(() => {
+        if (generation == wheelSyncGeneration)
+          wheelInternalChange = false;
+      });
+    });
+  }
+  function forceWheelIndexRefresh(indexes, changedIndex, optionCount) {
+    const generation = ++wheelSyncGeneration;
+    wheelInternalChange = true;
+    wheelIndexes.value = copyWheelIndexes(indexes);
+    scheduleFrame(() => {
+      if (generation != wheelSyncGeneration)
+        return null;
+      if (changedIndex >= 0 && changedIndex < indexes.length && optionCount > 1) {
+        const refreshed = copyWheelIndexes(indexes);
+        const target = indexes[changedIndex];
+        refreshed[changedIndex] = target > 0 ? target - 1 : 1;
+        wheelIndexes.value = refreshed;
+      }
+      scheduleFrame(() => {
+        if (generation != wheelSyncGeneration)
+          return null;
+        wheelIndexes.value = copyWheelIndexes(indexes);
+        scheduleFrame(() => {
+          if (generation == wheelSyncGeneration)
+            wheelInternalChange = false;
+        });
+      });
+    });
+  }
+  function wheelOptionCountAt(index) {
+    let visibleIndex = 0;
+    if (showYearColumn.value) {
+      if (visibleIndex == index)
+        return yearOptions.value.length;
+      visibleIndex++;
+    }
+    if (showMonthColumn.value) {
+      if (visibleIndex == index)
+        return monthOptions.value.length;
+      visibleIndex++;
+    }
+    if (showDayColumn.value) {
+      if (visibleIndex == index)
+        return dayOptions.value.length;
+      visibleIndex++;
+    }
+    if (showHourColumn.value) {
+      if (visibleIndex == index)
+        return hourOptions.value.length;
+      visibleIndex++;
+    }
+    if (showMinuteColumn.value) {
+      if (visibleIndex == index)
+        return minuteOptions.value.length;
+    }
+    return 0;
+  }
   function indexOfOption(options, value) {
     for (let index = 0; index < options.length; index++) {
       if (options[index].value == value)
@@ -374,7 +467,54 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     }
     return 0;
   }
-  function syncWheelIndexes() {
+  function clampDraftParts() {
+    if (normalizedMode.value == "time") {
+      currentTime.value = clampTime(currentTime.value);
+      return null;
+    }
+    const minDate = minDateParts();
+    const maxDate = maxDateParts();
+    let year = selectedYear();
+    let month = selectedMonth();
+    let day = selectedDay();
+    let hour = selectedHour();
+    let minute = selectedMinute();
+    if (year < minDate.getFullYear())
+      year = minDate.getFullYear();
+    if (year > maxDate.getFullYear())
+      year = maxDate.getFullYear();
+    const firstMonth = year == minDate.getFullYear() ? minDate.getMonth() + 1 : 1;
+    const lastMonth = year == maxDate.getFullYear() ? maxDate.getMonth() + 1 : 12;
+    if (month < firstMonth)
+      month = firstMonth;
+    if (month > lastMonth)
+      month = lastMonth;
+    let firstDay = 1;
+    let lastDay = daysInMonth(year, month);
+    if (year == minDate.getFullYear() && month == minDate.getMonth() + 1)
+      firstDay = minDate.getDate();
+    if (year == maxDate.getFullYear() && month == maxDate.getMonth() + 1)
+      lastDay = maxDate.getDate();
+    if (day < firstDay)
+      day = firstDay;
+    if (day > lastDay)
+      day = lastDay;
+    const timestamp = dateTimeToTimestamp(dateFromParts(year, month, day, hour, minute).split(" ")[0], padNumber(hour) + ":" + padNumber(minute));
+    if (timestamp < minDateValue()) {
+      currentDate.value = formatDate(minDateValue());
+      currentTime.value = formatTime(minDateValue());
+      return null;
+    }
+    if (timestamp > maxDateValue()) {
+      currentDate.value = formatDate(maxDateValue());
+      currentTime.value = formatTime(maxDateValue());
+      return null;
+    }
+    currentDate.value = year.toString() + "-" + padNumber(month) + "-" + padNumber(day);
+    currentTime.value = padNumber(hour) + ":" + padNumber(minute);
+  }
+  function syncWheelIndexes(syncNative = true) {
+    clampDraftParts();
     const indexes = [];
     if (showYearColumn.value)
       indexes.push(indexOfOption(yearOptions.value, selectedYear()));
@@ -386,7 +526,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       indexes.push(indexOfOption(hourOptions.value, selectedHour()));
     if (showMinuteColumn.value)
       indexes.push(indexOfOption(minuteOptions.value, selectedMinute()));
-    wheelIndexes.value = indexes;
+    if (syncNative)
+      syncNativeWheelIndexes(indexes);
+    return indexes;
   }
   function selectedOptionValue(options, index, fallback) {
     if (options.length == 0)
@@ -422,25 +564,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   function currentTimestamp() {
     return dateTimeToTimestamp(currentDate.value, currentTime.value);
   }
-  function clampTime(value) {
-    const text = normalizeTime(value);
-    const current = timeToMinutes(text);
-    const minValue = validHour(props.minHour) * 60 + validMinute(props.minMinute);
-    const maxValue = validHour(props.maxHour) * 60 + validMinute(props.maxMinute);
-    let nextValue = current;
-    if (nextValue < minValue)
-      nextValue = minValue;
-    if (nextValue > maxValue)
-      nextValue = maxValue;
-    return padNumber(Math.floor(nextValue / 60)) + ":" + padNumber(nextValue % 60);
-  }
   function outputValue() {
     if (normalizedMode.value == "time")
       return currentTime.value;
     return currentTimestamp();
   }
   function buildEvent() {
-    return new IDatetimePickerEvent({
+    return new common_vendor.UTSJSONObject({
       value: outputValue(),
       date: currentDate.value,
       time: currentTime.value,
@@ -496,6 +626,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     currentTime.value = formatTime(timestamp);
   }
   function syncFromProps() {
+    cancelWheelIndexSync();
+    cancelWheelReady();
+    wheelInitialized = false;
+    wheelInternalChange = true;
     const modelText = props.modelValue.toString();
     if (modelText.length > 0) {
       applyValue(props.modelValue);
@@ -505,12 +639,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     }
     clampCurrent();
     syncWheelIndexes();
+    scheduleWheelReady();
   }
   function open() {
     if (opened.value)
       return null;
-    syncFromProps();
     opened.value = true;
+    syncFromProps();
     emit("open");
     emit("update:show", true);
   }
@@ -520,6 +655,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     open();
   }
   function close() {
+    cancelWheelIndexSync();
+    cancelWheelReady();
+    wheelInitialized = false;
+    wheelInternalChange = false;
     if (!opened.value)
       return null;
     opened.value = false;
@@ -527,6 +666,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     emit("update:show", false);
   }
   function cancel() {
+    cancelWheelIndexSync();
     emit("cancel", buildEvent());
     close();
   }
@@ -534,6 +674,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     const event = buildEvent();
     emit("confirm", event);
     emitValue();
+    cancelWheelIndexSync();
     close();
   }
   function handleOverlayClick() {
@@ -541,27 +682,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       return null;
     close();
   }
-  function handleWheelChange(event = null) {
-    if (props.disabled || props.loading || event == null || typeof event != "object")
+  function handleWheelChange(event) {
+    if (props.disabled || props.loading || !wheelInitialized || wheelInternalChange)
       return null;
-    const detail = event["detail"];
-    if (detail == null || typeof detail != "object")
+    const values = event.detail.value;
+    if (values == null || !Array.isArray(values))
       return null;
-    const rawValues = detail["value"];
-    if (rawValues == null || !Array.isArray(rawValues))
-      return null;
-    const values = rawValues;
     const previousYearOptions = yearOptions.value;
     const previousMonthOptions = monthOptions.value;
     const previousDayOptions = dayOptions.value;
     const previousHourOptions = hourOptions.value;
     const previousMinuteOptions = minuteOptions.value;
     let valueIndex = 0;
-    let year = selectedYear();
-    let month = selectedMonth();
-    let day = selectedDay();
-    let hour = selectedHour();
-    let minute = selectedMinute();
+    const oldYear = selectedYear();
+    const oldMonth = selectedMonth();
+    const oldDay = selectedDay();
+    const oldHour = selectedHour();
+    const oldMinute = selectedMinute();
+    let year = oldYear;
+    let month = oldMonth;
+    let day = oldDay;
+    let hour = oldHour;
+    let minute = oldMinute;
     if (showYearColumn.value) {
       year = selectedOptionValue(previousYearOptions, wheelIndexAt(values, valueIndex), year);
       valueIndex++;
@@ -598,10 +740,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     currentDate.value = dateFromParts(year, month, day, hour, minute).split(" ")[0];
     currentTime.value = padNumber(hour) + ":" + padNumber(minute);
     clampCurrent();
-    syncWheelIndexes();
-    emit("change", buildEvent());
+    const indexes = syncWheelIndexes(false);
+    const dependentColumnChanged = year != oldYear || month != oldMonth;
+    if (dependentColumnChanged) {
+      const oldIndexes = copyWheelIndexes(wheelIndexes.value);
+      const changedIndex = findChangedWheelIndex(indexes, oldIndexes);
+      forceWheelIndexRefresh(indexes, changedIndex, wheelOptionCountAt(changedIndex));
+    } else {
+      cancelWheelIndexSync();
+    }
     if (!props.showToolbar)
       emitValue();
+    emit("change", buildEvent());
   }
   common_vendor.watch(() => {
     return props.show;
@@ -639,7 +789,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   common_vendor.watch(() => {
     return props.maxDate;
   }, () => {
-    clampCurrent();
+    syncFromProps();
+  });
+  common_vendor.onMounted(() => {
+    syncFromProps();
   });
   syncFromProps();
   __expose({

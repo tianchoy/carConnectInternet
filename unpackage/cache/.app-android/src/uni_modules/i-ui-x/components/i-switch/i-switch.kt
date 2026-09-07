@@ -60,7 +60,7 @@ open class GenUniModulesIUiXComponentsISwitchISwitch : VueComponent {
             val formatSize = ::gen_formatSize_fn
             fun gen_numericSize_fn(value: Any, fallback: Number): Number {
                 val text = value.toString().replace("px", "").replace("rpx", "").replace("%", "")
-                val numberValue = parseFloat(text)
+                val numberValue = parseFloat(text.toString())
                 if (isNaN(numberValue)) {
                     return fallback
                 }
@@ -148,7 +148,7 @@ open class GenUniModulesIUiXComponentsISwitchISwitch : VueComponent {
                 current.value = initialValue()
             }
             )
-            fun gen_toggle_fn() {
+            fun gen_toggle_fn(): Unit {
                 if (props.disabled || props.loading) {
                     return
                 }

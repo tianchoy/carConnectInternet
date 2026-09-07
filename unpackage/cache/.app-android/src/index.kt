@@ -13,7 +13,7 @@ import io.dcloud.uts.*
 import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
-import java.math.BigDecimal
+import java.util.TimeZone
 import kotlin.properties.Delegates
 import android.util.Log as AndroidLog
 import uts.sdk.modules.jgJpushU.EventCallBackParams
@@ -37,7 +37,6 @@ import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.redirectTo as uni_redirectTo
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.request as uni_request
-import io.dcloud.uniapp.extapi.rpx2px as uni_rpx2px
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showModal as uni_showModal
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
@@ -128,7 +127,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.76"
     val port: String = "8090"
-    val id: String = "app-android_UzrT_X"
+    val id: String = "app-android_2fGdIK"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -706,7 +705,7 @@ open class RequestOptions__1 (
     open var showError: Boolean? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("RequestOptions", "api/http.uts", 5, 6)
+        return UTSSourceMapPosition("RequestOptions", "api/http.uts", 6, 6)
     }
 }
 open class HttpError (
@@ -717,11 +716,27 @@ open class HttpError (
     open var data: Any? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("HttpError", "api/http.uts", 18, 6)
+        return UTSSourceMapPosition("HttpError", "api/http.uts", 19, 6)
     }
 }
 val BASE_URL = "https://gpsapp.zdiot.cn"
 val CLIENT_ID = "428a8310cd442757ae699df5d894f051"
+val DEFAULT_TIME_ZONE = "UTC"
+fun getDeviceTimeZone(): String {
+    var timeZone = ""
+    try {
+        timeZone = TimeZone.getDefault().getID()
+    }
+     catch (error: Throwable) {
+        console.warn("获取安卓时区失败", error, " at api/http.uts:61")
+    }
+    val normalizedTimeZone = timeZone.trim()
+    return if (normalizedTimeZone.length > 0) {
+        normalizedTimeZone
+    } else {
+        DEFAULT_TIME_ZONE
+    }
+}
 var isHandlingTokenExpired = false
 fun resetTokenExpiredState(): Unit {
     isHandlingTokenExpired = false
@@ -731,17 +746,17 @@ fun handleTokenExpired(): Unit {
         return
     }
     isHandlingTokenExpired = true
-    console.log("检测到token过期，执行跳转登录页逻辑", " at api/http.uts:53")
+    console.log("检测到token过期，执行跳转登录页逻辑", " at api/http.uts:88")
     uni_removeStorageSync("token")
     clearPushSessionState()
     showAppToast(ShowToastOptions(title = "登录已过期，请重新登录", icon = "none", duration = 2000))
     setTimeout(fun(){
-        console.log("正在跳转到登录页...", " at api/http.uts:68")
+        console.log("正在跳转到登录页...", " at api/http.uts:103")
         uni_redirectTo(RedirectToOptions(url = "/pages/login/login", success = fun(_){
-            console.log("跳转登录页成功", " at api/http.uts:72")
+            console.log("跳转登录页成功", " at api/http.uts:107")
         }
         , fail = fun(err){
-            console.log("跳转登录页失败:", err, " at api/http.uts:75")
+            console.log("跳转登录页失败:", err, " at api/http.uts:110")
             uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
         }
         ))
@@ -756,11 +771,13 @@ fun requestInterceptor(config: RequestOptions__1): RequestOptions__1 {
         ""
     }
     )
+    val timeZone = getDeviceTimeZone()
     if (config.header == null) {
         config.header = UTSJSONObject()
     }
     config.header!!.set("Authorization", authorization)
     config.header!!.set("clientId", CLIENT_ID)
+    config.header!!.set("x-time-zone", timeZone)
     return config
 }
 fun responseInterceptor(response: RequestSuccess<Any>, config: RequestOptions__1): Any {
@@ -774,7 +791,7 @@ fun logHttpError(error: HttpError): Unit {
     }
     )
     AndroidLog.e("HttpRequest", detail)
-    console.error("[HttpRequest] " + detail, " at api/http.uts:127")
+    console.error("[HttpRequest] " + detail, " at api/http.uts:165")
 }
 fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
     if (config.showLoading != false) {
@@ -2281,6 +2298,18 @@ fun __uts_large_remixCodeMap_build_0(): Map<String, String> {
     __uts_large_remixCodeMap_fill_fill_1(__map)
     return __map
 }
+open class IIconClickEvent (
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var code: String,
+    @JsonNotNull
+    open var label: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("IIconClickEvent", "uni_modules/i-ui-x/components/i-icon/i-icon.uvue", 82, 6)
+    }
+}
 val GenUniModulesIUiXComponentsIIconIIconClass = CreateVueComponent(GenUniModulesIUiXComponentsIIconIIcon::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIIconIIcon.name, inheritAttrs = GenUniModulesIUiXComponentsIIconIIcon.inheritAttrs, inject = GenUniModulesIUiXComponentsIIconIIcon.inject, props = GenUniModulesIUiXComponentsIIconIIcon.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIIconIIcon.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIIconIIcon.emits, components = GenUniModulesIUiXComponentsIIconIIcon.components, styles = GenUniModulesIUiXComponentsIIconIIcon.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenUniModulesIUiXComponentsIIconIIcon.setup(props as GenUniModulesIUiXComponentsIIconIIcon)
@@ -2301,2968 +2330,25 @@ val GenUniModulesIUiXComponentsILineProgressILineProgressClass = CreateVueCompon
     return GenUniModulesIUiXComponentsILineProgressILineProgress(instance)
 }
 )
-typealias PickerValue = Any
-open class PickerColumnItem (
-    open var id: Any? = null,
+open class IPickerItem (
     @JsonNotNull
-    open var label: String,
-    open var disabled: Boolean? = null,
+    open var text: String,
+    open var value: Any? = null,
     @JsonNotNull
-    open var value: String,
-    open var children: PickerColumn? = null,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PickerColumnItem", "uni_modules/lime-picker/components/l-picker/type.uts", 4, 13)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return PickerColumnItemReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class PickerColumnItemReactiveObject : PickerColumnItem, IUTSReactive<PickerColumnItem> {
-    override var __v_raw: PickerColumnItem
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: PickerColumnItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(id = __v_raw.id, label = __v_raw.label, disabled = __v_raw.disabled, value = __v_raw.value, children = __v_raw.children) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PickerColumnItemReactiveObject {
-        return PickerColumnItemReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var id: Any?
-        get() {
-            return _tRG(__v_raw, "id", __v_raw.id, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("id")) {
-                return
-            }
-            val oldValue = __v_raw.id
-            __v_raw.id = value
-            _tRS(__v_raw, "id", oldValue, value)
-        }
-    override var label: String
-        get() {
-            return _tRG(__v_raw, "label", __v_raw.label, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("label")) {
-                return
-            }
-            val oldValue = __v_raw.label
-            __v_raw.label = value
-            _tRS(__v_raw, "label", oldValue, value)
-        }
-    override var disabled: Boolean?
-        get() {
-            return _tRG(__v_raw, "disabled", __v_raw.disabled, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("disabled")) {
-                return
-            }
-            val oldValue = __v_raw.disabled
-            __v_raw.disabled = value
-            _tRS(__v_raw, "disabled", oldValue, value)
-        }
-    override var value: String
-        get() {
-            return _tRG(__v_raw, "value", __v_raw.value, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("value")) {
-                return
-            }
-            val oldValue = __v_raw.value
-            __v_raw.value = value
-            _tRS(__v_raw, "value", oldValue, value)
-        }
-    override var children: PickerColumn?
-        get() {
-            return _tRG(__v_raw, "children", __v_raw.children, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("children")) {
-                return
-            }
-            val oldValue = __v_raw.children
-            __v_raw.children = value
-            _tRS(__v_raw, "children", oldValue, value)
-        }
-}
-typealias PickerColumn = UTSArray<PickerColumnItem>
-open class PickerPickEvent (
-    @JsonNotNull
-    open var values: UTSArray<PickerValue>,
-    @JsonNotNull
-    open var column: Number,
-    @JsonNotNull
-    open var index: Number,
+    open var disabled: Boolean = false,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PickerPickEvent", "uni_modules/lime-picker/components/l-picker/type.uts", 12, 13)
+        return UTSSourceMapPosition("IPickerItem", "uni_modules/i-ui-x/components/i-picker/i-picker.uvue", 280, 6)
     }
 }
-open class PickerConfirmEvent (
-    @JsonNotNull
-    open var values: UTSArray<PickerValue>,
-    @JsonNotNull
-    open var indexs: UTSArray<Number>,
-    @JsonNotNull
-    open var items: UTSArray<PickerColumnItem>,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PickerConfirmEvent", "uni_modules/lime-picker/components/l-picker/type.uts", 17, 13)
-    }
-}
-interface PickerProps {
-    var cancelBtn: String?
-    var cancelStyle: Any?
-    var confirmBtn: String?
-    var confirmStyle: Any?
-    var title: String?
-    var titleStyle: Any?
-    var keys: UTSJSONObject?
-    var columns: UTSArray<PickerColumn>
-    var modelValue: UTSArray<PickerValue>?
-    var defaultValue: UTSArray<PickerValue>?
-    var value: UTSArray<PickerValue>?
-    var loading: Boolean
-    var loadingColor: String?
-    var loadingMaskColor: String?
-    var loadingSize: String
-    var itemHeight: String?
-    var itemColor: String?
-    var itemFontSize: String?
-    var itemActiveColor: String?
-    var itemActiveFontWeight: Number?
-    var indicatorStyle: String?
-    var maskColors: UTSArray<String>?
-    var bgColor: String?
-    var groupHeight: String?
-    var radius: String?
-    var resetIndex: Boolean
-}
-fun isString(str: Any?): Boolean {
-    return UTSAndroid.`typeof`(str) == "string"
-}
-fun isNumber(value: Any?): Boolean {
-    return _uA(
-        "Byte",
-        "UByte",
-        "Short",
-        "UShort",
-        "Int",
-        "UInt",
-        "Long",
-        "ULong",
-        "Float",
-        "Double",
-        "number"
-    ).includes(UTSAndroid.`typeof`(value))
-}
-fun isNumeric(value: Any?): Boolean {
-    if (value == null) {
-        return false
-    }
-    if (isNumber(value)) {
-        return true
-    } else if (isString(value)) {
-        val regex = UTSRegExp("^(-)?\\d+(\\.\\d+)?\$")
-        return regex.test(value as String)
-    }
-    return false
-}
-fun unitConvert(value: Any?, base: Number = 0): Number {
-    if (value == null) {
-        return NaN
-    }
-    if (isNumber(value)) {
-        return value as Number
-    }
-    if (isNumeric(value)) {
-        return parseFloat(value as String)
-    }
-    if (isString(value)) {
-        val reg = UTSRegExp("^-?([0-9]+)?([.]{1}[0-9]+){0,1}(em|rpx|px|%)\$", "g")
-        val results = reg.exec(value as String)
-        if (results == null) {
-            return NaN
-        }
-        val unit = results[3]
-        val _value = parseFloat(value)
-        if (unit == "rpx") {
-            return uni_rpx2px(_value)
-        }
-        if (unit == "px") {
-            return _value
-        }
-        if (unit == "%") {
-            return _value / 100 * base
-        }
-    }
-    return NaN
-}
-fun clamp(kVal: Number, min: Number, max: Number): Number {
-    return Math.max(min, Math.min(max, kVal))
-}
-open class MaskConfig (
-    @JsonNotNull
-    open var maskStartColor: String,
-    @JsonNotNull
-    open var maskEndColor: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MaskConfig", "uni_modules/lime-picker/components/l-picker-item/usePickerMask.uts", 2, 13)
-    }
-}
-open class PlatformMaskStyles (
-    @JsonNotNull
-    open var common: String,
-    @JsonNotNull
-    open var top: String,
-    @JsonNotNull
-    open var bottom: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PlatformMaskStyles", "uni_modules/lime-picker/components/l-picker-item/usePickerMask.uts", 6, 13)
-    }
-}
-open class UsePickerMaskReturn (
-    @JsonNotNull
-    open var maskConfig: ComputedRef<MaskConfig>,
-    @JsonNotNull
-    open var platformMaskStyles: ComputedRef<PlatformMaskStyles>,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UsePickerMaskReturn", "uni_modules/lime-picker/components/l-picker-item/usePickerMask.uts", 11, 13)
-    }
-}
-val usePickerMask = fun(backgroundColorRef: ComputedRef<String?>, isDarkModeRef: ComputedRef<Boolean>, maskColorsRef: ComputedRef<UTSArray<String>?>, isInitializedRef: Ref<Boolean>): UsePickerMaskReturn {
-    val maskConfig = computed<MaskConfig>(fun(): MaskConfig {
-        val bgColor = backgroundColorRef.value
-        val isDark = isDarkModeRef.value
-        val maskColors = maskColorsRef?.value
-        if (maskColors != null && maskColors.length >= 1) {
-            val maskStartColor = maskColors!![0]
-            val maskEndColor = if (maskColors!!.length > 1) {
-                maskColors[1]
-            } else {
-                "rgba(0,0,0,0)"
-            }
-            return MaskConfig(maskStartColor = maskStartColor, maskEndColor = maskEndColor)
-        }
-        val bg = bgColor ?: (if (isTruthy(isDark)) {
-            "#242424"
-        } else {
-            "#ffffff"
-        }
-        )
-        val endColor = if (isTruthy(isDark)) {
-            "rgba(36, 36, 36, 0)"
-        } else {
-            "rgba(255, 255, 255, 0)"
-        }
-        return MaskConfig(maskStartColor = bg, maskEndColor = endColor)
-    }
-    )
-    val platformMaskStyles = computed<PlatformMaskStyles>(fun(): PlatformMaskStyles {
-        val _maskConfig_value = maskConfig.value
-        val maskStartColor = _maskConfig_value.maskStartColor
-        val maskEndColor = _maskConfig_value.maskEndColor
-        val clean = fun(str: String): String {
-            return str.replace(UTSRegExp("\\s+", "g"), " ").trim()
-        }
-        return PlatformMaskStyles(common = if (backgroundColorRef.value == null && !isTruthy(isDarkModeRef.value)) {
-            clean("background-image:\n\t\t\t\t\tlinear-gradient(180deg, " + maskStartColor + ", " + maskEndColor + "),\n\t\t\t\t\tlinear-gradient(0deg, " + maskStartColor + ", " + maskEndColor + ")")
-        } else {
-            ""
-        }
-        , top = "background-image: linear-gradient(to bottom, " + maskStartColor + ", " + maskEndColor + ")", bottom = "background-image: linear-gradient(to top, " + maskStartColor + ", " + maskEndColor + ")")
-    }
-    )
-    return UsePickerMaskReturn(maskConfig = maskConfig, platformMaskStyles = platformMaskStyles)
-}
-typealias PickerCanvasElement = UniElement
-typealias PickerDrawableContext = DrawableContext
-open class PickerCanvasConfig (
-    @JsonNotNull
-    open var itemHeight: Number,
-    @JsonNotNull
-    open var itemFontSize: Number,
-    open var itemActiveFontWeight: Number? = null,
-    open var itemColor: String? = null,
-    open var itemActiveColor: String? = null,
-    @JsonNotNull
-    open var canvasWidth: Number,
-    @JsonNotNull
-    open var canvasHeight: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PickerCanvasConfig", "uni_modules/lime-picker/components/l-picker-item/PickerRenderer.uts", 6, 13)
-    }
-}
-open class PickerCanvasRenderer : IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PickerCanvasRenderer", "uni_modules/lime-picker/components/l-picker-item/PickerRenderer.uts", 15, 14)
-    }
-    private var ctx: PickerDrawableContext? = null
-    private var dpr: Number = 1
-    private var isInitialized: Boolean = false
-    private var canvas: PickerCanvasElement
-    private var lastWidth: Number = 0
-    private var lastHeight: Number = 0
-    constructor(itemRef: PickerCanvasElement){
-        this.canvas = itemRef
-        this.initCanvas()
-    }
-    private fun initCanvas() {
-        this.isInitialized = true
-        return
-    }
-    private fun setupCanvas(width: Number, height: Number) {
-        return
-    }
-    open fun clearRect(width: Number = 1000, height: Number = 100000) {
-        this.ctx?.reset()
-        return
-    }
-    open fun render(options: UTSArray<PickerColumnItem>, curIndex: Number, config: PickerCanvasConfig, isDarkMode: Boolean) {
-        val ctx = this.canvas.getDrawableContext()!!
-        val itemHeight = config.itemHeight
-        val fontSize = config.itemFontSize
-        val canvasWidth = config.canvasWidth
-        val canvasHeight = config.canvasHeight
-        this.setupCanvas(canvasWidth, canvasHeight)
-        ctx.reset()
-        val x = canvasWidth / 2
-        val itemActiveFontWeight = config?.itemActiveFontWeight ?: 700
-        val color = config?.itemColor ?: (if (isDarkMode) {
-            "rgba(255,255,255,0.88)"
-        } else {
-            "rgba(0,0,0,0.88)"
-        }
-        )
-        val itemActiveColor = config?.itemActiveColor ?: (if (isDarkMode) {
-            "rgba(255,255,255,0.88)"
-        } else {
-            "rgba(0,0,0,0.88)"
-        }
-        )
-        ctx.font = "" + fontSize + "px"
-        ctx.textAlign = "center"
-        ctx.lineWidth = 0.5
-        this.clearRect(canvasWidth, canvasHeight)
-        options.forEach(fun(item, index){
-            var offset: Number = 0.4
-            val y = itemHeight * index + fontSize + (itemHeight - fontSize) * offset
-            val isActive = index == curIndex && itemActiveFontWeight > 600
-            ctx.fillStyle = if (isActive) {
-                itemActiveColor
-            } else {
-                color
-            }
-            ctx.strokeStyle = if (isActive) {
-                itemActiveColor
-            } else {
-                color
-            }
-            ctx.fillText(item.label, x, y)
-            if (isActive) {
-                ctx.strokeText(item.label, x, y)
-            }
-        }
-        )
-        ctx.update()
-    }
-    open fun destroy() {
-        this.ctx = null
-        this.isInitialized = false
-    }
-}
-fun <T> arrayEqual(arr1: UTSArray<T>, arr2: UTSArray<T>): Boolean {
-    return (arr1.length == arr2.length && arr1.every(fun(kVal, i): Boolean {
-        return kVal == arr2[i]
-    }
-    ))
-}
-fun <T> assignAtIndex(arr: UTSArray<T>, index: Number, value: T): Unit {
-    if (index < 0) {
-        throw UTSError("Index must be a non-negative integer, got " + index)
-    }
-    if (index < arr.length) {
-        arr[index] = value
-    } else {
-        while(arr.length <= index){
-            arr.push(null as T)
-        }
-        arr[index] = value
-    }
-}
-open class RGB (
-    @JsonNotNull
-    open var r: Number,
-    @JsonNotNull
-    open var g: Number,
-    @JsonNotNull
-    open var b: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("RGB", "uni_modules/lime-color/utssdk/interface.uts", 1, 13)
-    }
-}
-open class RGBA (
-    @JsonNotNull
-    open var r: Number,
-    @JsonNotNull
-    open var g: Number,
-    @JsonNotNull
-    open var b: Number,
-    @JsonNotNull
-    open var a: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("RGBA", "uni_modules/lime-color/utssdk/interface.uts", 6, 13)
-    }
-}
-open class RGBAString (
-    @JsonNotNull
-    open var r: String,
-    @JsonNotNull
-    open var g: String,
-    @JsonNotNull
-    open var b: String,
-    @JsonNotNull
-    open var a: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("RGBAString", "uni_modules/lime-color/utssdk/interface.uts", 12, 13)
-    }
-}
-open class HSL (
-    @JsonNotNull
-    open var h: Number,
-    @JsonNotNull
-    open var s: Number,
-    @JsonNotNull
-    open var l: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("HSL", "uni_modules/lime-color/utssdk/interface.uts", 18, 13)
-    }
-}
-open class HSLA (
-    @JsonNotNull
-    open var h: Number,
-    @JsonNotNull
-    open var s: Number,
-    @JsonNotNull
-    open var l: Number,
-    @JsonNotNull
-    open var a: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("HSLA", "uni_modules/lime-color/utssdk/interface.uts", 23, 13)
-    }
-}
-open class HSV (
-    @JsonNotNull
-    open var h: Number,
-    @JsonNotNull
-    open var s: Number,
-    @JsonNotNull
-    open var v: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("HSV", "uni_modules/lime-color/utssdk/interface.uts", 29, 13)
-    }
-}
-open class HSVA (
-    @JsonNotNull
-    open var h: Number,
-    @JsonNotNull
-    open var s: Number,
-    @JsonNotNull
-    open var v: Number,
-    @JsonNotNull
-    open var a: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("HSVA", "uni_modules/lime-color/utssdk/interface.uts", 34, 13)
-    }
-}
-open class HSB (
-    @JsonNotNull
-    open var h: Number,
-    @JsonNotNull
-    open var s: Number,
-    @JsonNotNull
-    open var b: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("HSB", "uni_modules/lime-color/utssdk/interface.uts", 41, 13)
-    }
-}
-open class HSBA (
-    @JsonNotNull
-    open var h: Number,
-    @JsonNotNull
-    open var s: Number,
-    @JsonNotNull
-    open var b: Number,
-    @JsonNotNull
-    open var a: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("HSBA", "uni_modules/lime-color/utssdk/interface.uts", 46, 13)
-    }
-}
-open class LColorInfo (
-    open var ok: Boolean? = null,
-    open var format: LColorFormats? = null,
-    @JsonNotNull
-    open var r: Number,
-    @JsonNotNull
-    open var g: Number,
-    @JsonNotNull
-    open var b: Number,
-    @JsonNotNull
-    open var a: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("LColorInfo", "uni_modules/lime-color/utssdk/interface.uts", 52, 13)
-    }
-}
-typealias LColorFormats = String
-open class LColorOptions (
-    open var format: LColorFormats? = null,
-    open var gradientType: String? = null,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("LColorOptions", "uni_modules/lime-color/utssdk/interface.uts", 61, 13)
-    }
-}
-typealias LColorInput = Any
-fun isNumber__1(value: Any?): Boolean {
-    return _uA(
-        "Byte",
-        "UByte",
-        "Short",
-        "UShort",
-        "Int",
-        "UInt",
-        "Long",
-        "ULong",
-        "Float",
-        "Double",
-        "number"
-    ).includes(UTSAndroid.`typeof`(value))
-}
-fun isString__1(value: Any?): Boolean {
-    return UTSAndroid.`typeof`(value) == "string"
-}
-fun isNumeric__1(value: Any?): Boolean {
-    if (isNumber__1(value)) {
-        return true
-    } else if (isString__1(value)) {
-        val regex = UTSRegExp("^(-)?\\d+(\\.\\d+)?\$")
-        return regex.test(value as String)
-    }
-    return false
-}
-fun toBoolean(value: Any?): Boolean {
-    if (isNumber__1(value)) {
-        return (value as Number) != 0
-    }
-    if (isString__1(value)) {
-        return ("" + value).length > 0
-    }
-    if (UTSAndroid.`typeof`(value) == "boolean") {
-        return value as Boolean
-    }
-    return value != null
-}
-fun isPercentage(n: Any): Boolean {
-    return isString__1(n) && (n as String).indexOf("%") != -1
-}
-fun isOnePointZero(n: Any): Boolean {
-    return isString__1(n) && (n as String).indexOf(".") != -1 && parseFloat(n as String) == 1
-}
-fun bound01(n: String, max: Number): Number {
-    return bound01(n as Any, max as Number)
-}
-fun bound01(n: Number, max: Number): Number {
-    return bound01(n as Any, max as Number)
-}
-fun bound01(reassignedN: Any, max: Number): Number {
-    var n = reassignedN
-    if (!(isNumber__1(n) || isString__1(n))) {
-        return 1
-    }
-    if (isOnePointZero(n)) {
-        n = "100%"
-    }
-    val isPercent = isPercentage(n)
-    n = if (isNumber__1(n)) {
-        n
-    } else {
-        parseFloat(n as String)
-    }
-     as Number
-    n = if (max == 360) {
-        n
-    } else {
-        Math.min(max, Math.max(0, n))
-    }
-    if (isPercent) {
-        n = parseInt("" + Math.min(n, 100) * max, 10) / 100
-    }
-    if (Math.abs(n - max) < 0.000001) {
-        return 1
-    }
-    if (max == 360) {
-        n = (if (n < 0) {
-            (n % max) + max
-        } else {
-            n % max
-        }) / max
-    } else {
-        n = (n % max) / max
-    }
-    return n
-}
-fun clamp01(kVal: Number): Number {
-    return Math.min(1, Math.max(0, kVal))
-}
-fun boundAlpha(a: Number): Number {
-    return boundAlpha(a as Any?)
-}
-fun boundAlpha(a: String): Number {
-    return boundAlpha(a as Any?)
-}
-fun boundAlpha(a: Any?): Number {
-    var n = if (a == null) {
-        1
-    } else {
-        if (isString__1(a)) {
-            parseFloat(a as String)
-        } else {
-            a as Number
-        }
-    }
-    if (isNaN(n) || n < 0 || n > 1) {
-        n = 1
-    }
-    return n
-}
-fun convertToPercentage(n: Number): Number {
-    return convertToPercentage(n as Any) as Number
-}
-fun convertToPercentage(n: String): String {
-    return convertToPercentage(n as Any) as String
-}
-fun convertToPercentage(reassignedN: Any): Any {
-    var n = reassignedN
-    n = if (isNumeric__1(n)) {
-        parseFloat(if (UTSAndroid.`typeof`(n) == "string") {
-            n as String
-        } else {
-            BigDecimal.valueOf((n as Number).toDouble()).toPlainString()
-        })
-    } else {
-        n
-    }
-    if (isNumber__1(n) && (n as Number) <= 1) {
-        return ("" + n * 100 + "%").replace(".0%", "%")
-    }
-    return n
-}
-fun pad2(c: String): String {
-    return if (c.length == 1) {
-        "0" + c
-    } else {
-        "" + c
-    }
-}
-fun rgbToRgb(r: String, g: String, b: String): RGB {
-    return rgbToRgb(r as Any, g as Any, b as Any)
-}
-fun rgbToRgb(r: Number, g: String, b: String): RGB {
-    return rgbToRgb(r as Any, g as Any, b as Any)
-}
-fun rgbToRgb(r: Number, g: Number, b: String): RGB {
-    return rgbToRgb(r as Any, g as Any, b as Any)
-}
-fun rgbToRgb(r: Number, g: Number, b: Number): RGB {
-    return rgbToRgb(r as Any, g as Any, b as Any)
-}
-fun rgbToRgb(r: Any, g: Any, b: Any): RGB {
-    return RGB(r = bound01(r, 255) * 255, g = bound01(g, 255) * 255, b = bound01(b, 255) * 255)
-}
-fun rgbToHsl(r: String, g: String, b: String): HSL {
-    return rgbToHsl(r as Any, g as Any, b as Any)
-}
-fun rgbToHsl(r: Number, g: String, b: String): HSL {
-    return rgbToHsl(r as Any, g as Any, b as Any)
-}
-fun rgbToHsl(r: Number, g: Number, b: String): HSL {
-    return rgbToHsl(r as Any, g as Any, b as Any)
-}
-fun rgbToHsl(r: Number, g: Number, b: Number): HSL {
-    return rgbToHsl(r as Any, g as Any, b as Any)
-}
-fun rgbToHsl(reassignedR: Any, reassignedG: Any, reassignedB: Any): HSL {
-    var r = reassignedR
-    var g = reassignedG
-    var b = reassignedB
-    r = bound01(r, 255)
-    g = bound01(g, 255)
-    b = bound01(b, 255)
-    val max = Math.max(r, g, b)
-    val min = Math.min(r, g, b)
-    var h: Number = 0
-    var s: Number
-    val l = (max + min) / 2
-    if (max == min) {
-        s = 0
-        h = 0
-    } else {
-        val d = max - min
-        s = if (l > 0.5) {
-            d / (2 - max - min)
-        } else {
-            d / (max + min)
-        }
-        when (max) {
-            r -> 
-                h = (g - b) / d + (if (g < b) {
-                    6
-                } else {
-                    0
-                }
-                )
-            g -> 
-                h = (b - r) / d + 2
-            b -> 
-                h = (r - g) / d + 4
-            else -> 
-                console.log("h", " at uni_modules/lime-color/common/conversion.uts:64")
-        }
-        h /= 6
-    }
-    return HSL(h = h, s = s, l = l)
-}
-fun hue2rgb(p: Number, q: Number, t: Number): Number {
-    var _t = t
-    if (_t < 0) {
-        _t += 1
-    }
-    if (_t > 1) {
-        _t -= 1
-    }
-    if (_t < (1 as Number) / 6) {
-        return p + (q - p) * (6 * _t)
-    }
-    if (_t < 0.5) {
-        return q
-    }
-    if (_t < (2 as Number) / 3) {
-        return p + (q - p) * ((2 as Number) / 3 - _t) * 6
-    }
-    return p
-}
-fun hslToRgb(h: String, s: String, l: String): RGB {
-    return hslToRgb(h as Any, s as Any, l as Any)
-}
-fun hslToRgb(h: Number, s: String, l: String): RGB {
-    return hslToRgb(h as Any, s as Any, l as Any)
-}
-fun hslToRgb(h: Number, s: Number, l: String): RGB {
-    return hslToRgb(h as Any, s as Any, l as Any)
-}
-fun hslToRgb(h: Number, s: Number, l: Number): RGB {
-    return hslToRgb(h as Any, s as Any, l as Any)
-}
-fun hslToRgb(reassignedH: Any, reassignedS: Any, reassignedL: Any): RGB {
-    var h = reassignedH
-    var s = reassignedS
-    var l = reassignedL
-    var r: Number
-    var g: Number
-    var b: Number
-    h = bound01(h, 360)
-    s = bound01(s, 100)
-    l = bound01(l, 100)
-    if (s == 0) {
-        g = l
-        b = l
-        r = l
-    } else {
-        val q = if (l < 0.5) {
-            l * (1 + s)
-        } else {
-            l + s - l * s
-        }
-        val p = 2 * l - q
-        r = hue2rgb(p, q, h + (1 as Number) / 3)
-        g = hue2rgb(p, q, h)
-        b = hue2rgb(p, q, h - (1 as Number) / 3)
-    }
-    return RGB(r = r * 255, g = g * 255, b = b * 255)
-}
-fun rgbToHsv(reassignedR: Number, reassignedG: Number, reassignedB: Number): HSV {
-    var r = reassignedR
-    var g = reassignedG
-    var b = reassignedB
-    r = bound01(r, 255)
-    g = bound01(g, 255)
-    b = bound01(b, 255)
-    val max = Math.max(r, g, b)
-    val min = Math.min(r, g, b)
-    var h: Number = 0
-    val v = max
-    val d = max - min
-    val s = if (max == 0) {
-        0
-    } else {
-        d / max
-    }
-    if (max == min) {
-        h = 0
-    } else {
-        when (max) {
-            r -> 
-                h = (g - b) / d + (if (g < b) {
-                    6
-                } else {
-                    0
-                }
-                )
-            g -> 
-                h = (b - r) / d + 2
-            b -> 
-                h = (r - g) / d + 4
-            else -> 
-                console.log("1", " at uni_modules/lime-color/common/conversion.uts:171")
-        }
-        h /= 6
-    }
-    return HSV(h = h, s = s, v = v)
-}
-fun hsvToRgb(h: String, s: String, v: String): RGB {
-    return hsvToRgb(h as Any, s as Any, v as Any)
-}
-fun hsvToRgb(h: Number, s: String, v: String): RGB {
-    return hsvToRgb(h as Any, s as Any, v as Any)
-}
-fun hsvToRgb(h: Number, s: Number, v: String): RGB {
-    return hsvToRgb(h as Any, s as Any, v as Any)
-}
-fun hsvToRgb(h: Number, s: Number, v: Number): RGB {
-    return hsvToRgb(h as Any, s as Any, v as Any)
-}
-fun hsvToRgb(reassignedH: Any, reassignedS: Any, reassignedV: Any): RGB {
-    var h = reassignedH
-    var s = reassignedS
-    var v = reassignedV
-    h = bound01(h, 360) * 6
-    s = bound01(s, 100)
-    v = bound01(v, 100)
-    val i = Math.floor(h)
-    val f = h - i
-    val p = v * (1 - s)
-    val q = v * (1 - f * s)
-    val t = v * (1 - (1 - f) * s)
-    val mod = i % 6
-    val r = _uA(
-        v,
-        q,
-        p,
-        p,
-        t,
-        v
-    )[mod]
-    val g = _uA(
-        t,
-        v,
-        v,
-        q,
-        p,
-        p
-    )[mod]
-    val b = _uA(
-        p,
-        p,
-        t,
-        v,
-        v,
-        q
-    )[mod]
-    return RGB(r = r * 255, g = g * 255, b = b * 255)
-}
-fun rgbToHex(r: Number, g: Number, b: Number, allow3Char: Boolean = false): String {
-    val hex = _uA(
-        pad2(Math.round(r).toString(16)),
-        pad2(Math.round(g).toString(16)),
-        pad2(Math.round(b).toString(16))
-    )
-    if (allow3Char && hex[0].startsWith(hex[0].charAt(1)) && hex[1].startsWith(hex[1].charAt(1)) && hex[2].startsWith(hex[2].charAt(1))) {
-        return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0)
-    }
-    return hex.join("")
-}
-fun rgbaToHex(r: Number, g: Number, b: Number, a: Number, allow4Char: Boolean = false): String {
-    val hex = _uA(
-        pad2(Math.round(r).toString(16)),
-        pad2(Math.round(g).toString(16)),
-        pad2(Math.round(b).toString(16)),
-        pad2(convertDecimalToHex(a))
-    )
-    if (allow4Char && hex[0].startsWith(hex[0].charAt(1)) && hex[1].startsWith(hex[1].charAt(1)) && hex[2].startsWith(hex[2].charAt(1)) && hex[3].startsWith(hex[3].charAt(1))) {
-        return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0) + hex[3].charAt(0)
-    }
-    return hex.join("")
-}
-fun convertDecimalToHex(d: Number): String {
-    return convertDecimalToHex(d as Any)
-}
-fun convertDecimalToHex(d: String): String {
-    return convertDecimalToHex(d as Any)
-}
-fun convertDecimalToHex(d: Any): String {
-    return Math.round(parseFloat("" + d) * 255).toString(16)
-}
-fun convertHexToDecimal(h: String): Number {
-    return parseIntFromHex(h) / 255
-}
-fun parseIntFromHex(kVal: String): Number {
-    return parseInt(kVal, 16)
-}
-fun numberInputToObject(color: Number): RGB {
-    return RGB(r = color shr 16, g = (color and 0xff00) shr 8, b = color and 0xff)
-}
-val names: Map<String, String> = Map<String, String>(_uA(
-    _uA(
-        "aliceblue",
-        "#f0f8ff"
-    ),
-    _uA(
-        "antiquewhite",
-        "#faebd7"
-    ),
-    _uA(
-        "aqua",
-        "#00ffff"
-    ),
-    _uA(
-        "aquamarine",
-        "#7fffd4"
-    ),
-    _uA(
-        "azure",
-        "#f0ffff"
-    ),
-    _uA(
-        "beige",
-        "#f5f5dc"
-    ),
-    _uA(
-        "bisque",
-        "#ffe4c4"
-    ),
-    _uA(
-        "black",
-        "#000000"
-    ),
-    _uA(
-        "blanchedalmond",
-        "#ffebcd"
-    ),
-    _uA(
-        "blue",
-        "#0000ff"
-    ),
-    _uA(
-        "blueviolet",
-        "#8a2be2"
-    ),
-    _uA(
-        "brown",
-        "#a52a2a"
-    ),
-    _uA(
-        "burlywood",
-        "#deb887"
-    ),
-    _uA(
-        "cadetblue",
-        "#5f9ea0"
-    ),
-    _uA(
-        "chartreuse",
-        "#7fff00"
-    ),
-    _uA(
-        "chocolate",
-        "#d2691e"
-    ),
-    _uA(
-        "coral",
-        "#ff7f50"
-    ),
-    _uA(
-        "cornflowerblue",
-        "#6495ed"
-    ),
-    _uA(
-        "cornsilk",
-        "#fff8dc"
-    ),
-    _uA(
-        "crimson",
-        "#dc143c"
-    ),
-    _uA(
-        "cyan",
-        "#00ffff"
-    ),
-    _uA(
-        "darkblue",
-        "#00008b"
-    ),
-    _uA(
-        "darkcyan",
-        "#008b8b"
-    ),
-    _uA(
-        "darkgoldenrod",
-        "#b8860b"
-    ),
-    _uA(
-        "darkgray",
-        "#a9a9a9"
-    ),
-    _uA(
-        "darkgreen",
-        "#006400"
-    ),
-    _uA(
-        "darkgrey",
-        "#a9a9a9"
-    ),
-    _uA(
-        "darkkhaki",
-        "#bdb76b"
-    ),
-    _uA(
-        "darkmagenta",
-        "#8b008b"
-    ),
-    _uA(
-        "darkolivegreen",
-        "#556b2f"
-    ),
-    _uA(
-        "darkorange",
-        "#ff8c00"
-    ),
-    _uA(
-        "darkorchid",
-        "#9932cc"
-    ),
-    _uA(
-        "darkred",
-        "#8b0000"
-    ),
-    _uA(
-        "darksalmon",
-        "#e9967a"
-    ),
-    _uA(
-        "darkseagreen",
-        "#8fbc8f"
-    ),
-    _uA(
-        "darkslateblue",
-        "#483d8b"
-    ),
-    _uA(
-        "darkslategray",
-        "#2f4f4f"
-    ),
-    _uA(
-        "darkslategrey",
-        "#2f4f4f"
-    ),
-    _uA(
-        "darkturquoise",
-        "#00ced1"
-    ),
-    _uA(
-        "darkviolet",
-        "#9400d3"
-    ),
-    _uA(
-        "deeppink",
-        "#ff1493"
-    ),
-    _uA(
-        "deepskyblue",
-        "#00bfff"
-    ),
-    _uA(
-        "dimgray",
-        "#696969"
-    ),
-    _uA(
-        "dimgrey",
-        "#696969"
-    ),
-    _uA(
-        "dodgerblue",
-        "#1e90ff"
-    ),
-    _uA(
-        "firebrick",
-        "#b22222"
-    ),
-    _uA(
-        "floralwhite",
-        "#fffaf0"
-    ),
-    _uA(
-        "forestgreen",
-        "#228b22"
-    ),
-    _uA(
-        "fuchsia",
-        "#ff00ff"
-    ),
-    _uA(
-        "gainsboro",
-        "#dcdcdc"
-    ),
-    _uA(
-        "ghostwhite",
-        "#f8f8ff"
-    ),
-    _uA(
-        "goldenrod",
-        "#daa520"
-    ),
-    _uA(
-        "gold",
-        "#ffd700"
-    ),
-    _uA(
-        "gray",
-        "#808080"
-    ),
-    _uA(
-        "green",
-        "#008000"
-    ),
-    _uA(
-        "greenyellow",
-        "#adff2f"
-    ),
-    _uA(
-        "grey",
-        "#808080"
-    ),
-    _uA(
-        "honeydew",
-        "#f0fff0"
-    ),
-    _uA(
-        "hotpink",
-        "#ff69b4"
-    ),
-    _uA(
-        "indianred",
-        "#cd5c5c"
-    ),
-    _uA(
-        "indigo",
-        "#4b0082"
-    ),
-    _uA(
-        "ivory",
-        "#fffff0"
-    ),
-    _uA(
-        "khaki",
-        "#f0e68c"
-    ),
-    _uA(
-        "lavenderblush",
-        "#fff0f5"
-    ),
-    _uA(
-        "lavender",
-        "#e6e6fa"
-    ),
-    _uA(
-        "lawngreen",
-        "#7cfc00"
-    ),
-    _uA(
-        "lemonchiffon",
-        "#fffacd"
-    ),
-    _uA(
-        "lightblue",
-        "#add8e6"
-    ),
-    _uA(
-        "lightcoral",
-        "#f08080"
-    ),
-    _uA(
-        "lightcyan",
-        "#e0ffff"
-    ),
-    _uA(
-        "lightgoldenrodyellow",
-        "#fafad2"
-    ),
-    _uA(
-        "lightgray",
-        "#d3d3d3"
-    ),
-    _uA(
-        "lightgreen",
-        "#90ee90"
-    ),
-    _uA(
-        "lightgrey",
-        "#d3d3d3"
-    ),
-    _uA(
-        "lightpink",
-        "#ffb6c1"
-    ),
-    _uA(
-        "lightsalmon",
-        "#ffa07a"
-    ),
-    _uA(
-        "lightseagreen",
-        "#20b2aa"
-    ),
-    _uA(
-        "lightskyblue",
-        "#87cefa"
-    ),
-    _uA(
-        "lightslategray",
-        "#778899"
-    ),
-    _uA(
-        "lightslategrey",
-        "#778899"
-    ),
-    _uA(
-        "lightsteelblue",
-        "#b0c4de"
-    ),
-    _uA(
-        "lightyellow",
-        "#ffffe0"
-    ),
-    _uA(
-        "lime",
-        "#00ff00"
-    ),
-    _uA(
-        "limegreen",
-        "#32cd32"
-    ),
-    _uA(
-        "linen",
-        "#faf0e6"
-    ),
-    _uA(
-        "magenta",
-        "#ff00ff"
-    ),
-    _uA(
-        "maroon",
-        "#800000"
-    ),
-    _uA(
-        "mediumaquamarine",
-        "#66cdaa"
-    ),
-    _uA(
-        "mediumblue",
-        "#0000cd"
-    ),
-    _uA(
-        "mediumorchid",
-        "#ba55d3"
-    ),
-    _uA(
-        "mediumpurple",
-        "#9370db"
-    ),
-    _uA(
-        "mediumseagreen",
-        "#3cb371"
-    ),
-    _uA(
-        "mediumslateblue",
-        "#7b68ee"
-    ),
-    _uA(
-        "mediumspringgreen",
-        "#00fa9a"
-    ),
-    _uA(
-        "mediumturquoise",
-        "#48d1cc"
-    ),
-    _uA(
-        "mediumvioletred",
-        "#c71585"
-    ),
-    _uA(
-        "midnightblue",
-        "#191970"
-    ),
-    _uA(
-        "mintcream",
-        "#f5fffa"
-    ),
-    _uA(
-        "mistyrose",
-        "#ffe4e1"
-    ),
-    _uA(
-        "moccasin",
-        "#ffe4b5"
-    ),
-    _uA(
-        "navajowhite",
-        "#ffdead"
-    ),
-    _uA(
-        "navy",
-        "#000080"
-    ),
-    _uA(
-        "oldlace",
-        "#fdf5e6"
-    ),
-    _uA(
-        "olive",
-        "#808000"
-    ),
-    _uA(
-        "olivedrab",
-        "#6b8e23"
-    ),
-    _uA(
-        "orange",
-        "#ffa500"
-    ),
-    _uA(
-        "orangered",
-        "#ff4500"
-    ),
-    _uA(
-        "orchid",
-        "#da70d6"
-    ),
-    _uA(
-        "palegoldenrod",
-        "#eee8aa"
-    ),
-    _uA(
-        "palegreen",
-        "#98fb98"
-    ),
-    _uA(
-        "paleturquoise",
-        "#afeeee"
-    ),
-    _uA(
-        "palevioletred",
-        "#db7093"
-    ),
-    _uA(
-        "papayawhip",
-        "#ffefd5"
-    ),
-    _uA(
-        "peachpuff",
-        "#ffdab9"
-    ),
-    _uA(
-        "peru",
-        "#cd853f"
-    ),
-    _uA(
-        "pink",
-        "#ffc0cb"
-    ),
-    _uA(
-        "plum",
-        "#dda0dd"
-    ),
-    _uA(
-        "powderblue",
-        "#b0e0e6"
-    ),
-    _uA(
-        "purple",
-        "#800080"
-    ),
-    _uA(
-        "rebeccapurple",
-        "#663399"
-    ),
-    _uA(
-        "red",
-        "#ff0000"
-    ),
-    _uA(
-        "rosybrown",
-        "#bc8f8f"
-    ),
-    _uA(
-        "royalblue",
-        "#4169e1"
-    ),
-    _uA(
-        "saddlebrown",
-        "#8b4513"
-    ),
-    _uA(
-        "salmon",
-        "#fa8072"
-    ),
-    _uA(
-        "sandybrown",
-        "#f4a460"
-    ),
-    _uA(
-        "seagreen",
-        "#2e8b57"
-    ),
-    _uA(
-        "seashell",
-        "#fff5ee"
-    ),
-    _uA(
-        "sienna",
-        "#a0522d"
-    ),
-    _uA(
-        "silver",
-        "#c0c0c0"
-    ),
-    _uA(
-        "skyblue",
-        "#87ceeb"
-    ),
-    _uA(
-        "slateblue",
-        "#6a5acd"
-    ),
-    _uA(
-        "slategray",
-        "#708090"
-    ),
-    _uA(
-        "slategrey",
-        "#708090"
-    ),
-    _uA(
-        "snow",
-        "#fffafa"
-    ),
-    _uA(
-        "springgreen",
-        "#00ff7f"
-    ),
-    _uA(
-        "steelblue",
-        "#4682b4"
-    ),
-    _uA(
-        "tan",
-        "#d2b48c"
-    ),
-    _uA(
-        "teal",
-        "#008080"
-    ),
-    _uA(
-        "thistle",
-        "#d8bfd8"
-    ),
-    _uA(
-        "tomato",
-        "#ff6347"
-    ),
-    _uA(
-        "turquoise",
-        "#40e0d0"
-    ),
-    _uA(
-        "violet",
-        "#ee82ee"
-    ),
-    _uA(
-        "wheat",
-        "#f5deb3"
-    ),
-    _uA(
-        "white",
-        "#ffffff"
-    ),
-    _uA(
-        "whitesmoke",
-        "#f5f5f5"
-    ),
-    _uA(
-        "yellow",
-        "#ffff00"
-    ),
-    _uA(
-        "yellowgreen",
-        "#9acd32"
-    )
-))
-open class ColorMatchers (
-    @JsonNotNull
-    open var CSS_UNIT: UTSRegExp,
-    @JsonNotNull
-    open var rgb: UTSRegExp,
-    @JsonNotNull
-    open var rgba: UTSRegExp,
-    @JsonNotNull
-    open var hsl: UTSRegExp,
-    @JsonNotNull
-    open var hsla: UTSRegExp,
-    @JsonNotNull
-    open var hsv: UTSRegExp,
-    @JsonNotNull
-    open var hsva: UTSRegExp,
-    @JsonNotNull
-    open var hsb: UTSRegExp,
-    @JsonNotNull
-    open var hsba: UTSRegExp,
-    @JsonNotNull
-    open var hex3: UTSRegExp,
-    @JsonNotNull
-    open var hex6: UTSRegExp,
-    @JsonNotNull
-    open var hex4: UTSRegExp,
-    @JsonNotNull
-    open var hex8: UTSRegExp,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ColorMatchers", "uni_modules/lime-color/common/format-input.uts", 6, 6)
-    }
-}
-val CSS_INTEGER = "[-\\+]?\\d+%?"
-val CSS_NUMBER = "[-\\+]?\\d*\\.\\d+%?"
-val CSS_UNIT = "(?:" + CSS_NUMBER + ")|(?:" + CSS_INTEGER + ")"
-val PERMISSIVE_MATCH3 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?"
-val PERMISSIVE_MATCH4 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?"
-val matchers = ColorMatchers(CSS_UNIT = UTSRegExp(CSS_UNIT), rgb = UTSRegExp("rgb" + PERMISSIVE_MATCH3), rgba = UTSRegExp("rgba" + PERMISSIVE_MATCH4), hsl = UTSRegExp("hsl" + PERMISSIVE_MATCH3), hsla = UTSRegExp("hsla" + PERMISSIVE_MATCH4), hsv = UTSRegExp("hsv" + PERMISSIVE_MATCH3), hsva = UTSRegExp("hsva" + PERMISSIVE_MATCH4), hsb = UTSRegExp("hsb" + PERMISSIVE_MATCH3), hsba = UTSRegExp("hsba" + PERMISSIVE_MATCH4), hex3 = UTSRegExp("^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})\$", ""), hex6 = UTSRegExp("^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})\$", ""), hex4 = UTSRegExp("^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})\$", ""), hex8 = UTSRegExp("^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})\$", ""))
-fun isValidCSSUnit(color: String): Boolean {
-    return isValidCSSUnit(color as Any?)
-}
-fun isValidCSSUnit(color: Number): Boolean {
-    return isValidCSSUnit(color as Any?)
-}
-fun isValidCSSUnit(color: Any?): Boolean {
-    return toBoolean(matchers.CSS_UNIT.exec("" + color))
-}
-fun inputToRGB(color: String): LColorInfo {
-    return inputToRGB(color as Any)
-}
-fun inputToRGB(color: RGB): LColorInfo {
-    return inputToRGB(color as Any)
-}
-fun inputToRGB(color: RGBA): LColorInfo {
-    return inputToRGB(color as Any)
-}
-fun inputToRGB(color: HSL): LColorInfo {
-    return inputToRGB(color as Any)
-}
-fun inputToRGB(color: HSLA): LColorInfo {
-    return inputToRGB(color as Any)
-}
-fun inputToRGB(color: HSV): LColorInfo {
-    return inputToRGB(color as Any)
-}
-fun inputToRGB(color: HSVA): LColorInfo {
-    return inputToRGB(color as Any)
-}
-fun inputToRGB(color: HSB): LColorInfo {
-    return inputToRGB(color as Any)
-}
-fun inputToRGB(color: HSBA): LColorInfo {
-    return inputToRGB(color as Any)
-}
-fun inputToRGB(color: Any): LColorInfo {
-    var _color: UTSJSONObject? = null
-    var rgb = RGB(r = 0, g = 0, b = 0)
-    var a: Any = 1
-    var s: Any?
-    var v: Any?
-    var l: Any?
-    var ok = false
-    var format: LColorFormats? = null
-    if (UTSAndroid.`typeof`(color) == "string") {
-        _color = stringInputToObject(color as String)
-    } else if (UTSAndroid.`typeof`(color) == "object") {
-        _color = UTSAndroid.consoleDebugError(JSON.parse<UTSJSONObject>(JSON.stringify(color)), " at uni_modules/lime-color/common/format-input.uts:101") as UTSJSONObject
-    }
-    if (_color != null) {
-        if (isValidCSSUnit(_color["r"]) && isValidCSSUnit(_color["g"]) && isValidCSSUnit(_color["b"])) {
-            rgb = rgbToRgb(_color["r"]!!, _color["g"]!!, _color["b"]!!)
-            ok = true
-            format = if (("" + _color["r"]).endsWith("%")) {
-                "prgb"
-            } else {
-                "rgb"
-            }
-        } else if (isValidCSSUnit(_color["h"]) && isValidCSSUnit(_color["s"]) && (isValidCSSUnit(_color["v"]) || isValidCSSUnit(_color["b"]))) {
-            val isHSV = _color["v"] != null
-            s = convertToPercentage(_color["s"]!!)
-            v = if (isHSV) {
-                convertToPercentage(_color["v"]!!)
-            } else {
-                convertToPercentage(_color["b"]!!)
-            }
-            rgb = hsvToRgb(_color["h"]!!, s, v)
-            ok = true
-            format = if (isHSV) {
-                "hsv"
-            } else {
-                "hsb"
-            }
-        } else if (isValidCSSUnit(_color["h"]) && isValidCSSUnit(_color["s"]) && isValidCSSUnit(_color["l"])) {
-            s = convertToPercentage(_color["s"]!!)
-            l = convertToPercentage(_color["l"]!!)
-            rgb = hslToRgb(_color["h"]!!, s, l)
-            ok = true
-            format = "hsl"
-        }
-        if (_color["a"] != null) {
-            a = _color["a"]!!
-        }
-    }
-    a = boundAlpha(a)
-    return LColorInfo(ok = ok, format = _color?.get("format") as String? ?: format, r = Math.min(255, Math.max(rgb.r, 0)), g = Math.min(255, Math.max(rgb.g, 0)), b = Math.min(255, Math.max(rgb.b, 0)), a = a)
-}
-fun stringInputToObject(color: String): UTSJSONObject? {
-    var _color = color.trim().toLowerCase()
-    if (_color.length == 0) {
-        return null
-    }
-    var named = false
-    if (names.get(_color) != null) {
-        _color = names.get(_color)!!
-        named = true
-    } else if (_color == "transparent") {
-        return _uO("r" to 0, "g" to 0, "b" to 0, "a" to 0, "format" to "name")
-    }
-    var match = matchers.rgb.exec(_color)
-    if (match != null) {
-        val r = match[1]
-        val g = match[2]
-        val b = match[3]
-        return _uO("r" to r, "g" to g, "b" to b)
-    }
-    match = matchers.rgba.exec(_color)
-    if (match != null) {
-        val r = match[1]
-        val g = match[2]
-        val b = match[3]
-        val a = match[4]
-        return _uO("r" to r, "g" to g, "b" to b, "a" to a)
-    }
-    match = matchers.hsl.exec(_color)
-    if (match != null) {
-        val h = match[1]
-        val s = match[2]
-        val l = match[3]
-        return _uO("h" to h, "s" to s, "l" to l)
-    }
-    match = matchers.hsla.exec(_color)
-    if (match != null) {
-        val h = match[1]
-        val s = match[2]
-        val l = match[3]
-        val a = match[4]
-        return _uO("h" to h, "s" to s, "l" to l, "a" to a)
-    }
-    match = matchers.hsv.exec(_color)
-    if (match != null) {
-        val h = match[1]
-        val s = match[2]
-        val v = match[3]
-        return _uO("h" to h, "s" to s, "v" to v)
-    }
-    match = matchers.hsva.exec(_color)
-    if (match != null) {
-        val h = match[1]
-        val s = match[2]
-        val v = match[3]
-        val a = match[4]
-        return _uO("h" to h, "s" to s, "v" to v, "a" to a)
-    }
-    match = matchers.hex8.exec(_color)
-    if (match != null) {
-        val r = parseIntFromHex(match[1]!!)
-        val g = parseIntFromHex(match[2]!!)
-        val b = parseIntFromHex(match[3]!!)
-        val a = convertHexToDecimal(match[4]!!)
-        return _uO("r" to r, "g" to g, "b" to b, "a" to a, "format" to if (named) {
-            "name"
-        } else {
-            "hex8"
-        }
-        )
-    }
-    match = matchers.hex6.exec(_color)
-    if (match != null) {
-        val r = parseIntFromHex(match[1]!!)
-        val g = parseIntFromHex(match[2]!!)
-        val b = parseIntFromHex(match[3]!!)
-        return _uO("r" to r, "g" to g, "b" to b, "format" to if (named) {
-            "name"
-        } else {
-            "hex"
-        }
-        )
-    }
-    match = matchers.hex4.exec(_color)
-    if (match != null) {
-        val r = parseIntFromHex((match[1] + match[1]))
-        val g = parseIntFromHex((match[2] + match[2]))
-        val b = parseIntFromHex((match[3] + match[3]))
-        val a = convertHexToDecimal((match[4] + match[4]))
-        return _uO("r" to r, "g" to g, "b" to b, "a" to a, "format" to if (named) {
-            "name"
-        } else {
-            "hex8"
-        }
-        )
-    }
-    match = matchers.hex3.exec(_color)
-    if (match != null) {
-        val r = parseIntFromHex((match[1] + match[1]))
-        val g = parseIntFromHex((match[2] + match[2]))
-        val b = parseIntFromHex((match[3] + match[3]))
-        return _uO("r" to r, "g" to g, "b" to b, "format" to if (named) {
-            "name"
-        } else {
-            "hex"
-        }
-        )
-    }
-    return null
-}
-open class TinyColor : IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TinyColor", "uni_modules/lime-color/common/color.uts", 7, 14)
-    }
-    open lateinit var r: Number
-    open lateinit var g: Number
-    open lateinit var b: Number
-    open lateinit var a: Number
-    open var format: LColorFormats? = null
-    open lateinit var originalInput: LColorInput
-    open var isValid: Boolean by Delegates.notNull()
-    open var gradientType: String? = null
-    open lateinit var roundA: Number
-    open lateinit var reversedNames: Map<String, String>
-    constructor(color: LColorInput = "", opts: LColorOptions = LColorOptions()){
-        var _color: Any = color
-        if (isNumber__1(color)) {
-            _color = numberInputToObject(color as Number)
-        }
-        this.originalInput = _color
-        val rgb = inputToRGB(_color)
-        this.r = rgb.r
-        this.g = rgb.g
-        this.b = rgb.b
-        this.a = rgb.a
-        this.roundA = Math.round(100 * this.a) / 100
-        this.format = opts.format ?: rgb.format
-        this.gradientType = opts.gradientType
-        if (this.r < 1) {
-            this.r = Math.round(this.r)
-        }
-        if (this.g < 1) {
-            this.g = Math.round(this.g)
-        }
-        if (this.b < 1) {
-            this.b = Math.round(this.b)
-        }
-        this.isValid = rgb.ok ?: false
-        this.reversedNames = Map<String, String>()
-        names.forEach(fun(value: String, key: String){
-            this.reversedNames.set(value, key)
-        }
-        )
-    }
-    open fun isDark(): Boolean {
-        return this.getBrightness() < 128
-    }
-    open fun isLight(): Boolean {
-        return !this.isDark()
-    }
-    open fun getBrightness(): Number {
-        val rgb = this.toRgb()
-        return (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000
-    }
-    open fun getLuminance(): Number {
-        val rgb = this.toRgb()
-        var R: Number
-        var G: Number
-        var B: Number
-        val RsRGB: Number = rgb.r / 255
-        val GsRGB: Number = rgb.g / 255
-        val BsRGB: Number = rgb.b / 255
-        if (RsRGB <= 0.03928) {
-            R = RsRGB / 12.92
-        } else {
-            R = Math.pow((RsRGB + 0.055) / 1.055, 2.4)
-        }
-        if (GsRGB <= 0.03928) {
-            G = GsRGB / 12.92
-        } else {
-            G = Math.pow((GsRGB + 0.055) / 1.055, 2.4)
-        }
-        if (BsRGB <= 0.03928) {
-            B = BsRGB / 12.92
-        } else {
-            B = Math.pow((BsRGB + 0.055) / 1.055, 2.4)
-        }
-        return 0.2126 * R + 0.7152 * G + 0.0722 * B
-    }
-    open fun getAlpha(): Number {
-        return this.a
-    }
-    open fun setAlpha(alpha: String?): TinyColor {
-        return this.setAlpha(alpha as Any)
-    }
-    open fun setAlpha(alpha: Number?): TinyColor {
-        return this.setAlpha(alpha as Any)
-    }
-    open fun setAlpha(alpha: Any?): TinyColor {
-        this.a = boundAlpha(alpha)
-        this.roundA = Math.round(100 * this.a) / 100
-        return this
-    }
-    open fun isMonochrome(): Boolean {
-        val s = this.toHsl().s
-        return s == 0
-    }
-    open fun toHsv(): HSVA {
-        val hsv = rgbToHsv(this.r, this.g, this.b)
-        return HSVA(h = Math.round(hsv.h * 360), s = hsv.s, v = hsv.v, a = this.a)
-    }
-    open fun toHsvString(): String {
-        val hsv = rgbToHsv(this.r, this.g, this.b)
-        val h = Math.round(hsv.h * 360)
-        val s = Math.round(hsv.s * 100)
-        val v = Math.round(hsv.v * 100)
-        return if (this.a == 1) {
-            "hsv(" + h + ", " + s + "%, " + v + "%)"
-        } else {
-            "hsva(" + h + ", " + s + "%, " + v + "%, " + this.roundA + ")"
-        }
-    }
-    open fun toHsb(): HSBA {
-        val hsv = rgbToHsv(this.r, this.g, this.b)
-        return HSBA(h = Math.round(hsv.h * 360), s = hsv.s, b = hsv.v, a = this.a)
-    }
-    open fun toHsbString(): String {
-        val hsb = this.toHsb()
-        val h = Math.round(hsb.h)
-        val s = Math.round(hsb.s * 100)
-        val b = Math.round(hsb.b * 100)
-        return if (this.a == 1) {
-            "hsb(" + h + ", " + s + "%, " + b + "%)"
-        } else {
-            "hsba(" + h + ", " + s + "%, " + b + "%, " + this.roundA + ")"
-        }
-    }
-    open fun toHsl(): HSLA {
-        val hsl = rgbToHsl(this.r, this.g, this.b)
-        return HSLA(h = hsl.h * 360, s = hsl.s, l = hsl.l, a = this.a)
-    }
-    open fun toHslString(): String {
-        val hsl = rgbToHsl(this.r, this.g, this.b)
-        val h = Math.round(hsl.h * 360)
-        val s = Math.round(hsl.s * 100)
-        val l = Math.round(hsl.l * 100)
-        return if (this.a == 1) {
-            "hsl(" + h + ", " + s + "%, " + l + "%)"
-        } else {
-            "hsla(" + h + ", " + s + "%, " + l + "%, " + this.roundA + ")"
-        }
-    }
-    open fun toHex(allow3Char: Boolean = false): String {
-        return rgbToHex(this.r, this.g, this.b, allow3Char)
-    }
-    open fun toHexString(allow3Char: Boolean = false): String {
-        return "#" + this.toHex(allow3Char)
-    }
-    open fun toHex8(allow4Char: Boolean = false): String {
-        return rgbaToHex(this.r, this.g, this.b, this.a, allow4Char)
-    }
-    open fun toHex8String(allow4Char: Boolean = false): String {
-        return "#" + this.toHex8(allow4Char)
-    }
-    open fun toHexShortString(allowShortChar: Boolean = false): String {
-        return if (this.a == 1) {
-            this.toHexString(allowShortChar)
-        } else {
-            this.toHex8String(allowShortChar)
-        }
-    }
-    open fun toRgb(): RGBA {
-        return RGBA(r = Math.round(this.r), g = Math.round(this.g), b = Math.round(this.b), a = this.a)
-    }
-    open fun toRgbString(): String {
-        val r = Math.round(this.r)
-        val g = Math.round(this.g)
-        val b = Math.round(this.b)
-        return if (this.a == 1) {
-            "rgb(" + r + ", " + g + ", " + b + ")"
-        } else {
-            "rgba(" + r + ", " + g + ", " + b + ", " + this.roundA + ")"
-        }
-    }
-    open fun toPercentageRgb(): RGBAString {
-        val fmt = fun(x: Number): String {
-            return "" + Math.round(bound01(x, 255) * 100) + "%"
-        }
-        return RGBAString(r = fmt(this.r), g = fmt(this.g), b = fmt(this.b), a = this.a)
-    }
-    open fun toPercentageRgbString(): String {
-        val rnd = fun(x: Number): Number {
-            return Math.round(bound01(x, 255) * 100)
-        }
-        return if (this.a == 1) {
-            "rgb(" + rnd(this.r) + "%, " + rnd(this.g) + "%, " + rnd(this.b) + "%)"
-        } else {
-            "rgba(" + rnd(this.r) + "%, " + rnd(this.g) + "%, " + rnd(this.b) + "%, " + this.roundA + ")"
-        }
-    }
-    open fun toName(): String? {
-        if (this.a == 0) {
-            return "transparent"
-        }
-        if (this.a < 1) {
-            return null
-        }
-        val hex = this.toHexString()
-        return this.reversedNames.get(hex)
-    }
-    override fun toString(): String {
-        return this.toString(null)
-    }
-    open fun toString(format: LColorFormats?): String {
-        val formatSet = toBoolean(format)
-        var _format = format ?: this.format
-        var formattedString: String? = null
-        val hasAlpha = this.a < 1 && this.a >= 0
-        val needsAlphaFormat = !formatSet && hasAlpha && (_format != null && _format.startsWith("hex") || _format == "name")
-        if (needsAlphaFormat) {
-            if (_format == "name" && this.a == 0) {
-                return this.toName() ?: "transparent"
-            }
-            return this.toRgbString()
-        }
-        if (_format == "rgb") {
-            formattedString = this.toRgbString()
-        }
-        if (_format == "prgb") {
-            formattedString = this.toPercentageRgbString()
-        }
-        if (_format == "hex" || _format == "hex6") {
-            formattedString = this.toHexString()
-        }
-        if (_format == "hex3") {
-            formattedString = this.toHexString(true)
-        }
-        if (_format == "hex4") {
-            formattedString = this.toHex8String(true)
-        }
-        if (_format == "hex8") {
-            formattedString = this.toHex8String()
-        }
-        if (_format == "name") {
-            formattedString = this.toName()
-        }
-        if (_format == "hsl") {
-            formattedString = this.toHslString()
-        }
-        if (_format == "hsv") {
-            formattedString = this.toHsvString()
-        }
-        if (_format == "hsb") {
-            formattedString = this.toHsbString()
-        }
-        return formattedString ?: this.toHexString()
-    }
-    open fun toNumber(): Number {
-        return (Math.round(this.r) shl 16) + (Math.round(this.g) shl 8) + Math.round(this.b)
-    }
-    open fun clone(): TinyColor {
-        return TinyColor(this.toString())
-    }
-    open fun lighten(amount: Number = 10): TinyColor {
-        val hsl = this.toHsl()
-        hsl.l += amount / 100
-        hsl.l = clamp01(hsl.l)
-        return TinyColor(hsl, LColorOptions(format = this.format))
-    }
-    open fun brighten(amount: Number = 10): TinyColor {
-        val rgb = this.toRgb()
-        rgb.r = Math.max(0, Math.min(255, rgb.r - Math.round(255 * -(amount / 100))))
-        rgb.g = Math.max(0, Math.min(255, rgb.g - Math.round(255 * -(amount / 100))))
-        rgb.b = Math.max(0, Math.min(255, rgb.b - Math.round(255 * -(amount / 100))))
-        return TinyColor(rgb, LColorOptions(format = this.format))
-    }
-    open fun darken(amount: Number = 10): TinyColor {
-        val hsl = this.toHsl()
-        hsl.l -= amount / 100
-        hsl.l = clamp01(hsl.l)
-        return TinyColor(hsl, LColorOptions(format = this.format))
-    }
-    open fun tint(amount: Number = 10): TinyColor {
-        return this.mix("white", amount)
-    }
-    open fun shade(amount: Number = 10): TinyColor {
-        return this.mix("black", amount)
-    }
-    open fun desaturate(amount: Number = 10): TinyColor {
-        val hsl = this.toHsl()
-        hsl.s -= amount / 100
-        hsl.s = clamp01(hsl.s)
-        return TinyColor(hsl, LColorOptions(format = this.format))
-    }
-    open fun saturate(amount: Number = 10): TinyColor {
-        val hsl = this.toHsl()
-        hsl.s += amount / 100
-        hsl.s = clamp01(hsl.s)
-        return TinyColor(hsl, LColorOptions(format = this.format))
-    }
-    open fun greyscale(): TinyColor {
-        return this.desaturate(100)
-    }
-    open fun spin(amount: Number): TinyColor {
-        val hsl = this.toHsl()
-        val hue = (hsl.h + amount) % 360
-        hsl.h = if (hue < 0) {
-            360 + hue
-        } else {
-            hue
-        }
-        return TinyColor(hsl, LColorOptions(format = this.format))
-    }
-    open fun mix(color: LColorInput, amount: Number = 50): TinyColor {
-        val rgb1 = this.toRgb()
-        val rgb2 = TinyColor(color).toRgb()
-        val p = amount / 100
-        val rgba: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("rgba", "uni_modules/lime-color/common/color.uts", 462, 15), "r" to ((rgb2.r - rgb1.r) * p + rgb1.r), "g" to ((rgb2.g - rgb1.g) * p + rgb1.g), "b" to ((rgb2.b - rgb1.b) * p + rgb1.b), "a" to ((rgb2.a - rgb1.a) * p + rgb1.a))
-        return TinyColor(rgba, LColorOptions(format = this.format))
-    }
-    open fun analogous(results: Number = 6, slices: Number = 30): UTSArray<TinyColor> {
-        val hsl = this.toHsl()
-        val part = (360 as Number) / slices
-        val ret = _uA(
-            this
-        ) as UTSArray<TinyColor>
-        var _results = results
-        hsl.h = (hsl.h - ((part * _results) shr 1) + 720) % 360
-        while(_results > 0){
-            hsl.h = (hsl.h + part) % 360
-            ret.push(TinyColor(hsl))
-            _results--
-        }
-        return ret
-    }
-    open fun complement(): TinyColor {
-        val hsl = this.toHsl()
-        hsl.h = (hsl.h + 180) % 360
-        return TinyColor(hsl, LColorOptions(format = this.format))
-    }
-    open fun monochromatic(results: Number = 6): UTSArray<TinyColor> {
-        val hsv = this.toHsv()
-        val h = hsv.h
-        val s = hsv.s
-        var v = hsv.v
-        val res: UTSArray<TinyColor> = _uA()
-        val modification = (1 as Number) / results
-        var _results = results
-        while(_results > 0){
-            res.push(TinyColor(_uO("h" to h, "s" to s, "v" to v)))
-            v = (v + modification) % 1
-            _results--
-        }
-        return res
-    }
-    open fun splitcomplement(): UTSArray<TinyColor> {
-        val hsl = this.toHsl()
-        val h = hsl.h
-        return _uA<TinyColor>(this, TinyColor(_uO("h" to ((h + 72) % 360), "s" to hsl.s, "l" to hsl.l)), TinyColor(_uO("h" to ((h + 216) % 360), "s" to hsl.s, "l" to hsl.l)))
-    }
-    open fun onBackground(background: LColorInput): TinyColor {
-        val fg = this.toRgb()
-        val bg = TinyColor(background).toRgb()
-        val alpha = fg.a + bg.a * (1 - fg.a)
-        return TinyColor(_uO("r" to ((fg.r * fg.a + bg.r * bg.a * (1 - fg.a)) / alpha), "g" to ((fg.g * fg.a + bg.g * bg.a * (1 - fg.a)) / alpha), "b" to ((fg.b * fg.a + bg.b * bg.a * (1 - fg.a)) / alpha), "a" to alpha))
-    }
-    open fun triad(): UTSArray<TinyColor> {
-        return this.polyad(3)
-    }
-    open fun tetrad(): UTSArray<TinyColor> {
-        return this.polyad(4)
-    }
-    open fun polyad(n: Number): UTSArray<TinyColor> {
-        val hsl = this.toHsl()
-        val h = hsl.h
-        val result = _uA(
-            this
-        ) as UTSArray<TinyColor>
-        val increment = (360 as Number) / n
-        run {
-            var i: Number = 1
-            while(i < n){
-                result.push(TinyColor(_uO("h" to ((h + i * increment) % 360), "s" to hsl.s, "l" to hsl.l)))
-                i++
-            }
-        }
-        return result
-    }
-    override fun equals(other: LColorInput?): Boolean {
-        if (other == null) {
-            return false
-        } else if (other is TinyColor) {
-            return this.toRgbString() == (other as TinyColor).toRgbString()
-        }
-        return this.toRgbString() == TinyColor(other).toRgbString()
-    }
-}
-fun tinyColor(color: LColorInput = "", opts: LColorOptions = LColorOptions()): TinyColor {
-    return TinyColor(color, opts)
-}
-typealias TickType = String
-typealias LoadingType = String
-open class UseLoadingReturn (
-    @JsonNotNull
-    open var ratio: Number,
-    @JsonNotNull
-    open var type: LoadingType,
-    @JsonNotNull
-    open var mode: String,
-    @JsonNotNull
-    open var color: String,
-    open var play: () -> Unit,
-    open var failed: () -> Unit,
-    open var clear: () -> Unit,
-    open var destroy: () -> Unit,
-    open var pause: () -> Unit,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UseLoadingReturn", "uni_modules/lime-loading/index.uts", 22, 13)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return UseLoadingReturnReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class UseLoadingReturnReactiveObject : UseLoadingReturn, IUTSReactive<UseLoadingReturn> {
-    override var __v_raw: UseLoadingReturn
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: UseLoadingReturn, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(ratio = __v_raw.ratio, type = __v_raw.type, mode = __v_raw.mode, color = __v_raw.color, play = __v_raw.play, failed = __v_raw.failed, clear = __v_raw.clear, destroy = __v_raw.destroy, pause = __v_raw.pause) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UseLoadingReturnReactiveObject {
-        return UseLoadingReturnReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var ratio: Number
-        get() {
-            return _tRG(__v_raw, "ratio", __v_raw.ratio, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("ratio")) {
-                return
-            }
-            val oldValue = __v_raw.ratio
-            __v_raw.ratio = value
-            _tRS(__v_raw, "ratio", oldValue, value)
-        }
-    override var type: LoadingType
-        get() {
-            return _tRG(__v_raw, "type", __v_raw.type, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("type")) {
-                return
-            }
-            val oldValue = __v_raw.type
-            __v_raw.type = value
-            _tRS(__v_raw, "type", oldValue, value)
-        }
-    override var mode: String
-        get() {
-            return _tRG(__v_raw, "mode", __v_raw.mode, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("mode")) {
-                return
-            }
-            val oldValue = __v_raw.mode
-            __v_raw.mode = value
-            _tRS(__v_raw, "mode", oldValue, value)
-        }
-    override var color: String
-        get() {
-            return _tRG(__v_raw, "color", __v_raw.color, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("color")) {
-                return
-            }
-            val oldValue = __v_raw.color
-            __v_raw.color = value
-            _tRS(__v_raw, "color", oldValue, value)
-        }
-}
-fun getPointOnCircle(centerX: Number, centerY: Number, radius: Number, angleDegrees: Number): UTSArray<Number> {
-    val angleRadians = (angleDegrees * Math.PI) / 180
-    val x = centerX + radius * Math.cos(angleRadians)
-    val y = centerY + radius * Math.sin(angleRadians)
-    return _uA(
-        x,
-        y
-    )
-}
-fun useLoading(element: Ref<UniElement?>): UseLoadingReturn {
-    var isPlaying = false
-    var canvasWidth = ref(0)
-    var canvasHeight = ref(0)
-    var canvasSize = ref(0)
-    var animationFrameId: Number = -1
-    var animation: UniAnimation? = null
-    var drawFrame: (() -> Unit)? = null
-    val tick = ref<TickType>("pause")
-    val context = shallowRef<DrawableContext?>(null)
-    val state = reactive<UseLoadingReturn>(UseLoadingReturn(color = "#000", type = "circular", ratio = 1, mode = "raf", play = fun(){
-        tick.value = "play"
-    }
-    , failed = fun(){
-        tick.value = "failed"
-    }
-    , clear = fun(){
-        tick.value = "clear"
-    }
-    , destroy = fun(){
-        tick.value = "destroy"
-        cancelAnimationFrame(animationFrameId)
-        animation?.pause()
-        animation?.cancel()
-        context.value?.reset()
-        context.value?.update()
-        context.value = null
-        animation = null
-        isPlaying = false
-    }
-    , pause = fun(){
-        tick.value = "pause"
-    }
-    ))
-    val size = computed(fun(): Number {
-        return if (state.ratio > 1) {
-            state.ratio
-        } else {
-            canvasSize.value * state.ratio
-        }
-    }
-    )
-    val drawCircular = fun(){
-        var startAngle: Number = 0
-        var endAngle: Number = 0
-        var rotate: Number = 0
-        val MIN_ANGLE: Number = 5
-        val ARC_LENGTH: Number = 359.5
-        val PI = Math.PI / 180
-        val SPEED: Number = 0.0045
-        val ROTATE_INTERVAL: Number = 0.0225
-        val lineWidth = size.value / 10
-        val x = canvasWidth.value / 2
-        val y = canvasHeight.value / 2
-        val radius = size.value / 2 - lineWidth
-        try {
-            drawFrame = fun(){
-                if (context.value == null || !isPlaying) {
-                    return
-                }
-                var ctx = context.value!!
-                ctx.reset()
-                ctx.beginPath()
-                ctx.arc(x, y, radius, startAngle * PI + rotate, endAngle * PI + rotate)
-                ctx.lineWidth = lineWidth
-                ctx.strokeStyle = state.color
-                ctx.stroke()
-                if (endAngle < ARC_LENGTH) {
-                    endAngle = Math.min(ARC_LENGTH, endAngle + (ARC_LENGTH - MIN_ANGLE) * SPEED)
-                } else if (startAngle < ARC_LENGTH) {
-                    startAngle = Math.min(ARC_LENGTH, startAngle + (ARC_LENGTH - MIN_ANGLE) * SPEED)
-                } else {
-                    startAngle = 0
-                    endAngle = MIN_ANGLE
-                }
-                ctx.update()
-                if (state.mode == "raf") {
-                    rotate = (rotate + ROTATE_INTERVAL) % 360
-                    if (isPlaying && drawFrame != null) {
-                        animationFrameId = requestAnimationFrame(drawFrame!!)
-                    }
-                }
-            }
-        }
-         catch (err: Throwable) {}
-    }
-    var lastTime = Date.now()
-    val drawSpinner = fun(){
-        val steps: Number = 12
-        val lineWidth = size.value / 10
-        val x = canvasWidth.value / 2
-        val y = canvasHeight.value / 2
-        var step: Number = 0
-        val length = size.value / 3.6 - lineWidth
-        val offset = size.value / 4
-        fun generateColorGradient(hex: String, steps: Number): UTSArray<String> {
-            val colors: UTSArray<String> = _uA()
-            val _color = tinyColor(hex)
-            run {
-                var i: Number = 1
-                while(i <= steps){
-                    _color.setAlpha(i / steps)
-                    colors.push(_color.toRgbString())
-                    i++
-                }
-            }
-            return colors
-        }
-        var colors = computed(fun(): UTSArray<String> {
-            return generateColorGradient(state.color, steps)
-        }
-        )
-        drawFrame = fun(){
-            if (context.value == null || !isPlaying) {
-                return
-            }
-            val delta = Date.now() - lastTime
-            if (delta >= 100) {
-                lastTime = Date.now()
-                var ctx = context.value!!
-                ctx.reset()
-                run {
-                    var i: Number = 0
-                    while(i < steps){
-                        val stepAngle = (360 as Number) / steps
-                        val angle = stepAngle * i
-                        val index = (steps + i - step) % steps
-                        val radian = angle * Math.PI / 180
-                        val cos = Math.cos(radian)
-                        val sin = Math.sin(radian)
-                        ctx.beginPath()
-                        ctx.moveTo(x + offset * cos, y + offset * sin)
-                        ctx.lineTo(x + (offset + length) * cos, y + (offset + length) * sin)
-                        ctx.lineWidth = lineWidth
-                        ctx.lineCap = "round"
-                        ctx.strokeStyle = colors.value[index]
-                        ctx.stroke()
-                        i++
-                    }
-                }
-                ctx.update()
-                if (state.mode == "raf") {
-                    step = (step + 1) % steps
-                }
-            }
-            if (state.mode == "raf") {
-                if (isPlaying && drawFrame != null) {
-                    animationFrameId = requestAnimationFrame(drawFrame!!)
-                }
-            }
-        }
-    }
-    val drwaFailed = fun(){
-        if (context.value == null) {
-            return
-        }
-        var ctx = context.value!!
-        val innerSize = size.value * 0.8
-        val lineWidth = innerSize / 10
-        val lineLength = (size.value - lineWidth) / 2
-        val centerX = canvasWidth.value / 2
-        val centerY = canvasHeight.value / 2
-        val radius = (size.value - lineWidth) / 2
-        val angleRadians1 = 45 * Math.PI / 180
-        val angleRadians2 = -45 * Math.PI / 180
-        ctx.reset()
-        ctx.lineWidth = lineWidth
-        ctx.strokeStyle = state.color
-        ctx.beginPath()
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
-        ctx.lineWidth = lineWidth
-        ctx.strokeStyle = state.color
-        ctx.stroke()
-        val _getPointOnCircle = getPointOnCircle(centerX, centerY, lineLength / 2, 225)
-        val startX1 = _getPointOnCircle[0]
-        val startY = _getPointOnCircle[1]
-        val _getPointOnCircle__1 = getPointOnCircle(centerX, centerY, lineLength / 2, 315)
-        val startX2 = _getPointOnCircle__1[0]
-        val x2 = Math.sin(angleRadians1) * lineLength + startX1
-        val y2 = Math.cos(angleRadians1) * lineLength + startY
-        ctx.beginPath()
-        ctx.moveTo(startX1, startY)
-        ctx.lineTo(x2, y2)
-        ctx.stroke()
-        val x3 = Math.sin(angleRadians2) * lineLength + startX2
-        val y3 = Math.cos(angleRadians2) * lineLength + startY
-        ctx.beginPath()
-        ctx.moveTo(startX2, startY)
-        ctx.lineTo(x3, y3)
-        ctx.stroke()
-        ctx.update()
-    }
-    var currentType: LoadingType? = null
-    val useMode = fun(){
-        if (state.mode != "raf") {
-            val keyframes = _uA<UTSJSONObject>(_uO("transform" to "rotate(0)"), _uO("transform" to "rotate(360)"))
-            animation = element.value!!.animate(keyframes, UniAnimationOption(duration = 80000, easing = "linear", iterations = Infinity))
-        }
-    }
-    val startAnimation = fun(type: String){
-        if (context.value == null || element.value == null) {
-            return
-        }
-        animation?.pause()
-        if (currentType == type) {
-            isPlaying = true
-            animation?.play()
-            drawFrame?.invoke()
-            return
-        }
-        if (type == "circular") {
-            currentType = "circular"
-            drawCircular()
-            useMode()
-        }
-        if (type == "spinner") {
-            currentType = "spinner"
-            drawSpinner()
-            useMode()
-        }
-        isPlaying = true
-        drawFrame?.invoke()
-    }
-    var manualCheckTimer: Number? = null
-    val getBoundingClientRect = fun(){
-        if (manualCheckTimer != null) {
-            clearTimeout(manualCheckTimer!!)
-        }
-        requestAnimationFrame(fun(_timestamp){
-            element.value?.getBoundingClientRectAsync()?.then(fun(rect){
-                if (rect.width == 0 || rect.height == 0) {
-                    return
-                }
-                context.value = element.value!!.getDrawableContext() as DrawableContext
-                canvasWidth.value = rect.width
-                canvasHeight.value = rect.height
-                canvasSize.value = Math.min(rect.width, rect.height)
-            }
-            )
-        }
-        )
-    }
-    val resizeObserver: UniResizeObserver = UniResizeObserver(fun(_entries: UTSArray<UniResizeObserverEntry>){
-        getBoundingClientRect()
-    }
-    )
-    watchEffect(fun(){
-        if (element.value == null) {
-            return
-        }
-        resizeObserver.observe(element.value!!)
-    }
-    )
-    watchEffect(fun(){
-        if (context.value == null) {
-            return
-        }
-        if (tick.value == "play") {
-            animation?.pause()
-            isPlaying = false
-            cancelAnimationFrame(animationFrameId)
-            startAnimation(state.type)
-        }
-        if (tick.value == "failed") {
-            cancelAnimationFrame(animationFrameId)
-            animation?.pause()
-            animation?.cancel()
-            drwaFailed()
-            return
-        }
-        if (tick.value == "clear") {
-            cancelAnimationFrame(animationFrameId)
-            animation?.pause()
-            animation?.cancel()
-            context.value?.reset()
-            context.value?.update()
-            isPlaying = false
-            return
-        }
-        if (tick.value == "destroy") {
-            cancelAnimationFrame(animationFrameId)
-            animation?.pause()
-            animation?.cancel()
-            context.value?.reset()
-            context.value?.update()
-            context.value = null
-            animation = null
-            isPlaying = false
-            return
-        }
-        if (tick.value == "pause") {
-            if (animation == null) {
-                startAnimation(state.type)
-            }
-            cancelAnimationFrame(animationFrameId)
-            isPlaying = false
-            animation?.pause()
-            return
-        }
-    }
-    )
-    watchEffect(fun(){
-        if (state.color == "") {
-            return
-        }
-    }
-    )
-    return state
-}
-val GenUniModulesLimePickerComponentsLPickerItemLPickerItemClass = CreateVueComponent(GenUniModulesLimePickerComponentsLPickerItemLPickerItem::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesLimePickerComponentsLPickerItemLPickerItem.inheritAttrs, inject = GenUniModulesLimePickerComponentsLPickerItemLPickerItem.inject, props = GenUniModulesLimePickerComponentsLPickerItemLPickerItem.props, propsNeedCastKeys = GenUniModulesLimePickerComponentsLPickerItemLPickerItem.propsNeedCastKeys, emits = GenUniModulesLimePickerComponentsLPickerItemLPickerItem.emits, components = GenUniModulesLimePickerComponentsLPickerItemLPickerItem.components, styles = GenUniModulesLimePickerComponentsLPickerItemLPickerItem.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
-        return GenUniModulesLimePickerComponentsLPickerItemLPickerItem.setup(props as GenUniModulesLimePickerComponentsLPickerItemLPickerItem, ctx)
+val GenUniModulesIUiXComponentsIPickerIPickerClass = CreateVueComponent(GenUniModulesIUiXComponentsIPickerIPicker::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIPickerIPicker.name, inheritAttrs = GenUniModulesIUiXComponentsIPickerIPicker.inheritAttrs, inject = GenUniModulesIUiXComponentsIPickerIPicker.inject, props = GenUniModulesIUiXComponentsIPickerIPicker.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIPickerIPicker.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIPickerIPicker.emits, components = GenUniModulesIUiXComponentsIPickerIPicker.components, styles = GenUniModulesIUiXComponentsIPickerIPicker.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
+        return GenUniModulesIUiXComponentsIPickerIPicker.setup(props as GenUniModulesIUiXComponentsIPickerIPicker, ctx)
     }
     )
 }
-, fun(instance, renderer): GenUniModulesLimePickerComponentsLPickerItemLPickerItem {
-    return GenUniModulesLimePickerComponentsLPickerItemLPickerItem(instance)
-}
-)
-typealias ManageChildInList = (child: LPickerItemComponentPublicInstance, shouldAdd: Boolean) -> Unit
-val GenUniModulesLimePickerComponentsLPickerLPickerClass = CreateVueComponent(GenUniModulesLimePickerComponentsLPickerLPicker::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesLimePickerComponentsLPickerLPicker.inheritAttrs, inject = GenUniModulesLimePickerComponentsLPickerLPicker.inject, props = GenUniModulesLimePickerComponentsLPickerLPicker.props, propsNeedCastKeys = GenUniModulesLimePickerComponentsLPickerLPicker.propsNeedCastKeys, emits = GenUniModulesLimePickerComponentsLPickerLPicker.emits, components = GenUniModulesLimePickerComponentsLPickerLPicker.components, styles = GenUniModulesLimePickerComponentsLPickerLPicker.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
-        return GenUniModulesLimePickerComponentsLPickerLPicker.setup(props as GenUniModulesLimePickerComponentsLPickerLPicker, ctx)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesLimePickerComponentsLPickerLPicker {
-    return GenUniModulesLimePickerComponentsLPickerLPicker(instance)
-}
-)
-typealias LPickerComponentPublicInstance = GenUniModulesLimePickerComponentsLPickerLPicker
-typealias LPickerItemComponentPublicInstance = GenUniModulesLimePickerComponentsLPickerItemLPickerItem
-typealias OnPick = (value: PickerValue, index: Number, column: Number) -> Unit
-typealias UpdateItems = (value: PickerValue, index: Number, column: Number) -> Unit
-interface PickerItemProps {
-    var options: UTSArray<PickerColumnItem>
-    var value: PickerValue?
-    var column: Number
-    var name: Any?
-}
-fun raf(fn: UniAnimationFrameCallback): Number {
-    return raf(fn as Any)
-}
-fun raf(fn: UniAnimationFrameCallbackWithNoArgument): Number {
-    return raf(fn as Any)
-}
-fun raf(fn: Any): Number {
-    if (UTSAndroid.`typeof`(fn) == "UniAnimationFrameCallback") {
-        return requestAnimationFrame(fn as UniAnimationFrameCallback)
-    } else {
-        return requestAnimationFrame(fn as UniAnimationFrameCallbackWithNoArgument)
-    }
-}
-fun doubleRaf(fn: UniAnimationFrameCallback): Unit {
-    return doubleRaf(fn as Any)
-}
-fun doubleRaf(fn: UniAnimationFrameCallbackWithNoArgument): Unit {
-    return doubleRaf(fn as Any)
-}
-fun doubleRaf(fn: Any): Unit {
-    raf(fun(): Number {
-        return raf(fn)
-    }
-    )
-}
-typealias TransitionEmitStatus = String
-typealias TransitionStatus = String
-open class UseTransitionOptions (
-    open var element: Ref<UniElement?>? = null,
-    open var enterClass: String? = null,
-    open var enterActiveClass: String? = null,
-    open var enterToClass: String? = null,
-    open var leaveClass: String? = null,
-    open var leaveActiveClass: String? = null,
-    open var leaveToClass: String? = null,
-    open var appear: Boolean? = null,
-    open var defaultName: String? = null,
-    open var name: (() -> String)? = null,
-    open var visible: (() -> Boolean)? = null,
-    open var emits: ((name: TransitionEmitStatus) -> Unit)? = null,
-    open var onNextTick: ((name: TransitionEmitStatus) -> UTSPromise<Unit>)? = null,
-    open var duration: Number? = null,
-    open var removeClasses: Boolean? = null,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UseTransitionOptions", "uni_modules/lime-transition/index.uts", 5, 13)
-    }
-}
-typealias ClassNameMap = Map<String, String>
-open class UseTransitionReturn (
-    @JsonNotNull
-    open var state: Ref<Boolean>,
-    @JsonNotNull
-    open var display: Ref<Boolean>,
-    @JsonNotNull
-    open var inited: Ref<Boolean>,
-    @JsonNotNull
-    open var classes: Ref<String>,
-    @JsonNotNull
-    open var name: Ref<String>,
-    open var finished: () -> Unit,
-    open var toggle: (v: Boolean) -> Unit,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UseTransitionReturn", "uni_modules/lime-transition/index.uts", 23, 13)
-    }
-}
-fun useTransition(options: UseTransitionOptions): UseTransitionReturn {
-    val state = ref(false)
-    val display = ref(false)
-    val inited = ref(false)
-    val classes = ref("")
-    val name = ref(options.defaultName ?: "fade")
-    val enterClass = options.enterClass ?: ""
-    val enterActiveClass = options.enterActiveClass ?: ""
-    val enterToClass = options.enterToClass ?: ""
-    val leaveActiveClass = options.leaveActiveClass ?: ""
-    val leaveToClass = options.leaveToClass ?: ""
-    val leaveClass = options.leaveClass ?: ""
-    val appear = options.appear ?: false
-    val duration = options.duration ?: 300
-    var status: TransitionStatus = ""
-    var isTransitionEnd = false
-    var isTransitioning = false
-    var timeoutId: Number = -1
-    var finishTimeoutId: Number = -1
-    val emitEvent = fun(event: TransitionEmitStatus){
-        options.emits?.invoke(event)
-    }
-    val finished = fun(){
-        if (isTransitionEnd) {
-            return
-        }
-        isTransitionEnd = true
-        clearTimeout(finishTimeoutId)
-        if (options.removeClasses ?: false) {
-            classes.value = ""
-        }
-        emitEvent("after-" + status)
-        if (display.value && !state.value) {
-            display.value = false
-        }
-    }
-    val sleep = fun(): UTSPromise<Unit> {
-        return UTSPromise(fun(resolve, _reject){
-            nextTick(fun(){
-                raf(fun(){
-                    if (options.element?.value != null) {
-                        options.element?.value?.getBoundingClientRectAsync()?.then(fun(res){
-                            resolve(Unit)
-                        })
-                    } else {
-                        resolve(Unit)
-                    }
-                }
-                )
-            }
-            )
-        }
-        )
-    }
-    val getClassNames = fun(name: String): ClassNameMap {
-        return Map<String, String>(_uA(
-            _uA(
-                "enter",
-                "l-" + name + "-enter l-" + name + "-enter-active " + enterClass + " " + enterActiveClass
-            ),
-            _uA(
-                "enter-to",
-                "l-" + name + "-enter-to l-" + name + "-enter-active " + enterToClass + " " + enterActiveClass
-            ),
-            _uA(
-                "leave",
-                "l-" + name + "-leave l-" + name + "-leave-active " + leaveClass + " " + leaveActiveClass
-            ),
-            _uA(
-                "leave-to",
-                "l-" + name + "-leave-to l-" + name + "-leave-active " + leaveToClass + " " + leaveActiveClass
-            )
-        ))
-    }
-    val transitionQueue = ref(_uA<TransitionStatus>())
-    val performTransition = fun(newStatus: TransitionStatus, eventName: TransitionStatus): UTSPromise<Unit> {
-        return wrapUTSPromise(suspend w1@{
-                if (status == newStatus) {
-                    return@w1
-                }
-                transitionQueue.value.push(newStatus)
-                if (isTransitioning) {
-                    return@w1
-                }
-                isTransitioning = true
-                isTransitionEnd = true
-                while(transitionQueue.value.length > 0){
-                    val currentStatus = transitionQueue.value.shift()!!
-                    status = currentStatus
-                    emitEvent("before-" + eventName)
-                    await(sleep())
-                    await(sleep())
-                    await(sleep())
-                    await(sleep())
-                    await(sleep())
-                    if (status != currentStatus) {
-                        continue
-                    }
-                    val classNames = getClassNames(name.value)
-                    inited.value = true
-                    display.value = true
-                    classes.value = classNames.get(eventName)!!
-                    emitEvent(eventName)
-                    val executeAfterTick = options.onNextTick?.invoke(eventName)
-                    if (executeAfterTick != null) {
-                        await(executeAfterTick)
-                    }
-                    await(sleep())
-                    if (status != currentStatus) {
-                        continue
-                    }
-                    classes.value = classNames.get("" + eventName + "-to")!!
-                    if (status == "leave") {
-                        setTimeout(fun(){
-                            finished()
-                        }
-                        , duration)
-                    }
-                }
-                clearTimeout(timeoutId)
-                timeoutId = setTimeout(fun(){
-                    if (transitionQueue.value.length == 0 && status == newStatus) {
-                        isTransitionEnd = false
-                    }
-                }
-                , duration * 0.8)
-                isTransitioning = false
-        })
-    }
-    val enter = fun(){
-        performTransition("enter", "enter")
-    }
-    val leave = fun(){
-        performTransition("leave", "leave")
-    }
-    var init = false
-    var lastState: Boolean? = null
-    watchEffect(fun(){
-        if (options.visible == null) {
-            return
-        }
-        state.value = options.visible!!()
-        if (lastState == state.value) {
-            return
-        }
-        lastState = state.value
-        if (!appear && !init) {
-            init = true
-            return
-        }
-        if (state.value) {
-            enter()
-        } else {
-            leave()
-        }
-    }
-    )
-    watchEffect(fun(){
-        if (options.name == null) {
-            return
-        }
-        name.value = options.name!!()
-    }
-    )
-    val toggle = fun(v: Boolean){
-        state.value = v
-        if (v) {
-            enter()
-        } else {
-            leave()
-        }
-    }
-    return UseTransitionReturn(state = state, inited = inited, display = display, classes = classes, name = name, finished = finished, toggle = toggle)
-}
-interface OverlayProps {
-    var ariaLabel: String
-    var ariaRole: String
-    var lClass: String?
-    var bgColor: String?
-    var lStyle: Any?
-    var duration: Number
-    var preventScrollThrough: Boolean
-    var visible: Boolean
-    var zIndex: Number
-}
-val GenUniModulesLimeOverlayComponentsLOverlayLOverlayClass = CreateVueComponent(GenUniModulesLimeOverlayComponentsLOverlayLOverlay::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.inheritAttrs, inject = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.inject, props = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.props, propsNeedCastKeys = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.propsNeedCastKeys, emits = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.emits, components = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.components, styles = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesLimeOverlayComponentsLOverlayLOverlay.setup(props as GenUniModulesLimeOverlayComponentsLOverlayLOverlay)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesLimeOverlayComponentsLOverlayLOverlay {
-    return GenUniModulesLimeOverlayComponentsLOverlayLOverlay(instance)
-}
-)
-fun isDef(value: Any?): Boolean {
-    return value != null
-}
-fun addUnit(value: String): String? {
-    return addUnit(value as Any?)
-}
-fun addUnit(value: Number): String? {
-    return addUnit(value as Any?)
-}
-fun addUnit(reassignedValue: Any?): String? {
-    var value = reassignedValue
-    if (!isDef(value)) {
-        return null
-    }
-    value = "" + value
-    return if (isNumeric(value)) {
-        "" + value as String + "px"
-    } else {
-        value as String
-    }
-}
-fun convertRadius(radius: Any): UTSArray<String> {
-    if (UTSArray.isArray(radius)) {
-        val values = (radius as UTSArray<Any>).map(fun(item): String? {
-            return addUnit(item)
-        }
-        )
-        if (values.length == 1) {
-            return _uA(
-                values[0]!!,
-                values[0]!!,
-                values[0]!!,
-                values[0]!!
-            )
-        }
-        if (values.length == 2) {
-            return _uA(
-                values[0]!!,
-                values[1]!!,
-                values[0]!!,
-                values[1]!!
-            )
-        }
-        if (values.length == 3) {
-            return _uA(
-                values[0]!!,
-                values[1]!!,
-                values[2]!!,
-                values[1]!!
-            )
-        }
-        if (values.length == 4) {
-            return _uA(
-                values[0]!!,
-                values[1]!!,
-                values[2]!!,
-                values[3]!!
-            )
-        }
-        return _uA(
-            "0",
-            "0",
-            "0",
-            "0"
-        )
-    }
-    val value = addUnit(radius) ?: "0"
-    return _uA(
-        value,
-        value,
-        value,
-        value
-    )
-}
-interface PopupProps {
-    var closeable: Boolean
-    var closeOnClickOverlay: Boolean
-    var destroyOnClose: Boolean
-    var overlayStyle: Any?
-    var position: String
-    var preventScrollThrough: Boolean
-    var overlay: Boolean
-    var transitionName: String?
-    var visible: Boolean?
-    var zIndex: Number
-    var duration: Number
-    var bgColor: String?
-    var closeIcon: String
-    var iconColor: String?
-    var lStyle: Any?
-    var safeAreaInsetBottom: Boolean
-    var safeAreaInsetTop: Boolean
-    var radius: Any?
-}
-val GenUniModulesLimePopupComponentsLPopupLPopupClass = CreateVueComponent(GenUniModulesLimePopupComponentsLPopupLPopup::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesLimePopupComponentsLPopupLPopup.inheritAttrs, inject = GenUniModulesLimePopupComponentsLPopupLPopup.inject, props = GenUniModulesLimePopupComponentsLPopupLPopup.props, propsNeedCastKeys = GenUniModulesLimePopupComponentsLPopupLPopup.propsNeedCastKeys, emits = GenUniModulesLimePopupComponentsLPopupLPopup.emits, components = GenUniModulesLimePopupComponentsLPopupLPopup.components, styles = GenUniModulesLimePopupComponentsLPopupLPopup.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesLimePopupComponentsLPopupLPopup.setup(props as GenUniModulesLimePopupComponentsLPopupLPopup)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesLimePopupComponentsLPopupLPopup {
-    return GenUniModulesLimePopupComponentsLPopupLPopup(instance)
+, fun(instance, renderer): GenUniModulesIUiXComponentsIPickerIPicker {
+    return GenUniModulesIUiXComponentsIPickerIPicker(instance)
 }
 )
 val GenComponentsAppToastAppToastClass = CreateVueComponent(GenComponentsAppToastAppToast::class.java, fun(): VueComponentOptions {
@@ -5292,8 +2378,8 @@ val default__3 = "/static/dzwl.png"
 val default__4 = "/static/msg.png"
 val default__5 = "/static/pay.png"
 val default__6 = "/static/online.png"
-val default__7 = "/static/logout.png"
-val default__8 = "/static/del.png"
+val default__7 = "/static/del.png"
+val default__8 = "/static/logout.png"
 open class TodayTimeRange (
     @JsonNotNull
     open var nowTime: Number,
@@ -5316,6 +2402,10 @@ fun pad(value: Number): String {
 fun formatTimes(timestamp: Number): String {
     val d = Date(timestamp)
     return "" + d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds())
+}
+fun formatTimesToMinute(timestamp: Number): String {
+    val d = Date(timestamp)
+    return "" + d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes())
 }
 fun parseLocalDateTime(timestamp: String): Number? {
     val match = timestamp.match(UTSRegExp("^(\\d{4})[-\\/](\\d{2})[-\\/](\\d{2})(?:\\s+(\\d{2}):(\\d{2})(?::(\\d{2}))?)?\$", ""))
@@ -5425,7 +2515,7 @@ open class Device (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 228, 6)
+        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 226, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5609,7 +2699,7 @@ open class MapCenter (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 245, 6)
+        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 243, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5664,7 +2754,7 @@ open class DeviceStatus (
     open var signalStrength: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 295, 6)
+        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 294, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5730,7 +2820,7 @@ open class DeviceDetailState (
     open var lastUpdateTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 301, 6)
+        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 300, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -5787,6 +2877,19 @@ class DeviceDetailStateReactiveObject : DeviceDetailState, IUTSReactive<DeviceDe
             _tRS(__v_raw, "lastUpdateTime", oldValue, value)
         }
 }
+open class IPickerOption (
+    @JsonNotNull
+    open var text: String,
+    @JsonNotNull
+    open var value: String,
+    @JsonNotNull
+    open var disabled: Boolean = false,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("IPickerOption", "pages/index/index.uvue", 349, 6)
+    }
+}
+typealias IPickerColumns = UTSArray<UTSArray<IPickerOption>>
 open class SavedDevice (
     @JsonNotNull
     open var name: String,
@@ -5814,7 +2917,7 @@ open class SavedDevice (
     open var longitude: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 409, 6)
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 418, 6)
     }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
@@ -6053,6 +3156,127 @@ val GenUniModulesIUiXComponentsIFormItemIFormItemClass = CreateVueComponent(GenU
     return GenUniModulesIUiXComponentsIFormItemIFormItem(instance)
 }
 )
+open class IFormField (
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var label: String,
+    open var value: Any? = null,
+    @JsonNotNull
+    open var hasValue: Boolean = false,
+    @JsonNotNull
+    open var required: Boolean = false,
+    @JsonNotNull
+    open var message: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("IFormField", "uni_modules/i-ui-x/components/i-form/i-form.uvue", 122, 6)
+    }
+}
+open class IFormError (
+    @JsonNotNull
+    open var field: String,
+    @JsonNotNull
+    open var message: String,
+) : UTSReactiveObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("IFormError", "uni_modules/i-ui-x/components/i-form/i-form.uvue", 131, 6)
+    }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return IFormErrorReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class IFormErrorReactiveObject : IFormError, IUTSReactive<IFormError> {
+    override var __v_raw: IFormError
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: IFormError, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(field = __v_raw.field, message = __v_raw.message) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): IFormErrorReactiveObject {
+        return IFormErrorReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var field: String
+        get() {
+            return _tRG(__v_raw, "field", __v_raw.field, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("field")) {
+                return
+            }
+            val oldValue = __v_raw.field
+            __v_raw.field = value
+            _tRS(__v_raw, "field", oldValue, value)
+        }
+    override var message: String
+        get() {
+            return _tRG(__v_raw, "message", __v_raw.message, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("message")) {
+                return
+            }
+            val oldValue = __v_raw.message
+            __v_raw.message = value
+            _tRS(__v_raw, "message", oldValue, value)
+        }
+}
+open class IFormValidatePayload (
+    @JsonNotNull
+    open var valid: Boolean = false,
+    @JsonNotNull
+    open var message: String,
+    @JsonNotNull
+    open var errors: UTSArray<IFormError>,
+    @JsonNotNull
+    open var values: UTSJSONObject,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("IFormValidatePayload", "uni_modules/i-ui-x/components/i-form/i-form.uvue", 136, 6)
+    }
+}
+open class IFormSubmitPayload (
+    @JsonNotNull
+    open var valid: Boolean = false,
+    @JsonNotNull
+    open var values: UTSJSONObject,
+    @JsonNotNull
+    open var errors: UTSArray<IFormError>,
+    @JsonNotNull
+    open var message: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("IFormSubmitPayload", "uni_modules/i-ui-x/components/i-form/i-form.uvue", 143, 6)
+    }
+}
+open class IFormResetPayload (
+    @JsonNotNull
+    open var values: UTSJSONObject,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("IFormResetPayload", "uni_modules/i-ui-x/components/i-form/i-form.uvue", 150, 6)
+    }
+}
+open class IFormScrollPayload (
+    @JsonNotNull
+    open var field: String,
+    @JsonNotNull
+    open var targetId: String,
+    @JsonNotNull
+    open var selector: String,
+    @JsonNotNull
+    open var offsetTop: Number,
+    @JsonNotNull
+    open var duration: Number,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("IFormScrollPayload", "uni_modules/i-ui-x/components/i-form/i-form.uvue", 154, 6)
+    }
+}
 val GenUniModulesIUiXComponentsIFormIFormClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormIForm::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormIForm.name, inheritAttrs = GenUniModulesIUiXComponentsIFormIForm.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormIForm.inject, props = GenUniModulesIUiXComponentsIFormIForm.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormIForm.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormIForm.emits, components = GenUniModulesIUiXComponentsIFormIForm.components, styles = GenUniModulesIUiXComponentsIFormIForm.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
         return GenUniModulesIUiXComponentsIFormIForm.setup(props as GenUniModulesIUiXComponentsIFormIForm, ctx)
@@ -6726,6 +3950,16 @@ val GenUniModulesIUiXComponentsISliderISliderClass = CreateVueComponent(GenUniMo
     return GenUniModulesIUiXComponentsISliderISlider(instance)
 }
 )
+open class IWheelOption (
+    @JsonNotNull
+    open var value: Number,
+    @JsonNotNull
+    open var text: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("IWheelOption", "uni_modules/i-ui-x/components/i-datetime-picker/i-datetime-picker.uvue", 334, 6)
+    }
+}
 val GenUniModulesIUiXComponentsIDatetimePickerIDatetimePickerClass = CreateVueComponent(GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker.name, inheritAttrs = GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker.inheritAttrs, inject = GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker.inject, props = GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker.emits, components = GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker.components, styles = GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
         return GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker.setup(props as GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker, ctx)
@@ -6853,174 +4087,6 @@ val GenPagesPlayBackPlayBackClass = CreateVueComponent(GenPagesPlayBackPlayBack:
 }
 , fun(instance, renderer): GenPagesPlayBackPlayBack {
     return GenPagesPlayBackPlayBack(instance, renderer)
-}
-)
-open class ActionSheetItem (
-    @JsonNotNull
-    open var label: String,
-    open var color: String? = null,
-    @JsonNotNull
-    open var disabled: Boolean = false,
-    open var icon: String? = null,
-    open var iconColor: String? = null,
-    open var bgColor: String? = null,
-    open var fontSize: String? = null,
-    open var radius: String? = null,
-    @JsonNotNull
-    open var __index: Number,
-    @JsonNotNull
-    open var __isImage: Boolean = false,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ActionSheetItem", "uni_modules/lime-action-sheet/components/l-action-sheet/type.uts", 2, 13)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return ActionSheetItemReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class ActionSheetItemReactiveObject : ActionSheetItem, IUTSReactive<ActionSheetItem> {
-    override var __v_raw: ActionSheetItem
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: ActionSheetItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(label = __v_raw.label, color = __v_raw.color, disabled = __v_raw.disabled, icon = __v_raw.icon, iconColor = __v_raw.iconColor, bgColor = __v_raw.bgColor, fontSize = __v_raw.fontSize, radius = __v_raw.radius, __index = __v_raw.__index, __isImage = __v_raw.__isImage) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): ActionSheetItemReactiveObject {
-        return ActionSheetItemReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var label: String
-        get() {
-            return _tRG(__v_raw, "label", __v_raw.label, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("label")) {
-                return
-            }
-            val oldValue = __v_raw.label
-            __v_raw.label = value
-            _tRS(__v_raw, "label", oldValue, value)
-        }
-    override var color: String?
-        get() {
-            return _tRG(__v_raw, "color", __v_raw.color, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("color")) {
-                return
-            }
-            val oldValue = __v_raw.color
-            __v_raw.color = value
-            _tRS(__v_raw, "color", oldValue, value)
-        }
-    override var disabled: Boolean
-        get() {
-            return _tRG(__v_raw, "disabled", __v_raw.disabled, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("disabled")) {
-                return
-            }
-            val oldValue = __v_raw.disabled
-            __v_raw.disabled = value
-            _tRS(__v_raw, "disabled", oldValue, value)
-        }
-    override var icon: String?
-        get() {
-            return _tRG(__v_raw, "icon", __v_raw.icon, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("icon")) {
-                return
-            }
-            val oldValue = __v_raw.icon
-            __v_raw.icon = value
-            _tRS(__v_raw, "icon", oldValue, value)
-        }
-    override var iconColor: String?
-        get() {
-            return _tRG(__v_raw, "iconColor", __v_raw.iconColor, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("iconColor")) {
-                return
-            }
-            val oldValue = __v_raw.iconColor
-            __v_raw.iconColor = value
-            _tRS(__v_raw, "iconColor", oldValue, value)
-        }
-    override var bgColor: String?
-        get() {
-            return _tRG(__v_raw, "bgColor", __v_raw.bgColor, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("bgColor")) {
-                return
-            }
-            val oldValue = __v_raw.bgColor
-            __v_raw.bgColor = value
-            _tRS(__v_raw, "bgColor", oldValue, value)
-        }
-    override var fontSize: String?
-        get() {
-            return _tRG(__v_raw, "fontSize", __v_raw.fontSize, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("fontSize")) {
-                return
-            }
-            val oldValue = __v_raw.fontSize
-            __v_raw.fontSize = value
-            _tRS(__v_raw, "fontSize", oldValue, value)
-        }
-    override var radius: String?
-        get() {
-            return _tRG(__v_raw, "radius", __v_raw.radius, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("radius")) {
-                return
-            }
-            val oldValue = __v_raw.radius
-            __v_raw.radius = value
-            _tRS(__v_raw, "radius", oldValue, value)
-        }
-    override var __index: Number
-        get() {
-            return _tRG(__v_raw, "__index", __v_raw.__index, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("__index")) {
-                return
-            }
-            val oldValue = __v_raw.__index
-            __v_raw.__index = value
-            _tRS(__v_raw, "__index", oldValue, value)
-        }
-    override var __isImage: Boolean
-        get() {
-            return _tRG(__v_raw, "__isImage", __v_raw.__isImage, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("__isImage")) {
-                return
-            }
-            val oldValue = __v_raw.__isImage
-            __v_raw.__isImage = value
-            _tRS(__v_raw, "__isImage", oldValue, value)
-        }
-}
-val GenUniModulesLimeActionSheetPagesIndexClass = CreateVueComponent(GenUniModulesLimeActionSheetPagesIndex::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenUniModulesLimeActionSheetPagesIndex.inheritAttrs, inject = GenUniModulesLimeActionSheetPagesIndex.inject, props = GenUniModulesLimeActionSheetPagesIndex.props, propsNeedCastKeys = GenUniModulesLimeActionSheetPagesIndex.propsNeedCastKeys, emits = GenUniModulesLimeActionSheetPagesIndex.emits, components = GenUniModulesLimeActionSheetPagesIndex.components, styles = GenUniModulesLimeActionSheetPagesIndex.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesLimeActionSheetPagesIndex.setup(props as GenUniModulesLimeActionSheetPagesIndex)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesLimeActionSheetPagesIndex {
-    return GenUniModulesLimeActionSheetPagesIndex(instance, renderer)
 }
 )
 open class CoordinatePoint (
@@ -7812,20 +4878,6 @@ val GenPagesUserCenterPayDeviceListPayDeviceListClass = CreateVueComponent(GenPa
     return GenPagesUserCenterPayDeviceListPayDeviceList(instance, renderer)
 }
 )
-open class TabPayload (
-    @JsonNotNull
-    open var index: Number,
-    @JsonNotNull
-    open var name: String,
-    @JsonNotNull
-    open var value: String,
-    @JsonNotNull
-    open var item: Any,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TabPayload", "uni_modules/i-ui-x/components/i-tabs/i-tabs.uvue", 56, 6)
-    }
-}
 val GenUniModulesIUiXComponentsITabsITabsClass = CreateVueComponent(GenUniModulesIUiXComponentsITabsITabs::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsITabsITabs.name, inheritAttrs = GenUniModulesIUiXComponentsITabsITabs.inheritAttrs, inject = GenUniModulesIUiXComponentsITabsITabs.inject, props = GenUniModulesIUiXComponentsITabsITabs.props, propsNeedCastKeys = GenUniModulesIUiXComponentsITabsITabs.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsITabsITabs.emits, components = GenUniModulesIUiXComponentsITabsITabs.components, styles = GenUniModulesIUiXComponentsITabsITabs.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenUniModulesIUiXComponentsITabsITabs.setup(props as GenUniModulesIUiXComponentsITabsITabs)
@@ -7836,20 +4888,6 @@ val GenUniModulesIUiXComponentsITabsITabsClass = CreateVueComponent(GenUniModule
     return GenUniModulesIUiXComponentsITabsITabs(instance)
 }
 )
-open class ActionPayload (
-    @JsonNotNull
-    open var index: Number,
-    @JsonNotNull
-    open var item: Any,
-    @JsonNotNull
-    open var name: String,
-    @JsonNotNull
-    open var value: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ActionPayload", "uni_modules/i-ui-x/components/i-action-sheet/i-action-sheet.uvue", 81, 6)
-    }
-}
 val GenUniModulesIUiXComponentsIActionSheetIActionSheetClass = CreateVueComponent(GenUniModulesIUiXComponentsIActionSheetIActionSheet::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIActionSheetIActionSheet.name, inheritAttrs = GenUniModulesIUiXComponentsIActionSheetIActionSheet.inheritAttrs, inject = GenUniModulesIUiXComponentsIActionSheetIActionSheet.inject, props = GenUniModulesIUiXComponentsIActionSheetIActionSheet.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIActionSheetIActionSheet.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIActionSheetIActionSheet.emits, components = GenUniModulesIUiXComponentsIActionSheetIActionSheet.components, styles = GenUniModulesIUiXComponentsIActionSheetIActionSheet.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
         return GenUniModulesIUiXComponentsIActionSheetIActionSheet.setup(props as GenUniModulesIUiXComponentsIActionSheetIActionSheet, ctx)
@@ -8063,8 +5101,8 @@ fun main(app: IApp) {
 open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
     override var name: String = "中导物联"
     override var appid: String = "__UNI__662B0B4"
-    override var versionName: String = "1.0.1"
-    override var versionCode: String = "101"
+    override var versionName: String = "1.0.2"
+    override var versionCode: String = "102"
     override var uniCompilerVersion: String = "5.25"
     constructor() : super() {}
 }
@@ -8080,7 +5118,6 @@ fun definePageRoutes() {
     __uniRoutes.push(UniPageRoute(path = "pages/carInfoDetail/carInfoDetail", component = GenPagesCarInfoDetailCarInfoDetailClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "车辆详情")))
     __uniRoutes.push(UniPageRoute(path = "pages/addCar/addCar", component = GenPagesAddCarAddCarClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "添加车辆")))
     __uniRoutes.push(UniPageRoute(path = "pages/playBack/playBack", component = GenPagesPlayBackPlayBackClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "轨迹回放")))
-    __uniRoutes.push(UniPageRoute(path = "uni_modules/lime-action-sheet/pages/index", component = GenUniModulesLimeActionSheetPagesIndexClass, meta = UniPageMeta(isQuit = false), style = _uM()))
     __uniRoutes.push(UniPageRoute(path = "pages/vehicleTracking/vehicleTracking", component = GenPagesVehicleTrackingVehicleTrackingClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "车辆跟踪")))
     __uniRoutes.push(UniPageRoute(path = "pages/mileageRecord/mileageRecord", component = GenPagesMileageRecordMileageRecordClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "")))
     __uniRoutes.push(UniPageRoute(path = "pages/stopRecord/stopRecord", component = GenPagesStopRecordStopRecordClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "")))
@@ -8118,7 +5155,7 @@ fun defineAppConfig() {
 }
 open class UniCloudConfig : io.dcloud.unicloud.InternalUniCloudConfig, IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniCloudConfig", "main.uts", 87, 14)
+        return UTSSourceMapPosition("UniCloudConfig", "main.uts", 85, 14)
     }
     override var isDev: Boolean = true
     override var spaceList: String = "[{\"provider\":\"aliyun\",\"spaceName\":\"zdiot-car\",\"spaceId\":\"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff\",\"clientSecret\":\"s9pFKgenncFnOUhRGOJpcw==\",\"endpoint\":\"https://api.next.bspapp.com\",\"failoverEndpoint\":\"\"}]"

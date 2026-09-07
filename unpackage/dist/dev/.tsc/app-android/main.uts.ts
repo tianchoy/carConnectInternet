@@ -17,8 +17,8 @@ export function main(app: IApp) {
 export class UniAppConfig extends io.dcloud.uniapp.appframe.AppConfig {
     override name: string = "中导物联"
     override appid: string = "__UNI__662B0B4"
-    override versionName: string = "1.0.1"
-    override versionCode: string = "101"
+    override versionName: string = "1.0.2"
+    override versionCode: string = "102"
     override uniCompilerVersion: string = "5.25"
     
     constructor() { super() }
@@ -35,7 +35,6 @@ import GenPagesLoginSetPasswordClass from './pages/login/set-password.uvue'
 import GenPagesCarInfoDetailCarInfoDetailClass from './pages/carInfoDetail/carInfoDetail.uvue'
 import GenPagesAddCarAddCarClass from './pages/addCar/addCar.uvue'
 import GenPagesPlayBackPlayBackClass from './pages/playBack/playBack.uvue'
-import GenUniModulesLimeActionSheetPagesIndexClass from './uni_modules/lime-action-sheet/pages/index.uvue'
 import GenPagesVehicleTrackingVehicleTrackingClass from './pages/vehicleTracking/vehicleTracking.uvue'
 import GenPagesMileageRecordMileageRecordClass from './pages/mileageRecord/mileageRecord.uvue'
 import GenPagesStopRecordStopRecordClass from './pages/stopRecord/stopRecord.uvue'
@@ -61,7 +60,6 @@ __uniRoutes.push({ path: "pages/login/set-password", component: GenPagesLoginSet
 __uniRoutes.push({ path: "pages/carInfoDetail/carInfoDetail", component: GenPagesCarInfoDetailCarInfoDetailClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","车辆详情"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/addCar/addCar", component: GenPagesAddCarAddCarClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","添加车辆"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/playBack/playBack", component: GenPagesPlayBackPlayBackClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","轨迹回放"]]) } as UniPageRoute)
-__uniRoutes.push({ path: "uni_modules/lime-action-sheet/pages/index", component: GenUniModulesLimeActionSheetPagesIndexClass, meta: { isQuit: false } as UniPageMeta, style: _uM() } as UniPageRoute)
 __uniRoutes.push({ path: "pages/vehicleTracking/vehicleTracking", component: GenPagesVehicleTrackingVehicleTrackingClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","车辆跟踪"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/mileageRecord/mileageRecord", component: GenPagesMileageRecordMileageRecordClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/stopRecord/stopRecord", component: GenPagesStopRecordStopRecordClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)

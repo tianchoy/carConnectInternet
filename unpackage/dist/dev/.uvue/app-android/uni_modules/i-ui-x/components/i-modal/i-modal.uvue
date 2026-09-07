@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 const __sfc__ = defineComponent({
     __name: 'i-modal',
     name: 'i-modal',
@@ -12,24 +12,24 @@ const __sfc__ = defineComponent({
         showCancelButton: { type: Boolean, default: false },
         confirmColor: { type: String, default: '#2979ff' },
         cancelColor: { type: String, default: '#606266' },
-        duration: { type: Number, default: 200 },
+        duration: { type: [String, Number], default: 200 },
         buttonReverse: { type: Boolean, default: false },
         zoom: { type: Boolean, default: true },
-        zIndex: { type: Number, default: 10075 },
+        zIndex: { type: [String, Number], default: 10075 },
         asyncClose: { type: Boolean, default: false },
         closeable: { type: Boolean, default: false },
         closeOnMask: { type: Boolean, default: false },
-        negativeTop: { type: String, default: '0px' },
-        width: { type: String, default: '320px' },
+        negativeTop: { type: [String, Number], default: 0 },
+        width: { type: [String, Number], default: '320px' },
         confirmButtonShape: { type: String, default: '100px' },
-        round: { type: String, default: '6px' },
+        round: { type: [String, Number], default: '6px' },
         buttonModel: { type: String, default: 'text' },
         buttonRadius: { type: String, default: '100px' },
         confirmBgColor: { type: String, default: '' },
         cancelBgColor: { type: String, default: '' },
-        customStyle: { type: String, default: '' },
+        customStyle: { type: [String, Object], default: '' },
     },
-    emits: ['confirm', 'cancel', 'close', 'update:show'],
+    emits: ["confirm", "cancel", "close", "update:show"],
     setup(__props, __setupCtx: SetupContext): () => any | null {
         const __expose = __setupCtx.expose;
         const __ins = getCurrentInstance()!;
@@ -74,22 +74,26 @@ const __sfc__ = defineComponent({
         function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
             __ins.emit(event, ...do_not_transform_spread);
         }
-        function formatMs(value: number): string {
-            return value.toString(10) + 'ms';
+        function formatMs(value: any): string {
+            const text = value.toString();
+            if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0)
+                return text;
+            return text + 'ms';
         }
-        function formatSize(value: string): string {
-            if (value.indexOf('px') >= 0 || value.indexOf('rpx') >= 0 || value.indexOf('%') >= 0) {
-                return value;
+        function formatSize(value: any): string {
+            const text = value.toString();
+            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+                return text;
             }
-            return value + 'px';
+            return text + 'px';
         }
-        function stringifyStyle(value: string): string {
-            if (value.length == 0)
+        function stringifyStyle(value: any | null): string {
+            if (value == null)
                 return '';
-            return value.endsWith(';') ? value : value + ';';
-        }
-        function animationDuration(): number {
-            return props.duration;
+            const text = value.toString();
+            if (text == '[object Object]' || text.length == 0)
+                return '';
+            return isTruthy(text.endsWith(';')) ? text : text + ';';
         }
         const opened = ref(props.show);
         const active = ref(props.show);
@@ -97,18 +101,12 @@ const __sfc__ = defineComponent({
         let closeTimer = 0;
         const maskStyle = computed((): string => {
             return ('z-index:' +
-                props.zIndex.toString(10) +
+                (props.zIndex).toString() +
                 ';opacity:' +
-                (props.show || active.value ? '1' : '0') +
+                (active.value ? '1' : '0') +
                 ';transition-duration:' +
                 formatMs(props.duration) +
                 ';');
-        });
-        const visibleMaskStyle = computed((): string => {
-            if (props.show && !opened.value) {
-                return 'z-index:' + props.zIndex.toString(10) + ';opacity:1;transition-duration:' + formatMs(props.duration) + ';';
-            }
-            return maskStyle.value;
         });
         const modalClass = computed((): string => {
             const classes = ['i-modal'];
@@ -119,15 +117,12 @@ const __sfc__ = defineComponent({
             style = style + 'border-radius:' + formatSize(props.round) + ';';
             style = style + 'transition-duration:' + formatMs(props.duration) + ';';
             const top = formatSize(props.negativeTop);
-            const scaleValue = props.zoom ? (props.show || active.value ? '1' : '0.86') : '1';
+            const scaleValue = props.zoom ? (active.value ? '1' : '0.86') : '1';
             const translateValue = top != '0px' ? '-' + top : '0px';
-            style = style + 'opacity:' + (props.show || active.value ? '1' : '0') + ';';
+            style = style + 'opacity:' + (active.value ? '1' : '0') + ';';
             style = style + 'transform:translateY(' + translateValue + ') scale(' + scaleValue + ');';
             style = style + stringifyStyle(props.customStyle);
             return style;
-        });
-        const visibleModalStyle = computed((): string => {
-            return modalStyle.value;
         });
         const confirmButtonClass = computed((): string => {
             const classes = ['i-modal__button', 'i-modal__button--confirm'];
@@ -165,38 +160,49 @@ const __sfc__ = defineComponent({
                 style = style + 'background-color:' + props.cancelBgColor + ';';
             return style;
         });
-        function clearCloseTimer() {
+        function clearCloseTimer(): void {
             if (closeTimer > 0) {
                 clearTimeout(closeTimer);
                 closeTimer = 0;
             }
         }
-        function openPanel() {
+        function animationDuration(): number {
+            const text = (props.duration).toString();
+            if (text.indexOf('ms') >= 0)
+                return parseFloat((text.replace('ms', '')).toString());
+            if (text.indexOf('s') >= 0)
+                return parseFloat((text.replace('s', '')).toString()) * 1000;
+            const duration = parseFloat((text).toString());
+            if (isNaN(duration))
+                return 200;
+            return duration;
+        }
+        function openPanel(): void {
             clearCloseTimer();
             opened.value = true;
-            setTimeout(() => {
+            setTimeout((): void => {
                 active.value = true;
             }, 20);
         }
-        function closePanel(shouldEmitUpdate: boolean) {
+        function closePanel(shouldEmitUpdate: boolean): void {
             clearCloseTimer();
             active.value = false;
             loading.value = false;
-            closeTimer = setTimeout(() => {
+            closeTimer = setTimeout((): void => {
                 opened.value = false;
                 closeTimer = 0;
                 if (shouldEmitUpdate)
                     emit('update:show', false);
             }, animationDuration());
         }
-        function open() {
+        function open(): void {
             openPanel();
             emit('update:show', true);
         }
-        function close() {
+        function close(): void {
             closePanel(true);
         }
-        function confirm() {
+        function confirm(): void {
             if (loading.value)
                 return;
             emit('confirm');
@@ -206,35 +212,43 @@ const __sfc__ = defineComponent({
             }
             close();
         }
-        function cancel() {
+        function cancel(): void {
             emit('cancel');
             closePanel(true);
         }
-        function closeByIcon() {
+        function closeByIcon(): void {
             emit('close');
             closePanel(true);
         }
-        function handleOverlayClick() {
+        function handleOverlayClick(): void {
             if (!props.closeOnMask)
                 return;
             emit('close');
             closePanel(true);
         }
+        watch((): boolean => props.show, (nextValue: boolean): void => {
+            if (nextValue) {
+                openPanel();
+            }
+            else {
+                closePanel(false);
+            }
+        });
         __expose({
             open,
             close,
         });
         return (): any | null => {
-            return isTrue(isTruthy(_ctx.show) ? _ctx.show : opened.value)
+            return isTrue(opened.value)
                 ? _cE("view", _uM({
                     key: 0,
                     class: "i-modal__mask",
-                    style: _nS(visibleMaskStyle.value),
+                    style: _nS(maskStyle.value),
                     onClick: handleOverlayClick
                 }), [
                     _cE("view", _uM({
                         class: _nC(modalClass.value),
-                        style: _nS(visibleModalStyle.value),
+                        style: _nS(modalStyle.value),
                         onClick: withModifiers(() => { }, ["stop"])
                     }), [
                         isTrue(_ctx.closeable)

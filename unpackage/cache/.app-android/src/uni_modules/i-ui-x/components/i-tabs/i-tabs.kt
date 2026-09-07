@@ -38,41 +38,50 @@ open class GenUniModulesIUiXComponentsITabsITabs : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
-            fun formatSize(value: Any): String {
+            fun gen_formatSize_fn(value: Any): String {
                 val text = value.toString()
                 if (text == "auto" || text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
                     return text
                 }
                 return text + "px"
             }
-            fun numericSize(value: Any): Number {
-                val text = value.toString().replace("px", "").replace("rpx", "").replace("%", "")
-                val parsed = parseFloat(text)
-                return if (isNaN(parsed)) {
-                    0
-                } else {
-                    UTSNumber.from(parsed)
+            val formatSize = ::gen_formatSize_fn
+            fun gen_numericSize_fn(value: Any): Number {
+                val text = value.toString()
+                val numberValue = parseFloat(text.replace("px", "").replace("rpx", "").replace("%", "").toString())
+                if (isNaN(numberValue)) {
+                    return 0
                 }
+                return numberValue
             }
-            fun gen_configuredList_fn(): UTSArray<Any> {
-                val configured = props.list as UTSArray<Any>
-                if (configured != null && configured.length > 0) {
-                    return configured
-                }
-                val fallback = props.items as UTSArray<Any>
-                return if (fallback != null) {
-                    fallback
-                } else {
-                    _uA<Any>()
-                }
+            val numericSize = ::gen_numericSize_fn
+            val bgColor = computed(fun(): String {
+                return props.bgColor
             }
-            val configuredList = ::gen_configuredList_fn
-            fun gen_itemValue_fn(item: Any, keyName: String): String {
+            )
+            val list = computed(fun(): UTSArray<Any?> {
+                val source = props.list
+                if (source != null && source.length > 0) {
+                    return source
+                }
+                val items = props.items
+                if (items != null) {
+                    return items
+                }
+                val empty: UTSArray<Any?> = _uA()
+                return empty
+            }
+            )
+            fun gen_itemValue_fn(item: Any?, keyName: String): String {
                 if (item == null) {
                     return ""
                 }
                 if (UTSAndroid.`typeof`(item) == "object") {
-                    return (item as UTSJSONObject).getString(keyName, "")
+                    val value = (item as UTSJSONObject)[keyName]
+                    if (value == null) {
+                        return ""
+                    }
+                    return value.toString()
                 }
                 if (keyName == "name" || keyName == "text" || keyName == "value") {
                     return item.toString()
@@ -80,150 +89,70 @@ open class GenUniModulesIUiXComponentsITabsITabs : VueComponent {
                 return ""
             }
             val itemValue = ::gen_itemValue_fn
-            fun gen_itemBoolean_fn(item: Any, keyName: String): Boolean {
-                if (item == null || UTSAndroid.`typeof`(item) != "object") {
-                    return false
-                }
-                return (item as UTSJSONObject).getBoolean(keyName, false)
-            }
-            val itemBoolean = ::gen_itemBoolean_fn
-            fun gen_getItemName_fn(item: Any): String {
+            fun gen_getItemName_fn(item: Any?): String {
                 val name = itemValue(item, "name")
-                return if (name.length > 0) {
-                    name
-                } else {
-                    itemValue(item, "text")
+                if (name.length > 0) {
+                    return name
                 }
+                return itemValue(item, "text")
             }
             val getItemName = ::gen_getItemName_fn
-            fun gen_getItemValue_fn(item: Any): String {
+            fun gen_getItemValue_fn(item: Any?): String {
                 val value = itemValue(item, "value")
-                return if (value.length > 0) {
-                    value
-                } else {
-                    getItemName(item)
+                if (value.length > 0) {
+                    return value
                 }
+                return getItemName(item)
             }
             val getItemValue = ::gen_getItemValue_fn
-            fun gen_isItemDisabled_fn(item: Any): Boolean {
-                return itemBoolean(item, "disabled")
-            }
-            val isItemDisabled = ::gen_isItemDisabled_fn
-            fun gen_isItemDot_fn(item: Any): Boolean {
-                return itemBoolean(item, "dot")
-            }
-            val isItemDot = ::gen_isItemDot_fn
-            fun gen_getItemBadge_fn(item: Any): String {
-                return itemValue(item, "badge")
-            }
-            val getItemBadge = ::gen_getItemBadge_fn
-            fun gen_resolveScrollableItemWidth_fn(): Number {
-                val size = numericSize(props.itemWidth)
-                return if (size > 0) {
-                    size
-                } else {
-                    92
-                }
-            }
-            val resolveScrollableItemWidth = ::gen_resolveScrollableItemWidth_fn
             fun gen_resolveIndex_fn(): Number {
                 if (props.current >= 0) {
                     return props.current
                 }
                 val expected = props.value.toString()
-                val items = configuredList()
                 run {
-                    var index: Number = 0
-                    while(index < items.length){
-                        val item = items[index]
+                    var i: Number = 0
+                    while(i < list.value.length){
+                        val item = list.value[i]
                         if (getItemValue(item) == expected || getItemName(item) == expected) {
-                            return index
+                            return i
                         }
-                        index++
+                        i++
                     }
                 }
                 return 0
             }
             val resolveIndex = ::gen_resolveIndex_fn
+            val currentIndex = ref(resolveIndex())
+            val scrollIntoView = ref("i-tabs-item-" + currentIndex.value.toString(10))
+            fun gen_resolveScrollableItemWidth_fn(): Number {
+                val size = numericSize(props.itemWidth)
+                if (size > 0) {
+                    return size
+                }
+                return 92
+            }
+            val resolveScrollableItemWidth = ::gen_resolveScrollableItemWidth_fn
+            val navStyle = computed(fun(): String {
+                if (!props.scrollable) {
+                    return ""
+                }
+                return "width:" + (resolveScrollableItemWidth() * list.value.length).toString(10) + "px;"
+            }
+            )
             fun gen_getItemStyle_fn(index: Number): String {
                 if (props.scrollable) {
                     return "width:" + resolveScrollableItemWidth().toString(10) + "px;"
                 }
                 val width = formatSize(props.itemWidth)
-                return if (width == "auto") {
-                    ""
-                } else {
-                    "width:" + width + ";"
+                if (width == "auto") {
+                    return ""
                 }
+                return "width:" + width + ";"
             }
             val getItemStyle = ::gen_getItemStyle_fn
-            fun gen_buildPayload_fn(item: Any, index: Number): TabPayload {
-                return TabPayload(index = index, name = getItemName(item), value = getItemValue(item), item = item)
-            }
-            val buildPayload = ::gen_buildPayload_fn
-            val bgColor = computed<String>(fun(): String {
-                return props.bgColor
-            }
-            )
-            val list = computed<UTSArray<Any>>(fun(): UTSArray<Any> {
-                return configuredList()
-            }
-            )
-            val currentIndex = ref<Number>(resolveIndex())
-            val scrollIntoView = ref<String>("i-tabs-item-" + currentIndex.value.toString(10))
-            fun gen_getItemClass_fn(item: Any, index: Number): String {
-                var className = if (currentIndex.value == index) {
-                    "i-tabs__item i-tabs__item--active"
-                } else {
-                    "i-tabs__item"
-                }
-                if (isItemDisabled(item)) {
-                    className += " i-tabs__item--disabled"
-                }
-                return className
-            }
-            val getItemClass = ::gen_getItemClass_fn
-            fun gen_getTextStyle_fn(item: Any, index: Number): String {
-                val color = if (currentIndex.value == index) {
-                    props.activeColor
-                } else {
-                    props.inactiveColor
-                }
-                return "font-size:" + formatSize(props.fontSize) + ";color:" + (if (isItemDisabled(item)) {
-                    "#c8c9cc"
-                } else {
-                    color
-                }
-                ) + ";"
-            }
-            val getTextStyle = ::gen_getTextStyle_fn
-            fun gen_select_fn(item: Any, index: Number): Unit {
-                if (props.disabled || isItemDisabled(item)) {
-                    return
-                }
-                val payload = buildPayload(item, index)
-                emit("click", payload)
-                if (currentIndex.value == index) {
-                    return
-                }
-                currentIndex.value = index
-                scrollIntoView.value = "i-tabs-item-" + index.toString(10)
-                emit("select", payload)
-                emit("change", payload)
-                emit("update:value", payload.value)
-                emit("update:current", index)
-            }
-            val select = ::gen_select_fn
-            val navStyle = computed<String>(fun(): String {
-                return if (props.scrollable) {
-                    "width:" + (resolveScrollableItemWidth() * list.value.length).toString(10) + "px;"
-                } else {
-                    ""
-                }
-            }
-            )
-            val barStyle = computed<String>(fun(): String {
-                return "width:" + formatSize(props.lineWidth) + ";height:" + formatSize(props.lineHeight) + ";background-color:" + props.activeColor + ";"
+            val barStyle = computed(fun(): String {
+                return ("width:" + formatSize(props.lineWidth) + ";height:" + formatSize(props.lineHeight) + ";background-color:" + props.activeColor + ";")
             }
             )
             watch(fun(): Any {
@@ -242,6 +171,77 @@ open class GenUniModulesIUiXComponentsITabsITabs : VueComponent {
                 scrollIntoView.value = "i-tabs-item-" + currentIndex.value.toString(10)
             }
             )
+            fun gen_isItemDisabled_fn(item: Any?): Boolean {
+                if (item == null) {
+                    return false
+                }
+                if (UTSAndroid.`typeof`(item) == "object") {
+                    return (item as UTSJSONObject)["disabled"] == true
+                }
+                return false
+            }
+            val isItemDisabled = ::gen_isItemDisabled_fn
+            fun gen_isItemDot_fn(item: Any?): Boolean {
+                if (item == null) {
+                    return false
+                }
+                if (UTSAndroid.`typeof`(item) == "object") {
+                    return (item as UTSJSONObject)["dot"] == true
+                }
+                return false
+            }
+            val isItemDot = ::gen_isItemDot_fn
+            fun gen_getItemBadge_fn(item: Any?): String {
+                return itemValue(item, "badge")
+            }
+            val getItemBadge = ::gen_getItemBadge_fn
+            fun gen_buildPayload_fn(item: Any?, index: Number): UTSJSONObject {
+                return _uO("index" to index, "name" to getItemName(item), "value" to getItemValue(item), "item" to item)
+            }
+            val buildPayload = ::gen_buildPayload_fn
+            fun gen_getItemClass_fn(item: Any?, index: Number): String {
+                var className = if (currentIndex.value == index) {
+                    "i-tabs__item i-tabs__item--active"
+                } else {
+                    "i-tabs__item"
+                }
+                if (isItemDisabled(item)) {
+                    className += " i-tabs__item--disabled"
+                }
+                return className
+            }
+            val getItemClass = ::gen_getItemClass_fn
+            fun gen_getTextStyle_fn(item: Any?, index: Number): String {
+                val color = if (currentIndex.value == index) {
+                    props.activeColor
+                } else {
+                    props.inactiveColor
+                }
+                val realColor = if (isItemDisabled(item)) {
+                    "#c8c9cc"
+                } else {
+                    color
+                }
+                return "font-size:" + formatSize(props.fontSize) + ";color:" + realColor + ";"
+            }
+            val getTextStyle = ::gen_getTextStyle_fn
+            fun gen_select_fn(item: Any?, index: Number): Unit {
+                if (props.disabled || isItemDisabled(item)) {
+                    return
+                }
+                val payload = buildPayload(item, index)
+                emit("click", payload)
+                if (currentIndex.value == index) {
+                    return
+                }
+                currentIndex.value = index
+                scrollIntoView.value = "i-tabs-item-" + index.toString(10)
+                emit("select", payload)
+                emit("change", payload)
+                emit("update:value", payload["value"])
+                emit("update:current", index)
+            }
+            val select = ::gen_select_fn
             return fun(): Any? {
                 return _cE("view", _uM("class" to "i-tabs", "style" to _nS("background-color:" + bgColor.value)), _uA(
                     _cE("scroll-view", _uM("scroll-x" to _ctx.scrollable, "class" to "i-tabs__scroll", "scroll-into-view" to scrollIntoView.value, "scroll-with-animation" to true, "show-scrollbar" to false), _uA(

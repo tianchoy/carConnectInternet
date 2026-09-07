@@ -155,9 +155,17 @@ function isArray(value : any | null) : boolean {
   return value != null && Array.isArray(value)
 }
 
+function normalizedIndex(value : number, fallback : number) : number {
+  return isNaN(value) || !isFinite(value) ? fallback : Math.floor(value)
+}
+
 function normalizeItem(item : any | null) : IPickerItem {
   if (item != null && typeof item == 'object') {
-    const object = item as UTSJSONObject
+    // Typed UTS objects compile to generated classes on Android and cannot be
+    // directly cast to UTSJSONObject. Serializing first preserves the generic
+    // { text, value, disabled } contract for both typed and JSON-style options.
+    const serialized = JSON.stringify(item)
+    const object = JSON.parse(serialized) as UTSJSONObject
     const rawText = object['text']
     const rawValue = object['value']
     const text = rawText != null ? rawText.toString() : (rawValue == null ? '' : rawValue.toString())
@@ -181,7 +189,35 @@ function normalizeColumn(list : any | null) : Array<IPickerItem> {
 
 
 const opened = ref(props.show)
+// Keep the draft selection separate from the value controlled by the native wheel.
 const currentIndexs = ref<Array<number>>([])
+const pickerViewIndexes = ref<Array<number>>([])
+let indexSyncGeneration = 0
+let pickerInitialized = false
+let pickerInternalChange = false
+
+function scheduleFrame(callback : () => void) : void {
+  setTimeout(callback, 16)
+}
+
+function copyIndexes(indexes : Array<number>) : Array<number> {
+  return indexes.slice()
+}
+
+function findChangedIndex(nextIndexes : Array<number>, oldIndexes : Array<number>) : number {
+  const length = Math.max(nextIndexes.length, oldIndexes.length)
+  for (let index = 0; index < length; index++) {
+    const nextValue = index < nextIndexes.length ? nextIndexes[index] : -1
+    const oldValue = index < oldIndexes.length ? oldIndexes[index] : -1
+    if (nextValue != oldValue) return index
+  }
+  return -1
+}
+
+function cancelIndexSync() : void {
+  indexSyncGeneration++
+  pickerInternalChange = false
+}
 
 const normalizedColumns = computed(() : Array<Array<IPickerItem>> => {
   const columns = props.columns
@@ -220,6 +256,34 @@ function selectedItems() : Array<IPickerItem> {
 function columnAt(index : number) : Array<IPickerItem> {
   if (index < 0 || index >= normalizedColumns.value.length) return []
   return normalizedColumns.value[index]
+}
+
+function scheduleIndexSync(indexes : Array<number>, changedIndex : number = -1, initialize : boolean = false) : void {
+  const generation = ++indexSyncGeneration
+  pickerInternalChange = true
+  pickerViewIndexes.value = copyIndexes(indexes)
+
+  scheduleFrame(() => {
+    if (generation != indexSyncGeneration) return
+    if (changedIndex >= 0 && changedIndex < indexes.length) {
+      const refreshed = copyIndexes(indexes)
+      const columns = normalizedColumns.value
+      const optionCount = changedIndex < columns.length ? columns[changedIndex].length : 0
+      if (optionCount > 1) {
+        refreshed[changedIndex] = indexes[changedIndex] > 0 ? indexes[changedIndex] - 1 : 1
+      }
+      pickerViewIndexes.value = refreshed
+    }
+    scheduleFrame(() => {
+      if (generation != indexSyncGeneration) return
+      pickerViewIndexes.value = copyIndexes(indexes)
+      scheduleFrame(() => {
+        if (generation != indexSyncGeneration) return
+        pickerInternalChange = false
+        if (initialize) pickerInitialized = true
+      })
+    })
+  })
 }
 
 function visibleCountNumber() : number {
@@ -313,15 +377,17 @@ function columnTargetValue(value : any | null, columnIndex : number) : any | nul
 
 function defaultIndexAt(columnIndex : number) : number {
   const value = props.defaultIndex
+  let index = 0
   if (isArray(value)) {
     const values = value as Array<any | null>
     if (values.length > columnIndex) {
       const item = values[columnIndex]
-      return item == null ? 0 : parseFloat(item.toString())
+      if (item != null) index = parseFloat(item.toString())
     }
-    return 0
+  } else if (columnIndex == 0) {
+    index = parseFloat(value.toString())
   }
-  return columnIndex == 0 ? parseFloat(value.toString()) : 0
+  return normalizedIndex(index, 0)
 }
 
 function findValueIndex(column : Array<IPickerItem>, value : any) : number {
@@ -382,6 +448,10 @@ function syncIndexs() : void {
   const value = activeModelValue()
   for (let i = 0; i < columns.length; i++) {
     const column = columns[i]
+    if (column.length == 0) {
+      result.push(0)
+      continue
+    }
     const targetValue = columnTargetValue(value, i)
     let index = -1
     if (targetValue != null && targetValue.toString().length > 0) {
@@ -393,9 +463,12 @@ function syncIndexs() : void {
     result.push(index)
   }
   currentIndexs.value = result
+  scheduleIndexSync(result, -1, !pickerInitialized)
 }
 
 function close() : void {
+  cancelIndexSync()
+  pickerInitialized = false
   if (!opened.value) return
   opened.value = false
   emit('close')
@@ -404,8 +477,8 @@ function close() : void {
 
 function open() : void {
   if (opened.value) return
-  syncIndexs()
   opened.value = true
+  syncIndexs()
   emit('open')
   emit('update:show', true)
 }
@@ -415,18 +488,22 @@ function openByTrigger() : void {
 }
 
 function cancel() : void {
+  cancelIndexSync()
   emit('cancel', buildChangeEvent(0, selectedIndexAt(0)))
   close()
 }
 
 function confirm() : void {
-  emit('confirm', buildConfirmEvent())
+  const event = buildConfirmEvent()
+  emit('confirm', event)
   emitSelectedValue()
+  cancelIndexSync()
   close()
 }
 
 function clear() : void {
   currentIndexs.value = []
+  pickerViewIndexes.value = []
   emit('clear')
   emit('change', buildChangeEvent(0, -1))
   emit('update:value', '')
@@ -437,30 +514,29 @@ function handleOverlayClick() : void {
   if (props.closeOnMask) close()
 }
 
-function handlePickerChange(event : any) : void {
-  if (props.disabled || props.loading || event == null || typeof event != 'object') return
-  const detail = (event as UTSJSONObject)['detail']
-  if (detail == null || typeof detail != 'object') return
-  const rawValues = (detail as UTSJSONObject)['value']
-  if (rawValues == null || !Array.isArray(rawValues)) return
-  const values = rawValues as Array<any | null>
+function handlePickerChange(event : UniPickerViewChangeEvent) : void {
+  if (props.disabled || props.loading || !pickerInitialized || pickerInternalChange) return
+  const values = event.detail.value
+  if (values == null || !Array.isArray(values)) return
   const nextIndexs : Array<number> = []
   let changedColumnIndex = 0
   for (let i = 0; i < normalizedColumns.value.length; i++) {
     const column = normalizedColumns.value[i]
-    const oldIndex = selectedIndexAt(i)
-    let nextIndex = 0
-    if (values.length > i) {
-      const rawIndex = values[i]
-      if (rawIndex != null) nextIndex = parseFloat(rawIndex.toString())
+    if (column.length == 0) {
+      nextIndexs.push(0)
+      continue
     }
+    const oldIndex = selectedIndexAt(i)
+    let nextIndex = normalizedIndex(values.length > i ? values[i] : 0, 0)
     if (nextIndex < 0) nextIndex = 0
     if (nextIndex >= column.length) nextIndex = column.length - 1
-    if (column.length > 0 && column[nextIndex].disabled) nextIndex = oldIndex
+    if (column[nextIndex].disabled) nextIndex = oldIndex
     if (oldIndex != nextIndex) changedColumnIndex = i
     nextIndexs.push(nextIndex)
   }
   currentIndexs.value = nextIndexs
+  // The native wheel owns the active gesture. Do not write the controlled
+  // value back on every change; it would pull iOS toward a stale offset.
   emit('change', buildChangeEvent(changedColumnIndex, selectedIndexAt(changedColumnIndex)))
   if (props.immediateChange) emitSelectedValue()
 }
@@ -625,7 +701,7 @@ const _component_picker_view = resolveComponent("picker-view")
             _cV(_component_picker_view, _uM({
               class: "i-picker__columns",
               style: _nS(columnsStyle.value),
-              value: currentIndexs.value,
+              value: pickerViewIndexes.value,
               "indicator-style": indicatorStyle.value,
               onChange: handlePickerChange
             }), _uM({

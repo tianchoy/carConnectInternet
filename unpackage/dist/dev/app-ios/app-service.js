@@ -52,15 +52,15 @@
         });
         resolve(null);
       }, SOCKET_TIMEOUT);
-      socket.onOpen((e2) => {
+      socket.onOpen((e) => {
         clearTimeout(timer);
         resolve(socket);
       });
-      socket.onClose((e2) => {
+      socket.onClose((e) => {
         clearTimeout(timer);
         resolve(null);
       });
-      socket.onError((e2) => {
+      socket.onError((e) => {
         clearTimeout(timer);
         resolve(null);
       });
@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.1.76";
     const port = "8090";
-    const id = "app-ios_ElFxH7";
+    const id = "app-ios_oyz_x_";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -100,13 +100,36 @@
     });
   }
   initRuntimeSocketService();
-  const _sfc_main$S = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
+  class IIconClickEvent extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            name: { type: String, optional: false },
+            code: { type: String, optional: false },
+            label: { type: String, optional: false }
+          };
+        },
+        name: "IIconClickEvent"
+      };
+    }
+    constructor(options, metadata = IIconClickEvent.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.name = this.__props__.name;
+      this.code = this.__props__.code;
+      this.label = this.__props__.label;
+      delete this.__props__;
+    }
+  }
+  const _sfc_main$O = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
     name: {
       type: String,
       default: "home-3-fill"
     },
     fontSize: {
-      type: String,
+      type: [String, Number],
       default: "16"
     },
     fontFamily: {
@@ -142,7 +165,7 @@
       default: ""
     },
     size: {
-      type: String,
+      type: [String, Number],
       default: ""
     },
     plain: {
@@ -168,14 +191,51 @@
     const emit = __emit;
     const spinAngle = vue.ref(0);
     let spinTimer = 0;
-    function formatSize(value) {
-      if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("rem") >= 0 || value.indexOf("%") >= 0) {
-        return value;
+    function normalizeAngle(value) {
+      let angle = value % 360;
+      if (angle < 0)
+        angle = angle + 360;
+      return angle;
+    }
+    function iconTypeColor() {
+      if (props.type == "primary")
+        return "#2979ff";
+      if (props.type == "success")
+        return "#19be6b";
+      if (props.type == "warning")
+        return "#ff9900";
+      if (props.type == "danger")
+        return "#fa3534";
+      return "#303133";
+    }
+    function formatSize(value = null) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0) {
+        return text;
       }
-      return value + "px";
+      return text + "px";
+    }
+    function startSpin() {
+      if (spinTimer > 0)
+        return null;
+      spinTimer = setInterval(() => {
+        const duration = Math.max(120, parseFloat(props.duration.toString()));
+        const step = Math.max(6, Math.round(360 * 50 / duration));
+        spinAngle.value = normalizeAngle(spinAngle.value + step);
+      }, 50);
+    }
+    function stopSpin() {
+      if (spinTimer > 0) {
+        clearInterval(spinTimer);
+        spinTimer = 0;
+      }
+      spinAngle.value = 0;
     }
     const iconBgColor = vue.computed(() => {
       return props.bgColor;
+    });
+    const activeRotation = vue.computed(() => {
+      return normalizeAngle(props.rotation + spinAngle.value);
     });
     const remixCodeMap = /* @__PURE__ */ new Map([
       ["home-3-fill", "ee1a"],
@@ -260,7 +320,7 @@
       return props.name;
     });
     const normalizedSize = vue.computed(() => {
-      const value = props.size;
+      const value = props.size.toString();
       if (value == "mini" || value == "normal" || value == "large")
         return value;
       if (value.length > 0)
@@ -301,7 +361,7 @@
       return classes.join(" ");
     });
     const resolvedFontSize = vue.computed(() => {
-      const value = props.size;
+      const value = props.size.toString();
       if (value == "mini")
         return "14px";
       if (value == "normal")
@@ -313,7 +373,7 @@
       return formatSize(props.fontSize);
     });
     const badgeSize = vue.computed(() => {
-      const value = props.size;
+      const value = props.size.toString();
       if (value == "mini")
         return "26px";
       if (value == "normal")
@@ -322,9 +382,10 @@
         return "44px";
       if (value.length > 0)
         return formatSize(value);
-      if (props.fontSize.length > 0)
+      const numberSize = parseFloat(props.fontSize.toString());
+      if (isNaN(numberSize))
         return formatSize(props.fontSize);
-      return "16px";
+      return formatSize(numberSize + 18);
     });
     const wrapStyle = vue.computed(() => {
       let style = props.customStyle;
@@ -337,23 +398,6 @@
       }
       return style;
     });
-    function iconTypeColor() {
-      if (props.type == "primary")
-        return "#2979ff";
-      if (props.type == "success")
-        return "#19be6b";
-      if (props.type == "warning")
-        return "#ff9900";
-      if (props.type == "danger")
-        return "#fa3534";
-      return "#303133";
-    }
-    const activeRotation = vue.computed(() => {
-      let angle = (props.rotation + spinAngle.value) % 360;
-      if (angle < 0)
-        angle = angle + 360;
-      return angle;
-    });
     const imageStyle = vue.computed(() => {
       const size = resolvedFontSize.value;
       let style = "width:" + size + ";height:" + size + ";";
@@ -362,25 +406,6 @@
         style = style + "transform:rotate(" + angle.toString() + "deg);";
       return style;
     });
-    function startSpin() {
-      if (spinTimer > 0)
-        return null;
-      spinTimer = setInterval(() => {
-        const duration = Math.max(120, props.duration);
-        const step = Math.max(6, Math.round(360 * 50 / duration));
-        let angle = (spinAngle.value + step) % 360;
-        if (angle < 0)
-          angle = angle + 360;
-        spinAngle.value = angle;
-      }, 50);
-    }
-    function stopSpin() {
-      if (spinTimer > 0) {
-        clearInterval(spinTimer);
-        spinTimer = 0;
-      }
-      spinAngle.value = 0;
-    }
     const textStyle = vue.computed(() => {
       let style = "font-size:" + resolvedFontSize.value + ";";
       if (props.fontFamily.length > 0 && iconCode.value.length > 0) {
@@ -397,6 +422,23 @@
         style = style + "transform:rotate(" + angle.toString() + "deg);";
       return style;
     });
+    vue.watch(() => {
+      return props.spin;
+    }, (nextValue) => {
+      if (nextValue) {
+        startSpin();
+      } else {
+        stopSpin();
+      }
+    });
+    vue.watch(() => {
+      return props.duration;
+    }, () => {
+      if (props.spin) {
+        stopSpin();
+        startSpin();
+      }
+    });
     vue.onMounted(() => {
       if (props.spin)
         startSpin();
@@ -405,21 +447,22 @@
       stopSpin();
     });
     function handleClick() {
-      emit("click", new UTSJSONObject({
+      const payload = new IIconClickEvent({
         name: props.name,
         code: iconCode.value,
         label: props.label
-      }));
+      });
+      emit("click", payload);
     }
     const __returned__ = { props, emit, spinAngle, get spinTimer() {
       return spinTimer;
     }, set spinTimer(v2) {
       spinTimer = v2;
-    }, formatSize, iconBgColor, remixCodeMap, legacyNameMap, legacyGlyphMap, normalizedName, isImage, iconCode, iconText, normalizedSize, hasBadge, iconClass, textClass, imageClass, resolvedFontSize, badgeSize, wrapStyle, iconTypeColor, activeRotation, imageStyle, startSpin, stopSpin, textStyle, handleClick };
+    }, normalizeAngle, iconTypeColor, formatSize, startSpin, stopSpin, iconBgColor, activeRotation, remixCodeMap, legacyNameMap, legacyGlyphMap, normalizedName, isImage, iconCode, iconText, normalizedSize, hasBadge, iconClass, textClass, imageClass, resolvedFontSize, badgeSize, wrapStyle, imageStyle, textStyle, handleClick };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
-  const _style_0$Q = { "i-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "i-icon--badge": { "": { "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34 } }, "i-icon--mini": { "": { "width": 26, "height": 26, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26 } }, "i-icon--large": { "": { "width": 44, "height": 44, "borderTopLeftRadius": 44, "borderTopRightRadius": 44, "borderBottomRightRadius": 44, "borderBottomLeftRadius": 44 } }, "i-icon--primary": { "": { "backgroundColor": "#2979ff" } }, "i-icon--success": { "": { "backgroundColor": "#19be6b" } }, "i-icon--warning": { "": { "backgroundColor": "#ff9900" } }, "i-icon--danger": { "": { "backgroundColor": "#fa3534" } }, "i-icon--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "i-icon__text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": 1 } }, "i-icon__text--badge": { "": { "color": "#ffffff", "fontWeight": 700 } }, "i-icon__text--primary": { "": { "color": "#2979ff" } }, "i-icon__text--success": { "": { "color": "#19be6b" } }, "i-icon__text--warning": { "": { "color": "#ff9900" } }, "i-icon__text--danger": { "": { "color": "#fa3534" } }, "i-icon__image": { "": { "width": 16, "height": 16 } }, "@FONT-FACE": [{ "fontFamily": "remixicon", "src": 'url("/uni_modules/i-ui-x/static/remixicon.woff2") format("woff2"),\n    url("https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.ttf")\n      format("truetype")' }] };
+  const _style_0$N = { "i-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "i-icon--badge": { "": { "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34 } }, "i-icon--mini": { "": { "width": 26, "height": 26, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26 } }, "i-icon--large": { "": { "width": 44, "height": 44, "borderTopLeftRadius": 44, "borderTopRightRadius": 44, "borderBottomRightRadius": 44, "borderBottomLeftRadius": 44 } }, "i-icon--primary": { "": { "backgroundColor": "#2979ff" } }, "i-icon--success": { "": { "backgroundColor": "#19be6b" } }, "i-icon--warning": { "": { "backgroundColor": "#ff9900" } }, "i-icon--danger": { "": { "backgroundColor": "#fa3534" } }, "i-icon--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "i-icon__text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": 1 } }, "i-icon__text--badge": { "": { "color": "#ffffff", "fontWeight": 700 } }, "i-icon__text--primary": { "": { "color": "#2979ff" } }, "i-icon__text--success": { "": { "color": "#19be6b" } }, "i-icon__text--warning": { "": { "color": "#ff9900" } }, "i-icon__text--danger": { "": { "color": "#fa3534" } }, "i-icon__image": { "": { "width": 16, "height": 16 } }, "@FONT-FACE": [{ "fontFamily": "remixicon", "src": 'url("/uni_modules/i-ui-x/static/remixicon.woff2") format("woff2"),\n    url("https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.ttf")\n      format("truetype")' }] };
   const _export_sfc = (sfc, props) => {
     const target = sfc.__vccOpts || sfc;
     for (const [key, val] of props) {
@@ -427,7 +470,7 @@
     }
     return target;
   };
-  function _sfc_render$R(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$N(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -458,11 +501,555 @@
       /* CLASS, STYLE */
     );
   }
-  const __easycom_0$7 = /* @__PURE__ */ _export_sfc(_sfc_main$S, [["render", _sfc_render$R], ["styles", [_style_0$Q]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-icon/i-icon.uvue"]]);
+  const __easycom_0$4 = /* @__PURE__ */ _export_sfc(_sfc_main$O, [["render", _sfc_render$N], ["styles", [_style_0$N]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-icon/i-icon.uvue"]]);
+  function arrayPop(array) {
+    if (array.length === 0) {
+      return null;
+    }
+    return array.pop();
+  }
+  function arrayShift(array) {
+    if (array.length === 0) {
+      return null;
+    }
+    return array.shift();
+  }
+  function arrayFind(array, predicate) {
+    const index = array.findIndex(predicate);
+    if (index < 0) {
+      return null;
+    }
+    return array[index];
+  }
+  function arrayFindLast(array, predicate) {
+    const index = array.findLastIndex(predicate);
+    if (index < 0) {
+      return null;
+    }
+    return array[index];
+  }
+  function arrayAt(array, index) {
+    if (index < -array.length || index >= array.length) {
+      return null;
+    }
+    return array.at(index);
+  }
+  const UTS_CLASS_METADATA_KIND_LIST = [0, 1, 2];
+  function getType(val) {
+    return Object.prototype.toString.call(val).slice(8, -1).toLowerCase();
+  }
+  function isPlainObject(val) {
+    if (val == null || typeof val !== "object") {
+      return false;
+    }
+    const proto = Object.getPrototypeOf(val);
+    return proto === Object.prototype || proto === null;
+  }
+  class UTSError extends Error {
+    constructor(message) {
+      super(message);
+    }
+  }
+  function isUTSMetadata(metadata) {
+    return !!(metadata && UTS_CLASS_METADATA_KIND_LIST.includes(metadata.kind) && metadata.interfaces);
+  }
+  function isNativeType(proto) {
+    return !proto || proto === Object.prototype;
+  }
+  const utsMetadataKey = "$UTSMetadata$";
+  function getParentTypeList(type) {
+    const metadata = utsMetadataKey in type ? type[utsMetadataKey] : {};
+    let interfaces = [];
+    if (!isUTSMetadata(metadata)) {
+      interfaces = [];
+    } else {
+      interfaces = metadata.interfaces || [];
+    }
+    const proto = Object.getPrototypeOf(type);
+    if (!isNativeType(proto)) {
+      interfaces.push(proto.constructor);
+    }
+    return interfaces;
+  }
+  function isImplementationOf(leftType, rightType, visited = []) {
+    if (isNativeType(leftType)) {
+      return false;
+    }
+    if (leftType === rightType) {
+      return true;
+    }
+    visited.push(leftType);
+    const parentTypeList = getParentTypeList(leftType);
+    return parentTypeList.some((parentType) => {
+      if (visited.includes(parentType)) {
+        return false;
+      }
+      return isImplementationOf(parentType, rightType, visited);
+    });
+  }
+  function isInstanceOf(value, type) {
+    if (type === UTSValueIterable) {
+      return value && value[Symbol.iterator];
+    }
+    const isNativeInstanceofType = value instanceof type;
+    if (isNativeInstanceofType || typeof value !== "object" || value === null) {
+      return isNativeInstanceofType;
+    }
+    const proto = Object.getPrototypeOf(value).constructor;
+    return isImplementationOf(proto, type);
+  }
+  function isBaseType(type) {
+    return type === Number || type === String || type === Boolean;
+  }
+  function isUnknownType(type) {
+    return type === "Unknown";
+  }
+  function isAnyType(type) {
+    return type === "Any";
+  }
+  function isUTSType(type) {
+    return type && type.prototype && type.prototype instanceof UTSType;
+  }
+  function normalizeGenericValue(value, genericType, isJSONParse = false) {
+    return value == null ? null : isBaseType(genericType) || isUnknownType(genericType) || isAnyType(genericType) ? value : genericType === Array ? new Array(...value) : new genericType(value, void 0, isJSONParse);
+  }
+  class UTSType {
+    static get$UTSMetadata$(...args) {
+      return {
+        name: "",
+        kind: 2,
+        interfaces: [],
+        fields: {}
+      };
+    }
+    get $UTSMetadata$() {
+      return UTSType.get$UTSMetadata$();
+    }
+    // TODO 缓存withGenerics结果
+    static withGenerics(parent, generics, isJSONParse = false) {
+      if (isJSONParse) {
+        const illegalGeneric = generics.find((item) => !(item === Array || isBaseType(item) || isUnknownType(item) || isAnyType(item) || item === UTSJSONObject$1 || item.prototype && item.prototype instanceof UTSType));
+        if (illegalGeneric) {
+          throw new Error("Generic is not UTSType or Array or UTSJSONObject or base type, generic: " + illegalGeneric);
+        }
+      }
+      if (parent === Array) {
+        return class UTSArray extends UTSType {
+          constructor(options, isJSONParse2 = false) {
+            if (!Array.isArray(options)) {
+              throw new UTSError("Failed to contruct type, ".concat(options, " is not an array"));
+            }
+            super();
+            return options.map((item) => {
+              return normalizeGenericValue(item, generics[0], isJSONParse2);
+            });
+          }
+        };
+      } else if (parent === Map || parent === WeakMap) {
+        return class UTSMap extends UTSType {
+          constructor(options, isJSONParse2 = false) {
+            if (options == null || typeof options !== "object") {
+              throw new UTSError("Failed to contruct type, ".concat(options, " is not an object"));
+            }
+            super();
+            const obj = new parent();
+            for (const key in options) {
+              obj.set(normalizeGenericValue(key, generics[0], isJSONParse2), normalizeGenericValue(options[key], generics[1], isJSONParse2));
+            }
+            return obj;
+          }
+        };
+      } else if (isUTSType(parent)) {
+        return class VirtualClassWithGenerics extends parent {
+          static get$UTSMetadata$() {
+            return parent.get$UTSMetadata$(...generics);
+          }
+          constructor(options, metadata = VirtualClassWithGenerics.get$UTSMetadata$(), isJSONParse2 = false) {
+            super(options, metadata, isJSONParse2);
+          }
+        };
+      } else {
+        return parent;
+      }
+    }
+    constructor() {
+    }
+    static initProps(options, metadata, isJSONParse = false) {
+      if (!isJSONParse) {
+        return options;
+      }
+      const obj = {};
+      if (!metadata.fields) {
+        return obj;
+      }
+      for (const key in metadata.fields) {
+        const { type, optional, jsonField } = metadata.fields[key];
+        const realKey = isJSONParse ? jsonField || key : key;
+        if (options[realKey] == null) {
+          if (optional) {
+            obj[key] = null;
+            continue;
+          } else {
+            throw new UTSError("Failed to contruct type, missing required property: ".concat(key));
+          }
+        }
+        if (isUTSType(type)) {
+          obj[key] = isJSONParse ? (
+            // @ts-expect-error
+            new type(options[realKey], void 0, isJSONParse)
+          ) : options[realKey];
+        } else if (type === Array) {
+          if (!Array.isArray(options[realKey])) {
+            throw new UTSError("Failed to contruct type, property ".concat(key, " is not an array"));
+          }
+          obj[key] = options[realKey];
+        } else {
+          obj[key] = options[realKey];
+        }
+      }
+      return obj;
+    }
+  }
+  function initUTSJSONObjectProperties(obj) {
+    const propertyList = [
+      "_resolveKeyPath",
+      "_getValue",
+      "toJSON",
+      "get",
+      "set",
+      "getAny",
+      "getString",
+      "getNumber",
+      "getBoolean",
+      "getJSON",
+      "getArray",
+      "toMap",
+      "forEach"
+    ];
+    const propertyDescriptorMap = {};
+    for (let i2 = 0; i2 < propertyList.length; i2++) {
+      const property = propertyList[i2];
+      propertyDescriptorMap[property] = {
+        enumerable: false,
+        value: obj[property]
+      };
+    }
+    Object.defineProperties(obj, propertyDescriptorMap);
+  }
+  function getRealDefaultValue(defaultValue) {
+    return defaultValue === void 0 ? null : defaultValue;
+  }
+  let UTSJSONObject$1 = class UTSJSONObject {
+    static keys(obj) {
+      return Object.keys(obj);
+    }
+    static assign(target, ...sources) {
+      for (let i2 = 0; i2 < sources.length; i2++) {
+        const source = sources[i2];
+        for (let key in source) {
+          target[key] = source[key];
+        }
+      }
+      return target;
+    }
+    constructor(content = {}) {
+      if (content instanceof Map) {
+        content.forEach((value, key) => {
+          this[key] = value;
+        });
+      } else {
+        for (const key in content) {
+          if (Object.prototype.hasOwnProperty.call(content, key)) {
+            this[key] = content[key];
+          }
+        }
+      }
+      initUTSJSONObjectProperties(this);
+    }
+    _resolveKeyPath(keyPath) {
+      let token = "";
+      const keyPathArr = [];
+      let inOpenParentheses = false;
+      for (let i2 = 0; i2 < keyPath.length; i2++) {
+        const word = keyPath[i2];
+        switch (word) {
+          case ".":
+            if (token.length > 0) {
+              keyPathArr.push(token);
+              token = "";
+            }
+            break;
+          case "[": {
+            inOpenParentheses = true;
+            if (token.length > 0) {
+              keyPathArr.push(token);
+              token = "";
+            }
+            break;
+          }
+          case "]":
+            if (inOpenParentheses) {
+              if (token.length > 0) {
+                const tokenFirstChar = token[0];
+                const tokenLastChar = token[token.length - 1];
+                if (tokenFirstChar === '"' && tokenLastChar === '"' || tokenFirstChar === "'" && tokenLastChar === "'" || tokenFirstChar === "`" && tokenLastChar === "`") {
+                  if (token.length > 2) {
+                    token = token.slice(1, -1);
+                  } else {
+                    return [];
+                  }
+                } else if (!/^\d+$/.test(token)) {
+                  return [];
+                }
+                keyPathArr.push(token);
+                token = "";
+              } else {
+                return [];
+              }
+              inOpenParentheses = false;
+            } else {
+              return [];
+            }
+            break;
+          default:
+            token += word;
+            break;
+        }
+        if (i2 === keyPath.length - 1) {
+          if (token.length > 0) {
+            keyPathArr.push(token);
+            token = "";
+          }
+        }
+      }
+      return keyPathArr;
+    }
+    _getValue(keyPath, defaultValue) {
+      const keyPathArr = this._resolveKeyPath(keyPath);
+      const realDefaultValue = getRealDefaultValue(defaultValue);
+      if (keyPathArr.length === 0) {
+        return realDefaultValue;
+      }
+      let value = this;
+      for (let i2 = 0; i2 < keyPathArr.length; i2++) {
+        const key = keyPathArr[i2];
+        if (value instanceof Object) {
+          if (key in value) {
+            value = value[key];
+          } else {
+            return realDefaultValue;
+          }
+        } else {
+          return realDefaultValue;
+        }
+      }
+      return value;
+    }
+    get(key) {
+      return this._getValue(key);
+    }
+    set(key, value) {
+      this[key] = value;
+    }
+    getAny(key, defaultValue) {
+      const realDefaultValue = getRealDefaultValue(defaultValue);
+      return this._getValue(key, realDefaultValue);
+    }
+    getString(key, defaultValue) {
+      const realDefaultValue = getRealDefaultValue(defaultValue);
+      const value = this._getValue(key, realDefaultValue);
+      if (typeof value === "string") {
+        return value;
+      } else {
+        return realDefaultValue;
+      }
+    }
+    getNumber(key, defaultValue) {
+      const realDefaultValue = getRealDefaultValue(defaultValue);
+      const value = this._getValue(key, realDefaultValue);
+      if (typeof value === "number") {
+        return value;
+      } else {
+        return realDefaultValue;
+      }
+    }
+    getBoolean(key, defaultValue) {
+      const realDefaultValue = getRealDefaultValue(defaultValue);
+      const boolean = this._getValue(key, realDefaultValue);
+      if (typeof boolean === "boolean") {
+        return boolean;
+      } else {
+        return realDefaultValue;
+      }
+    }
+    getJSON(key, defaultValue) {
+      const realDefaultValue = getRealDefaultValue(defaultValue);
+      let value = this._getValue(key, realDefaultValue);
+      if (value instanceof Object) {
+        return value;
+      } else {
+        return realDefaultValue;
+      }
+    }
+    getArray(key, defaultValue) {
+      const realDefaultValue = getRealDefaultValue(defaultValue);
+      let value = this._getValue(key, realDefaultValue);
+      if (value instanceof Array) {
+        return value;
+      } else {
+        return realDefaultValue;
+      }
+    }
+    toMap() {
+      let map = /* @__PURE__ */ new Map();
+      for (let key in this) {
+        map.set(key, this[key]);
+      }
+      return map;
+    }
+    forEach(callback) {
+      for (let key in this) {
+        callback(this[key], key);
+      }
+    }
+  };
+  const OriginalJSON = JSON;
+  function createUTSJSONObjectOrArray(obj) {
+    if (Array.isArray(obj)) {
+      return obj.map((item) => {
+        return createUTSJSONObjectOrArray(item);
+      });
+    } else if (isPlainObject(obj)) {
+      const result = new UTSJSONObject$1({});
+      for (const key in obj) {
+        const value = obj[key];
+        result[key] = createUTSJSONObjectOrArray(value);
+      }
+      return result;
+    }
+    return obj;
+  }
+  function parseObjectOrArray(object, utsType) {
+    const objectType = getType(object);
+    if (object === null || objectType !== "object" && objectType !== "array") {
+      return object;
+    }
+    if (utsType && utsType !== UTSJSONObject$1) {
+      try {
+        return new utsType(object, void 0, true);
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    }
+    if (objectType === "array" || objectType === "object") {
+      return createUTSJSONObjectOrArray(object);
+    }
+    return object;
+  }
+  const UTSJSON = {
+    parse: (text, reviver, utsType) => {
+      if (reviver && (isUTSType(reviver) || reviver === UTSJSONObject$1)) {
+        utsType = reviver;
+        reviver = void 0;
+      }
+      try {
+        const parseResult = OriginalJSON.parse(text, reviver);
+        return parseObjectOrArray(parseResult, utsType);
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    },
+    parseArray(text, utsType) {
+      try {
+        const parseResult = OriginalJSON.parse(text);
+        if (Array.isArray(parseResult)) {
+          return parseObjectOrArray(parseResult, utsType ? UTSType.withGenerics(Array, [utsType], true) : void 0);
+        }
+        return null;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    },
+    parseObject(text, utsType) {
+      try {
+        const parseResult = OriginalJSON.parse(text);
+        if (Array.isArray(parseResult)) {
+          return null;
+        }
+        return parseObjectOrArray(parseResult, utsType);
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    },
+    stringify: (value, replacer, space) => {
+      try {
+        if (!replacer) {
+          const visited = /* @__PURE__ */ new Set();
+          replacer = function(_2, v2) {
+            if (typeof v2 === "object") {
+              if (visited.has(v2)) {
+                return null;
+              }
+              visited.add(v2);
+            }
+            return v2;
+          };
+        }
+        return OriginalJSON.stringify(value, replacer, space);
+      } catch (error) {
+        console.error(error);
+        return "";
+      }
+    }
+  };
+  function mapGet(map, key) {
+    if (!map.has(key)) {
+      return null;
+    }
+    return map.get(key);
+  }
+  function stringCodePointAt(str, pos) {
+    if (pos < 0 || pos >= str.length) {
+      return null;
+    }
+    return str.codePointAt(pos);
+  }
+  function stringAt(str, pos) {
+    if (pos < -str.length || pos >= str.length) {
+      return null;
+    }
+    return str.at(pos);
+  }
+  function weakMapGet(map, key) {
+    if (!map.has(key)) {
+      return null;
+    }
+    return map.get(key);
+  }
+  const UTS$1 = {
+    arrayAt,
+    arrayFind,
+    arrayFindLast,
+    arrayPop,
+    arrayShift,
+    isInstanceOf,
+    UTSType,
+    mapGet,
+    stringAt,
+    stringCodePointAt,
+    weakMapGet,
+    JSON: UTSJSON
+  };
+  class UTSValueIterable {
+  }
   function resolveEasycom(component, easycom2) {
     return typeof component === "string" ? easycom2 : component;
   }
-  const _sfc_main$R = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
+  const _sfc_main$N = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
     percent: { type: Number, default: 45 },
     title: { type: String, default: "" },
     activeColor: { type: String, default: "#19be6b" },
@@ -494,8 +1081,8 @@
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
-  const _style_0$P = { "i-card": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-title": { "": { "color": "#303133", "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-muted": { "": { "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-row": { "": { "flexDirection": "row", "alignItems": "center", "flexWrap": "wrap" } }, "i-btn": { "": { "minHeight": 34, "marginTop": 10, "marginRight": 8, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "backgroundColor": "#ecf5ff", "alignItems": "center", "justifyContent": "center" } }, "i-btn--plain": { "": { "backgroundColor": "#f5f7fa" } }, "i-btn--danger": { "": { "backgroundColor": "#fef0f0" } }, "i-btn-text": { "": { "color": "#2979ff", "fontSize": 13, "lineHeight": "18px" } }, "i-danger": { "": { "color": "#f56c6c" } }, "i-head": { "": { "justifyContent": "space-between" } }, "i-track": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginRight": 5, "overflow": "hidden" } }, "i-fill": { "": { "height": "100%", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } } };
-  function _sfc_render$Q(_ctx, _cache, $props, $setup, $data, $options) {
+  const _style_0$M = { "i-card": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-title": { "": { "color": "#303133", "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-muted": { "": { "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-row": { "": { "flexDirection": "row", "alignItems": "center", "flexWrap": "wrap" } }, "i-btn": { "": { "minHeight": 34, "marginTop": 10, "marginRight": 8, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "backgroundColor": "#ecf5ff", "alignItems": "center", "justifyContent": "center" } }, "i-btn--plain": { "": { "backgroundColor": "#f5f7fa" } }, "i-btn--danger": { "": { "backgroundColor": "#fef0f0" } }, "i-btn-text": { "": { "color": "#2979ff", "fontSize": 13, "lineHeight": "18px" } }, "i-danger": { "": { "color": "#f56c6c" } }, "i-head": { "": { "justifyContent": "space-between" } }, "i-track": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginRight": 5, "overflow": "hidden" } }, "i-fill": { "": { "height": "100%", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } } };
+  function _sfc_render$M(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", {
       class: "i-card",
       onClick: $setup.emitClick
@@ -542,3145 +1129,914 @@
       ])
     ]);
   }
-  const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$R, [["render", _sfc_render$Q], ["styles", [_style_0$P]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-line-progress/i-line-progress.uvue"]]);
-  function isString$1(str) {
-    return typeof str == "string";
-  }
-  function isNumber$2(value) {
-    return ["Int8", "UInt8", "Int16", "UInt16", "Int32", "UInt32", "Int64", "UInt64", "Int", "UInt", "Float", "Float16", "Float32", "Float64", "Double", "number"].includes(typeof value);
-  }
-  function isNumeric$1(value) {
-    if (value == null) {
-      return false;
-    }
-    if (isNumber$2(value)) {
-      return true;
-    } else if (isString$1(value)) {
-      const regex = new RegExp("^(-)?\\d+(\\.\\d+)?$");
-      return regex.test(value);
-    }
-    return false;
-  }
-  function unitConvert(value, base = 0) {
-    if (value == null)
-      return NaN;
-    if (isNumber$2(value)) {
-      return value;
-    }
-    if (isNumeric$1(value)) {
-      return parseFloat(value);
-    }
-    if (isString$1(value)) {
-      const reg = /^-?([0-9]+)?([.]{1}[0-9]+){0,1}(em|rpx|px|%)$/g;
-      const results = reg.exec(value);
-      if (results == null) {
-        return NaN;
-      }
-      const unit = results[3];
-      const _value = parseFloat(value);
-      if (unit == "rpx") {
-        return uni.rpx2px(_value);
-      }
-      if (unit == "px") {
-        return _value;
-      }
-      if (unit == "%") {
-        return _value / 100 * base;
-      }
-    }
-    return NaN;
-  }
-  function clamp(val, min, max) {
-    return Math.max(min, Math.min(max, val));
-  }
-  const usePickerMask = (backgroundColorRef, isDarkModeRef, maskColorsRef, isInitializedRef) => {
-    const maskConfig = vue.computed(() => {
-      const bgColor = backgroundColorRef.value;
-      const isDark = isDarkModeRef.value;
-      const maskColors = maskColorsRef === null || maskColorsRef === void 0 ? void 0 : maskColorsRef.value;
-      if (maskColors != null && maskColors.length >= 1) {
-        const maskStartColor = maskColors[0];
-        const maskEndColor = maskColors.length > 1 ? maskColors[1] : "rgba(0,0,0,0)";
-        return {
-          maskStartColor,
-          maskEndColor
-        };
-      }
-      const bg = bgColor !== null && bgColor !== void 0 ? bgColor : isDark ? "#242424" : "#ffffff";
-      const endColor = isDark ? "rgba(36, 36, 36, 0)" : "rgba(255, 255, 255, 0)";
-      return {
-        maskStartColor: bg,
-        maskEndColor: endColor
-      };
-    });
-    const platformMaskStyles = vue.computed(() => {
-      const _a = maskConfig.value, maskStartColor = _a.maskStartColor, maskEndColor = _a.maskEndColor;
-      const clean = (str) => {
-        return str.replace(/\s+/g, " ").trim();
-      };
-      return {
-        common: backgroundColorRef.value == null && !isDarkModeRef.value ? clean("background-image:\n					linear-gradient(180deg, ".concat(maskStartColor, ", ").concat(maskEndColor, "),\n					linear-gradient(0deg, ").concat(maskStartColor, ", ").concat(maskEndColor, ")")) : "",
-        top: isInitializedRef.value ? "background-color: rgba(0,0,0,0)" : "",
-        bottom: isInitializedRef.value ? "background-color: rgba(0,0,0,0)" : ""
-      };
-    });
-    return {
-      maskConfig,
-      platformMaskStyles
-    };
-  };
-  class PickerCanvasConfig extends UTS.UTSType {
+  const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$N, [["render", _sfc_render$M], ["styles", [_style_0$M]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-line-progress/i-line-progress.uvue"]]);
+  class IPickerItem extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
         kind: 2,
         get fields() {
           return {
-            itemHeight: { type: Number, optional: false },
-            itemFontSize: { type: Number, optional: false },
-            itemActiveFontWeight: { type: Number, optional: true },
-            itemColor: { type: String, optional: true },
-            itemActiveColor: { type: String, optional: true },
-            canvasWidth: { type: Number, optional: false },
-            canvasHeight: { type: Number, optional: false }
+            text: { type: String, optional: false },
+            value: { type: "Any", optional: true },
+            disabled: { type: Boolean, optional: false }
           };
         },
-        name: "PickerCanvasConfig"
+        name: "IPickerItem"
       };
     }
-    constructor(options, metadata = PickerCanvasConfig.get$UTSMetadata$(), isJSONParse = false) {
+    constructor(options, metadata = IPickerItem.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.itemHeight = this.__props__.itemHeight;
-      this.itemFontSize = this.__props__.itemFontSize;
-      this.itemActiveFontWeight = this.__props__.itemActiveFontWeight;
-      this.itemColor = this.__props__.itemColor;
-      this.itemActiveColor = this.__props__.itemActiveColor;
-      this.canvasWidth = this.__props__.canvasWidth;
-      this.canvasHeight = this.__props__.canvasHeight;
+      this.text = this.__props__.text;
+      this.value = this.__props__.value;
+      this.disabled = this.__props__.disabled;
       delete this.__props__;
     }
   }
-  class PickerCanvasRenderer {
-    constructor(itemRef) {
-      this.ctx = null;
-      this.dpr = 1;
-      this.isInitialized = false;
-      this.lastWidth = 0;
-      this.lastHeight = 0;
-      this.canvas = itemRef;
-      this.initCanvas();
-    }
-    initCanvas() {
-      this.isInitialized = true;
-      return null;
-    }
-    setupCanvas(width, height) {
-      return null;
-    }
-    clearRect(width = 1e3, height = 1e5) {
-      var _a;
-      (_a = this.ctx) === null || _a === void 0 ? null : _a.reset();
-      return null;
-    }
-    render(options, curIndex, config, isDarkMode) {
-      var _a, _b, _c;
-      const ctx = this.canvas.getDrawableContext();
-      const itemHeight = config.itemHeight;
-      const fontSize = config.itemFontSize;
-      const canvasWidth = config.canvasWidth;
-      const canvasHeight = config.canvasHeight;
-      this.setupCanvas(canvasWidth, canvasHeight);
-      ctx.reset();
-      const x2 = canvasWidth / 2;
-      const itemActiveFontWeight = (_a = config === null || config === void 0 ? null : config.itemActiveFontWeight) !== null && _a !== void 0 ? _a : 700;
-      const color = (_b = config === null || config === void 0 ? null : config.itemColor) !== null && _b !== void 0 ? _b : isDarkMode ? "rgba(255,255,255,0.88)" : "rgba(0,0,0,0.88)";
-      const itemActiveColor = (_c = config === null || config === void 0 ? null : config.itemActiveColor) !== null && _c !== void 0 ? _c : isDarkMode ? "rgba(255,255,255,0.88)" : "rgba(0,0,0,0.88)";
-      ctx.font = "".concat(fontSize, "px");
-      ctx.textAlign = "center";
-      ctx.lineWidth = 0.5;
-      this.clearRect(canvasWidth, canvasHeight);
-      options.forEach((item, index) => {
-        let offset = 0.4;
-        offset = 0.55;
-        const y2 = itemHeight * index + fontSize + (itemHeight - fontSize) * offset;
-        const isActive = index == curIndex && itemActiveFontWeight > 600;
-        ctx.fillStyle = isActive ? itemActiveColor : color;
-        ctx.strokeStyle = isActive ? itemActiveColor : color;
-        ctx.fillText(item.label, x2, y2);
-        if (isActive) {
-          ctx.fillText(item.label, x2 - 0.2, y2);
-          ctx.fillText(item.label, x2 + 0.2, y2);
-          ctx.fillText(item.label, x2, y2 - 0.2);
-          ctx.fillText(item.label, x2, y2 + 0.2);
-        }
-      });
-      ctx.update();
-    }
-    destroy() {
-      this.ctx = null;
-      this.isInitialized = false;
-    }
-  }
-  const _sfc_main$Q = /* @__PURE__ */ vue.defineComponent({
-    __name: "l-picker-item",
-    props: {
-      options: { type: Array, required: true, default: [] },
-      value: { type: [String, Number], required: false },
-      column: { type: Number, required: true, default: -1 },
-      name: { type: [String, Number], required: false }
+  const _sfc_main$M = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-picker" }, { __name: "i-picker", props: {
+    modelValue: {
+      type: [String, Number, Array],
+      default: ""
     },
-    setup(__props, _a) {
-      var __expose = _a.expose;
-      const themeMode = vue.inject("limeConfigProviderTheme", vue.computed(() => {
-        return "light";
-      }));
-      const instance = vue.getCurrentInstance();
-      const props = __props;
-      const picker = vue.inject("limePicker", null);
-      const pickerItemInstanceArray = vue.inject("limePickerItems", null);
-      const manageChildInList = vue.inject("limePickerManageChildInList", null);
-      manageChildInList === null || manageChildInList === void 0 ? null : manageChildInList(instance.proxy, true);
-      const onPick = vue.inject("limePickerOnPick", null);
-      const updateItems = vue.inject("limePickerUpdateItems", null);
-      const curIndex = vue.ref(0);
-      const isInitialized = vue.ref(false);
-      const curValue = vue.ref(props.value);
-      const innerIndex = vue.computed(() => {
-        return [curIndex.value];
-      });
-      const isDarkMode = vue.computed(() => {
-        return themeMode.value == "dark";
-      });
-      const column = vue.computed(() => {
-        var _a2;
-        return props.column != -1 ? props.column : (_a2 = pickerItemInstanceArray === null || pickerItemInstanceArray === void 0 ? null : pickerItemInstanceArray.indexOf(instance.proxy)) !== null && _a2 !== void 0 ? _a2 : props.column;
-      });
-      const platformMaskStyles = usePickerMask(vue.computed(() => {
-        return picker === null || picker === void 0 ? null : picker.bgColor;
-      }), isDarkMode, vue.computed(() => {
-        return picker === null || picker === void 0 ? null : picker.maskColors;
-      }), isInitialized).platformMaskStyles;
-      const indicatorStyles = vue.computed(() => {
-        var _a2;
-        let style = "height: ".concat((_a2 = picker === null || picker === void 0 ? null : picker.itemHeight) !== null && _a2 !== void 0 ? _a2 : "50px", ";border-bottom-color: transparent;");
-        return style + (isInitialized.value ? "border-top-color: rgba(0,0,0,0.001);" : "border-top-color: transparent;");
-      });
-      const itemStyles = vue.computed(() => {
-        var _a2;
-        const style = /* @__PURE__ */ new Map();
-        style.set("height", unitConvert((_a2 = picker === null || picker === void 0 ? null : picker.itemHeight) !== null && _a2 !== void 0 ? _a2 : 50) * props.options.length + "px");
-        return style;
-      });
-      const itemActiveStyles = vue.computed(() => {
-        const style = /* @__PURE__ */ new Map();
-        if ((picker === null || picker === void 0 ? null : picker.itemActiveColor) != null) {
-          style.set("color", picker.itemActiveColor);
-        }
-        if ((picker === null || picker === void 0 ? null : picker.itemActiveFontWeight) != null) {
-          style.set("font-weight", picker.itemActiveFontWeight);
-        }
-        return style;
-      });
-      const getIndexByValue = (val = null) => {
-        let defaultIndex = 0;
-        if (val != null) {
-          defaultIndex = props.options.findIndex((item = null) => {
-            return item.value == val;
-          });
-        }
-        return defaultIndex < 0 ? 0 : defaultIndex;
-      };
-      let lastCount = props.options.length;
-      const setIndex = (index) => {
-        curIndex.value;
-        let _index = clamp(index, 0, props.options.length - 1);
-        if (props.options.length > _index) {
-          if (props.options.length == lastCount) {
-            curIndex.value = _index;
-            curValue.value = props.options[_index].value;
-          } else {
-            requestAnimationFrame(() => {
-              curIndex.value = _index - 1;
-              curIndex.value = _index;
-              curValue.value = props.options[_index].value;
-              lastCount = props.options.length;
-            });
-          }
-        }
-      };
-      const setValue = (value = null) => {
-        if (value == curValue.value)
-          return null;
-        curValue.value = value;
-        const index = getIndexByValue(value);
-        setIndex(index);
-      };
-      const setOptions = () => {
-      };
-      const setUpdateItems = () => {
-        const index = clamp(curIndex.value, 0, props.options.length - 1);
-        const curItem = props.options.length > index ? props.options[index] : null;
-        if (curItem == null)
-          return null;
-        updateItems === null || updateItems === void 0 ? null : updateItems(curItem, index, column.value);
-      };
-      const handlePick = (e2) => {
-        if (props.options.length == 0)
-          return null;
-        const index = clamp(e2.detail.value[0], 0, props.options.length - 1);
-        const curItem = props.options[index];
-        if (index == curIndex.value)
-          return null;
-        setIndex(index);
-        onPick === null || onPick === void 0 ? null : onPick(curItem, index, column.value);
-      };
-      const stopValue = vue.watch(() => {
-        return props.value;
-      }, (v2 = null) => {
-        setValue(v2);
-        setUpdateItems();
-      }, { immediate: true });
-      const itemRef = vue.ref(null);
-      let canvasRenderer = null;
-      const canvasWidth = vue.ref(0);
-      const canvasHeight = vue.ref(0);
-      const canvasConfig = vue.computed(() => {
-        var _a2, _b;
-        return new PickerCanvasConfig({
-          itemHeight: unitConvert((_a2 = picker === null || picker === void 0 ? null : picker.itemHeight) !== null && _a2 !== void 0 ? _a2 : 50),
-          itemFontSize: unitConvert((_b = picker === null || picker === void 0 ? null : picker.itemFontSize) !== null && _b !== void 0 ? _b : 16),
-          itemActiveFontWeight: picker === null || picker === void 0 ? null : picker.itemActiveFontWeight,
-          itemColor: picker === null || picker === void 0 ? null : picker.itemColor,
-          itemActiveColor: picker === null || picker === void 0 ? null : picker.itemActiveColor,
-          canvasWidth: canvasWidth.value,
-          canvasHeight: canvasHeight.value
-        });
-      });
-      const updateItemStyle = () => {
-        if (itemRef.value == null)
-          return null;
-        if (canvasRenderer == null) {
-          canvasRenderer = new PickerCanvasRenderer(itemRef.value);
-        }
-        canvasRenderer === null || canvasRenderer === void 0 ? null : canvasRenderer.render(props.options, curIndex.value, canvasConfig.value, isDarkMode.value);
-      };
-      const getBoundingClientRect = () => {
-        requestAnimationFrame(() => {
-          var _a2, _b;
-          (_b = (_a2 = itemRef.value) === null || _a2 === void 0 ? null : _a2.getBoundingClientRectAsync()) === null || _b === void 0 ? null : _b.then((res) => {
-            canvasWidth.value = res.width;
-            canvasHeight.value = res.height;
-          });
-        });
-      };
-      const resizeObserver = new UniResizeObserver((entries) => {
-        getBoundingClientRect();
-      });
-      let timerId = null;
-      let renderCount = 0;
-      const stopOptionsWatch = vue.watch([() => {
-        return props.options;
-      }, canvasHeight, isDarkMode, curIndex], () => {
-        if (canvasHeight.value == 0)
-          return null;
-        updateItemStyle();
-        if (renderCount > 2)
-          return null;
-        if (timerId != null) {
-          clearTimeout(timerId);
-        }
-        timerId = setTimeout(() => {
-          updateItemStyle();
-          renderCount++;
-        }, 50);
-      });
-      const stopItemRefWatch = vue.watch(() => {
-        return itemRef.value;
-      }, (el = null) => {
-        if (el == null)
-          return null;
-        resizeObserver.observe(el);
-        getBoundingClientRect();
-      });
-      vue.onMounted(() => {
-        vue.nextTick(() => {
-          setTimeout(() => {
-            isInitialized.value = true;
-          }, 400);
-        });
-      });
-      vue.onBeforeUnmount(() => {
-        manageChildInList === null || manageChildInList === void 0 ? null : manageChildInList(instance.proxy, false);
-        stopOptionsWatch();
-        stopItemRefWatch();
-        resizeObserver.disconnect();
-        canvasRenderer = null;
-      });
-      __expose({
-        setIndex,
-        setValue,
-        // setOptions,
-        // setUpdateItems,
-        getIndexByValue
-      });
-      const __returned__ = { themeMode, instance, props, picker, pickerItemInstanceArray, manageChildInList, onPick, updateItems, curIndex, isInitialized, curValue, innerIndex, isDarkMode, column, platformMaskStyles, indicatorStyles, itemStyles, itemActiveStyles, getIndexByValue, get lastCount() {
-        return lastCount;
-      }, set lastCount(v2 = null) {
-        lastCount = v2;
-      }, setIndex, setValue, setOptions, setUpdateItems, handlePick, stopValue, itemRef, get canvasRenderer() {
-        return canvasRenderer;
-      }, set canvasRenderer(v2 = null) {
-        canvasRenderer = v2;
-      }, canvasWidth, canvasHeight, canvasConfig, updateItemStyle, getBoundingClientRect, resizeObserver, get timerId() {
-        return timerId;
-      }, set timerId(v2 = null) {
-        timerId = v2;
-      }, get renderCount() {
-        return renderCount;
-      }, set renderCount(v2) {
-        renderCount = v2;
-      }, stopOptionsWatch, stopItemRefWatch };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
+    show: {
+      type: Boolean,
+      default: false
+    },
+    showToolbar: {
+      type: Boolean,
+      default: true
+    },
+    title: {
+      type: String,
+      default: ""
+    },
+    columns: {
+      type: Array,
+      default: () => {
+        return [];
+      }
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    itemHeight: {
+      type: [String, Number],
+      default: 44
+    },
+    cancelText: {
+      type: String,
+      default: "取消"
+    },
+    confirmText: {
+      type: String,
+      default: "确认"
+    },
+    cancelColor: {
+      type: String,
+      default: "#909193"
+    },
+    confirmColor: {
+      type: String,
+      default: "#3c9cff"
+    },
+    visibleItemCount: {
+      type: [String, Number],
+      default: 5
+    },
+    closeOnMask: { type: Boolean, default: true },
+    defaultIndex: {
+      type: [Number, Array],
+      default: 0
+    },
+    immediateChange: {
+      type: Boolean,
+      default: false
+    },
+    round: {
+      type: [String, Number],
+      default: 16
+    },
+    showInput: {
+      type: Boolean,
+      default: true
+    },
+    showDefaultValue: {
+      type: Boolean,
+      default: true
+    },
+    options: {
+      type: Array,
+      default: () => {
+        return ["Apple", "Orange", "Banana"];
+      }
+    },
+    value: {
+      type: [String, Number],
+      default: ""
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
-  });
-  const _style_0$O = { "l-picker-item__group": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-picker-item__group-item": { "": { "height": "var(--l-picker-item-height, 50px)", "lineHeight": "var(--l-picker-item-height, 50px)", "textAlign": "center", "transitionDuration": "100ms", "transitionProperty": "fontWeight,color", "transitionTimingFunction": "linear", "fontWeight": 400, "color": "var(--l-picker-item-color, #000000E0)", "fontSize": "var(--l-picker-item-font-size, 16px)", "whiteSpace": "nowrap" } }, "l-picker-item__group-item--active": { "": { "color": "var(--l-picker-item-active-color, #000000E0)", "fontWeight": "var(--l-picker-item-active-font-weight, 700)" } }, "l-picker-item__wrapper": { "": { "width": "100%" } }, "@TRANSITION": { "l-picker-item__group-item": { "duration": "100ms", "property": "fontWeight,color", "timingFunction": "linear" } } };
-  function _sfc_render$P(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock("picker-view", {
-      class: "l-picker-item__group",
-      style: vue.normalizeStyle({ opacity: $props.options.length > 0 ? 1 : 0 }),
-      "mask-style": $setup.platformMaskStyles.common,
-      "mask-top-style": $setup.platformMaskStyles.top,
-      "mask-bottom-style": $setup.platformMaskStyles.bottom,
-      "indicator-style": $setup.indicatorStyles,
-      "mask-class": "l-picker-item__mask",
-      value: $setup.innerIndex,
-      onChange: $setup.handlePick,
-      "indicator-class": "l-picker-item__indicator"
-    }, [
-      vue.createElementVNode("picker-view-column", { class: "l-picker-item__wrapper" }, [
-        vue.createElementVNode(
-          "view",
-          {
-            ref: "itemRef",
-            style: vue.normalizeStyle([$setup.itemStyles])
-          },
-          null,
-          4
-          /* STYLE */
-        )
-      ])
-    ], 44, ["mask-style", "mask-top-style", "mask-bottom-style", "indicator-style", "value"]);
-  }
-  const __easycom_0$6 = /* @__PURE__ */ _export_sfc(_sfc_main$Q, [["render", _sfc_render$P], ["styles", [_style_0$O]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/lime-picker/components/l-picker-item/l-picker-item.uvue"]]);
-  function arrayEqual(arr1, arr2) {
-    return arr1.length == arr2.length && arr1.every((val, i2) => {
-      return val == arr2[i2];
+  }, emits: [
+    "open",
+    "close",
+    "cancel",
+    "change",
+    "confirm",
+    "clear",
+    "update:value",
+    "update:modelValue",
+    "update:show"
+  ], setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    function isArray(value = null) {
+      return value != null && Array.isArray(value);
+    }
+    function normalizedIndex(value, fallback) {
+      return isNaN(value) || !isFinite(value) ? fallback : Math.floor(value);
+    }
+    function normalizeItem(item = null) {
+      if (item != null && typeof item == "object") {
+        const serialized = UTS.JSON.stringify(item);
+        const object = UTS.JSON.parse(serialized);
+        const rawText = object["text"];
+        const rawValue = object["value"];
+        const text = rawText != null ? rawText.toString() : rawValue == null ? "" : rawValue.toString();
+        const value = rawValue != null ? rawValue : text;
+        return new IPickerItem({ text, value, disabled: object["disabled"] == true });
+      }
+      return new IPickerItem({
+        text: item == null ? "" : item.toString(),
+        value: item,
+        disabled: false
+      });
+    }
+    function normalizeColumn(list = null) {
+      const result = [];
+      if (list == null || !Array.isArray(list))
+        return result;
+      const values = list;
+      for (let i2 = 0; i2 < values.length; i2++)
+        result.push(normalizeItem(values[i2]));
+      return result;
+    }
+    const opened = vue.ref(props.show);
+    const currentIndexs = vue.ref([]);
+    const pickerViewIndexes = vue.ref([]);
+    let indexSyncGeneration = 0;
+    let pickerInitialized = false;
+    let pickerInternalChange = false;
+    function scheduleFrame(callback) {
+      setTimeout(callback, 16);
+    }
+    function copyIndexes(indexes) {
+      return indexes.slice();
+    }
+    function findChangedIndex(nextIndexes, oldIndexes) {
+      const length = Math.max(nextIndexes.length, oldIndexes.length);
+      for (let index = 0; index < length; index++) {
+        const nextValue = index < nextIndexes.length ? nextIndexes[index] : -1;
+        const oldValue = index < oldIndexes.length ? oldIndexes[index] : -1;
+        if (nextValue != oldValue)
+          return index;
+      }
+      return -1;
+    }
+    function cancelIndexSync() {
+      indexSyncGeneration++;
+      pickerInternalChange = false;
+    }
+    const normalizedColumns = vue.computed(() => {
+      const columns = props.columns;
+      const options = props.options;
+      const source = columns != null && columns.length > 0 ? columns : options == null ? [] : options;
+      if (source.length == 0)
+        return [];
+      const first = source[0];
+      if (isArray(first)) {
+        const result = [];
+        for (let i2 = 0; i2 < source.length; i2++)
+          result.push(normalizeColumn(source[i2]));
+        return result;
+      }
+      return [normalizeColumn(source)];
     });
-  }
-  function assignAtIndex(arr, index, value) {
-    if (index < 0) {
-      throw new Error("Index must be a non-negative integer, got ".concat(index));
-    }
-    arr[index] = value;
-  }
-  function __awaiter(thisArg, _arguments, P, generator) {
-    function adopt(value) {
-      return value instanceof P ? value : new P(function(resolve) {
-        resolve(value);
-      });
-    }
-    return new (P || (P = Promise))(function(resolve, reject) {
-      function fulfilled(value) {
-        try {
-          step(generator.next(value));
-        } catch (e2) {
-          reject(e2);
-        }
-      }
-      function rejected(value) {
-        try {
-          step(generator["throw"](value));
-        } catch (e2) {
-          reject(e2);
-        }
-      }
-      function step(result) {
-        result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-      }
-      step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-  }
-  function __values(o2) {
-    var s2 = typeof Symbol === "function" && Symbol.iterator, m2 = s2 && o2[s2], i2 = 0;
-    if (m2)
-      return m2.call(o2);
-    if (o2 && typeof o2.length === "number")
-      return {
-        next: function() {
-          if (o2 && i2 >= o2.length)
-            o2 = void 0;
-          return { value: o2 && o2[i2++], done: !o2 };
-        }
-      };
-    throw new TypeError(s2 ? "Object is not iterable." : "Symbol.iterator is not defined.");
-  }
-  function __read(o2, n2) {
-    var m2 = typeof Symbol === "function" && o2[Symbol.iterator];
-    if (!m2)
-      return o2;
-    var i2 = m2.call(o2), r2, ar2 = [], e2;
-    try {
-      while ((n2 === void 0 || n2-- > 0) && !(r2 = i2.next()).done)
-        ar2.push(r2.value);
-    } catch (error) {
-      e2 = { error };
-    } finally {
-      try {
-        if (r2 && !r2.done && (m2 = i2["return"]))
-          m2.call(i2);
-      } finally {
-        if (e2)
-          throw e2.error;
-      }
-    }
-    return ar2;
-  }
-  typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
-    var e2 = new Error(message);
-    return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
-  };
-  class RGB extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            r: { type: Number, optional: false },
-            g: { type: Number, optional: false },
-            b: { type: Number, optional: false }
-          };
-        },
-        name: "RGB"
-      };
-    }
-    constructor(options, metadata = RGB.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.r = this.__props__.r;
-      this.g = this.__props__.g;
-      this.b = this.__props__.b;
-      delete this.__props__;
-    }
-  }
-  class RGBA extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            r: { type: Number, optional: false },
-            g: { type: Number, optional: false },
-            b: { type: Number, optional: false },
-            a: { type: Number, optional: false }
-          };
-        },
-        name: "RGBA"
-      };
-    }
-    constructor(options, metadata = RGBA.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.r = this.__props__.r;
-      this.g = this.__props__.g;
-      this.b = this.__props__.b;
-      this.a = this.__props__.a;
-      delete this.__props__;
-    }
-  }
-  class RGBAString extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            r: { type: String, optional: false },
-            g: { type: String, optional: false },
-            b: { type: String, optional: false },
-            a: { type: Number, optional: false }
-          };
-        },
-        name: "RGBAString"
-      };
-    }
-    constructor(options, metadata = RGBAString.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.r = this.__props__.r;
-      this.g = this.__props__.g;
-      this.b = this.__props__.b;
-      this.a = this.__props__.a;
-      delete this.__props__;
-    }
-  }
-  class HSL extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            h: { type: Number, optional: false },
-            s: { type: Number, optional: false },
-            l: { type: Number, optional: false }
-          };
-        },
-        name: "HSL"
-      };
-    }
-    constructor(options, metadata = HSL.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.h = this.__props__.h;
-      this.s = this.__props__.s;
-      this.l = this.__props__.l;
-      delete this.__props__;
-    }
-  }
-  class HSLA extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            h: { type: Number, optional: false },
-            s: { type: Number, optional: false },
-            l: { type: Number, optional: false },
-            a: { type: Number, optional: false }
-          };
-        },
-        name: "HSLA"
-      };
-    }
-    constructor(options, metadata = HSLA.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.h = this.__props__.h;
-      this.s = this.__props__.s;
-      this.l = this.__props__.l;
-      this.a = this.__props__.a;
-      delete this.__props__;
-    }
-  }
-  class HSV extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            h: { type: Number, optional: false },
-            s: { type: Number, optional: false },
-            v: { type: Number, optional: false }
-          };
-        },
-        name: "HSV"
-      };
-    }
-    constructor(options, metadata = HSV.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.h = this.__props__.h;
-      this.s = this.__props__.s;
-      this.v = this.__props__.v;
-      delete this.__props__;
-    }
-  }
-  class HSVA extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            h: { type: Number, optional: false },
-            s: { type: Number, optional: false },
-            v: { type: Number, optional: false },
-            a: { type: Number, optional: false }
-          };
-        },
-        name: "HSVA"
-      };
-    }
-    constructor(options, metadata = HSVA.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.h = this.__props__.h;
-      this.s = this.__props__.s;
-      this.v = this.__props__.v;
-      this.a = this.__props__.a;
-      delete this.__props__;
-    }
-  }
-  class HSB extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            h: { type: Number, optional: false },
-            s: { type: Number, optional: false },
-            b: { type: Number, optional: false }
-          };
-        },
-        name: "HSB"
-      };
-    }
-    constructor(options, metadata = HSB.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.h = this.__props__.h;
-      this.s = this.__props__.s;
-      this.b = this.__props__.b;
-      delete this.__props__;
-    }
-  }
-  class HSBA extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            h: { type: Number, optional: false },
-            s: { type: Number, optional: false },
-            b: { type: Number, optional: false },
-            a: { type: Number, optional: false }
-          };
-        },
-        name: "HSBA"
-      };
-    }
-    constructor(options, metadata = HSBA.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.h = this.__props__.h;
-      this.s = this.__props__.s;
-      this.b = this.__props__.b;
-      this.a = this.__props__.a;
-      delete this.__props__;
-    }
-  }
-  class LColorInfo extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            ok: { type: Boolean, optional: true },
-            format: { type: "Unknown", optional: true },
-            r: { type: Number, optional: false },
-            g: { type: Number, optional: false },
-            b: { type: Number, optional: false },
-            a: { type: Number, optional: false }
-          };
-        },
-        name: "LColorInfo"
-      };
-    }
-    constructor(options, metadata = LColorInfo.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.ok = this.__props__.ok;
-      this.format = this.__props__.format;
-      this.r = this.__props__.r;
-      this.g = this.__props__.g;
-      this.b = this.__props__.b;
-      this.a = this.__props__.a;
-      delete this.__props__;
-    }
-  }
-  class LColorOptions extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            format: { type: "Unknown", optional: true },
-            gradientType: { type: String, optional: true }
-          };
-        },
-        name: "LColorOptions"
-      };
-    }
-    constructor(options, metadata = LColorOptions.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.format = this.__props__.format;
-      this.gradientType = this.__props__.gradientType;
-      delete this.__props__;
-    }
-  }
-  class LGenerateOptions extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            theme: { type: "Unknown", optional: true },
-            backgroundColor: { type: String, optional: true }
-          };
-        },
-        name: "LGenerateOptions"
-      };
-    }
-    constructor(options, metadata = LGenerateOptions.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.theme = this.__props__.theme;
-      this.backgroundColor = this.__props__.backgroundColor;
-      delete this.__props__;
-    }
-  }
-  function isNumber$1(value = null) {
-    return ["Int8", "UInt8", "Int16", "UInt16", "Int32", "UInt32", "Int64", "UInt64", "Int", "UInt", "Float", "Float16", "Float32", "Float64", "Double", "number"].includes(typeof value);
-  }
-  function isString(value = null) {
-    return typeof value == "string";
-  }
-  function isNumeric(value = null) {
-    if (isNumber$1(value)) {
-      return true;
-    } else if (isString(value)) {
-      const regex = new RegExp("^(-)?\\d+(\\.\\d+)?$");
-      return regex.test(value);
-    }
-    return false;
-  }
-  function toBoolean(value = null) {
-    if (isNumber$1(value)) {
-      return value != 0;
-    }
-    if (isString(value)) {
-      return "".concat(value).length > 0;
-    }
-    if (typeof value == "boolean") {
-      return value;
-    }
-    return value != null;
-  }
-  function isPercentage(n2 = null) {
-    return isString(n2) && n2.indexOf("%") != -1;
-  }
-  function isOnePointZero(n2 = null) {
-    return isString(n2) && n2.indexOf(".") != -1 && parseFloat(n2) == 1;
-  }
-  function bound01(n2 = null, max) {
-    if (!(isNumber$1(n2) || isString(n2))) {
-      return 1;
-    }
-    if (isOnePointZero(n2)) {
-      n2 = "100%";
-    }
-    const isPercent = isPercentage(n2);
-    n2 = isNumber$1(n2) ? n2 : parseFloat(n2);
-    n2 = max == 360 ? n2 : Math.min(max, Math.max(0, n2));
-    if (isPercent) {
-      n2 = parseInt("".concat(Math.min(n2, 100) * max), 10) / 100;
-    }
-    if (Math.abs(n2 - max) < 1e-6) {
-      return 1;
-    }
-    if (max == 360) {
-      n2 = (n2 < 0 ? n2 % max + max : n2 % max) / max;
-    } else {
-      n2 = n2 % max / max;
-    }
-    return n2;
-  }
-  function clamp01(val) {
-    return Math.min(1, Math.max(0, val));
-  }
-  function boundAlpha(a2 = null) {
-    let n2 = a2 == null ? 1 : isString(a2) ? parseFloat(a2) : a2;
-    if (isNaN(n2) || n2 < 0 || n2 > 1) {
-      n2 = 1;
-    }
-    return n2;
-  }
-  function convertToPercentage(n2 = null) {
-    n2 = isNumeric(n2) ? parseFloat("".concat(n2)) : n2;
-    if (isNumber$1(n2) && n2 <= 1) {
-      return "".concat(n2 * 100, "%").replace(".0%", "%");
-    }
-    return n2;
-  }
-  function pad2(c2) {
-    return c2.length == 1 ? "0" + c2 : "".concat(c2);
-  }
-  function rgbToRgb(r2 = null, g2 = null, b2 = null) {
-    return new RGB({
-      r: bound01(r2, 255) * 255,
-      g: bound01(g2, 255) * 255,
-      b: bound01(b2, 255) * 255
-    });
-  }
-  function rgbToHsl(r2 = null, g2 = null, b2 = null) {
-    r2 = bound01(r2, 255);
-    g2 = bound01(g2, 255);
-    b2 = bound01(b2, 255);
-    const max = Math.max(r2, g2, b2);
-    const min = Math.min(r2, g2, b2);
-    let h2 = 0;
-    let s2;
-    const l2 = (max + min) / 2;
-    if (max == min) {
-      s2 = 0;
-      h2 = 0;
-    } else {
-      const d2 = max - min;
-      s2 = l2 > 0.5 ? d2 / (2 - max - min) : d2 / (max + min);
-      switch (max) {
-        case r2:
-          h2 = (g2 - b2) / d2 + (g2 < b2 ? 6 : 0);
-          break;
-        case g2:
-          h2 = (b2 - r2) / d2 + 2;
-          break;
-        case b2:
-          h2 = (r2 - g2) / d2 + 4;
-          break;
-        default:
-          uni.__log__("log", "at uni_modules/lime-color/common/conversion.uts:64", "h");
-          break;
-      }
-      h2 /= 6;
-    }
-    return new HSL({ h: h2, s: s2, l: l2 });
-  }
-  function hue2rgb(p2, q2, t2) {
-    let _t2 = t2;
-    if (_t2 < 0) {
-      _t2 += 1;
-    }
-    if (_t2 > 1) {
-      _t2 -= 1;
-    }
-    if (_t2 < 1 / 6) {
-      return p2 + (q2 - p2) * (6 * _t2);
-    }
-    if (_t2 < 1 / 2) {
-      return q2;
-    }
-    if (_t2 < 2 / 3) {
-      return p2 + (q2 - p2) * (2 / 3 - _t2) * 6;
-    }
-    return p2;
-  }
-  function hslToRgb(h2 = null, s2 = null, l2 = null) {
-    let r2;
-    let g2;
-    let b2;
-    h2 = bound01(h2, 360);
-    s2 = bound01(s2, 100);
-    l2 = bound01(l2, 100);
-    if (s2 == 0) {
-      g2 = l2;
-      b2 = l2;
-      r2 = l2;
-    } else {
-      const q2 = l2 < 0.5 ? l2 * (1 + s2) : l2 + s2 - l2 * s2;
-      const p2 = 2 * l2 - q2;
-      r2 = hue2rgb(p2, q2, h2 + 1 / 3);
-      g2 = hue2rgb(p2, q2, h2);
-      b2 = hue2rgb(p2, q2, h2 - 1 / 3);
-    }
-    return new RGB({ r: r2 * 255, g: g2 * 255, b: b2 * 255 });
-  }
-  function rgbToHsv(r2, g2, b2) {
-    r2 = bound01(r2, 255);
-    g2 = bound01(g2, 255);
-    b2 = bound01(b2, 255);
-    const max = Math.max(r2, g2, b2);
-    const min = Math.min(r2, g2, b2);
-    let h2 = 0;
-    const v2 = max;
-    const d2 = max - min;
-    const s2 = max == 0 ? 0 : d2 / max;
-    if (max == min) {
-      h2 = 0;
-    } else {
-      switch (max) {
-        case r2:
-          h2 = (g2 - b2) / d2 + (g2 < b2 ? 6 : 0);
-          break;
-        case g2:
-          h2 = (b2 - r2) / d2 + 2;
-          break;
-        case b2:
-          h2 = (r2 - g2) / d2 + 4;
-          break;
-        default:
-          uni.__log__("log", "at uni_modules/lime-color/common/conversion.uts:171", "1");
-          break;
-      }
-      h2 /= 6;
-    }
-    return new HSV({ h: h2, s: s2, v: v2 });
-  }
-  function hsvToRgb(h2 = null, s2 = null, v2 = null) {
-    h2 = bound01(h2, 360) * 6;
-    s2 = bound01(s2, 100);
-    v2 = bound01(v2, 100);
-    const i2 = Math.floor(h2);
-    const f2 = h2 - i2;
-    const p2 = v2 * (1 - s2);
-    const q2 = v2 * (1 - f2 * s2);
-    const t2 = v2 * (1 - (1 - f2) * s2);
-    const mod = i2 % 6;
-    const r2 = [v2, q2, p2, p2, t2, v2][mod];
-    const g2 = [t2, v2, v2, q2, p2, p2][mod];
-    const b2 = [p2, p2, t2, v2, v2, q2][mod];
-    return new RGB({ r: r2 * 255, g: g2 * 255, b: b2 * 255 });
-  }
-  function rgbToHex(r2, g2, b2, allow3Char = false) {
-    const hex = [
-      pad2(Math.round(r2).toString(16)),
-      pad2(Math.round(g2).toString(16)),
-      pad2(Math.round(b2).toString(16))
-    ];
-    if (allow3Char && hex[0].startsWith(hex[0].charAt(1)) && hex[1].startsWith(hex[1].charAt(1)) && hex[2].startsWith(hex[2].charAt(1))) {
-      return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0);
-    }
-    return hex.join("");
-  }
-  function rgbaToHex(r2, g2, b2, a2, allow4Char = false) {
-    const hex = [
-      pad2(Math.round(r2).toString(16)),
-      pad2(Math.round(g2).toString(16)),
-      pad2(Math.round(b2).toString(16)),
-      pad2(convertDecimalToHex(a2))
-    ];
-    if (allow4Char && hex[0].startsWith(hex[0].charAt(1)) && hex[1].startsWith(hex[1].charAt(1)) && hex[2].startsWith(hex[2].charAt(1)) && hex[3].startsWith(hex[3].charAt(1))) {
-      return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0) + hex[3].charAt(0);
-    }
-    return hex.join("");
-  }
-  function convertDecimalToHex(d2 = null) {
-    return Math.round(parseFloat("".concat(d2)) * 255).toString(16);
-  }
-  function convertHexToDecimal(h2) {
-    return parseIntFromHex(h2) / 255;
-  }
-  function parseIntFromHex(val) {
-    return parseInt(val, 16);
-  }
-  function numberInputToObject(color) {
-    return new RGB({
-      r: color >> 16,
-      g: (color & 65280) >> 8,
-      b: color & 255
-    });
-  }
-  const names = /* @__PURE__ */ new Map([
-    ["aliceblue", "#f0f8ff"],
-    ["antiquewhite", "#faebd7"],
-    ["aqua", "#00ffff"],
-    ["aquamarine", "#7fffd4"],
-    ["azure", "#f0ffff"],
-    ["beige", "#f5f5dc"],
-    ["bisque", "#ffe4c4"],
-    ["black", "#000000"],
-    ["blanchedalmond", "#ffebcd"],
-    ["blue", "#0000ff"],
-    ["blueviolet", "#8a2be2"],
-    ["brown", "#a52a2a"],
-    ["burlywood", "#deb887"],
-    ["cadetblue", "#5f9ea0"],
-    ["chartreuse", "#7fff00"],
-    ["chocolate", "#d2691e"],
-    ["coral", "#ff7f50"],
-    ["cornflowerblue", "#6495ed"],
-    ["cornsilk", "#fff8dc"],
-    ["crimson", "#dc143c"],
-    ["cyan", "#00ffff"],
-    ["darkblue", "#00008b"],
-    ["darkcyan", "#008b8b"],
-    ["darkgoldenrod", "#b8860b"],
-    ["darkgray", "#a9a9a9"],
-    ["darkgreen", "#006400"],
-    ["darkgrey", "#a9a9a9"],
-    ["darkkhaki", "#bdb76b"],
-    ["darkmagenta", "#8b008b"],
-    ["darkolivegreen", "#556b2f"],
-    ["darkorange", "#ff8c00"],
-    ["darkorchid", "#9932cc"],
-    ["darkred", "#8b0000"],
-    ["darksalmon", "#e9967a"],
-    ["darkseagreen", "#8fbc8f"],
-    ["darkslateblue", "#483d8b"],
-    ["darkslategray", "#2f4f4f"],
-    ["darkslategrey", "#2f4f4f"],
-    ["darkturquoise", "#00ced1"],
-    ["darkviolet", "#9400d3"],
-    ["deeppink", "#ff1493"],
-    ["deepskyblue", "#00bfff"],
-    ["dimgray", "#696969"],
-    ["dimgrey", "#696969"],
-    ["dodgerblue", "#1e90ff"],
-    ["firebrick", "#b22222"],
-    ["floralwhite", "#fffaf0"],
-    ["forestgreen", "#228b22"],
-    ["fuchsia", "#ff00ff"],
-    ["gainsboro", "#dcdcdc"],
-    ["ghostwhite", "#f8f8ff"],
-    ["goldenrod", "#daa520"],
-    ["gold", "#ffd700"],
-    ["gray", "#808080"],
-    ["green", "#008000"],
-    ["greenyellow", "#adff2f"],
-    ["grey", "#808080"],
-    ["honeydew", "#f0fff0"],
-    ["hotpink", "#ff69b4"],
-    ["indianred", "#cd5c5c"],
-    ["indigo", "#4b0082"],
-    ["ivory", "#fffff0"],
-    ["khaki", "#f0e68c"],
-    ["lavenderblush", "#fff0f5"],
-    ["lavender", "#e6e6fa"],
-    ["lawngreen", "#7cfc00"],
-    ["lemonchiffon", "#fffacd"],
-    ["lightblue", "#add8e6"],
-    ["lightcoral", "#f08080"],
-    ["lightcyan", "#e0ffff"],
-    ["lightgoldenrodyellow", "#fafad2"],
-    ["lightgray", "#d3d3d3"],
-    ["lightgreen", "#90ee90"],
-    ["lightgrey", "#d3d3d3"],
-    ["lightpink", "#ffb6c1"],
-    ["lightsalmon", "#ffa07a"],
-    ["lightseagreen", "#20b2aa"],
-    ["lightskyblue", "#87cefa"],
-    ["lightslategray", "#778899"],
-    ["lightslategrey", "#778899"],
-    ["lightsteelblue", "#b0c4de"],
-    ["lightyellow", "#ffffe0"],
-    ["lime", "#00ff00"],
-    ["limegreen", "#32cd32"],
-    ["linen", "#faf0e6"],
-    ["magenta", "#ff00ff"],
-    ["maroon", "#800000"],
-    ["mediumaquamarine", "#66cdaa"],
-    ["mediumblue", "#0000cd"],
-    ["mediumorchid", "#ba55d3"],
-    ["mediumpurple", "#9370db"],
-    ["mediumseagreen", "#3cb371"],
-    ["mediumslateblue", "#7b68ee"],
-    ["mediumspringgreen", "#00fa9a"],
-    ["mediumturquoise", "#48d1cc"],
-    ["mediumvioletred", "#c71585"],
-    ["midnightblue", "#191970"],
-    ["mintcream", "#f5fffa"],
-    ["mistyrose", "#ffe4e1"],
-    ["moccasin", "#ffe4b5"],
-    ["navajowhite", "#ffdead"],
-    ["navy", "#000080"],
-    ["oldlace", "#fdf5e6"],
-    ["olive", "#808000"],
-    ["olivedrab", "#6b8e23"],
-    ["orange", "#ffa500"],
-    ["orangered", "#ff4500"],
-    ["orchid", "#da70d6"],
-    ["palegoldenrod", "#eee8aa"],
-    ["palegreen", "#98fb98"],
-    ["paleturquoise", "#afeeee"],
-    ["palevioletred", "#db7093"],
-    ["papayawhip", "#ffefd5"],
-    ["peachpuff", "#ffdab9"],
-    ["peru", "#cd853f"],
-    ["pink", "#ffc0cb"],
-    ["plum", "#dda0dd"],
-    ["powderblue", "#b0e0e6"],
-    ["purple", "#800080"],
-    ["rebeccapurple", "#663399"],
-    ["red", "#ff0000"],
-    ["rosybrown", "#bc8f8f"],
-    ["royalblue", "#4169e1"],
-    ["saddlebrown", "#8b4513"],
-    ["salmon", "#fa8072"],
-    ["sandybrown", "#f4a460"],
-    ["seagreen", "#2e8b57"],
-    ["seashell", "#fff5ee"],
-    ["sienna", "#a0522d"],
-    ["silver", "#c0c0c0"],
-    ["skyblue", "#87ceeb"],
-    ["slateblue", "#6a5acd"],
-    ["slategray", "#708090"],
-    ["slategrey", "#708090"],
-    ["snow", "#fffafa"],
-    ["springgreen", "#00ff7f"],
-    ["steelblue", "#4682b4"],
-    ["tan", "#d2b48c"],
-    ["teal", "#008080"],
-    ["thistle", "#d8bfd8"],
-    ["tomato", "#ff6347"],
-    ["turquoise", "#40e0d0"],
-    ["violet", "#ee82ee"],
-    ["wheat", "#f5deb3"],
-    ["white", "#ffffff"],
-    ["whitesmoke", "#f5f5f5"],
-    ["yellow", "#ffff00"],
-    ["yellowgreen", "#9acd32"]
-  ]);
-  class ColorMatchers extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            CSS_UNIT: { type: "Unknown", optional: false },
-            rgb: { type: "Unknown", optional: false },
-            rgba: { type: "Unknown", optional: false },
-            hsl: { type: "Unknown", optional: false },
-            hsla: { type: "Unknown", optional: false },
-            hsv: { type: "Unknown", optional: false },
-            hsva: { type: "Unknown", optional: false },
-            hsb: { type: "Unknown", optional: false },
-            hsba: { type: "Unknown", optional: false },
-            hex3: { type: "Unknown", optional: false },
-            hex6: { type: "Unknown", optional: false },
-            hex4: { type: "Unknown", optional: false },
-            hex8: { type: "Unknown", optional: false }
-          };
-        },
-        name: "ColorMatchers"
-      };
-    }
-    constructor(options, metadata = ColorMatchers.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.CSS_UNIT = this.__props__.CSS_UNIT;
-      this.rgb = this.__props__.rgb;
-      this.rgba = this.__props__.rgba;
-      this.hsl = this.__props__.hsl;
-      this.hsla = this.__props__.hsla;
-      this.hsv = this.__props__.hsv;
-      this.hsva = this.__props__.hsva;
-      this.hsb = this.__props__.hsb;
-      this.hsba = this.__props__.hsba;
-      this.hex3 = this.__props__.hex3;
-      this.hex6 = this.__props__.hex6;
-      this.hex4 = this.__props__.hex4;
-      this.hex8 = this.__props__.hex8;
-      delete this.__props__;
-    }
-  }
-  const CSS_INTEGER = "[-\\+]?\\d+%?";
-  const CSS_NUMBER = "[-\\+]?\\d*\\.\\d+%?";
-  const CSS_UNIT = "(?:".concat(CSS_NUMBER, ")|(?:").concat(CSS_INTEGER, ")");
-  const PERMISSIVE_MATCH3 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
-  const PERMISSIVE_MATCH4 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
-  const matchers = new ColorMatchers({
-    CSS_UNIT: new RegExp(CSS_UNIT),
-    rgb: new RegExp("rgb" + PERMISSIVE_MATCH3),
-    rgba: new RegExp("rgba" + PERMISSIVE_MATCH4),
-    hsl: new RegExp("hsl" + PERMISSIVE_MATCH3),
-    hsla: new RegExp("hsla" + PERMISSIVE_MATCH4),
-    hsv: new RegExp("hsv" + PERMISSIVE_MATCH3),
-    hsva: new RegExp("hsva" + PERMISSIVE_MATCH4),
-    hsb: new RegExp("hsb" + PERMISSIVE_MATCH3),
-    hsba: new RegExp("hsba" + PERMISSIVE_MATCH4),
-    hex3: /^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
-    hex6: /^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/,
-    hex4: /^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
-    hex8: /^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
-  });
-  function isValidCSSUnit(color = null) {
-    return toBoolean(matchers.CSS_UNIT.exec("".concat(color)));
-  }
-  function inputToRGB(color = null) {
-    var _a;
-    let _color = null;
-    let rgb = new RGB({ r: 0, g: 0, b: 0 });
-    let a2 = 1;
-    let s2 = null;
-    let v2 = null;
-    let l2 = null;
-    let ok = false;
-    let format = null;
-    if (typeof color == "string") {
-      _color = stringInputToObject(color);
-    } else if (typeof color == "object") {
-      _color = UTS.JSON.parse(UTS.JSON.stringify(color), UTSJSONObject);
-    } else
-      ;
-    if (_color != null) {
-      if (isValidCSSUnit(_color["r"]) && isValidCSSUnit(_color["g"]) && isValidCSSUnit(_color["b"])) {
-        rgb = rgbToRgb(_color["r"], _color["g"], _color["b"]);
-        ok = true;
-        format = "".concat(_color["r"]).endsWith("%") ? "prgb" : "rgb";
-      } else if (isValidCSSUnit(_color["h"]) && isValidCSSUnit(_color["s"]) && (isValidCSSUnit(_color["v"]) || isValidCSSUnit(_color["b"]))) {
-        const isHSV = _color["v"] != null;
-        s2 = convertToPercentage(_color["s"]);
-        v2 = isHSV ? convertToPercentage(_color["v"]) : convertToPercentage(_color["b"]);
-        rgb = hsvToRgb(_color["h"], s2, v2);
-        ok = true;
-        format = isHSV ? "hsv" : "hsb";
-      } else if (isValidCSSUnit(_color["h"]) && isValidCSSUnit(_color["s"]) && isValidCSSUnit(_color["l"])) {
-        s2 = convertToPercentage(_color["s"]);
-        l2 = convertToPercentage(_color["l"]);
-        rgb = hslToRgb(_color["h"], s2, l2);
-        ok = true;
-        format = "hsl";
-      }
-      if (_color["a"] != null) {
-        a2 = _color["a"];
-      }
-    }
-    a2 = boundAlpha(a2);
-    return new LColorInfo({
-      ok,
-      format: (_a = _color === null || _color === void 0 ? null : _color["format"]) !== null && _a !== void 0 ? _a : format,
-      r: Math.min(255, Math.max(rgb.r, 0)),
-      g: Math.min(255, Math.max(rgb.g, 0)),
-      b: Math.min(255, Math.max(rgb.b, 0)),
-      a: a2
-    });
-  }
-  function stringInputToObject(color) {
-    let _color = color.trim().toLowerCase();
-    if (_color.length == 0) {
-      return null;
-    }
-    let named = false;
-    if (UTS.mapGet(names, _color) != null) {
-      _color = UTS.mapGet(names, _color);
-      named = true;
-    } else if (_color == "transparent") {
-      return new UTSJSONObject({ r: 0, g: 0, b: 0, a: 0, format: "name" });
-    }
-    let match = matchers.rgb.exec(_color);
-    if (match != null) {
-      const r2 = match[1];
-      const g2 = match[2];
-      const b2 = match[3];
-      return new UTSJSONObject({ r: r2, g: g2, b: b2 });
-    }
-    match = matchers.rgba.exec(_color);
-    if (match != null) {
-      const r2 = match[1];
-      const g2 = match[2];
-      const b2 = match[3];
-      const a2 = match[4];
-      return new UTSJSONObject({ r: r2, g: g2, b: b2, a: a2 });
-    }
-    match = matchers.hsl.exec(_color);
-    if (match != null) {
-      match[1];
-      const s2 = match[2];
-      const l2 = match[3];
-      return new UTSJSONObject({ h: vue.h, s: s2, l: l2 });
-    }
-    match = matchers.hsla.exec(_color);
-    if (match != null) {
-      match[1];
-      const s2 = match[2];
-      const l2 = match[3];
-      const a2 = match[4];
-      return new UTSJSONObject({ h: vue.h, s: s2, l: l2, a: a2 });
-    }
-    match = matchers.hsv.exec(_color);
-    if (match != null) {
-      match[1];
-      const s2 = match[2];
-      const v2 = match[3];
-      return new UTSJSONObject({ h: vue.h, s: s2, v: v2 });
-    }
-    match = matchers.hsva.exec(_color);
-    if (match != null) {
-      match[1];
-      const s2 = match[2];
-      const v2 = match[3];
-      const a2 = match[4];
-      return new UTSJSONObject({ h: vue.h, s: s2, v: v2, a: a2 });
-    }
-    match = matchers.hex8.exec(_color);
-    if (match != null) {
-      const r2 = parseIntFromHex(match[1]);
-      const g2 = parseIntFromHex(match[2]);
-      const b2 = parseIntFromHex(match[3]);
-      const a2 = convertHexToDecimal(match[4]);
-      return new UTSJSONObject({
-        r: r2,
-        g: g2,
-        b: b2,
-        a: a2,
-        format: named ? "name" : "hex8"
-      });
-    }
-    match = matchers.hex6.exec(_color);
-    if (match != null) {
-      const r2 = parseIntFromHex(match[1]);
-      const g2 = parseIntFromHex(match[2]);
-      const b2 = parseIntFromHex(match[3]);
-      return new UTSJSONObject({
-        r: r2,
-        g: g2,
-        b: b2,
-        format: named ? "name" : "hex"
-      });
-    }
-    match = matchers.hex4.exec(_color);
-    if (match != null) {
-      const r2 = parseIntFromHex(match[1] + match[1]);
-      const g2 = parseIntFromHex(match[2] + match[2]);
-      const b2 = parseIntFromHex(match[3] + match[3]);
-      const a2 = convertHexToDecimal(match[4] + match[4]);
-      return new UTSJSONObject({
-        r: r2,
-        g: g2,
-        b: b2,
-        a: a2,
-        format: named ? "name" : "hex8"
-      });
-    }
-    match = matchers.hex3.exec(_color);
-    if (match != null) {
-      const r2 = parseIntFromHex(match[1] + match[1]);
-      const g2 = parseIntFromHex(match[2] + match[2]);
-      const b2 = parseIntFromHex(match[3] + match[3]);
-      return new UTSJSONObject({
-        r: r2,
-        g: g2,
-        b: b2,
-        format: named ? "name" : "hex"
-      });
-    }
-    return null;
-  }
-  class TinyColor {
-    constructor(color = "", opts = new LColorOptions({
-      format: null,
-      gradientType: null
-    })) {
-      var _a, _b;
-      let _color = color;
-      if (isNumber$1(color)) {
-        _color = numberInputToObject(color);
-      }
-      this.originalInput = _color;
-      const rgb = inputToRGB(_color);
-      this.r = rgb.r;
-      this.g = rgb.g;
-      this.b = rgb.b;
-      this.a = rgb.a;
-      this.roundA = Math.round(100 * this.a) / 100;
-      this.format = (_a = opts.format) !== null && _a !== void 0 ? _a : rgb.format;
-      this.gradientType = opts.gradientType;
-      if (this.r < 1) {
-        this.r = Math.round(this.r);
-      }
-      if (this.g < 1) {
-        this.g = Math.round(this.g);
-      }
-      if (this.b < 1) {
-        this.b = Math.round(this.b);
-      }
-      this.isValid = (_b = rgb.ok) !== null && _b !== void 0 ? _b : false;
-      this.reversedNames = /* @__PURE__ */ new Map();
-      names.forEach((value, key) => {
-        this.reversedNames.set(value, key);
-      });
-    }
-    /**
-     * 判断当前颜色是否为暗色。
-     * @returns 一个布尔值，表示当前颜色是否为暗色。
-     */
-    isDark() {
-      return this.getBrightness() < 128;
-    }
-    /**
-     * 判断当前颜色是否为亮色。
-     * @returns 一个布尔值，表示当前颜色是否为亮色。
-     */
-    isLight() {
-      return !this.isDark();
-    }
-    /**
-     * 计算当前颜色的亮度值。
-     * 亮度值是根据 RGB 颜色空间中的红、绿、蓝三个通道的值计算得出的，计算公式为：(r * 299 + g * 587 + b * 114) / 1000。
-     * @returns 返回颜色的感知亮度，范围从0-255。
-     */
-    getBrightness() {
-      const rgb = this.toRgb();
-      return (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1e3;
-    }
-    /**
-     * 计算当前颜色的相对亮度值。
-     * 相对亮度值是根据 RGB 颜色空间中的红、绿、蓝三个通道的值计算得出的，计算公式为：0.2126 * R + 0.7152 * G + 0.0722 * B。
-     * @returns 返回颜色的感知亮度，范围从0-1。
-     */
-    getLuminance() {
-      const rgb = this.toRgb();
-      let R2;
-      let G2;
-      let B2;
-      const RsRGB = rgb.r / 255;
-      const GsRGB = rgb.g / 255;
-      const BsRGB = rgb.b / 255;
-      if (RsRGB <= 0.03928) {
-        R2 = RsRGB / 12.92;
-      } else {
-        R2 = Math.pow((RsRGB + 0.055) / 1.055, 2.4);
-      }
-      if (GsRGB <= 0.03928) {
-        G2 = GsRGB / 12.92;
-      } else {
-        G2 = Math.pow((GsRGB + 0.055) / 1.055, 2.4);
-      }
-      if (BsRGB <= 0.03928) {
-        B2 = BsRGB / 12.92;
-      } else {
-        B2 = Math.pow((BsRGB + 0.055) / 1.055, 2.4);
-      }
-      return 0.2126 * R2 + 0.7152 * G2 + 0.0722 * B2;
-    }
-    /**
-     * 获取当前颜色的透明度值。
-     * 透明度值的范围是 0 到 1，其中 0 表示完全透明，1 表示完全不透明。
-     * @returns 一个数字，表示当前颜色的透明度值。
-     */
-    getAlpha() {
-      return this.a;
-    }
-    setAlpha(alpha = null) {
-      this.a = boundAlpha(alpha);
-      this.roundA = Math.round(100 * this.a) / 100;
-      return this;
-    }
-    /**
-     * 判断当前颜色是否为单色。
-     * 单色是指颜色的饱和度（S）为 0 的颜色，这些颜色只有明度（L）变化，没有颜色变化。
-     * @returns 一个布尔值，表示当前颜色是否为单色。
-     */
-    isMonochrome() {
-      const s2 = this.toHsl().s;
-      return s2 == 0;
-    }
-    /**
-     * 将当前颜色转换为 HSV（色相、饱和度、亮度）颜色空间。
-     * @returns 一个对象，包含四个属性：`h`（色相）、`s`（饱和度）、`v`（亮度）和 `a`（透明度）。
-     */
-    toHsv() {
-      const hsv = rgbToHsv(this.r, this.g, this.b);
-      return new HSVA({ h: Math.round(hsv.h * 360), s: hsv.s, v: hsv.v, a: this.a });
-    }
-    /**
-     * 将当前颜色转换为 HSV（色相、饱和度、亮度）颜色空间的字符串表示。
-     * @returns 一个字符串，表示当前颜色的 HSV 或 HSVA 格式 hsva(xxx, xxx, xxx, xx)。
-     */
-    toHsvString() {
-      const hsv = rgbToHsv(this.r, this.g, this.b);
-      const h2 = Math.round(hsv.h * 360);
-      const s2 = Math.round(hsv.s * 100);
-      const v2 = Math.round(hsv.v * 100);
-      return this.a == 1 ? "hsv(".concat(h2, ", ").concat(s2, "%, ").concat(v2, "%)") : "hsva(".concat(h2, ", ").concat(s2, "%, ").concat(v2, "%, ").concat(this.roundA, ")");
-    }
-    /**
-     * 将当前颜色对象转换为HSBA颜色空间,即Hue（色相）、Saturation（饱和度）、Brightness（亮度）和Alpha（透明度
-     * @returns {HSBA} 返回一个HSBA对象，表示当前颜色对象在HSBA颜色空间中的值
-     */
-    toHsb() {
-      const hsv = rgbToHsv(this.r, this.g, this.b);
-      return new HSBA({ h: Math.round(hsv.h * 360), s: hsv.s, b: hsv.v, a: this.a });
-    }
-    /**
-     * 将当前颜色对象转换为CSS风格的HSB或HSVA字符串
-     * @returns {string} 返回一个CSS风格的HSB或HSVA字符串，表示当前颜色对象的颜色值
-     */
-    toHsbString() {
-      const hsb = this.toHsb();
-      const h2 = Math.round(hsb.h);
-      const s2 = Math.round(hsb.s * 100);
-      const b2 = Math.round(hsb.b * 100);
-      return this.a == 1 ? "hsb(".concat(h2, ", ").concat(s2, "%, ").concat(b2, "%)") : "hsba(".concat(h2, ", ").concat(s2, "%, ").concat(b2, "%, ").concat(this.roundA, ")");
-    }
-    /**
-     * 将当前颜色转换为 HSL（色相、饱和度、明度）颜色空间。
-     * @returns 一个对象，包含四个属性：`h`（色相）、`s`（饱和度）、`l`（明度）和 `a`（透明度）。
-     */
-    toHsl() {
-      const hsl = rgbToHsl(this.r, this.g, this.b);
-      return new HSLA({ h: hsl.h * 360, s: hsl.s, l: hsl.l, a: this.a });
-    }
-    /**
-     * 将当前颜色转换为 HSL（色相、饱和度、明度）颜色空间的字符串表示。
-     * @returns 一个字符串，表示当前颜色的 HSL 或 HSLA 格式 hsla(xxx, xxx, xxx, xx)。
-     */
-    toHslString() {
-      const hsl = rgbToHsl(this.r, this.g, this.b);
-      const h2 = Math.round(hsl.h * 360);
-      const s2 = Math.round(hsl.s * 100);
-      const l2 = Math.round(hsl.l * 100);
-      return this.a == 1 ? "hsl(".concat(h2, ", ").concat(s2, "%, ").concat(l2, "%)") : "hsla(".concat(h2, ", ").concat(s2, "%, ").concat(l2, "%, ").concat(this.roundA, ")");
-    }
-    /**
-     * 将当前颜色转换为十六进制颜色表示。
-     * @param allow3Char 是否允许返回简写的十六进制颜色表示（如果可能）。默认值为 `false`。
-     * @returns 一个字符串，表示当前颜色的十六进制格式。
-     */
-    toHex(allow3Char = false) {
-      return rgbToHex(this.r, this.g, this.b, allow3Char);
-    }
-    /**
-     * 将当前颜色转换为带有井号（`#`）前缀的十六进制颜色表示。
-     * @param allow3Char 是否允许返回简写的十六进制颜色表示（如果可能）。默认值为 `false`。
-     * @returns 一个字符串，表示当前颜色的带有井号前缀的十六进制格式。
-     */
-    toHexString(allow3Char = false) {
-      return "#" + this.toHex(allow3Char);
-    }
-    /**
-     * 返回颜色的八位十六进制值.
-     * @param allow4Char 如果可能的话，将十六进制值缩短为4个字符
-     */
-    toHex8(allow4Char = false) {
-      return rgbaToHex(this.r, this.g, this.b, this.a, allow4Char);
-    }
-    /**
-     * 返回颜色的八位十六进制值，并且值前面带有#符号.
-     * @param allow4Char 如果可能的话，将十六进制值缩短为4个字符
-     */
-    toHex8String(allow4Char = false) {
-      return "#" + this.toHex8(allow4Char);
-    }
-    /**
-     * 根据颜色的透明度（Alpha值）返回较短的十六进制值，并且值前面带有#符号。
-     * @param allowShortChar 如果可能的话，将十六进制值缩短至3个或4个字符
-     */
-    toHexShortString(allowShortChar = false) {
-      return this.a == 1 ? this.toHexString(allowShortChar) : this.toHex8String(allowShortChar);
-    }
-    /**
-     * 将当前颜色转换为 RGB（红、绿、蓝）颜色空间的对象表示。
-     * @returns 一个包含 `r`、`g`、`b` 和 `a` 属性的对象，表示当前颜色的 RGB 格式。
-     */
-    toRgb() {
-      return new RGBA({
-        r: Math.round(this.r),
-        g: Math.round(this.g),
-        b: Math.round(this.b),
-        a: this.a
-      });
-    }
-    /**
-     * 将当前颜色对象转换为CSS风格的RGB或RGBA字符串
-     * @returns {string} 返回一个CSS风格的RGB或RGBA字符串，表示当前颜色对象的颜色值
-     */
-    toRgbString() {
-      const r2 = Math.round(this.r);
-      const g2 = Math.round(this.g);
-      const b2 = Math.round(this.b);
-      return this.a == 1 ? "rgb(".concat(r2, ", ").concat(g2, ", ").concat(b2, ")") : "rgba(".concat(r2, ", ").concat(g2, ", ").concat(b2, ", ").concat(this.roundA, ")");
-    }
-    /**
-     * 将当前颜色转换为百分比表示的 RGB（红、绿、蓝）颜色空间的对象表示。
-     * @returns 一个包含 `r`、`g`、`b` 和 `a` 属性的对象，表示当前颜色的百分比表示的 RGB 格式。
-     */
-    toPercentageRgb() {
-      const fmt = (x2) => {
-        return "".concat(Math.round(bound01(x2, 255) * 100), "%");
-      };
-      return new RGBAString({
-        r: fmt(this.r),
-        g: fmt(this.g),
-        b: fmt(this.b),
-        a: this.a
-      });
-    }
-    /**
-     * 将RGBA相对值插值为一个字符串，颜色值以百分比表示。
-     */
-    toPercentageRgbString() {
-      const rnd = (x2) => {
-        return Math.round(bound01(x2, 255) * 100);
-      };
-      return this.a == 1 ? "rgb(".concat(rnd(this.r), "%, ").concat(rnd(this.g), "%, ").concat(rnd(this.b), "%)") : "rgba(".concat(rnd(this.r), "%, ").concat(rnd(this.g), "%, ").concat(rnd(this.b), "%, ").concat(this.roundA, ")");
-    }
-    /**
-     * 返回这个颜色的'真实'名称,不存在返回null
-     */
-    toName() {
-      if (this.a == 0) {
-        return "transparent";
-      }
-      if (this.a < 1) {
-        return null;
-      }
-      const hex = this.toHexString();
-      return UTS.mapGet(this.reversedNames, hex);
-    }
-    /**
-     * 将颜色转换为字符串表示。
-     *
-     * @param format - 用于显示字符串表示的格式。
-     */
-    // toString<T extends 'name'>(format : T) : string;
-    // toString<T extends LColorFormats>(format ?: T) : string;
-    toString(format = null) {
-      var _a;
-      const formatSet = toBoolean(format);
-      let _format = format !== null && format !== void 0 ? format : this.format;
-      let formattedString = null;
-      const hasAlpha = this.a < 1 && this.a >= 0;
-      const needsAlphaFormat = !formatSet && hasAlpha && (_format != null && _format.startsWith("hex") || _format == "name");
-      if (needsAlphaFormat) {
-        if (_format == "name" && this.a == 0) {
-          return (_a = this.toName()) !== null && _a !== void 0 ? _a : "transparent";
-        }
-        return this.toRgbString();
-      }
-      if (_format == "rgb") {
-        formattedString = this.toRgbString();
-      }
-      if (_format == "prgb") {
-        formattedString = this.toPercentageRgbString();
-      }
-      if (_format == "hex" || _format == "hex6") {
-        formattedString = this.toHexString();
-      }
-      if (_format == "hex3") {
-        formattedString = this.toHexString(true);
-      }
-      if (_format == "hex4") {
-        formattedString = this.toHex8String(true);
-      }
-      if (_format == "hex8") {
-        formattedString = this.toHex8String();
-      }
-      if (_format == "name") {
-        formattedString = this.toName();
-      }
-      if (_format == "hsl") {
-        formattedString = this.toHslString();
-      }
-      if (_format == "hsv") {
-        formattedString = this.toHsvString();
-      }
-      if (_format == "hsb") {
-        formattedString = this.toHsbString();
-      }
-      return formattedString !== null && formattedString !== void 0 ? formattedString : this.toHexString();
-    }
-    toNumber() {
-      return (Math.round(this.r) << 16) + (Math.round(this.g) << 8) + Math.round(this.b);
-    }
-    clone() {
-      return new TinyColor(this.toString());
-    }
-    /**
-     * 将颜色变浅指定的量。提供100将始终返回白色。
-     * @param amount - 有效值介于1-100之间
-     */
-    lighten(amount = 10) {
-      const hsl = this.toHsl();
-      hsl.l += amount / 100;
-      hsl.l = clamp01(hsl.l);
-      return new TinyColor(hsl, new LColorOptions({
-        gradientType: null,
-        format: this.format
-      }));
-    }
-    /**
-     * 将颜色变亮一定的量，范围从0到100。
-     * @param amount - 有效值在1-100之间
-     */
-    brighten(amount = 10) {
-      const rgb = this.toRgb();
-      rgb.r = Math.max(0, Math.min(255, rgb.r - Math.round(255 * -(amount / 100))));
-      rgb.g = Math.max(0, Math.min(255, rgb.g - Math.round(255 * -(amount / 100))));
-      rgb.b = Math.max(0, Math.min(255, rgb.b - Math.round(255 * -(amount / 100))));
-      return new TinyColor(rgb, new LColorOptions({
-        gradientType: null,
-        format: this.format
-      }));
-    }
-    /**
-     * 将颜色变暗一定的量，范围从0到100。
-     * 提供100将始终返回黑色。
-     * @param amount - 有效值在1-100之间
-     */
-    darken(amount = 10) {
-      const hsl = this.toHsl();
-      hsl.l -= amount / 100;
-      hsl.l = clamp01(hsl.l);
-      return new TinyColor(hsl, new LColorOptions({
-        gradientType: null,
-        format: this.format
-      }));
-    }
-    /**
-     * 将颜色与纯白色混合，范围从0到100。
-     * 提供0将什么都不做，提供100将始终返回白色。
-     * @param amount - 有效值在1-100之间
-     */
-    tint(amount = 10) {
-      return this.mix("white", amount);
-    }
-    /**
-     * 将颜色与纯黑色混合，范围从0到100。
-     * 提供0将什么都不做，提供100将始终返回黑色。
-     * @param amount - 有效值在1-100之间
-     */
-    shade(amount = 10) {
-      return this.mix("black", amount);
-    }
-    /**
-     * 将颜色的饱和度降低一定的量，范围从0到100。
-     * 提供100与调用greyscale相同
-     * @param amount - 有效值在1-100之间
-     */
-    desaturate(amount = 10) {
-      const hsl = this.toHsl();
-      hsl.s -= amount / 100;
-      hsl.s = clamp01(hsl.s);
-      return new TinyColor(hsl, new LColorOptions({
-        gradientType: null,
-        format: this.format
-      }));
-    }
-    /**
-     * 将颜色饱和度提高一定数量，范围从 0 到 100。
-     * @param amount - 有效值介于 1 到 100 之间。
-     */
-    saturate(amount = 10) {
-      const hsl = this.toHsl();
-      hsl.s += amount / 100;
-      hsl.s = clamp01(hsl.s);
-      return new TinyColor(hsl, new LColorOptions({
-        gradientType: null,
-        format: this.format
-      }));
-    }
-    /**
-     * 将颜色完全去饱和为灰度。
-     * 等同于调用 `desaturate(100)`。
-     */
-    greyscale() {
-      return this.desaturate(100);
-    }
-    /**
-     * spin 方法接收一个正数或负数作为参数，表示色相的变化量，变化范围在 [-360, 360] 之间。
-     * 如果提供的值超出此范围，它将被限制在此范围内。
-     */
-    spin(amount) {
-      const hsl = this.toHsl();
-      const hue = (hsl.h + amount) % 360;
-      hsl.h = hue < 0 ? 360 + hue : hue;
-      return new TinyColor(hsl, new LColorOptions({
-        gradientType: null,
-        format: this.format
-      }));
-    }
-    /**
-     * 将当前颜色与另一种颜色按给定的比例混合，范围从0到100。
-     * 0表示不混合（返回当前颜色）
-     */
-    mix(color = null, amount = 50) {
-      const rgb1 = this.toRgb();
-      const rgb2 = new TinyColor(color).toRgb();
-      const p2 = amount / 100;
-      const rgba = new UTSJSONObject({
-        r: (rgb2.r - rgb1.r) * p2 + rgb1.r,
-        g: (rgb2.g - rgb1.g) * p2 + rgb1.g,
-        b: (rgb2.b - rgb1.b) * p2 + rgb1.b,
-        a: (rgb2.a - rgb1.a) * p2 + rgb1.a
-      });
-      return new TinyColor(rgba, new LColorOptions({
-        gradientType: null,
-        format: this.format
-      }));
-    }
-    /**
-     * 生成一组与当前颜色相似的颜色。
-     * 这些颜色在色相环上是相邻的，形成一个类似于彩虹的颜色序列。
-     * @param results - 要生成的相似颜色的数量，默认值为 6。
-     * @param slices - 将色相环划分为多少个部分，默认值为 30。
-     * @returns 一个包含当前颜色及其相似颜色的 TinyColor 对象数组。
-     */
-    analogous(results = 6, slices = 30) {
-      const hsl = this.toHsl();
-      const part = 360 / slices;
-      const ret = [this];
-      let _results = results;
-      hsl.h = (hsl.h - (part * _results >> 1) + 720) % 360;
-      while (_results > 0) {
-        hsl.h = (hsl.h + part) % 360;
-        ret.push(new TinyColor(hsl));
-        _results--;
-      }
-      return ret;
-    }
-    /**
-     * 计算当前颜色的补色。
-     * 补色是指在色相环上相对位置的颜色，它们的色相差为 180°。
-     * taken from https://github.com/infusion/jQuery-xcolor/blob/master/jquery.xcolor.js
-     * @returns 一个 TinyColor 对象，表示当前颜色的补色。
-     */
-    complement() {
-      const hsl = this.toHsl();
-      hsl.h = (hsl.h + 180) % 360;
-      return new TinyColor(hsl, new LColorOptions({
-        gradientType: null,
-        format: this.format
-      }));
-    }
-    /**
-     * 生成一组与当前颜色具有相同色相和饱和度的颜色。
-     * 这些颜色的亮度值不同，形成一个单色调的颜色序列。
-     * @param results - 要生成的单色调颜色的数量，默认值为 6。
-     * @returns 一个包含当前颜色及其单色调颜色的 TinyColor 对象数组。
-     */
-    monochromatic(results = 6) {
-      const hsv = this.toHsv();
-      const h2 = hsv.h;
-      const s2 = hsv.s;
-      let v2 = hsv.v;
-      const res = [];
-      const modification = 1 / results;
-      let _results = results;
-      while (_results > 0) {
-        res.push(new TinyColor(new UTSJSONObject({ h: h2, s: s2, v: v2 })));
-        v2 = (v2 + modification) % 1;
-        _results--;
-      }
-      return res;
-    }
-    /**
-     * 生成当前颜色的分裂补色。
-     * 分裂补色是指在色相环上位于当前颜色的两侧的颜色，它们的色相差为 180°。
-     * @returns 一个包含当前颜色及其分裂补色的 TinyColor 对象数组。
-     */
-    splitcomplement() {
-      const hsl = this.toHsl();
-      const h2 = hsl.h;
-      return [
-        this,
-        new TinyColor(new UTSJSONObject({ h: (h2 + 72) % 360, s: hsl.s, l: hsl.l })),
-        new TinyColor(new UTSJSONObject({ h: (h2 + 216) % 360, s: hsl.s, l: hsl.l }))
-      ];
-    }
-    /**
-     * 计算当前颜色在给定背景颜色上的显示效果。
-     * @param background - 背景颜色，可以是任何 LColorInput 类型的值。
-     * @returns 一个 TinyColor 对象，表示当前颜色在给定背景颜色上的显示效果。
-     */
-    onBackground(background = null) {
-      const fg = this.toRgb();
-      const bg = new TinyColor(background).toRgb();
-      const alpha = fg.a + bg.a * (1 - fg.a);
-      return new TinyColor(new UTSJSONObject({
-        r: (fg.r * fg.a + bg.r * bg.a * (1 - fg.a)) / alpha,
-        g: (fg.g * fg.a + bg.g * bg.a * (1 - fg.a)) / alpha,
-        b: (fg.b * fg.a + bg.b * bg.a * (1 - fg.a)) / alpha,
-        a: alpha
-      }));
-    }
-    /**
-     * 生成当前颜色的三色调。
-     * 三色调是指在色相环上位于当前颜色的两侧的颜色，它们的色相差为 120°。
-     * 这是 `polyad(3)` 方法的别名。
-     * @returns 一个包含当前颜色及其三色调颜色的 TinyColor 对象数组。
-     */
-    triad() {
-      return this.polyad(3);
-    }
-    /**
-     * 生成当前颜色的四色调。
-     * 四色调是指在色相环上位于当前颜色的两侧的颜色，它们的色相差为 90°。
-     * 这是 `polyad(4)` 方法的别名。
-     * @returns 一个包含当前颜色及其四色调颜色的 TinyColor 对象数组。
-     */
-    tetrad() {
-      return this.polyad(4);
-    }
-    /**
-     * 生成当前颜色的 n 色调。
-     * n 色调是指在色相环上位于当前颜色的两侧的颜色，它们的色相差为 360° / n。
-     * Get polyad colors, like (for 1, 2, 3, 4, 5, 6, 7, 8, etc...)
-     * monad, dyad, triad, tetrad, pentad, hexad, heptad, octad, etc...
-     * @param n - 一个整数，表示要生成的色调数量。
-     * @returns 一个包含当前颜色及其 n 色调颜色的 TinyColor 对象数组。
-     */
-    polyad(n2) {
-      const hsl = this.toHsl();
-      const h2 = hsl.h;
-      const result = [this];
-      const increment = 360 / n2;
-      for (let i2 = 1; i2 < n2; i2++) {
-        result.push(new TinyColor(new UTSJSONObject({ h: (h2 + i2 * increment) % 360, s: hsl.s, l: hsl.l })));
+    function selectedIndexAt(columnIndex) {
+      if (currentIndexs.value.length <= columnIndex)
+        return 0;
+      return currentIndexs.value[columnIndex];
+    }
+    function selectedItems() {
+      const result = [];
+      const columns = normalizedColumns.value;
+      for (let i2 = 0; i2 < columns.length; i2++) {
+        const column = columns[i2];
+        const index = selectedIndexAt(i2);
+        if (index >= 0 && index < column.length)
+          result.push(column[index]);
       }
       return result;
     }
-    /**
-     * 比较当前颜色与给定颜色是否相等。
-     * @param color - 一个 LColorInput 类型的值，表示要比较的颜色。
-     * @returns 一个布尔值，表示当前颜色与给定颜色是否相等。
-     */
-    equals(other = null) {
-      if (other == null) {
-        return false;
-      } else if (UTS.isInstanceOf(other, TinyColor)) {
-        return this.toRgbString() == other.toRgbString();
-      }
-      return this.toRgbString() == new TinyColor(other).toRgbString();
+    function columnAt(index) {
+      if (index < 0 || index >= normalizedColumns.value.length)
+        return [];
+      return normalizedColumns.value[index];
     }
-  }
-  function tinyColor(color = "", opts = new LColorOptions({
-    format: null,
-    gradientType: null
-  })) {
-    return new TinyColor(color, opts);
-  }
-  class DarkColorMapItem extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            index: { type: Number, optional: false },
-            opacity: { type: Number, optional: false }
-          };
-        },
-        name: "DarkColorMapItem"
-      };
-    }
-    constructor(options, metadata = DarkColorMapItem.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.index = this.__props__.index;
-      this.opacity = this.__props__.opacity;
-      delete this.__props__;
-    }
-  }
-  [
-    new DarkColorMapItem({ index: 7, opacity: 0.15 }),
-    new DarkColorMapItem({ index: 6, opacity: 0.25 }),
-    new DarkColorMapItem({ index: 5, opacity: 0.3 }),
-    new DarkColorMapItem({ index: 5, opacity: 0.45 }),
-    new DarkColorMapItem({ index: 5, opacity: 0.65 }),
-    new DarkColorMapItem({ index: 5, opacity: 0.85 }),
-    new DarkColorMapItem({ index: 4, opacity: 0.9 }),
-    new DarkColorMapItem({ index: 3, opacity: 0.95 }),
-    new DarkColorMapItem({ index: 2, opacity: 0.97 }),
-    new DarkColorMapItem({ index: 1, opacity: 0.98 })
-  ];
-  class UseLoadingReturn extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            ratio: { type: "Unknown", optional: false },
-            type: { type: "Unknown", optional: false },
-            mode: { type: "Unknown", optional: false },
-            color: { type: String, optional: false },
-            play: { type: "Unknown", optional: false },
-            failed: { type: "Unknown", optional: false },
-            clear: { type: "Unknown", optional: false },
-            destroy: { type: "Unknown", optional: false },
-            pause: { type: "Unknown", optional: false }
-          };
-        },
-        name: "UseLoadingReturn"
-      };
-    }
-    constructor(options, metadata = UseLoadingReturn.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.ratio = this.__props__.ratio;
-      this.type = this.__props__.type;
-      this.mode = this.__props__.mode;
-      this.color = this.__props__.color;
-      this.play = this.__props__.play;
-      this.failed = this.__props__.failed;
-      this.clear = this.__props__.clear;
-      this.destroy = this.__props__.destroy;
-      this.pause = this.__props__.pause;
-      delete this.__props__;
-    }
-  }
-  function getPointOnCircle(centerX, centerY, radius, angleDegrees) {
-    const angleRadians = angleDegrees * Math.PI / 180;
-    const x2 = centerX + radius * Math.cos(angleRadians);
-    const y2 = centerY + radius * Math.sin(angleRadians);
-    return [x2, y2];
-  }
-  function useLoading(element) {
-    let isPlaying = false;
-    let canvasWidth = vue.ref(0);
-    let canvasHeight = vue.ref(0);
-    let canvasSize = vue.ref(0);
-    let animationFrameId = -1;
-    let animation = null;
-    let drawFrame = null;
-    const tick = vue.ref("pause");
-    const context = vue.shallowRef(null);
-    const state = vue.reactive(new UseLoadingReturn({
-      color: "#000",
-      type: "circular",
-      ratio: 1,
-      mode: "raf",
-      play: () => {
-        tick.value = "play";
-      },
-      failed: () => {
-        tick.value = "failed";
-      },
-      clear: () => {
-        tick.value = "clear";
-      },
-      destroy: () => {
-        var _a, _b;
-        tick.value = "destroy";
-        cancelAnimationFrame(animationFrameId);
-        animation === null || animation === void 0 ? null : animation.pause();
-        animation === null || animation === void 0 ? null : animation.cancel();
-        (_a = context.value) === null || _a === void 0 ? null : _a.reset();
-        (_b = context.value) === null || _b === void 0 ? null : _b.update();
-        context.value = null;
-        animation = null;
-        isPlaying = false;
-      },
-      pause: () => {
-        tick.value = "pause";
-      }
-    }));
-    const size = vue.computed(() => {
-      return state.ratio > 1 ? state.ratio : canvasSize.value * state.ratio;
-    });
-    const drawCircular = () => {
-      let startAngle = 0;
-      let endAngle = 0;
-      let rotate = 0;
-      const MIN_ANGLE = 5;
-      const ARC_LENGTH = 359.5;
-      const PI = Math.PI / 180;
-      const SPEED = 0.018 / 4;
-      const ROTATE_INTERVAL = 0.09 / 4;
-      const lineWidth = size.value / 10;
-      const x2 = canvasWidth.value / 2;
-      const y2 = canvasHeight.value / 2;
-      const radius = size.value / 2 - lineWidth;
-      try {
-        drawFrame = () => {
-          if (context.value == null || !isPlaying)
-            return null;
-          let ctx = context.value;
-          ctx.reset();
-          ctx.beginPath();
-          ctx.arc(x2, y2, radius, startAngle * PI + rotate, endAngle * PI + rotate);
-          ctx.lineWidth = lineWidth;
-          ctx.strokeStyle = state.color;
-          ctx.stroke();
-          if (endAngle < ARC_LENGTH) {
-            endAngle = Math.min(ARC_LENGTH, endAngle + (ARC_LENGTH - MIN_ANGLE) * SPEED);
-          } else if (startAngle < ARC_LENGTH) {
-            startAngle = Math.min(ARC_LENGTH, startAngle + (ARC_LENGTH - MIN_ANGLE) * SPEED);
-          } else {
-            startAngle = 0;
-            endAngle = MIN_ANGLE;
-          }
-          ctx.update();
-          if (state.mode == "raf") {
-            rotate = (rotate + ROTATE_INTERVAL) % 360;
-            if (isPlaying && drawFrame != null) {
-              animationFrameId = requestAnimationFrame(drawFrame);
-            }
-          }
-        };
-      } catch (err) {
-      }
-    };
-    let lastTime = Date.now();
-    const drawSpinner = () => {
-      const steps = 12;
-      const lineWidth = size.value / 10;
-      const x2 = canvasWidth.value / 2;
-      const y2 = canvasHeight.value / 2;
-      let step = 0;
-      const length = size.value / 3.6 - lineWidth;
-      const offset = size.value / 4;
-      function generateColorGradient(hex, steps2) {
-        const colors2 = [];
-        const _color = tinyColor(hex);
-        for (let i2 = 1; i2 <= steps2; i2++) {
-          _color.setAlpha(i2 / steps2);
-          colors2.push(_color.toRgbString());
-        }
-        return colors2;
-      }
-      let colors = vue.computed(() => {
-        return generateColorGradient(state.color, steps);
-      });
-      drawFrame = () => {
-        if (context.value == null || !isPlaying)
+    function scheduleIndexSync(indexes, changedIndex = -1, initialize = false) {
+      const generation = ++indexSyncGeneration;
+      pickerInternalChange = true;
+      pickerViewIndexes.value = copyIndexes(indexes);
+      scheduleFrame(() => {
+        if (generation != indexSyncGeneration)
           return null;
-        const delta = Date.now() - lastTime;
-        if (delta >= 1e3 / 10) {
-          lastTime = Date.now();
-          let ctx = context.value;
-          ctx.reset();
-          for (let i2 = 0; i2 < steps; i2++) {
-            const stepAngle = 360 / steps;
-            const angle = stepAngle * i2;
-            const index = (steps + i2 - step) % steps;
-            const radian = angle * Math.PI / 180;
-            const cos = Math.cos(radian);
-            const sin = Math.sin(radian);
-            ctx.beginPath();
-            ctx.moveTo(x2 + offset * cos, y2 + offset * sin);
-            ctx.lineTo(x2 + (offset + length) * cos, y2 + (offset + length) * sin);
-            ctx.lineWidth = lineWidth;
-            ctx.lineCap = "round";
-            ctx.strokeStyle = colors.value[index];
-            ctx.stroke();
+        if (changedIndex >= 0 && changedIndex < indexes.length) {
+          const refreshed = copyIndexes(indexes);
+          const columns = normalizedColumns.value;
+          const optionCount = changedIndex < columns.length ? columns[changedIndex].length : 0;
+          if (optionCount > 1) {
+            refreshed[changedIndex] = indexes[changedIndex] > 0 ? indexes[changedIndex] - 1 : 1;
           }
-          ctx.update();
-          if (state.mode == "raf") {
-            step = (step + 1) % steps;
-          }
+          pickerViewIndexes.value = refreshed;
         }
-        if (state.mode == "raf") {
-          if (isPlaying && drawFrame != null) {
-            animationFrameId = requestAnimationFrame(drawFrame);
-          }
-        }
-      };
-    };
-    const drwaFailed = () => {
-      if (context.value == null)
-        return null;
-      let ctx = context.value;
-      const innerSize = size.value * 0.8;
-      const lineWidth = innerSize / 10;
-      const lineLength = (size.value - lineWidth) / 2;
-      const centerX = canvasWidth.value / 2;
-      const centerY = canvasHeight.value / 2;
-      const radius = (size.value - lineWidth) / 2;
-      const angleRadians1 = 45 * Math.PI / 180;
-      const angleRadians2 = (45 - 90) * Math.PI / 180;
-      ctx.reset();
-      ctx.lineWidth = lineWidth;
-      ctx.strokeStyle = state.color;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.lineWidth = lineWidth;
-      ctx.strokeStyle = state.color;
-      ctx.stroke();
-      const _a = __read(getPointOnCircle(centerX, centerY, lineLength / 2, 180 + 45), 2), startX1 = _a[0], startY = _a[1];
-      const _b = __read(getPointOnCircle(centerX, centerY, lineLength / 2, 180 + 90 + 45), 1), startX2 = _b[0];
-      const x2 = Math.sin(angleRadians1) * lineLength + startX1;
-      const y2 = Math.cos(angleRadians1) * lineLength + startY;
-      ctx.beginPath();
-      ctx.moveTo(startX1, startY);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      const x3 = Math.sin(angleRadians2) * lineLength + startX2;
-      const y3 = Math.cos(angleRadians2) * lineLength + startY;
-      ctx.beginPath();
-      ctx.moveTo(startX2, startY);
-      ctx.lineTo(x3, y3);
-      ctx.stroke();
-      ctx.update();
-    };
-    let currentType = null;
-    const useMode = () => {
-      if (state.mode != "raf") {
-        const keyframes = [new UTSJSONObject({ transform: "rotate(0)" }), new UTSJSONObject({ transform: "rotate(360)" })];
-        animation = element.value.animate(keyframes, new UTSJSONObject({
-          duration: 8e4,
-          easing: "linear",
-          // fill: 'forwards',
-          iterations: Infinity
-        }));
-      }
-    };
-    const startAnimation = (type) => {
-      if (context.value == null || element.value == null)
-        return null;
-      animation === null || animation === void 0 ? null : animation.pause();
-      if (currentType == type) {
-        isPlaying = true;
-        animation === null || animation === void 0 ? null : animation.play();
-        drawFrame === null || drawFrame === void 0 ? null : drawFrame();
-        return null;
-      }
-      if (type == "circular") {
-        currentType = "circular";
-        drawCircular();
-        useMode();
-      }
-      if (type == "spinner") {
-        currentType = "spinner";
-        drawSpinner();
-        useMode();
-      }
-      isPlaying = true;
-      drawFrame === null || drawFrame === void 0 ? null : drawFrame();
-    };
-    let manualCheckTimer = null;
-    const getBoundingClientRect = () => {
-      if (manualCheckTimer != null) {
-        clearTimeout(manualCheckTimer);
-      }
-      requestAnimationFrame(() => {
-        var _a, _b;
-        (_b = (_a = element.value) === null || _a === void 0 ? null : _a.getBoundingClientRectAsync()) === null || _b === void 0 ? null : _b.then((rect) => {
-          if (rect.width == 0 || rect.height == 0)
+        scheduleFrame(() => {
+          if (generation != indexSyncGeneration)
             return null;
-          context.value = element.value.getDrawableContext();
-          canvasWidth.value = rect.width;
-          canvasHeight.value = rect.height;
-          canvasSize.value = Math.min(rect.width, rect.height);
-        });
-      });
-    };
-    const resizeObserver = new UniResizeObserver((_entries) => {
-      getBoundingClientRect();
-    });
-    vue.watchEffect(() => {
-      if (element.value == null)
-        return null;
-      resizeObserver.observe(element.value);
-      manualCheckTimer = setTimeout(() => {
-        getBoundingClientRect();
-      }, 50);
-    });
-    vue.watchEffect(() => {
-      var _a, _b, _c, _d;
-      if (context.value == null)
-        return null;
-      if (tick.value == "play") {
-        animation === null || animation === void 0 ? null : animation.pause();
-        isPlaying = false;
-        cancelAnimationFrame(animationFrameId);
-        startAnimation(state.type);
-      }
-      if (tick.value == "failed") {
-        cancelAnimationFrame(animationFrameId);
-        animation === null || animation === void 0 ? null : animation.pause();
-        animation === null || animation === void 0 ? null : animation.cancel();
-        drwaFailed();
-        return null;
-      }
-      if (tick.value == "clear") {
-        cancelAnimationFrame(animationFrameId);
-        animation === null || animation === void 0 ? null : animation.pause();
-        animation === null || animation === void 0 ? null : animation.cancel();
-        (_a = context.value) === null || _a === void 0 ? null : _a.reset();
-        (_b = context.value) === null || _b === void 0 ? null : _b.update();
-        isPlaying = false;
-        return null;
-      }
-      if (tick.value == "destroy") {
-        cancelAnimationFrame(animationFrameId);
-        animation === null || animation === void 0 ? null : animation.pause();
-        animation === null || animation === void 0 ? null : animation.cancel();
-        (_c = context.value) === null || _c === void 0 ? null : _c.reset();
-        (_d = context.value) === null || _d === void 0 ? null : _d.update();
-        context.value = null;
-        animation = null;
-        isPlaying = false;
-        return null;
-      }
-      if (tick.value == "pause") {
-        if (animation == null) {
-          startAnimation(state.type);
-        }
-        cancelAnimationFrame(animationFrameId);
-        isPlaying = false;
-        animation === null || animation === void 0 ? null : animation.pause();
-        return null;
-      }
-    });
-    vue.watchEffect(() => {
-      if (state.color == "")
-        return null;
-    });
-    return state;
-  }
-  const _sfc_main$P = /* @__PURE__ */ vue.defineComponent({
-    __name: "l-picker",
-    props: {
-      cancelBtn: { type: String, required: false },
-      cancelStyle: { type: null, required: false },
-      confirmBtn: { type: String, required: false },
-      confirmStyle: { type: null, required: false },
-      title: { type: String, required: false },
-      titleStyle: { type: null, required: false },
-      keys: { type: null, required: false },
-      columns: { type: Array, required: true, default: [] },
-      modelValue: { type: Array, required: false },
-      defaultValue: { type: Array, required: false },
-      value: { type: Array, required: false },
-      loading: { type: Boolean, required: true, default: false },
-      loadingColor: { type: String, required: false },
-      loadingMaskColor: { type: String, required: false },
-      loadingSize: { type: String, required: true, default: "32px" },
-      itemHeight: { type: String, required: false },
-      itemColor: { type: String, required: false },
-      itemFontSize: { type: String, required: false },
-      itemActiveColor: { type: String, required: false },
-      itemActiveFontWeight: { type: Number, required: false },
-      indicatorStyle: { type: String, required: false },
-      maskColors: { type: Array, required: false },
-      bgColor: { type: String, required: false },
-      groupHeight: { type: String, required: false },
-      radius: { type: String, required: false },
-      resetIndex: { type: Boolean, required: true, default: false }
-    },
-    emits: ["change", "cancel", "pick", "confirm", "update:modelValue"],
-    setup(__props, _a) {
-      var _b, _c, _d, _e2;
-      var __expose = _a.expose, __emit = _a.emit;
-      const emit = __emit;
-      const props = __props;
-      const pickerItemInstanceArray = vue.reactive([]);
-      const modelValue = vue.ref((_d = (_c = (_b = props.value) !== null && _b !== void 0 ? _b : props.modelValue) !== null && _c !== void 0 ? _c : props.defaultValue) !== null && _d !== void 0 ? _d : []);
-      const pickerValue = vue.computed({
-        set(value) {
-          if (arrayEqual(value, modelValue.value))
-            return null;
-          modelValue.value = value;
-          emit("update:modelValue", value);
-          emit("change", value);
-        },
-        get() {
-          var _a2, _b2;
-          return (_b2 = (_a2 = props.value) !== null && _a2 !== void 0 ? _a2 : props.modelValue) !== null && _b2 !== void 0 ? _b2 : modelValue.value;
-        }
-      });
-      const isEmpty = vue.computed(() => {
-        return props.columns.length == 0 && pickerItemInstanceArray.every((child = null) => {
-          return child.options.length == 0;
-        });
-      });
-      const styles = vue.computed(() => {
-        const style = /* @__PURE__ */ new Map();
-        if (props.bgColor != null) {
-          style.set("background", props.bgColor);
-        }
-        if (props.radius != null) {
-          style.set("border-top-left-radius", props.radius);
-          style.set("border-top-right-radius", props.radius);
-        }
-        return style;
-      });
-      const curIndexArray = vue.ref([]);
-      const curValueArray = vue.ref([...pickerValue.value]);
-      const curItemArray = [];
-      const realColumns = vue.computed(() => {
-        const pickerColumns = pickerItemInstanceArray.map((child = null) => {
-          return child.options;
-        });
-        if (pickerColumns.length > 0) {
-          return pickerColumns;
-        }
-        return props.columns;
-      });
-      const manageChildInList = (child = null, shouldAdd) => {
-        const index = pickerItemInstanceArray.indexOf(child);
-        if (shouldAdd) {
-          if (index != -1)
-            return null;
-          pickerItemInstanceArray.push(child);
-        } else {
-          if (index == -1)
-            return null;
-          pickerItemInstanceArray.splice(index, 1);
-        }
-      };
-      const updateItems = (item, index, column) => {
-        assignAtIndex(curIndexArray.value, column, index);
-        assignAtIndex(curValueArray.value, column, item.value);
-        assignAtIndex(curItemArray, column, item);
-      };
-      const updatePickerItems = () => {
-        const _indexs = [];
-        const _values = [];
-        pickerItemInstanceArray.forEach((child = null, column) => {
-          if (child.options.length == 0)
-            return null;
-          const value = curValueArray.value.length > column ? curValueArray.value[column] : null;
-          const index = value == null ? 0 : child.$callMethod("getIndexByValue", value);
-          child.$callMethod("setIndex", index);
-          const item = child.options[index];
-          _indexs.push(index);
-          _values.push(item.value);
-          assignAtIndex(curItemArray, column, item);
-        });
-        if (arrayEqual(curValueArray.value, _values) && arrayEqual(curIndexArray.value, _indexs))
-          return null;
-        curIndexArray.value = _indexs;
-        curValueArray.value = _values;
-        pickerValue.value = [...curValueArray.value];
-      };
-      const onPick = (item, index, column) => {
-        if (curIndexArray.value[column] == index)
-          return null;
-        assignAtIndex(curIndexArray.value, column, index);
-        assignAtIndex(curValueArray.value, column, item.value);
-        assignAtIndex(curItemArray, column, item);
-        const obj = {
-          values: curValueArray.value,
-          column,
-          index
-        };
-        pickerValue.value = [...curValueArray.value];
-        emit("pick", obj);
-      };
-      const onCancel = (e2) => {
-        updatePickerItems();
-        emit("cancel", e2);
-      };
-      const onConfirm = () => {
-        const values = [...curValueArray.value];
-        const indexs = [...curIndexArray.value];
-        const items = curItemArray.map((item) => {
-          return vue.toRaw(item);
-        });
-        if (!arrayEqual(pickerValue.value, values)) {
-          pickerValue.value = values;
-        }
-        const obj = {
-          values,
-          indexs,
-          items
-        };
-        emit("confirm", obj);
-      };
-      const stopPickerValue = vue.watch(pickerValue, () => {
-        if (arrayEqual(pickerValue.value, curValueArray.value))
-          return null;
-        curValueArray.value = pickerValue.value.map((item) => {
-          return item;
-        });
-        updatePickerItems();
-      });
-      const stopColumns = vue.watch(realColumns, () => {
-        updatePickerItems();
-      });
-      vue.onMounted(() => {
-        vue.nextTick(() => {
-          if (!arrayEqual(pickerValue.value, curValueArray.value) && pickerValue.value.length > 0) {
-            curValueArray.value = [...pickerValue.value];
-            updatePickerItems();
-          }
-        });
-      });
-      const loadingRef = vue.ref(null);
-      const loadingAni = useLoading(loadingRef);
-      loadingAni.type = "circular";
-      loadingAni.color = (_e2 = props.loadingColor) !== null && _e2 !== void 0 ? _e2 : "#3283ff";
-      loadingAni.ratio = unitConvert(props.loadingSize);
-      vue.watchEffect(() => {
-        if (props.loading) {
-          loadingAni.play();
-        } else {
-          loadingAni.clear();
-        }
-      });
-      vue.onBeforeUnmount(() => {
-        stopPickerValue();
-        stopColumns();
-      });
-      __expose({
-        confirm: onConfirm,
-        getSelectedOptions: () => {
-          const values = [...curValueArray.value];
-          const indexs = [...curIndexArray.value];
-          const items = curItemArray.map((item) => {
-            return vue.toRaw(item);
+          pickerViewIndexes.value = copyIndexes(indexes);
+          scheduleFrame(() => {
+            if (generation != indexSyncGeneration)
+              return null;
+            pickerInternalChange = false;
+            if (initialize)
+              pickerInitialized = true;
           });
-          if (!arrayEqual(pickerValue.value, values)) {
-            pickerValue.value = values;
-          }
-          const obj = {
-            values,
-            indexs,
-            items
-          };
-          return obj;
-        }
+        });
       });
-      vue.provide("limePicker", props);
-      vue.provide("limePickerOnPick", onPick);
-      vue.provide("limePickerUpdateItems", updateItems);
-      vue.provide("limePickerItems", pickerItemInstanceArray);
-      vue.provide("limePickerManageChildInList", manageChildInList);
-      const __returned__ = { emit, props, pickerItemInstanceArray, modelValue, pickerValue, isEmpty, styles, curIndexArray, curValueArray, curItemArray, realColumns, manageChildInList, updateItems, updatePickerItems, onPick, onCancel, onConfirm, stopPickerValue, stopColumns, loadingRef, loadingAni };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
     }
-  });
-  const _style_0$N = { "l-picker": { "": { "position": "relative", "backgroundColor": "var(--l-picker-bg-color, #fff)", "borderTopLeftRadius": "var(--l-picker-border-radius, 12px)", "borderTopRightRadius": "var(--l-picker-border-radius, 12px)" } }, "l-picker__toolbar": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "height": "var(--l-picker-toolbar-height, 58px)", "flexDirection": "row", "position": "relative" } }, "l-picker__title": { "": { "position": "absolute", "left": "50%", "top": "50%", "transform": "translateX(-50%) translateY(-50%)", "textAlign": "center", "overflow": "hidden", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "color": "var(--l-picker-title-color, #000000E0)", "lineHeight": "var(--l-picker-title-line-height, 26px)", "fontWeight": "var(--l-picker-title-font-weight, 700)", "fontSize": "var(--l-picker-title-font-size, 18px)" } }, "l-picker__cancel": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginRight": "auto", "color": "var(--l-picker-cancel-color, #000000A6)" } }, "l-picker__confirm": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginLeft": "auto", "color": "var(--l-picker-confirm-color, #3283ff)" } }, "l-picker__main": { "": { "position": "relative", "display": "flex", "height": "var(--l-picker-group-height, 200px)", "flexDirection": "row", "zIndex": 2, "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8 } }, "l-picker__empty": { "": { "pointerEvents": "none", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0, "zIndex": 3 } }, "l-picker__loading": { "": { "zIndex": 3, "backgroundColor": "var(--l-picker-loading-mask-color, rgba(255, 255, 255, 0.9))", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0 } }, "l-picker__indicator": { "": { "position": "absolute", "backgroundColor": "var(--l-picker-indicator-bg-color, #0000000A)", "top": "50%", "left": "var(--l-picker-indicator-margin, 10px)", "right": "var(--l-picker-indicator-margin, 10px)", "height": "var(--l-picker-item-height, 50px)", "transform": "translateY(-50%)", "zIndex": -1, "borderTopLeftRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderTopRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomLeftRadius": "var(--l-picker-indicator-border-radius, 6px)" } } };
-  function _sfc_render$O(_ctx, _cache, $props, $setup, $data, $options) {
-    var _a, _b, _c, _d;
-    const _component_l_picker_item = resolveEasycom(vue.resolveDynamicComponent("l-picker-item"), __easycom_0$6);
-    return vue.openBlock(), vue.createElementBlock(
-      "view",
-      {
-        class: "l-picker",
-        style: vue.normalizeStyle([$setup.styles]),
-        ref: "pickerRef"
-      },
-      [
-        $props.cancelBtn != null || $props.title != null || $props.confirmBtn != null ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 0,
-          class: "l-picker__toolbar"
-        }, [
-          $props.cancelBtn != null ? (vue.openBlock(), vue.createElementBlock(
-            "text",
-            {
-              key: 0,
-              class: "l-picker__cancel",
-              style: vue.normalizeStyle([(_a = $props.cancelStyle) != null ? _a : {}]),
-              onClick: $setup.onCancel
-            },
-            vue.toDisplayString($props.cancelBtn),
-            5
-            /* TEXT, STYLE */
-          )) : vue.createCommentVNode("v-if", true),
-          vue.createElementVNode(
-            "text",
-            {
-              class: "l-picker__title",
-              style: vue.normalizeStyle([(_b = $props.titleStyle) != null ? _b : {}])
-            },
-            vue.toDisplayString($props.title),
-            5
-            /* TEXT, STYLE */
-          ),
-          $props.confirmBtn != null ? (vue.openBlock(), vue.createElementBlock(
-            "text",
-            {
-              key: 1,
-              class: "l-picker__confirm",
-              style: vue.normalizeStyle([(_c = $props.confirmStyle) != null ? _c : {}]),
-              onClick: $setup.onConfirm
-            },
-            vue.toDisplayString($props.confirmBtn),
-            5
-            /* TEXT, STYLE */
-          )) : vue.createCommentVNode("v-if", true)
-        ])) : vue.createCommentVNode("v-if", true),
-        vue.renderSlot(_ctx.$slots, "header"),
+    function visibleCountNumber() {
+      const count = parseFloat(props.visibleItemCount.toString());
+      if (isNaN(count) || count <= 0)
+        return 5;
+      return count;
+    }
+    function itemHeightNumber() {
+      const height = parseFloat(props.itemHeight.toString());
+      if (isNaN(height) || height <= 0)
+        return 44;
+      return height;
+    }
+    function formatSize(value = null) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+        return text;
+      }
+      return text + "px";
+    }
+    const displayText = vue.computed(() => {
+      const items = selectedItems();
+      if (items.length == 0)
+        return "请选择";
+      const texts = [];
+      for (let i2 = 0; i2 < items.length; i2++)
+        texts.push(items[i2].text);
+      return texts.join(" / ");
+    });
+    const displayTextClass = vue.computed(() => {
+      return selectedItems().length == 0 ? "i-picker__input-text i-picker__input-text--placeholder" : "i-picker__input-text";
+    });
+    const columnCount = vue.computed(() => {
+      return normalizedColumns.value.length;
+    });
+    const column0 = vue.computed(() => {
+      return columnAt(0);
+    });
+    const column1 = vue.computed(() => {
+      return columnAt(1);
+    });
+    const column2 = vue.computed(() => {
+      return columnAt(2);
+    });
+    const column3 = vue.computed(() => {
+      return columnAt(3);
+    });
+    const column4 = vue.computed(() => {
+      return columnAt(4);
+    });
+    const column5 = vue.computed(() => {
+      return columnAt(5);
+    });
+    const columnsStyle = vue.computed(() => {
+      const height = itemHeightNumber() * visibleCountNumber();
+      return "width:100%;height:" + height.toString() + "px;";
+    });
+    const indicatorStyle = vue.computed(() => {
+      return "height:" + formatSize(props.itemHeight) + ";background-color:transparent;border-top:1px solid #eef0f4;border-bottom:1px solid #eef0f4;";
+    });
+    const itemStyle = vue.computed(() => {
+      return "height:" + formatSize(props.itemHeight) + ";";
+    });
+    const panelStyle = vue.computed(() => {
+      const radius = formatSize(props.round);
+      return "border-radius:" + radius + " " + radius + " 0 0;";
+    });
+    function hasModelValue() {
+      const value = props.modelValue;
+      if (isArray(value))
+        return value.length > 0;
+      return value.toString().length > 0;
+    }
+    function activeModelValue() {
+      if (hasModelValue())
+        return props.modelValue;
+      if (props.value.toString().length > 0)
+        return props.value;
+      return null;
+    }
+    function columnTargetValue(value = null, columnIndex) {
+      if (value == null)
+        return null;
+      if (isArray(value)) {
+        const values = value;
+        return values.length > columnIndex ? values[columnIndex] : null;
+      }
+      return columnIndex == 0 ? value : null;
+    }
+    function defaultIndexAt(columnIndex) {
+      const value = props.defaultIndex;
+      let index = 0;
+      if (isArray(value)) {
+        const values = value;
+        if (values.length > columnIndex) {
+          const item = values[columnIndex];
+          if (item != null)
+            index = parseFloat(item.toString());
+        }
+      } else if (columnIndex == 0) {
+        index = parseFloat(value.toString());
+      }
+      return normalizedIndex(index, 0);
+    }
+    function findValueIndex(column, value = null) {
+      const valueText = value.toString();
+      for (let i2 = 0; i2 < column.length; i2++) {
+        const itemValue = column[i2].value;
+        if (itemValue != null && itemValue.toString() == valueText)
+          return i2;
+      }
+      return -1;
+    }
+    function selectedValue() {
+      const items = selectedItems();
+      if (items.length == 0)
+        return "";
+      if (items.length == 1) {
+        const value = items[0].value;
+        return value == null ? "" : value;
+      }
+      const values = [];
+      for (let i2 = 0; i2 < items.length; i2++)
+        values.push(items[i2].value);
+      return values;
+    }
+    function pickerValuePayload() {
+      const items = selectedItems();
+      if (items.length == 1)
+        return items[0];
+      return items;
+    }
+    function buildChangeEvent(columnIndex, index) {
+      return new UTSJSONObject({
+        index,
+        indexs: currentIndexs.value,
+        columnIndex,
+        value: pickerValuePayload(),
+        values: selectedItems()
+      });
+    }
+    function buildConfirmEvent() {
+      return new UTSJSONObject({
+        indexs: currentIndexs.value,
+        value: pickerValuePayload(),
+        values: selectedItems()
+      });
+    }
+    function emitSelectedValue() {
+      const value = selectedValue();
+      emit("update:modelValue", value);
+      emit("update:value", isArray(value) ? "" : value);
+    }
+    function syncIndexs() {
+      const columns = normalizedColumns.value;
+      const result = [];
+      const value = activeModelValue();
+      for (let i2 = 0; i2 < columns.length; i2++) {
+        const column = columns[i2];
+        if (column.length == 0) {
+          result.push(0);
+          continue;
+        }
+        const targetValue = columnTargetValue(value, i2);
+        let index = -1;
+        if (targetValue != null && targetValue.toString().length > 0) {
+          index = findValueIndex(column, targetValue);
+        }
+        if (index < 0 && (props.showDefaultValue || !hasModelValue()))
+          index = defaultIndexAt(i2);
+        if (index < 0)
+          index = 0;
+        if (index >= column.length)
+          index = column.length - 1;
+        result.push(index);
+      }
+      currentIndexs.value = result;
+      scheduleIndexSync(result, -1, !pickerInitialized);
+    }
+    function close() {
+      cancelIndexSync();
+      pickerInitialized = false;
+      if (!opened.value)
+        return null;
+      opened.value = false;
+      emit("close");
+      emit("update:show", false);
+    }
+    function open() {
+      if (opened.value)
+        return null;
+      opened.value = true;
+      syncIndexs();
+      emit("open");
+      emit("update:show", true);
+    }
+    function openByTrigger() {
+      if (!props.disabled)
+        open();
+    }
+    function cancel() {
+      cancelIndexSync();
+      emit("cancel", buildChangeEvent(0, selectedIndexAt(0)));
+      close();
+    }
+    function confirm() {
+      const event = buildConfirmEvent();
+      emit("confirm", event);
+      emitSelectedValue();
+      cancelIndexSync();
+      close();
+    }
+    function clear() {
+      currentIndexs.value = [];
+      pickerViewIndexes.value = [];
+      emit("clear");
+      emit("change", buildChangeEvent(0, -1));
+      emit("update:value", "");
+      emit("update:modelValue", "");
+    }
+    function handleOverlayClick() {
+      if (props.closeOnMask)
+        close();
+    }
+    function handlePickerChange(event) {
+      if (props.disabled || props.loading || !pickerInitialized || pickerInternalChange)
+        return null;
+      const values = event.detail.value;
+      if (values == null || !Array.isArray(values))
+        return null;
+      const nextIndexs = [];
+      let changedColumnIndex = 0;
+      for (let i2 = 0; i2 < normalizedColumns.value.length; i2++) {
+        const column = normalizedColumns.value[i2];
+        if (column.length == 0) {
+          nextIndexs.push(0);
+          continue;
+        }
+        const oldIndex = selectedIndexAt(i2);
+        let nextIndex = normalizedIndex(values.length > i2 ? values[i2] : 0, 0);
+        if (nextIndex < 0)
+          nextIndex = 0;
+        if (nextIndex >= column.length)
+          nextIndex = column.length - 1;
+        if (column[nextIndex].disabled)
+          nextIndex = oldIndex;
+        if (oldIndex != nextIndex)
+          changedColumnIndex = i2;
+        nextIndexs.push(nextIndex);
+      }
+      currentIndexs.value = nextIndexs;
+      emit("change", buildChangeEvent(changedColumnIndex, selectedIndexAt(changedColumnIndex)));
+      if (props.immediateChange)
+        emitSelectedValue();
+    }
+    function itemClass(item, columnIndex, itemIndex) {
+      const classes = ["i-picker__item"];
+      if (selectedIndexAt(columnIndex) == itemIndex)
+        classes.push("i-picker__item--active");
+      if (item.disabled)
+        classes.push("i-picker__item--disabled");
+      return classes.join(" ");
+    }
+    function itemTextClass(item, columnIndex, itemIndex) {
+      return selectedIndexAt(columnIndex) == itemIndex ? "i-picker__item-text i-picker__item-text--active" : "i-picker__item-text";
+    }
+    function itemTextStyle(item, columnIndex, itemIndex) {
+      let style = "line-height:" + formatSize(props.itemHeight) + ";color:#606266;";
+      if (selectedIndexAt(columnIndex) == itemIndex) {
+        style = style + "color:#111827;";
+      }
+      return style;
+    }
+    function getIndexs() {
+      return currentIndexs.value;
+    }
+    function getValues() {
+      return selectedItems();
+    }
+    function getColumns() {
+      return normalizedColumns.value;
+    }
+    function getColumnValues(columnIndex) {
+      if (columnIndex < 0 || columnIndex >= normalizedColumns.value.length)
+        return [];
+      return normalizedColumns.value[columnIndex];
+    }
+    function setColumnValues(columnIndex, values) {
+      emit("change", new UTSJSONObject({
+        index: selectedIndexAt(columnIndex),
+        indexs: currentIndexs.value,
+        columnIndex,
+        value: values,
+        values
+      }));
+    }
+    vue.watch(() => {
+      return props.show;
+    }, (nextValue) => {
+      if (opened.value == nextValue)
+        return null;
+      opened.value = nextValue;
+      if (nextValue) {
+        syncIndexs();
+        emit("open");
+      } else {
+        emit("close");
+      }
+    });
+    vue.watch(() => {
+      return props.modelValue;
+    }, () => {
+      syncIndexs();
+    });
+    vue.watch(() => {
+      return props.value;
+    }, () => {
+      syncIndexs();
+    });
+    vue.watch(() => {
+      return props.columns;
+    }, () => {
+      syncIndexs();
+    });
+    vue.watch(() => {
+      return props.defaultIndex;
+    }, () => {
+      syncIndexs();
+    });
+    syncIndexs();
+    __expose({
+      open,
+      close,
+      clear,
+      getIndexs,
+      getValues,
+      getColumns,
+      getColumnValues,
+      setColumnValues
+    });
+    const __returned__ = { props, emit, isArray, normalizedIndex, normalizeItem, normalizeColumn, opened, currentIndexs, pickerViewIndexes, get indexSyncGeneration() {
+      return indexSyncGeneration;
+    }, set indexSyncGeneration(v2) {
+      indexSyncGeneration = v2;
+    }, get pickerInitialized() {
+      return pickerInitialized;
+    }, set pickerInitialized(v2) {
+      pickerInitialized = v2;
+    }, get pickerInternalChange() {
+      return pickerInternalChange;
+    }, set pickerInternalChange(v2) {
+      pickerInternalChange = v2;
+    }, scheduleFrame, copyIndexes, findChangedIndex, cancelIndexSync, normalizedColumns, selectedIndexAt, selectedItems, columnAt, scheduleIndexSync, visibleCountNumber, itemHeightNumber, formatSize, displayText, displayTextClass, columnCount, column0, column1, column2, column3, column4, column5, columnsStyle, indicatorStyle, itemStyle, panelStyle, hasModelValue, activeModelValue, columnTargetValue, defaultIndexAt, findValueIndex, selectedValue, pickerValuePayload, buildChangeEvent, buildConfirmEvent, emitSelectedValue, syncIndexs, close, open, openByTrigger, cancel, confirm, clear, handleOverlayClick, handlePickerChange, itemClass, itemTextClass, itemTextStyle, getIndexs, getValues, getColumns, getColumnValues, setColumnValues };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  } }));
+  const _style_0$L = { "i-picker": { "": { "width": "100%" } }, "i-picker__trigger": { "": { "width": "100%" } }, "i-picker__input": { "": { "height": 44, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff", "flexDirection": "row", "alignItems": "center" } }, "i-picker__input-text": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#303133", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__input-text--placeholder": { "": { "color": "#909193" } }, "i-picker__arrow": { "": { "width": 20, "color": "#909193", "fontSize": 20, "lineHeight": "24px", "textAlign": "right", "transform": "rotate(90deg)" } }, "i-picker__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "zIndex": 150, "backgroundColor": "rgba(0,0,0,0.42)", "justifyContent": "flex-end" } }, "i-picker__panel": { "": { "overflow": "hidden", "backgroundColor": "#ffffff" } }, "i-picker__toolbar": { "": { "height": 48, "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-picker__cancel": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px" } }, "i-picker__confirm": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px", "textAlign": "right" } }, "i-picker__title": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#111827", "fontSize": 16, "fontWeight": 700, "lineHeight": "24px", "textAlign": "center" } }, "i-picker__loading": { "": { "position": "absolute", "left": 0, "right": 0, "top": 48, "bottom": 0, "zIndex": 2, "backgroundColor": "rgba(255,255,255,0.78)", "alignItems": "center", "justifyContent": "center" } }, "i-picker__loading-text": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__columns": { "": { "width": "100%" } }, "i-picker__column": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": "100%" } }, "i-picker__item": { "": { "width": "100%", "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8, "alignItems": "center", "justifyContent": "center" } }, "i-picker__item--active": { "": { "backgroundColor": "rgba(0,0,0,0)" } }, "i-picker__item--disabled": { "": { "opacity": 0.42 } }, "i-picker__item-text": { "": { "color": "#303133", "fontSize": 15, "lineHeight": "22px", "textAlign": "center" } }, "i-picker__item-text--active": { "": { "color": "#111827", "fontWeight": 700 } } };
+  function _sfc_render$L(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", { class: "i-picker" }, [
+      $props.showInput ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 0,
+        class: "i-picker__trigger",
+        onClick: $setup.openByTrigger
+      }, [
+        vue.renderSlot(_ctx.$slots, "trigger", {}, () => [
+          vue.renderSlot(_ctx.$slots, "default", {}, () => [
+            vue.createElementVNode("view", { class: "i-picker__input" }, [
+              vue.createElementVNode(
+                "text",
+                {
+                  class: vue.normalizeClass($setup.displayTextClass)
+                },
+                vue.toDisplayString($setup.displayText),
+                3
+                /* TEXT, CLASS */
+              ),
+              vue.createElementVNode("text", { class: "i-picker__arrow" }, "›")
+            ])
+          ])
+        ])
+      ])) : vue.createCommentVNode("v-if", true),
+      $setup.opened ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 1,
+        class: "i-picker__mask",
+        onClick: $setup.handleOverlayClick
+      }, [
         vue.createElementVNode(
           "view",
           {
-            class: "l-picker__main",
-            style: vue.normalizeStyle([$props.groupHeight != null ? { height: $props.groupHeight } : {}])
+            class: "i-picker__panel",
+            style: vue.normalizeStyle($setup.panelStyle),
+            onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
+            }, ["stop"]))
           },
           [
-            vue.renderSlot(_ctx.$slots, "default", {}, () => [
-              (vue.openBlock(true), vue.createElementBlock(
-                vue.Fragment,
-                null,
-                vue.renderList($setup.props.columns, (options, i2) => {
-                  return vue.openBlock(), vue.createBlock(_component_l_picker_item, {
-                    options,
-                    key: i2,
-                    column: i2,
-                    value: $setup.pickerValue.length > i2 ? $setup.pickerValue[i2] : null
-                  }, null, 8, ["options", "column", "value"]);
-                }),
-                128
-                /* KEYED_FRAGMENT */
-              ))
-            ]),
-            $setup.isEmpty ? (vue.openBlock(), vue.createElementBlock("view", {
+            $props.showToolbar ? (vue.openBlock(), vue.createElementBlock("view", {
               key: 0,
-              class: "l-picker__empty"
+              class: "i-picker__toolbar"
             }, [
-              vue.renderSlot(_ctx.$slots, "empty")
+              vue.createElementVNode(
+                "text",
+                {
+                  class: "i-picker__cancel",
+                  style: vue.normalizeStyle("color:" + $props.cancelColor + ";"),
+                  onClick: $setup.cancel
+                },
+                vue.toDisplayString($props.cancelText),
+                5
+                /* TEXT, STYLE */
+              ),
+              vue.createElementVNode(
+                "text",
+                { class: "i-picker__title" },
+                vue.toDisplayString($props.title),
+                1
+                /* TEXT */
+              ),
+              vue.createElementVNode(
+                "text",
+                {
+                  class: "i-picker__confirm",
+                  style: vue.normalizeStyle("color:" + $props.confirmColor + ";"),
+                  onClick: $setup.confirm
+                },
+                vue.toDisplayString($props.confirmText),
+                5
+                /* TEXT, STYLE */
+              )
             ])) : vue.createCommentVNode("v-if", true),
-            !$setup.isEmpty ? (vue.openBlock(), vue.createElementBlock(
-              "view",
-              {
-                key: 1,
-                class: "l-picker__indicator",
-                style: vue.normalizeStyle((_d = $props.indicatorStyle) != null ? _d : "")
-              },
-              null,
-              4
-              /* STYLE */
-            )) : vue.createCommentVNode("v-if", true)
-          ],
-          4
-          /* STYLE */
-        ),
-        vue.renderSlot(_ctx.$slots, "footer"),
-        $props.loading ? (vue.openBlock(), vue.createElementBlock(
-          "view",
-          {
-            key: 1,
-            class: "l-picker__loading",
-            ref: "loadingRef",
-            style: vue.normalizeStyle([$props.loadingMaskColor != null ? { background: $props.loadingMaskColor } : {}])
-          },
-          null,
-          4
-          /* STYLE */
-        )) : vue.createCommentVNode("v-if", true)
-      ],
-      4
-      /* STYLE */
-    );
-  }
-  const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$P, [["render", _sfc_render$O], ["styles", [_style_0$N]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/lime-picker/components/l-picker/l-picker.uvue"]]);
-  function raf(fn2 = null) {
-    if (typeof fn2 == "UniAnimationFrameCallback") {
-      return requestAnimationFrame(fn2);
-    } else {
-      return requestAnimationFrame(fn2);
-    }
-  }
-  function useTransition(options) {
-    var _a, _b, _c, _d, _e2, _f, _g, _h, _j;
-    const state = vue.ref(false);
-    const display = vue.ref(false);
-    const inited = vue.ref(false);
-    const classes = vue.ref("");
-    const name2 = vue.ref((_a = options.defaultName) !== null && _a !== void 0 ? _a : "fade");
-    const enterClass = (_b = options.enterClass) !== null && _b !== void 0 ? _b : "";
-    const enterActiveClass = (_c = options.enterActiveClass) !== null && _c !== void 0 ? _c : "";
-    const enterToClass = (_d = options.enterToClass) !== null && _d !== void 0 ? _d : "";
-    const leaveActiveClass = (_e2 = options.leaveActiveClass) !== null && _e2 !== void 0 ? _e2 : "";
-    const leaveToClass = (_f = options.leaveToClass) !== null && _f !== void 0 ? _f : "";
-    const leaveClass = (_g = options.leaveClass) !== null && _g !== void 0 ? _g : "";
-    const appear = (_h = options.appear) !== null && _h !== void 0 ? _h : false;
-    const duration = (_j = options.duration) !== null && _j !== void 0 ? _j : 300;
-    let status = "";
-    let isTransitionEnd = false;
-    let isTransitioning = false;
-    let timeoutId = -1;
-    let finishTimeoutId = -1;
-    const emitEvent = (event) => {
-      var _a2;
-      (_a2 = options.emits) === null || _a2 === void 0 ? void 0 : _a2.call(options, event);
-    };
-    const finished = () => {
-      var _a2;
-      if (isTransitionEnd)
-        return;
-      isTransitionEnd = true;
-      clearTimeout(finishTimeoutId);
-      if ((_a2 = options.removeClasses) !== null && _a2 !== void 0 ? _a2 : false) {
-        classes.value = "";
-      }
-      emitEvent("after-".concat(status));
-      if (display.value && !state.value) {
-        display.value = false;
-      }
-    };
-    const sleep = () => {
-      return new Promise((resolve) => {
-        vue.nextTick(() => {
-          raf(() => {
-            var _a2, _b2, _c2, _d2;
-            if (((_a2 = options.element) === null || _a2 === void 0 ? void 0 : _a2.value) != null) {
-              (_d2 = (_c2 = (_b2 = options.element) === null || _b2 === void 0 ? void 0 : _b2.value) === null || _c2 === void 0 ? void 0 : _c2.getBoundingClientRectAsync()) === null || _d2 === void 0 ? void 0 : _d2.then((res) => {
-                resolve();
-              });
-            } else {
-              resolve();
-            }
-          });
-        });
-      });
-    };
-    const getClassNames = (name3) => {
-      return /* @__PURE__ */ new Map([
-        ["enter", "l-".concat(name3, "-enter l-").concat(name3, "-enter-active ").concat(enterClass, " ").concat(enterActiveClass)],
-        ["enter-to", "l-".concat(name3, "-enter-to l-").concat(name3, "-enter-active ").concat(enterToClass, " ").concat(enterActiveClass)],
-        ["leave", "l-".concat(name3, "-leave l-").concat(name3, "-leave-active ").concat(leaveClass, " ").concat(leaveActiveClass)],
-        ["leave-to", "l-".concat(name3, "-leave-to l-").concat(name3, "-leave-active ").concat(leaveToClass, " ").concat(leaveActiveClass)]
-      ]);
-    };
-    const transitionQueue = vue.ref([]);
-    const performTransition = (newStatus, eventName) => {
-      return __awaiter(this, void 0, void 0, function* () {
-        var _a2;
-        if (status == newStatus)
-          return;
-        transitionQueue.value.push(newStatus);
-        if (isTransitioning)
-          return;
-        isTransitioning = true;
-        isTransitionEnd = true;
-        while (transitionQueue.value.length > 0) {
-          const currentStatus = transitionQueue.value.shift();
-          status = currentStatus;
-          emitEvent("before-".concat(eventName));
-          yield sleep();
-          yield sleep();
-          yield sleep();
-          yield sleep();
-          yield sleep();
-          if (status != currentStatus)
-            continue;
-          const classNames = getClassNames(name2.value);
-          inited.value = true;
-          display.value = true;
-          classes.value = classNames.get(eventName);
-          emitEvent(eventName);
-          const executeAfterTick = (_a2 = options.onNextTick) === null || _a2 === void 0 ? void 0 : _a2.call(options, eventName);
-          if (executeAfterTick != null) {
-            yield executeAfterTick;
-          }
-          yield sleep();
-          if (status != currentStatus)
-            continue;
-          classes.value = classNames.get("".concat(eventName, "-to"));
-          if (status == "leave") {
-            setTimeout(() => {
-              finished();
-            }, duration);
-          }
-        }
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          if (transitionQueue.value.length == 0 && status == newStatus) {
-            isTransitionEnd = false;
-          }
-        }, duration * 0.8);
-        isTransitioning = false;
-      });
-    };
-    const enter = () => {
-      performTransition("enter", "enter");
-    };
-    const leave = () => {
-      performTransition("leave", "leave");
-    };
-    let init = false;
-    let lastState = null;
-    vue.watchEffect(() => {
-      if (options.visible == null)
-        return;
-      state.value = options.visible();
-      if (lastState == state.value)
-        return;
-      lastState = state.value;
-      if (!appear && !init) {
-        init = true;
-        return;
-      }
-      if (state.value) {
-        enter();
-      } else {
-        leave();
-      }
-    });
-    vue.watchEffect(() => {
-      if (options.name == null)
-        return;
-      name2.value = options.name();
-    });
-    const toggle = (v2) => {
-      state.value = v2;
-      if (v2) {
-        enter();
-      } else {
-        leave();
-      }
-    };
-    return {
-      state,
-      inited,
-      display,
-      classes,
-      name: name2,
-      finished,
-      toggle
-    };
-  }
-  const _sfc_main$O = /* @__PURE__ */ vue.defineComponent({
-    __name: "l-overlay",
-    props: {
-      ariaLabel: { type: String, required: true, default: "关闭" },
-      ariaRole: { type: String, required: true, default: "button" },
-      lClass: { type: String, required: false },
-      bgColor: { type: String, required: false },
-      lStyle: { type: null, required: false },
-      duration: { type: Number, required: true, default: 300 },
-      preventScrollThrough: { type: Boolean, required: true, default: true },
-      visible: { type: Boolean, required: true, default: false },
-      zIndex: { type: Number, required: true, default: 998 }
-    },
-    emits: ["click", "before-enter", "enter", "after-enter", "before-leave", "leave", "after-leave"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
-      __expose();
-      const props = __props;
-      const emit = __emit;
-      const _b = useTransition({
-        defaultName: "fade",
-        appear: props.visible,
-        emits: (name2) => {
-          emit(name2);
-        },
-        visible: () => {
-          return props.visible;
-        },
-        duration: props.duration
-      }), inited = _b.inited, display = _b.display, classes = _b.classes, finished = _b.finished;
-      const styles = vue.computed(() => {
-        const style = /* @__PURE__ */ new Map();
-        if (props.bgColor != null) {
-          style.set("background-color", props.bgColor);
-        }
-        if (props.zIndex > 0) {
-          style.set("z-index", props.zIndex);
-        }
-        return style;
-      });
-      const noop = () => {
-      };
-      const onClick = (event) => {
-        emit("click", !props.visible);
-      };
-      const overlayRef = vue.ref(null);
-      vue.watchEffect(() => {
-        var _a2, _b2, _c;
-        (_a2 = overlayRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", "".concat(props.duration, "ms"));
-        if (!display.value) {
-          (_b2 = overlayRef.value) === null || _b2 === void 0 ? null : _b2.style.setProperty("display", "none");
-        } else {
-          (_c = overlayRef.value) === null || _c === void 0 ? null : _c.style.setProperty("display", "flex");
-        }
-      });
-      const __returned__ = { props, emit, inited, display, classes, finished, styles, noop, onClick, overlayRef };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
-    }
-  });
-  const _style_0$M = { "l-overlay": { "": { "position": "fixed", "top": 0, "left": 0, "width": "100%", "bottom": 0, "backgroundColor": "var(--l-overlay-bg-color, rgba(0, 0, 0, 0.45))", "transitionProperty": "opacity", "transitionTimingFunction": "ease", "zIndex": "var(--l-overlay-z-index, 998)", "opacity": 1, "transitionDuration": "300ms" } }, "l-fade-enter": { "": { "opacity": 0 } }, "l-fade-leave-to": { "": { "opacity": 0 } }, "@TRANSITION": { "l-overlay": { "property": "opacity", "timingFunction": "ease", "duration": "300ms" } } };
-  function _sfc_render$N(_ctx, _cache, $props, $setup, $data, $options) {
-    return $setup.inited ? (vue.openBlock(), vue.createElementBlock("view", {
-      key: 0,
-      class: vue.normalizeClass(["l-overlay", [$props.lClass, $setup.classes]]),
-      ref: "overlayRef",
-      style: vue.normalizeStyle([$setup.styles, $props.lStyle]),
-      onClick: vue.withModifiers($setup.onClick, ["stop"]),
-      onTouchmove: vue.withModifiers($setup.noop, ["stop"]),
-      onTransitionend: _cache[0] || (_cache[0] = (...args) => $setup.finished && $setup.finished(...args)),
-      "aria-role": $props.ariaRole,
-      "aria-label": $props.ariaLabel
-    }, [
-      vue.renderSlot(_ctx.$slots, "default")
-    ], 46, ["aria-role", "aria-label"])) : vue.createCommentVNode("v-if", true);
-  }
-  const __easycom_0$4 = /* @__PURE__ */ _export_sfc(_sfc_main$O, [["render", _sfc_render$N], ["styles", [_style_0$M]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/lime-overlay/components/l-overlay/l-overlay.uvue"]]);
-  function isDef(value) {
-    return value != null;
-  }
-  function addUnit(value) {
-    if (!isDef(value)) {
-      return null;
-    }
-    value = "".concat(value);
-    return isNumeric$1(value) ? "".concat(value, "px") : value;
-  }
-  function convertRadius(radius) {
-    var _a;
-    if (Array.isArray(radius)) {
-      const values = radius.map((item) => {
-        return addUnit(item);
-      });
-      if (values.length == 1) {
-        return [values[0], values[0], values[0], values[0]];
-      }
-      if (values.length == 2) {
-        return [values[0], values[1], values[0], values[1]];
-      }
-      if (values.length == 3) {
-        return [values[0], values[1], values[2], values[1]];
-      }
-      if (values.length == 4) {
-        return [values[0], values[1], values[2], values[3]];
-      }
-      return ["0", "0", "0", "0"];
-    }
-    const value = (_a = addUnit(radius)) !== null && _a !== void 0 ? _a : "0";
-    return [value, value, value, value];
-  }
-  const _sfc_main$N = /* @__PURE__ */ vue.defineComponent({
-    __name: "l-popup",
-    props: /* @__PURE__ */ vue.mergeModels(new UTSJSONObject({
-      closeable: { type: Boolean, required: true, default: false },
-      closeOnClickOverlay: { type: Boolean, required: true, default: true },
-      destroyOnClose: { type: Boolean, required: true, default: false },
-      overlayStyle: { type: null, required: false },
-      position: { type: String, required: true, default: "center" },
-      preventScrollThrough: { type: Boolean, required: true, default: true },
-      overlay: { type: Boolean, required: true, default: true },
-      transitionName: { type: String, required: false },
-      visible: { type: Boolean, required: false },
-      zIndex: { type: Number, required: true, default: 999 },
-      duration: { type: Number, required: true, default: 300 },
-      bgColor: { type: String, required: false },
-      closeIcon: { type: String, required: true, default: "close" },
-      iconColor: { type: String, required: false },
-      lStyle: { type: null, required: false },
-      safeAreaInsetBottom: { type: Boolean, required: true, default: true },
-      safeAreaInsetTop: { type: Boolean, required: true, default: false },
-      radius: { type: [String, Number, Array], required: false }
-    }), new UTSJSONObject({
-      "modelValue": { type: Boolean },
-      "modelModifiers": {}
-    })),
-    emits: /* @__PURE__ */ vue.mergeModels(["change", "click-overlay", "click-close", "open", "opened", "close", "closed", "before-enter", "enter", "after-enter", "before-leave", "leave", "after-leave"], ["update:modelValue"]),
-    setup(__props, _a) {
-      var _b;
-      var __expose = _a.expose, __emit = _a.emit;
-      __expose();
-      const emit = __emit;
-      const props = __props;
-      const modelValue = vue.useModel(__props, "modelValue");
-      const innerValue = vue.computed({
-        set(value) {
-          modelValue.value = value;
-          emit("change", value);
-        },
-        get() {
-          return props.visible || modelValue.value;
-        }
-      });
-      const status = vue.ref("before-enter");
-      const _c = useTransition({
-        defaultName: (_b = props.transitionName) !== null && _b !== void 0 ? _b : "popup-fade",
-        appear: innerValue.value,
-        emits: (name2) => {
-          status.value = name2;
-          if (name2 == "before-enter") {
-            emit("open");
-          } else if (name2 == "after-enter") {
-            emit("opened");
-          } else if (name2 == "before-leave") {
-            emit("close");
-          } else if (name2 == "after-leave") {
-            emit("closed");
-          }
-          emit(name2);
-        },
-        visible: () => {
-          return innerValue.value;
-        },
-        duration: props.duration
-      }), inited = _c.inited, display = _c.display, classes = _c.classes, finished = _c.finished;
-      const overlayZIndex = vue.computed(() => {
-        return props.zIndex > 0 ? props.zIndex - 1 : 998;
-      });
-      const rootClass = vue.computed(() => {
-        const safe = props.safeAreaInsetTop && props.position == "top" ? "l-popup--safe-top" : props.safeAreaInsetBottom && props.position == "bottom" ? "l-popup--safe-bottom" : "";
-        return "l-popup--".concat(props.position, " ").concat(safe, " ").concat(classes.value);
-      });
-      const safeAreaInsets = uni.getWindowInfo().safeAreaInsets;
-      const styles = vue.computed(() => {
-        const style = /* @__PURE__ */ new Map();
-        style.set("transition-duration", (["after-leave", "before-enter"].includes(status.value) ? 0 : props.duration) + "ms");
-        if (props.bgColor != null) {
-          style.set("background", props.bgColor);
-        }
-        if (props.zIndex > 0) {
-          style.set("z-index", props.zIndex);
-        }
-        if (props.radius != null) {
-          const values = convertRadius(props.radius);
-          style.set("border-top-left-radius", values[0]);
-          style.set("border-top-right-radius", values[1]);
-          style.set("border-bottom-right-radius", values[2]);
-          style.set("border-bottom-left-radius", values[3]);
-        }
-        return style;
-      });
-      const handleOverlayClick = () => {
-        if (props.closeOnClickOverlay) {
-          innerValue.value = false;
-          emit("click-overlay");
-        }
-      };
-      const handleClose = () => {
-        innerValue.value = false;
-        emit("click-close");
-      };
-      const popupRef = vue.ref(null);
-      vue.watchEffect(() => {
-        var _a2, _b2, _c2, _d;
-        if (!display.value) {
-          (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("pointer-events", "none");
-          (_b2 = popupRef.value) === null || _b2 === void 0 ? null : _b2.style.setProperty("z-index", -1e4);
-        } else {
-          (_c2 = popupRef.value) === null || _c2 === void 0 ? null : _c2.style.setProperty("pointer-events", "auto");
-          (_d = popupRef.value) === null || _d === void 0 ? null : _d.style.setProperty("z-index", props.zIndex);
-        }
-      });
-      const __returned__ = { emit, props, modelValue, innerValue, status, inited, display, classes, finished, overlayZIndex, rootClass, safeAreaInsets, styles, handleOverlayClick, handleClose, popupRef };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
-    }
-  });
-  const _style_0$L = { "l-popup": { "": { "position": "fixed", "transitionDuration": "300ms", "transitionProperty": "transform,opacity", "transitionTimingFunction": "ease", "backgroundColor": "var(--l-popup-bg-color, #fff)", "overflow": "visible", "opacity": 1 }, ".l-popup-fade-enter": { "opacity": 0 }, ".l-popup-fade-leave-to": { "opacity": 0 }, ".l-popup-fade-enter.l-popup--top": { "transform": "scale(1) translate(0, -100%)" }, ".l-popup-fade-leave-to.l-popup--top": { "transform": "scale(1) translate(0, -100%)" }, ".l-popup-fade-enter.l-popup--bottom": { "transform": "scale(1) translate(0, 100%)" }, ".l-popup-fade-leave-to.l-popup--bottom": { "transform": "scale(1) translate(0, 100%)" }, ".l-popup-fade-enter.l-popup--left": { "transform": "scale(1) translate(-100%, 0)" }, ".l-popup-fade-leave-to.l-popup--left": { "transform": "scale(1) translate(-100%, 0)" }, ".l-popup-fade-enter.l-popup--right": { "transform": "scale(1) translate(100%, 0)" }, ".l-popup-fade-leave-to.l-popup--right": { "transform": "scale(1) translate(100%, 0)" }, ".l-popup-fade-enter.l-popup--center": { "transform": "translate(-50%, -50%)", "opacity": 0 }, ".l-popup-fade-leave-to.l-popup--center": { "transform": "translate(-50%, -50%)", "opacity": 0 }, ".l-dialog-enter.l-popup--center": { "transform": "scale(0.6) translate(-50%, -50%)", "opacity": 0 }, ".l-dialog-leave-to.l-popup--center": { "transform": "scale(0.6) translate(-50%, -50%)", "opacity": 0 } }, "l-popup__close": { "": { "position": "absolute", "top": 0, "right": 0, "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "l-popup__close-icon": { "": { "color": "var(--l-popup-close-icon-color, #000000A6)" } }, "l-popup--top": { "": { "top": 0, "left": 0, "right": 0, "borderBottomLeftRadius": "var(--l-popup-border-radius, 9px)", "borderBottomRightRadius": "var(--l-popup-border-radius, 9px)", "transform": "scale(1) translate(0, 0)" } }, "l-popup--bottom": { "": { "bottom": 0, "left": 0, "right": 0, "borderTopLeftRadius": "var(--l-popup-border-radius, 9px)", "borderTopRightRadius": "var(--l-popup-border-radius, 9px)", "transform": "scale(1) translate(0, 0)" } }, "l-popup--safe-top": { "": { "paddingTop": "var(--uni-safe-area-inset-top)" } }, "l-popup--safe-bottom": { "": { "paddingBottom": "var(--uni-safe-area-inset-bottom)" } }, "l-popup--left": { "": { "top": 0, "left": 0, "bottom": 0, "transform": "scale(1) translate(0, 0)" } }, "l-popup--right": { "": { "top": 0, "right": 0, "bottom": 0, "transform": "scale(1) translate(0, 0)" } }, "l-popup--center": { "": { "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "transformOrigin": "50% 50%", "borderTopLeftRadius": "var(--l-popup-border-radius, 9px)", "borderTopRightRadius": "var(--l-popup-border-radius, 9px)", "borderBottomRightRadius": "var(--l-popup-border-radius, 9px)", "borderBottomLeftRadius": "var(--l-popup-border-radius, 9px)" } }, "@TRANSITION": { "l-popup": { "duration": "300ms", "property": "transform,opacity", "timingFunction": "ease" } } };
-  function _sfc_render$M(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_l_overlay = resolveEasycom(vue.resolveDynamicComponent("l-overlay"), __easycom_0$4);
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
-    return vue.openBlock(), vue.createElementBlock(
-      vue.Fragment,
-      null,
-      [
-        ($props.destroyOnClose ? $setup.display && $props.overlay : $props.overlay) ? (vue.openBlock(), vue.createBlock(_component_l_overlay, {
-          key: 0,
-          visible: $setup.innerValue,
-          zIndex: $setup.overlayZIndex,
-          appear: true,
-          preventScrollThrough: $props.preventScrollThrough,
-          "l-style": $props.overlayStyle,
-          onClick: $setup.handleOverlayClick
-        }, null, 8, ["visible", "zIndex", "preventScrollThrough", "l-style"])) : vue.createCommentVNode("v-if", true),
-        ($props.destroyOnClose ? $setup.display : $setup.inited) ? (vue.openBlock(), vue.createElementBlock(
-          "view",
-          {
-            key: 1,
-            class: vue.normalizeClass(["l-popup", $setup.rootClass]),
-            ref: "popupRef",
-            style: vue.normalizeStyle([$setup.styles, $props.lStyle]),
-            onTransitionend: _cache[0] || (_cache[0] = (...args) => $setup.finished && $setup.finished(...args))
-          },
-          [
-            vue.renderSlot(_ctx.$slots, "default"),
-            $props.closeable ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 0,
-              class: "l-popup__close",
-              onClick: $setup.handleClose
+            $props.loading ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
+              class: "i-picker__loading"
             }, [
-              vue.renderSlot(_ctx.$slots, "close-btn", {}, () => [
-                vue.createVNode(_component_i_icon, {
-                  name: "close",
-                  fontSize: "20",
-                  size: "27px",
-                  color: $props.iconColor
-                }, null, 8, ["color"])
-              ])
-            ])) : vue.createCommentVNode("v-if", true)
+              vue.createElementVNode("text", { class: "i-picker__loading-text" }, "加载中...")
+            ])) : vue.createCommentVNode("v-if", true),
+            vue.createElementVNode("picker-view", {
+              class: "i-picker__columns",
+              style: vue.normalizeStyle($setup.columnsStyle),
+              value: $setup.pickerViewIndexes,
+              "indicator-style": $setup.indicatorStyle,
+              onChange: $setup.handlePickerChange
+            }, [
+              $setup.columnCount > 0 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 0,
+                class: "i-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.column0, (item, itemIndex) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: vue.normalizeClass($setup.itemClass(item, 0, itemIndex)),
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          {
+                            class: vue.normalizeClass($setup.itemTextClass(item, 0, itemIndex)),
+                            style: vue.normalizeStyle($setup.itemTextStyle(item, 0, itemIndex))
+                          },
+                          vue.toDisplayString(item.text),
+                          7
+                          /* TEXT, CLASS, STYLE */
+                        )
+                      ],
+                      6
+                      /* CLASS, STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true),
+              $setup.columnCount > 1 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 1,
+                class: "i-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.column1, (item, itemIndex) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: vue.normalizeClass($setup.itemClass(item, 1, itemIndex)),
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          {
+                            class: vue.normalizeClass($setup.itemTextClass(item, 1, itemIndex)),
+                            style: vue.normalizeStyle($setup.itemTextStyle(item, 1, itemIndex))
+                          },
+                          vue.toDisplayString(item.text),
+                          7
+                          /* TEXT, CLASS, STYLE */
+                        )
+                      ],
+                      6
+                      /* CLASS, STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true),
+              $setup.columnCount > 2 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 2,
+                class: "i-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.column2, (item, itemIndex) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: vue.normalizeClass($setup.itemClass(item, 2, itemIndex)),
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          {
+                            class: vue.normalizeClass($setup.itemTextClass(item, 2, itemIndex)),
+                            style: vue.normalizeStyle($setup.itemTextStyle(item, 2, itemIndex))
+                          },
+                          vue.toDisplayString(item.text),
+                          7
+                          /* TEXT, CLASS, STYLE */
+                        )
+                      ],
+                      6
+                      /* CLASS, STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true),
+              $setup.columnCount > 3 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 3,
+                class: "i-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.column3, (item, itemIndex) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: vue.normalizeClass($setup.itemClass(item, 3, itemIndex)),
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          {
+                            class: vue.normalizeClass($setup.itemTextClass(item, 3, itemIndex)),
+                            style: vue.normalizeStyle($setup.itemTextStyle(item, 3, itemIndex))
+                          },
+                          vue.toDisplayString(item.text),
+                          7
+                          /* TEXT, CLASS, STYLE */
+                        )
+                      ],
+                      6
+                      /* CLASS, STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true),
+              $setup.columnCount > 4 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 4,
+                class: "i-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.column4, (item, itemIndex) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: vue.normalizeClass($setup.itemClass(item, 4, itemIndex)),
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          {
+                            class: vue.normalizeClass($setup.itemTextClass(item, 4, itemIndex)),
+                            style: vue.normalizeStyle($setup.itemTextStyle(item, 4, itemIndex))
+                          },
+                          vue.toDisplayString(item.text),
+                          7
+                          /* TEXT, CLASS, STYLE */
+                        )
+                      ],
+                      6
+                      /* CLASS, STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true),
+              $setup.columnCount > 5 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 5,
+                class: "i-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.column5, (item, itemIndex) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: vue.normalizeClass($setup.itemClass(item, 5, itemIndex)),
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          {
+                            class: vue.normalizeClass($setup.itemTextClass(item, 5, itemIndex)),
+                            style: vue.normalizeStyle($setup.itemTextStyle(item, 5, itemIndex))
+                          },
+                          vue.toDisplayString(item.text),
+                          7
+                          /* TEXT, CLASS, STYLE */
+                        )
+                      ],
+                      6
+                      /* CLASS, STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true)
+            ], 44, ["value", "indicator-style"])
           ],
-          38
-          /* CLASS, STYLE, NEED_HYDRATION */
-        )) : vue.createCommentVNode("v-if", true)
-      ],
-      64
-      /* STABLE_FRAGMENT */
-    );
+          4
+          /* STYLE */
+        )
+      ])) : vue.createCommentVNode("v-if", true)
+    ]);
   }
-  const __easycom_3$2 = /* @__PURE__ */ _export_sfc(_sfc_main$N, [["render", _sfc_render$M], ["styles", [_style_0$L]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/lime-popup/components/l-popup/l-popup.uvue"]]);
-  const _sfc_main$M = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-toast" }, { __name: "i-toast", props: {
+  const __easycom_2$6 = /* @__PURE__ */ _export_sfc(_sfc_main$M, [["render", _sfc_render$L], ["styles", [_style_0$L]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-picker/i-picker.uvue"]]);
+  const _sfc_main$L = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-toast" }, { __name: "i-toast", props: {
     zIndex: { type: [String, Number], default: 10090 },
     loading: { type: Boolean, default: false },
     title: { type: String, default: "" },
@@ -3708,11 +2064,62 @@
     const currentCustomStyle = vue.ref(props.customStyle);
     const loadingAngle = vue.ref(0);
     let loadingTimer = 0;
+    function normalizePosition(value = null) {
+      if (value == "top" || value == "bottom")
+        return value.toString();
+      return "center";
+    }
+    function resolveBgColor() {
+      if (currentType.value == "primary")
+        return "#2979ff";
+      if (currentType.value == "success")
+        return "#19be6b";
+      if (currentType.value == "warning")
+        return "#ff9900";
+      if (currentType.value == "error")
+        return "#fa3534";
+      return "rgba(0, 0, 0, 0.78)";
+    }
+    function isImagePath(value = null) {
+      const text = value.toString();
+      return text.indexOf("/") >= 0 || text.indexOf("http") == 0;
+    }
+    function setToastOption(options, keyName) {
+      const value = options[keyName];
+      if (value == null)
+        return null;
+      if (keyName == "zIndex")
+        currentZIndex.value = value;
+      if (keyName == "loading")
+        currentLoading.value = value == true;
+      if (keyName == "title")
+        currentTitle.value = value.toString();
+      if (keyName == "icon")
+        currentIcon.value = value.toString();
+      if (keyName == "type")
+        currentType.value = value.toString();
+      if (keyName == "mask")
+        currentMask.value = value == true;
+      if (keyName == "position")
+        currentPosition.value = value.toString();
+      if (keyName == "duration")
+        currentDuration.value = value;
+      if (keyName == "fill")
+        currentFill.value = value == true;
+      if (keyName == "customStyle")
+        currentCustomStyle.value = value;
+    }
+    function normalizeAngle(value) {
+      let angle = value % 360;
+      if (angle < 0)
+        angle = angle + 360;
+      return angle;
+    }
     const toastClass = vue.computed(() => {
       return "i-toast i-toast--" + normalizePosition(currentPosition.value);
     });
     const toastStyle = vue.computed(() => {
-      let style = "z-index:" + String(currentZIndex.value) + ";";
+      let style = "z-index:" + currentZIndex.value.toString() + ";";
       style += "background-color:" + resolveBgColor() + ";";
       if (typeof currentCustomStyle.value == "string")
         style += currentCustomStyle.value;
@@ -3741,60 +2148,9 @@
       return currentIcon.value.length > 0 && isImagePath(currentIcon.value);
     });
     const loadingStyle = vue.computed(() => {
-      return "transform:rotate(" + String(loadingAngle.value) + "deg);";
+      return "transform:rotate(" + loadingAngle.value.toString() + "deg);";
     });
-    vue.onUnmounted(() => {
-      clearTimeout(timer.value);
-      stopLoadingAnimation();
-    });
-    function open(options = null) {
-      applyOptions(options, "");
-      showToast();
-    }
-    function close() {
-      clearTimeout(timer.value);
-      stopLoadingAnimation();
-      visible.value = false;
-    }
-    function primary(options = null) {
-      applyOptions(options, "primary");
-      showToast();
-    }
-    function success(options = null) {
-      applyOptions(options, "success");
-      showToast();
-    }
-    function error(options = null) {
-      applyOptions(options, "error");
-      showToast();
-    }
-    function warning(options = null) {
-      applyOptions(options, "warning");
-      showToast();
-    }
-    function showLoading(options = null) {
-      applyOptions(options, "default");
-      currentLoading.value = true;
-      if (currentTitle.value.length == 0)
-        currentTitle.value = "加载中";
-      showToast();
-    }
-    function showToast() {
-      clearTimeout(timer.value);
-      visible.value = true;
-      if (currentLoading.value) {
-        startLoadingAnimation();
-      } else {
-        stopLoadingAnimation();
-      }
-      const duration = Number(currentDuration.value);
-      if (duration > 0) {
-        timer.value = setTimeout(() => {
-          close();
-        }, duration);
-      }
-    }
-    function applyOptions(options = null, forcedType = null) {
+    function applyToastOptions(options = null, forcedType) {
       currentZIndex.value = props.zIndex;
       currentLoading.value = props.loading;
       currentTitle.value = props.title;
@@ -3812,51 +2168,24 @@
         return null;
       }
       if (typeof options == "object") {
-        setValue(options, "zIndex");
-        setValue(options, "loading");
-        setValue(options, "title");
-        setValue(options, "icon");
-        setValue(options, "type");
-        setValue(options, "mask");
-        setValue(options, "position");
-        setValue(options, "duration");
-        setValue(options, "fill");
-        setValue(options, "customStyle");
+        const object = options;
+        setToastOption(object, "zIndex");
+        setToastOption(object, "loading");
+        setToastOption(object, "title");
+        setToastOption(object, "icon");
+        setToastOption(object, "type");
+        setToastOption(object, "mask");
+        setToastOption(object, "position");
+        setToastOption(object, "duration");
+        setToastOption(object, "fill");
+        setToastOption(object, "customStyle");
       }
-    }
-    function setValue(options = null, keyName = null) {
-      const value = options[keyName];
-      if (value == null)
-        return null;
-      if (keyName == "zIndex")
-        currentZIndex.value = value;
-      if (keyName == "loading")
-        currentLoading.value = value == true;
-      if (keyName == "title")
-        currentTitle.value = String(value);
-      if (keyName == "icon")
-        currentIcon.value = String(value);
-      if (keyName == "type")
-        currentType.value = String(value);
-      if (keyName == "mask")
-        currentMask.value = value == true;
-      if (keyName == "position")
-        currentPosition.value = String(value);
-      if (keyName == "duration")
-        currentDuration.value = value;
-      if (keyName == "fill")
-        currentFill.value = value == true;
-      if (keyName == "customStyle")
-        currentCustomStyle.value = value;
     }
     function startLoadingAnimation() {
       if (loadingTimer > 0)
         return null;
       loadingTimer = setInterval(() => {
-        let angle = (loadingAngle.value + 24) % 360;
-        if (angle < 0)
-          angle = angle + 360;
-        loadingAngle.value = angle;
+        loadingAngle.value = normalizeAngle(loadingAngle.value + 24);
       }, 50);
     }
     function stopLoadingAnimation() {
@@ -3866,26 +2195,56 @@
       }
       loadingAngle.value = 0;
     }
-    function normalizePosition(value = null) {
-      if (value == "top" || value == "bottom")
-        return value;
-      return "center";
+    function close() {
+      clearTimeout(timer.value);
+      stopLoadingAnimation();
+      visible.value = false;
     }
-    function resolveBgColor() {
-      if (currentType.value == "primary")
-        return "#2979ff";
-      if (currentType.value == "success")
-        return "#19be6b";
-      if (currentType.value == "warning")
-        return "#ff9900";
-      if (currentType.value == "error")
-        return "#fa3534";
-      return "rgba(0, 0, 0, 0.78)";
+    function showToast() {
+      clearTimeout(timer.value);
+      visible.value = true;
+      if (currentLoading.value)
+        startLoadingAnimation();
+      else
+        stopLoadingAnimation();
+      const duration = parseFloat(currentDuration.value.toString());
+      if (duration > 0) {
+        timer.value = setTimeout(() => {
+          close();
+        }, duration);
+      }
     }
-    function isImagePath(value = null) {
-      const text = String(value);
-      return text.indexOf("/") >= 0 || text.indexOf("http") == 0;
+    function open(options = null) {
+      applyToastOptions(options, "");
+      showToast();
     }
+    function primary(options = null) {
+      applyToastOptions(options, "primary");
+      showToast();
+    }
+    function success(options = null) {
+      applyToastOptions(options, "success");
+      showToast();
+    }
+    function error(options = null) {
+      applyToastOptions(options, "error");
+      showToast();
+    }
+    function warning(options = null) {
+      applyToastOptions(options, "warning");
+      showToast();
+    }
+    function showLoading(options = null) {
+      applyToastOptions(options, "default");
+      currentLoading.value = true;
+      if (currentTitle.value.length == 0)
+        currentTitle.value = "加载中";
+      showToast();
+    }
+    vue.onUnmounted(() => {
+      clearTimeout(timer.value);
+      stopLoadingAnimation();
+    });
     __expose({
       open,
       close,
@@ -3899,12 +2258,12 @@
       return loadingTimer;
     }, set loadingTimer(v2) {
       loadingTimer = v2;
-    }, toastClass, toastStyle, iconClass, displayIcon, isImageIcon, loadingStyle, open, close, primary, success, error, warning, showLoading, showToast, applyOptions, setValue, startLoadingAnimation, stopLoadingAnimation, normalizePosition, resolveBgColor, isImagePath };
+    }, normalizePosition, resolveBgColor, isImagePath, setToastOption, normalizeAngle, toastClass, toastStyle, iconClass, displayIcon, isImageIcon, loadingStyle, applyToastOptions, startLoadingAnimation, stopLoadingAnimation, close, showToast, open, primary, success, error, warning, showLoading };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
-  const _style_0$K = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "alignSelf": "center", "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
-  function _sfc_render$L(_ctx, _cache, $props, $setup, $data, $options) {
+  const _style_0$K = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "left": 50, "right": 50, "minWidth": 96, "minHeight": 44, "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
+  function _sfc_render$K(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
       null,
@@ -3914,7 +2273,7 @@
           {
             key: 0,
             class: "i-toast__mask",
-            style: vue.normalizeStyle("z-index:" + String(Number($setup.currentZIndex) - 1))
+            style: vue.normalizeStyle("z-index:" + (parseFloat($setup.currentZIndex.toString()) - 1).toString())
           },
           null,
           4
@@ -3977,7 +2336,7 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const __easycom_0$3 = /* @__PURE__ */ _export_sfc(_sfc_main$M, [["render", _sfc_render$L], ["styles", [_style_0$K]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-toast/i-toast.uvue"]]);
+  const __easycom_0$3 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["render", _sfc_render$K], ["styles", [_style_0$K]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-toast/i-toast.uvue"]]);
   const iosToastHandlers = [];
   const pendingIosToasts = [];
   const maxPendingToastCount = 10;
@@ -4011,7 +2370,7 @@
       pendingIosToasts.push(options);
     }
   }
-  const _sfc_main$L = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-toast" }, { __name: "app-toast", setup(__props, _a) {
+  const _sfc_main$K = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-toast" }, { __name: "app-toast", setup(__props, _a) {
     var __expose = _a.expose;
     __expose();
     const toastRef = vue.ref(null);
@@ -4047,7 +2406,7 @@
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
-  function _sfc_render$K(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$J(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_i_toast = resolveEasycom(vue.resolveDynamicComponent("i-toast"), __easycom_0$3);
     return vue.openBlock(), vue.createBlock(
       _component_i_toast,
@@ -4057,7 +2416,52 @@
       /* NEED_PATCH */
     );
   }
-  const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["render", _sfc_render$K], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/app-toast/app-toast.uvue"]]);
+  const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["render", _sfc_render$J], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/app-toast/app-toast.uvue"]]);
+  function __awaiter(thisArg, _arguments, P2, generator) {
+    function adopt(value) {
+      return value instanceof P2 ? value : new P2(function(resolve) {
+        resolve(value);
+      });
+    }
+    return new (P2 || (P2 = Promise))(function(resolve, reject) {
+      function fulfilled(value) {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function rejected(value) {
+        try {
+          step(generator["throw"](value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function step(result) {
+        result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+      }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+  }
+  function __values(o2) {
+    var s2 = typeof Symbol === "function" && Symbol.iterator, m2 = s2 && o2[s2], i2 = 0;
+    if (m2)
+      return m2.call(o2);
+    if (o2 && typeof o2.length === "number")
+      return {
+        next: function() {
+          if (o2 && i2 >= o2.length)
+            o2 = void 0;
+          return { value: o2 && o2[i2++], done: !o2 };
+        }
+      };
+    throw new TypeError(s2 ? "Object is not iterable." : "Symbol.iterator is not defined.");
+  }
+  typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+  };
   class Coordinate extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -5044,6 +3448,19 @@
   }
   const BASE_URL = "https://gpsapp.zdiot.cn";
   const CLIENT_ID = "428a8310cd442757ae699df5d894f051";
+  const DEFAULT_TIME_ZONE = "UTC";
+  function getDeviceTimeZone() {
+    let timeZone = "";
+    try {
+      const resolved = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (resolved != null)
+        timeZone = resolved.toString();
+    } catch (error) {
+      uni.__log__("warn", "at api/http.uts:70", "获取 iOS 时区失败", error);
+    }
+    const normalizedTimeZone = timeZone.trim();
+    return normalizedTimeZone.length > 0 ? normalizedTimeZone : DEFAULT_TIME_ZONE;
+  }
   let isHandlingTokenExpired = false;
   function resetTokenExpiredState() {
     isHandlingTokenExpired = false;
@@ -5052,7 +3469,7 @@
     if (isHandlingTokenExpired)
       return null;
     isHandlingTokenExpired = true;
-    uni.__log__("log", "at api/http.uts:53", "检测到token过期，执行跳转登录页逻辑");
+    uni.__log__("log", "at api/http.uts:88", "检测到token过期，执行跳转登录页逻辑");
     uni.removeStorageSync("token");
     clearPushSessionState();
     showAppToast({
@@ -5061,14 +3478,14 @@
       duration: 2e3
     });
     setTimeout(() => {
-      uni.__log__("log", "at api/http.uts:68", "正在跳转到登录页...");
+      uni.__log__("log", "at api/http.uts:103", "正在跳转到登录页...");
       uni.redirectTo({
         url: "/pages/login/login",
         success: () => {
-          uni.__log__("log", "at api/http.uts:72", "跳转登录页成功");
+          uni.__log__("log", "at api/http.uts:107", "跳转登录页成功");
         },
         fail: (err) => {
-          uni.__log__("log", "at api/http.uts:75", "跳转登录页失败:", err);
+          uni.__log__("log", "at api/http.uts:110", "跳转登录页失败:", err);
           uni.reLaunch({
             url: "/pages/login/login"
           });
@@ -5079,11 +3496,13 @@
   function requestInterceptor(config) {
     const token = uni.getStorageSync("token");
     const authorization = "Bearer " + (token != null ? token.toString() : "");
+    const timeZone = getDeviceTimeZone();
     if (config.header == null) {
       config.header = new UTSJSONObject();
     }
     config.header.set("Authorization", authorization);
     config.header.set("clientId", CLIENT_ID);
+    config.header.set("x-time-zone", timeZone);
     return config;
   }
   function responseInterceptor(response, config) {
@@ -5091,7 +3510,7 @@
   }
   function logHttpError(error) {
     const detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (error.data != null ? error.data.toString() : "");
-    uni.__log__("error", "at api/http.uts:127", "[HttpRequest] " + detail);
+    uni.__log__("error", "at api/http.uts:165", "[HttpRequest] " + detail);
   }
   function errorHandler(error, config) {
     if (config.showLoading != false) {
@@ -5302,7 +3721,7 @@
   const msgState = "/usermessage/detail/";
   const updateDevice = "/device/update";
   const deviceDetail = "/device/info/";
-  const logoutUrl = "/sys/logout";
+  const logoutUrl = "/auth/logout";
   const sendcmd = "/command/sendCmd";
   const getGeofence = "/geofence";
   const deleteGeo = "/geofence/";
@@ -6060,11 +4479,6 @@
       return userDevicePageResponse(raw);
     });
   };
-  const uniVerifyLogin = (data) => {
-    return post(authLoginUrl, data).then((raw = null) => {
-      return jsonDataResponse(raw);
-    });
-  };
   const sendSmsLoginCode = (data) => {
     return get(smsSendCodeUrl, new UTSJSONObject({
       phonenumber: data.phonenumber,
@@ -6217,6 +4631,7 @@
     });
   };
   const getAppCommandHistory = (query) => {
+    query.set("tenantId", defaultTenantId);
     return get(appCommandListUrl, query).then((raw = null) => {
       return appCommandPageResponse(raw);
     });
@@ -6408,6 +4823,10 @@
     const d2 = new Date(timestamp);
     return "".concat(d2.getFullYear(), "-").concat(pad(d2.getMonth() + 1), "-").concat(pad(d2.getDate()), " ").concat(pad(d2.getHours()), ":").concat(pad(d2.getMinutes()), ":").concat(pad(d2.getSeconds()));
   }
+  function formatTimesToMinute(timestamp) {
+    const d2 = new Date(timestamp);
+    return "".concat(d2.getFullYear(), "-").concat(pad(d2.getMonth() + 1), "-").concat(pad(d2.getDate()), " ").concat(pad(d2.getHours()), ":").concat(pad(d2.getMinutes()));
+  }
   function parseLocalDateTime(timestamp) {
     var _a, _b, _c, _d, _e2, _f;
     const match = timestamp.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/);
@@ -6577,6 +4996,29 @@
   }
   const SELECTED_DEVICE_STORAGE_KEY = "selected_device_info";
   const SELECTED_DEVICE_INDEX_STORAGE_KEY = "selected_device_index";
+  class IPickerOption extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            text: { type: String, optional: false },
+            value: { type: String, optional: false },
+            disabled: { type: Boolean, optional: false }
+          };
+        },
+        name: "IPickerOption"
+      };
+    }
+    constructor(options, metadata = IPickerOption.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.text = this.__props__.text;
+      this.value = this.__props__.value;
+      this.disabled = this.__props__.disabled;
+      delete this.__props__;
+    }
+  }
   class SavedDevice extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -6619,7 +5061,7 @@
     }
   }
   const userLocationMarkerId = 1e4;
-  const _sfc_main$K = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$J = /* @__PURE__ */ vue.defineComponent({
     __name: "index",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -6654,7 +5096,8 @@
       const navBarHeight = vue.ref(44);
       const deviceList = vue.ref([]);
       const showPicker = vue.ref(false);
-      const pickerValues = vue.ref([]);
+      const pickerDefaultIndex = vue.ref([0]);
+      const pickerValue = vue.ref("");
       const currentCarImei = vue.ref("");
       const currentCarDeptId = vue.ref("");
       const currentCarDeviceId = vue.ref("");
@@ -6676,10 +5119,14 @@
       const markers = vue.ref([]);
       const lastUpdateTime = vue.ref("--:--:--");
       const devicePosInfo = vue.ref(null);
+      let devicePositionRequestId = 0;
       const devicePositionUpdateTime = vue.computed(() => {
         const position = devicePosInfo.value;
         return position != null ? position.getString("positionUpdateTime", "暂无位置") : "暂无位置";
       });
+      const isValidDeviceCoordinate = (latitude, longitude) => {
+        return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0);
+      };
       const safeDeviceDetail = vue.computed(() => {
         const detail = deviceDetail2.value;
         return new DeviceDetailState({
@@ -6696,17 +5143,18 @@
         return [deviceList.value.map((device) => {
           const displayName = device.deviceName || device.name || device.imei || "未命名设备";
           const statusText = device.connectionStatus == "online" ? "在线" : "离线";
-          return {
-            id: null,
-            label: "".concat(displayName, " (").concat(statusText, ")"),
+          return new IPickerOption({
+            text: "".concat(displayName, " (").concat(statusText, ")"),
             value: device.imei || device.deviceId,
-            disabled: false,
-            children: null
-          };
+            disabled: false
+          });
         })];
       });
       const closePicker = () => {
         showPicker.value = false;
+      };
+      const onPickerShowChange = (value) => {
+        showPicker.value = value;
       };
       const initDimensions = () => {
         const systemInfo = uni.getSystemInfoSync();
@@ -6736,9 +5184,9 @@
             longitude: device.longitude
           });
           uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:389", "保存选中设备成功:", deviceInfo);
+          uni.__log__("log", "at pages/index/index.uvue:412", "保存选中设备成功:", deviceInfo);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:391", "保存选中设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:414", "保存选中设备失败:", error);
         }
       };
       const decodeSavedDevice = (raw = null) => {
@@ -6784,23 +5232,23 @@
             return null;
           return decodeSavedDevice(rawDevice);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:451", "获取保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:474", "获取保存设备失败:", error);
         }
         return null;
       };
       const clearSavedSelectedDevice = () => {
         try {
           uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:460", "清除保存设备成功");
+          uni.__log__("log", "at pages/index/index.uvue:483", "清除保存设备成功");
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:462", "清除保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:485", "清除保存设备失败:", error);
         }
       };
       const saveSelectedDeviceIndex = (index) => {
         try {
           uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:471", "保存选中设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:494", "保存选中设备索引失败:", error);
         }
       };
       const getSavedSelectedDeviceIndex = () => {
@@ -6811,7 +5259,7 @@
             return isNaN(index) || index < 0 ? null : index;
           }
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:484", "获取保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:507", "获取保存设备索引失败:", error);
         }
         return null;
       };
@@ -6819,7 +5267,7 @@
         try {
           uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:494", "清除保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:517", "清除保存设备索引失败:", error);
         }
       };
       const setCurrentCarFromSavedDevice = (savedDevice = null) => {
@@ -6874,8 +5322,11 @@
         const selectedDevice = deviceList.value[selectedIndex];
         if (selectedDevice == null)
           return null;
-        pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId];
-        showPicker.value = true;
+        pickerValue.value = selectedDevice.imei || selectedDevice.deviceId;
+        pickerDefaultIndex.value = [selectedIndex];
+        vue.nextTick(() => {
+          showPicker.value = true;
+        });
       };
       const createMarker = (id, lat, lng, type, title = null) => {
         const isOnline = currentCarConnectionStatus.value == "online";
@@ -6917,18 +5368,20 @@
       }
       function getUserLocation() {
         uni.getLocation(new UTSJSONObject({
-          type: "gcj02",
+          type: "wgs84",
+          provider: "system",
           success: (res) => {
-            uni.__log__("log", "at pages/index/index.uvue:611", "用户当前位置:", res);
-            userLocation.latitude = res.latitude;
-            userLocation.longitude = res.longitude;
+            uni.__log__("log", "at pages/index/index.uvue:638", "用户当前位置:", res);
+            const convertedCoord = CoordTransform.wgs84ToTencent(res.latitude, res.longitude);
+            userLocation.latitude = convertedCoord.lat;
+            userLocation.longitude = convertedCoord.lng;
             hasUserLocation.value = true;
             if (!hasDevice.value) {
               centerOnUserLocation();
             }
           },
           fail: (err) => {
-            uni.__log__("error", "at pages/index/index.uvue:620", "获取用户当前位置失败:", err.errMsg, err);
+            uni.__log__("error", "at pages/index/index.uvue:654", "获取用户当前位置失败:", err.errMsg, err);
           }
         }));
       }
@@ -6939,7 +5392,7 @@
             const res = yield getDeviceDetail(deviceId);
             const detail = res.data;
             if (res.code != 200 || detail == null) {
-              uni.__log__("error", "at pages/index/index.uvue:631", "加载设备详情失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:665", "加载设备详情失败:", res.msg);
               return Promise.resolve(null);
             }
             if (detail != null) {
@@ -6961,7 +5414,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:653", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:687", "加载设备详情失败", error);
           }
         });
       };
@@ -6985,7 +5438,7 @@
         currentCarConnectionStatus.value = "";
         currentCarCarType.value = "";
         currentCarPlateNo.value = "";
-        pickerValues.value = [];
+        pickerValue.value = "";
         deviceDetail2.value = {
           deviceStatus: {
             batteryPercent: 0,
@@ -7038,7 +5491,7 @@
             if (requestId != trackRequestId)
               return Promise.resolve(null);
             if (res.code != 200) {
-              uni.__log__("error", "at pages/index/index.uvue:739", "加载轨迹失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:773", "加载轨迹失败:", res.msg);
               clearTripData();
               return Promise.resolve(null);
             }
@@ -7051,7 +5504,7 @@
           } catch (error) {
             if (requestId != trackRequestId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/index/index.uvue:752", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:786", "加载轨迹失败", error);
             clearTripData();
           }
         });
@@ -7069,12 +5522,17 @@
       };
       const loadDevicePos = (data) => {
         return __awaiter(this, void 0, void 0, function* () {
+          const requestId = ++devicePositionRequestId;
           positionState.value = "loading";
+          markers.value = [];
+          devicePosInfo.value = null;
           try {
             const res = yield getDevicePos(data);
+            if (requestId != devicePositionRequestId)
+              return false;
             const positions = res.data;
             if (res.code != 200 || positions == null || positions.length == 0) {
-              uni.__log__("warn", "at pages/index/index.uvue:776", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
+              uni.__log__("warn", "at pages/index/index.uvue:816", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
               positionState.value = "empty";
               return false;
             }
@@ -7082,9 +5540,10 @@
             devicePosInfo.value = position;
             const lat = position.getNumber("latitude", 0);
             const lng = position.getNumber("longitude", 0);
-            const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
+            const isValidCoordinate2 = isValidDeviceCoordinate(lat, lng);
             if (!isValidCoordinate2) {
-              uni.__log__("error", "at pages/index/index.uvue:791", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              uni.__log__("error", "at pages/index/index.uvue:829", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              markers.value = [];
               positionState.value = "invalid";
               showAppToast({
                 title: "定位数据异常",
@@ -7099,12 +5558,14 @@
             try {
               yield centerMapOnDevice(convertedCoord.lat, convertedCoord.lng);
             } catch (mapError) {
-              uni.__log__("error", "at pages/index/index.uvue:817", "刷新地图视图失败", mapError);
+              uni.__log__("error", "at pages/index/index.uvue:856", "刷新地图视图失败", mapError);
             }
-            uni.__log__("log", "at pages/index/index.uvue:819", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
+            uni.__log__("log", "at pages/index/index.uvue:858", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
             return true;
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:822", "加载设备位置失败", error);
+            if (requestId != devicePositionRequestId)
+              return false;
+            uni.__log__("error", "at pages/index/index.uvue:862", "加载设备位置失败", error);
             positionState.value = "failed";
             showAppToast({
               title: "定位失败，请重试",
@@ -7116,7 +5577,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:834", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:874", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -7129,7 +5590,7 @@
               icon: "none"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:847", "切换车辆失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:887", "切换车辆失败", error);
             showAppToast({
               title: "切换失败，请重试",
               icon: "none"
@@ -7139,17 +5600,13 @@
           }
         });
       };
-      const handlePickerConfirm = (e2) => {
+      const handlePickerConfirm = (event) => {
+        var _a2;
         showPicker.value = false;
-        const selectedValue = e2.values.length > 0 ? e2.values[0].toString() : "";
+        const indexs = (_a2 = event.getArray("indexs")) !== null && _a2 !== void 0 ? _a2 : [];
         let selectedIndex = -1;
-        if (selectedValue != "") {
-          selectedIndex = deviceList.value.findIndex((device) => {
-            return device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue;
-          });
-        }
-        if (selectedIndex < 0 && e2.indexs.length > 0) {
-          const eventIndex = e2.indexs[0];
+        if (indexs.length > 0) {
+          const eventIndex = indexs[0];
           if (eventIndex >= 0 && eventIndex < deviceList.value.length) {
             selectedIndex = eventIndex;
           }
@@ -7169,7 +5626,8 @@
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:893", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:927", "选择的设备111:", selectedDevice.imei, selectedDevice.deviceId, currentCarImei.value, currentCarDeviceId.value);
+          uni.__log__("log", "at pages/index/index.uvue:928", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -7182,10 +5640,8 @@
         currentCarConnectionStatus.value = selectedDevice.connectionStatus;
         currentCarCarType.value = selectedDevice.carType;
         currentCarPlateNo.value = selectedDevice.plateNo;
-        center.latitude = selectedDevice.latitude;
-        center.longitude = selectedDevice.longitude;
         saveSelectedDeviceIndex(selectedIndex);
-        pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId];
+        pickerValue.value = selectedDevice.imei || selectedDevice.deviceId;
         saveSelectedDevice(selectedDevice);
         uni.showLoading(new UTSJSONObject({
           title: "加载车辆数据...",
@@ -7208,7 +5664,7 @@
               });
               return Promise.resolve(null);
             }
-            uni.__log__("log", "at pages/index/index.uvue:937", "加载车辆列表返回:", res.data);
+            uni.__log__("log", "at pages/index/index.uvue:970", "加载车辆列表返回:", res.data);
             const pageData = res.data;
             if (pageData == null) {
               userDeviceList2.value = [];
@@ -7275,7 +5731,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:1014", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:1047", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -7289,9 +5745,7 @@
                 currentCarConnectionStatus.value = device.connectionStatus;
                 currentCarCarType.value = device.carType;
                 currentCarPlateNo.value = device.plateNo;
-                center.latitude = device.latitude;
-                center.longitude = device.longitude;
-                pickerValues.value = [device.imei != "" ? device.imei : device.deviceId];
+                pickerValue.value = device.imei != "" ? device.imei : device.deviceId;
                 yield loadDeviceDetail(device.deviceId);
                 yield loadDevicePos(new UTSJSONObject({
                   deviceId: device.deviceId,
@@ -7314,7 +5768,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:1058", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1089", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -7348,7 +5802,7 @@
               deviceids: currentCarImei.value
             }));
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:1095", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:1126", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -7391,7 +5845,7 @@
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1139", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1170", "跳转轨迹详情失败:", err);
           }
         });
       };
@@ -7402,7 +5856,7 @@
           url: "/pages/deviceList/deviceList"
         });
       };
-      const toDeviceDetail = (e2 = null) => {
+      const toDeviceDetail = (e = null) => {
         if (!isLogin())
           return null;
         if (!isCarSelected())
@@ -7418,7 +5872,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1167", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1198", "跳转添加设备失败:", err);
           }
         });
       };
@@ -7472,7 +5926,7 @@
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1258", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1289", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -7492,7 +5946,7 @@
       function unbindCurrentDevice() {
         return __awaiter(this, void 0, void 0, function* () {
           const result = yield delDevice(currentCarDeviceId.value);
-          uni.__log__("log", "at pages/index/index.uvue:1281", "解绑设备结果:", result);
+          uni.__log__("log", "at pages/index/index.uvue:1312", "解绑设备结果:", result);
           if (result.code == 200) {
             showAppToast({
               title: "解绑成功",
@@ -7524,32 +5978,34 @@
           }
         }));
       };
-      const handleExit = () => {
+      function performLogout() {
+        return __awaiter(this, void 0, void 0, function* () {
+          yield unbindPushDeviceOnLogout();
+          const res = yield logout();
+          if (res.code == 200) {
+            clearSavedSelectedDevice();
+            clearSavedSelectedDeviceIndex();
+            uni.removeStorageSync("token");
+            clearPushSessionState();
+            uni.reLaunch({
+              url: "/pages/login/login"
+            });
+          } else {
+            showAppToast({
+              title: res.msg || "退出账户失败"
+            });
+          }
+        });
+      }
+      const logout$1 = () => {
         if (!isLogin())
           return null;
         showAppModal(new UTSJSONObject({
           title: "退出登录",
           content: "确定退出登录吗？",
           success: (res) => {
-            return __awaiter(this, void 0, void 0, function* () {
-              if (res.confirm) {
-                yield unbindPushDeviceOnLogout();
-                const res_1 = yield logout();
-                if (res_1.code == 200) {
-                  clearSavedSelectedDevice();
-                  clearSavedSelectedDeviceIndex();
-                  uni.removeStorageSync("token");
-                  clearPushSessionState();
-                  uni.reLaunch({
-                    url: "/pages/login/login"
-                  });
-                } else {
-                  showAppToast({
-                    title: res_1.msg || "退出账户失败"
-                  });
-                }
-              }
-            });
+            if (res.confirm)
+              void performLogout();
           }
         }));
       };
@@ -7576,11 +6032,15 @@
           loadDeviceList();
         }
       });
-      const __returned__ = { center, userLocation, hasUserLocation, hasDevice, userDeviceList: userDeviceList2, positionState, positionMessage, initialMapScale, mapScale, isMapReady, statusBarHeight, menuButtonInfo, navBarHeight, deviceList, showPicker, pickerValues, currentCarImei, currentCarDeptId, currentCarDeviceId, currentCarIccId, currentCarName, currentCarSimMerchant, currentCarConnectionStatus, currentCarCarType, currentCarPlateNo, deviceDetail: deviceDetail2, markers, lastUpdateTime, devicePosInfo, devicePositionUpdateTime, SELECTED_DEVICE_STORAGE_KEY, SELECTED_DEVICE_INDEX_STORAGE_KEY, safeDeviceDetail, pickerColumns, closePicker, initDimensions, delay, saveSelectedDevice, decodeSavedDevice, getSavedSelectedDevice, clearSavedSelectedDevice, saveSelectedDeviceIndex, getSavedSelectedDeviceIndex, clearSavedSelectedDeviceIndex, setCurrentCarFromSavedDevice, findDeviceIndex, handlePicker, createMarker, userLocationMarkerId, centerOnUserLocation, getUserLocation, loadDeviceDetail, trackPosInfo, tripData, totalMileage, averageSpeed, get trackRequestId() {
+      const __returned__ = { center, userLocation, hasUserLocation, hasDevice, userDeviceList: userDeviceList2, positionState, positionMessage, initialMapScale, mapScale, isMapReady, statusBarHeight, menuButtonInfo, navBarHeight, deviceList, showPicker, pickerDefaultIndex, pickerValue, currentCarImei, currentCarDeptId, currentCarDeviceId, currentCarIccId, currentCarName, currentCarSimMerchant, currentCarConnectionStatus, currentCarCarType, currentCarPlateNo, deviceDetail: deviceDetail2, markers, lastUpdateTime, devicePosInfo, get devicePositionRequestId() {
+        return devicePositionRequestId;
+      }, set devicePositionRequestId(v2) {
+        devicePositionRequestId = v2;
+      }, devicePositionUpdateTime, isValidDeviceCoordinate, SELECTED_DEVICE_STORAGE_KEY, SELECTED_DEVICE_INDEX_STORAGE_KEY, safeDeviceDetail, pickerColumns, closePicker, onPickerShowChange, initDimensions, delay, saveSelectedDevice, decodeSavedDevice, getSavedSelectedDevice, clearSavedSelectedDevice, saveSelectedDeviceIndex, getSavedSelectedDeviceIndex, clearSavedSelectedDeviceIndex, setCurrentCarFromSavedDevice, findDeviceIndex, handlePicker, createMarker, userLocationMarkerId, centerOnUserLocation, getUserLocation, loadDeviceDetail, trackPosInfo, tripData, totalMileage, averageSpeed, get trackRequestId() {
         return trackRequestId;
       }, set trackRequestId(v2) {
         trackRequestId = v2;
-      }, clearTripData, clearCurrentCar, processTripData, createTrackRequestData, loadTrackPos, centerMapOnDevice, loadDevicePos, loadDeviceData, handlePickerConfirm, loadDeviceList, totalTrips, refreshLocation, checkToken, isLogin, isCarSelected, toRecordDetail, toDeviceList, toDeviceDetail, toAdd, toMsgCenter, toFindCar, toFence, contactCustomerService, needRefresh, toPay, gotoLogin, unbindCurrentDevice, unbindDevice, handleExit, handleReload };
+      }, clearTripData, clearCurrentCar, processTripData, createTrackRequestData, loadTrackPos, centerMapOnDevice, loadDevicePos, loadDeviceData, handlePickerConfirm, loadDeviceList, totalTrips, refreshLocation, checkToken, isLogin, isCarSelected, toRecordDetail, toDeviceList, toDeviceDetail, toAdd, toMsgCenter, toFindCar, toFence, contactCustomerService, needRefresh, toPay, gotoLogin, unbindCurrentDevice, unbindDevice, performLogout, logout: logout$1, handleReload };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -7594,14 +6054,14 @@
   const _imports_7 = "/static/pay.png";
   const _imports_8 = "/static/online.png";
   const _imports_9 = "/static/del.png";
-  const _style_0$J = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "10rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexShrink": 0, "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "flexShrink": 0, "marginLeft": "30rpx" } }, "nav-tool-add": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "width": "40rpx", "height": "40rpx", "alignItems": "center", "justifyContent": "center" } }, "nav-tool-add-image": { ".container .page-bg .top .device-car .nav-tools ": { "width": "36rpx", "height": "36rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh-wrap": { ".container .page-bg .content .map-box .map-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header .map-refresh-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "map-container": { ".container .page-bg .content .map-box ": { "position": "relative", "height": "300rpx" } }, "map-status": { ".container .page-bg .content .map-box .map-container ": { "position": "absolute", "left": "24rpx", "right": "24rpx", "bottom": "24rpx", "paddingTop": "16rpx", "paddingRight": "20rpx", "paddingBottom": "16rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "rgba(0,0,0,0.68)", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "map-status-text": { ".container .page-bg .content .map-box .map-container .map-status ": { "color": "#ffffff", "fontSize": "24rpx" } }, "map-status-retry": { ".container .page-bg .content .map-box .map-container .map-status ": { "flexShrink": 0, "marginLeft": "20rpx", "color": "#8de39b", "fontSize": "24rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc-wrap": { ".container .page-bg .content .mile-record .record-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header .record-desc-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3", "borderTopWidth": "5rpx", "borderRightWidth": "5rpx", "borderBottomWidth": "5rpx", "borderLeftWidth": "5rpx" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
-  function _sfc_render$J(_ctx, _cache, $props, $setup, $data, $options) {
+  const _imports_10 = "/static/logout.png";
+  const _style_0$J = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "10rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexShrink": 0, "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "flexShrink": 0, "marginLeft": "30rpx" } }, "nav-tool-add": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "width": "40rpx", "height": "40rpx", "alignItems": "center", "justifyContent": "center" } }, "nav-tool-add-image": { ".container .page-bg .top .device-car .nav-tools ": { "width": "36rpx", "height": "36rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh-wrap": { ".container .page-bg .content .map-box .map-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header .map-refresh-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "map-container": { ".container .page-bg .content .map-box ": { "position": "relative", "height": "300rpx" } }, "map-status": { ".container .page-bg .content .map-box .map-container ": { "position": "absolute", "left": "24rpx", "right": "24rpx", "bottom": "24rpx", "paddingTop": "16rpx", "paddingRight": "20rpx", "paddingBottom": "16rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "rgba(0,0,0,0.68)", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "map-status-text": { ".container .page-bg .content .map-box .map-container .map-status ": { "color": "#ffffff", "fontSize": "24rpx" } }, "map-status-retry": { ".container .page-bg .content .map-box .map-container .map-status ": { "flexShrink": 0, "marginLeft": "20rpx", "color": "#8de39b", "fontSize": "24rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc-wrap": { ".container .page-bg .content .mile-record .record-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header .record-desc-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "126rpx", "height": "126rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3", "borderTopWidth": "5rpx", "borderRightWidth": "5rpx", "borderBottomWidth": "5rpx", "borderLeftWidth": "5rpx" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
+  function _sfc_render$I(_ctx, _cache, $props, $setup, $data, $options) {
     var _a;
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     const _component_i_line_progress = resolveEasycom(vue.resolveDynamicComponent("i-line-progress"), __easycom_1$4);
     const _component_map = vue.resolveComponent("map");
-    const _component_l_picker = resolveEasycom(vue.resolveDynamicComponent("l-picker"), __easycom_0$5);
-    const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
+    const _component_i_picker = resolveEasycom(vue.resolveDynamicComponent("i-picker"), __easycom_2$6);
     const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$1);
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
@@ -7672,10 +6132,7 @@
                     ])
                   ])
                 ]),
-                $setup.safeDeviceDetail.deviceStatus.batteryPercent && $setup.safeDeviceDetail.deviceStatus.voltage ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 0,
-                  class: "device-info"
-                }, [
+                vue.createElementVNode("view", { class: "device-info" }, [
                   $setup.safeDeviceDetail.deviceStatus.batteryPercent ? (vue.openBlock(), vue.createBlock(_component_i_line_progress, {
                     key: 0,
                     percent: $setup.safeDeviceDetail.deviceStatus.batteryPercent
@@ -7700,7 +6157,7 @@
                     1
                     /* TEXT */
                   )) : vue.createCommentVNode("v-if", true)
-                ])) : vue.createCommentVNode("v-if", true),
+                ]),
                 vue.createElementVNode("view", { class: "banner" }, [
                   vue.createElementVNode("image", {
                     src: _imports_2$2,
@@ -7755,7 +6212,7 @@
                     longitude: $setup.center.longitude,
                     scale: $setup.mapScale,
                     style: { "width": "100%", "height": "100%" },
-                    "show-location": true,
+                    "show-location": false,
                     "enable-traffic": true,
                     "enable-overlooking": true,
                     "enable-building": true,
@@ -7948,32 +6405,39 @@
                       class: "item-title",
                       style: { "color": "#d81e06" }
                     }, "删除设备")
+                  ]),
+                  vue.createElementVNode("view", {
+                    class: "service-item",
+                    onClick: $setup.logout
+                  }, [
+                    vue.createElementVNode("image", {
+                      src: _imports_10,
+                      mode: "aspectFit",
+                      class: "icon-image"
+                    }),
+                    vue.createElementVNode("text", {
+                      class: "item-title",
+                      style: { "color": "#EE793A" }
+                    }, "退出登录")
                   ])
                 ])
               ])
             ])
           ]),
-          vue.createVNode(_component_l_popup, {
-            modelValue: $setup.showPicker,
-            "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.showPicker = $event),
-            position: "bottom",
-            closeable: false,
-            "safe-area-inset-bottom": true
-          }, {
-            default: vue.withCtx(() => [
-              vue.createVNode(_component_l_picker, {
-                modelValue: $setup.pickerValues,
-                "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.pickerValues = $event),
-                "cancel-btn": "取消",
-                "confirm-btn": "确认",
-                columns: $setup.pickerColumns,
-                onCancel: $setup.closePicker,
-                onConfirm: $setup.handlePickerConfirm
-              }, null, 8, ["modelValue", "columns"])
-            ]),
-            _: 1
-            /* STABLE */
-          }, 8, ["modelValue"])
+          $setup.showPicker ? (vue.openBlock(), vue.createBlock(_component_i_picker, {
+            key: 0,
+            show: $setup.showPicker,
+            "model-value": $setup.pickerValue,
+            columns: $setup.pickerColumns,
+            "default-index": $setup.pickerDefaultIndex,
+            "cancel-text": "取消",
+            "confirm-text": "确认",
+            "close-on-mask": false,
+            "show-input": false,
+            onCancel: $setup.closePicker,
+            onConfirm: $setup.handlePickerConfirm,
+            "onUpdate:show": $setup.onPickerShowChange
+          }, null, 8, ["show", "model-value", "columns", "default-index"])) : vue.createCommentVNode("v-if", true)
         ]),
         vue.createVNode(_component_app_toast)
       ],
@@ -7981,8 +6445,8 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["render", _sfc_render$J], ["styles", [_style_0$J]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/index/index.uvue"]]);
-  const _sfc_main$J = /* @__PURE__ */ vue.defineComponent({
+  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["render", _sfc_render$I], ["styles", [_style_0$J]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/index/index.uvue"]]);
+  const _sfc_main$I = /* @__PURE__ */ vue.defineComponent({
     __name: "custom-navBar",
     props: {
       title: String,
@@ -8035,8 +6499,8 @@
   });
   const _imports_0$3 = "/static/back.png";
   const _style_0$I = { "navbar": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "back-btn": { "": { "display": "flex", "alignItems": "center", "width": "70rpx", "height": "40rpx", "zIndex": 10, "justifyContent": "center" } }, "title": { "": { "textAlign": "center", "fontWeight": "bold", "fontSize": "36rpx" } }, "capsule-item": { "": { "width": 40, "height": "100%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "icon": { "": { "width": "40rpx", "height": "40rpx" } }, "menu-icon": { "": { "width": "60rpx", "height": "60rpx" } } };
-  function _sfc_render$I(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+  function _sfc_render$H(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
       null,
@@ -8129,8 +6593,8 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const __easycom_0$2 = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["render", _sfc_render$I], ["styles", [_style_0$I]], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/custom-navBar/custom-navBar.uvue"]]);
-  const _sfc_main$I = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-modal" }, { __name: "i-modal", props: {
+  const __easycom_0$2 = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["render", _sfc_render$H], ["styles", [_style_0$I]], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/custom-navBar/custom-navBar.uvue"]]);
+  const _sfc_main$H = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-modal" }, { __name: "i-modal", props: {
     show: { type: Boolean, default: false },
     title: { type: String, default: "" },
     content: { type: String, default: "" },
@@ -8140,55 +6604,53 @@
     showCancelButton: { type: Boolean, default: false },
     confirmColor: { type: String, default: "#2979ff" },
     cancelColor: { type: String, default: "#606266" },
-    duration: { type: Number, default: 200 },
+    duration: { type: [String, Number], default: 200 },
     buttonReverse: { type: Boolean, default: false },
     zoom: { type: Boolean, default: true },
-    zIndex: { type: Number, default: 10075 },
+    zIndex: { type: [String, Number], default: 10075 },
     asyncClose: { type: Boolean, default: false },
     closeable: { type: Boolean, default: false },
     closeOnMask: { type: Boolean, default: false },
-    negativeTop: { type: String, default: "0px" },
-    width: { type: String, default: "320px" },
+    negativeTop: { type: [String, Number], default: 0 },
+    width: { type: [String, Number], default: "320px" },
     confirmButtonShape: { type: String, default: "100px" },
-    round: { type: String, default: "6px" },
+    round: { type: [String, Number], default: "6px" },
     buttonModel: { type: String, default: "text" },
     buttonRadius: { type: String, default: "100px" },
     confirmBgColor: { type: String, default: "" },
     cancelBgColor: { type: String, default: "" },
-    customStyle: { type: String, default: "" }
+    customStyle: { type: [String, Object], default: "" }
   }, emits: ["confirm", "cancel", "close", "update:show"], setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
     const props = __props;
     const emit = __emit;
-    function formatMs(value) {
-      return value.toString() + "ms";
+    function formatMs(value = null) {
+      const text = value.toString();
+      if (text.indexOf("ms") >= 0 || text.indexOf("s") >= 0)
+        return text;
+      return text + "ms";
     }
-    function formatSize(value) {
-      if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("%") >= 0) {
-        return value;
+    function formatSize(value = null) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+        return text;
       }
-      return value + "px";
+      return text + "px";
     }
-    function stringifyStyle(value) {
-      if (value.length == 0)
+    function stringifyStyle(value = null) {
+      if (value == null)
         return "";
-      return value.endsWith(";") ? value : value + ";";
-    }
-    function animationDuration() {
-      return props.duration;
+      const text = value.toString();
+      if (text == "[object Object]" || text.length == 0)
+        return "";
+      return text.endsWith(";") ? text : text + ";";
     }
     const opened = vue.ref(props.show);
     const active = vue.ref(props.show);
     const loading = vue.ref(false);
     let closeTimer = 0;
     const maskStyle = vue.computed(() => {
-      return "z-index:" + props.zIndex.toString() + ";opacity:" + (props.show || active.value ? "1" : "0") + ";transition-duration:" + formatMs(props.duration) + ";";
-    });
-    const visibleMaskStyle = vue.computed(() => {
-      if (props.show && !opened.value) {
-        return "z-index:" + props.zIndex.toString() + ";opacity:1;transition-duration:" + formatMs(props.duration) + ";";
-      }
-      return maskStyle.value;
+      return "z-index:" + props.zIndex.toString() + ";opacity:" + (active.value ? "1" : "0") + ";transition-duration:" + formatMs(props.duration) + ";";
     });
     const modalClass = vue.computed(() => {
       const classes = ["i-modal"];
@@ -8199,15 +6661,12 @@
       style = style + "border-radius:" + formatSize(props.round) + ";";
       style = style + "transition-duration:" + formatMs(props.duration) + ";";
       const top = formatSize(props.negativeTop);
-      const scaleValue = props.zoom ? props.show || active.value ? "1" : "0.86" : "1";
+      const scaleValue = props.zoom ? active.value ? "1" : "0.86" : "1";
       const translateValue = top != "0px" ? "-" + top : "0px";
-      style = style + "opacity:" + (props.show || active.value ? "1" : "0") + ";";
+      style = style + "opacity:" + (active.value ? "1" : "0") + ";";
       style = style + "transform:translateY(" + translateValue + ") scale(" + scaleValue + ");";
       style = style + stringifyStyle(props.customStyle);
       return style;
-    });
-    const visibleModalStyle = vue.computed(() => {
-      return modalStyle.value;
     });
     const confirmButtonClass = vue.computed(() => {
       const classes = ["i-modal__button", "i-modal__button--confirm"];
@@ -8250,6 +6709,17 @@
         clearTimeout(closeTimer);
         closeTimer = 0;
       }
+    }
+    function animationDuration() {
+      const text = props.duration.toString();
+      if (text.indexOf("ms") >= 0)
+        return parseFloat(text.replace("ms", "").toString());
+      if (text.indexOf("s") >= 0)
+        return parseFloat(text.replace("s", "").toString()) * 1e3;
+      const duration = parseFloat(text.toString());
+      if (isNaN(duration))
+        return 200;
+      return duration;
     }
     function openPanel() {
       clearCloseTimer();
@@ -8300,26 +6770,35 @@
       emit("close");
       closePanel(true);
     }
+    vue.watch(() => {
+      return props.show;
+    }, (nextValue) => {
+      if (nextValue) {
+        openPanel();
+      } else {
+        closePanel(false);
+      }
+    });
     __expose({
       open,
       close
     });
-    const __returned__ = { props, emit, formatMs, formatSize, stringifyStyle, animationDuration, opened, active, loading, get closeTimer() {
+    const __returned__ = { props, emit, formatMs, formatSize, stringifyStyle, opened, active, loading, get closeTimer() {
       return closeTimer;
     }, set closeTimer(v2) {
       closeTimer = v2;
-    }, maskStyle, visibleMaskStyle, modalClass, modalStyle, visibleModalStyle, confirmButtonClass, cancelButtonClass, confirmTextStyle, cancelTextStyle, confirmButtonStyle, cancelButtonStyle, clearCloseTimer, openPanel, closePanel, open, close, confirm, cancel, closeByIcon, handleOverlayClick };
+    }, maskStyle, modalClass, modalStyle, confirmButtonClass, cancelButtonClass, confirmTextStyle, cancelTextStyle, confirmButtonStyle, cancelButtonStyle, clearCloseTimer, animationDuration, openPanel, closePanel, open, close, confirm, cancel, closeByIcon, handleOverlayClick };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
   const _style_0$H = { "i-modal__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0.5)", "alignItems": "center", "justifyContent": "center", "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-modal": { "": { "position": "relative", "overflow": "hidden", "backgroundColor": "#ffffff", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-modal__close": { "": { "position": "absolute", "right": 8, "top": 8, "zIndex": 2, "width": 34, "height": 34, "alignItems": "center", "justifyContent": "center" } }, "i-modal__close-text": { "": { "color": "#909399", "fontSize": 22, "lineHeight": "30px" } }, "i-modal__title": { "": { "paddingTop": 22, "paddingRight": 22, "paddingBottom": 8, "paddingLeft": 22, "color": "#303133", "fontSize": 17, "fontWeight": 600, "lineHeight": "24px", "textAlign": "center" } }, "i-modal__content-wrap": { "": { "minHeight": 52, "paddingTop": 8, "paddingRight": 22, "paddingBottom": 22, "paddingLeft": 22, "alignItems": "center", "justifyContent": "center" } }, "i-modal__content": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-modal__footer": { "": { "minHeight": 48, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "i-modal__footer--button": { "": { "paddingTop": 10, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14, "borderTopWidth": 0 } }, "i-modal__footer-inner": { "": { "flexDirection": "row" } }, "i-modal__button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 48, "alignItems": "center", "justifyContent": "center" } }, "i-modal__button--cancel": { "": { "borderRightWidth": 1, "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "i-modal__button--model-button": { "": { "height": 40, "marginTop": 0, "marginRight": 5, "marginBottom": 0, "marginLeft": 5, "borderRightWidth": 0, "backgroundColor": "#f5f7fb" } }, "i-modal__button--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-modal__confirm-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-modal__cancel-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-modal__mask": { "property": "opacity", "timingFunction": "ease" }, "i-modal": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
-  function _sfc_render$H(_ctx, _cache, $props, $setup, $data, $options) {
-    return $props.show || $setup.opened ? (vue.openBlock(), vue.createElementBlock(
+  function _sfc_render$G(_ctx, _cache, $props, $setup, $data, $options) {
+    return $setup.opened ? (vue.openBlock(), vue.createElementBlock(
       "view",
       {
         key: 0,
         class: "i-modal__mask",
-        style: vue.normalizeStyle($setup.visibleMaskStyle),
+        style: vue.normalizeStyle($setup.maskStyle),
         onClick: $setup.handleOverlayClick
       },
       [
@@ -8327,7 +6806,7 @@
           "view",
           {
             class: vue.normalizeClass($setup.modalClass),
-            style: vue.normalizeStyle($setup.visibleModalStyle),
+            style: vue.normalizeStyle($setup.modalStyle),
             onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
             }, ["stop"]))
           },
@@ -8484,8 +6963,8 @@
       /* STYLE */
     )) : vue.createCommentVNode("v-if", true);
   }
-  const __easycom_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["render", _sfc_render$H], ["styles", [_style_0$H]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-modal/i-modal.uvue"]]);
-  const _sfc_main$H = /* @__PURE__ */ vue.defineComponent({
+  const __easycom_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["render", _sfc_render$G], ["styles", [_style_0$H]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-modal/i-modal.uvue"]]);
+  const _sfc_main$G = /* @__PURE__ */ vue.defineComponent({
     __name: "message",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -8866,8 +7345,8 @@
       return __returned__;
     }
   });
-  const _style_0$G = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-box": { ".container .list-box ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "backgroundColor": "#f56c6c", "marginLeft": "16rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "unread-badge": { ".container .list-box .unread-box ": { "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx", "textAlign": "center" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
-  function _sfc_render$G(_ctx, _cache, $props, $setup, $data, $options) {
+  const _style_0$G = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-box": { ".container .list-box ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "backgroundColor": "#f56c6c", "marginLeft": "16rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "unread-badge": { ".container .list-box .unread-box ": { "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx", "textAlign": "center" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "new-message-text": { ".container .list-box ": { "color": "#ffffff" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
+  function _sfc_render$F(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
     const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$1);
@@ -8915,7 +7394,7 @@
               }, [
                 vue.createElementVNode(
                   "text",
-                  null,
+                  { class: "new-message-text" },
                   "有 " + vue.toDisplayString($setup.newMessageCount) + " 条新消息，点击查看",
                   1
                   /* TEXT */
@@ -8996,8 +7475,8 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["render", _sfc_render$G], ["styles", [_style_0$G]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/message/message.uvue"]]);
-  const _sfc_main$G = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-badge" }, { __name: "i-badge", props: {
+  const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["render", _sfc_render$F], ["styles", [_style_0$G]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/message/message.uvue"]]);
+  const _sfc_main$F = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-badge" }, { __name: "i-badge", props: {
     label: {
       type: String,
       default: ""
@@ -9065,17 +7544,15 @@
     __expose();
     const props = __props;
     const emit = __emit;
+    const bgColor = vue.computed(() => {
+      return props.bgColor;
+    });
     function hasNumberValue() {
-      if (props.value != null && props.value.toString().length > 0)
-        return true;
-      return props.count > 0 || props.showZero;
+      return props.value.toString().length > 0 || props.count > 0 || props.showZero;
     }
     function effectiveCount() {
-      if (props.value != null && props.value.toString().length > 0) {
-        if (typeof props.value == "number")
-          return props.value;
-        return parseFloat(props.value);
-      }
+      if (props.value.toString().length > 0)
+        return parseFloat(props.value.toString());
       return props.count;
     }
     function getMaxCount() {
@@ -9084,8 +7561,8 @@
       return props.max;
     }
     function effectiveBgColor() {
-      if (props.bgColor.length > 0)
-        return props.bgColor;
+      if (bgColor.value.length > 0)
+        return bgColor.value;
       return props.type;
     }
     function effectiveFontColor() {
@@ -9094,7 +7571,7 @@
       return props.fontColor;
     }
     function normalizeTheme(value) {
-      const text = value;
+      const text = value.toString();
       if (text == "danger")
         return "error";
       if (text == "error" || text == "primary" || text == "success" || text == "warning" || text == "info")
@@ -9102,7 +7579,7 @@
       return "custom";
     }
     function parseColor(value) {
-      const text = value;
+      const text = value.toString();
       if (text == "white")
         return "#ffffff";
       if (text == "black")
@@ -9120,7 +7597,7 @@
       return text;
     }
     function normalizePosition(value) {
-      const text = value;
+      const text = value.toString();
       if (text == "rightTop")
         return "right";
       if (text == "leftTop")
@@ -9138,11 +7615,9 @@
       if (offset == null || offset.length <= index)
         return 0;
       const value = offset[index];
-      if (typeof value == "number")
-        return value;
-      if (typeof value == "string")
-        return parseFloat(value);
-      return 0;
+      if (value == null)
+        return 0;
+      return parseFloat(value.toString());
     }
     function positionStyle() {
       const x2 = getOffset(0);
@@ -9167,9 +7642,6 @@
         return text;
       return text + "px";
     }
-    const bgColor = vue.computed(() => {
-      return props.bgColor;
-    });
     const showBadge = vue.computed(() => {
       if (props.hidden)
         return false;
@@ -9245,12 +7717,12 @@
         position: props.position
       }));
     }
-    const __returned__ = { props, emit, hasNumberValue, effectiveCount, getMaxCount, effectiveBgColor, effectiveFontColor, normalizeTheme, parseColor, normalizePosition, getOffset, positionStyle, formatSize, bgColor, showBadge, displayValue, dot, rootClass, badgeClass, badgeStyle, badgeTextStyle, handleClick };
+    const __returned__ = { props, emit, bgColor, hasNumberValue, effectiveCount, getMaxCount, effectiveBgColor, effectiveFontColor, normalizeTheme, parseColor, normalizePosition, getOffset, positionStyle, formatSize, showBadge, displayValue, dot, rootClass, badgeClass, badgeStyle, badgeTextStyle, handleClick };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
   const _style_0$F = { "i-badge": { "": { "position": "relative", "alignSelf": "flex-start", "paddingTop": 10, "paddingRight": 12, "overflow": "visible" } }, "i-badge--left-space": { "": { "paddingLeft": 12, "paddingRight": 0 } }, "i-badge--dot": { "": { "paddingTop": 4, "paddingRight": 4 } }, "i-badge--dot-left-space": { "": { "paddingLeft": 4, "paddingRight": 0 } }, "i-badge--bottomLeft": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottomRight": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottom": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--dot-bottom": { "": { "paddingBottom": 4 } }, "i-badge--top": { "": { "paddingRight": 0 } }, "i-badge--dot-top": { "": { "paddingRight": 0 } }, "i-badge__mark": { "": { "position": "absolute", "zIndex": 2, "minWidth": 20, "height": 20, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10, "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "overflow": "visible" } }, "i-badge__mark--dot": { "": { "width": 8, "minWidth": 8, "height": 8, "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-badge__mark--danger": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--error": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-badge__mark--success": { "": { "backgroundColor": "#5ac725" } }, "i-badge__mark--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-badge__mark--info": { "": { "backgroundColor": "#909399" } }, "i-badge__text": { "": { "color": "#ffffff", "lineHeight": "20px", "whiteSpace": "nowrap" } } };
-  function _sfc_render$F(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$E(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -9297,10 +7769,10 @@
       /* CLASS */
     );
   }
-  const __easycom_2$5 = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["render", _sfc_render$F], ["styles", [_style_0$F]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-badge/i-badge.uvue"]]);
+  const __easycom_2$5 = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["render", _sfc_render$E], ["styles", [_style_0$F]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-badge/i-badge.uvue"]]);
   const buttonWidth = 120;
   const buttonHeight = 200;
-  const _sfc_main$F = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$E = /* @__PURE__ */ vue.defineComponent({
     __name: "userCenter",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -9361,8 +7833,8 @@
           icon: "none"
         });
       };
-      const onMoveChange = (e2) => {
-        const detail = e2.getJSON("detail");
+      const onMoveChange = (e) => {
+        const detail = e.getJSON("detail");
         const x2 = detail != null ? detail.getNumber("x", 0) : 0;
         const y2 = detail != null ? detail.getNumber("y", 0) : 0;
         const maxX = windowWidth.value - buttonWidth;
@@ -9425,9 +7897,9 @@
     }
   });
   const _style_0$E = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#ffffff", "position": "relative" } }, "user-info-box": { ".container ": { "width": "100%", "paddingTop": "40rpx", "paddingRight": "60rpx", "paddingBottom": "40rpx", "paddingLeft": "60rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "userinfo": { ".container .user-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "user-info": { ".container .user-info-box ": { "marginLeft": "20rpx", "textAlign": "center", "fontSize": "30rpx", "color": "#333333" } }, "list": { ".container ": { "backgroundColor": "#f5f5f5", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "marginTop": "15rpx", "marginRight": "15rpx", "marginBottom": "15rpx", "marginLeft": "15rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "fontSize": "25rpx" } }, "left": { ".container .list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "badge": { ".container .list .left ": { "marginLeft": "20rpx" } }, "version": { ".container ": { "position": "fixed", "bottom": "50rpx", "left": "20rpx", "right": "20rpx", "textAlign": "center", "fontSize": "25rpx", "color": "#c3c2c2ff", "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx" } }, "movable-area": { ".container ": { "position": "fixed", "top": 0, "left": 0, "right": 0, "bottom": 0, "width": "100%", "height": "100%", "pointerEvents": "none", "zIndex": 999 } } };
-  function _sfc_render$E(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$D(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     const _component_i_badge = resolveEasycom(vue.resolveDynamicComponent("i-badge"), __easycom_2$5);
     const _component_movable_view = vue.resolveComponent("movable-view");
     const _component_movable_area = vue.resolveComponent("movable-area");
@@ -9541,14 +8013,14 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesUserCenterUserCenter = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["render", _sfc_render$E], ["styles", [_style_0$E]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/userCenter/userCenter.uvue"]]);
-  const _sfc_main$E = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
+  const PagesUserCenterUserCenter = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$D], ["styles", [_style_0$E]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/userCenter/userCenter.uvue"]]);
+  const _sfc_main$D = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
     modelValue: {
-      type: String,
+      type: [String, Number],
       default: ""
     },
     value: {
-      type: String,
+      type: [String, Number],
       default: ""
     },
     type: {
@@ -9556,7 +8028,7 @@
       default: "text"
     },
     height: {
-      type: String,
+      type: [String, Number],
       default: "40px"
     },
     disabled: {
@@ -9580,7 +8052,7 @@
       default: true
     },
     maxlength: {
-      type: Number,
+      type: [String, Number],
       default: -1
     },
     placeholder: {
@@ -9612,19 +8084,19 @@
       default: false
     },
     cursor: {
-      type: Number,
+      type: [String, Number],
       default: -1
     },
     cursorSpacing: {
-      type: Number,
+      type: [String, Number],
       default: 30
     },
     selectionStart: {
-      type: Number,
+      type: [String, Number],
       default: -1
     },
     selectionEnd: {
-      type: Number,
+      type: [String, Number],
       default: -1
     },
     adjustPosition: {
@@ -9636,7 +8108,7 @@
       default: "left"
     },
     fontSize: {
-      type: String,
+      type: [String, Number],
       default: "15px"
     },
     color: {
@@ -9644,6 +8116,10 @@
       default: "#303133"
     },
     prefiicon: {
+      type: String,
+      default: ""
+    },
+    prefixIcon: {
       type: String,
       default: ""
     },
@@ -9695,47 +8171,33 @@
       type: String,
       default: ""
     }
-  }, emits: [
-    "update:modelValue",
-    "update:value",
-    "input",
-    "change",
-    "focus",
-    "blur",
-    "confirm",
-    "keyboardheightchange",
-    "clear"
-  ], setup(__props, _a) {
+  }, emits: ["update:modelValue", "update:value", "input", "change", "focus", "blur", "confirm", "keyboardheightchange", "clear"], setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
     const props = __props;
     const emit = __emit;
     function initialValue() {
-      const modelValue = props.modelValue;
+      const modelValue = props.modelValue.toString();
       if (modelValue.length > 0)
         return modelValue;
-      return props.value;
+      return props.value.toString();
     }
-    function formatSize(value) {
-      if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("%") >= 0) {
-        return value;
+    function formatSize(value = null) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+        return text;
       }
-      return value + "px";
+      return text + "px";
+    }
+    function emitValue(value) {
+      emit("update:modelValue", value);
+      emit("update:value", value);
+      emit("input", value);
+      emit("change", value);
     }
     const inputBgColor = vue.computed(() => {
       return props.bgColor;
     });
     const current = vue.ref(initialValue());
-    vue.watch(() => {
-      return props.modelValue;
-    }, () => {
-      current.value = props.modelValue;
-    });
-    vue.watch(() => {
-      return props.value;
-    }, () => {
-      if (props.modelValue.length == 0)
-        current.value = props.value;
-    });
     const focused = vue.ref(false);
     const passwordVisible = vue.ref(props.password);
     const wrapClass = vue.computed(() => {
@@ -9766,14 +8228,18 @@
         return props.placeholderStyle;
       return "color:#c0c4cc;";
     });
-    function emitValue(value) {
-      emit("update:modelValue", value);
-      emit("update:value", value);
-      emit("input", value);
-      emit("change", value);
-    }
+    vue.watch(() => {
+      return props.modelValue;
+    }, () => {
+      current.value = initialValue();
+    });
+    vue.watch(() => {
+      return props.value;
+    }, () => {
+      current.value = initialValue();
+    });
     function handleInput(event) {
-      const nextValue = event.detail.value;
+      const nextValue = event.detail.value.toString();
       if (props.readonly) {
         current.value = initialValue();
         return null;
@@ -9781,18 +8247,25 @@
       current.value = nextValue;
       emitValue(nextValue);
     }
-    function handleFocus(event) {
+    function handleFocus(event = null) {
       focused.value = true;
       emit("focus", event);
     }
-    function handleBlur(event) {
+    function handleBlur(event = null) {
       focused.value = false;
       emit("blur", event);
     }
-    function handleConfirm(event) {
-      emit("confirm", event.detail.value);
+    function handleConfirm(event = null) {
+      if (event == null || typeof event != "object")
+        return null;
+      const eventObject = event;
+      const detail = eventObject["detail"];
+      if (detail == null || typeof detail != "object")
+        return null;
+      const value = detail["value"];
+      emit("confirm", value == null ? "" : value.toString());
     }
-    function handleKeyboardHeightChange(event) {
+    function handleKeyboardHeightChange(event = null) {
       emit("keyboardheightchange", event);
     }
     function clear() {
@@ -9807,13 +8280,13 @@
       setFormatter() {
       }
     });
-    const __returned__ = { props, emit, initialValue, formatSize, inputBgColor, current, focused, passwordVisible, wrapClass, wrapStyle, fieldStyle, placeholderStyleText, emitValue, handleInput, handleFocus, handleBlur, handleConfirm, handleKeyboardHeightChange, clear, togglePassword };
+    const __returned__ = { props, emit, initialValue, formatSize, emitValue, inputBgColor, current, focused, passwordVisible, wrapClass, wrapStyle, fieldStyle, placeholderStyleText, handleInput, handleFocus, handleBlur, handleConfirm, handleKeyboardHeightChange, clear, togglePassword };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
   const _style_0$D = { "i-input": { "": { "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "flexDirection": "row", "alignItems": "center" } }, "i-input--disabled": { "": { "opacity": 0.76 } }, "i-input--focus": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff" } }, "i-input__prefix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginRight": 8 } }, "i-input__suffix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginLeft": 8 } }, "i-input__clear": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__eye": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__count": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 12, "lineHeight": "18px" } }, "i-input__field": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0 } } };
-  function _sfc_render$D(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+  function _sfc_render$C(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -9822,14 +8295,14 @@
       },
       [
         vue.renderSlot(_ctx.$slots, "prefix", {}, () => [
-          $props.prefiicon.length > 0 || $props.prefix.length > 0 ? (vue.openBlock(), vue.createElementBlock(
+          $props.prefiicon.length > 0 || $props.prefixIcon.length > 0 || $props.prefix.length > 0 ? (vue.openBlock(), vue.createElementBlock(
             "text",
             {
               key: 0,
               class: "i-input__prefix",
               style: vue.normalizeStyle($props.prefiiconStyle)
             },
-            vue.toDisplayString($props.prefix.length > 0 ? $props.prefix : $props.prefiicon),
+            vue.toDisplayString($props.prefix.length > 0 ? $props.prefix : $props.prefixIcon.length > 0 ? $props.prefixIcon : $props.prefiicon),
             5
             /* TEXT, STYLE */
           )) : vue.createCommentVNode("v-if", true)
@@ -9844,15 +8317,15 @@
           "placeholder-style": $setup.placeholderStyleText,
           password: $setup.passwordVisible,
           disabled: $props.disabled,
-          maxlength: $props.maxlength,
+          maxlength: parseFloat($props.maxlength.toString()),
           "confirm-type": $props.confirmType,
           "confirm-hold": $props.confirmHold,
           inputmode: $props.inputmode,
           focus: $props.focus,
-          cursor: $props.cursor,
-          "cursor-spacing": $props.cursorSpacing,
-          "selection-start": $props.selectionStart,
-          "selection-end": $props.selectionEnd,
+          cursor: parseFloat($props.cursor.toString()),
+          "cursor-spacing": parseFloat($props.cursorSpacing.toString()),
+          "selection-start": parseFloat($props.selectionStart.toString()),
+          "selection-end": parseFloat($props.selectionEnd.toString()),
           "adjust-position": $props.adjustPosition,
           onInput: $setup.handleInput,
           onFocus: $setup.handleFocus,
@@ -9900,8 +8373,8 @@
       /* CLASS, STYLE */
     );
   }
-  const __easycom_2$4 = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$D], ["styles", [_style_0$D]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-input/i-input.uvue"]]);
-  const _sfc_main$D = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-checkbox" }, { __name: "i-checkbox", props: {
+  const __easycom_2$4 = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$C], ["styles", [_style_0$D]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-input/i-input.uvue"]]);
+  const _sfc_main$C = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-checkbox" }, { __name: "i-checkbox", props: {
     name: {
       type: [String, Number],
       default: ""
@@ -9987,36 +8460,62 @@
     __expose();
     const props = __props;
     const emit = __emit;
-    function formatSize(value) {
+    function formatSize(value = null) {
+      if (value == null)
+        return "0px";
       const text = value.toString();
       if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
         return text;
       }
       return text + "px";
     }
-    function valueText(value = null) {
-      if (typeof value == "string")
-        return value;
-      if (typeof value == "number" || typeof value == "boolean")
-        return value.toString();
-      return "";
+    function selectedValue() {
+      const modelValue = props.modelValue;
+      if (modelValue != null && modelValue.toString().length > 0)
+        return modelValue;
+      return props.value;
+    }
+    function nameText() {
+      const name2 = props.name;
+      return name2 == null ? "" : name2.toString();
     }
     function isChecked() {
       if (props.checked)
         return true;
-      const modelValue = props.modelValue;
-      const value = valueText(modelValue).length > 0 ? modelValue : props.value;
+      const value = selectedValue();
+      if (value == null)
+        return false;
       if (Array.isArray(value)) {
-        const names2 = value;
-        for (let i2 = 0; i2 < names2.length; i2++) {
-          if (valueText(names2[i2]) == valueText(props.name))
+        const list = value;
+        for (let i2 = 0; i2 < list.length; i2++) {
+          const item = list[i2];
+          if (item != null && item.toString() == nameText())
             return true;
         }
         return false;
       }
       if (typeof value == "boolean")
         return value;
-      return valueText(value) == valueText(props.name);
+      return value.toString() == nameText();
+    }
+    function buildValue(nextChecked, previousChecked) {
+      const value = selectedValue();
+      if (value != null && Array.isArray(value)) {
+        const list = value.slice(0);
+        if (nextChecked && !previousChecked)
+          list.push(props.name);
+        if (!nextChecked && previousChecked) {
+          const nextList = [];
+          for (let i2 = 0; i2 < list.length; i2++) {
+            const item = list[i2];
+            if (item == null || item.toString() != nameText())
+              nextList.push(item);
+          }
+          return nextList;
+        }
+        return list;
+      }
+      return nextChecked;
     }
     const internalChecked = vue.ref(isChecked());
     const checked = vue.computed(() => {
@@ -10063,42 +8562,6 @@
         color = props.activeLabelColor;
       return "color:" + color + ";font-size:" + formatSize(props.labelSize) + ";";
     });
-    vue.watch(() => {
-      return props.modelValue;
-    }, () => {
-      internalChecked.value = isChecked();
-    });
-    vue.watch(() => {
-      return props.value;
-    }, () => {
-      internalChecked.value = isChecked();
-    });
-    vue.watch(() => {
-      return props.checked;
-    }, () => {
-      internalChecked.value = isChecked();
-    });
-    function buildValue(nextChecked, previousChecked) {
-      const modelValue = props.modelValue;
-      const value = valueText(modelValue).length > 0 ? modelValue : props.value;
-      if (Array.isArray(value)) {
-        const list = value;
-        const nextList = list.slice(0);
-        const exists = previousChecked;
-        if (nextChecked && !exists)
-          nextList.push(props.name);
-        if (!nextChecked && exists) {
-          const filtered = [];
-          for (let i2 = 0; i2 < nextList.length; i2++) {
-            if (valueText(nextList[i2]) != valueText(props.name))
-              filtered.push(nextList[i2]);
-          }
-          return filtered;
-        }
-        return nextList;
-      }
-      return nextChecked;
-    }
     function updateChecked(nextChecked) {
       const previousChecked = checked.value;
       internalChecked.value = nextChecked;
@@ -10118,12 +8581,27 @@
         return null;
       toggle();
     }
-    const __returned__ = { props, emit, formatSize, valueText, isChecked, internalChecked, checked, wrapClass, labelClass, boxStyle, markStyle, labelStyle, buildValue, updateChecked, toggle, toggleByLabel };
+    vue.watch(() => {
+      return props.modelValue;
+    }, () => {
+      internalChecked.value = isChecked();
+    });
+    vue.watch(() => {
+      return props.value;
+    }, () => {
+      internalChecked.value = isChecked();
+    });
+    vue.watch(() => {
+      return props.checked;
+    }, () => {
+      internalChecked.value = isChecked();
+    });
+    const __returned__ = { props, emit, formatSize, selectedValue, nameText, isChecked, buildValue, internalChecked, checked, wrapClass, labelClass, boxStyle, markStyle, labelStyle, updateChecked, toggle, toggleByLabel };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
   const _style_0$C = { "i-checkbox": { "": { "minHeight": 32, "flexDirection": "row", "alignItems": "center" } }, "i-checkbox--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "i-checkbox--button": { "": { "minWidth": 64, "minHeight": 34, "paddingTop": 7, "paddingRight": 12, "paddingBottom": 7, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox--button-checked": { "": { "borderTopColor": "#2979ff", "borderRightColor": "#2979ff", "borderBottomColor": "#2979ff", "borderLeftColor": "#2979ff", "backgroundColor": "#ecf5ff" } }, "i-checkbox--button-plain-checked": { "": { "backgroundColor": "#ffffff" } }, "i-checkbox--disabled": { "": { "opacity": 0.5 } }, "i-checkbox--border": { "": { "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4" } }, "i-checkbox__box": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox__mark": { "": { "lineHeight": "18px" } }, "i-checkbox__label": { "": { "marginLeft": 8, "lineHeight": "22px" } }, "i-checkbox__label--button": { "": { "marginLeft": 0, "textAlign": "center" } } };
-  function _sfc_render$C(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$B(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -10174,8 +8652,8 @@
       /* CLASS */
     );
   }
-  const __easycom_2$3 = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$C], ["styles", [_style_0$C]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-checkbox/i-checkbox.uvue"]]);
-  const _sfc_main$C = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-button" }, { __name: "i-button", props: {
+  const __easycom_2$3 = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["render", _sfc_render$B], ["styles", [_style_0$C]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-checkbox/i-checkbox.uvue"]]);
+  const _sfc_main$B = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-button" }, { __name: "i-button", props: {
     hairline: {
       type: Boolean,
       default: true
@@ -10320,11 +8798,31 @@
     const lastClickTime = vue.ref(0);
     const loadingAngle = vue.ref(0);
     let loadingTimer = 0;
-    function formatSize(value) {
+    function normalizeAngle(value) {
+      let angle = value % 360;
+      if (angle < 0)
+        angle = angle + 360;
+      return angle;
+    }
+    function formatSize(value = null) {
       const text = value.toString();
       if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
         return text;
       return text + "px";
+    }
+    function startLoading() {
+      if (loadingTimer > 0)
+        return null;
+      loadingTimer = setInterval(() => {
+        loadingAngle.value = normalizeAngle(loadingAngle.value + 24);
+      }, 50);
+    }
+    function stopLoading() {
+      if (loadingTimer > 0) {
+        clearInterval(loadingTimer);
+        loadingTimer = 0;
+      }
+      loadingAngle.value = 0;
     }
     const normalizedType = vue.computed(() => {
       if (props.type == "danger")
@@ -10332,25 +8830,12 @@
       return props.type;
     });
     const contentText = vue.computed(() => {
-      if (props.text == null)
-        return "";
-      return props.text.toString();
+      return props.text.toString().length > 0 ? props.text.toString() : "";
     });
     const computedHoverClass = vue.computed(() => {
       if (props.disabled || props.loading)
         return "none";
       return props.hoverClass;
-    });
-    function normalizeNumber(value) {
-      if (typeof value == "number")
-        return value;
-      return Number.from(parseFloat(value));
-    }
-    const hoverStartTimeValue = vue.computed(() => {
-      return normalizeNumber(props.hoverStartTime);
-    });
-    const hoverStayTimeValue = vue.computed(() => {
-      return normalizeNumber(props.hoverStayTime);
     });
     const useNativeButton = vue.computed(() => {
       return props.openType.length > 0 || props.formType.length > 0;
@@ -10436,23 +8921,6 @@
       const size = formatSize(props.loadingSize);
       return "width:" + size + ";height:" + size + ";transform:rotate(" + loadingAngle.value.toString() + "deg);";
     });
-    function startLoading() {
-      if (loadingTimer > 0)
-        return null;
-      loadingTimer = setInterval(() => {
-        let angle = (loadingAngle.value + 24) % 360;
-        if (angle < 0)
-          angle = angle + 360;
-        loadingAngle.value = angle;
-      }, 50);
-    }
-    function stopLoading() {
-      if (loadingTimer > 0) {
-        clearInterval(loadingTimer);
-        loadingTimer = 0;
-      }
-      loadingAngle.value = 0;
-    }
     vue.watch(() => {
       return props.loading;
     }, (nextValue) => {
@@ -10472,8 +8940,8 @@
     function canClick() {
       if (props.disabled || props.loading)
         return false;
-      const wait = normalizeNumber(props.throttleTime);
-      if (wait <= 0 || isNaN(wait))
+      const wait = parseFloat(props.throttleTime.toString());
+      if (wait <= 0)
         return true;
       const now = Date.now();
       if (now - lastClickTime.value < wait)
@@ -10508,12 +8976,12 @@
       return loadingTimer;
     }, set loadingTimer(v2) {
       loadingTimer = v2;
-    }, formatSize, normalizedType, contentText, computedHoverClass, normalizeNumber, hoverStartTimeValue, hoverStayTimeValue, useNativeButton, buttonClass, textClass, iconClass, loadingClass, buttonStyle, textStyle, iconStyle, loadingStyle, startLoading, stopLoading, canClick, handleClick, handleGetPhoneNumber, handleGetUserInfo, handleError, handleOpenSetting, handleLaunchApp, handleAgreePrivacyAuthorization };
+    }, normalizeAngle, formatSize, startLoading, stopLoading, normalizedType, contentText, computedHoverClass, useNativeButton, buttonClass, textClass, iconClass, loadingClass, buttonStyle, textStyle, iconStyle, loadingStyle, canClick, handleClick, handleGetPhoneNumber, handleGetUserInfo, handleError, handleOpenSetting, handleLaunchApp, handleAgreePrivacyAuthorization };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
   const _style_0$B = { "i-button": { "": { "display": "flex", "height": 44, "minWidth": 86, "paddingTop": 0, "paddingRight": 18, "paddingBottom": 0, "paddingLeft": 18, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "backgroundColor": "#f4f4f5", "alignItems": "center", "justifyContent": "center", "flexDirection": "row", "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "overflow": "hidden" } }, "i-button__inner": { "": { "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-button--block": { "": { "width": "100%" } }, "i-button--large": { "": { "height": 50, "minWidth": 108, "paddingTop": 0, "paddingRight": 22, "paddingBottom": 0, "paddingLeft": 22 } }, "i-button--normal": { "": { "height": 44 } }, "i-button--small": { "": { "height": 36, "minWidth": 72, "paddingTop": 0, "paddingRight": 14, "paddingBottom": 0, "paddingLeft": 14 } }, "i-button--mini": { "": { "height": 30, "minWidth": 58, "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10 } }, "i-button--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-button--success": { "": { "backgroundColor": "#5ac725" } }, "i-button--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-button--error": { "": { "backgroundColor": "#f56c6c" } }, "i-button--info": { "": { "backgroundColor": "#909399" } }, "i-button--default": { "": { "backgroundColor": "#f4f4f5", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain-primary": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff", "backgroundColor": "#ffffff" } }, "i-button--plain-success": { "": { "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725", "backgroundColor": "#ffffff" } }, "i-button--plain-warning": { "": { "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d", "backgroundColor": "#ffffff" } }, "i-button--plain-error": { "": { "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c", "backgroundColor": "#ffffff" } }, "i-button--plain-info": { "": { "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399", "backgroundColor": "#ffffff" } }, "i-button--hairline": { "": { "borderTopWidth": 0.5, "borderRightWidth": 0.5, "borderBottomWidth": 0.5, "borderLeftWidth": 0.5 } }, "i-button--disabled": { "": { "opacity": 0.6 } }, "i-button--loading": { "": { "opacity": 0.9 } }, "i-button--hover": { "": { "opacity": 0.86 } }, "i-button__text": { "": { "color": "#ffffff", "fontSize": 15, "fontWeight": 500, "lineHeight": "22px" } }, "i-button__text--small": { "": { "fontSize": 13, "lineHeight": "20px" } }, "i-button__text--default": { "": { "color": "#303133" } }, "i-button__text--plain-primary": { "": { "color": "#3c9cff" } }, "i-button__text--plain-success": { "": { "color": "#5ac725" } }, "i-button__text--plain-warning": { "": { "color": "#f9ae3d" } }, "i-button__text--plain-error": { "": { "color": "#f56c6c" } }, "i-button__text--plain-info": { "": { "color": "#909399" } }, "i-button__text--plain-default": { "": { "color": "#303133" } }, "i-button__text--disabled": { "": { "opacity": 0.9 } }, "i-button__icon": { "": { "marginRight": 6, "color": "#ffffff", "fontSize": 15, "lineHeight": "22px" } }, "i-button__icon--right": { "": { "marginRight": 0, "marginLeft": 6 } }, "i-button__loading": { "": { "marginRight": 6, "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.45)", "borderBottomColor": "rgba(255,255,255,0.45)", "borderLeftColor": "rgba(255,255,255,0.45)", "boxSizing": "border-box" } }, "i-button__loading--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button__text--loading": { "": { "opacity": 0.96 } }, "i-button__loading--muted": { "": { "borderTopColor": "#606266", "borderRightColor": "rgba(48,49,51,0.18)", "borderBottomColor": "rgba(48,49,51,0.18)", "borderLeftColor": "rgba(48,49,51,0.18)" } }, "i-button__loading--plain-primary": { "": { "borderTopColor": "#3c9cff" } }, "i-button__loading--plain-success": { "": { "borderTopColor": "#5ac725" } }, "i-button__loading--plain-warning": { "": { "borderTopColor": "#f9ae3d" } }, "i-button__loading--plain-error": { "": { "borderTopColor": "#f56c6c" } }, "i-button__loading--plain-info": { "": { "borderTopColor": "#909399" } } };
-  function _sfc_render$B(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$A(_ctx, _cache, $props, $setup, $data, $options) {
     return $setup.useNativeButton ? (vue.openBlock(), vue.createElementBlock("button", {
       key: 0,
       class: vue.normalizeClass($setup.buttonClass),
@@ -10524,8 +8992,8 @@
       "app-parameter": $props.appParameter,
       "hover-class": $setup.computedHoverClass,
       "hover-stop-propagation": $props.hoverStopPropagation,
-      "hover-start-time": $setup.hoverStartTimeValue,
-      "hover-stay-time": $setup.hoverStayTimeValue,
+      "hover-start-time": parseFloat($props.hoverStartTime.toString()),
+      "hover-stay-time": parseFloat($props.hoverStayTime.toString()),
       lang: $props.lang,
       "session-from": $props.sessionFrom,
       "send-message-title": $props.sendMessageTitle,
@@ -10605,8 +9073,8 @@
       style: vue.normalizeStyle($setup.buttonStyle),
       "hover-class": $setup.computedHoverClass,
       "hover-stop-propagation": $props.hoverStopPropagation,
-      "hover-start-time": $setup.hoverStartTimeValue,
-      "hover-stay-time": $setup.hoverStayTimeValue,
+      "hover-start-time": parseFloat($props.hoverStartTime.toString()),
+      "hover-stay-time": parseFloat($props.hoverStayTime.toString()),
       "data-name": $props.dataName,
       onClick: $setup.handleClick
     }, [
@@ -10670,8 +9138,8 @@
       ])
     ], 14, ["hover-class", "hover-stop-propagation", "hover-start-time", "hover-stay-time", "data-name"]));
   }
-  const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["render", _sfc_render$B], ["styles", [_style_0$B]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-button/i-button.uvue"]]);
-  const _sfc_main$B = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-modal" }, { __name: "app-modal", setup(__props, _a) {
+  const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$A], ["styles", [_style_0$B]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-button/i-button.uvue"]]);
+  const _sfc_main$A = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-modal" }, { __name: "app-modal", setup(__props, _a) {
     var __expose = _a.expose;
     __expose();
     const visible = vue.ref(false);
@@ -10716,7 +9184,7 @@
     return __returned__;
   } }));
   const _style_0$A = { "app-modal-mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "display": "flex", "justifyContent": "center", "alignItems": "center", "backgroundColor": "rgba(0,0,0,0.5)", "zIndex": 10075 } }, "app-modal": { "": { "width": "640rpx", "display": "flex", "flexDirection": "column", "backgroundColor": "#ffffff", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "overflow": "hidden" } }, "app-modal-title": { "": { "paddingTop": "36rpx", "paddingRight": "44rpx", "paddingBottom": "16rpx", "paddingLeft": "44rpx", "color": "#303133", "fontSize": "34rpx", "fontWeight": 600, "lineHeight": "48rpx", "textAlign": "center" } }, "app-modal-content-scroll": { "": { "height": "600rpx", "maxHeight": "600rpx", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0 } }, "app-modal-content": { "": { "paddingTop": "16rpx", "paddingRight": "44rpx", "paddingBottom": "36rpx", "paddingLeft": "44rpx" } }, "app-modal-content-text": { "": { "display": "flex", "width": "100%", "color": "#606266", "fontSize": "28rpx", "lineHeight": "44rpx", "textAlign": "left" } }, "app-modal-footer": { "": { "display": "flex", "flexDirection": "row", "minHeight": "96rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "app-modal-button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "app-modal-cancel": { "": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "app-modal-confirm-text": { "": { "fontSize": "30rpx", "fontWeight": 600, "color": "#2979ff" } }, "app-modal-cancel-text": { "": { "fontSize": "30rpx", "fontWeight": 600, "color": "#606266" } } };
-  function _sfc_render$A(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$z(_ctx, _cache, $props, $setup, $data, $options) {
     return $setup.visible ? (vue.openBlock(), vue.createElementBlock("view", {
       key: 0,
       class: "app-modal-mask"
@@ -10794,7 +9262,7 @@
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const __easycom_5 = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$A], ["styles", [_style_0$A]], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/app-modal/app-modal.uvue"]]);
+  const __easycom_5 = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$z], ["styles", [_style_0$A]], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/app-modal/app-modal.uvue"]]);
   const userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。";
   const privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。";
   const POST_LOGIN_INITIALIZATION_DELAY = 1200;
@@ -10886,209 +9354,6 @@
   function clearSmsRegisterContext() {
     pendingContext = null;
   }
-  class UniVerifyPreLoginResult extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            ok: { type: Boolean, optional: false },
-            message: { type: String, optional: false }
-          };
-        },
-        name: "UniVerifyPreLoginResult"
-      };
-    }
-    constructor(options, metadata = UniVerifyPreLoginResult.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.ok = this.__props__.ok;
-      this.message = this.__props__.message;
-      delete this.__props__;
-    }
-  }
-  class UniVerifyResult extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            ok: { type: Boolean, optional: false },
-            cancelled: { type: Boolean, optional: false },
-            message: { type: String, optional: false },
-            token: { type: String, optional: false }
-          };
-        },
-        name: "UniVerifyResult"
-      };
-    }
-    constructor(options, metadata = UniVerifyResult.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.ok = this.__props__.ok;
-      this.cancelled = this.__props__.cancelled;
-      this.message = this.__props__.message;
-      this.token = this.__props__.token;
-      delete this.__props__;
-    }
-  }
-  let manager = null;
-  let preLoginReady = false;
-  let requesting = false;
-  function getPlatform() {
-    return "ios";
-  }
-  function getManager() {
-    if (manager == null) {
-      manager = uni.getUniVerifyManager();
-    }
-    return manager;
-  }
-  function getErrorMessage(error) {
-    const errCode = error.errCode;
-    uni.__log__("error", "at services/auth/uni-verify.uts:38", "Uni Verify 授权失败:", errCode, error.errMsg);
-    if (errCode == 30001)
-      return "已取消本机号码授权";
-    if (errCode == 30004 || errCode == 30005 || errCode == 30006)
-      return "运营商认证失败，请检查 SIM 卡、移动网络后重试";
-    if (errCode == 30007)
-      return "本机号码授权已过期，请重试";
-    if (errCode == 30008)
-      return "正在进行本机号码授权，请稍候";
-    if (errCode == 40001 || errCode == 40002)
-      return "网络异常，请检查移动网络后重试";
-    return "本机号码授权失败（错误码：" + errCode + "），请稍后重试";
-  }
-  function getPreLoginErrorMessage(error) {
-    const errCode = error.errCode;
-    const errMsg2 = error.errMsg || "";
-    const cause = error.cause || "";
-    uni.__log__("error", "at services/auth/uni-verify.uts:51", "Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + errMsg2, "cause=" + cause);
-    if (errCode == 30005)
-      return "本机号码预取失败，请检查本地包签名与 Uni Verify 配置，或确认 SIM 卡和移动数据可用";
-    if (errCode == 1e3 || errCode == 1001 || errCode == 1002)
-      return "一键登录服务未正确配置，请检查应用签名与 Uni Verify 控制台配置";
-    if (errCode == 1004)
-      return "一键登录服务已禁用，请检查 Uni Verify 服务状态";
-    if (errCode == 30001)
-      return "本机号码预取已取消";
-    if (errCode == 30004) {
-      if (errMsg2.indexOf("-20102") >= 0)
-        return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK";
-      if (errMsg2.indexOf("-20201") >= 0)
-        return "未检测到可用 SIM 卡，暂无法使用本机号码一键登录";
-      if (errMsg2.indexOf("-20202") >= 0)
-        return "未开启蜂窝移动网络，请开启移动数据后重试";
-      if (errMsg2.indexOf("-20203") >= 0)
-        return "当前运营商暂不支持本机号码一键登录";
-      return "本机号码预取失败，请稍后重试";
-    }
-    if (errCode == 40001 || errCode == 40002)
-      return "网络异常，无法获取本机号码，请检查移动网络后重试";
-    return "本机号码预取失败（错误码：" + errCode + "），请稍后重试";
-  }
-  function createPreLoginResult(ok, message) {
-    return new UniVerifyPreLoginResult({ ok, message });
-  }
-  function ensurePreLogin() {
-    return new Promise((resolve) => {
-      try {
-        const uniVerifyManager = getManager();
-        if (preLoginReady || uniVerifyManager.isPreLoginValid()) {
-          preLoginReady = true;
-          resolve(createPreLoginResult(true, ""));
-          return null;
-        }
-        uniVerifyManager.preLogin(new UTSJSONObject({
-          success: () => {
-            preLoginReady = true;
-            resolve(createPreLoginResult(true, ""));
-          },
-          fail: (error) => {
-            preLoginReady = false;
-            resolve(createPreLoginResult(false, getPreLoginErrorMessage(error)));
-          }
-        }));
-      } catch (error) {
-        preLoginReady = false;
-        uni.__log__("error", "at services/auth/uni-verify.uts:92", "Uni Verify 管理器初始化失败:", error);
-        resolve(createPreLoginResult(false, "一键登录初始化失败，请确认 uni-verify 模块、应用签名与控制台配置"));
-      }
-    });
-  }
-  function prefetchUniVerify() {
-    ensurePreLogin();
-  }
-  function createResult(ok, cancelled, message, token) {
-    return new UniVerifyResult({ ok, cancelled, message, token });
-  }
-  function closeLoginPage(uniVerifyManager = null) {
-    if (uniVerifyManager != null)
-      uniVerifyManager.close();
-  }
-  function loginByUniVerify(clientVersion, deviceId) {
-    return new Promise((resolve) => {
-      if (requesting) {
-        resolve(createResult(false, false, "正在进行本机号码授权，请稍候", ""));
-        return null;
-      }
-      requesting = true;
-      ensurePreLogin().then((preLoginResult) => {
-        if (!preLoginResult.ok) {
-          requesting = false;
-          resolve(createResult(false, false, preLoginResult.message, ""));
-          return null;
-        }
-        let uniVerifyManager = null;
-        try {
-          uniVerifyManager = getManager();
-          uniVerifyManager.login(new UTSJSONObject({
-            uniVerifyStyle: new UTSJSONObject({
-              fullScreen: false,
-              loginBtnText: "本机号码一键登录"
-            }),
-            success: (result) => {
-              const requestData = new UTSJSONObject();
-              requestData.set("openId", result.openId);
-              requestData.set("accessToken", result.accessToken);
-              requestData.set("platform", getPlatform());
-              requestData.set("clientVersion", clientVersion);
-              requestData.set("clientId", "428a8310cd442757ae699df5d894f051");
-              requestData.set("device_id", deviceId);
-              requestData.set("grantType", "univerify");
-              requestData.set("tenantId", "000000");
-              uniVerifyLogin(requestData).then((response) => {
-                const loginData = response.data;
-                const token = loginData != null ? loginData.getString("access_token", "") : "";
-                if (response.code == 200 && token != "") {
-                  resolve(createResult(true, false, "", token));
-                } else {
-                  resolve(createResult(false, false, response.msg || "本机号码登录失败，请稍后重试", ""));
-                }
-              }).catch(() => {
-                resolve(createResult(false, false, "登录服务连接失败，请检查网络后重试", ""));
-              }).finally(() => {
-                closeLoginPage(uniVerifyManager);
-                requesting = false;
-              });
-            },
-            fail: (error) => {
-              preLoginReady = false;
-              resolve(createResult(false, error.errCode == 30001, getErrorMessage(error), ""));
-              closeLoginPage(uniVerifyManager);
-              requesting = false;
-            }
-          }));
-        } catch (error) {
-          resolve(createResult(false, false, "当前设备不支持本机号码一键登录", ""));
-          requesting = false;
-        }
-      }).catch(() => {
-        requesting = false;
-        resolve(createResult(false, false, "一键登录预取号异常，请检查 SIM 卡、移动网络及服务配置", ""));
-      });
-    });
-  }
   let PersonalLoginForm$1 = class PersonalLoginForm2 extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -11131,7 +9396,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$A = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$z = /* @__PURE__ */ vue.defineComponent({
     __name: "login",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -11156,7 +9421,6 @@
       const smsSending = vue.ref(false);
       const smsSubmitting = vue.ref(false);
       let smsCooldownTimer = null;
-      const nativeLoginLoading = vue.ref(false);
       const isPersonalPasswordLoginReady = vue.computed(() => {
         return personalForm.value.username != "" && personalForm.value.password != "";
       });
@@ -11176,7 +9440,7 @@
         try {
           return (_a2 = uni.getDeviceInfo().deviceId) !== null && _a2 !== void 0 ? _a2 : "";
         } catch (error) {
-          uni.__log__("warn", "at pages/login/login.uvue:243", "获取登录设备标识失败:", error);
+          uni.__log__("warn", "at pages/login/login.uvue:251", "获取登录设备标识失败:", error);
           return "";
         }
       };
@@ -11350,40 +9614,12 @@
           smsCooldown.value = 0;
         }
       };
-      const startUniVerifyLogin = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          var _a2;
-          if (!ensureAgreementAccepted() || nativeLoginLoading.value)
-            return Promise.resolve(null);
-          try {
-            nativeLoginLoading.value = true;
-            let clientVersion = "1.0.0";
-            try {
-              const appVersion = (_a2 = uni.getAppBaseInfo().appVersion) !== null && _a2 !== void 0 ? _a2 : "";
-              if (appVersion != "")
-                clientVersion = appVersion;
-            } catch (error) {
-              uni.__log__("warn", "at pages/login/login.uvue:424", "获取应用版本失败，使用默认版本号:", error);
-            }
-            const result = yield loginByUniVerify(clientVersion, getLoginDeviceId());
-            if (result.ok) {
-              completeLogin(result.token);
-              return Promise.resolve(null);
-            }
-            if (!result.cancelled) {
-              showAppToast({ title: result.message, icon: "none" });
-            }
-          } finally {
-            nativeLoginLoading.value = false;
-          }
-        });
-      };
       const loginBt = () => {
         if (!docState.value) {
           showAppToast({ title: "请先阅读并同意用户协议", icon: "error" });
         }
       };
-      const handleGetPhoneNumber = (e2 = null) => {
+      const handleGetPhoneNumber = (e = null) => {
         return __awaiter(this, void 0, void 0, function* () {
         });
       };
@@ -11400,7 +9636,7 @@
           enterpriseForm.value.password = account.getString("password", "");
           rememberPassword.value = enterpriseForm.value.username != "" || enterpriseForm.value.password != "";
         } catch (error) {
-          uni.__log__("warn", "at pages/login/login.uvue:504", "加载保存的企业账号失败:", error);
+          uni.__log__("warn", "at pages/login/login.uvue:513", "加载保存的企业账号失败:", error);
         }
       };
       const toggleEnterpriseLogin = () => {
@@ -11460,9 +9696,6 @@
       const gotoPrivacy = () => {
         showAppModal(new UTSJSONObject({ title: "隐私政策", content: privacyPolicy, showCancel: false }));
       };
-      vue.onMounted(() => {
-        prefetchUniVerify();
-      });
       vue.onUnmounted(() => {
         stopSmsCooldown();
       });
@@ -11470,14 +9703,14 @@
         return smsCooldownTimer;
       }, set smsCooldownTimer(v2 = null) {
         smsCooldownTimer = v2;
-      }, nativeLoginLoading, isPersonalPasswordLoginReady, isSmsLoginReady, isLoginSubmitReady, isDocState, getLoginDeviceId, completeLogin, ensureAgreementAccepted, validatePersonalPasswordLogin, submitPersonalPasswordLogin, stopSmsCooldown, goRegister, goForgotPassword, isValidMobile, isValidSmsCode, startSmsCooldown, sendSmsCode, submitSmsLogin, submitLogin, toggleLoginMode, startUniVerifyLogin, loginBt, handleGetPhoneNumber, gotoIndex, loadSavedEnterpriseAccount, toggleEnterpriseLogin, toggleRememberPassword, saveEnterpriseAccount, submitEnterpriseLogin, gotoAgreement, gotoPrivacy };
+      }, isPersonalPasswordLoginReady, isSmsLoginReady, isLoginSubmitReady, isDocState, getLoginDeviceId, completeLogin, ensureAgreementAccepted, validatePersonalPasswordLogin, submitPersonalPasswordLogin, stopSmsCooldown, goRegister, goForgotPassword, isValidMobile, isValidSmsCode, startSmsCooldown, sendSmsCode, submitSmsLogin, submitLogin, toggleLoginMode, loginBt, handleGetPhoneNumber, gotoIndex, loadSavedEnterpriseAccount, toggleEnterpriseLogin, toggleRememberPassword, saveEnterpriseAccount, submitEnterpriseLogin, gotoAgreement, gotoPrivacy };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
   const _imports_0$2 = "/static/car_location.png";
   const _style_0$z = { "container": { "": { "height": "100%", "backgroundColor": "#fbfcfe" } }, "banner": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "height": "230rpx", "backgroundColor": "#fbfcfe" } }, "banner-image": { "": { "width": "160rpx", "height": "160rpx" } }, "title": { "": { "marginLeft": "12rpx", "color": "#333333", "fontSize": "42rpx", "fontWeight": "bold" } }, "content": { "": { "paddingTop": "40rpx", "paddingRight": "38rpx", "paddingBottom": 0, "paddingLeft": "38rpx" } }, "mini-program-content": { "": { "paddingTop": "40rpx", "paddingRight": "38rpx", "paddingBottom": 0, "paddingLeft": "38rpx" } }, "wechat-login": { ".mini-program-content ": { "marginBottom": "20rpx", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 }, "": { "marginTop": "42rpx", "paddingTop": 0, "paddingRight": "38rpx", "paddingBottom": 0, "paddingLeft": "38rpx" } }, "enterprise-login-form": { "": { "width": "100%" } }, "remember-password": { "": { "display": "flex", "marginBottom": "25rpx" } }, "mini-program-actions": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "marginTop": "48rpx", "color": "#5b92cc", "fontSize": "30rpx" } }, "mini-program-action": { "": { "paddingTop": 0, "paddingRight": "44rpx", "paddingBottom": 0, "paddingLeft": "44rpx" } }, "no-login": { "": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#a9bfd7" } }, "login-form": { "": { "width": "100%" } }, "login-input": { "": { "width": "100%", "borderTopLeftRadius": "25rpx", "borderTopRightRadius": "25rpx", "borderBottomRightRadius": "25rpx", "borderBottomLeftRadius": "25rpx", "marginBottom": "26rpx" } }, "password-input": { "": { "marginBottom": "34rpx" } }, "documents": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "25rpx" } }, "doc-info-box": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-text": { "": { "fontSize": "30rpx", "lineHeight": "44rpx", "color": "#8195ac" } }, "doc-link": { "": { "fontSize": "30rpx", "lineHeight": "44rpx", "color": "#2e83df" } }, "wechat-login-button": { "": { "width": "100%", "borderTopColor": "#2f83df", "borderRightColor": "#2f83df", "borderBottomColor": "#2f83df", "borderLeftColor": "#2f83df", "borderTopLeftRadius": "52rpx", "borderTopRightRadius": "52rpx", "borderBottomRightRadius": "52rpx", "borderBottomLeftRadius": "52rpx", "color": "#2f83df", "fontSize": "32rpx" } }, "page-actions": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "marginTop": "54rpx" } }, "action-item": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": 0, "marginRight": "17rpx", "marginBottom": 0, "marginLeft": "17rpx" } }, "action-link": { "": { "color": "#5b92cc", "fontSize": "29rpx", "fontWeight": 500, "lineHeight": "42rpx" } }, "action-arrow": { "": { "color": "#5b92cc", "fontSize": "34rpx", "fontWeight": 500, "lineHeight": "42rpx", "marginLeft": "5rpx" } }, "sms-country-code": { "": { "color": "#5d7a9b", "fontSize": "32rpx", "fontWeight": 500, "marginRight": "20rpx" } }, "sms-send-button": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "18rpx", "paddingBottom": 0, "paddingLeft": "18rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#3485df" } }, "sms-send-button-disabled": { "": { "backgroundColor": "#b8d7ff" } }, "sms-send-button-text": { "": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx", "whiteSpace": "nowrap" } }, "i-input": { "": { "boxSizing": "border-box", "paddingTop": 0, "paddingRight": "34rpx", "paddingBottom": 0, "paddingLeft": "34rpx", "!borderTopWidth": "2rpx", "!borderRightWidth": "2rpx", "!borderBottomWidth": "2rpx", "!borderLeftWidth": "2rpx" } }, "i-input__field": { "": { "paddingTop": 0, "paddingBottom": 0 } }, "i-checkbox": { "": { "minHeight": "44rpx" } }, "i-button__text": { "": { "fontSize": "38rpx", "fontWeight": 600, "letterSpacing": "2rpx" } }, "login-submit": { "": { "marginTop": "42rpx" } }, "i-input--focus": { "": { "!borderTopColor": "#3485df", "!borderRightColor": "#3485df", "!borderBottomColor": "#3485df", "!borderLeftColor": "#3485df", "backgroundColor": "#ffffff" } }, "i-input__eye": { "": { "marginLeft": "14rpx", "opacity": 0.78 } }, "i-checkbox__box": { "": { "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx" } } };
-  function _sfc_render$z(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$y(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_2$4);
     const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_2$3);
@@ -11639,6 +9872,14 @@
             }, 8, ["loading", "disabled"])
           ]),
           vue.createElementVNode("view", { class: "page-actions" }, [
+            !$setup.smsLoginMode ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "action-item",
+              onClick: $setup.gotoIndex
+            }, [
+              vue.createElementVNode("text", { class: "action-link" }, "暂不登录"),
+              vue.createElementVNode("text", { class: "action-arrow" }, "›")
+            ])) : vue.createCommentVNode("v-if", true),
             vue.createElementVNode("view", {
               class: "action-item",
               onClick: $setup.toggleLoginMode
@@ -11653,7 +9894,7 @@
               vue.createElementVNode("text", { class: "action-arrow" }, "›")
             ]),
             !$setup.smsLoginMode ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 0,
+              key: 1,
               class: "action-item",
               onClick: $setup.goRegister
             }, [
@@ -11661,7 +9902,7 @@
               vue.createElementVNode("text", { class: "action-arrow" }, "›")
             ])) : vue.createCommentVNode("v-if", true),
             !$setup.smsLoginMode ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 1,
+              key: 2,
               class: "action-item",
               onClick: $setup.goForgotPassword
             }, [
@@ -11677,8 +9918,8 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$z], ["styles", [_style_0$z]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/login.uvue"]]);
-  const _sfc_main$z = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form-item" }, { __name: "i-form-item", props: {
+  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["render", _sfc_render$y], ["styles", [_style_0$z]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/login.uvue"]]);
+  const _sfc_main$y = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form-item" }, { __name: "i-form-item", props: {
     name: {
       type: String,
       default: ""
@@ -11736,25 +9977,18 @@
     __expose();
     const props = __props;
     const emit = __emit;
-    function formatSize(value) {
+    function formatSize(value = null) {
       const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
         return text;
-      }
       return text + "px";
     }
     function normalizeIdName(name2) {
+      const allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
       let result = "";
       for (let i2 = 0; i2 < name2.length; i2++) {
         const char = name2.charAt(i2);
-        const isNumber2 = char >= "0" && char <= "9";
-        const isUpper = char >= "A" && char <= "Z";
-        const isLower = char >= "a" && char <= "z";
-        if (isNumber2 || isUpper || isLower || char == "-" || char == "_") {
-          result = result + char;
-        } else {
-          result = result + "-";
-        }
+        result += allowed.indexOf(char) >= 0 ? char : "-";
       }
       return result;
     }
@@ -11799,7 +10033,7 @@
     return __returned__;
   } }));
   const _style_0$y = { "i-form-item": { "": { "paddingTop": 12, "paddingRight": 14, "paddingBottom": 12, "paddingLeft": 14, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff" } }, "i-form-item--horizontal": { "": { "flexDirection": "row", "alignItems": "flex-start" } }, "i-form-item__header": { "": { "flexDirection": "row", "alignItems": "center" } }, "i-form-item__header--horizontal": { "": { "minHeight": 40 } }, "i-form-item__required": { "": { "marginRight": 4, "color": "#fa3534", "fontSize": 14, "lineHeight": "22px" } }, "i-form-item__label": { "": { "color": "#303133", "fontSize": 14, "fontWeight": 600, "lineHeight": "22px" } }, "i-form-item__content": { "": { "marginTop": 8 } }, "i-form-item__content--horizontal": { "": { "marginTop": 0 } }, "i-form-item__body": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-form-item__hint": { "": { "marginTop": 6, "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-form-item__error": { "": { "marginTop": 6, "color": "#fa3534", "fontSize": 12, "lineHeight": "18px" } } };
-  function _sfc_render$y(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$x(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", {
       id: $setup.itemId,
       class: vue.normalizeClass($setup.itemClass)
@@ -11866,8 +10100,154 @@
       ])
     ], 10, ["id"]);
   }
-  const __easycom_2$2 = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["render", _sfc_render$y], ["styles", [_style_0$y]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-form-item/i-form-item.uvue"]]);
-  const _sfc_main$y = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form" }, { __name: "i-form", props: {
+  const __easycom_2$2 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$x], ["styles", [_style_0$y]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-form-item/i-form-item.uvue"]]);
+  class IFormField extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            name: { type: String, optional: false },
+            label: { type: String, optional: false },
+            value: { type: "Any", optional: true },
+            hasValue: { type: Boolean, optional: false },
+            required: { type: Boolean, optional: false },
+            message: { type: String, optional: false }
+          };
+        },
+        name: "IFormField"
+      };
+    }
+    constructor(options, metadata = IFormField.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.name = this.__props__.name;
+      this.label = this.__props__.label;
+      this.value = this.__props__.value;
+      this.hasValue = this.__props__.hasValue;
+      this.required = this.__props__.required;
+      this.message = this.__props__.message;
+      delete this.__props__;
+    }
+  }
+  class IFormError extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            field: { type: String, optional: false },
+            message: { type: String, optional: false }
+          };
+        },
+        name: "IFormError"
+      };
+    }
+    constructor(options, metadata = IFormError.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.field = this.__props__.field;
+      this.message = this.__props__.message;
+      delete this.__props__;
+    }
+  }
+  class IFormValidatePayload extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            valid: { type: Boolean, optional: false },
+            message: { type: String, optional: false },
+            errors: { type: "Unknown", optional: false },
+            values: { type: "Unknown", optional: false }
+          };
+        },
+        name: "IFormValidatePayload"
+      };
+    }
+    constructor(options, metadata = IFormValidatePayload.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.valid = this.__props__.valid;
+      this.message = this.__props__.message;
+      this.errors = this.__props__.errors;
+      this.values = this.__props__.values;
+      delete this.__props__;
+    }
+  }
+  class IFormSubmitPayload extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            valid: { type: Boolean, optional: false },
+            values: { type: "Unknown", optional: false },
+            errors: { type: "Unknown", optional: false },
+            message: { type: String, optional: false }
+          };
+        },
+        name: "IFormSubmitPayload"
+      };
+    }
+    constructor(options, metadata = IFormSubmitPayload.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.valid = this.__props__.valid;
+      this.values = this.__props__.values;
+      this.errors = this.__props__.errors;
+      this.message = this.__props__.message;
+      delete this.__props__;
+    }
+  }
+  class IFormResetPayload extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            values: { type: "Unknown", optional: false }
+          };
+        },
+        name: "IFormResetPayload"
+      };
+    }
+    constructor(options, metadata = IFormResetPayload.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.values = this.__props__.values;
+      delete this.__props__;
+    }
+  }
+  class IFormScrollPayload extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            field: { type: String, optional: false },
+            targetId: { type: String, optional: false },
+            selector: { type: String, optional: false },
+            offsetTop: { type: Number, optional: false },
+            duration: { type: Number, optional: false }
+          };
+        },
+        name: "IFormScrollPayload"
+      };
+    }
+    constructor(options, metadata = IFormScrollPayload.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.field = this.__props__.field;
+      this.targetId = this.__props__.targetId;
+      this.selector = this.__props__.selector;
+      this.offsetTop = this.__props__.offsetTop;
+      this.duration = this.__props__.duration;
+      delete this.__props__;
+    }
+  }
+  const _sfc_main$x = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form" }, { __name: "i-form", props: {
     modelValue: {
       type: Object,
       default() {
@@ -11930,17 +10310,99 @@
       type: Boolean,
       default: false
     }
-  }, emits: [
-    "submit",
-    "reset",
-    "validate",
-    "scroll-to-error",
-    "update:modelValid",
-    "update:valid"
-  ], setup(__props, _a) {
+  }, emits: ["submit", "reset", "validate", "scroll-to-error", "update:modelValid", "update:valid"], setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
     const props = __props;
     const emit = __emit;
+    function objectText(object, keyName) {
+      const value = object[keyName];
+      return value == null ? "" : value.toString();
+    }
+    function normalizeField(raw = null) {
+      if (raw == null || typeof raw != "object")
+        return null;
+      const object = raw;
+      const value = object["value"];
+      return {
+        name: objectText(object, "name"),
+        label: objectText(object, "label"),
+        value,
+        hasValue: value != null,
+        required: object["required"] == true,
+        message: objectText(object, "message")
+      };
+    }
+    function normalizeFields(value = null) {
+      const result = [];
+      if (value == null)
+        return result;
+      for (let i2 = 0; i2 < value.length; i2++) {
+        const field = normalizeField(value[i2]);
+        if (field != null)
+          result.push(field);
+      }
+      return result;
+    }
+    function activeFields() {
+      const fields = normalizeFields(props.fields);
+      if (fields.length > 0)
+        return fields;
+      return normalizeFields(props.rules);
+    }
+    function modelFieldValue(name2) {
+      const model = props.modelValue;
+      if (model == null || typeof model != "object")
+        return null;
+      return model[name2];
+    }
+    function fieldValue(item) {
+      const configuredValue = item.value;
+      if (item.hasValue && configuredValue != null)
+        return configuredValue;
+      if (item.name.length == 0)
+        return "";
+      const value = modelFieldValue(item.name);
+      return value == null ? "" : value;
+    }
+    function fieldLabel(item) {
+      const label = item.label.length > 0 ? item.label : item.name;
+      return label.length > 0 ? label : "字段";
+    }
+    function fieldMessage(item) {
+      if (item.message.length > 0)
+        return item.message;
+      return fieldLabel(item) + "不能为空";
+    }
+    function checkField(item, selectedKeys) {
+      if (selectedKeys.length > 0 && selectedKeys.indexOf(item.name) < 0)
+        return "";
+      const value = fieldValue(item);
+      if (item.required && value.toString().length == 0)
+        return fieldMessage(item);
+      return "";
+    }
+    function collectValues() {
+      const values = new UTSJSONObject({});
+      const list = activeFields();
+      for (let i2 = 0; i2 < list.length; i2++) {
+        const item = list[i2];
+        if (item.name.length > 0)
+          values[item.name] = fieldValue(item);
+      }
+      return values;
+    }
+    function normalizeIdName(name2) {
+      const allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+      let result = "";
+      for (let i2 = 0; i2 < name2.length; i2++) {
+        const char = name2.charAt(i2);
+        result += allowed.indexOf(char) >= 0 ? char : "-";
+      }
+      return result;
+    }
+    function scrollTargetId(name2) {
+      return props.scrollIdPrefix + normalizeIdName(name2);
+    }
     const valid = vue.ref(true);
     const message = vue.ref("");
     const errors = vue.ref([]);
@@ -11956,123 +10418,26 @@
     const messageStyle = vue.computed(() => {
       return "text-align:" + props.errorAlign + ";";
     });
-    function valueText(value = null) {
-      if (typeof value == "string")
-        return value;
-      if (typeof value == "number" || typeof value == "boolean")
-        return value.toString();
-      if (Array.isArray(value)) {
-        const list = value;
-        return list.join(",");
-      }
-      if (value != null && typeof value == "object")
-        return "[object Object]";
-      return "";
-    }
-    function activeFields() {
-      const fields = props.fields;
-      if (fields != null && fields.length > 0)
-        return fields;
-      const rules = props.rules;
-      if (rules != null)
-        return rules;
-      return [];
-    }
-    function fieldValue(item) {
-      const configuredValue = item["value"];
-      if (configuredValue != null)
-        return configuredValue;
-      const name2 = item.getString("name", "");
-      if (name2.length == 0)
-        return "";
-      const values = props.modelValue;
-      if (values != null) {
-        const modelValue = values[name2];
-        if (modelValue != null)
-          return modelValue;
-      }
-      return "";
-    }
-    function fieldLabel(item) {
-      const label = item.getString("label", item.getString("name", ""));
-      return label.length > 0 ? label : "字段";
-    }
-    function fieldRequired(item) {
-      return item.getBoolean("required", false);
-    }
-    function fieldMessage(item) {
-      const customMessage = item.getString("message", "");
-      if (customMessage.length > 0)
-        return customMessage;
-      return fieldLabel(item) + "不能为空";
-    }
-    function checkField(item, selectedKeys) {
-      const name2 = item.getString("name", "");
-      if (selectedKeys.length > 0 && selectedKeys.indexOf(name2) < 0)
-        return "";
-      const value = fieldValue(item);
-      if (fieldRequired(item) && valueText(value).length == 0) {
-        return fieldMessage(item);
-      }
-      return "";
-    }
-    function collectValues() {
-      const values = new UTSJSONObject({});
-      const list = activeFields();
-      for (let i2 = 0; i2 < list.length; i2++) {
-        const item = list[i2];
-        const name2 = item.getString("name", "");
-        if (name2.length > 0)
-          values[name2] = fieldValue(item);
-      }
-      return values;
-    }
-    function numberValue(value) {
-      if (typeof value == "number")
-        return value;
-      return Number.from(parseFloat(value));
-    }
-    function normalizeIdName(name2) {
-      let result = "";
-      for (let i2 = 0; i2 < name2.length; i2++) {
-        const char = name2.charAt(i2);
-        const isNumber2 = char >= "0" && char <= "9";
-        const isUpper = char >= "A" && char <= "Z";
-        const isLower = char >= "a" && char <= "z";
-        if (isNumber2 || isUpper || isLower || char == "-" || char == "_") {
-          result = result + char;
-        } else {
-          result = result + "-";
-        }
-      }
-      return result;
-    }
-    function scrollTargetId(name2) {
-      return props.scrollIdPrefix + normalizeIdName(name2);
-    }
     function scrollToFirstError(nextErrors) {
       if (!props.errorAutoPage || nextErrors.length == 0)
         return null;
-      const field = nextErrors[0].getString("field", "");
+      const field = nextErrors[0].field;
       if (field.length == 0)
         return null;
       const targetId = scrollTargetId(field);
       const selector = "#" + targetId;
-      const offsetTop = numberValue(props.scrollOffsetTop);
-      const duration = numberValue(props.scrollDuration);
-      emit("scroll-to-error", new UTSJSONObject({
+      const offsetTop = parseFloat(props.scrollOffsetTop.toString());
+      const duration = parseFloat(props.scrollDuration.toString());
+      const payload = new IFormScrollPayload({
         field,
         targetId,
         selector,
         offsetTop,
         duration
-      }));
+      });
+      emit("scroll-to-error", payload);
       vue.nextTick(() => {
-        uni.pageScrollTo(new UTSJSONObject({
-          selector,
-          offsetTop,
-          duration
-        }));
+        uni.pageScrollTo(new UTSJSONObject({ selector, offsetTop, duration }));
       });
     }
     function validateFields(selectedKeys, silent) {
@@ -12082,27 +10447,21 @@
         const item = list[i2];
         const errorMessage = checkField(item, selectedKeys);
         if (errorMessage.length > 0) {
-          nextErrors.push(new UTSJSONObject({
-            field: item.getString("name", ""),
-            message: errorMessage
-          }));
+          const error = new IFormError({ field: item.name, message: errorMessage });
+          nextErrors.push(error);
         }
       }
       errors.value = nextErrors;
       valid.value = nextErrors.length == 0;
       if (!silent) {
-        if (valid.value) {
-          message.value = "校验通过";
-        } else {
-          const firstError = nextErrors[0];
-          message.value = firstError.getString("message", "");
-        }
-        emit("validate", new UTSJSONObject({
+        message.value = valid.value ? "校验通过" : nextErrors[0].message.toString();
+        const payload = new IFormValidatePayload({
           valid: valid.value,
           message: message.value,
           errors: nextErrors,
           values: collectValues()
-        }));
+        });
+        emit("validate", payload);
         if (!valid.value)
           scrollToFirstError(nextErrors);
       }
@@ -12128,7 +10487,7 @@
     }
     function submit() {
       const isValid = validate();
-      const result = new UTSJSONObject({
+      const result = new IFormSubmitPayload({
         valid: isValid,
         values: collectValues(),
         errors: errors.value,
@@ -12138,16 +10497,33 @@
     }
     function reset() {
       clearValid();
-      emit("reset", new UTSJSONObject({
-        values: collectValues()
-      }));
+      const payload = new IFormResetPayload({ values: collectValues() });
+      emit("reset", payload);
     }
     vue.watch(() => {
-      return [props.fields, props.rules, props.modelValue, props.watchValidStatus];
+      return props.fields;
     }, () => {
       if (props.watchValidStatus)
         validateFields([], true);
     }, { deep: true });
+    vue.watch(() => {
+      return props.rules;
+    }, () => {
+      if (props.watchValidStatus)
+        validateFields([], true);
+    }, { deep: true });
+    vue.watch(() => {
+      return props.modelValue;
+    }, () => {
+      if (props.watchValidStatus)
+        validateFields([], true);
+    }, { deep: true });
+    vue.watch(() => {
+      return props.watchValidStatus;
+    }, (value) => {
+      if (value)
+        validateFields([], true);
+    });
     __expose({
       valid: validFields,
       validate,
@@ -12156,12 +10532,12 @@
       submit,
       reset
     });
-    const __returned__ = { props, emit, valid, message, errors, formClass, messageClass, messageStyle, valueText, activeFields, fieldValue, fieldLabel, fieldRequired, fieldMessage, checkField, collectValues, numberValue, normalizeIdName, scrollTargetId, scrollToFirstError, validateFields, validate, validFields, checkAsyncVaildStatus, clearValid, submit, reset };
+    const __returned__ = { props, emit, objectText, normalizeField, normalizeFields, activeFields, modelFieldValue, fieldValue, fieldLabel, fieldMessage, checkField, collectValues, normalizeIdName, scrollTargetId, valid, message, errors, formClass, messageClass, messageStyle, scrollToFirstError, validateFields, validate, validFields, checkAsyncVaildStatus, clearValid, submit, reset };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
   const _style_0$x = { "i-form": { "": { "paddingTop": 4, "paddingRight": 0, "paddingBottom": 4, "paddingLeft": 0 } }, "i-form__message": { "": { "marginTop": 10, "fontSize": 13, "lineHeight": "20px" } }, "i-form__message--success": { "": { "color": "#19be6b" } }, "i-form__message--error": { "": { "color": "#fa3534" } }, "i-form__actions": { "": { "marginTop": 12, "flexDirection": "row", "justifyContent": "flex-end" } } };
-  function _sfc_render$x(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$w(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_3);
     return vue.openBlock(), vue.createElementBlock(
       "view",
@@ -12221,7 +10597,7 @@
       /* CLASS */
     );
   }
-  const __easycom_4$2 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$x], ["styles", [_style_0$x]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-form/i-form.uvue"]]);
+  const __easycom_4$2 = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["render", _sfc_render$w], ["styles", [_style_0$x]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-form/i-form.uvue"]]);
   class PersonalLoginForm extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -12243,7 +10619,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$x = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$w = /* @__PURE__ */ vue.defineComponent({
     __name: "personal-password-login",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -12339,7 +10715,7 @@
     }
   });
   const _style_0$w = { "container": { "": { "backgroundColor": "#ffffff" } }, "banner": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "260rpx", "backgroundColor": "#ffffff" } }, "banner-image": { "": { "width": "180rpx", "height": "180rpx" } }, "title": { "": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { "": { "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "documents": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { "": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { "": { "fontSize": "28rpx" } }, "page-actions": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "marginTop": "40rpx" } }, "action-link": { "": { "fontSize": "26rpx", "color": "#8b8c8d" } }, "action-divider": { "": { "marginTop": 0, "marginRight": "28rpx", "marginBottom": 0, "marginLeft": "28rpx", "color": "#d9d9d9" } }, "i-form-item": { "": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
-  function _sfc_render$w(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$v(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_2$4);
     const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
@@ -12467,7 +10843,7 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesLoginPersonalPasswordLogin = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["render", _sfc_render$w], ["styles", [_style_0$w]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/personal-password-login.uvue"]]);
+  const PagesLoginPersonalPasswordLogin = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["render", _sfc_render$v], ["styles", [_style_0$w]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/personal-password-login.uvue"]]);
   class RegisterForm extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -12491,7 +10867,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$w = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$v = /* @__PURE__ */ vue.defineComponent({
     __name: "register",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -12680,7 +11056,7 @@
     }
   });
   const _style_0$v = { "container": { "": { "height": "100%", "backgroundColor": "#fbfcfe" } }, "content": { "": { "paddingTop": "50rpx", "paddingRight": "32rpx", "paddingBottom": 0, "paddingLeft": "32rpx" } }, "page-title": { "": { "display": "flex", "color": "#1f2d3d", "fontSize": "54rpx", "fontWeight": 700, "lineHeight": "76rpx" } }, "register-input": { "": { "width": "100%", "borderTopLeftRadius": "25rpx", "borderTopRightRadius": "25rpx", "borderBottomRightRadius": "25rpx", "borderBottomLeftRadius": "25rpx", "marginTop": "52rpx" } }, "sms-code-input": { "": { "marginTop": "28rpx" } }, "password-input": { "": { "marginTop": "28rpx" } }, "country-code": { "": { "color": "#5d7a9b", "fontSize": "34rpx", "fontWeight": 500, "marginRight": "20rpx" } }, "sms-send-button": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "58rpx", "paddingTop": 0, "paddingRight": "18rpx", "paddingBottom": 0, "paddingLeft": "18rpx", "borderTopLeftRadius": "29rpx", "borderTopRightRadius": "29rpx", "borderBottomRightRadius": "29rpx", "borderBottomLeftRadius": "29rpx" } }, "sms-send-button-disabled": { "": { "opacity": 0.45 } }, "sms-send-button-text": { "": { "color": "#1878e5", "fontSize": "30rpx", "fontWeight": 600, "lineHeight": "58rpx", "whiteSpace": "nowrap" } }, "password-hint": { "": { "display": "flex", "marginTop": "22rpx", "marginRight": "6rpx", "marginBottom": 0, "marginLeft": "6rpx", "color": "#7f96ae", "fontSize": "26rpx", "lineHeight": "40rpx" } }, "documents": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "38rpx" } }, "doc-info-box": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-text": { "": { "fontSize": "30rpx", "lineHeight": "44rpx", "color": "#8397ad" } }, "doc-link": { "": { "fontSize": "30rpx", "lineHeight": "44rpx", "color": "#1878e5" } }, "submit-button": { "": { "marginTop": "46rpx" } }, "login-link-box": { "": { "display": "flex", "justifyContent": "center", "marginTop": "52rpx" } }, "login-link": { "": { "color": "#3485df", "fontSize": "30rpx", "lineHeight": "48rpx", "textAlign": "center" } }, "i-input": { "": { "boxSizing": "border-box" } }, "i-input__field": { "": { "paddingTop": 0, "paddingBottom": 0 } }, "i-checkbox": { "": { "minHeight": "44rpx" } }, "i-button__text": { "": { "fontSize": "38rpx", "fontWeight": 600 } } };
-  function _sfc_render$v(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$u(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_2$4);
     const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_2$3);
@@ -12829,7 +11205,7 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesLoginRegister = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["render", _sfc_render$v], ["styles", [_style_0$v]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/register.uvue"]]);
+  const PagesLoginRegister = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["render", _sfc_render$u], ["styles", [_style_0$v]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/register.uvue"]]);
   class ForgotPasswordForm extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -12855,7 +11231,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$v = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$u = /* @__PURE__ */ vue.defineComponent({
     __name: "forgot-password",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -13022,7 +11398,7 @@
     }
   });
   const _style_0$u = { "container": { "": { "backgroundColor": "#fbfcfe" } }, "content": { "": { "paddingTop": "48rpx", "paddingRight": "60rpx", "paddingBottom": "80rpx", "paddingLeft": "60rpx" } }, "forgot-password-steps": { "": { "width": "70%", "height": "130rpx", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto", "overflow": "visible" } }, "forgot-password-steps__indicators": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "height": "50rpx" } }, "forgot-password-steps__line": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": "1rpx", "marginTop": 0, "marginRight": "20rpx", "marginBottom": 0, "marginLeft": "20rpx", "backgroundColor": "#dce7f0" } }, "forgot-password-steps__line--active": { "": { "backgroundColor": "#3485df" } }, "forgot-password-steps__dot": { "": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "width": "50rpx", "height": "50rpx", "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#dce7f0", "borderRightColor": "#dce7f0", "borderBottomColor": "#dce7f0", "borderLeftColor": "#dce7f0", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "backgroundColor": "#ffffff" } }, "forgot-password-steps__dot--active": { "": { "borderTopColor": "#3485df", "borderRightColor": "#3485df", "borderBottomColor": "#3485df", "borderLeftColor": "#3485df", "backgroundColor": "#3485df" } }, "forgot-password-steps__index": { "": { "color": "#9aafc2", "fontSize": "30rpx", "fontWeight": 600, "lineHeight": "78rpx" }, ".forgot-password-steps__dot--active ": { "color": "#ffffff" } }, "forgot-password-steps__titles": { "": { "position": "relative", "height": "40rpx", "marginTop": "22rpx", "overflow": "visible" } }, "forgot-password-steps__title": { "": { "color": "#9aafc2", "fontSize": "28rpx", "fontWeight": 500, "lineHeight": "40rpx", "whiteSpace": "nowrap" } }, "forgot-password-steps__title--0": { "": { "position": "absolute", "left": "25rpx", "transform": "translateX(-50%)" } }, "forgot-password-steps__title--1": { "": { "position": "absolute", "left": "50%", "transform": "translateX(-50%)" } }, "forgot-password-steps__title--2": { "": { "position": "absolute", "right": 0 } }, "forgot-password-steps__title--active": { "": { "color": "#3485df", "fontWeight": 600 } }, "form-section": { "": { "marginTop": "118rpx" } }, "form-input": { "": { "width": "100%", "borderTopLeftRadius": "25rpx", "borderTopRightRadius": "25rpx", "borderBottomRightRadius": "25rpx", "borderBottomLeftRadius": "25rpx" } }, "sms-code-input": { "": { "marginTop": "28rpx" } }, "confirm-password-input": { "": { "marginTop": "28rpx" } }, "country-code": { "": { "marginRight": "20rpx", "color": "#5d7a9b", "fontSize": "34rpx", "fontWeight": 500 } }, "sms-send-button": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "58rpx", "paddingTop": 0, "paddingRight": "18rpx", "paddingBottom": 0, "paddingLeft": "18rpx", "borderTopLeftRadius": "29rpx", "borderTopRightRadius": "29rpx", "borderBottomRightRadius": "29rpx", "borderBottomLeftRadius": "29rpx" } }, "sms-send-button-disabled": { "": { "opacity": 0.45 } }, "sms-send-button-text": { "": { "color": "#1878e5", "fontSize": "30rpx", "fontWeight": 600, "lineHeight": "58rpx", "whiteSpace": "nowrap" } }, "password-hint": { "": { "display": "flex", "marginTop": "22rpx", "marginRight": "6rpx", "marginBottom": 0, "marginLeft": "6rpx", "color": "#7f96ae", "fontSize": "26rpx", "lineHeight": "40rpx" } }, "submit-button": { "": { "marginTop": "72rpx" } }, "password-submit-button": { "": { "marginTop": "70rpx" } }, "success-section": { "": { "display": "flex", "flexDirection": "column", "alignItems": "center", "marginTop": "170rpx" } }, "success-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center", "width": "150rpx", "height": "150rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "backgroundColor": "#e3f7ef" } }, "success-check": { "": { "color": "#2db37a", "fontSize": "86rpx", "fontWeight": 500, "lineHeight": "150rpx" } }, "success-title": { "": { "marginTop": "56rpx", "color": "#1f2d3d", "fontSize": "50rpx", "fontWeight": 700, "lineHeight": "72rpx" } }, "success-description": { "": { "marginTop": "42rpx", "color": "#7f96ae", "fontSize": "30rpx", "lineHeight": "52rpx", "textAlign": "center" } }, "success-button": { "": { "alignSelf": "stretch", "marginTop": "126rpx" } }, "i-input": { "": { "boxSizing": "border-box", "paddingTop": 0, "paddingRight": "34rpx", "paddingBottom": 0, "paddingLeft": "34rpx", "!borderTopWidth": "2rpx", "!borderRightWidth": "2rpx", "!borderBottomWidth": "2rpx", "!borderLeftWidth": "2rpx" } }, "i-input__field": { "": { "paddingTop": 0, "paddingBottom": 0 } }, "i-input--focus": { "": { "!borderTopColor": "#3485df", "!borderRightColor": "#3485df", "!borderBottomColor": "#3485df", "!borderLeftColor": "#3485df", "backgroundColor": "#ffffff" } }, "i-input__eye": { "": { "marginLeft": "14rpx", "opacity": 0.78 } }, "i-button__text": { "": { "fontSize": "38rpx", "fontWeight": 600, "letterSpacing": "2rpx" } } };
-  function _sfc_render$u(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$t(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_2$4);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_3);
@@ -13270,7 +11646,7 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesLoginForgotPassword = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["render", _sfc_render$u], ["styles", [_style_0$u]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/forgot-password.uvue"]]);
+  const PagesLoginForgotPassword = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["render", _sfc_render$t], ["styles", [_style_0$u]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/forgot-password.uvue"]]);
   let PasswordForm$1 = class PasswordForm2 extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -13292,7 +11668,7 @@
       delete this.__props__;
     }
   };
-  const _sfc_main$u = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$t = /* @__PURE__ */ vue.defineComponent({
     __name: "set-password",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -13418,7 +11794,7 @@
     }
   });
   const _style_0$t = { "container": { "": { "backgroundColor": "#fbfcfe" } }, "content": { "": { "paddingTop": "54rpx", "paddingRight": "40rpx", "paddingBottom": 0, "paddingLeft": "40rpx" } }, "page-title": { "": { "display": "flex", "color": "#1f2d3d", "fontSize": "54rpx", "fontWeight": 700, "lineHeight": "76rpx" } }, "page-subtitle": { "": { "display": "flex", "marginTop": "28rpx", "color": "#7f96ae", "fontSize": "30rpx", "lineHeight": "44rpx" } }, "password-input": { "": { "width": "100%", "marginTop": "62rpx" } }, "confirm-password-input": { "": { "marginTop": "30rpx" } }, "password-hint": { "": { "display": "flex", "marginTop": "22rpx", "marginRight": "6rpx", "marginBottom": 0, "marginLeft": "6rpx", "color": "#7f96ae", "fontSize": "26rpx", "lineHeight": "40rpx" } }, "submit-button": { "": { "marginTop": "70rpx" } }, "i-input": { "": { "boxSizing": "border-box" } }, "i-input__field": { "": { "paddingTop": 0, "paddingBottom": 0 } }, "i-button__text": { "": { "fontSize": "38rpx", "fontWeight": 600 } } };
-  function _sfc_render$t(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$s(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_2$4);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_3);
@@ -13489,7 +11865,7 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesLoginSetPassword = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["render", _sfc_render$t], ["styles", [_style_0$t]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/set-password.uvue"]]);
+  const PagesLoginSetPassword = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["render", _sfc_render$s], ["styles", [_style_0$t]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/set-password.uvue"]]);
   class PickerItem extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -13530,7 +11906,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$t = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$s = /* @__PURE__ */ vue.defineComponent({
     __name: "sub-navBar",
     props: {
       showTime: {
@@ -13592,8 +11968,8 @@
         columns.value = props.cars;
         currentPickerType.value = "car";
       };
-      const confirm = (e2) => {
-        const selected = e2.value[0];
+      const confirm = (e) => {
+        const selected = e.value[0];
         if (currentPickerType.value === "time") {
           emit("update:currentTime", selected.label);
         } else if (currentPickerType.value === "car") {
@@ -13608,7 +11984,7 @@
     }
   });
   const _style_0$s = { "tools-box": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "slot": { ".tools-box ": { "width": "50rpx", "height": "20rpx" } }, "car-box": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 } }, "selectCar": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginRight": "20rpx", "backgroundColor": "rgba(3,109,246,0.71)", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "plateNo": { ".tools-box .car-box .selectCar ": { "fontSize": "30rpx", "color": "#ffffff" } }, "car-state": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "10rpx", "paddingRight": "15rpx", "paddingBottom": "10rpx", "paddingLeft": "15rpx" } }, "state": { ".tools-box .car-box .car-state ": { "fontSize": "25rpx", "color": "#ffffff" } }, "success": { ".tools-box .car-box ": { "backgroundColor": "#5ac725" } }, "error": { ".tools-box .car-box ": { "backgroundColor": "#f56c6c" } }, "second": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(3,109,246,0.71)", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "times": { ".tools-box .second ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "refresh": { ".tools-box .second .times ": { "fontSize": "30rpx", "color": "#ffffff" } }, "down_icon": { ".tools-box ": { "width": "30rpx", "height": "30rpx" } } };
-  function _sfc_render$s(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$r(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "tools-box" }, [
       $props.showTime ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
@@ -13666,8 +12042,8 @@
       ])
     ]);
   }
-  const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["render", _sfc_render$s], ["styles", [_style_0$s]], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/sub-navBar/sub-navBar.uvue"]]);
-  const _sfc_main$s = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-grid" }, { __name: "i-grid", props: {
+  const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["render", _sfc_render$r], ["styles", [_style_0$s]], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/sub-navBar/sub-navBar.uvue"]]);
+  const _sfc_main$r = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-grid" }, { __name: "i-grid", props: {
     items: {
       type: Array,
       default() {
@@ -13735,43 +12111,45 @@
     __expose();
     const props = __props;
     const emit = __emit;
-    function valueText(value = null) {
-      if (typeof value == "string")
-        return value;
-      if (typeof value == "number" || typeof value == "boolean")
-        return value.toString();
-      return "";
-    }
-    function formatSize(value) {
+    function formatSize(value = null) {
       const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0 || text == "auto") {
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0 || text == "auto")
         return text;
-      }
       return text + "px";
     }
+    const bgColor = vue.computed(() => {
+      return props.bgColor;
+    });
+    const selected = vue.ref(-1);
+    const gridStyle = vue.computed(() => {
+      return "width:" + props.width + ";background-color:" + bgColor.value + ";border-radius:" + formatSize(props.round) + ";";
+    });
     function itemValue(item = null, keyName) {
-      if (item == null || typeof item != "object")
+      if (item == null)
         return "";
-      const values = item;
-      const value = values[keyName];
-      if (value == null)
-        return "";
-      return valueText(value);
+      if (typeof item == "object") {
+        const serialized = UTS.JSON.stringify(item);
+        const object = UTS.JSON.parse(serialized);
+        const value = object[keyName];
+        if (value == null)
+          return "";
+        return value.toString();
+      }
+      return "";
     }
     function getItemText(item = null) {
       const text = itemValue(item, "text");
       if (text.length > 0)
         return text;
-      return valueText(item);
+      if (item == null)
+        return "";
+      return item.toString();
     }
     function getItemIcon(item = null) {
       return itemValue(item, "icon");
     }
     function getItemImage(item = null) {
       return itemValue(item, "image");
-    }
-    function getItemName(item = null) {
-      return itemValue(item, "name");
     }
     function getItemBgColor(item = null) {
       const color = itemValue(item, "bgColor");
@@ -13794,19 +12172,6 @@
     function getItemUrl(item = null) {
       return itemValue(item, "url");
     }
-    const bgColor = vue.computed(() => {
-      return props.bgColor;
-    });
-    const gridItems = vue.computed(() => {
-      const items = props.items;
-      if (items == null)
-        return [];
-      return items;
-    });
-    const selected = vue.ref(-1);
-    const gridStyle = vue.computed(() => {
-      return "width:" + props.width + ";background-color:" + bgColor.value + ";border-radius:" + formatSize(props.round) + ";";
-    });
     function getColumns() {
       if (props.col <= 1)
         return 1;
@@ -13814,12 +12179,13 @@
         return 6;
       return props.col;
     }
+    function getItemCount() {
+      const items = props.items;
+      return items == null ? 0 : items.length;
+    }
     function getRows() {
       const columns = getColumns();
-      const items = props.items;
-      if (items == null)
-        return 0;
-      return Math.ceil(items.length / columns);
+      return Math.ceil(getItemCount() / columns);
     }
     function getItemWidth() {
       const columns = getColumns();
@@ -13860,32 +12226,21 @@
     function getTextStyle(item = null) {
       return "color:" + getItemTextColor(item) + ";font-size:" + formatSize(props.fontSize) + ";";
     }
-    function buildPayload(item = null, index) {
-      return new UTSJSONObject({
-        index,
-        name: getItemName(item),
-        text: getItemText(item),
-        icon: getItemIcon(item),
-        image: getItemImage(item),
-        url: getItemUrl(item)
-      });
-    }
     function select(item = null, index) {
       selected.value = index;
-      const payload = buildPayload(item, index);
-      emit("select", payload);
-      emit("change", payload);
-      emit("click", payload);
+      emit("select", item);
+      emit("change", item);
+      emit("click", item);
     }
     function loadMore() {
-      emit("loadmore", gridItems.value.length);
+      emit("loadmore", getItemCount());
     }
-    const __returned__ = { props, emit, valueText, formatSize, itemValue, getItemText, getItemIcon, getItemImage, getItemName, getItemBgColor, getItemIconColor, getItemTextColor, getItemUrl, bgColor, gridItems, selected, gridStyle, getColumns, getRows, getItemWidth, getItemStyle, getIconStyle, getImageStyle, getTextStyle, buildPayload, select, loadMore };
+    const __returned__ = { props, emit, formatSize, bgColor, selected, gridStyle, itemValue, getItemText, getItemIcon, getItemImage, getItemBgColor, getItemIconColor, getItemTextColor, getItemUrl, getColumns, getItemCount, getRows, getItemWidth, getItemStyle, getIconStyle, getImageStyle, getTextStyle, select, loadMore };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
   const _style_0$r = { "i-grid": { "": { "flexDirection": "row", "flexWrap": "wrap", "overflow": "hidden" } }, "i-grid__item": { "": { "boxSizing": "border-box", "overflow": "hidden", "alignItems": "center", "justifyContent": "center" } }, "i-grid__item--hover": { "": { "backgroundColor": "#f3f4f6" } }, "i-grid__item--active": { "": { "backgroundColor": "#ecf5ff" } }, "i-grid__image": { "": { "marginBottom": 8 } }, "i-grid__icon": { "": { "marginBottom": 8, "textAlign": "center", "lines": 1 } }, "i-grid__text": { "": { "lineHeight": "18px", "textAlign": "center", "lines": 1 } } };
-  function _sfc_render$r(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$q(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -13896,7 +12251,7 @@
         (vue.openBlock(true), vue.createElementBlock(
           vue.Fragment,
           null,
-          vue.renderList($setup.gridItems, (item, index) => {
+          vue.renderList($props.items, (item, index) => {
             return vue.openBlock(), vue.createElementBlock("view", {
               key: index.toString() + "-" + $setup.getItemText(item),
               class: vue.normalizeClass(
@@ -13943,7 +12298,7 @@
       /* STYLE */
     );
   }
-  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["render", _sfc_render$r], ["styles", [_style_0$r]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-grid/i-grid.uvue"]]);
+  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["render", _sfc_render$q], ["styles", [_style_0$r]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-grid/i-grid.uvue"]]);
   const DEFAULT_TK = "1e3374be3d63de65d44dbfdc7b311afb";
   class AddressResult extends UTS.UTSType {
     static get$UTSMetadata$() {
@@ -14066,7 +12421,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$r = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$q = /* @__PURE__ */ vue.defineComponent({
     __name: "carInfoDetail",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -14248,6 +12603,7 @@
           signalRssi.value = null;
           signalSat.value = null;
           let retry = retryCount;
+          uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:333", "loadData", data, retryCount);
           const tryLoad = (attempt) => {
             return __awaiter(this, void 0, void 0, function* () {
               var e_1, _a2;
@@ -14271,7 +12627,7 @@
                       const latitude = item.getNumber("latitude", 0);
                       const longitude = item.getNumber("longitude", 0);
                       if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:361", "位置信息缺失", item);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:362", "位置信息缺失", item);
                         showAppToast({
                           title: "位置信息缺失",
                           icon: "none"
@@ -14281,7 +12637,7 @@
                       const lat = parseFloat(latitude.toString());
                       const lng = parseFloat(longitude.toString());
                       if (isNaN(lat) || isNaN(lng)) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:374", "经纬度格式错误", latitude, longitude);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:375", "经纬度格式错误", latitude, longitude);
                         return false;
                       }
                       let convertedLat = lat;
@@ -14291,7 +12647,7 @@
                         convertedLat = coord.lat;
                         convertedLng = coord.lng;
                       } catch (transformError) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:386", "坐标转换失败:", transformError);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:387", "坐标转换失败:", transformError);
                       }
                       center.latitude = convertedLat;
                       center.longitude = convertedLng;
@@ -14317,7 +12673,7 @@
                       if (signalRssi.value != null) {
                         const signalExp = getSignalDetail(signalRssi.value).experience;
                         if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:429", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
+                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:430", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
                         }
                       }
                     }
@@ -14338,10 +12694,10 @@
                 }
                 return true;
               } catch (error) {
-                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:443", "第".concat(attempt, "次加载设备数据失败:"), error);
+                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:444", "第".concat(attempt, "次加载设备数据失败:"), error);
                 if (attempt < retry) {
                   const delayMs = Math.pow(2, attempt) * 1e3;
-                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:449", "等待".concat(delayMs / 1e3, "秒后重试..."));
+                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:450", "等待".concat(delayMs / 1e3, "秒后重试..."));
                   yield delay(delayMs);
                   return false;
                 } else {
@@ -14393,7 +12749,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:511", "手动刷新失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:512", "手动刷新失败:", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -14450,34 +12806,44 @@
         }
       };
       const baseList = vue.computed(() => {
-        const list = [new UTSJSONObject({
-          image: "/static/gjhf.png",
-          text: "轨迹回放"
-        }), new UTSJSONObject({
-          image: "/static/clgz.png",
-          text: "车辆跟踪"
-        }), new UTSJSONObject({
-          image: "/static/lcjl.png",
-          text: "里程记录"
-        }), new UTSJSONObject({
-          image: "/static/tcjl.png",
-          text: "停车记录"
-        }), new UTSJSONObject({
-          image: "/static/dzwl.png",
-          text: "电子围栏"
-        }), new UTSJSONObject({
-          image: "/static/navto.png",
-          text: "一键寻车"
-        }), new UTSJSONObject({
-          image: "/static/power.png",
-          text: "恢复油电"
-        }), new UTSJSONObject({
-          image: "/static/offpower.png",
-          text: "断开油电"
-        }), new UTSJSONObject({
-          image: "/static/cmd.png",
-          text: "发送指令"
-        })];
+        const list = [
+          new UTSJSONObject({
+            image: "/static/gjhf.png",
+            text: "轨迹回放"
+          }),
+          new UTSJSONObject({
+            image: "/static/clgz.png",
+            text: "车辆跟踪"
+          }),
+          new UTSJSONObject({
+            image: "/static/lcjl.png",
+            text: "里程记录"
+          }),
+          new UTSJSONObject({
+            image: "/static/tcjl.png",
+            text: "停车记录"
+          }),
+          new UTSJSONObject({
+            image: "/static/dzwl.png",
+            text: "电子围栏"
+          }),
+          new UTSJSONObject({
+            image: "/static/navto.png",
+            text: "一键寻车"
+          }),
+          new UTSJSONObject({
+            image: "/static/power.png",
+            text: "恢复油电"
+          }),
+          new UTSJSONObject({
+            image: "/static/offpower.png",
+            text: "断开油电"
+          })
+          // {
+          // 		image: '/static/cmd.png',
+          // 		text: '发送指令'
+          // 	}
+        ];
         const productId = currentCarInfo.value.productId;
         if (productId == "product-1141811865601576960" || productId == "product-1183161303028600832") {
           list.push(new UTSJSONObject({
@@ -14531,7 +12897,7 @@
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:694", "操作失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:695", "操作失败:", error);
             showAppToast({
               title: "操作失败，请重试",
               icon: "none"
@@ -14563,7 +12929,7 @@
             const addr = yield getAddress(center.latitude, center.longitude);
             address.value = addr.result.formatted_address;
           } catch (error) {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:730", "获取地址信息失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:731", "获取地址信息失败:", error);
           }
         });
       };
@@ -14651,7 +13017,7 @@
               showAppToast({ title: res.msg || "获取设备详情失败", icon: "none" });
             }
           } else {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:827", "设备id获取失败");
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:828", "设备id获取失败");
           }
         });
       };
@@ -14676,17 +13042,17 @@
         });
       });
       vue.onShow(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:861", "页面显示，检查自动刷新状态");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:862", "页面显示，检查自动刷新状态");
         if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
           setupAutoRefresh(currentTime.value);
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:870", "页面隐藏时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:871", "页面隐藏时停止自动刷新");
         stopAutoRefresh();
       });
       vue.onUnmounted(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:875", "页面卸载时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:876", "页面卸载时停止自动刷新");
         stopAutoRefresh();
       });
       const __returned__ = { deptId, imei, deviceId, center, mapScale, isMapReady, datainfo, address, currentTime, onCurrentTimeChange, times, refreshTimer, isRefreshing, popupRef, psw, currentOperation, modalTitle, userType, filterNonLatin, markers, showDevicePopup, currentDeviceInfo, currentCarInfo, signalRssi, signalSat, carVoltage, batteryPercent, getBatteryColor, getSignalDetail, getMobileSignalBarClass, createMarker, delay, loadData, manualRefresh, setupAutoRefresh, stopAutoRefresh, baseList, executeOperation, confirm, carDetail, refreshAdress, navTo, handleGridClick, loadDeviceDetail };
@@ -14697,12 +13063,12 @@
   const _imports_0$1 = "/static/sate.png";
   const _imports_1$1 = "/static/v.png";
   const _imports_2$1 = "/static/pow.png";
-  const _style_0$q = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "imei-text": { ".container .tools-panel .imei-box .imei-info .imeis ": { "fontSize": "28rpx" } }, "pos-time": { ".container .tools-panel .imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "time-item": { ".container .tools-panel .imei-box .pos-date ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-row": { ".container .tools-panel .imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 }, ".container .tools-panel .imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 } }, "address-label": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "color": "#999999" } }, "address-text": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .imei-box .pos-date .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0 } }, "signal-item": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginRight": "10rpx" } }, "mobile-signal": { ".container .tools-panel .imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "5rpx" } }, "signal-bar-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "marginRight": "3rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" } }, "signal-info-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "battery": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
-  function _sfc_render$q(_ctx, _cache, $props, $setup, $data, $options) {
+  const _style_0$q = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "imei-text": { ".container .tools-panel .imei-box .imei-info .imeis ": { "fontSize": "28rpx" } }, "pos-time": { ".container .tools-panel .imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "time-item": { ".container .tools-panel .imei-box .pos-date ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-row": { ".container .tools-panel .imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 }, ".container .tools-panel .imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 } }, "address-label": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "color": "#999999" } }, "address-text": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .imei-box .pos-date .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "height": "100rpx" } }, "signal-item": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginRight": "10rpx" } }, "mobile-signal": { ".container .tools-panel .imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "5rpx" } }, "signal-bar-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "marginRight": "3rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" } }, "signal-info-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "width": "45rpx", "height": "45rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" }, ".container .tools-panel .imei-box .signal-container .power ": { "fontSize": "24rpx", "color": "#3da634", "fontWeight": "bold" }, ".container .tools-panel .imei-box .signal-container .battery ": { "fontSize": "24rpx", "color": "#3da634", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "45rpx", "height": "45rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "45rpx", "height": "45rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginLeft": "10rpx" } }, "battery": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginLeft": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
+  function _sfc_render$p(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_map = vue.resolveComponent("map");
     const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$2);
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$1);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_2$4);
     const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
@@ -14817,10 +13183,7 @@
                 ])
               ]),
               vue.createElementVNode("view", { class: "signal-container" }, [
-                $setup.signalRssi != null ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 0,
-                  class: "signal-item"
-                }, [
+                vue.createElementVNode("view", { class: "signal-item" }, [
                   vue.createElementVNode("view", { class: "mobile-signal" }, [
                     vue.createElementVNode("view", { class: "signal-bars-horizontal" }, [
                       vue.createElementVNode(
@@ -14897,11 +13260,8 @@
                       )
                     ])
                   ])
-                ])) : vue.createCommentVNode("v-if", true),
-                $setup.signalSat != null ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 1,
-                  class: "satellite-item-h"
-                }, [
+                ]),
+                vue.createElementVNode("view", { class: "satellite-item-h" }, [
                   vue.createElementVNode("image", {
                     class: "satellite-icon",
                     src: _imports_0$1
@@ -14909,31 +13269,27 @@
                   vue.createElementVNode(
                     "text",
                     { class: "satellite-text" },
-                    vue.toDisplayString($setup.signalSat),
+                    vue.toDisplayString($setup.signalSat || 0),
                     1
                     /* TEXT */
                   )
-                ])) : vue.createCommentVNode("v-if", true),
-                $setup.carVoltage ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 2,
-                  class: "power"
-                }, [
+                ]),
+                vue.createElementVNode("view", { class: "power" }, [
                   vue.createElementVNode("image", {
                     class: "power-icon",
                     src: _imports_1$1
                   }),
                   vue.createElementVNode(
                     "text",
-                    null,
-                    vue.toDisplayString($setup.carVoltage) + "V",
+                    { class: "satellite-text" },
+                    vue.toDisplayString($setup.carVoltage || 0) + "∨",
                     1
                     /* TEXT */
                   )
-                ])) : vue.createCommentVNode("v-if", true),
-                $setup.batteryPercent ? (vue.openBlock(), vue.createElementBlock(
+                ]),
+                vue.createElementVNode(
                   "view",
                   {
-                    key: 3,
                     class: "battery",
                     style: vue.normalizeStyle({ color: $setup.getBatteryColor($setup.batteryPercent) })
                   },
@@ -14945,15 +13301,15 @@
                     }),
                     vue.createElementVNode(
                       "text",
-                      null,
-                      vue.toDisplayString($setup.batteryPercent) + "%",
+                      { class: "satellite-text" },
+                      vue.toDisplayString($setup.batteryPercent || 0) + "%",
                       1
                       /* TEXT */
                     )
                   ],
                   4
                   /* STYLE */
-                )) : vue.createCommentVNode("v-if", true)
+                )
               ])
             ]),
             vue.createVNode(_component_i_grid, {
@@ -14997,14 +13353,14 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesCarInfoDetailCarInfoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["render", _sfc_render$q], ["styles", [_style_0$q]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/carInfoDetail/carInfoDetail.uvue"]]);
+  const PagesCarInfoDetailCarInfoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["styles", [_style_0$q]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/carInfoDetail/carInfoDetail.uvue"]]);
   function ensureCameraPermission(callback) {
     callback("granted");
   }
   function openCameraPermissionSettings() {
-    uni.__log__("log", "at utils/cameraPermission.uts:129", "非 Android 平台无需打开相机权限设置");
+    uni.__log__("log", "at utils/cameraPermission.uts:156", "非 Android 平台无需打开相机权限设置");
   }
-  const _sfc_main$q = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-popup" }, { __name: "i-popup", props: {
+  const _sfc_main$p = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-popup" }, { __name: "i-popup", props: {
     show: { type: Boolean, default: false },
     overlay: { type: Boolean, default: true },
     mode: { type: String, default: "bottom" },
@@ -15082,27 +13438,36 @@
     const touching = vue.ref(false);
     let closeTimer = 0;
     let lazyTimer = 0;
+    const rootStyle = vue.computed(() => {
+      return "z-index:" + props.zIndex.toString() + ";";
+    });
     const drawerPosition = vue.computed(() => {
       if (props.position.length > 0)
         return props.position;
       return props.mode;
     });
     const normalizedMode = vue.computed(() => {
-      if (drawerPosition.value == "left" || drawerPosition.value == "right" || drawerPosition.value == "top" || drawerPosition.value == "center") {
+      if (drawerPosition.value == "left" || drawerPosition.value == "right" || drawerPosition.value == "top" || drawerPosition.value == "center")
         return drawerPosition.value;
-      }
       return "bottom";
     });
+    function isVerticalMode() {
+      return normalizedMode.value == "top" || normalizedMode.value == "bottom";
+    }
     function shouldCoverCenter() {
-      return props.widthCoverCenter && (normalizedMode.value == "top" || normalizedMode.value == "bottom") && props.width.toString().length > 0;
+      return props.widthCoverCenter && isVerticalMode() && props.width.toString().length > 0;
+    }
+    function formatSize(value = null) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
+        return text;
+      return text + "px";
     }
     function stringifyStyle(value = null) {
       if (value == null)
         return "";
       const text = value.toString();
-      if (text == "[object Object]")
-        return "";
-      if (text.length == 0)
+      if (text == "[object Object]" || text.length == 0)
         return "";
       return text.endsWith(";") ? text : text + ";";
     }
@@ -15112,102 +13477,19 @@
         return text;
       return text + "ms";
     }
-    function formatSize(value = null) {
-      const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-        return text;
-      }
-      return text + "px";
+    function animationDuration() {
+      const text = props.duration.toString();
+      if (text.indexOf("ms") >= 0)
+        return parseFloat(text.replace("ms", ""));
+      if (text.indexOf("s") >= 0)
+        return parseFloat(text.replace("s", "")) * 1e3;
+      const duration = parseFloat(text);
+      return isNaN(duration) ? 300 : duration;
     }
-    const rootStyle = vue.computed(() => {
-      return "z-index:" + props.zIndex.toString() + ";";
-    });
-    const panelClass = vue.computed(() => {
-      const classes = ["i-popup__panel"];
-      classes.push("i-popup__panel--" + normalizedMode.value);
-      if (shouldCoverCenter())
-        classes.push("i-popup__panel--cover-center");
-      return classes.join(" ");
-    });
-    const overlayComputedStyle = vue.computed(() => {
-      let bgColor2 = "rgba(0,0,0," + props.overlayOpacity.toString() + ")";
-      if (props.overflayBgColor.length > 0)
-        bgColor2 = props.overflayBgColor;
-      let style = "background-color:" + bgColor2 + ";";
-      style = style + "opacity:" + (active.value ? "1" : "0") + ";";
-      style = style + "transition-duration:" + formatMs(props.duration) + ";";
-      style = style + stringifyStyle(props.overlayStyle);
-      return style;
-    });
-    const titleStyleText = vue.computed(() => {
-      return stringifyStyle(props.titleStyle);
-    });
-    function marginStyle() {
-      const margin = formatSize(props.margin);
-      if (margin == "0px")
-        return "";
-      return "margin:" + margin + ";";
-    }
-    function sizeStyle() {
-      let style = "";
-      const size = props.size.toString();
-      if (normalizedMode.value == "left" || normalizedMode.value == "right") {
-        if (props.width.toString().length > 0) {
-          style = style + "width:" + formatSize(props.width) + ";";
-        } else if (size.length > 0) {
-          style = style + "width:" + formatSize(size) + ";";
-        }
-      } else if (normalizedMode.value == "top" || normalizedMode.value == "bottom") {
-        if (props.width.toString().length == 0 && !shouldCoverCenter()) {
-          style = style + "width:100%;";
-        }
-        if (props.height.toString().length > 0) {
-          style = style + "height:" + formatSize(props.height) + ";";
-        } else if (size.length > 0) {
-          style = style + "height:" + formatSize(size) + ";";
-        }
-        if (props.width.toString().length > 0)
-          style = style + "width:" + formatSize(props.width) + ";";
-      } else {
-        if (props.width.toString().length > 0)
-          style = style + "width:" + formatSize(props.width) + ";";
-        if (props.height.toString().length > 0)
-          style = style + "height:" + formatSize(props.height) + ";";
-      }
-      if (normalizedMode.value == "top") {
-        if (props.navbarHeight > 0)
-          style = style + "top:" + props.navbarHeight.toString() + "px;";
-        if (props.offsetTop.toString().length > 0)
-          style = style + "top:" + formatSize(props.offsetTop) + ";";
-      }
-      if (normalizedMode.value == "bottom" && props.offsetBottom.toString().length > 0) {
-        style = style + "bottom:" + formatSize(props.offsetBottom) + ";";
-      }
-      return style;
-    }
-    function roundStyle() {
-      const round = formatSize(props.round);
-      if (normalizedMode.value == "top")
-        return "border-radius:0 0 " + round + " " + round + ";";
-      if (normalizedMode.value == "bottom")
-        return "border-radius:" + round + " " + round + " 0 0;";
-      if (normalizedMode.value == "left")
-        return "border-radius:0 " + round + " " + round + " 0;";
-      if (normalizedMode.value == "right")
-        return "border-radius:" + round + " 0 0 " + round + ";";
-      if (normalizedMode.value == "center")
-        return "border-radius:" + round + ";";
-      return "";
-    }
-    function safeAreaStyle() {
-      let style = "";
-      if (props.safeTop && normalizedMode.value == "top") {
-        style = style + "padding-top:env(safe-area-inset-top);";
-      }
-      if (props.safeBottom && normalizedMode.value == "bottom") {
-        style = style + "padding-bottom:env(safe-area-inset-bottom);";
-      }
-      return style;
+    function normalizeClosePos() {
+      if (props.closeIconPos == "top-left" || props.closeIconPos == "bottom-left" || props.closeIconPos == "bottom-right")
+        return props.closeIconPos;
+      return "top-right";
     }
     function transformStyle() {
       const x2 = offsetX.value.toString();
@@ -15230,6 +13512,85 @@
         return "transform:translateX(" + (active.value ? x2 + "px" : "100%") + ");";
       return "";
     }
+    function marginStyle() {
+      const margin = formatSize(props.margin);
+      return margin == "0px" ? "" : "margin:" + margin + ";";
+    }
+    function sizeStyle() {
+      let style = "";
+      const size = props.size.toString();
+      if (normalizedMode.value == "left" || normalizedMode.value == "right") {
+        if (props.width.toString().length > 0)
+          style += "width:" + formatSize(props.width) + ";";
+        else if (size.length > 0)
+          style += "width:" + formatSize(size) + ";";
+      } else if (normalizedMode.value == "top" || normalizedMode.value == "bottom") {
+        if (props.width.toString().length == 0 && !shouldCoverCenter())
+          style += "width:100%;";
+        if (props.height.toString().length > 0)
+          style += "height:" + formatSize(props.height) + ";";
+        else if (size.length > 0)
+          style += "height:" + formatSize(size) + ";";
+        if (props.width.toString().length > 0)
+          style += "width:" + formatSize(props.width) + ";";
+      } else {
+        if (props.width.toString().length > 0)
+          style += "width:" + formatSize(props.width) + ";";
+        if (props.height.toString().length > 0)
+          style += "height:" + formatSize(props.height) + ";";
+      }
+      if (normalizedMode.value == "top") {
+        if (props.navbarHeight > 0)
+          style += "top:" + props.navbarHeight.toString() + "px;";
+        if (props.offsetTop.toString().length > 0)
+          style += "top:" + formatSize(props.offsetTop) + ";";
+      }
+      if (normalizedMode.value == "bottom" && props.offsetBottom.toString().length > 0)
+        style += "bottom:" + formatSize(props.offsetBottom) + ";";
+      return style;
+    }
+    function roundStyle() {
+      const round = formatSize(props.round);
+      if (normalizedMode.value == "top")
+        return "border-radius:0 0 " + round + " " + round + ";";
+      if (normalizedMode.value == "bottom")
+        return "border-radius:" + round + " " + round + " 0 0;";
+      if (normalizedMode.value == "left")
+        return "border-radius:0 " + round + " " + round + " 0;";
+      if (normalizedMode.value == "right")
+        return "border-radius:" + round + " 0 0 " + round + ";";
+      if (normalizedMode.value == "center")
+        return "border-radius:" + round + ";";
+      return "";
+    }
+    function safeAreaStyle() {
+      let style = "";
+      if (props.safeTop && normalizedMode.value == "top")
+        style += "padding-top:env(safe-area-inset-top);";
+      if (props.safeBottom && normalizedMode.value == "bottom")
+        style += "padding-bottom:env(safe-area-inset-bottom);";
+      return style;
+    }
+    const panelClass = vue.computed(() => {
+      const classes = ["i-popup__panel"];
+      classes.push("i-popup__panel--" + normalizedMode.value);
+      if (shouldCoverCenter())
+        classes.push("i-popup__panel--cover-center");
+      return classes.join(" ");
+    });
+    const overlayComputedStyle = vue.computed(() => {
+      let bgColor2 = "rgba(0,0,0," + props.overlayOpacity.toString() + ")";
+      if (props.overflayBgColor.length > 0)
+        bgColor2 = props.overflayBgColor;
+      let style = "background-color:" + bgColor2 + ";";
+      style = style + "opacity:" + (active.value ? "1" : "0") + ";";
+      style = style + "transition-duration:" + formatMs(props.duration) + ";";
+      style = style + stringifyStyle(props.overlayStyle);
+      return style;
+    });
+    const titleStyleText = vue.computed(() => {
+      return stringifyStyle(props.titleStyle);
+    });
     const panelStyle = vue.computed(() => {
       let style = "background-color:" + bgColor.value + ";";
       style = style + "transition-duration:" + formatMs(props.duration) + ";";
@@ -15266,11 +13627,7 @@
     });
     const closeClass = vue.computed(() => {
       const classes = ["i-popup__close"];
-      let position = "top-right";
-      if (props.closeIconPos == "top-left" || props.closeIconPos == "bottom-left" || props.closeIconPos == "bottom-right") {
-        position = props.closeIconPos;
-      }
-      classes.push("i-popup__close--" + position);
+      classes.push("i-popup__close--" + normalizeClosePos());
       return classes.join(" ");
     });
     const closeStyle = vue.computed(() => {
@@ -15281,7 +13638,7 @@
         return "×";
       return props.closeIcon;
     });
-    const clearTimers = () => {
+    function clearTimers() {
       if (closeTimer > 0) {
         clearTimeout(closeTimer);
         closeTimer = 0;
@@ -15290,24 +13647,13 @@
         clearTimeout(lazyTimer);
         lazyTimer = 0;
       }
-    };
-    const resetOffset = () => {
+    }
+    function resetOffset() {
       offsetX.value = 0;
       offsetY.value = 0;
       touching.value = false;
-    };
-    const animationDuration = () => {
-      const text = props.duration.toString();
-      if (text.indexOf("ms") >= 0)
-        return parseFloat(text.replace("ms", ""));
-      if (text.indexOf("s") >= 0)
-        return parseFloat(text.replace("s", "")) * 1e3;
-      const duration = parseFloat(text);
-      if (isNaN(duration))
-        return 300;
-      return duration;
-    };
-    const openPanel = (shouldEmitUpdate) => {
+    }
+    function openPanel(shouldEmitUpdate) {
       if (props.disabled)
         return null;
       if (opened.value && active.value)
@@ -15330,8 +13676,8 @@
         if (shouldEmitUpdate)
           emit("update:show", true);
       }, 20);
-    };
-    const closePanel = (shouldEmitUpdate) => {
+    }
+    function closePanel(shouldEmitUpdate) {
       if (!opened.value && !active.value)
         return null;
       clearTimers();
@@ -15347,16 +13693,7 @@
         if (shouldEmitUpdate)
           emit("update:show", false);
       }, animationDuration());
-    };
-    vue.watch(() => {
-      return props.show;
-    }, (nextValue) => {
-      if (nextValue) {
-        openPanel(false);
-      } else {
-        closePanel(false);
-      }
-    });
+    }
     function open() {
       openPanel(true);
     }
@@ -15379,39 +13716,30 @@
       emit("confirm");
       close();
     }
-    const readTouchX = (event) => {
-      let point = null;
-      if (event.touches.length > 0) {
-        point = event.touches[0];
-      } else if (event.changedTouches.length > 0) {
-        point = event.changedTouches[0];
-      }
-      if (point == null)
-        return 0;
-      return point.clientX;
-    };
-    const readTouchY = (event) => {
-      let point = null;
-      if (event.touches.length > 0) {
-        point = event.touches[0];
-      } else if (event.changedTouches.length > 0) {
-        point = event.changedTouches[0];
-      }
-      if (point == null)
-        return 0;
-      return point.clientY;
-    };
-    const handleTouchStart = (event) => {
+    function readTouchX(event) {
+      if (event.touches.length > 0)
+        return event.touches[0].clientX;
+      if (event.changedTouches.length > 0)
+        return event.changedTouches[0].clientX;
+      return 0;
+    }
+    function readTouchY(event) {
+      if (event.touches.length > 0)
+        return event.touches[0].clientY;
+      if (event.changedTouches.length > 0)
+        return event.changedTouches[0].clientY;
+      return 0;
+    }
+    function handleTouchStart(event) {
       if (!props.swipeClose)
         return null;
       touching.value = true;
       startX.value = readTouchX(event);
       startY.value = readTouchY(event);
-    };
+    }
     function handleContentTouchStart(event) {
-      if (!props.contentDraggable)
-        return null;
-      handleTouchStart(event);
+      if (props.swipeClose && props.contentDraggable)
+        handleTouchStart(event);
     }
     function handleHandleTouchStart(event) {
       handleTouchStart(event);
@@ -15419,10 +13747,8 @@
     function handleTouchMove(event) {
       if (!props.swipeClose || !touching.value)
         return null;
-      const currentX = readTouchX(event);
-      const currentY = readTouchY(event);
-      const deltaX = currentX - startX.value;
-      const deltaY = currentY - startY.value;
+      const deltaX = readTouchX(event) - startX.value;
+      const deltaY = readTouchY(event) - startY.value;
       if (normalizedMode.value == "bottom" && deltaY > 0)
         offsetY.value = deltaY;
       if (normalizedMode.value == "top" && deltaY < 0)
@@ -15445,6 +13771,24 @@
       }
       resetOffset();
     }
+    function handleContentTouchMove(event) {
+      if (!props.contentDraggable)
+        return null;
+      handleTouchMove(event);
+    }
+    function handleContentTouchEnd() {
+      if (!props.contentDraggable)
+        return null;
+      handleTouchEnd();
+    }
+    vue.watch(() => {
+      return props.show;
+    }, (nextValue) => {
+      if (nextValue)
+        openPanel(false);
+      else
+        closePanel(false);
+    });
     __expose({
       open,
       close
@@ -15457,12 +13801,12 @@
       return lazyTimer;
     }, set lazyTimer(v2) {
       lazyTimer = v2;
-    }, drawerPosition, normalizedMode, shouldCoverCenter, stringifyStyle, formatMs, formatSize, rootStyle, panelClass, overlayComputedStyle, titleStyleText, marginStyle, sizeStyle, roundStyle, safeAreaStyle, transformStyle, panelStyle, bodyStyle, footerStyle, confirmTextStyle, confirmTextValue, cancelTextValue, contentVisible, closeClass, closeStyle, closeIconText, clearTimers, resetOffset, animationDuration, openPanel, closePanel, open, close, handleOverlayClick, cancel, confirm, readTouchX, readTouchY, handleTouchStart, handleContentTouchStart, handleHandleTouchStart, handleTouchMove, handleTouchEnd };
+    }, rootStyle, drawerPosition, normalizedMode, isVerticalMode, shouldCoverCenter, formatSize, stringifyStyle, formatMs, animationDuration, normalizeClosePos, transformStyle, marginStyle, sizeStyle, roundStyle, safeAreaStyle, panelClass, overlayComputedStyle, titleStyleText, panelStyle, bodyStyle, footerStyle, confirmTextStyle, confirmTextValue, cancelTextValue, contentVisible, closeClass, closeStyle, closeIconText, clearTimers, resetOffset, openPanel, closePanel, open, close, handleOverlayClick, cancel, confirm, readTouchX, readTouchY, handleTouchStart, handleContentTouchStart, handleHandleTouchStart, handleTouchMove, handleTouchEnd, handleContentTouchMove, handleContentTouchEnd };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
   const _style_0$p = { "i-popup__trigger": { "": { "flexDirection": "column" } }, "i-popup": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0 } }, "i-popup__overlay": { "": { "position": "absolute", "left": 0, "right": 0, "top": 0, "bottom": 0, "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-popup__panel": { "": { "position": "absolute", "overflow": "hidden", "flexDirection": "column", "boxShadow": "0 12px 34px rgba(15, 23, 42, 0.18)", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-popup__panel--bottom": { "": { "left": 0, "right": 0, "bottom": 0, "minHeight": 160 } }, "i-popup__panel--top": { "": { "left": 0, "right": 0, "top": 0, "minHeight": 160 } }, "i-popup__panel--left": { "": { "left": 0, "top": 0, "bottom": 0, "width": 280 } }, "i-popup__panel--right": { "": { "right": 0, "top": 0, "bottom": 0, "width": 280 } }, "i-popup__panel--center": { "": { "left": "50%", "top": "50%", "width": 300 } }, "i-popup__panel--cover-center": { "": { "left": "50%", "right": "auto", "width": "100%", "transformOrigin": "center center" } }, "i-popup__swipe-handle": { "": { "height": 24, "alignItems": "center", "justifyContent": "center" } }, "i-popup__swipe-bar": { "": { "width": 38, "height": 4, "borderTopLeftRadius": 99, "borderTopRightRadius": 99, "borderBottomRightRadius": 99, "borderBottomLeftRadius": 99, "backgroundColor": "#d9dee8" } }, "i-popup__header": { "": { "minHeight": 54, "paddingTop": 0, "paddingRight": 52, "paddingBottom": 0, "paddingLeft": 18, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#f2f3f5", "alignItems": "center", "justifyContent": "center" } }, "i-popup__title": { "": { "color": "#303133", "fontSize": 16, "fontWeight": 600, "lineHeight": "24px" } }, "i-popup__close": { "": { "position": "absolute", "zIndex": 2, "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34, "backgroundColor": "rgba(245,247,250,0.92)", "alignItems": "center", "justifyContent": "center" } }, "i-popup__close--top-right": { "": { "right": 12, "top": 10 } }, "i-popup__close--top-left": { "": { "left": 12, "top": 10 } }, "i-popup__close--bottom-left": { "": { "left": 12, "bottom": 10 } }, "i-popup__close--bottom-right": { "": { "right": 12, "bottom": 10 } }, "i-popup__close-text": { "": { "color": "#606266", "fontSize": 22, "lineHeight": "34px", "textAlign": "center" } }, "i-popup__body": { "": { "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-popup__body--scroll": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-popup__footer": { "": { "minHeight": 58, "paddingTop": 10, "paddingRight": 14, "paddingBottom": 10, "paddingLeft": 14, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f2f3f5", "backgroundColor": "#ffffff", "flexDirection": "row" } }, "i-popup__footer-button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 40, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "alignItems": "center", "justifyContent": "center" } }, "i-popup__footer-button--cancel": { "": { "marginRight": 8, "backgroundColor": "#f5f7fb" } }, "i-popup__footer-button--confirm": { "": { "backgroundColor": "#eef6ff" } }, "i-popup__footer-button--disabled": { "": { "opacity": 0.45 } }, "i-popup__footer-cancel": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px", "color": "#606266" } }, "i-popup__footer-confirm": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-popup__overlay": { "property": "opacity", "timingFunction": "ease" }, "i-popup__panel": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
-  function _sfc_render$p(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$o(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.createElementVNode("view", {
         class: "i-popup__trigger",
@@ -15496,7 +13840,11 @@
               class: vue.normalizeClass($setup.panelClass),
               style: vue.normalizeStyle($setup.panelStyle),
               onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
-              }, ["stop"]))
+              }, ["stop"])),
+              onTouchstart: $setup.handleContentTouchStart,
+              onTouchmove: $setup.handleContentTouchMove,
+              onTouchend: $setup.handleContentTouchEnd,
+              onTouchcancel: $setup.handleContentTouchEnd
             },
             [
               vue.renderSlot(_ctx.$slots, "bg"),
@@ -15541,22 +13889,20 @@
                 {
                   key: 2,
                   class: vue.normalizeClass($setup.closeClass),
+                  style: vue.normalizeStyle($setup.closeStyle),
                   onClick: $setup.close
                 },
                 [
                   vue.createElementVNode(
                     "text",
-                    {
-                      class: "i-popup__close-text",
-                      style: vue.normalizeStyle($setup.closeStyle)
-                    },
+                    { class: "i-popup__close-text" },
                     vue.toDisplayString($setup.closeIconText),
-                    5
-                    /* TEXT, STYLE */
+                    1
+                    /* TEXT */
                   )
                 ],
-                2
-                /* CLASS */
+                6
+                /* CLASS, STYLE */
               )) : vue.createCommentVNode("v-if", true),
               $props.disabledScroll ? (vue.openBlock(), vue.createElementBlock(
                 "view",
@@ -15639,26 +13985,24 @@
                 {
                   key: 5,
                   class: vue.normalizeClass($setup.closeClass),
+                  style: vue.normalizeStyle($setup.closeStyle),
                   onClick: $setup.close
                 },
                 [
                   vue.createElementVNode(
                     "text",
-                    {
-                      class: "i-popup__close-text",
-                      style: vue.normalizeStyle($setup.closeStyle)
-                    },
+                    { class: "i-popup__close-text" },
                     vue.toDisplayString($setup.closeIconText),
-                    5
-                    /* TEXT, STYLE */
+                    1
+                    /* TEXT */
                   )
                 ],
-                2
-                /* CLASS */
+                6
+                /* CLASS, STYLE */
               )) : vue.createCommentVNode("v-if", true)
             ],
-            6
-            /* CLASS, STYLE */
+            38
+            /* CLASS, STYLE, NEED_HYDRATION */
           )
         ],
         4
@@ -15666,8 +14010,8 @@
       )) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const __easycom_4$1 = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["styles", [_style_0$p]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-popup/i-popup.uvue"]]);
-  const _sfc_main$p = /* @__PURE__ */ vue.defineComponent({
+  const __easycom_4$1 = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["render", _sfc_render$o], ["styles", [_style_0$p]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-popup/i-popup.uvue"]]);
+  const _sfc_main$o = /* @__PURE__ */ vue.defineComponent({
     __name: "car-icons",
     props: {
       show: { type: Boolean, required: true, default: false },
@@ -15734,7 +14078,7 @@
     }
   });
   const _style_0$o = { "icon-selector": { "": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "backgroundColor": "#ffffff", "width::-webkit-scrollbar": 4, "backgroundColor::-webkit-scrollbar-thumb": "#dddddd", "borderTopLeftRadius::-webkit-scrollbar-thumb": 4, "borderTopRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomLeftRadius::-webkit-scrollbar-thumb": 4, "backgroundColor::-webkit-scrollbar-track": "#f5f5f5" } }, "icon-grid": { ".icon-selector ": { "width": "100%", "display": "flex", "flexDirection": "row", "flexWrap": "wrap" } }, "grid-item": { ".icon-selector .icon-grid ": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "paddingTop": "20rpx", "paddingRight": "10rpx", "paddingBottom": "20rpx", "paddingLeft": "10rpx", "width": "25%", "height": "100%", "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" } }, "@TRANSITION": { "grid-item": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
-  function _sfc_render$o(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$1);
     const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4$1);
     return vue.openBlock(), vue.createBlock(_component_i_popup, {
@@ -15768,7 +14112,7 @@
       /* STABLE */
     }, 8, ["show", "title", "safeBottom"]);
   }
-  const carIcons = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["render", _sfc_render$o], ["styles", [_style_0$o]], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/car-icons/car-icons.uvue"]]);
+  const carIcons = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["styles", [_style_0$o]], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/car-icons/car-icons.uvue"]]);
   class CarFormData extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -15840,7 +14184,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$o = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$n = /* @__PURE__ */ vue.defineComponent({
     __name: "addCar",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -15910,7 +14254,7 @@
         ensureCameraPermission(handleCameraPermission);
       };
       const handleScanResult = (data) => {
-        uni.__log__("log", "at pages/addCar/addCar.uvue:159", "接收到扫码结果:", data.result);
+        uni.__log__("log", "at pages/addCar/addCar.uvue:168", "接收到扫码结果:", data.result);
         if (data.result.length == 15) {
           carInfo.value.imei = "0" + data.result.slice(4, 15);
           return null;
@@ -15930,7 +14274,7 @@
       const selectIcon = (item) => {
         const name2 = item.getString("name", "");
         const text = item.getString("text", "");
-        uni.__log__("log", "at pages/addCar/addCar.uvue:182", name2);
+        uni.__log__("log", "at pages/addCar/addCar.uvue:191", name2);
         carInfo.value.deviceType = name2;
         carInfo.value.deviceTypeValue = text;
         carIconSelectorVisible.value = false;
@@ -15960,11 +14304,11 @@
       };
       const submit = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/addCar/addCar.uvue:219", "=== 开始提交设备 ===");
+          uni.__log__("log", "at pages/addCar/addCar.uvue:228", "=== 开始提交设备 ===");
           try {
             if (!validateForm())
               return Promise.resolve(null);
-            uni.__log__("log", "at pages/addCar/addCar.uvue:224", "✅ 表单验证通过");
+            uni.__log__("log", "at pages/addCar/addCar.uvue:233", "✅ 表单验证通过");
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "添加中...",
@@ -15976,9 +14320,9 @@
               carType: carInfo.value.deviceType,
               plateNo: carInfo.value.plateNo
             });
-            uni.__log__("log", "at pages/addCar/addCar.uvue:239", "📤 提交数据:", submitData);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:248", "📤 提交数据:", submitData);
             const res = yield addDevice(submitData);
-            uni.__log__("log", "at pages/addCar/addCar.uvue:242", "✅ 添加设备返回:", res);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:251", "✅ 添加设备返回:", res);
             uni.hideLoading();
             loading.value = false;
             if (res.code == 200) {
@@ -15999,7 +14343,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/addCar/addCar.uvue:269", "❌ 添加设备失败:", error);
+            uni.__log__("error", "at pages/addCar/addCar.uvue:278", "❌ 添加设备失败:", error);
             uni.hideLoading();
             loading.value = false;
             showAppToast({
@@ -16030,11 +14374,11 @@
     }
   });
   const _style_0$n = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#f5f5f5" } }, "content": { ".container ": { "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "paddingTop": "20rpx", "paddingRight": "40rpx", "paddingBottom": "20rpx", "paddingLeft": "40rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "clickable": { ".container ": { "marginTop": 10, "color": "#999999", "fontSize": "28rpx" } }, "btn": { ".container ": { "marginTop": "50rpx", "marginRight": "20rpx", "marginBottom": 0, "marginLeft": "20rpx" } }, "plate-input": { ".container ": { "width": "100%" } }, "input-wrapper": { ".container .plate-input ": { "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000" } }, "car-input-container": { ".container ": { "display": "flex", "flexDirection": "row" } }, "car-number-input": { ".container ": { "width": "60%", "textAlign": "right" } }, "plate-close": { ".container .car-number-container ": { "height": 40, "display": "flex", "textAlign": "right", "backgroundColor": "#FFFFFF", "flexDirection": "row", "justifyContent": "flex-end", "alignItems": "center" } }, "car-input-item": { ".container .car-input-container .car-input-box ": { "position": "relative", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#E2E2E2", "borderRightColor": "#E2E2E2", "borderBottomColor": "#E2E2E2", "borderLeftColor": "#E2E2E2", "height": 40, "lineHeight": "40px", "textAlign": "center", "fontSize": 17 } }, "new-item-img": { ".container .car-input-container .car-input-box .car-input-item ": { "position": "absolute", "top": -2, "left": "50%", "marginLeft": -15, "height": 13, "width": 30, "zIndex": 9 } }, "i-form-item": { ".container ": { "paddingTop": "5rpx", "paddingRight": "10rpx", "paddingBottom": "5rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": 0, "borderTopRightRadius": 0, "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#99999924" } } };
-  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_2$4);
     const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_4$2);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_3);
     const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$1);
@@ -16174,1508 +14518,1090 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesAddCarAddCar = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["styles", [_style_0$n]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/addCar/addCar.uvue"]]);
-  const MODE_YEAR = 1;
-  const MODE_MONTH = 2;
-  const MODE_DATE = 4;
-  const MODE_HOUR = 8;
-  const MODE_MINUTE = 16;
-  const MODE_SECOND = 32;
-  const MODE_MAP = /* @__PURE__ */ new Map([
-    ["年", MODE_YEAR],
-    ["月", MODE_MONTH],
-    ["日", MODE_DATE],
-    ["时", MODE_HOUR],
-    ["分", MODE_MINUTE],
-    ["秒", MODE_SECOND],
-    ["year", MODE_YEAR],
-    ["month", MODE_MONTH],
-    ["date", MODE_DATE],
-    ["hour", MODE_HOUR],
-    ["minute", MODE_MINUTE],
-    ["second", MODE_SECOND]
-  ]);
-  const FORMAT_MAP = /* @__PURE__ */ new Map([
-    ["year", "YYYY"],
-    ["month", "MM"],
-    ["date", "DD"],
-    ["hour", "HH"],
-    ["minute", "mm"],
-    ["second", "ss"]
-  ]);
-  const UNIT_MAP = /* @__PURE__ */ new Map([
-    ["year", "年"],
-    ["month", "月"],
-    ["date", "日"],
-    ["hour", "时"],
-    ["minute", "分"],
-    ["second", "秒"]
-  ]);
-  const MODE_NAMES = ["year", "month", "date", "hour", "minute", "second"];
-  const DEFAULT_FORMAT = "YYYY-MM-DD HH:mm:ss";
-  function coalesce(...values) {
-    var e_1, _a;
-    try {
-      for (var values_1 = __values(values), values_1_1 = values_1.next(); !values_1_1.done; values_1_1 = values_1.next()) {
-        var value = values_1_1.value;
-        if (value == null)
-          continue;
-        if (typeof value == "string" && value == "")
-          continue;
-        return value;
-      }
-    } catch (e_1_1) {
-      e_1 = { error: e_1_1 };
-    } finally {
-      try {
-        if (values_1_1 && !values_1_1.done && (_a = values_1.return))
-          _a.call(values_1);
-      } finally {
-        if (e_1)
-          throw e_1.error;
-      }
+  const PagesAddCarAddCar = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["styles", [_style_0$n]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/addCar/addCar.uvue"]]);
+  class IWheelOption extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            value: { type: Number, optional: false },
+            text: { type: String, optional: false }
+          };
+        },
+        name: "IWheelOption"
+      };
     }
-    return null;
+    constructor(options, metadata = IWheelOption.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.value = this.__props__.value;
+      this.text = this.__props__.text;
+      delete this.__props__;
+    }
   }
-  function getMeaningColumn(mode) {
-    const res = [];
-    let _mode = 0;
-    if (typeof mode == "string") {
-      if (mode.includes("|") && /\d/.test(mode)) {
-        const bits = mode.split("|").map((bit) => {
-          return parseInt(bit.trim());
-        });
-        _mode = bits.reduce((result, bit) => {
-          return result | bit;
-        }, 0);
-      } else {
-        MODE_MAP.forEach((value, key) => {
-          if (mode.includes(key)) {
-            _mode = _mode | value;
-          }
-        });
+  const _sfc_main$m = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-datetime-picker" }, { __name: "i-datetime-picker", props: {
+    modelValue: {
+      type: [String, Number],
+      default: ""
+    },
+    show: {
+      type: Boolean,
+      default: false
+    },
+    showToolbar: {
+      type: Boolean,
+      default: true
+    },
+    title: {
+      type: String,
+      default: "请选择"
+    },
+    mode: {
+      type: String,
+      default: "datetime"
+    },
+    minDate: {
+      type: Number,
+      default: 0
+    },
+    maxDate: {
+      type: Number,
+      default: 0
+    },
+    minHour: {
+      type: Number,
+      default: 0
+    },
+    maxHour: {
+      type: Number,
+      default: 23
+    },
+    minMinute: {
+      type: Number,
+      default: 0
+    },
+    maxMinute: {
+      type: Number,
+      default: 59
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    cancelText: {
+      type: String,
+      default: "取消"
+    },
+    confirmText: {
+      type: String,
+      default: "确认"
+    },
+    cancelColor: {
+      type: String,
+      default: "#909193"
+    },
+    confirmColor: {
+      type: String,
+      default: "#3c9cff"
+    },
+    closeOnMask: { type: Boolean, default: true },
+    round: {
+      type: [String, Number],
+      default: 16
+    },
+    date: {
+      type: String,
+      default: "2026-05-22"
+    },
+    time: {
+      type: String,
+      default: "16:30"
+    },
+    dateLabel: {
+      type: String,
+      default: "日期"
+    },
+    timeLabel: {
+      type: String,
+      default: "时间"
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  }, emits: [
+    "open",
+    "close",
+    "cancel",
+    "change",
+    "confirm",
+    "update:modelValue",
+    "update:show",
+    "update:date",
+    "update:time"
+  ], setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    function padNumber(value = null) {
+      const numberValue = parseFloat(value.toString());
+      return numberValue < 10 ? "0" + numberValue.toString() : numberValue.toString();
+    }
+    function formatDate(timestamp) {
+      const date = new Date(timestamp);
+      return date.getFullYear().toString() + "-" + padNumber(date.getMonth() + 1) + "-" + padNumber(date.getDate());
+    }
+    function formatTime(timestamp) {
+      const date = new Date(timestamp);
+      return padNumber(date.getHours()) + ":" + padNumber(date.getMinutes());
+    }
+    function validHour(value = null) {
+      const numberValue = parseFloat(value.toString());
+      if (numberValue < 0)
+        return 0;
+      if (numberValue > 23)
+        return 23;
+      return numberValue;
+    }
+    function validMinute(value = null) {
+      const numberValue = parseFloat(value.toString());
+      if (numberValue < 0)
+        return 0;
+      if (numberValue > 59)
+        return 59;
+      return numberValue;
+    }
+    function timeToMinutes(value) {
+      return parseFloat(value.substring(0, 2).toString()) * 60 + parseFloat(value.substring(3, 5).toString());
+    }
+    function normalizeTime(value) {
+      if (value.length >= 5)
+        return value.substring(0, 5);
+      return "00:00";
+    }
+    function dateTimeToTimestamp(dateText, timeText) {
+      const year = parseFloat(dateText.substring(0, 4).toString());
+      const month = parseFloat(dateText.substring(5, 7).toString()) - 1;
+      const day = parseFloat(dateText.substring(8, 10).toString());
+      const hour = parseFloat(timeText.substring(0, 2).toString());
+      const minute = parseFloat(timeText.substring(3, 5).toString());
+      return new Date(year, month, day, hour, minute, 0).getTime();
+    }
+    function minDateValue() {
+      if (props.minDate > 0)
+        return props.minDate;
+      const now = /* @__PURE__ */ new Date();
+      return new Date(now.getFullYear() - 10, now.getMonth(), now.getDate(), 0, 0, 0).getTime();
+    }
+    function maxDateValue() {
+      if (props.maxDate > 0)
+        return props.maxDate;
+      const now = /* @__PURE__ */ new Date();
+      return new Date(now.getFullYear() + 10, now.getMonth(), now.getDate(), 23, 59, 59).getTime();
+    }
+    function formatSize(value = null) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+        return text;
       }
-    } else if (typeof mode == "number") {
-      _mode = mode;
+      return text + "px";
     }
-    if (_mode <= 0) {
-      return res;
+    function clampTime(value) {
+      const text = normalizeTime(value);
+      const current = timeToMinutes(text);
+      const minValue = validHour(props.minHour) * 60 + validMinute(props.minMinute);
+      const maxValue = validHour(props.maxHour) * 60 + validMinute(props.maxMinute);
+      let nextValue = current;
+      if (nextValue < minValue)
+        nextValue = minValue;
+      if (nextValue > maxValue)
+        nextValue = maxValue;
+      return padNumber(Math.floor(nextValue / 60)) + ":" + padNumber(nextValue % 60);
     }
-    const modeBitmasks = [MODE_YEAR, MODE_MONTH, MODE_DATE, MODE_HOUR, MODE_MINUTE, MODE_SECOND];
-    const activeBitmasks = modeBitmasks.filter((bitmask) => {
-      return (_mode & bitmask) != 0;
+    const opened = vue.ref(props.show);
+    const currentDate = vue.ref(props.date);
+    const currentTime = vue.ref(props.time);
+    function boundaryStartTime() {
+      if (currentDate.value == formatDate(minDateValue()))
+        return formatTime(minDateValue());
+      return "00:00";
+    }
+    function boundaryEndTime() {
+      if (currentDate.value == formatDate(maxDateValue()))
+        return formatTime(maxDateValue());
+      return "23:59";
+    }
+    const normalizedMode = vue.computed(() => {
+      if (props.mode == "date")
+        return "date";
+      if (props.mode == "time")
+        return "time";
+      if (props.mode == "year-month")
+        return "year-month";
+      return "datetime";
     });
-    if (activeBitmasks.length == 0) {
-      return [];
+    function datePart(value, index, fallback) {
+      const parts = value.split(/[- :]/);
+      if (parts.length <= index)
+        return fallback;
+      const parsed = parseFloat(parts[index]);
+      return isNaN(parsed) ? fallback : parsed;
     }
-    let longestSequence = [];
-    let currentSequence = [];
-    activeBitmasks.forEach((bitmask) => {
-      if (currentSequence.length == 0 || bitmask == currentSequence[currentSequence.length - 1] * 2) {
-        currentSequence.push(bitmask);
-      } else {
-        if (currentSequence.length > longestSequence.length) {
-          longestSequence = currentSequence;
-        }
-        currentSequence = [bitmask];
+    function optionRange(start, end, suffix, pad2 = false) {
+      const result = [];
+      for (let value = start; value <= end; value++) {
+        const text = pad2 ? padNumber(value) : value.toString();
+        result.push(new IWheelOption({ value, text: text + suffix }));
       }
+      return result;
+    }
+    function dateFromParts(year, month, day, hour, minute) {
+      return year.toString() + "-" + padNumber(month) + "-" + padNumber(day) + " " + padNumber(hour) + ":" + padNumber(minute);
+    }
+    function daysInMonth(year, month) {
+      return new Date(year, month, 0).getDate();
+    }
+    function selectedYear() {
+      return datePart(currentDate.value, 0, (/* @__PURE__ */ new Date()).getFullYear());
+    }
+    function selectedMonth() {
+      return datePart(currentDate.value, 1, (/* @__PURE__ */ new Date()).getMonth() + 1);
+    }
+    function selectedDay() {
+      return datePart(currentDate.value, 2, (/* @__PURE__ */ new Date()).getDate());
+    }
+    function selectedHour() {
+      return datePart(currentTime.value, 0, 0);
+    }
+    function selectedMinute() {
+      return datePart(currentTime.value, 1, 0);
+    }
+    function minDateParts() {
+      return new Date(minDateValue());
+    }
+    function maxDateParts() {
+      return new Date(maxDateValue());
+    }
+    const showYearColumn = vue.computed(() => {
+      return normalizedMode.value != "time";
     });
-    if (currentSequence.length > longestSequence.length) {
-      longestSequence = currentSequence;
-    }
-    return longestSequence.map((bitmask) => {
-      return MODE_NAMES[modeBitmasks.indexOf(bitmask)];
+    const showMonthColumn = vue.computed(() => {
+      return normalizedMode.value != "time";
     });
-  }
-  class DayutsConfig extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            date: { type: "Any", optional: true },
-            format: { type: String, optional: true },
-            locale: { type: String, optional: true }
-          };
-        },
-        name: "DayutsConfig"
-      };
-    }
-    constructor(options, metadata = DayutsConfig.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.date = this.__props__.date;
-      this.format = this.__props__.format;
-      this.locale = this.__props__.locale;
-      delete this.__props__;
-    }
-  }
-  class DayutsFormats extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            LT: { type: String, optional: false },
-            LTS: { type: String, optional: false },
-            L: { type: String, optional: false },
-            LL: { type: String, optional: false },
-            LLL: { type: String, optional: false },
-            LLLL: { type: String, optional: false },
-            l: { type: String, optional: false },
-            ll: { type: String, optional: false },
-            lll: { type: String, optional: false },
-            llll: { type: String, optional: false }
-          };
-        },
-        name: "DayutsFormats"
-      };
-    }
-    constructor(options, metadata = DayutsFormats.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.LT = this.__props__.LT;
-      this.LTS = this.__props__.LTS;
-      this.L = this.__props__.L;
-      this.LL = this.__props__.LL;
-      this.LLL = this.__props__.LLL;
-      this.LLLL = this.__props__.LLLL;
-      this.l = this.__props__.l;
-      this.ll = this.__props__.ll;
-      this.lll = this.__props__.lll;
-      this.llll = this.__props__.llll;
-      delete this.__props__;
-    }
-  }
-  class DayutsRelativeTime extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            future: { type: String, optional: false },
-            past: { type: String, optional: false },
-            s: { type: String, optional: false },
-            m: { type: String, optional: false },
-            mm: { type: String, optional: false },
-            h: { type: String, optional: false },
-            hh: { type: String, optional: false },
-            d: { type: String, optional: false },
-            dd: { type: String, optional: false },
-            M: { type: String, optional: false },
-            MM: { type: String, optional: false },
-            y: { type: String, optional: false },
-            yy: { type: String, optional: false }
-          };
-        },
-        name: "DayutsRelativeTime"
-      };
-    }
-    constructor(options, metadata = DayutsRelativeTime.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.future = this.__props__.future;
-      this.past = this.__props__.past;
-      this.s = this.__props__.s;
-      this.m = this.__props__.m;
-      this.mm = this.__props__.mm;
-      this.h = this.__props__.h;
-      this.hh = this.__props__.hh;
-      this.d = this.__props__.d;
-      this.dd = this.__props__.dd;
-      this.M = this.__props__.M;
-      this.MM = this.__props__.MM;
-      this.y = this.__props__.y;
-      this.yy = this.__props__.yy;
-      delete this.__props__;
-    }
-  }
-  let DayutsLocale$1 = class DayutsLocale2 extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            name: { type: String, optional: false },
-            weekdays: { type: UTS.UTSType.withGenerics(Array, [String]), optional: false },
-            weekdaysShort: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
-            weekdaysMin: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
-            months: { type: UTS.UTSType.withGenerics(Array, [String]), optional: false },
-            monthsShort: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
-            ordinal: { type: "Unknown", optional: false },
-            weekStart: { type: Number, optional: true },
-            yearStart: { type: Number, optional: true },
-            formats: { type: DayutsFormats, optional: true },
-            relativeTime: { type: DayutsRelativeTime, optional: true },
-            meridiem: { type: "Unknown", optional: true }
-          };
-        },
-        name: "DayutsLocale"
-      };
-    }
-    constructor(options, metadata = DayutsLocale2.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.name = this.__props__.name;
-      this.weekdays = this.__props__.weekdays;
-      this.weekdaysShort = this.__props__.weekdaysShort;
-      this.weekdaysMin = this.__props__.weekdaysMin;
-      this.months = this.__props__.months;
-      this.monthsShort = this.__props__.monthsShort;
-      this.ordinal = this.__props__.ordinal;
-      this.weekStart = this.__props__.weekStart;
-      this.yearStart = this.__props__.yearStart;
-      this.formats = this.__props__.formats;
-      this.relativeTime = this.__props__.relativeTime;
-      this.meridiem = this.__props__.meridiem;
-      delete this.__props__;
-    }
-  };
-  class DayutsObject extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            years: { type: Number, optional: false },
-            months: { type: Number, optional: false },
-            date: { type: Number, optional: false },
-            hours: { type: Number, optional: false },
-            minutes: { type: Number, optional: false },
-            seconds: { type: Number, optional: false },
-            milliseconds: { type: Number, optional: false }
-          };
-        },
-        name: "DayutsObject"
-      };
-    }
-    constructor(options, metadata = DayutsObject.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.years = this.__props__.years;
-      this.months = this.__props__.months;
-      this.date = this.__props__.date;
-      this.hours = this.__props__.hours;
-      this.minutes = this.__props__.minutes;
-      this.seconds = this.__props__.seconds;
-      this.milliseconds = this.__props__.milliseconds;
-      delete this.__props__;
-    }
-  }
-  const SECONDS_A_MINUTE = 60;
-  const SECONDS_A_HOUR = SECONDS_A_MINUTE * 60;
-  const SECONDS_A_DAY = SECONDS_A_HOUR * 24;
-  const SECONDS_A_WEEK = SECONDS_A_DAY * 7;
-  const MILLISECONDS_A_SECOND = 1e3;
-  const MILLISECONDS_A_MINUTE = SECONDS_A_MINUTE * MILLISECONDS_A_SECOND;
-  const MILLISECONDS_A_HOUR = SECONDS_A_HOUR * MILLISECONDS_A_SECOND;
-  const MILLISECONDS_A_DAY = SECONDS_A_DAY * MILLISECONDS_A_SECOND;
-  const MILLISECONDS_A_WEEK = SECONDS_A_WEEK * MILLISECONDS_A_SECOND;
-  const MS = "millisecond";
-  const S$1 = "second";
-  const MIN = "minute";
-  const H$1 = "hour";
-  const D$1 = "day";
-  const W$1 = "week";
-  const M$1 = "month";
-  const Q$1 = "quarter";
-  const Y$1 = "year";
-  const DATE = "date";
-  const FORMAT_DEFAULT = "YYYY-MM-DDTHH:mm:ssZ";
-  const INVALID_DATE_STRING = "Invalid Date";
-  const REGEX_PARSE = /^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/;
-  const REGEX_FORMAT = /\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g;
-  function padStart(string, length, pad3) {
-    const str = string;
-    if (str.length >= length)
-      return str;
-    return str.padStart(length, pad3);
-  }
-  function padZoneStr(instance) {
-    const negMinutes = -instance.utcOffset();
-    const minutes = Math.abs(negMinutes);
-    const hourOffset = Math.floor(minutes / 60);
-    const minuteOffset = minutes % 60;
-    return "".concat(negMinutes <= 0 ? "+" : "-").concat(padStart(hourOffset.toString(), 2, "0"), ":").concat(padStart(minuteOffset.toString(), 2, "0"));
-  }
-  function isNumber(value) {
-    return ["Int8", "UInt8", "Int16", "UInt16", "Int32", "UInt32", "Int64", "UInt64", "Int", "UInt", "Float", "Float16", "Float32", "Float64", "Double", "number"].includes(typeof value);
-  }
-  function prettyUnit(u2) {
-    var _a;
-    const special = /* @__PURE__ */ new Map([
-      ["M", M$1],
-      ["y", Y$1],
-      ["w", W$1],
-      ["d", D$1],
-      ["D", DATE],
-      ["h", H$1],
-      ["m", MIN],
-      ["s", S$1],
-      ["ms", MS],
-      ["Q", Q$1]
-    ]);
-    return (_a = special.get(u2)) !== null && _a !== void 0 ? _a : "".concat(u2).toLowerCase().replace(/s$/, "");
-  }
-  function monthDiff(a2, b2) {
-    if (a2.date() < b2.date())
-      return -monthDiff(b2, a2);
-    const wholeMonthDiff = (b2.year() - a2.year()) * 12 + (b2.month() - a2.month());
-    const anchor = a2.clone().add(wholeMonthDiff, M$1).valueOf();
-    const c2 = b2.valueOf() - anchor < 0;
-    const anchor2 = a2.clone().add(wholeMonthDiff + (c2 ? -1 : 1), M$1).valueOf();
-    const decimalMonthDiff = (b2.valueOf() - anchor) / (c2 ? anchor - anchor2 : anchor2 - anchor);
-    const result = wholeMonthDiff + decimalMonthDiff;
-    const negatedResult = -result;
-    const absResult = +negatedResult;
-    const finalResult = !isNaN(absResult) ? absResult : 0;
-    return finalResult;
-  }
-  function absFloor(n2) {
-    return n2 < 0 ? Math.max(Math.ceil(n2), 0) : Math.floor(n2);
-  }
-  const en$1 = {
-    name: "en",
-    /**
-     * 星期名称数组。
-     */
-    weekdays: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    /**
-     * 月份名称数组。
-     */
-    months: [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ],
-    relativeTime: {
-      future: "in %s",
-      past: "%s ago",
-      s: "a few seconds",
-      m: "a minute",
-      mm: "%d minutes",
-      h: "an hour",
-      hh: "%d hours",
-      d: "a day",
-      dd: "%d days",
-      M: "a month",
-      MM: "%d months",
-      y: "a year",
-      yy: "%d years"
-    },
-    /**
-     * 序数函数，用于将数字转换为带有序数后缀的字符串。
-     *
-     * @param {number} n - 要转换的数字。
-     * @returns {string} 带有序数后缀的字符串。
-     */
-    ordinal: (n2, _2) => {
-      const s2 = ["th", "st", "nd", "rd"];
-      const v2 = n2 % 100;
-      const i2 = (v2 - 20) % 10;
-      const k2 = i2 < s2.length ? i2 : v2 < s2.length ? v2 : 0;
-      return "[".concat(n2).concat(s2[k2], "]");
-    }
-  };
-  const locale = {
-    name: "zh-cn",
-    weekdays: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
-    weekdaysShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
-    weekdaysMin: ["日", "一", "二", "三", "四", "五", "六"],
-    months: [
-      "一月",
-      "二月",
-      "三月",
-      "四月",
-      "五月",
-      "六月",
-      "七月",
-      "八月",
-      "九月",
-      "十月",
-      "十一月",
-      "十二月"
-    ],
-    monthsShort: [
-      "1月",
-      "2月",
-      "3月",
-      "4月",
-      "5月",
-      "6月",
-      "7月",
-      "8月",
-      "9月",
-      "10月",
-      "11月",
-      "12月"
-    ],
-    ordinal: (number, period) => {
-      if (period == "W") {
-        return "".concat(number, "周");
-      }
-      return "".concat(number, "日");
-    },
-    weekStart: 1,
-    yearStart: 4,
-    formats: {
-      LT: "HH:mm",
-      LTS: "HH:mm:ss",
-      L: "YYYY/MM/DD",
-      LL: "YYYY年M月D日",
-      LLL: "YYYY年M月D日Ah点mm分",
-      LLLL: "YYYY年M月D日ddddAh点mm分",
-      l: "YYYY/M/D",
-      ll: "YYYY年M月D日",
-      lll: "YYYY年M月D日 HH:mm",
-      llll: "YYYY年M月D日dddd HH:mm"
-    },
-    relativeTime: {
-      future: "%s内",
-      past: "%s前",
-      s: "几秒",
-      m: "1 分钟",
-      mm: "%d 分钟",
-      h: "1 小时",
-      hh: "%d 小时",
-      d: "1 天",
-      dd: "%d 天",
-      M: "1 个月",
-      MM: "%d 个月",
-      y: "1 年",
-      yy: "%d 年"
-    },
-    meridiem: (hour, minute, _2) => {
-      const hm = hour * 100 + minute;
-      if (hm < 600) {
-        return "凌晨";
-      } else if (hm < 900) {
-        return "早上";
-      } else if (hm < 1100) {
-        return "上午";
-      } else if (hm < 1300) {
-        return "中午";
-      } else if (hm < 1800) {
-        return "下午";
-      }
-      return "晚上";
-    }
-  };
-  const localesMap = /* @__PURE__ */ new Map();
-  let localeState = vue.reactive({
-    lang: "en",
-    locales: localesMap
-  });
-  localeState.locales.set("en", en$1);
-  localeState.locales.set("zh-cn", locale);
-  class DayutsIntl {
-    constructor() {
-    }
-    use(locale2) {
-      localeState.locales.set(locale2.name, locale2);
-      return this;
-    }
-    set locale(locale2) {
-      if (localeState.locales.has(locale2)) {
-        localeState.lang = locale2;
-      } else {
-        let list = [];
-        localeState.locales.forEach(function(_2, key) {
-          list.push(key);
-        });
-        uni.__log__("warn", "at uni_modules/lime-dayuts/common/use.ts:46", '未知语言: "'.concat(locale2, '". 请使用以下已知语言之一:').concat(list.join(", ")));
-      }
-    }
-    get locale() {
-      return localeState.lang;
-    }
-    set(name2, locale2) {
-      localeState.locales.set(name2, locale2);
-    }
-    has(name2) {
-      return localeState.locales.has(name2);
-    }
-  }
-  const dayutsIntl = new DayutsIntl();
-  function parseLocale(preset, object = null, isLocal = false) {
-    let l2 = null;
-    if (preset == null)
-      return dayutsIntl.locale;
-    if (typeof preset == "string") {
-      const presetLower = preset.toLowerCase();
-      if (dayutsIntl.has(presetLower)) {
-        l2 = presetLower;
-      }
-      if (object != null) {
-        dayutsIntl.set(presetLower, object);
-        l2 = presetLower;
-      }
-      const presetSplit = preset.split("-");
-      if (l2 == null && presetSplit.length > 1) {
-        return parseLocale(presetSplit[0]);
-      }
-    } else if (preset instanceof DayutsLocale) {
-      dayutsIntl.set(preset.name, preset);
-      l2 = preset.name;
-    }
-    if (!isLocal && l2 != null) {
-      dayutsIntl.locale = l2;
-    }
-    return l2 !== null && l2 !== void 0 ? l2 : dayutsIntl.locale;
-  }
-  function tryParseNumberAtIndex(digits, index) {
-    if (index >= 0 && index < digits.length) {
-      if (digits[index] == null)
-        return null;
-      const parsedNumber = isNumber(digits[index]) ? digits[index] : parseInt("".concat(digits[index]), 10);
-      if (!isNaN(parsedNumber)) {
-        return parsedNumber;
-      }
-    }
-    return null;
-  }
-  function createDateFromArray(d2, offset = 0) {
-    var _a, _b, _c, _e2, _f, _g, _h;
-    const year = (_a = tryParseNumberAtIndex(d2, 1 - offset)) !== null && _a !== void 0 ? _a : (/* @__PURE__ */ new Date()).getFullYear();
-    const month = ((_b = tryParseNumberAtIndex(d2, 2 - offset)) !== null && _b !== void 0 ? _b : 1) - 1;
-    const day = (_c = tryParseNumberAtIndex(d2, 3 - offset)) !== null && _c !== void 0 ? _c : 1;
-    const hour = (_e2 = tryParseNumberAtIndex(d2, 4 - offset)) !== null && _e2 !== void 0 ? _e2 : 0;
-    const minute = (_f = tryParseNumberAtIndex(d2, 5 - offset)) !== null && _f !== void 0 ? _f : 0;
-    const second = (_g = tryParseNumberAtIndex(d2, 6 - offset)) !== null && _g !== void 0 ? _g : 0;
-    const millisecond = ((_h = tryParseNumberAtIndex(d2, 7 - offset)) !== null && _h !== void 0 ? _h : 0).toString().substring(0, 3);
-    return new Date(year, month, day, hour, minute, second, parseInt(millisecond));
-  }
-  function parseDate(cfg) {
-    const date = cfg.date;
-    if (date == null)
-      return /* @__PURE__ */ new Date();
-    if (date instanceof Date)
-      return date;
-    try {
-      if (typeof date == "string" && !/Z$/i.test(date)) {
-        const d2 = date.match(REGEX_PARSE);
-        const isNull = d2 == null || Array.isArray(d2) && d2.length == 0;
-        if (!isNull) {
-          return createDateFromArray(d2);
-        }
-      }
-      if (typeof date == "string")
-        return new Date(date);
-      if (Array.isArray(date)) {
-        return createDateFromArray(date, 1);
-      }
-      if (isNumber(date))
-        return new Date(date);
-      return null;
-    } catch (err) {
-      return null;
-    }
-  }
-  function wrapper(date, instance) {
-    return dayuts(date, instance.$L);
-  }
-  class Dayuts {
-    constructor(cfg) {
-      var _a;
-      this.valid = true;
-      this.$d = /* @__PURE__ */ new Date();
-      this.$y = 0;
-      this.$M = 0;
-      this.$D = 0;
-      this.$W = 0;
-      this.$H = 0;
-      this.$m = 0;
-      this.$s = 0;
-      this.$ms = 0;
-      this.$u = false;
-      this.$L = (_a = parseLocale(cfg.locale)) !== null && _a !== void 0 ? _a : dayutsIntl.locale;
-      this.parse(cfg);
-    }
-    parse(cfg) {
-      const _d = parseDate(cfg);
-      if (_d != null) {
-        this.$d = parseDate(cfg);
-        this.init();
-      } else {
-        this.valid = false;
-      }
-    }
-    init() {
-      const $d = this.$d;
-      this.$y = $d.getFullYear();
-      this.$M = $d.getMonth();
-      this.$D = $d.getDate();
-      this.$W = $d.getDay();
-      this.$H = $d.getHours();
-      this.$m = $d.getMinutes();
-      this.$s = $d.getSeconds();
-      this.$ms = $d.getMilliseconds();
-    }
-    /**
-     * 检查日期对象是否有效。
-     *
-     * @returns {boolean} 如果日期对象有效，则返回true；否则返回false。
-     */
-    isValid() {
-      return this.valid;
-    }
-    isSame(input, units = "millisecond") {
-      const other = input instanceof Dayuts ? input : dayuts(input);
-      const date1 = this.startOf(units).valueOf();
-      const date2 = other.valueOf();
-      const date3 = this.endOf(units).valueOf();
-      return date1 <= date2 && date2 <= date3;
-    }
-    isAfter(input, units = "millisecond") {
-      const other = input instanceof Dayuts ? input : dayuts(input);
-      const date1 = other.valueOf();
-      const date2 = this.startOf(units).valueOf();
-      return date1 < date2;
-    }
-    isBefore(input, units = "millisecond") {
-      const other = input instanceof Dayuts ? input : dayuts(input);
-      const date1 = other.valueOf();
-      const date2 = this.endOf(units).valueOf();
-      return date2 < date1;
-    }
-    isSameOrBefore(input, units = "millisecond") {
-      return this.isSame(input, units) || this.isBefore(input, units);
-    }
-    isSameOrAfter(input, units = "millisecond") {
-      return this.isSame(input, units) || this.isAfter(input, units);
-    }
-    /**
-     * 判断当前Dayuts对象是否在给定的两个时间之间
-     * @param {any} input - 第一个时间输入
-     * @param {any} input2 - 第二个时间输入
-     * @param {DayutsUnit} units - 指定的时间单位
-     * @param {string} interval - 区间符号，表示区间的开闭性，默认为'()'，表示开区间
-     * @returns {boolean} - 如果当前Dayuts对象在给定的两个时间之间，则返回true，否则返回false
-     */
-    isBetween(input, input2, units = "millisecond", interval = "()") {
-      const dA = dayuts(input);
-      const dB = dayuts(input2);
-      const dAi = interval.startsWith("(");
-      const dBi = interval.endsWith(")");
-      return (dAi ? this.isAfter(dA, units) : !this.isBefore(dA, units)) && (dBi ? this.isBefore(dB, units) : !this.isAfter(dB, units)) || (dAi ? this.isBefore(dA, units) : !this.isAfter(dA, units)) && (dBi ? this.isAfter(dB, units) : !this.isBefore(dB, units));
-    }
-    /**
-     * 判断当前Dayuts对象所在的年份是否为闰年
-     * @returns {boolean} - 如果当前Dayuts对象所在的年份是闰年，则返回true，否则返回false
-     */
-    isLeapYear() {
-      return this.$y % 4 == 0 && this.$y % 100 != 0 || this.$y % 400 == 0;
-    }
-    isToday() {
-      const comparisonTemplate = "YYYY-MM-DD";
-      const now = dayuts();
-      return this.format(comparisonTemplate) == now.format(comparisonTemplate);
-    }
-    /**
-     * 获取当前 `dayuts` 对象的 Unix 时间戳（以秒为单位）。
-     *
-     * @returns {number} 返回当前 `dayuts` 对象的 Unix 时间戳（以秒为单位）。
-     */
-    unix() {
-      return Math.floor(this.valueOf() / 1e3);
-    }
-    /**
-     * 将当前日期设置为指定时间单位的开始或结束。
-     *
-     * @param {string} units - 时间单位，例如'year'、'month'、'day'等。
-     * @param {boolean} startOf - 如果为true，则设置为开始；如果为false，则设置为结束。
-     * @returns {Dayuts} 返回一个新的Dayuts对象，表示调整后的日期。
-     */
-    startOf(units, startOf = true) {
-      var _a;
-      const isStartOf = startOf;
-      const unit = prettyUnit(units);
-      const instanceFactory = (d2, m2) => {
-        const ins = dayuts(new Date(this.$y, m2, d2));
-        return isStartOf ? ins : ins.endOf(D$1);
-      };
-      const instanceFactorySet = (method, slice) => {
-        const argumentStart = [0, 0, 0, 0];
-        const argumentEnd = [23, 59, 59, 999];
-        const args = (isStartOf ? argumentStart : argumentEnd).slice(slice);
-        const date = this.toDate();
-        if (method == "setHours") {
-          date.setHours(args[0]);
-          date.setMinutes(args[1]);
-          date.setSeconds(args[2]);
-          date.setMilliseconds(args[3]);
-        } else if (method == "setMinutes") {
-          date.setMinutes(args[0]);
-          date.setSeconds(args[1]);
-          date.setMilliseconds(args[2]);
-        } else if (method == "setSeconds") {
-          date.setSeconds(args[0]);
-          date.setMilliseconds(args[1]);
-        } else if (method == "setMilliseconds") {
-          date.setMilliseconds(args[0]);
-        }
-        return dayuts(date);
-      };
-      const _b = this, $W = _b.$W, $M = _b.$M, $D = _b.$D;
-      const utcPad = "set".concat(this.$u ? "UTC" : "");
-      if (unit == Y$1) {
-        return isStartOf ? instanceFactory(1, 0) : instanceFactory(31, 11);
-      } else if (unit == M$1) {
-        return isStartOf ? instanceFactory(1, $M) : instanceFactory(0, $M + 1);
-      } else if (unit == W$1) {
-        const weekStart = (_a = this.$locale().weekStart) !== null && _a !== void 0 ? _a : 0;
-        const gap = ($W < weekStart ? $W + 7 : $W) - weekStart;
-        return instanceFactory(isStartOf ? $D - gap : $D + (6 - gap), $M);
-      } else if (unit == D$1 || unit == DATE) {
-        return instanceFactorySet("".concat(utcPad, "Hours"), 0);
-      } else if (unit == H$1) {
-        return instanceFactorySet("".concat(utcPad, "Minutes"), 1);
-      } else if (unit == MIN) {
-        return instanceFactorySet("".concat(utcPad, "Seconds"), 2);
-      } else if (unit == S$1) {
-        return instanceFactorySet("".concat(utcPad, "Milliseconds"), 3);
-      } else {
-        return this.clone();
-      }
-    }
-    /**
-     * 将当前日期设置为指定时间单位的结束。
-     *
-     * @param {string} arg - 时间单位，例如'year'、'month'、'day'等。
-     * @returns {Dayuts} 返回一个新的Dayuts对象，表示调整后的日期。
-     */
-    endOf(units) {
-      return this.startOf(units, false);
-    }
-    /**
-     * 设置指定的时间单位的值。
-     *
-     * @param {string} units - 要设置的时间单位（如 "year"、"month"、"day" 等）。
-     * @param {number} int - 要设置的值。
-     * @returns {Dayuts} 返回当前对象。
-     */
-    $set(units, int) {
-      const unit = prettyUnit(units);
-      const arg = unit == D$1 ? this.$D + (int - this.$W) : int;
-      const setDateUnit = (date, unit2, arg2) => {
-        if (unit2 == D$1 || unit2 == DATE) {
-          date.$d.setDate(arg2);
-        } else if (unit2 == M$1) {
-          date.$d.setMonth(arg2);
-        } else if (unit2 == Y$1) {
-          date.$d.setFullYear(arg2);
-        } else if (unit2 == H$1) {
-          date.$d.setHours(arg2);
-        } else if (unit2 == MIN) {
-          date.$d.setMinutes(arg2);
-        } else if (unit2 == S$1) {
-          date.$d.setSeconds(arg2);
-        } else if (unit2 == MS) {
-          date.$d.setMilliseconds(arg2);
-        }
-      };
-      if (unit == M$1 || unit == Y$1) {
-        const date = this.clone().set(DATE, 1);
-        setDateUnit(date, unit, arg);
-        date.init();
-        this.$d = date.set(DATE, Math.min(this.$D, date.daysInMonth())).$d;
-      } else {
-        setDateUnit(this, unit, arg);
-      }
-      this.init();
-      return this;
-    }
-    /**
-     * 创建一个当前对象的副本，并设置指定的时间单位的值。
-     *
-     * @param {string} string - 要设置的时间单位（如 "year"、"month"、"day" 等）。
-     * @param {number} int - 要设置的值。
-     * @returns {Dayuts} 返回一个新的 `dayuts` 对象，其值为当前对象的副本，并设置了指定的时间单位的值。
-     */
-    set(string, int) {
-      return this.clone().$set(string, int);
-    }
-    /**
-     * 获取当前 `dayuts` 对象的指定时间单位的值。
-     *
-     * @param {string} units - 要获取的时间单位（如 "year"、"month"、"day" 等）。
-     * @returns {number} 返回当前 `dayuts` 对象的指定时间单位的值。
-     */
-    get(units) {
-      const unit = prettyUnit(units);
-      if (unit == D$1) {
-        return this.day();
-      } else if (unit == DATE) {
-        return this.date();
-      } else if (unit == M$1) {
-        return this.month();
-      } else if (unit == Y$1) {
-        return this.year();
-      } else if (unit == H$1) {
-        return this.hour();
-      } else if (unit == MIN) {
-        return this.minute();
-      } else if (unit == S$1) {
-        return this.second();
-      } else if (unit == MS) {
-        return this.millisecond();
-      }
-      return 0;
-    }
-    year(input = null) {
-      if (input == null)
-        return this.$y;
-      return this.set(Y$1, input);
-    }
-    month(input = null) {
-      if (input == null)
-        return this.$M;
-      return this.set(M$1, input);
-    }
-    day(input = null) {
-      if (input == null)
-        return this.$W;
-      return this.set(D$1, input);
-    }
-    date(input = null) {
-      if (input == null)
-        return this.$D;
-      return this.set(DATE, input);
-    }
-    hour(input = null) {
-      if (input == null)
-        return this.$H;
-      return this.set(H$1, input);
-    }
-    minute(input = null) {
-      if (input == null)
-        return this.$m;
-      return this.set(MIN, input);
-    }
-    second(input = null) {
-      if (input == null)
-        return this.$s;
-      return this.set(S$1, input);
-    }
-    millisecond(input = null) {
-      if (input == null)
-        return this.$ms;
-      return this.set(MS, input);
-    }
-    /**
-     * 在当前 Dayuts 实例上添加指定的时间长度。
-     * @param {number} number - 要添加的时间长度。
-     * @param {string} units - 要添加的时间单位（例如，“years”，“months”，“days”等）。
-     * @returns {Dayuts} 更新的 Dayuts 实例。
-     */
-    add(number, units) {
-      var _a;
-      const unit = prettyUnit(units);
-      const instanceFactorySet = (n2) => {
-        const d2 = dayuts(this);
-        return d2.date(d2.date() + Math.round(n2 * number));
-      };
-      if (unit == M$1) {
-        return this.set(M$1, this.$M + number);
-      }
-      if (unit == Y$1) {
-        return this.set(Y$1, this.$y + number);
-      }
-      if (unit == D$1) {
-        return instanceFactorySet(1);
-      }
-      if (unit == W$1) {
-        return instanceFactorySet(7);
-      }
-      const steps = /* @__PURE__ */ new Map([
-        [MIN, MILLISECONDS_A_MINUTE],
-        [H$1, MILLISECONDS_A_HOUR],
-        [S$1, MILLISECONDS_A_SECOND]
-      ]);
-      const step = (_a = steps.get(unit)) !== null && _a !== void 0 ? _a : 1;
-      const nextTimeStamp = this.$d.getTime() + number * step;
-      return wrapper(nextTimeStamp, this);
-    }
-    /**
-     * 从当前 Dayuts 实例中减去指定的时间。
-     * @param {number} number - 要减去的时间。
-     * @param {string} units - 要减去的时间单位（例如，“years”，“months”，“days”等）。
-     * @returns {Dayuts} 更新的 Dayuts 实例。
-     */
-    subtract(number, units) {
-      return this.add(number * -1, units);
-    }
-    /**
-     * 日期格式化
-     * @param {string} formatStr - 格式化字符串，包含各种格式化占位符（例如，“YYYY-MM-DD”，“HH:mm:ss”等）。
-     * @returns {string} 格式化后的日期字符串。
-     */
-    format(formatStr = null) {
-      const locale2 = this.$locale();
-      if (!this.isValid())
-        return INVALID_DATE_STRING;
-      const str = formatStr !== null && formatStr !== void 0 ? formatStr : FORMAT_DEFAULT;
-      const zoneStr = padZoneStr(this);
-      const _a = this, $H = _a.$H, $m = _a.$m, $M = _a.$M;
-      const weekdays = locale2.weekdays, months = locale2.months, meridiem = locale2.meridiem;
-      function getShort(arr, index, full = [], length = 0) {
-        if (arr != null && arr.length >= index) {
-          return arr[index];
-        } else if (full.length >= index) {
-          return full[index].slice(0, length);
-        }
-        return "";
-      }
-      const get$H = (num) => {
-        return padStart(($H % 12 == 0 ? 12 : $H % 12).toString(), num, "0");
-      };
-      const meridiemFunc = meridiem !== null && meridiem !== void 0 ? meridiem : (hour, _2, isLowercase) => {
-        const m2 = hour < 12 ? "AM" : "PM";
-        return isLowercase ? m2.toLowerCase() : m2;
-      };
-      const matches = (match) => {
-        if (match == "YY") {
-          return this.$y.toString().slice(-2);
-        } else if (match == "YYYY") {
-          return padStart(this.$y.toString(), 4, "0");
-        } else if (match == "M") {
-          return ($M + 1).toString();
-        } else if (match == "MM") {
-          return padStart(($M + 1).toString(), 2, "0");
-        } else if (match == "MMM") {
-          return getShort(locale2.monthsShort, $M, months, 3);
-        } else if (match == "MMMM") {
-          return getShort(months, $M);
-        } else if (match == "D") {
-          return this.$D.toString();
-        } else if (match == "DD") {
-          return padStart(this.$D.toString(), 2, "0");
-        } else if (match == "d") {
-          return this.$W.toString();
-        } else if (match == "dd") {
-          return getShort(locale2.weekdaysMin, this.$W, weekdays, 2);
-        } else if (match == "ddd") {
-          return getShort(locale2.weekdaysShort, this.$W, weekdays, 3);
-        } else if (match == "dddd") {
-          return weekdays[this.$W];
-        } else if (match == "H") {
-          return $H.toString();
-        } else if (match == "HH") {
-          return padStart($H.toString(), 2, "0");
-        } else if (match == "h") {
-          return get$H(1);
-        } else if (match == "hh") {
-          return get$H(2);
-        } else if (match == "a") {
-          return meridiemFunc($H, $m, true);
-        } else if (match == "A") {
-          return meridiemFunc($H, $m, false);
-        } else if (match == "m") {
-          return $m.toString();
-        } else if (match == "mm") {
-          return padStart($m.toString(), 2, "0");
-        } else if (match == "s") {
-          return this.$s.toString();
-        } else if (match == "ss") {
-          return padStart(this.$s.toString(), 2, "0");
-        } else if (match == "SSS") {
-          return padStart(this.$ms.toString(), 3, "0");
-        } else if (match == "Z") {
-          return zoneStr;
-        }
-        return null;
-      };
-      return str.replace(REGEX_FORMAT, (match, $1, offset, string) => {
-        var _a2;
-        return (_a2 = $1 !== null && $1 !== void 0 ? $1 : matches(match)) !== null && _a2 !== void 0 ? _a2 : zoneStr.replace(":", "");
-      });
-    }
-    /**
-     * 获取 Dayuts 实例的 UTC 偏移量（以分钟为单位）。
-     * @returns {number} UTC 偏移量（以分钟为单位）。
-     */
-    utcOffset() {
-      return 0;
-    }
-    diff(input, units = "millisecond", float = false) {
-      const unit = prettyUnit(units);
-      const that = dayuts(input);
-      const zoneDelta = (that.utcOffset() - this.utcOffset()) * MILLISECONDS_A_MINUTE;
-      const diff = this.valueOf() - that.valueOf();
-      const getMonth = () => {
-        return monthDiff(this, that);
-      };
-      let result;
-      switch (unit) {
-        case Y$1:
-          result = getMonth() / 12;
-          break;
-        case M$1:
-          result = getMonth();
-          break;
-        case Q$1:
-          result = getMonth() / 3;
-          break;
-        case W$1:
-          result = (diff - zoneDelta) / MILLISECONDS_A_WEEK;
-          break;
-        case D$1:
-          result = (diff - zoneDelta) / MILLISECONDS_A_DAY;
-          break;
-        case H$1:
-          result = diff / MILLISECONDS_A_HOUR;
-          break;
-        case MIN:
-          result = diff / MILLISECONDS_A_MINUTE;
-          break;
-        case S$1:
-          result = diff / MILLISECONDS_A_SECOND;
-          break;
-        default:
-          result = diff;
-          break;
-      }
-      return float ? result : absFloor(result);
-    }
-    /**
-     * 将当前 Dayuts 对象转换为原生 Date 对象。
-     *
-     * @returns {Date} 返回一个表示当前日期的原生 Date 对象。
-     */
-    toDate() {
-      return new Date(this.valueOf());
-    }
-    /**
-     * 将 Moment 对象转换为 JSON 字符串
-     * @returns {string | null} 如果 Moment 对象有效，则返回 ISO 8601 格式的字符串，否则返回 null
-     */
-    toJSON() {
-      return this.isValid() ? this.toISOString() : null;
-    }
-    /**
-     * 将 Moment 对象转换为 ISO 8601 格式的字符串
-     * @returns {string} 返回 ISO 8601 格式的字符串
-     */
-    toISOString() {
-      return this.$d.toString();
-    }
-    toObject() {
-      return {
-        years: this.$y,
-        months: this.$M,
-        date: this.$D,
-        hours: this.$H,
-        minutes: this.$m,
-        seconds: this.$s,
-        milliseconds: this.$ms
-      };
-    }
-    toArray() {
-      return [
-        this.$y,
-        this.$M,
-        this.$D,
-        this.$H,
-        this.$m,
-        this.$s,
-        this.$ms
-      ];
-    }
-    /**
-     * 获取当前日期的毫秒数。
-     *
-     * @returns {number} 返回一个表示当前日期的毫秒数。
-     */
-    valueOf() {
-      return this.$d.getTime();
-    }
-    /**
-     * 获取当前 `dayuts` 对象所在月份的天数。
-     *
-     * @returns {number} 返回当前 `dayuts` 对象所在月份的天数。
-     */
-    daysInMonth() {
-      return this.endOf(M$1).$D;
-    }
-    /**
-     * 获取当前日期的区域设置对象。
-     *
-     * @returns {Object} 区域设置对象。
-     */
-    $locale() {
-      return localeState.locales.get(this.$L);
-    }
-    locale(preset, object = null) {
-      const that = this.clone();
-      const nextLocaleName = parseLocale(preset, object, true);
-      if (nextLocaleName != null)
-        that.$L = nextLocaleName;
-      return that;
-    }
-    clone() {
-      return wrapper(this.$d.getTime(), this);
-    }
-    /**
-     * 返回当前 dayuts 对象的 UTC 字符串表示。
-     *
-     * @returns {string} 当前 dayuts 对象的 UTC 字符串表示。
-     */
-    toString() {
-      return this.$d.toString();
-    }
-    dayOfYear(input = null) {
-      const dayOfYear = Math.round((this.startOf("day").valueOf() - this.startOf("year").valueOf()) / 864e5) + 1;
-      return input == null ? dayOfYear : this.add(input - dayOfYear, "day");
-    }
-    fromToBase(input, withoutSuffix, instance, isFrom) {
-      var _a, _b;
-      const relObj = (_a = localeState.locales.get("en")) === null || _a === void 0 ? void 0 : _a.relativeTime;
-      const loc = (_b = instance.$locale().relativeTime) !== null && _b !== void 0 ? _b : relObj;
-      if (loc == null)
-        return "";
-      const T2 = [
-        { l: "s", r: 44, d: S$1 },
-        { l: "m", r: 89 },
-        { l: "mm", r: 44, d: MIN },
-        { l: "h", r: 89 },
-        { l: "hh", r: 21, d: H$1 },
-        { l: "d", r: 35 },
-        { l: "dd", r: 25, d: D$1 },
-        { l: "M", r: 45 },
-        { l: "MM", r: 10, d: M$1 },
-        { l: "y", r: 17 },
-        { l: "yy", d: Y$1 }
-      ];
-      const Tl = T2.length;
-      let result = 0;
-      let out = "";
-      let isFuture = false;
-      for (let i2 = 0; i2 < Tl; i2 += 1) {
-        let t2 = T2[i2];
-        if (t2.d != null) {
-          result = isFrom ? dayuts(input).diff(instance, t2.d, true) : instance.diff(input, t2.d, true);
-        }
-        let abs = Math.round(Math.abs(result));
-        isFuture = result > 0;
-        if (t2.r == null || t2.r != null && abs <= t2.r) {
-          if (abs <= 1 && i2 > 0)
-            t2 = T2[i2 - 1];
-          const format = loc[t2.l];
-          if (typeof format == "string") {
-            out = format.replace("%d", abs.toString());
-          }
-          break;
-        }
-      }
-      if (withoutSuffix)
-        return out;
-      const pastOrFuture = isFuture ? loc.future : loc.past;
-      return pastOrFuture.replace("%s", out);
-    }
-    to(input, withoutSuffix = false) {
-      return this.fromToBase(input, withoutSuffix, this, true);
-    }
-    from(input, withoutSuffix = false) {
-      return this.fromToBase(input, withoutSuffix, this, false);
-    }
-    toNow(withoutSuffix = false) {
-      return this.to(dayuts(), withoutSuffix);
-    }
-    fromNow(withoutSuffix = false) {
-      return this.from(dayuts(), withoutSuffix);
-    }
-  }
-  function dayuts(date = null, format = null, locale2 = null) {
-    if (date != null && date instanceof Dayuts)
-      return date.clone();
-    return new Dayuts({
-      date,
-      format,
-      locale: locale2
+    const showDayColumn = vue.computed(() => {
+      return normalizedMode.value == "datetime" || normalizedMode.value == "date";
     });
-  }
-  const _sfc_main$n = /* @__PURE__ */ vue.defineComponent({
-    __name: "l-date-time-picker",
-    props: {
-      cancelBtn: { type: String, required: false },
-      cancelStyle: { type: null, required: false },
-      confirmBtn: { type: String, required: false },
-      confirmStyle: { type: null, required: false },
-      customLocale: { type: String, required: false },
-      end: { type: [String, Number], required: false },
-      start: { type: [String, Number], required: false },
-      steps: { type: null, required: false },
-      title: { type: String, required: false },
-      titleStyle: { type: null, required: false },
-      value: { type: [String, Number], required: false },
-      defaultValue: { type: [String, Number], required: false },
-      modelValue: { type: [String, Number], required: false },
-      format: { type: String, required: true, default: DEFAULT_FORMAT },
-      mode: { type: null, required: true, default: 1 | 2 | 4 },
-      customFilter: { type: Function, required: false },
-      renderLabel: { type: Function, required: false },
-      showUnit: { type: Boolean, required: true, default: true },
-      itemHeight: { type: String, required: false },
-      itemColor: { type: String, required: false },
-      itemFontSize: { type: String, required: false },
-      itemActiveColor: { type: String, required: false },
-      indicatorStyle: { type: String, required: false },
-      maskColors: { type: Array, required: false },
-      bgColor: { type: String, required: false },
-      groupHeight: { type: String, required: false },
-      radius: { type: String, required: false },
-      resetIndex: { type: Boolean, required: true, default: false },
-      minHour: { type: Number, required: true, default: 0 },
-      maxHour: { type: Number, required: true, default: 23 },
-      minMinute: { type: Number, required: true, default: 0 },
-      maxMinute: { type: Number, required: true, default: 59 }
-    },
-    emits: ["change", "cancel", "confirm", "pick", "update:modelValue", "update:value"],
-    setup(__props, _a) {
-      var _b;
-      var __expose = _a.expose, __emit = _a.emit;
-      __expose();
-      const emit = __emit;
-      const props = __props;
-      let defaultValue = (_b = coalesce(props.value, props.modelValue, props.defaultValue)) !== null && _b !== void 0 ? _b : Date.now();
-      const innerValue = vue.computed({
-        set(value) {
-          if (defaultValue == value)
-            return null;
-          defaultValue = value;
-          emit("change", value);
-          emit("update:modelValue", value);
-          emit("update:value", value);
-        },
-        get() {
-          var _a2;
-          return (_a2 = coalesce(props.value, props.modelValue)) !== null && _a2 !== void 0 ? _a2 : defaultValue;
+    const showHourColumn = vue.computed(() => {
+      return normalizedMode.value == "datetime" || normalizedMode.value == "time";
+    });
+    const showMinuteColumn = vue.computed(() => {
+      return normalizedMode.value == "datetime" || normalizedMode.value == "time";
+    });
+    const yearOptions = vue.computed(() => {
+      const minYear = minDateParts().getFullYear();
+      const maxYear = maxDateParts().getFullYear();
+      return optionRange(minYear, maxYear, "年");
+    });
+    const columnsStyle = vue.computed(() => {
+      return "width:100%;height:220px;";
+    });
+    const indicatorStyle = vue.computed(() => {
+      return "height:44px;background-color:transparent;border-top:1px solid #eef0f4;border-bottom:1px solid #eef0f4;";
+    });
+    const itemStyle = vue.computed(() => {
+      return "height:44px;";
+    });
+    const monthOptions = vue.computed(() => {
+      let firstMonth = 1;
+      let lastMonth = 12;
+      const minDate = minDateParts();
+      const maxDate = maxDateParts();
+      if (selectedYear() == minDate.getFullYear())
+        firstMonth = minDate.getMonth() + 1;
+      if (selectedYear() == maxDate.getFullYear())
+        lastMonth = maxDate.getMonth() + 1;
+      return optionRange(firstMonth, lastMonth, "月");
+    });
+    const dayOptions = vue.computed(() => {
+      let firstDay = 1;
+      let lastDay = daysInMonth(selectedYear(), selectedMonth());
+      const minDate = minDateParts();
+      const maxDate = maxDateParts();
+      if (selectedYear() == minDate.getFullYear() && selectedMonth() == minDate.getMonth() + 1)
+        firstDay = minDate.getDate();
+      if (selectedYear() == maxDate.getFullYear() && selectedMonth() == maxDate.getMonth() + 1)
+        lastDay = maxDate.getDate();
+      if (firstDay > lastDay)
+        firstDay = lastDay;
+      return optionRange(firstDay, lastDay, "日");
+    });
+    function hourRange() {
+      let firstHour = 0;
+      let lastHour = 23;
+      if (normalizedMode.value == "time") {
+        firstHour = validHour(props.minHour);
+        lastHour = validHour(props.maxHour);
+      } else {
+        const timestampDate = dateTimeToTimestamp(currentDate.value, currentTime.value);
+        if (formatDate(timestampDate) == formatDate(minDateValue()))
+          firstHour = new Date(minDateValue()).getHours();
+        if (formatDate(timestampDate) == formatDate(maxDateValue()))
+          lastHour = new Date(maxDateValue()).getHours();
+      }
+      return [firstHour, lastHour];
+    }
+    const hourOptions = vue.computed(() => {
+      const range = hourRange();
+      return optionRange(range[0], range[1], "时", true);
+    });
+    function minuteRange() {
+      let firstMinute = 0;
+      let lastMinute = 59;
+      const range = hourRange();
+      const hour = selectedHour();
+      if (normalizedMode.value == "time") {
+        if (hour == range[0])
+          firstMinute = validMinute(props.minMinute);
+        if (hour == range[1])
+          lastMinute = validMinute(props.maxMinute);
+      } else {
+        const timestampDate = dateTimeToTimestamp(currentDate.value, currentTime.value);
+        if (formatDate(timestampDate) == formatDate(minDateValue()) && hour == new Date(minDateValue()).getHours()) {
+          firstMinute = new Date(minDateValue()).getMinutes();
         }
-      });
-      const meaningColumn = getMeaningColumn(props.mode);
-      const isTimeMode = ["hour", "minute", "second"].includes(meaningColumn[0]);
-      const normalize = (val = null, defaultDay) => {
-        return val != "" && val != null && dayuts(val).isValid() ? dayuts(val) : defaultDay;
-      };
-      const minDate = vue.computed(() => {
-        return normalize(props.start, dayuts().subtract(1, "year"));
-      });
-      const maxDate = vue.computed(() => {
-        return normalize(props.end, dayuts());
-      });
-      const rationalize = (val) => {
-        if (isTimeMode)
-          return val;
-        if (val.isBefore(minDate.value))
-          return minDate.value;
-        if (val.isAfter(maxDate.value))
-          return maxDate.value;
-        return val;
-      };
-      const calcDate = (currentValue = null) => {
-        if (meaningColumn.length == 1 && meaningColumn[0] == "year") {
-          if (currentValue != null) {
-            if (typeof currentValue == "string") {
-              const yearNum = parseInt(currentValue);
-              if (!isNaN(yearNum) && yearNum > 1e3) {
-                return rationalize(dayuts().year(yearNum).startOf("year"));
-              }
-            }
-          }
+        if (formatDate(timestampDate) == formatDate(maxDateValue()) && hour == new Date(maxDateValue()).getHours()) {
+          lastMinute = new Date(maxDateValue()).getMinutes();
         }
-        if (isTimeMode && typeof currentValue == "string") {
-          let format = "YYYY-MM-DD";
-          let space = " ";
-          const hasHour = meaningColumn.includes("hour");
-          const hasMinute = meaningColumn.includes("minute");
-          const hasSecond = meaningColumn.includes("second");
-          if (!hasHour && hasMinute) {
-            format += " HH";
-            space = ":";
-          } else if (!hasHour && !hasMinute && hasSecond) {
-            format += " HH:mm";
-            space = ":";
-          }
-          const dateStr = dayuts(minDate.value).format(format);
-          currentValue = "".concat(dateStr).concat(space).concat(currentValue);
-        }
-        return currentValue != null && dayuts(currentValue).isValid() ? rationalize(dayuts(currentValue)) : maxDate.value;
-      };
-      const curDate = vue.ref(calcDate(innerValue.value));
-      const valueOfPicker = vue.computed(() => {
-        return meaningColumn.map((item) => {
-          return curDate.value.get(item).toString();
-        });
-      });
-      const columnCache = /* @__PURE__ */ new Map();
-      const columns = vue.computed(() => {
-        const ret = [];
-        const getDate = (date) => {
-          return [
-            date.year(),
-            date.month() + 1,
-            date.date(),
-            date.hour(),
-            date.minute(),
-            date.second()
-          ];
-        };
-        const _a2 = __read(getDate(curDate.value), 5), curYear = _a2[0], curMonth = _a2[1], curDay = _a2[2], curHour = _a2[3], curMinute = _a2[4];
-        const _b2 = __read(getDate(minDate.value), 6), minYear = _b2[0], minMonth = _b2[1], minDay = _b2[2], minHour = _b2[3], minMinute = _b2[4], minSecond = _b2[5];
-        const _c = __read(getDate(maxDate.value), 6), maxYear = _c[0], maxMonth = _c[1], maxDay = _c[2], maxHour = _c[3], maxMinute = _c[4], maxSecond = _c[5];
-        const isInMinYear = curYear == minYear;
-        const isInMaxYear = curYear == maxYear;
-        const isInMinMonth = isInMinYear && curMonth == minMonth;
-        const isInMaxMonth = isInMaxYear && curMonth === maxMonth;
-        const isInMinDay = isInMinMonth && curDay == minDay;
-        const isInMaxDay = isInMaxMonth && curDay == maxDay;
-        const isInMinHour = isInMinDay && curHour == minHour;
-        const isInMaxHour = isInMaxDay && curHour == maxHour;
-        const isInMinMinute = isInMinHour && curMinute == minMinute;
-        const isInMaxMinute = isInMaxHour && curMinute == maxMinute;
-        const generateColumn = (type, lowerBound, upperBound) => {
-          const cacheKey = "".concat(type, "-").concat(lowerBound, "-").concat(upperBound);
-          if (columnCache.has(cacheKey)) {
-            ret.push(UTS.mapGet(columnCache, cacheKey));
-            return null;
-          }
-          const arr = [];
-          for (let i2 = lowerBound; i2 <= upperBound; i2++) {
-            const value = i2;
-            arr.push({
-              label: props.renderLabel != null ? props.renderLabel(type, i2.toString()) : "".concat(value).concat(props.showUnit ? UTS.mapGet(UNIT_MAP, type) : ""),
-              value: type == "month" ? "".concat(value - 1) : value.toString()
+      }
+      return [firstMinute, lastMinute];
+    }
+    const minuteOptions = vue.computed(() => {
+      const range = minuteRange();
+      return optionRange(range[0], range[1], "分", true);
+    });
+    const wheelIndexes = vue.ref([]);
+    let wheelSyncGeneration = 0;
+    let wheelReadyGeneration = 0;
+    let wheelInitialized = false;
+    let wheelInternalChange = false;
+    function scheduleFrame(callback) {
+      setTimeout(callback, 16);
+    }
+    function copyWheelIndexes(indexes) {
+      return indexes.slice();
+    }
+    function findChangedWheelIndex(nextIndexes, oldIndexes) {
+      const length = Math.max(nextIndexes.length, oldIndexes.length);
+      for (let index = 0; index < length; index++) {
+        const nextValue = index < nextIndexes.length ? nextIndexes[index] : -1;
+        const oldValue = index < oldIndexes.length ? oldIndexes[index] : -1;
+        if (nextValue != oldValue)
+          return index;
+      }
+      return -1;
+    }
+    function cancelWheelIndexSync() {
+      wheelSyncGeneration++;
+      wheelInternalChange = false;
+    }
+    function cancelWheelReady() {
+      wheelReadyGeneration++;
+    }
+    function scheduleWheelReady() {
+      const generation = ++wheelReadyGeneration;
+      vue.nextTick(() => {
+        scheduleFrame(() => {
+          scheduleFrame(() => {
+            scheduleFrame(() => {
+              if (generation != wheelReadyGeneration || !opened.value)
+                return null;
+              wheelInitialized = true;
+              wheelInternalChange = false;
             });
-          }
-          if (props.customFilter != null) {
-            const _arr = props.customFilter(type, arr);
-            ret.push(_arr);
-            columnCache.set(cacheKey, _arr);
-          } else {
-            ret.push(arr);
-            columnCache.set(cacheKey, arr);
-          }
-        };
-        if (meaningColumn.includes("year")) {
-          generateColumn("year", minYear, maxYear);
-        }
-        if (meaningColumn.includes("month")) {
-          const lower = isInMinYear ? minMonth : 1;
-          const upper = isInMaxYear ? maxMonth : 12;
-          generateColumn("month", lower, upper);
-        }
-        if (meaningColumn.includes("date")) {
-          const lower = isInMinMonth ? minDay : 1;
-          const upper = isInMaxMonth ? maxDay : dayuts("".concat(curYear, "-").concat(curMonth)).daysInMonth();
-          generateColumn("date", lower, upper);
-        }
-        if (meaningColumn.includes("hour")) {
-          const lower = isInMinDay && !isTimeMode ? minHour : clamp(props.minHour, 0, 23);
-          const upper = isInMaxDay && !isTimeMode ? maxHour : clamp(props.maxHour, lower, 23);
-          generateColumn("hour", lower, upper);
-        }
-        if (meaningColumn.includes("minute")) {
-          const lower = isInMinHour && !isTimeMode ? minMinute : clamp(props.minMinute, 0, 59);
-          const upper = isInMaxHour && !isTimeMode ? maxMinute : clamp(props.maxMinute, lower, 59);
-          generateColumn("minute", lower, upper);
-        }
-        if (meaningColumn.includes("second")) {
-          const lower = isInMinMinute && !isTimeMode ? minSecond : 0;
-          const upper = isInMaxMinute && !isTimeMode ? maxSecond : 59;
-          generateColumn("second", lower, upper);
-        }
-        return ret;
-      });
-      const innterFormat = vue.computed(() => {
-        const first = meaningColumn.length > 0 ? meaningColumn[0] : "year";
-        const last = meaningColumn.length > 0 ? meaningColumn[meaningColumn.length - 1] : "date";
-        const format = DEFAULT_FORMAT.substring(DEFAULT_FORMAT.indexOf(UTS.mapGet(FORMAT_MAP, first)), DEFAULT_FORMAT.lastIndexOf(UTS.mapGet(FORMAT_MAP, last)) + UTS.mapGet(FORMAT_MAP, last).length);
-        return format;
-      });
-      const onConfirm = (_a2) => {
-        var values = _a2.values;
-        let cur = curDate.value;
-        values.forEach((item, index) => {
-          const type = meaningColumn[index];
-          cur = cur.set(type, parseInt("".concat(item), 10));
+          });
         });
-        const curValue = cur.format(props.format);
-        innerValue.value = cur.format(innterFormat.value);
-        emit("confirm", curValue);
-      };
-      const onCancel = () => {
-        emit("cancel");
-      };
-      const onPick = (_a2) => {
-        _a2.values;
-        var column = _a2.column, index = _a2.index;
-        const type = meaningColumn[column];
-        const val = curDate.value.set(type, parseInt(columns.value[column][index].value, 10));
-        curDate.value = rationalize(val);
-        emit("pick", rationalize(val).format(props.format));
-      };
-      const onChange = (values) => {
-        let cur = curDate.value;
-        values.forEach((item, index) => {
-          const type = meaningColumn[index];
-          cur = cur.set(type, parseInt("".concat(item), 10));
-        });
-        curDate.value = rationalize(cur);
-        const curValue = curDate.value.format(innterFormat.value);
-        innerValue.value = curValue;
-      };
-      const stop = vue.watch(innerValue, (val) => {
-        curDate.value = calcDate(val);
       });
-      vue.onBeforeUnmount(() => {
-        stop();
-        columnCache.clear();
-      });
-      const __returned__ = { emit, props, get defaultValue() {
-        return defaultValue;
-      }, set defaultValue(v2) {
-        defaultValue = v2;
-      }, innerValue, meaningColumn, isTimeMode, normalize, minDate, maxDate, rationalize, calcDate, curDate, valueOfPicker, columnCache, columns, innterFormat, onConfirm, onCancel, onPick, onChange, stop };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
     }
-  });
-  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_l_picker = resolveEasycom(vue.resolveDynamicComponent("l-picker"), __easycom_0$5);
-    return vue.openBlock(), vue.createBlock(_component_l_picker, {
-      title: $props.title,
-      titleStyle: $props.titleStyle,
-      "confirm-btn": $props.confirmBtn,
-      "confirm-style": $props.confirmStyle,
-      "cancel-btn": $props.cancelBtn,
-      "cancel-style": $props.cancelStyle,
-      itemHeight: $props.itemHeight,
-      itemColor: $props.itemColor,
-      itemFontSize: $props.itemFontSize,
-      itemActiveColor: $props.itemActiveColor,
-      indicatorStyle: $props.indicatorStyle,
-      bgColor: $props.bgColor,
-      groupHeight: $props.groupHeight,
-      radius: $props.radius,
-      value: $setup.valueOfPicker,
-      columns: $setup.columns,
-      maskColors: $props.maskColors,
-      onConfirm: $setup.onConfirm,
-      onCancel: $setup.onCancel,
-      onChange: $setup.onChange,
-      onPick: $setup.onPick
-    }, null, 8, ["title", "titleStyle", "confirm-btn", "confirm-style", "cancel-btn", "cancel-style", "itemHeight", "itemColor", "itemFontSize", "itemActiveColor", "indicatorStyle", "bgColor", "groupHeight", "radius", "value", "columns", "maskColors"]);
+    function syncNativeWheelIndexes(indexes) {
+      const generation = ++wheelSyncGeneration;
+      wheelInternalChange = true;
+      wheelIndexes.value = copyWheelIndexes(indexes);
+      scheduleFrame(() => {
+        if (generation != wheelSyncGeneration)
+          return null;
+        wheelIndexes.value = copyWheelIndexes(indexes);
+        scheduleFrame(() => {
+          if (generation == wheelSyncGeneration)
+            wheelInternalChange = false;
+        });
+      });
+    }
+    function forceWheelIndexRefresh(indexes, changedIndex, optionCount) {
+      const generation = ++wheelSyncGeneration;
+      wheelInternalChange = true;
+      wheelIndexes.value = copyWheelIndexes(indexes);
+      scheduleFrame(() => {
+        if (generation != wheelSyncGeneration)
+          return null;
+        if (changedIndex >= 0 && changedIndex < indexes.length && optionCount > 1) {
+          const refreshed = copyWheelIndexes(indexes);
+          const target = indexes[changedIndex];
+          refreshed[changedIndex] = target > 0 ? target - 1 : 1;
+          wheelIndexes.value = refreshed;
+        }
+        scheduleFrame(() => {
+          if (generation != wheelSyncGeneration)
+            return null;
+          wheelIndexes.value = copyWheelIndexes(indexes);
+          scheduleFrame(() => {
+            if (generation == wheelSyncGeneration)
+              wheelInternalChange = false;
+          });
+        });
+      });
+    }
+    function wheelOptionCountAt(index) {
+      let visibleIndex = 0;
+      if (showYearColumn.value) {
+        if (visibleIndex == index)
+          return yearOptions.value.length;
+        visibleIndex++;
+      }
+      if (showMonthColumn.value) {
+        if (visibleIndex == index)
+          return monthOptions.value.length;
+        visibleIndex++;
+      }
+      if (showDayColumn.value) {
+        if (visibleIndex == index)
+          return dayOptions.value.length;
+        visibleIndex++;
+      }
+      if (showHourColumn.value) {
+        if (visibleIndex == index)
+          return hourOptions.value.length;
+        visibleIndex++;
+      }
+      if (showMinuteColumn.value) {
+        if (visibleIndex == index)
+          return minuteOptions.value.length;
+      }
+      return 0;
+    }
+    function indexOfOption(options, value) {
+      for (let index = 0; index < options.length; index++) {
+        if (options[index].value == value)
+          return index;
+      }
+      return 0;
+    }
+    function clampDraftParts() {
+      if (normalizedMode.value == "time") {
+        currentTime.value = clampTime(currentTime.value);
+        return null;
+      }
+      const minDate = minDateParts();
+      const maxDate = maxDateParts();
+      let year = selectedYear();
+      let month = selectedMonth();
+      let day = selectedDay();
+      let hour = selectedHour();
+      let minute = selectedMinute();
+      if (year < minDate.getFullYear())
+        year = minDate.getFullYear();
+      if (year > maxDate.getFullYear())
+        year = maxDate.getFullYear();
+      const firstMonth = year == minDate.getFullYear() ? minDate.getMonth() + 1 : 1;
+      const lastMonth = year == maxDate.getFullYear() ? maxDate.getMonth() + 1 : 12;
+      if (month < firstMonth)
+        month = firstMonth;
+      if (month > lastMonth)
+        month = lastMonth;
+      let firstDay = 1;
+      let lastDay = daysInMonth(year, month);
+      if (year == minDate.getFullYear() && month == minDate.getMonth() + 1)
+        firstDay = minDate.getDate();
+      if (year == maxDate.getFullYear() && month == maxDate.getMonth() + 1)
+        lastDay = maxDate.getDate();
+      if (day < firstDay)
+        day = firstDay;
+      if (day > lastDay)
+        day = lastDay;
+      const timestamp = dateTimeToTimestamp(dateFromParts(year, month, day, hour, minute).split(" ")[0], padNumber(hour) + ":" + padNumber(minute));
+      if (timestamp < minDateValue()) {
+        currentDate.value = formatDate(minDateValue());
+        currentTime.value = formatTime(minDateValue());
+        return null;
+      }
+      if (timestamp > maxDateValue()) {
+        currentDate.value = formatDate(maxDateValue());
+        currentTime.value = formatTime(maxDateValue());
+        return null;
+      }
+      currentDate.value = year.toString() + "-" + padNumber(month) + "-" + padNumber(day);
+      currentTime.value = padNumber(hour) + ":" + padNumber(minute);
+    }
+    function syncWheelIndexes(syncNative = true) {
+      clampDraftParts();
+      const indexes = [];
+      if (showYearColumn.value)
+        indexes.push(indexOfOption(yearOptions.value, selectedYear()));
+      if (showMonthColumn.value)
+        indexes.push(indexOfOption(monthOptions.value, selectedMonth()));
+      if (showDayColumn.value)
+        indexes.push(indexOfOption(dayOptions.value, selectedDay()));
+      if (showHourColumn.value)
+        indexes.push(indexOfOption(hourOptions.value, selectedHour()));
+      if (showMinuteColumn.value)
+        indexes.push(indexOfOption(minuteOptions.value, selectedMinute()));
+      if (syncNative)
+        syncNativeWheelIndexes(indexes);
+      return indexes;
+    }
+    function selectedOptionValue(options, index, fallback) {
+      if (options.length == 0)
+        return fallback;
+      let safeIndex = index;
+      if (safeIndex < 0)
+        safeIndex = 0;
+      if (safeIndex >= options.length)
+        safeIndex = options.length - 1;
+      return options[safeIndex].value;
+    }
+    function wheelIndexAt(values, index) {
+      if (values.length <= index || values[index] == null)
+        return 0;
+      const result = parseFloat(values[index].toString());
+      if (isNaN(result) || result < 0)
+        return 0;
+      return Math.floor(result);
+    }
+    const displayValue = vue.computed(() => {
+      if (normalizedMode.value == "time")
+        return currentTime.value;
+      if (normalizedMode.value == "date")
+        return currentDate.value;
+      if (normalizedMode.value == "year-month")
+        return currentDate.value.substring(0, 7);
+      return currentDate.value + " " + currentTime.value;
+    });
+    const panelStyle = vue.computed(() => {
+      const radius = formatSize(props.round);
+      return "border-radius:" + radius + " " + radius + " 0 0;";
+    });
+    function currentTimestamp() {
+      return dateTimeToTimestamp(currentDate.value, currentTime.value);
+    }
+    function outputValue() {
+      if (normalizedMode.value == "time")
+        return currentTime.value;
+      return currentTimestamp();
+    }
+    function buildEvent() {
+      return new UTSJSONObject({
+        value: outputValue(),
+        date: currentDate.value,
+        time: currentTime.value,
+        timestamp: currentTimestamp(),
+        mode: normalizedMode.value
+      });
+    }
+    function emitValue() {
+      const event = buildEvent();
+      emit("update:modelValue", event.value);
+      emit("update:date", currentDate.value);
+      emit("update:time", currentTime.value);
+    }
+    function applyValue(value = null) {
+      if (normalizedMode.value == "time") {
+        currentTime.value = normalizeTime(value.toString());
+        return null;
+      }
+      if (typeof value == "number") {
+        if (value > 0) {
+          currentDate.value = formatDate(value);
+          currentTime.value = formatTime(value);
+        }
+        return null;
+      }
+      const text = value.toString();
+      if (/^\d+$/.test(text)) {
+        const timestamp = parseFloat(text);
+        if (!isNaN(timestamp) && timestamp > 0) {
+          currentDate.value = formatDate(timestamp);
+          currentTime.value = formatTime(timestamp);
+          return null;
+        }
+      }
+      if (text.length >= 10)
+        currentDate.value = text.substring(0, 10);
+      if (text.length >= 16)
+        currentTime.value = text.substring(11, 16);
+    }
+    function clampCurrent() {
+      if (normalizedMode.value == "time") {
+        currentTime.value = clampTime(currentTime.value);
+        return null;
+      }
+      let timestamp = currentTimestamp();
+      const minValue = minDateValue();
+      const maxValue = maxDateValue();
+      if (timestamp < minValue)
+        timestamp = minValue;
+      if (timestamp > maxValue)
+        timestamp = maxValue;
+      currentDate.value = formatDate(timestamp);
+      currentTime.value = formatTime(timestamp);
+    }
+    function syncFromProps() {
+      cancelWheelIndexSync();
+      cancelWheelReady();
+      wheelInitialized = false;
+      wheelInternalChange = true;
+      const modelText = props.modelValue.toString();
+      if (modelText.length > 0) {
+        applyValue(props.modelValue);
+      } else {
+        currentDate.value = props.date;
+        currentTime.value = props.time;
+      }
+      clampCurrent();
+      syncWheelIndexes();
+      scheduleWheelReady();
+    }
+    function open() {
+      if (opened.value)
+        return null;
+      opened.value = true;
+      syncFromProps();
+      emit("open");
+      emit("update:show", true);
+    }
+    function openByTrigger() {
+      if (props.disabled)
+        return null;
+      open();
+    }
+    function close() {
+      cancelWheelIndexSync();
+      cancelWheelReady();
+      wheelInitialized = false;
+      wheelInternalChange = false;
+      if (!opened.value)
+        return null;
+      opened.value = false;
+      emit("close");
+      emit("update:show", false);
+    }
+    function cancel() {
+      cancelWheelIndexSync();
+      emit("cancel", buildEvent());
+      close();
+    }
+    function confirm() {
+      const event = buildEvent();
+      emit("confirm", event);
+      emitValue();
+      cancelWheelIndexSync();
+      close();
+    }
+    function handleOverlayClick() {
+      if (!props.closeOnMask)
+        return null;
+      close();
+    }
+    function handleWheelChange(event) {
+      if (props.disabled || props.loading || !wheelInitialized || wheelInternalChange)
+        return null;
+      const values = event.detail.value;
+      if (values == null || !Array.isArray(values))
+        return null;
+      const previousYearOptions = yearOptions.value;
+      const previousMonthOptions = monthOptions.value;
+      const previousDayOptions = dayOptions.value;
+      const previousHourOptions = hourOptions.value;
+      const previousMinuteOptions = minuteOptions.value;
+      let valueIndex = 0;
+      const oldYear = selectedYear();
+      const oldMonth = selectedMonth();
+      const oldDay = selectedDay();
+      const oldHour = selectedHour();
+      const oldMinute = selectedMinute();
+      let year = oldYear;
+      let month = oldMonth;
+      let day = oldDay;
+      let hour = oldHour;
+      let minute = oldMinute;
+      if (showYearColumn.value) {
+        year = selectedOptionValue(previousYearOptions, wheelIndexAt(values, valueIndex), year);
+        valueIndex++;
+      }
+      if (showMonthColumn.value) {
+        month = selectedOptionValue(previousMonthOptions, wheelIndexAt(values, valueIndex), month);
+        valueIndex++;
+      }
+      if (showDayColumn.value) {
+        day = selectedOptionValue(previousDayOptions, wheelIndexAt(values, valueIndex), day);
+        valueIndex++;
+      }
+      if (showHourColumn.value) {
+        hour = selectedOptionValue(previousHourOptions, wheelIndexAt(values, valueIndex), hour);
+        valueIndex++;
+      }
+      if (showMinuteColumn.value) {
+        minute = selectedOptionValue(previousMinuteOptions, wheelIndexAt(values, valueIndex), minute);
+        valueIndex++;
+      }
+      const minDate = minDateParts();
+      const maxDate = maxDateParts();
+      const minMonth = year == minDate.getFullYear() ? minDate.getMonth() + 1 : 1;
+      const maxMonth = year == maxDate.getFullYear() ? maxDate.getMonth() + 1 : 12;
+      if (month < minMonth)
+        month = minMonth;
+      if (month > maxMonth)
+        month = maxMonth;
+      const maxDay = daysInMonth(year, month);
+      if (day < 1)
+        day = 1;
+      if (day > maxDay)
+        day = maxDay;
+      currentDate.value = dateFromParts(year, month, day, hour, minute).split(" ")[0];
+      currentTime.value = padNumber(hour) + ":" + padNumber(minute);
+      clampCurrent();
+      const indexes = syncWheelIndexes(false);
+      const dependentColumnChanged = year != oldYear || month != oldMonth;
+      if (dependentColumnChanged) {
+        const oldIndexes = copyWheelIndexes(wheelIndexes.value);
+        const changedIndex = findChangedWheelIndex(indexes, oldIndexes);
+        forceWheelIndexRefresh(indexes, changedIndex, wheelOptionCountAt(changedIndex));
+      } else {
+        cancelWheelIndexSync();
+      }
+      if (!props.showToolbar)
+        emitValue();
+      emit("change", buildEvent());
+    }
+    vue.watch(() => {
+      return props.show;
+    }, (nextValue) => {
+      if (opened.value == nextValue)
+        return null;
+      opened.value = nextValue;
+      if (nextValue) {
+        syncFromProps();
+        emit("open");
+      } else {
+        emit("close");
+      }
+    });
+    vue.watch(() => {
+      return props.modelValue;
+    }, () => {
+      syncFromProps();
+    });
+    vue.watch(() => {
+      return props.date;
+    }, () => {
+      syncFromProps();
+    });
+    vue.watch(() => {
+      return props.time;
+    }, () => {
+      syncFromProps();
+    });
+    vue.watch(() => {
+      return props.minDate;
+    }, () => {
+      clampCurrent();
+    });
+    vue.watch(() => {
+      return props.maxDate;
+    }, () => {
+      syncFromProps();
+    });
+    vue.onMounted(() => {
+      syncFromProps();
+    });
+    syncFromProps();
+    __expose({
+      open,
+      close,
+      setFormatter() {
+      }
+    });
+    const __returned__ = { props, emit, padNumber, formatDate, formatTime, validHour, validMinute, timeToMinutes, normalizeTime, dateTimeToTimestamp, minDateValue, maxDateValue, formatSize, clampTime, opened, currentDate, currentTime, boundaryStartTime, boundaryEndTime, normalizedMode, datePart, optionRange, dateFromParts, daysInMonth, selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute, minDateParts, maxDateParts, showYearColumn, showMonthColumn, showDayColumn, showHourColumn, showMinuteColumn, yearOptions, columnsStyle, indicatorStyle, itemStyle, monthOptions, dayOptions, hourRange, hourOptions, minuteRange, minuteOptions, wheelIndexes, get wheelSyncGeneration() {
+      return wheelSyncGeneration;
+    }, set wheelSyncGeneration(v2) {
+      wheelSyncGeneration = v2;
+    }, get wheelReadyGeneration() {
+      return wheelReadyGeneration;
+    }, set wheelReadyGeneration(v2) {
+      wheelReadyGeneration = v2;
+    }, get wheelInitialized() {
+      return wheelInitialized;
+    }, set wheelInitialized(v2) {
+      wheelInitialized = v2;
+    }, get wheelInternalChange() {
+      return wheelInternalChange;
+    }, set wheelInternalChange(v2) {
+      wheelInternalChange = v2;
+    }, scheduleFrame, copyWheelIndexes, findChangedWheelIndex, cancelWheelIndexSync, cancelWheelReady, scheduleWheelReady, syncNativeWheelIndexes, forceWheelIndexRefresh, wheelOptionCountAt, indexOfOption, clampDraftParts, syncWheelIndexes, selectedOptionValue, wheelIndexAt, displayValue, panelStyle, currentTimestamp, outputValue, buildEvent, emitValue, applyValue, clampCurrent, syncFromProps, open, openByTrigger, close, cancel, confirm, handleOverlayClick, handleWheelChange };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  } }));
+  const _style_0$m = { "i-datetime-picker": { "": { "width": "100%" } }, "i-datetime-picker__trigger": { "": { "width": "100%" } }, "i-datetime-picker__input": { "": { "height": 44, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff", "flexDirection": "row", "alignItems": "center" } }, "i-datetime-picker__input-text": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#303133", "fontSize": 14, "lineHeight": "22px" } }, "i-datetime-picker__arrow": { "": { "width": 20, "color": "#909193", "fontSize": 20, "lineHeight": "24px", "textAlign": "right", "transform": "rotate(90deg)" } }, "i-datetime-picker__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "zIndex": 150, "backgroundColor": "rgba(0,0,0,0.42)", "justifyContent": "flex-end" } }, "i-datetime-picker__panel": { "": { "overflow": "hidden", "backgroundColor": "#ffffff" } }, "i-datetime-picker__toolbar": { "": { "height": 48, "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-datetime-picker__cancel": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px" } }, "i-datetime-picker__confirm": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px", "textAlign": "right" } }, "i-datetime-picker__title": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#111827", "fontSize": 16, "fontWeight": 700, "lineHeight": "24px", "textAlign": "center" } }, "i-datetime-picker__loading": { "": { "position": "absolute", "left": 0, "right": 0, "top": 48, "bottom": 0, "zIndex": 2, "backgroundColor": "rgba(255,255,255,0.78)", "alignItems": "center", "justifyContent": "center" } }, "i-datetime-picker__loading-text": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px" } }, "i-datetime-picker__columns": { "": { "width": "100%", "height": 220 } }, "i-datetime-picker__column": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": "100%" } }, "i-datetime-picker__item": { "": { "width": "100%", "alignItems": "center", "justifyContent": "center" } }, "i-datetime-picker__value": { "": { "color": "#606266", "fontSize": 15, "lineHeight": "44px", "textAlign": "center" } } };
+  function _sfc_render$l(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", { class: "i-datetime-picker" }, [
+      vue.createElementVNode("view", {
+        class: "i-datetime-picker__trigger",
+        onClick: $setup.openByTrigger
+      }, [
+        vue.renderSlot(_ctx.$slots, "trigger", {}, () => [
+          vue.renderSlot(_ctx.$slots, "default", {}, () => [
+            vue.createElementVNode("view", { class: "i-datetime-picker__input" }, [
+              vue.createElementVNode(
+                "text",
+                { class: "i-datetime-picker__input-text" },
+                vue.toDisplayString($setup.displayValue),
+                1
+                /* TEXT */
+              ),
+              vue.createElementVNode("text", { class: "i-datetime-picker__arrow" }, "›")
+            ])
+          ])
+        ])
+      ]),
+      $setup.opened ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 0,
+        class: "i-datetime-picker__mask",
+        onClick: $setup.handleOverlayClick
+      }, [
+        vue.createElementVNode(
+          "view",
+          {
+            class: "i-datetime-picker__panel",
+            style: vue.normalizeStyle($setup.panelStyle),
+            onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
+            }, ["stop"]))
+          },
+          [
+            $props.showToolbar ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "i-datetime-picker__toolbar"
+            }, [
+              vue.createElementVNode(
+                "text",
+                {
+                  class: "i-datetime-picker__cancel",
+                  style: vue.normalizeStyle("color:" + $props.cancelColor + ";"),
+                  onClick: $setup.cancel
+                },
+                vue.toDisplayString($props.cancelText),
+                5
+                /* TEXT, STYLE */
+              ),
+              vue.createElementVNode(
+                "text",
+                { class: "i-datetime-picker__title" },
+                vue.toDisplayString($props.title),
+                1
+                /* TEXT */
+              ),
+              vue.createElementVNode(
+                "text",
+                {
+                  class: "i-datetime-picker__confirm",
+                  style: vue.normalizeStyle("color:" + $props.confirmColor + ";"),
+                  onClick: $setup.confirm
+                },
+                vue.toDisplayString($props.confirmText),
+                5
+                /* TEXT, STYLE */
+              )
+            ])) : vue.createCommentVNode("v-if", true),
+            $props.loading ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
+              class: "i-datetime-picker__loading"
+            }, [
+              vue.createElementVNode("text", { class: "i-datetime-picker__loading-text" }, "加载中...")
+            ])) : vue.createCommentVNode("v-if", true),
+            vue.createElementVNode("picker-view", {
+              class: "i-datetime-picker__columns",
+              style: vue.normalizeStyle($setup.columnsStyle),
+              value: $setup.wheelIndexes,
+              "indicator-style": $setup.indicatorStyle,
+              onChange: $setup.handleWheelChange
+            }, [
+              $setup.showYearColumn ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 0,
+                class: "i-datetime-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.yearOptions, (item) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: "i-datetime-picker__item",
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          { class: "i-datetime-picker__value" },
+                          vue.toDisplayString(item.text),
+                          1
+                          /* TEXT */
+                        )
+                      ],
+                      4
+                      /* STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true),
+              $setup.showMonthColumn ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 1,
+                class: "i-datetime-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.monthOptions, (item) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: "i-datetime-picker__item",
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          { class: "i-datetime-picker__value" },
+                          vue.toDisplayString(item.text),
+                          1
+                          /* TEXT */
+                        )
+                      ],
+                      4
+                      /* STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true),
+              $setup.showDayColumn ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 2,
+                class: "i-datetime-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.dayOptions, (item) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: "i-datetime-picker__item",
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          { class: "i-datetime-picker__value" },
+                          vue.toDisplayString(item.text),
+                          1
+                          /* TEXT */
+                        )
+                      ],
+                      4
+                      /* STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true),
+              $setup.showHourColumn ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 3,
+                class: "i-datetime-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.hourOptions, (item) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: "i-datetime-picker__item",
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          { class: "i-datetime-picker__value" },
+                          vue.toDisplayString(item.text),
+                          1
+                          /* TEXT */
+                        )
+                      ],
+                      4
+                      /* STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true),
+              $setup.showMinuteColumn ? (vue.openBlock(), vue.createElementBlock("picker-view-column", {
+                key: 4,
+                class: "i-datetime-picker__column"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.minuteOptions, (item) => {
+                    return vue.openBlock(), vue.createElementBlock(
+                      "view",
+                      {
+                        key: item.value,
+                        class: "i-datetime-picker__item",
+                        style: vue.normalizeStyle($setup.itemStyle)
+                      },
+                      [
+                        vue.createElementVNode(
+                          "text",
+                          { class: "i-datetime-picker__value" },
+                          vue.toDisplayString(item.text),
+                          1
+                          /* TEXT */
+                        )
+                      ],
+                      4
+                      /* STYLE */
+                    );
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true)
+            ], 44, ["value", "indicator-style"])
+          ],
+          4
+          /* STYLE */
+        )
+      ])) : vue.createCommentVNode("v-if", true)
+    ]);
   }
-  const __easycom_2$1 = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.uvue"]]);
+  const __easycom_2$1 = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["styles", [_style_0$m]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-datetime-picker/i-datetime-picker.uvue"]]);
   class TrackPoint extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -17780,7 +15706,7 @@
       delete this.__props__;
     }
   };
-  const _sfc_main$m = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$l = /* @__PURE__ */ vue.defineComponent({
     __name: "playBack",
     setup(__props, _a) {
       var __expose = _a.expose;
@@ -17802,7 +15728,7 @@
       const polyline = vue.ref([]);
       const isPlaying = vue.ref(false);
       const isTrackPlayable = vue.ref(false);
-      const playbackSpeed = vue.ref(5);
+      const playbackSpeed = vue.ref(1);
       const totalDistance = vue.ref(0);
       const currentSpeed = vue.ref(0);
       const currentTime = vue.ref("");
@@ -17811,15 +15737,25 @@
       let playbackTimer = null;
       let lastTimestamp = 0;
       let replaySessionId = 0;
+      const minDate = vue.computed(() => {
+        const now2 = /* @__PURE__ */ new Date();
+        return new Date(now2.getFullYear(), now2.getMonth() - 6, now2.getDate(), 0, 0, 0).getTime();
+      });
+      const maxDate = vue.computed(() => {
+        return Date.now();
+      });
       function formatPlaybackTime(timestamp) {
         var _a2;
-        return (_a2 = formatTimes(timestamp)) !== null && _a2 !== void 0 ? _a2 : "";
+        return (_a2 = formatTimesToMinute(timestamp)) !== null && _a2 !== void 0 ? _a2 : "";
       }
       const now = /* @__PURE__ */ new Date();
-      const initialEndTime = formatTimes(now.getTime());
-      const initialStartTime = formatTimes(now.getTime() - 36e5 * 6);
+      const initialEndTime = formatTimesToMinute(now.getTime());
+      const initialStartTime = formatTimesToMinute(now.getTime() - 36e5 * 6);
       const startTime = vue.ref(initialStartTime);
       const endTime = vue.ref(initialEndTime);
+      const currentPickerValue = vue.computed(() => {
+        return currentPickerType.value == "start" ? startTime.value : endTime.value;
+      });
       function normalizePlaybackTime(value, fallback) {
         const milliseconds = parseLocalDateTime(value);
         return milliseconds == null ? fallback : formatPlaybackTime(milliseconds);
@@ -17857,7 +15793,7 @@
           const milliseconds = parseLocalDateTime(decoded);
           return milliseconds == null ? null : formatPlaybackTime(milliseconds);
         } catch (error) {
-          uni.__log__("error", "at pages/playBack/playBack.uvue:205", "解析回放时间失败:", error);
+          uni.__log__("error", "at pages/playBack/playBack.uvue:224", "解析回放时间失败:", error);
           return null;
         }
       }
@@ -18191,7 +16127,7 @@
             imei: imei.value,
             startTime: startTime.value.replace(/\//g, "-"),
             endTime: endTime.value.replace(/\//g, "-"),
-            minParkTime: 2,
+            minParkTime: 1,
             withStop: false,
             withPos: true,
             withTrip: false
@@ -18222,7 +16158,7 @@
           } catch (error) {
             if (requestId != replaySessionId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/playBack/playBack.uvue:691", "加载轨迹失败:", error);
+            uni.__log__("error", "at pages/playBack/playBack.uvue:710", "加载轨迹失败:", error);
             showAppToast({ title: "轨迹加载失败", icon: "none" });
             if (!isNaN(parseFloat((_a2 = lat.value) !== null && _a2 !== void 0 ? _a2 : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
               showCurrentPosition();
@@ -18291,9 +16227,15 @@
           startPlayback();
         }
       }
-      function onConfirm(value) {
+      function getPickerTimestamp(event) {
+        return event.getNumber("timestamp", 0);
+      }
+      function onConfirm(event) {
         var _a2, _b;
-        const formattedValue = normalizeDateTime(value);
+        const timestamp = getPickerTimestamp(event);
+        if (timestamp <= 0)
+          return null;
+        const formattedValue = formatPlaybackTime(timestamp);
         if (currentPickerType.value == "start") {
           setPlaybackTimeRange(formattedValue, (_a2 = endTime.value) !== null && _a2 !== void 0 ? _a2 : "");
         } else {
@@ -18306,10 +16248,13 @@
       function onCancel() {
         showDateTimePicker.value = false;
       }
+      function onPickerShowChange(value) {
+        showDateTimePicker.value = value;
+      }
       function applyPlaybackSpeed(value) {
         if (!isFinite(value))
           return null;
-        playbackSpeed.value = Math.min(50, Math.max(5, value));
+        playbackSpeed.value = Math.min(30, Math.max(1, value));
         if (!isPlaying.value)
           return null;
         const timer = playbackTimer;
@@ -18339,7 +16284,7 @@
         lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
         sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
         eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
-        uni.__log__("log", "at pages/playBack/playBack.uvue:820", sTime.value, eTime.value);
+        uni.__log__("log", "at pages/playBack/playBack.uvue:849", sTime.value, eTime.value);
         const routeStartTime = resolveRouteDateTime(sTime.value);
         const routeEndTime = resolveRouteDateTime(eTime.value);
         if (routeStartTime != null && routeEndTime != null) {
@@ -18370,20 +16315,19 @@
         return replaySessionId;
       }, set replaySessionId(v2) {
         replaySessionId = v2;
-      }, formatPlaybackTime, now, initialEndTime, initialStartTime, startTime, endTime, normalizePlaybackTime, getPlaybackDate, getPlaybackClock, setPlaybackTimeRange, lat, lng, sTime, eTime, markers, safeParseDate, normalizeDateTime, resolveRouteDateTime, formatTimeForDisplay, formatDateForDisplay, calculateBearing, getDistance, calculateTrackBounds, adjustMapToFitTrack, calculateTrackDistance, initDateTime, initCarMarker, toMpPoints, updatePolyline, initPolyline, updateCarPosition, showPicker, showCurrentPosition, clearTrackDisplay, pausePlayback, renderPlaybackIndex, processTrackData, loadTrackPos, resetPlayback, playNextPoint, playbackStep, startPlayback, togglePlayback, onConfirm, onCancel, applyPlaybackSpeed, setPlaybackSpeedFromValue, setPlaybackSpeed };
+      }, minDate, maxDate, formatPlaybackTime, now, initialEndTime, initialStartTime, startTime, endTime, currentPickerValue, normalizePlaybackTime, getPlaybackDate, getPlaybackClock, setPlaybackTimeRange, lat, lng, sTime, eTime, markers, safeParseDate, normalizeDateTime, resolveRouteDateTime, formatTimeForDisplay, formatDateForDisplay, calculateBearing, getDistance, calculateTrackBounds, adjustMapToFitTrack, calculateTrackDistance, initDateTime, initCarMarker, toMpPoints, updatePolyline, initPolyline, updateCarPosition, showPicker, showCurrentPosition, clearTrackDisplay, pausePlayback, renderPlaybackIndex, processTrackData, loadTrackPos, resetPlayback, playNextPoint, playbackStep, startPlayback, togglePlayback, getPickerTimestamp, onConfirm, onCancel, onPickerShowChange, applyPlaybackSpeed, setPlaybackSpeedFromValue, setPlaybackSpeed };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$m = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "tools-panel": { ".container ": { "width": "100%", "boxSizing": "border-box", "backgroundColor": "#ffffff", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "boxShadow": "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "30rpx" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "display": "flex", "boxSizing": "border-box", "flexDirection": "row", "alignItems": "center" } }, "date-time-control": { ".container .tools-panel .Datetime-box .date-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0, "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx", "paddingTop": "6rpx", "paddingRight": "4rpx", "paddingBottom": "6rpx", "paddingLeft": "4rpx" } }, "date-part": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "24rpx", "lineHeight": "32rpx", "whiteSpace": "nowrap" } }, "time-part": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "24rpx", "lineHeight": "32rpx", "whiteSpace": "nowrap" } }, "date-arrow": { ".container .tools-panel .Datetime-box .date-box ": { "flexShrink": 0 } }, "date-separator": { ".container .tools-panel .Datetime-box .date-box ": { "flexShrink": 0, "marginTop": 0, "marginRight": "20rpx", "marginBottom": 0, "marginLeft": "20rpx", "fontSize": "26rpx" } }, "playbackdetail": { ".container .tools-panel .Datetime-box ": { "fontSize": "25rpx", "color": "#1890FF" } }, "tool-tag-item": { ".container .tools-panel ": { "paddingTop": "40rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "speed-label": { ".container .tools-panel .tool-tag-item ": { "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#1890FF", "borderRightColor": "#1890FF", "borderBottomColor": "#1890FF", "borderLeftColor": "#1890FF", "fontSize": "25rpx", "color": "#1890FF", "paddingTop": "5rpx", "paddingRight": "15rpx", "paddingBottom": "5rpx", "paddingLeft": "15rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx", "marginLeft": "20rpx" } }, "slider": { ".container .tools-panel .tool-tag-item ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "30rpx", "overflow": "visible" } }, "play-btn": { ".container .tools-panel .tool-tag-item ": { "fontSize": "25rpx", "color": "#ffffff", "paddingTop": "10rpx", "paddingRight": "25rpx", "paddingBottom": "10rpx", "paddingLeft": "25rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginLeft": "20rpx", "backgroundColor": "#1890FF" } }, "play-back-info": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "backgroundColor": "#f9f9f9", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "item-info": { ".container .tools-panel .play-back-info ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "info-label": { ".container .tools-panel .play-back-info ": { "fontSize": "24rpx", "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": "10rpx", "paddingLeft": 0, "color": "#999999" } } };
-  function _sfc_render$l(_ctx, _cache, $props, $setup, $data, $options) {
+  const _style_0$l = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "tools-panel": { ".container ": { "width": "100%", "boxSizing": "border-box", "backgroundColor": "#ffffff", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "boxShadow": "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "30rpx" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "display": "flex", "boxSizing": "border-box", "flexDirection": "row", "alignItems": "center" } }, "date-time-control": { ".container .tools-panel .Datetime-box .date-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0, "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx", "paddingTop": "6rpx", "paddingRight": "4rpx", "paddingBottom": "6rpx", "paddingLeft": "4rpx" } }, "date-part": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "24rpx", "lineHeight": "32rpx", "whiteSpace": "nowrap" } }, "time-part": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "24rpx", "lineHeight": "32rpx", "whiteSpace": "nowrap" } }, "date-arrow": { ".container .tools-panel .Datetime-box .date-box ": { "flexShrink": 0 } }, "date-separator": { ".container .tools-panel .Datetime-box .date-box ": { "flexShrink": 0, "marginTop": 0, "marginRight": "20rpx", "marginBottom": 0, "marginLeft": "20rpx", "fontSize": "26rpx" } }, "playbackdetail": { ".container .tools-panel .Datetime-box ": { "fontSize": "25rpx", "color": "#1890FF" } }, "tool-tag-item": { ".container .tools-panel ": { "paddingTop": "40rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "speed-label": { ".container .tools-panel .tool-tag-item ": { "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#1890FF", "borderRightColor": "#1890FF", "borderBottomColor": "#1890FF", "borderLeftColor": "#1890FF", "fontSize": "25rpx", "color": "#1890FF", "paddingTop": "5rpx", "paddingRight": "15rpx", "paddingBottom": "5rpx", "paddingLeft": "15rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx", "marginLeft": "20rpx" } }, "slider": { ".container .tools-panel .tool-tag-item ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "30rpx", "overflow": "visible" } }, "play-btn": { ".container .tools-panel .tool-tag-item ": { "fontSize": "25rpx", "color": "#ffffff", "paddingTop": "10rpx", "paddingRight": "25rpx", "paddingBottom": "10rpx", "paddingLeft": "25rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginLeft": "20rpx", "backgroundColor": "#1890FF" } }, "play-back-info": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "backgroundColor": "#f9f9f9", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "item-info": { ".container .tools-panel .play-back-info ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "info-label": { ".container .tools-panel .play-back-info ": { "fontSize": "24rpx", "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": "10rpx", "paddingLeft": 0, "color": "#999999" } } };
+  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_map = vue.resolveComponent("map");
     const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$2);
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_3);
-    const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), __easycom_2$1);
-    const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
+    const _component_i_datetime_picker = resolveEasycom(vue.resolveDynamicComponent("i-datetime-picker"), __easycom_2$1);
     const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$1);
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
@@ -18477,9 +16421,9 @@
               vue.createElementVNode("view", { class: "slider" }, [
                 vue.createElementVNode("slider", {
                   value: $setup.playbackSpeed,
-                  min: 5,
-                  max: 50,
-                  step: 5,
+                  min: 1,
+                  max: 30,
+                  step: 1,
                   onChanging: $setup.setPlaybackSpeed,
                   onChange: $setup.setPlaybackSpeed
                 }, null, 40, ["value"])
@@ -18524,26 +16468,25 @@
                 vue.createElementVNode("text", { class: "info-label" }, "里程")
               ])
             ]),
-            vue.createVNode(_component_l_popup, {
-              modelValue: $setup.showDateTimePicker,
-              "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.showDateTimePicker = $event),
-              position: "bottom",
-              closeable: false
+            vue.createVNode(_component_i_datetime_picker, {
+              show: $setup.showDateTimePicker,
+              "model-value": $setup.currentPickerValue,
+              mode: "datetime",
+              title: $setup.pickerTitle,
+              "cancel-text": "取消",
+              "confirm-text": "确认",
+              onConfirm: $setup.onConfirm,
+              minDate: $setup.minDate,
+              maxDate: $setup.maxDate,
+              onCancel: $setup.onCancel,
+              "onUpdate:show": $setup.onPickerShowChange
             }, {
-              default: vue.withCtx(() => [
-                vue.createVNode(_component_l_date_time_picker, {
-                  "confirm-btn": "确认",
-                  "cancel-btn": "取消",
-                  title: $setup.pickerTitle,
-                  mode: 63,
-                  format: "YYYY-MM-DD HH:mm:ss",
-                  onConfirm: $setup.onConfirm,
-                  onCancel: $setup.onCancel
-                }, null, 8, ["title"])
+              trigger: vue.withCtx(() => [
+                vue.createElementVNode("view")
               ]),
               _: 1
               /* STABLE */
-            }, 8, ["modelValue"])
+            }, 8, ["show", "model-value", "title", "minDate", "maxDate"])
           ])
         ]),
         vue.createVNode(_component_app_toast)
@@ -18552,313 +16495,7 @@
       /* STABLE_FRAGMENT */
     );
   }
-  const PagesPlayBackPlayBack = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["styles", [_style_0$m]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/playBack/playBack.uvue"]]);
-  const _sfc_main$l = /* @__PURE__ */ vue.defineComponent({
-    __name: "index",
-    setup(__props, _a) {
-      var __expose = _a.expose;
-      __expose();
-      const instance = vue.getCurrentInstance();
-      const actionItems = vue.shallowRef([]);
-      const description = vue.shallowRef("");
-      const title = vue.shallowRef("");
-      const cancelText = vue.shallowRef("");
-      const align = vue.shallowRef("center");
-      const bordered = vue.shallowRef(false);
-      const closeable = vue.shallowRef(false);
-      const overlay = vue.shallowRef(true);
-      const rowCol = vue.ref(null);
-      const innerValue = vue.ref(false);
-      let selected = vue.ref(-1);
-      let parentKey = vue.ref("action-sheet-1");
-      vue.onLoad((options) => {
-        var _a2, _b, _c, _d, _e2, _f, _g, _h, _j;
-        const param = UTS.JSON.parseObject("".concat((_a2 = options["param"]) !== null && _a2 !== void 0 ? _a2 : "{}"));
-        parentKey.value = (_b = param.getString("key")) !== null && _b !== void 0 ? _b : "action-sheet-1";
-        description.value = (_c = param.getString("description")) !== null && _c !== void 0 ? _c : "";
-        title.value = (_d = param.getString("title")) !== null && _d !== void 0 ? _d : "";
-        cancelText.value = (_e2 = param.getString("cancelText")) !== null && _e2 !== void 0 ? _e2 : "";
-        align.value = (_f = param.getString("align")) !== null && _f !== void 0 ? _f : "center";
-        bordered.value = (_g = param.getBoolean("bordered")) !== null && _g !== void 0 ? _g : false;
-        closeable.value = (_h = param.getBoolean("closeable")) !== null && _h !== void 0 ? _h : true;
-        rowCol.value = param.getArray("rowCol");
-        const list = param.getArray("list");
-        const isImage = (name2 = null) => {
-          if (name2 == null)
-            return false;
-          return /\.(jpe?g|png|gif|bmp|webp|tiff?)$/i.test(name2) || /^data:image\/(jpeg|png|gif|bmp|webp|tiff);base64,/.test(name2);
-        };
-        actionItems.value = (_j = list === null || list === void 0 ? null : list.map((it2, index) => {
-          var _a3, _b2, _c2;
-          return {
-            label: (_a3 = it2.getString("label")) !== null && _a3 !== void 0 ? _a3 : "",
-            color: it2.getString("color"),
-            icon: it2.getString("icon"),
-            iconColor: it2.getString("iconColor"),
-            bgColor: it2.getString("bgColor"),
-            fontSize: (_b2 = it2.getString("fontSize")) !== null && _b2 !== void 0 ? _b2 : "32rpx",
-            disabled: (_c2 = it2.getBoolean("disabled")) !== null && _c2 !== void 0 ? _c2 : false,
-            radius: it2.getString("radius"),
-            __index: index,
-            __isImage: isImage(it2.getString("icon"))
-          };
-        })) !== null && _j !== void 0 ? _j : [];
-        vue.nextTick(() => {
-          innerValue.value = true;
-        });
-      });
-      const actionRowCols = vue.computed(() => {
-        const result = [];
-        const _rowCol = rowCol.value;
-        if (_rowCol == null)
-          return result;
-        const list = [...actionItems.value];
-        const rows = _rowCol.length;
-        for (let i2 = 0; i2 < rows; i2++) {
-          let cols = _rowCol[i2];
-          const row = [];
-          while (cols > 0 && list.length > 0) {
-            const item = UTS.arrayShift(list);
-            cols--;
-            row.push(item);
-          }
-          if (row.length > 0) {
-            result.push(row);
-          }
-        }
-        if (list.length > 0) {
-          result.push(list);
-        }
-        return result;
-      });
-      const handleSelected = (item) => {
-        if (item.disabled)
-          return null;
-        innerValue.value = false;
-        selected.value = item.__index;
-      };
-      const handleCancel = () => {
-        innerValue.value = false;
-        selected.value = -1;
-      };
-      const onClose = () => {
-        uni.closeDialogPage(new UTSJSONObject({
-          dialogPage: instance.proxy.$page,
-          fail(err) {
-            uni.__log__("log", "at uni_modules/lime-action-sheet/pages/index.uvue:189", "err", err);
-          }
-        }));
-        uni.$emit(parentKey.value, selected.value);
-      };
-      const __returned__ = { instance, actionItems, description, title, cancelText, align, bordered, closeable, overlay, rowCol, innerValue, get selected() {
-        return selected;
-      }, set selected(v2) {
-        selected = v2;
-      }, get parentKey() {
-        return parentKey;
-      }, set parentKey(v2) {
-        parentKey = v2;
-      }, actionRowCols, handleSelected, handleCancel, onClose };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
-    }
-  });
-  const _style_0$l = { "l-action-sheet": { "": { "borderTopLeftRadius": "var(--l-action-sheet-border-radius, 9px)", "borderTopRightRadius": "var(--l-action-sheet-border-radius, 9px)" } }, "l-action-sheet__item": { "": { "height": "var(--l-action-sheet-item-height, 56px)", "justifyContent": "center", "alignItems": "center", "flexDirection": "row", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16 } }, "l-action-sheet__item-text": { "": { "color": "var(--l-action-sheet-color, #000000E0)", "fontSize": "var(--l-action-sheet-font-size, 16px)", "marginLeft": 8, "marginRight": 8 } }, "l-action-sheet__item-icon": { "": { "color": "var(--l-action-sheet-color, #000000E0)", "fontSize": "var(--l-action-sheet-font-size, 16px)" } }, "l-action-sheet__item--hover": { "": { "backgroundColor": "var(--l-action-sheet-hover-color, #e7e7e7)" } }, "l-action-sheet__item--left": { "": { "justifyContent": "flex-start" } }, "l-action-sheet__item--disabled": { "": { "opacity": 0.5 } }, "l-action-sheet__item--bordered": { "": { "borderBottomWidth": 0.5, "borderBottomStyle": "solid", "borderBottomColor": "var(--l-action-sheet-border-color, #e7e7e7)" } }, "l-action-sheet__gap": { "": { "height": "var(--l-action-sheet-gap-height, 8px)", "backgroundColor": "var(--l-action-sheet-gap-color, #f3f3f3)" } }, "l-action-sheet__cancel": { "": { "display": "flex", "backgroundColor": "var(--l-action-sheet-cancel-bg-color, #fff)", "height": "var(--l-action-sheet-cancel-height, 48px)", "justifyContent": "center", "alignItems": "center", "boxSizing": "content-box" } }, "l-action-sheet__cancel--hover": { "": { "backgroundColor": "var(--l-action-sheet-hover-color, #e7e7e7)" } }, "l-action-sheet__cancel-text": { "": { "color": "var(--l-action-sheet-cancel-color, #000000E0)", "fontSize": "var(--l-action-sheet-font-size, 16px)" } }, "l-action-sheet__title": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center", "boxSizing": "content-box", "paddingTop": "var(--l-action-sheet-title-padding, 16px)", "paddingRight": "var(--l-action-sheet-title-padding, 16px)", "paddingBottom": "var(--l-action-sheet-title-padding, 16px)", "paddingLeft": "var(--l-action-sheet-title-padding, 16px)", "position": "relative" } }, "l-action-sheet__title-text": { "": { "fontSize": "var(--l-action-sheet-title-font-size, 18px)", "fontWeight": "var(--l-action-sheet-title-font-weight, 700)", "color": "var(--l-action-sheet-title-color, #000000E0)" } }, "l-action-sheet__close-btn": { "": { "fontFamily": "l", "position": "absolute", "top": "var(--l-action-sheet-close-btn-spacing, 16px)", "right": "var(--l-action-sheet-close-btn-spacing, 16px)", "fontSize": "var(--l-action-sheet-close-btn-font-size, 20px)", "color": "var(--l-action-sheet-close-btn-color, #000000E0)" } }, "l-action-sheet__description": { "": { "color": "var(--l-action-sheet-description-color, #00000073)", "lineHeight": "var(--l-action-sheet-description-line-height, 22px)", "fontSize": "var(--l-action-sheet-description-font-size, 14px)", "textAlign": "var(--l-action-sheet-text-align, center)", "paddingTop": "var(--l-action-sheet-description-padding-y, 12px)", "paddingRight": "var(--l-action-sheet-description-padding-x, 16px)", "paddingBottom": "var(--l-action-sheet-description-padding-y, 12px)", "paddingLeft": "var(--l-action-sheet-description-padding-x, 16px)", "borderBottomWidth": 0.5, "borderBottomStyle": "solid", "borderBottomColor": "var(--l-action-sheet-border-color, #e7e7e7)" } }, "l-action-sheet__description--left": { "": { "textAlign": "left" } }, "l-action-sheet__wrap": { "": { "display": "flex", "paddingTop": 16, "paddingBottom": 16, "flexDirection": "row", "flexWrap": "nowrap" } }, "l-action-sheet__row": { "": { "paddingTop": 16, "paddingBottom": 16, "flexDirection": "row" } }, "l-action-sheet__row--border": { "": { "borderTopWidth": 0.8, "borderTopStyle": "solid", "borderTopColor": "var(--l-action-sheet-border-color, #e7e7e7)" } }, "l-action-sheet__col": { "": { "justifyContent": "center", "alignItems": "center" } }, "l-action-sheet__col--evenly": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-action-sheet__col-text": { "": { "color": "var(--l-action-sheet-color, #000000E0)", "paddingTop": "var(--l-action-sheet-col-text-padding, 12px)", "fontSize": "var(--l-action-sheet-col-font-size, 12px)" } }, "l-action-sheet__col-icon": { "": { "fontSize": "var(--l-action-sheet-icon-size, 24px)", "color": "var(--l-action-sheet-color, #000000E0)" } }, "l-action-sheet__image": { "": { "width": "var(--l-action-sheet-image-size, 48px)", "height": "var(--l-action-sheet-image-size, 48px)", "marginTop": 0, "marginRight": 16, "marginBottom": 0, "marginLeft": 16, "backgroundColor": "var(--l-action-sheet-image-bg-color, #0000000A)", "borderTopLeftRadius": 99, "borderTopRightRadius": 99, "borderBottomRightRadius": 99, "borderBottomLeftRadius": 99 } }, "l-action-sheet__image--center": { "": { "justifyContent": "center", "alignItems": "center" } } };
-  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_l_icon = vue.resolveComponent("l-icon");
-    const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
-    return vue.openBlock(), vue.createBlock(_component_l_popup, {
-      modelValue: $setup.innerValue,
-      "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.innerValue = $event),
-      position: "bottom",
-      onClosed: $setup.onClose
-    }, {
-      default: vue.withCtx(() => [
-        vue.createElementVNode("view", { class: "l-action-sheet" }, [
-          $setup.title.length > 0 || _ctx.$slots["title"] != null ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 0,
-            class: "l-action-sheet__title"
-          }, [
-            vue.renderSlot(_ctx.$slots, "title"),
-            $setup.title.length > 0 ? (vue.openBlock(), vue.createElementBlock(
-              "text",
-              {
-                key: 0,
-                class: "l-action-sheet__title-text"
-              },
-              vue.toDisplayString($setup.title),
-              1
-              /* TEXT */
-            )) : vue.createCommentVNode("v-if", true),
-            $setup.closeable ? (vue.openBlock(), vue.createElementBlock("text", {
-              key: 1,
-              class: "l-action-sheet__close-btn",
-              onClick: $setup.handleCancel
-            }, "")) : vue.createCommentVNode("v-if", true)
-          ])) : vue.createCommentVNode("v-if", true),
-          vue.renderSlot(_ctx.$slots, "description", {}, () => [
-            $setup.description.length > 0 ? (vue.openBlock(), vue.createElementBlock(
-              "text",
-              {
-                key: 0,
-                class: vue.normalizeClass(["l-action-sheet__description", { "l-action-sheet__description--left": $setup.align == "left" }])
-              },
-              vue.toDisplayString($setup.description),
-              3
-              /* TEXT, CLASS */
-            )) : vue.createCommentVNode("v-if", true)
-          ]),
-          vue.createElementVNode("view", { class: "l-action-sheet__content" }, [
-            $setup.rowCol == null ? (vue.openBlock(true), vue.createElementBlock(
-              vue.Fragment,
-              { key: 0 },
-              vue.renderList($setup.actionItems, (item, index) => {
-                var _a;
-                return vue.openBlock(), vue.createElementBlock("view", {
-                  class: vue.normalizeClass(["l-action-sheet__item", {
-                    "l-action-sheet__item--left": $setup.align == "left",
-                    "l-action-sheet__item--bordered": $setup.bordered && index != $setup.actionItems.length - 1,
-                    "l-action-sheet__item--disabled": item.disabled
-                  }]),
-                  "hover-class": !item.disabled ? "l-action-sheet__item--hover" : "",
-                  onClick: ($event) => $setup.handleSelected(item),
-                  key: index
-                }, [
-                  item.icon != null ? (vue.openBlock(), vue.createBlock(_component_l_icon, {
-                    key: 0,
-                    class: "l-action-sheet__item-icon",
-                    color: (_a = item.iconColor) != null ? _a : item.color,
-                    size: item.fontSize,
-                    name: item.icon
-                  }, null, 8, ["color", "size", "name"])) : vue.createCommentVNode("v-if", true),
-                  vue.createElementVNode(
-                    "text",
-                    {
-                      class: "l-action-sheet__item-text",
-                      style: vue.normalizeStyle([
-                        item.color != null ? "color:" + item.color : "",
-                        item.fontSize != null ? "font-size:" + item.fontSize : ""
-                      ])
-                    },
-                    vue.toDisplayString(item.label),
-                    5
-                    /* TEXT, STYLE */
-                  )
-                ], 10, ["hover-class", "onClick"]);
-              }),
-              128
-              /* KEYED_FRAGMENT */
-            )) : (vue.openBlock(true), vue.createElementBlock(
-              vue.Fragment,
-              { key: 1 },
-              vue.renderList($setup.actionRowCols, (row, rowIndex) => {
-                return vue.openBlock(), vue.createElementBlock(
-                  "scroll-view",
-                  {
-                    class: vue.normalizeClass(["l-action-sheet__row", {
-                      "l-action-sheet__row--border": rowIndex > 0 && rowIndex < $setup.actionRowCols.length
-                    }]),
-                    "scroll-x": true,
-                    direction: "horizontal",
-                    "show-scrollbar": false,
-                    "scroll-with-animation": true,
-                    key: "row" + rowIndex
-                  },
-                  [
-                    (vue.openBlock(true), vue.createElementBlock(
-                      vue.Fragment,
-                      null,
-                      vue.renderList(row, (item, colIndex) => {
-                        var _a, _b;
-                        return vue.openBlock(), vue.createElementBlock("view", {
-                          class: vue.normalizeClass(["l-action-sheet__col", {
-                            "l-action-sheet__item--disabled": item.disabled,
-                            "l-action-sheet__col--evenly": !(row.length > 4)
-                          }]),
-                          onClick: ($event) => $setup.handleSelected(item),
-                          key: colIndex
-                        }, [
-                          item.icon != null && item.__isImage ? (vue.openBlock(), vue.createElementBlock("image", {
-                            key: 0,
-                            class: "l-action-sheet__image",
-                            style: vue.normalizeStyle([
-                              "background: transparent",
-                              item.radius != null ? "border-radius:" + item.radius : ""
-                            ]),
-                            src: item.icon
-                          }, null, 12, ["src"])) : item.icon != null ? (vue.openBlock(), vue.createElementBlock(
-                            "view",
-                            {
-                              key: 1,
-                              class: "l-action-sheet__image l-action-sheet__image--center",
-                              style: vue.normalizeStyle([
-                                item.bgColor != null ? "background:" + item.bgColor : "",
-                                item.radius != null ? "border-radius:" + item.radius : ""
-                              ])
-                            },
-                            [
-                              vue.createVNode(_component_l_icon, {
-                                class: "l-action-sheet__col-icon",
-                                color: (_a = item.iconColor) != null ? _a : item.color,
-                                size: (_b = item.fontSize) != null ? _b : "48rpx",
-                                name: item.icon
-                              }, null, 8, ["color", "size", "name"])
-                            ],
-                            4
-                            /* STYLE */
-                          )) : vue.createCommentVNode("v-if", true),
-                          vue.createElementVNode(
-                            "text",
-                            {
-                              class: "l-action-sheet__col-text",
-                              style: vue.normalizeStyle([
-                                item.color != null ? "color:" + item.color : "",
-                                item.fontSize != null ? "font-size:" + item.fontSize : ""
-                              ])
-                            },
-                            vue.toDisplayString(item.label),
-                            5
-                            /* TEXT, STYLE */
-                          )
-                        ], 10, ["onClick"]);
-                      }),
-                      128
-                      /* KEYED_FRAGMENT */
-                    ))
-                  ],
-                  2
-                  /* CLASS */
-                );
-              }),
-              128
-              /* KEYED_FRAGMENT */
-            ))
-          ]),
-          $setup.cancelText.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 1,
-            class: "l-action-sheet__gap"
-          })) : vue.createCommentVNode("v-if", true),
-          $setup.cancelText.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 2,
-            class: "l-action-sheet__cancel",
-            "hover-class": "l-action-sheet__cancel--hover",
-            onClick: $setup.handleCancel
-          }, [
-            vue.createElementVNode(
-              "text",
-              { class: "l-action-sheet__cancel-text" },
-              vue.toDisplayString($setup.cancelText),
-              1
-              /* TEXT */
-            )
-          ])) : vue.createCommentVNode("v-if", true)
-        ])
-      ]),
-      _: 3
-      /* FORWARDED */
-    }, 8, ["modelValue"]);
-  }
-  const UniModulesLimeActionSheetPagesIndex = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["styles", [_style_0$l]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/lime-action-sheet/pages/index.uvue"]]);
+  const PagesPlayBackPlayBack = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["styles", [_style_0$l]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/playBack/playBack.uvue"]]);
   class CoordinatePoint extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -19581,13 +17218,13 @@
     __expose();
     const props = __props;
     const emit = __emit;
-    function formatSize(value) {
+    function formatSize(value = null) {
       const text = value.toString();
       if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
         return text;
       return text + "px";
     }
-    function formatBoxSize(value) {
+    function formatBoxSize(value = null) {
       const text = value.toString();
       if (text.indexOf(" ") >= 0)
         return text;
@@ -19794,6 +17431,12 @@
     __expose();
     const props = __props;
     const emit = __emit;
+    function formatSize(value = null) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0)
+        return text;
+      return text + "px";
+    }
     const bgColor = vue.computed(() => {
       return props.bgColor;
     });
@@ -19883,6 +17526,25 @@
         return props.round;
       return props.round.toString().length > 0;
     });
+    const shadowStyle = vue.computed(() => {
+      const value = props.shadow;
+      const text = value.toString();
+      if (text.length == 0 || text == "none")
+        return "";
+      if (Array.isArray(value)) {
+        const list = value;
+        if (list.length >= 4) {
+          const first = list[0];
+          const second = list[1];
+          const third = list[2];
+          const fourth = list[3];
+          if (first != null && second != null && third != null && fourth != null) {
+            return "box-shadow:" + formatSize(first) + " " + formatSize(second) + " " + formatSize(third) + " " + fourth.toString() + ";";
+          }
+        }
+      }
+      return "box-shadow:0 " + formatSize(value) + " " + formatSize(parseFloat(value.toString()) * 2) + " rgba(0,0,0,0.12);";
+    });
     const tagClass = vue.computed(() => {
       const classes = [
         "i-tag",
@@ -19910,24 +17572,6 @@
       if (normalizedSize.value == "xs")
         classes.push("i-tag__close--xs");
       return classes.join(" ");
-    });
-    function formatSize(value = null) {
-      const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0) {
-        return text;
-      }
-      return text + "px";
-    }
-    const shadowStyle = vue.computed(() => {
-      const value = props.shadow;
-      const text = value.toString();
-      if (text.length == 0 || text == "none")
-        return "";
-      if (Array.isArray(value) && value.length >= 4) {
-        const shadowValues = value;
-        return "box-shadow:" + formatSize(shadowValues[0]) + " " + formatSize(shadowValues[1]) + " " + formatSize(shadowValues[2]) + " " + shadowValues[3].toString() + ";";
-      }
-      return "box-shadow:0 " + formatSize(value) + " " + formatSize(parseFloat(value.toString()) * 2) + " rgba(0,0,0,0.12);";
     });
     const tagStyle = vue.computed(() => {
       let style = "";
@@ -19965,14 +17609,14 @@
     const closeStyle = vue.computed(() => {
       return "color:" + computedTextColor.value + ";";
     });
-    function handleClick(event = null) {
+    function handleClick() {
       if (closeClicking.value) {
         closeClicking.value = false;
         return null;
       }
       if (props.disabled)
         return null;
-      emit("click", event);
+      emit("click", contentText.value);
     }
     function handleClose() {
       if (props.disabled)
@@ -19983,19 +17627,19 @@
         closeClicking.value = false;
       }, 0);
     }
-    const __returned__ = { props, emit, bgColor, closeClicking, contentText, normalizedType, normalizedSkin, themeColor, computedTextColor, computedIconSize, closeText, normalizedSize, isCustomRound, isRound, tagClass, textClass, closeClass, formatSize, shadowStyle, tagStyle, textStyle, closeStyle, handleClick, handleClose };
+    const __returned__ = { props, emit, formatSize, bgColor, closeClicking, contentText, normalizedType, normalizedSkin, themeColor, computedTextColor, computedIconSize, closeText, normalizedSize, isCustomRound, isRound, shadowStyle, tagClass, textClass, closeClass, tagStyle, textStyle, closeStyle, handleClick, handleClose };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
   const _style_0$i = { "i-tag": { "": { "height": 28, "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10, "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "alignItems": "center", "justifyContent": "center", "flexDirection": "row", "backgroundColor": "#3c9cff", "overflow": "hidden" } }, "i-tag--round": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-tag--xs": { "": { "height": 20, "paddingTop": 0, "paddingRight": 7, "paddingBottom": 0, "paddingLeft": 7 } }, "i-tag--small": { "": { "height": 22, "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8 } }, "i-tag--large": { "": { "height": 34, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12 } }, "i-tag--disabled": { "": { "opacity": 0.5 } }, "i-tag--primary": { "": { "backgroundColor": "#3c9cff", "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff" } }, "i-tag--success": { "": { "backgroundColor": "#5ac725", "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725" } }, "i-tag--warning": { "": { "backgroundColor": "#f9ae3d", "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d" } }, "i-tag--error": { "": { "backgroundColor": "#f56c6c", "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c" } }, "i-tag--info": { "": { "backgroundColor": "#909399", "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399" } }, "i-tag--thin": { "": { "backgroundColor": "#ecf5ff", "borderTopColor": "#ecf5ff", "borderRightColor": "#ecf5ff", "borderBottomColor": "#ecf5ff", "borderLeftColor": "#ecf5ff" } }, "i-tag--thin-success": { "": { "backgroundColor": "#f0f9eb", "borderTopColor": "#f0f9eb", "borderRightColor": "#f0f9eb", "borderBottomColor": "#f0f9eb", "borderLeftColor": "#f0f9eb" } }, "i-tag--thin-warning": { "": { "backgroundColor": "#fdf6ec", "borderTopColor": "#fdf6ec", "borderRightColor": "#fdf6ec", "borderBottomColor": "#fdf6ec", "borderLeftColor": "#fdf6ec" } }, "i-tag--thin-error": { "": { "backgroundColor": "#fef0f0", "borderTopColor": "#fef0f0", "borderRightColor": "#fef0f0", "borderBottomColor": "#fef0f0", "borderLeftColor": "#fef0f0" } }, "i-tag--thin-info": { "": { "backgroundColor": "#f4f4f5", "borderTopColor": "#f4f4f5", "borderRightColor": "#f4f4f5", "borderBottomColor": "#f4f4f5", "borderLeftColor": "#f4f4f5" } }, "i-tag--outlined": { "": { "backgroundColor": "#ffffff" } }, "i-tag--dashed": { "": { "backgroundColor": "#ffffff", "borderTopStyle": "dashed", "borderRightStyle": "dashed", "borderBottomStyle": "dashed", "borderLeftStyle": "dashed" } }, "i-tag--text": { "": { "backgroundColor": "#ffffff", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)" } }, "i-tag--outlined-primary": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff" } }, "i-tag--dashed-primary": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff" } }, "i-tag--outlined-success": { "": { "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725" } }, "i-tag--dashed-success": { "": { "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725" } }, "i-tag--outlined-warning": { "": { "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d" } }, "i-tag--dashed-warning": { "": { "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d" } }, "i-tag--outlined-error": { "": { "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c" } }, "i-tag--dashed-error": { "": { "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c" } }, "i-tag--outlined-info": { "": { "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399" } }, "i-tag--dashed-info": { "": { "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399" } }, "i-tag__text": { "": { "color": "#ffffff", "fontSize": 12, "lineHeight": "18px" } }, "i-tag__text--xs": { "": { "fontSize": 11, "lineHeight": "16px" } }, "i-tag__text--large": { "": { "fontSize": 14, "lineHeight": "20px" } }, "i-tag__icon": { "": { "marginRight": 4 } }, "i-tag__close": { "": { "marginLeft": 5, "color": "#ffffff", "fontSize": 14, "lineHeight": "18px" } }, "i-tag__close--xs": { "": { "fontSize": 12, "lineHeight": "16px" } } };
   function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
         class: vue.normalizeClass($setup.tagClass),
         style: vue.normalizeStyle($setup.tagStyle),
-        onClick: vue.withModifiers($setup.handleClick, ["stop"])
+        onClick: $setup.handleClick
       },
       [
         $props.icon.length > 0 ? (vue.openBlock(), vue.createBlock(_component_i_icon, {
@@ -20106,7 +17750,17 @@
       const pickerTitle = vue.ref("选择开始时间");
       const startTime = vue.ref("");
       const endTime = vue.ref("");
+      const currentPickerValue = vue.computed(() => {
+        return currentPickerType.value === "start" ? startTime.value : endTime.value;
+      });
       const imei = vue.ref("");
+      const minDate = vue.computed(() => {
+        const now = /* @__PURE__ */ new Date();
+        return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime();
+      });
+      const maxDate = vue.computed(() => {
+        return Date.now();
+      });
       const groupedTrips = vue.computed(() => {
         const dateGroups = [];
         tripData.value.forEach((trip) => {
@@ -20173,8 +17827,8 @@
       });
       const initDateTime = () => {
         const now = /* @__PURE__ */ new Date();
-        endTime.value = formatTimes(now.getTime());
-        startTime.value = formatTimes(now.getTime() - 36e5 * 24);
+        endTime.value = formatTimesToMinute(now.getTime());
+        startTime.value = formatTimesToMinute(now.getTime() - 36e5 * 24);
       };
       const processTripData = (data) => {
         const trips = data.getArray("trips");
@@ -20216,13 +17870,13 @@
               showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
               return Promise.resolve(null);
             }
-            uni.__log__("log", "at pages/mileageRecord/mileageRecord.uvue:206", "获取里程数据成功:", res);
+            uni.__log__("log", "at pages/mileageRecord/mileageRecord.uvue:225", "获取里程数据成功:", res);
             const trackData = res.data;
             if (trackData != null) {
               processTripData(trackData);
             }
-          } catch (e2) {
-            uni.__log__("error", "at pages/mileageRecord/mileageRecord.uvue:212", "获取里程数据失败:", e2);
+          } catch (e) {
+            uni.__log__("error", "at pages/mileageRecord/mileageRecord.uvue:231", "获取里程数据失败:", e);
             showAppToast({
               title: "数据加载失败",
               icon: "none"
@@ -20275,7 +17929,14 @@
         pickerTitle.value = type === "start" ? "选择开始时间" : "选择结束时间";
         showDateTimePicker.value = true;
       };
-      const onConfirm = (value) => {
+      const getPickerTimestamp = (event) => {
+        return event.getNumber("timestamp", 0);
+      };
+      const onConfirm = (event) => {
+        const timestamp = getPickerTimestamp(event);
+        if (timestamp <= 0)
+          return null;
+        const value = formatTimesToMinute(timestamp);
         if (currentPickerType.value === "start") {
           startTime.value = value;
         } else {
@@ -20287,17 +17948,19 @@
       const onCancel = () => {
         showDateTimePicker.value = false;
       };
-      const __returned__ = { carStatus, plateNo, carType, totalMileage, averageSpeed, tripData, showDateTimePicker, currentPickerType, pickerTitle, startTime, endTime, imei, groupedTrips, getTripStartTime, getTripEndTime, getTripHourRange, getTripDistanceText, getTripDuration, totalTrips, initDateTime, processTripData, loadMileageData, gotoTripDetail, formatDisplayTime, formatTime, formatDuration, showPicker, onConfirm, onCancel };
+      const onPickerShowChange = (value) => {
+        showDateTimePicker.value = value;
+      };
+      const __returned__ = { carStatus, plateNo, carType, totalMileage, averageSpeed, tripData, showDateTimePicker, currentPickerType, pickerTitle, startTime, endTime, currentPickerValue, imei, minDate, maxDate, groupedTrips, getTripStartTime, getTripEndTime, getTripHourRange, getTripDistanceText, getTripDuration, totalTrips, initDateTime, processTripData, loadMileageData, gotoTripDetail, formatDisplayTime, formatTime, formatDuration, showPicker, getPickerTimestamp, onConfirm, onCancel, onPickerShowChange };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$h = { "container": { "": { "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa", "paddingBottom": "20rpx" } }, "tools-panel": { ".container ": { "backgroundColor": "#ffffff", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#69c2f1", "borderRightColor": "#69c2f1", "borderBottomColor": "#69c2f1", "borderLeftColor": "#69c2f1", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "25rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx", "color": "#333333" } }, "summary-panel": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "backgroundColor": "#ffffff", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx", "boxShadow": "0 2rpx 10rpx rgba(0, 0, 0, 0.05)" } }, "summary-item": { ".container .summary-panel ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "label": { ".container .summary-panel .summary-item ": { "fontSize": "24rpx", "color": "#999999", "marginBottom": "10rpx" } }, "value": { ".container .summary-panel .summary-item ": { "fontSize": "28rpx", "color": "#333333", "fontWeight": "bold" } }, "content": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "20%", "marginLeft": "20rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "trip-list": { ".container .content ": { "width": "100%", "paddingBottom": "20rpx" } }, "trip-group": { ".container .content .trip-list ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "group-header": { ".container .content .trip-list .trip-group ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "15rpx", "paddingRight": 0, "paddingBottom": "15rpx", "paddingLeft": 0 } }, "group-header-title": { ".container .content .trip-list .trip-group .group-header ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "group-date": { ".container .content .trip-list .trip-group .group-header ": { "fontSize": "30rpx", "color": "#333333", "marginRight": "30rpx" } }, "group-separator": { ".container .content .trip-list .trip-group ": { "height": "1rpx", "backgroundColor": "#eeeeee", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "10rpx", "marginLeft": 0 } }, "trip-item": { ".container .content .trip-list .trip-group ": { "display": "flex", "paddingTop": "25rpx", "paddingRight": 0, "paddingBottom": "25rpx", "paddingLeft": 0, "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "trip-index": { ".container .content .trip-list .trip-group .trip-item ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "paddingTop": "5rpx" } }, "icon": { ".container .content .trip-list .trip-group .trip-item .trip-index ": { "width": "40rpx", "height": "40rpx", "backgroundColor": "#1296db", "color": "#ffffff", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "display": "flex", "justifyContent": "center", "alignItems": "center", "fontSize": "24rpx", "marginRight": "20rpx" } }, "trip-distance-time": { ".container .content .trip-list .trip-group .trip-item .trip-index ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "trip-content": { ".container .content .trip-list .trip-group .trip-item ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "icons": { ".container .content .trip-list .trip-group .trip-item .trip-content .trip-locations ": { "width": "50rpx", "height": "50rpx" } } };
+  const _style_0$h = { "container": { "": { "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa", "paddingBottom": "20rpx" } }, "tools-panel": { ".container ": { "backgroundColor": "#ffffff", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#69c2f1", "borderRightColor": "#69c2f1", "borderBottomColor": "#69c2f1", "borderLeftColor": "#69c2f1", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "display": "flex", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "25rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx", "color": "#333333" } }, "summary-panel": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "backgroundColor": "#ffffff", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx", "boxShadow": "0 2rpx 10rpx rgba(0, 0, 0, 0.05)" } }, "summary-item": { ".container .summary-panel ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "label": { ".container .summary-panel .summary-item ": { "fontSize": "24rpx", "color": "#999999", "marginBottom": "10rpx" } }, "value": { ".container .summary-panel .summary-item ": { "fontSize": "28rpx", "color": "#333333", "fontWeight": "bold" } }, "content": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "20%", "marginLeft": "20rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "trip-list": { ".container .content ": { "width": "100%", "paddingBottom": "20rpx" } }, "trip-group": { ".container .content .trip-list ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "group-header": { ".container .content .trip-list .trip-group ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "15rpx", "paddingRight": 0, "paddingBottom": "15rpx", "paddingLeft": 0 } }, "group-header-title": { ".container .content .trip-list .trip-group .group-header ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "group-date": { ".container .content .trip-list .trip-group .group-header ": { "fontSize": "30rpx", "color": "#333333", "marginRight": "30rpx" } }, "group-separator": { ".container .content .trip-list .trip-group ": { "height": "1rpx", "backgroundColor": "#eeeeee", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "10rpx", "marginLeft": 0 } }, "trip-item": { ".container .content .trip-list .trip-group ": { "display": "flex", "paddingTop": "25rpx", "paddingRight": 0, "paddingBottom": "25rpx", "paddingLeft": 0, "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "trip-index": { ".container .content .trip-list .trip-group .trip-item ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "paddingTop": "5rpx" } }, "icon": { ".container .content .trip-list .trip-group .trip-item .trip-index ": { "width": "40rpx", "height": "40rpx", "backgroundColor": "#1296db", "color": "#ffffff", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "display": "flex", "justifyContent": "center", "alignItems": "center", "fontSize": "24rpx", "marginRight": "20rpx" } }, "trip-distance-time": { ".container .content .trip-list .trip-group .trip-item .trip-index ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "trip-content": { ".container .content .trip-list .trip-group .trip-item ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "icons": { ".container .content .trip-list .trip-group .trip-item .trip-content .trip-locations ": { "width": "50rpx", "height": "50rpx" } } };
   function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
-    const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), __easycom_2$1);
-    const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
+    const _component_i_datetime_picker = resolveEasycom(vue.resolveDynamicComponent("i-datetime-picker"), __easycom_2$1);
     const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
     const _component_i_tag = resolveEasycom(vue.resolveDynamicComponent("i-tag"), __easycom_1$1);
     const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$1);
@@ -20353,25 +18016,25 @@
                 })
               ])
             ]),
-            vue.createVNode(_component_l_popup, {
-              modelValue: $setup.showDateTimePicker,
-              "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.showDateTimePicker = $event),
-              position: "bottom",
-              closeable: false
+            vue.createVNode(_component_i_datetime_picker, {
+              show: $setup.showDateTimePicker,
+              "model-value": $setup.currentPickerValue,
+              mode: "datetime",
+              title: $setup.pickerTitle,
+              "cancel-text": "取消",
+              "confirm-text": "确认",
+              onConfirm: $setup.onConfirm,
+              minDate: $setup.minDate,
+              maxDate: $setup.maxDate,
+              onCancel: $setup.onCancel,
+              "onUpdate:show": $setup.onPickerShowChange
             }, {
-              default: vue.withCtx(() => [
-                vue.createVNode(_component_l_date_time_picker, {
-                  "confirm-btn": "确认",
-                  "cancel-btn": "取消",
-                  title: $setup.pickerTitle,
-                  mode: 63,
-                  onConfirm: $setup.onConfirm,
-                  onCancel: $setup.onCancel
-                }, null, 8, ["title"])
+              trigger: vue.withCtx(() => [
+                vue.createElementVNode("view")
               ]),
               _: 1
               /* STABLE */
-            }, 8, ["modelValue"])
+            }, 8, ["show", "model-value", "title", "minDate", "maxDate"])
           ]),
           vue.createElementVNode("view", { class: "summary-panel" }, [
             vue.createElementVNode("view", { class: "summary-item" }, [
@@ -20526,7 +18189,11 @@
       const pickerTitle = vue.ref("选择开始时间");
       const startTime = vue.ref("");
       const endTime = vue.ref("");
+      const currentPickerValue = vue.computed(() => {
+        return currentPickerType.value === "start" ? startTime.value : endTime.value;
+      });
       const imei = vue.ref("");
+      const currentDateTime = vue.ref("");
       const carStopDetail = vue.ref([]);
       const getStopNumber = (item, key) => {
         return item.getNumber(key, 0);
@@ -20534,6 +18201,13 @@
       const getStopText = (item, key) => {
         return item.getString(key, "");
       };
+      const minDate = vue.computed(() => {
+        const now = /* @__PURE__ */ new Date();
+        return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime();
+      });
+      const maxDate = vue.computed(() => {
+        return Date.now();
+      });
       const sortedCarStopDetail = vue.computed(() => {
         const sorted = carStopDetail.value.slice();
         sorted.sort((a2, b2) => {
@@ -20552,8 +18226,8 @@
       });
       const initDateTime = () => {
         const now = /* @__PURE__ */ new Date();
-        endTime.value = formatTimes(now.getTime());
-        startTime.value = formatTimes(now.getTime() - 36e5 * 24);
+        endTime.value = formatTimesToMinute(now.getTime());
+        startTime.value = formatTimesToMinute(now.getTime() - 36e5 * 24);
       };
       const loadStopData = () => {
         return __awaiter(this, void 0, void 0, function* () {
@@ -20588,7 +18262,7 @@
             });
             carStopDetail.value = stopsWithAddress;
           } catch (error) {
-            uni.__log__("error", "at pages/stopRecord/stopRecord.uvue:131", "获取停车数据失败:", error);
+            uni.__log__("error", "at pages/stopRecord/stopRecord.uvue:151", "获取停车数据失败:", error);
             showAppToast({ title: "数据加载失败", icon: "none" });
           } finally {
             uni.hideLoading();
@@ -20604,17 +18278,27 @@
         pickerTitle.value = type === "start" ? "选择开始时间" : "选择结束时间";
         showDateTimePicker.value = true;
       };
-      const onConfirm = (value) => {
+      const getPickerTimestamp = (event) => {
+        return event.getNumber("timestamp", 0);
+      };
+      const onConfirm = (event) => {
+        const timestamp = getPickerTimestamp(event);
+        if (timestamp <= 0)
+          return null;
+        const value = formatTimesToMinute(timestamp);
         if (currentPickerType.value === "start") {
           startTime.value = value;
         } else {
           endTime.value = value;
         }
-        loadStopData();
         showDateTimePicker.value = false;
+        loadStopData();
       };
       const onCancel = () => {
         showDateTimePicker.value = false;
+      };
+      const onPickerShowChange = (value) => {
+        showDateTimePicker.value = value;
       };
       const calculateDuration = (diff) => {
         const hours = Math.floor(diff / (1e3 * 60 * 60));
@@ -20629,7 +18313,7 @@
           name: "停车位置"
         }));
       };
-      const __returned__ = { carStatus, showDateTimePicker, currentPickerType, pickerTitle, startTime, endTime, imei, carStopDetail, getStopNumber, getStopText, sortedCarStopDetail, initDateTime, loadStopData, showPicker, onConfirm, onCancel, calculateDuration, showAddress };
+      const __returned__ = { carStatus, showDateTimePicker, currentPickerType, pickerTitle, startTime, endTime, currentPickerValue, imei, currentDateTime, carStopDetail, getStopNumber, getStopText, minDate, maxDate, sortedCarStopDetail, initDateTime, loadStopData, showPicker, getPickerTimestamp, onConfirm, onCancel, onPickerShowChange, calculateDuration, showAddress };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -20641,9 +18325,8 @@
   const _style_0$g = { "container": { "": { "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "tools-panel": { ".container ": { "backgroundColor": "#ffffff", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#69c2f1", "borderRightColor": "#69c2f1", "borderBottomColor": "#69c2f1", "borderLeftColor": "#69c2f1", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "width": "100%", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "25rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx" } }, "mileage_title": { ".container ": { "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "content": { ".container ": { "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": "20rpx", "marginLeft": "40rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "alignItems": "flex-start", "backgroundColor": "#ffffff", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "content-box": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0, "marginBottom": "30rpx" } }, "item": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "15rpx", "paddingRight": 0, "paddingBottom": "15rpx", "paddingLeft": 0 } }, "icons": { ".container .content .item ": { "width": "40rpx", "height": "40rpx", "marginRight": "15rpx" } } };
   function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
-    const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), __easycom_2$1);
-    const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
+    const _component_i_datetime_picker = resolveEasycom(vue.resolveDynamicComponent("i-datetime-picker"), __easycom_2$1);
     const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
     const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$1);
     return vue.openBlock(), vue.createElementBlock(
@@ -20698,25 +18381,25 @@
                 })
               ])
             ]),
-            vue.createVNode(_component_l_popup, {
-              modelValue: $setup.showDateTimePicker,
-              "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.showDateTimePicker = $event),
-              position: "bottom",
-              closeable: false
+            vue.createVNode(_component_i_datetime_picker, {
+              show: $setup.showDateTimePicker,
+              "model-value": $setup.currentPickerValue,
+              mode: "datetime",
+              title: $setup.pickerTitle,
+              "cancel-text": "取消",
+              "confirm-text": "确认",
+              onConfirm: $setup.onConfirm,
+              minDate: $setup.minDate,
+              maxDate: $setup.maxDate,
+              onCancel: $setup.onCancel,
+              "onUpdate:show": $setup.onPickerShowChange
             }, {
-              default: vue.withCtx(() => [
-                vue.createVNode(_component_l_date_time_picker, {
-                  "confirm-btn": "确认",
-                  "cancel-btn": "取消",
-                  title: $setup.pickerTitle,
-                  mode: 63,
-                  onConfirm: $setup.onConfirm,
-                  onCancel: $setup.onCancel
-                }, null, 8, ["title"])
+              trigger: vue.withCtx(() => [
+                vue.createElementVNode("view")
               ]),
               _: 1
               /* STABLE */
-            }, 8, ["modelValue"])
+            }, 8, ["show", "model-value", "title", "minDate", "maxDate"])
           ]),
           vue.createElementVNode("scroll-view", {
             class: "content-box",
@@ -20862,8 +18545,8 @@
               createTime: createTime != null ? createTime : ""
             };
             uni.__log__("log", "at pages/userCenter/userInfo/userInfo.uvue:84", "用户信息:", userInfo.value);
-          } catch (e2) {
-            uni.__log__("error", "at pages/userCenter/userInfo/userInfo.uvue:86", "解析用户信息失败:", e2);
+          } catch (e) {
+            uni.__log__("error", "at pages/userCenter/userInfo/userInfo.uvue:86", "解析用户信息失败:", e);
           }
         }
       });
@@ -20897,7 +18580,7 @@
   const _style_0$f = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#f5f5f5", "position": "relative" } }, "content": { ".container ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "120rpx", "paddingLeft": "20rpx" } }, "title": { ".container .content ": { "color": "#666666", "fontSize": "26rpx", "marginTop": "30rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0 } }, "list": { ".container .content ": { "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "item": { ".container .content .list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "10rpx", "paddingBottom": "20rpx", "paddingLeft": "10rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e5e5e5" } }, "right": { ".container .content .list .item ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "info": { ".container .content .list .item .right ": { "marginRight": "10rpx" } }, "footer": { ".container .content ": { "position": "fixed", "bottom": "100rpx", "left": "20rpx", "right": "20rpx" } }, "logout": { ".container .content .footer ": { "width": "100%", "height": "90rpx", "lineHeight": "90rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "color": "#f56c6c", "textAlign": "center", "backgroundColor": "#ffffff", "fontSize": "32rpx" } } };
   function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$1);
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
@@ -21587,7 +19270,7 @@
   function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_2$4);
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_3);
     const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$1);
     return vue.openBlock(), vue.createElementBlock(
@@ -21611,7 +19294,7 @@
               vue.createElementVNode(
                 "text",
                 { class: "info" },
-                vue.toDisplayString($setup.carInfo.getString("deviceId", "")),
+                vue.toDisplayString($setup.carInfo.getString("deviceImei", "")),
                 1
                 /* TEXT */
               )
@@ -21857,16 +19540,14 @@
     const emit = __emit;
     function formatSize(value = null) {
       const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
         return text;
-      }
       return text + "px";
     }
     const checked = vue.computed(() => {
       if (props.checked)
         return true;
-      const modelValueText = props.modelValue.toString();
-      const value = modelValueText.length > 0 ? props.modelValue : props.value;
+      const value = props.modelValue.toString().length > 0 ? props.modelValue : props.value;
       return value.toString() == props.name.toString();
     });
     const wrapClass = vue.computed(() => {
@@ -21900,10 +19581,8 @@
       return "width:" + formatSize(props.size) + ";height:" + formatSize(props.size) + ";border-radius:" + (circle ? formatSize(props.size) : "4px") + ";border-color:" + (checked.value ? props.activeColor : props.inactiveColor) + ";background-color:" + (checked.value && props.shape == "check" ? props.activeColor : "transparent") + ";";
     });
     const dotStyle = vue.computed(() => {
-      return "background-color:" + props.activeColor + ";";
-    });
-    const checkStyle = vue.computed(() => {
-      return "background-color:" + props.activeColor + ";color:" + props.iconColor + ";font-size:" + formatSize(parseFloat(props.iconSize.toString()) + 2) + ";";
+      const fontSize = props.shape == "check" ? formatSize(parseFloat(props.iconSize.toString()) + 2) : formatSize(props.iconSize);
+      return "background-color:" + props.activeColor + ";color:" + props.iconColor + ";font-size:" + fontSize + ";";
     });
     const labelStyle = vue.computed(() => {
       let color = props.labelColor;
@@ -21924,7 +19603,7 @@
         return null;
       select();
     }
-    const __returned__ = { props, emit, formatSize, checked, wrapClass, labelClass, boxStyle, dotStyle, checkStyle, labelStyle, select, selectByLabel };
+    const __returned__ = { props, emit, formatSize, checked, wrapClass, labelClass, boxStyle, dotStyle, labelStyle, select, selectByLabel };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
@@ -21962,7 +19641,7 @@
                 {
                   key: 1,
                   class: "i-radio__check",
-                  style: vue.normalizeStyle($setup.checkStyle)
+                  style: vue.normalizeStyle($setup.dotStyle)
                 },
                 "✓",
                 4
@@ -22081,14 +19760,13 @@
     }
     function formatSize(value = null) {
       const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
         return text;
-      }
       return text + "px";
     }
     function numericSize(value = null, fallback) {
       const text = value.toString().replace("px", "").replace("rpx", "").replace("%", "");
-      const numberValue = parseFloat(text);
+      const numberValue = parseFloat(text.toString());
       if (isNaN(numberValue))
         return fallback;
       return numberValue;
@@ -23222,10 +20900,6 @@
         const deviceName2 = device.getString("deviceName", "");
         return deviceName2 ? deviceName2 : device.getString("plateNo", "");
       }
-      function closeEditDialog() {
-        var _a2;
-        (_a2 = editDialogPopup.value) === null || _a2 === void 0 ? null : _a2.$callMethod("close");
-      }
       function getSelectedFenceName() {
         const fence = selectedFence.value;
         return fence != null ? fence.getString("name", "") : "";
@@ -23240,10 +20914,10 @@
         var _a2;
         (_a2 = showFenceModal.value) === null || _a2 === void 0 ? null : _a2.$callMethod("close");
         const fence = selectedFence.value;
-        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1206", "删除电子围栏", fence);
+        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1202", "删除电子围栏", fence);
         if (fence != null) {
           const fenceId = fence.getString("id", "");
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1210", "删除电子围栏ID", fenceId);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1206", "删除电子围栏ID", fenceId);
           if (fenceId !== "") {
             deleteFence(fenceId);
           } else {
@@ -23273,8 +20947,8 @@
         points.value.push(point);
         updateMapDisplay();
       }
-      const handleMapTap = (e2) => {
-        const detail = e2.detail;
+      const handleMapTap = (e) => {
+        const detail = e.detail;
         if (!isDrawing.value || detail == null || detail.latitude == null || detail.longitude == null)
           return null;
         const latitude = detail.latitude;
@@ -23337,7 +21011,7 @@
           circles.value = [];
         }
       };
-      const clearDrawing = () => {
+      function clearDrawing() {
         isDrawing.value = false;
         points.value = [];
         circleCenter.value = null;
@@ -23347,11 +21021,19 @@
         circles.value = [];
         updateMarkers();
         renderFencesOnMap();
-      };
+      }
+      function closeEditDialog() {
+        var _a2;
+        (_a2 = editDialogPopup.value) === null || _a2 === void 0 ? null : _a2.$callMethod("close");
+        if (editingFence.value == null) {
+          clearDrawing();
+        }
+      }
       vue.onLoad((option) => {
+        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1356", "加载参数", option);
         connectionStatus.value = option.connectionStatus;
         imei.value = option.imei;
-        currentCar.value = option.plateNo;
+        currentCar.value = option.plateNo || option.deviceName;
         deptId.value = option.deptId;
         carType.value = option.carType;
         deviceName.value = option.deviceName;
@@ -23362,7 +21044,7 @@
         return loadMoreTimer;
       }, set loadMoreTimer(v2 = null) {
         loadMoreTimer = v2;
-      }, pagination, canFinishDrawing, loadingMore, hasMore, loadInitialPosition, calculateMapRotation, getFenceType, isValidCoordinate: isValidCoordinate2, parsePolygon, parseCircle, updateMarkers, renderFencesOnMap, updateMapDisplay, loadGeofenceList, generatePolygonString, generateCircleString, calculateZoomLevelFromRadius, calculateBounds, setMapCenterToFence, showFenceList, selectFence, editFence, deleteFenceById, deleteFence, saveFence, resetPagination, initPagination, loadBoundDevices, loadUnboundDevices, showBindDevices, switchTab, handleLoadMore, toggleDeviceBinding, isDeviceBound, setDrawingMode, startDrawing, handleDeviceBindingChange, getDeviceImei, isDeviceOnline, getDeviceDisplayName, closeEditDialog, getSelectedFenceName, editSelectedFence, deleteSelectedFence, showSelectedFenceDevices, calculateDistance, addNewPoint, handleMapTap, finishDrawing, updateFencePolygon, updateFenceCircle, clearDrawing };
+      }, pagination, canFinishDrawing, loadingMore, hasMore, loadInitialPosition, calculateMapRotation, getFenceType, isValidCoordinate: isValidCoordinate2, parsePolygon, parseCircle, updateMarkers, renderFencesOnMap, updateMapDisplay, loadGeofenceList, generatePolygonString, generateCircleString, calculateZoomLevelFromRadius, calculateBounds, setMapCenterToFence, showFenceList, selectFence, editFence, deleteFenceById, deleteFence, saveFence, resetPagination, initPagination, loadBoundDevices, loadUnboundDevices, showBindDevices, switchTab, handleLoadMore, toggleDeviceBinding, isDeviceBound, setDrawingMode, startDrawing, handleDeviceBindingChange, getDeviceImei, isDeviceOnline, getDeviceDisplayName, getSelectedFenceName, editSelectedFence, deleteSelectedFence, showSelectedFenceDevices, calculateDistance, addNewPoint, handleMapTap, finishDrawing, updateFencePolygon, updateFenceCircle, clearDrawing, closeEditDialog };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -23372,7 +21054,7 @@
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_map = vue.resolveComponent("map");
     const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$2);
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_3);
     const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4$1);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_2$4);
@@ -23958,7 +21640,7 @@
           return null;
         pendingBack.value = false;
         clearBackTimer();
-        uni.__log__("log", "at pages/scancode/scancode.uvue:48", "扫码页已释放相机，返回添加设备页");
+        uni.__log__("log", "at pages/scancode/scancode.uvue:153", "扫码页已释放相机，返回添加设备页");
         uni.navigateBack(new UTSJSONObject({ delta: 1 }));
       };
       const requestBack = () => {
@@ -23971,12 +21653,12 @@
         }, 1200);
       };
       const handleCameraInitDone = () => {
-        uni.__log__("log", "at pages/scancode/scancode.uvue:62", "扫码摄像头初始化完成");
+        uni.__log__("log", "at pages/scancode/scancode.uvue:167", "扫码摄像头初始化完成");
       };
-      const handleScan = (e2) => {
+      const handleScan = (e) => {
         if (hasFinished.value || !scanFunctionIsUseable.value)
           return null;
-        const scanResult = e2.detail.result;
+        const scanResult = e.detail.result;
         if (scanResult == null)
           return null;
         const result = scanResult;
@@ -23985,7 +21667,7 @@
         hasFinished.value = true;
         scanFunctionIsUseable.value = false;
         uni.vibrateLong(new UTSJSONObject({}));
-        uni.__log__("log", "at pages/scancode/scancode.uvue:75", "扫码结果:", result);
+        uni.__log__("log", "at pages/scancode/scancode.uvue:180", "扫码结果:", result);
         uni.setStorageSync("scanCodeResult", result);
         showAppToast({
           title: "扫码成功",
@@ -23995,18 +21677,18 @@
         requestBack();
       };
       const handleCameraStop = () => {
-        uni.__log__("warn", "at pages/scancode/scancode.uvue:86", "扫码摄像头已停止");
+        uni.__log__("warn", "at pages/scancode/scancode.uvue:191", "扫码摄像头已停止");
         if (pendingBack.value) {
-          uni.__log__("log", "at pages/scancode/scancode.uvue:88", "等待相机资源释放完成后返回添加设备页");
+          uni.__log__("log", "at pages/scancode/scancode.uvue:193", "等待相机资源释放完成后返回添加设备页");
           return null;
         }
-        uni.__log__("warn", "at pages/scancode/scancode.uvue:91", "摄像头停止但扫码页仍保持打开，等待用户返回或重试");
+        uni.__log__("warn", "at pages/scancode/scancode.uvue:196", "摄像头停止但扫码页仍保持打开，等待用户返回或重试");
       };
-      const handleCameraError = (e2) => {
+      const handleCameraError = (e) => {
         if (hasFinished.value)
           return null;
         hasFinished.value = true;
-        uni.__log__("error", "at pages/scancode/scancode.uvue:97", "摄像头初始化失败:", e2.detail);
+        uni.__log__("error", "at pages/scancode/scancode.uvue:202", "摄像头初始化失败:", e.detail);
         showAppToast({
           title: "摄像头初始化失败，请检查相机权限",
           icon: "none",
@@ -24015,11 +21697,11 @@
         requestBack();
       };
       vue.onHide(() => {
-        uni.__log__("log", "at pages/scancode/scancode.uvue:107", "扫码页隐藏");
+        uni.__log__("log", "at pages/scancode/scancode.uvue:212", "扫码页隐藏");
         releaseCamera();
       });
       vue.onUnload(() => {
-        uni.__log__("log", "at pages/scancode/scancode.uvue:112", "扫码页卸载");
+        uni.__log__("log", "at pages/scancode/scancode.uvue:217", "扫码页卸载");
         clearBackTimer();
         releaseCamera();
       });
@@ -24301,75 +21983,43 @@
     __expose();
     const props = __props;
     const emit = __emit;
-    const bgColor = vue.computed(() => {
-      return props.bgColor;
-    });
-    const list = vue.computed(() => {
-      if (props.list.length > 0)
-        return props.list;
-      return props.items;
-    });
-    const currentIndex = vue.ref(resolveIndex());
-    const scrollIntoView = vue.ref("i-tabs-item-" + String(currentIndex.value));
-    const navStyle = vue.computed(() => {
-      if (!props.scrollable)
-        return "";
-      return "width:" + String(resolveScrollableItemWidth() * list.value.length) + "px;";
-    });
-    function getItemStyle(index = null) {
-      if (props.scrollable)
-        return "width:" + String(resolveScrollableItemWidth()) + "px;";
-      const width = formatSize(props.itemWidth);
-      if (width == "auto")
-        return "";
-      return "width:" + width + ";";
-    }
-    const barStyle = vue.computed(() => {
-      return "width:" + formatSize(props.lineWidth) + ";height:" + formatSize(props.lineHeight) + ";background-color:" + props.activeColor + ";";
-    });
-    vue.watch(() => {
-      return props.value;
-    }, () => {
-      currentIndex.value = resolveIndex();
-      scrollIntoView.value = "i-tabs-item-" + String(currentIndex.value);
-    });
-    vue.watch(() => {
-      return props.current;
-    }, () => {
-      currentIndex.value = resolveIndex();
-      scrollIntoView.value = "i-tabs-item-" + String(currentIndex.value);
-    });
     function formatSize(value = null) {
-      const text = String(value);
-      if (text == "auto" || text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+      const text = value.toString();
+      if (text == "auto" || text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
         return text;
-      }
       return text + "px";
     }
     function numericSize(value = null) {
-      const text = String(value);
-      const numberValue = Number(text.replace("px", "").replace("rpx", "").replace("%", ""));
+      const text = value.toString();
+      const numberValue = parseFloat(text.replace("px", "").replace("rpx", "").replace("%", "").toString());
       if (isNaN(numberValue))
         return 0;
       return numberValue;
     }
-    function resolveScrollableItemWidth() {
-      const size = numericSize(props.itemWidth);
-      if (size > 0)
-        return size;
-      return 92;
-    }
-    function itemValue(item = null, keyName = null) {
+    const bgColor = vue.computed(() => {
+      return props.bgColor;
+    });
+    const list = vue.computed(() => {
+      const source = props.list;
+      if (source != null && source.length > 0)
+        return source;
+      const items = props.items;
+      if (items != null)
+        return items;
+      const empty = [];
+      return empty;
+    });
+    function itemValue(item = null, keyName) {
       if (item == null)
         return "";
       if (typeof item == "object") {
         const value = item[keyName];
         if (value == null)
           return "";
-        return String(value);
+        return value.toString();
       }
       if (keyName == "name" || keyName == "text" || keyName == "value")
-        return String(item);
+        return item.toString();
       return "";
     }
     function getItemName(item = null) {
@@ -24384,6 +22034,53 @@
         return value;
       return getItemName(item);
     }
+    function resolveIndex() {
+      if (props.current >= 0)
+        return props.current;
+      const expected = props.value.toString();
+      for (let i2 = 0; i2 < list.value.length; i2++) {
+        const item = list.value[i2];
+        if (getItemValue(item) == expected || getItemName(item) == expected)
+          return i2;
+      }
+      return 0;
+    }
+    const currentIndex = vue.ref(resolveIndex());
+    const scrollIntoView = vue.ref("i-tabs-item-" + currentIndex.value.toString());
+    function resolveScrollableItemWidth() {
+      const size = numericSize(props.itemWidth);
+      if (size > 0)
+        return size;
+      return 92;
+    }
+    const navStyle = vue.computed(() => {
+      if (!props.scrollable)
+        return "";
+      return "width:" + (resolveScrollableItemWidth() * list.value.length).toString() + "px;";
+    });
+    function getItemStyle(index) {
+      if (props.scrollable)
+        return "width:" + resolveScrollableItemWidth().toString() + "px;";
+      const width = formatSize(props.itemWidth);
+      if (width == "auto")
+        return "";
+      return "width:" + width + ";";
+    }
+    const barStyle = vue.computed(() => {
+      return "width:" + formatSize(props.lineWidth) + ";height:" + formatSize(props.lineHeight) + ";background-color:" + props.activeColor + ";";
+    });
+    vue.watch(() => {
+      return props.value;
+    }, () => {
+      currentIndex.value = resolveIndex();
+      scrollIntoView.value = "i-tabs-item-" + currentIndex.value.toString();
+    });
+    vue.watch(() => {
+      return props.current;
+    }, () => {
+      currentIndex.value = resolveIndex();
+      scrollIntoView.value = "i-tabs-item-" + currentIndex.value.toString();
+    });
     function isItemDisabled(item = null) {
       if (item == null)
         return false;
@@ -24401,18 +22098,7 @@
     function getItemBadge(item = null) {
       return itemValue(item, "badge");
     }
-    function resolveIndex() {
-      if (props.current >= 0)
-        return props.current;
-      const expected = String(props.value);
-      for (let i2 = 0; i2 < list.value.length; i2++) {
-        const item = list.value[i2];
-        if (getItemValue(item) == expected || getItemName(item) == expected)
-          return i2;
-      }
-      return 0;
-    }
-    function buildPayload(item = null, index = null) {
+    function buildPayload(item = null, index) {
       return new UTSJSONObject({
         index,
         name: getItemName(item),
@@ -24420,18 +22106,18 @@
         item
       });
     }
-    function getItemClass(item = null, index = null) {
+    function getItemClass(item = null, index) {
       let className = currentIndex.value == index ? "i-tabs__item i-tabs__item--active" : "i-tabs__item";
       if (isItemDisabled(item))
         className += " i-tabs__item--disabled";
       return className;
     }
-    function getTextStyle(item = null, index = null) {
+    function getTextStyle(item = null, index) {
       const color = currentIndex.value == index ? props.activeColor : props.inactiveColor;
       const realColor = isItemDisabled(item) ? "#c8c9cc" : color;
       return "font-size:" + formatSize(props.fontSize) + ";color:" + realColor + ";";
     }
-    function select(item = null, index = null) {
+    function select(item = null, index) {
       if (props.disabled || isItemDisabled(item))
         return null;
       const payload = buildPayload(item, index);
@@ -24439,13 +22125,13 @@
       if (currentIndex.value == index)
         return null;
       currentIndex.value = index;
-      scrollIntoView.value = "i-tabs-item-" + String(index);
+      scrollIntoView.value = "i-tabs-item-" + index.toString();
       emit("select", payload);
       emit("change", payload);
       emit("update:value", payload.value);
       emit("update:current", index);
     }
-    const __returned__ = { props, emit, bgColor, list, currentIndex, scrollIntoView, navStyle, getItemStyle, barStyle, formatSize, numericSize, resolveScrollableItemWidth, itemValue, getItemName, getItemValue, isItemDisabled, isItemDot, getItemBadge, resolveIndex, buildPayload, getItemClass, getTextStyle, select };
+    const __returned__ = { props, emit, formatSize, numericSize, bgColor, list, itemValue, getItemName, getItemValue, resolveIndex, currentIndex, scrollIntoView, resolveScrollableItemWidth, navStyle, getItemStyle, barStyle, isItemDisabled, isItemDot, getItemBadge, buildPayload, getItemClass, getTextStyle, select };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
@@ -24477,8 +22163,8 @@
                 null,
                 vue.renderList($setup.list, (item, index) => {
                   return vue.openBlock(), vue.createElementBlock("view", {
-                    id: "i-tabs-item-" + String(index),
-                    key: String(index) + "-" + $setup.getItemName(item),
+                    id: "i-tabs-item-" + index.toString(),
+                    key: index.toString() + "-" + $setup.getItemName(item),
                     class: vue.normalizeClass($setup.getItemClass(item, index)),
                     style: vue.normalizeStyle($setup.getItemStyle(index)),
                     onClick: ($event) => $setup.select(item, index)
@@ -24584,6 +22270,19 @@
     const props = __props;
     const emit = __emit;
     const innerShow = vue.ref(props.show);
+    function formatSize(value = null) {
+      const text = value.toString();
+      if (text.length == 0)
+        return "0px";
+      if (text.indexOf("vh") > -1 || text.indexOf("vw") > -1) {
+        const numberValue = parseFloat(text.replace("vh", "").replace("vw", ""));
+        return (isNaN(numberValue) ? 0 : numberValue) + "px";
+      }
+      if (text.indexOf("px") > -1 || text.indexOf("rpx") > -1 || text.indexOf("%") > -1) {
+        return text;
+      }
+      return text + "px";
+    }
     const titleStyleText = vue.computed(() => {
       if (typeof props.titleStyle == "string")
         return props.titleStyle;
@@ -24593,7 +22292,7 @@
       let style = "";
       style += "border-top-left-radius:" + formatSize(props.round) + ";";
       style += "border-top-right-radius:" + formatSize(props.round) + ";";
-      if (String(props.height).length > 0) {
+      if (props.height.toString().length > 0) {
         style += "height:" + formatSize(props.height) + ";";
       }
       if (typeof props.customStyle == "string") {
@@ -24606,30 +22305,18 @@
     }, (value) => {
       innerShow.value = value;
     });
-    function formatSize(value = null) {
-      const text = String(value);
-      if (text.length == 0)
-        return "0px";
-      if (text.indexOf("vh") > -1 || text.indexOf("vw") > -1) {
-        const numberValue = Number(text.replace("vh", "").replace("vw", ""));
-        return (isNaN(numberValue) ? 0 : numberValue) + "px";
-      }
-      if (text.indexOf("px") > -1 || text.indexOf("rpx") > -1 || text.indexOf("%") > -1) {
-        return text;
-      }
-      return text + "px";
-    }
-    function itemValue(item = null, keyName = null) {
+    function itemValue(item = null, keyName) {
       if (item == null)
         return "";
       if (typeof item == "object") {
-        const value = item[keyName];
+        const object = item;
+        const value = object[keyName];
         if (value == null)
           return "";
-        return String(value);
+        return value.toString();
       }
       if (keyName == "name" || keyName == "value")
-        return String(item);
+        return item.toString();
       return "";
     }
     function getActionText(item = null) {
@@ -24653,6 +22340,24 @@
         return color;
       return "#303133";
     }
+    function isDisabled(item = null) {
+      if (item == null)
+        return false;
+      if (typeof item == "object") {
+        const object = item;
+        return object["disabled"] == true;
+      }
+      return false;
+    }
+    function isLoading(item = null) {
+      if (item == null)
+        return false;
+      if (typeof item == "object") {
+        const object = item;
+        return object["loading"] == true;
+      }
+      return false;
+    }
     function getItemColor(item = null) {
       if (isDisabled(item))
         return "#b8b8b8";
@@ -24663,20 +22368,6 @@
       if (itemOpenType.length > 0)
         return itemOpenType;
       return props.openType;
-    }
-    function isDisabled(item = null) {
-      if (item == null)
-        return false;
-      if (typeof item == "object")
-        return item["disabled"] == true;
-      return false;
-    }
-    function isLoading(item = null) {
-      if (item == null)
-        return false;
-      if (typeof item == "object")
-        return item["loading"] == true;
-      return false;
     }
     function getItemClass(item = null) {
       if (isDisabled(item)) {
@@ -24711,7 +22402,7 @@
         return null;
       closeByUser();
     }
-    function buildPayload(item = null, index = null) {
+    function buildPayload(item = null, index) {
       return new UTSJSONObject({
         index,
         item,
@@ -24719,24 +22410,24 @@
         value: getActionValue(item)
       });
     }
-    function handleSelect(item = null, index = null) {
+    function handleSelect(item = null, index) {
       if (isDisabled(item) || isLoading(item))
         return null;
       emit("select", buildPayload(item, index));
       if (props.closeOnClickAction)
         closeSilently();
     }
-    function handleOpenEvent(name2 = null, event = null) {
+    function handleOpenEvent(name2, event = null) {
       emit(name2, event);
     }
     __expose({ open, close: closeByUser });
-    const __returned__ = { props, emit, innerShow, titleStyleText, panelStyle, formatSize, itemValue, getActionText, getActionValue, getSubname, getActionIcon, getActionColor, getItemColor, getActionOpenType, isDisabled, isLoading, getItemClass, open, closeSilently, closeByUser, handleOverlayClick, buildPayload, handleSelect, handleOpenEvent };
+    const __returned__ = { props, emit, innerShow, formatSize, titleStyleText, panelStyle, itemValue, getActionText, getActionValue, getSubname, getActionIcon, getActionColor, isDisabled, isLoading, getItemColor, getActionOpenType, getItemClass, open, closeSilently, closeByUser, handleOverlayClick, buildPayload, handleSelect, handleOpenEvent };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
   const _style_0$5 = { "i-action-sheet__trigger": { "": { "flexDirection": "column" } }, "i-action-sheet__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "zIndex": 99, "backgroundColor": "rgba(0,0,0,0.45)" } }, "i-action-sheet__panel": { "": { "position": "fixed", "left": 0, "right": 0, "bottom": 0, "zIndex": 100, "backgroundColor": "#f7f7f7", "overflow": "hidden" } }, "i-action-sheet__close": { "": { "position": "absolute", "top": 10, "right": 12, "zIndex": 2, "width": 32, "height": 32, "borderTopLeftRadius": 16, "borderTopRightRadius": 16, "borderBottomRightRadius": 16, "borderBottomLeftRadius": 16, "alignItems": "center", "justifyContent": "center" } }, "i-action-sheet__close-text": { "": { "color": "#909193", "fontSize": 24, "lineHeight": "28px" } }, "i-action-sheet__header": { "": { "minHeight": 38, "paddingTop": 8, "paddingRight": 48, "paddingBottom": 8, "paddingLeft": 48, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee", "backgroundColor": "#ffffff", "alignItems": "center", "justifyContent": "center" } }, "i-action-sheet__title": { "": { "color": "#909193", "fontSize": 14, "fontWeight": 400, "lineHeight": "20px", "textAlign": "center" } }, "i-action-sheet__desc": { "": { "marginTop": 4, "color": "#909193", "fontSize": 13, "lineHeight": "20px", "textAlign": "center" } }, "i-action-sheet__scroll": { "": { "maxHeight": 320, "backgroundColor": "#ffffff" } }, "i-action-sheet__item": { "": { "minHeight": 51, "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "borderTopLeftRadius": 0, "borderTopRightRadius": 0, "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "backgroundColor": "#ffffff", "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f2f3f5" } }, "i-action-sheet__item--disabled": { "": { "backgroundColor": "#fafafa", "opacity": 1 } }, "i-action-sheet__item--loading": { "": { "opacity": 0.72 } }, "i-action-sheet__item-inner": { "": { "minHeight": 51, "paddingTop": 8, "paddingRight": 16, "paddingBottom": 8, "paddingLeft": 16, "alignItems": "center", "justifyContent": "center" } }, "i-action-sheet__main": { "": { "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-action-sheet__icon": { "": { "marginRight": 6 } }, "i-action-sheet__item-text": { "": { "fontSize": 15, "lineHeight": "22px", "textAlign": "center" } }, "i-action-sheet__subname": { "": { "marginTop": 2, "color": "#909193", "fontSize": 12, "lineHeight": "18px", "textAlign": "center" } }, "i-action-sheet__loading": { "": { "marginTop": 2, "color": "#909193", "fontSize": 12, "lineHeight": "18px" } }, "i-action-sheet__cancel": { "": { "minHeight": 52, "marginTop": 8, "backgroundColor": "#ffffff", "alignItems": "center", "justifyContent": "center" } }, "i-action-sheet__cancel-text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": "22px" } }, "i-action-sheet__safe-bottom": { "": { "height": 12, "backgroundColor": "#ffffff" } } };
   function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$7);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_0$4);
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.createElementVNode("view", {
         class: "i-action-sheet__trigger",
@@ -24801,7 +22492,7 @@
               null,
               vue.renderList($props.actions, (item, index) => {
                 return vue.openBlock(), vue.createElementBlock("button", {
-                  key: String(index) + "-" + $setup.getActionText(item),
+                  key: index.toString() + "-" + $setup.getActionText(item),
                   class: vue.normalizeClass($setup.getItemClass(item)),
                   disabled: $setup.isDisabled(item) || $setup.isLoading(item),
                   "open-type": $setup.getActionOpenType(item),
@@ -24886,27 +22577,6 @@
     ]);
   }
   const __easycom_4 = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["styles", [_style_0$5]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-action-sheet/i-action-sheet.uvue"]]);
-  class TabItem extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            name: { type: String, optional: false },
-            value: { type: String, optional: false }
-          };
-        },
-        name: "TabItem"
-      };
-    }
-    constructor(options, metadata = TabItem.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.name = this.__props__.name;
-      this.value = this.__props__.value;
-      delete this.__props__;
-    }
-  }
   const historyPageSize = 10;
   const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
     __name: "cmd",
@@ -24917,8 +22587,8 @@
       const deviceId = vue.ref("");
       const activeTab = vue.ref("send");
       const tabItems = [
-        new TabItem({ name: "下发指令", value: "send" }),
-        new TabItem({ name: "指令记录", value: "history" })
+        new UTSJSONObject({ name: "下发指令", value: "send" }),
+        new UTSJSONObject({ name: "指令记录", value: "history" })
       ];
       const availableCommands = vue.ref([]);
       const selectedCommand = vue.ref(null);
@@ -24939,11 +22609,125 @@
       const isHistoryLoading = vue.ref(false);
       const hasLoadedHistory = vue.ref(false);
       const hasMoreHistory = vue.ref(true);
-      const refreshing = vue.ref(false);
+      const hasReachedHistoryBottom = vue.ref(false);
       const detailVisible = vue.ref(false);
       const isDetailLoading = vue.ref(false);
       const detailRecord = vue.ref(new UTSJSONObject({}));
       const isRetrying = vue.ref(false);
+      function getString(item = null, key) {
+        return item != null ? item.getString(key, "") : "";
+      }
+      function getBoolean(item = null, key) {
+        if (item == null)
+          return false;
+        return item.getBoolean(key, false) || getString(item, key) == "1";
+      }
+      function getCommandKey(command, index) {
+        const cmdId = getString(command, "cmdId");
+        return cmdId != "" ? cmdId : "command_" + index.toString();
+      }
+      function getCommandName(command = null) {
+        const name2 = getString(command, "cmdName");
+        return name2 != "" ? name2 : "未命名指令";
+      }
+      function getCommandCode(command = null) {
+        return getString(command, "cmdCode");
+      }
+      function getCommandRemark(command = null) {
+        return getString(command, "remark");
+      }
+      function isCommandAllowed(command = null) {
+        return getBoolean(command, "appAllowed");
+      }
+      function commandNeedsParams(command = null) {
+        return getString(command, "needParam") == "1";
+      }
+      function isSelectedCommand(command) {
+        return getCommandKey(command, 0) == selectedCommandId.value;
+      }
+      function getParamKey(param, index) {
+        const key = getString(param, "key");
+        return key != "" ? key : "param_" + index.toString();
+      }
+      function getParamLabel(param) {
+        const label = getString(param, "label");
+        return label != "" ? label : "参数";
+      }
+      function getParamType(param) {
+        return getString(param, "type");
+      }
+      function isParamRequired(param) {
+        return getBoolean(param, "required");
+      }
+      function getParamPlaceholder(param) {
+        const placeholder = getString(param, "placeholder");
+        return placeholder != "" ? placeholder : "请输入" + getParamLabel(param);
+      }
+      function getParamValue(index) {
+        return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : "";
+      }
+      function getParamError(index) {
+        return index >= 0 && index < paramErrors.value.length ? paramErrors.value[index] : "";
+      }
+      function getParamOptions(param) {
+        const options = param.getArray("options");
+        return options != null ? options : [];
+      }
+      function getOptionValue(option) {
+        return getString(option, "value");
+      }
+      function getOptionLabel(option) {
+        const label = getString(option, "label");
+        return label != "" ? label : getOptionValue(option);
+      }
+      function parseNumber(value) {
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? 0 : Number.from(parsed);
+      }
+      function validateParam(index, updateError) {
+        if (index < 0 || index >= paramConfigs.value.length)
+          return "";
+        const param = paramConfigs.value[index];
+        const value = getParamValue(index).trim();
+        let error = "";
+        if (isParamRequired(param) && value == "") {
+          error = "请填写" + getParamLabel(param);
+        } else if (value != "" && getParamType(param) == "number") {
+          const numberValue = parseFloat(value);
+          if (isNaN(numberValue)) {
+            error = getParamLabel(param) + "必须为数字";
+          } else {
+            const minText = getString(param, "min");
+            const maxText = getString(param, "max");
+            if (minText != "" && numberValue < parseNumber(minText))
+              error = getParamLabel(param) + "不能小于" + minText;
+            if (error == "" && maxText != "" && numberValue > parseNumber(maxText))
+              error = getParamLabel(param) + "不能大于" + maxText;
+          }
+        }
+        if (updateError && index >= 0 && index < paramErrors.value.length)
+          paramErrors.value[index] = error;
+        return error;
+      }
+      function getStatusValue(record = null) {
+        return getString(record, "sendStatus");
+      }
+      function getStatusText(record = null) {
+        const status = getStatusValue(record);
+        if (status == "1")
+          return "下发成功";
+        if (status == "2")
+          return "下发失败";
+        return "等待下发";
+      }
+      function getStatusClass(record = null) {
+        const status = getStatusValue(record);
+        if (status == "1")
+          return "status-success";
+        if (status == "2")
+          return "status-failed";
+        return "status-pending";
+      }
       const displayDeviceIdentity = vue.computed(() => {
         return imei.value != "" ? imei.value : deviceId.value != "" ? "设备 " + deviceId.value : "未识别设备";
       });
@@ -24965,78 +22749,7 @@
         const status = getStatusValue(detailRecord.value);
         return !isDetailLoading.value && (status == "0" || status == "2");
       });
-      const getValue = (item = null, key) => {
-        if (item == null)
-          return null;
-        return item[key];
-      };
-      const getString = (item = null, key) => {
-        const value = getValue(item, key);
-        return value == null ? "" : value.toString();
-      };
-      const getBoolean = (item = null, key) => {
-        const value = getValue(item, key);
-        return value == true || value == "true" || value == 1 || value == "1";
-      };
-      const getCommandKey = (command, index) => {
-        const cmdId = getString(command, "cmdId");
-        return cmdId != "" ? cmdId : "command_" + index.toString();
-      };
-      const getCommandName = (command = null) => {
-        const name2 = getString(command, "cmdName");
-        return name2 != "" ? name2 : "未命名指令";
-      };
-      const getCommandCode = (command = null) => {
-        return getString(command, "cmdCode");
-      };
-      const getCommandRemark = (command = null) => {
-        return getString(command, "remark");
-      };
-      const isCommandAllowed = (command = null) => {
-        return getBoolean(command, "appAllowed");
-      };
-      const commandNeedsParams = (command = null) => {
-        return getString(command, "needParam") == "1";
-      };
-      const isSelectedCommand = (command) => {
-        return getCommandKey(command, 0) == selectedCommandId.value;
-      };
-      const getParamKey = (param, index) => {
-        const key = getString(param, "key");
-        return key != "" ? key : "param_" + index.toString();
-      };
-      const getParamLabel = (param) => {
-        const label = getString(param, "label");
-        return label != "" ? label : "参数";
-      };
-      const getParamType = (param) => {
-        return getString(param, "type");
-      };
-      const isParamRequired = (param) => {
-        return getBoolean(param, "required");
-      };
-      const getParamPlaceholder = (param) => {
-        const placeholder = getString(param, "placeholder");
-        return placeholder != "" ? placeholder : "请输入" + getParamLabel(param);
-      };
-      const getParamValue = (index) => {
-        return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : "";
-      };
-      const getParamError = (index) => {
-        return index >= 0 && index < paramErrors.value.length ? paramErrors.value[index] : "";
-      };
-      const getParamOptions = (param) => {
-        const options = getValue(param, "options");
-        return Array.isArray(options) ? options : [];
-      };
-      const getOptionValue = (option) => {
-        return getString(option, "value");
-      };
-      const getOptionLabel = (option) => {
-        const label = getString(option, "label");
-        return label != "" ? label : getOptionValue(option);
-      };
-      const parseParamConfigs = (schema) => {
+      function parseParamConfigs(schema) {
         paramConfigError.value = "";
         if (schema.trim() == "")
           return [];
@@ -25070,51 +22783,26 @@
           }
           return configs;
         } catch (error) {
-          uni.__log__("error", "at pages/cmd/cmd.uvue:348", "解析指令参数配置失败:", error);
+          uni.__log__("error", "at pages/cmd/cmd.uvue:380", "解析指令参数配置失败:", error);
           paramConfigError.value = "指令参数配置无效";
           return [];
         }
-      };
-      const initializeParamValues = (configs) => {
+      }
+      function initializeParamValues(configs) {
         const values = [];
         for (let index = 0; index < configs.length; index++) {
-          const defaultValue = getValue(configs[index], "default");
-          values.push(defaultValue == null ? "" : defaultValue.toString());
+          const defaultValue = configs[index].getString("default", "");
+          values.push(defaultValue);
         }
         return values;
-      };
-      const validateParam = (index, updateError) => {
-        if (index < 0 || index >= paramConfigs.value.length)
-          return "";
-        const param = paramConfigs.value[index];
-        const value = getParamValue(index).trim();
-        let error = "";
-        if (isParamRequired(param) && value == "") {
-          error = "请填写" + getParamLabel(param);
-        } else if (value != "" && getParamType(param) == "number") {
-          const numberValue = Number(value);
-          if (isNaN(numberValue)) {
-            error = getParamLabel(param) + "必须为数字";
-          } else {
-            const minText = getString(param, "min");
-            const maxText = getString(param, "max");
-            if (minText != "" && numberValue < Number(minText))
-              error = getParamLabel(param) + "不能小于" + minText;
-            if (error == "" && maxText != "" && numberValue > Number(maxText))
-              error = getParamLabel(param) + "不能大于" + maxText;
-          }
-        }
-        if (updateError && index >= 0 && index < paramErrors.value.length)
-          paramErrors.value[index] = error;
-        return error;
-      };
-      const updateParamValue = (index, value = null) => {
+      }
+      function updateParamValue(index, value = null) {
         if (isSending.value || index < 0 || index >= paramValues.value.length)
           return null;
         paramValues.value[index] = value == null ? "" : value.toString();
         validateParam(index, true);
-      };
-      const getSelectedOptionLabel = (index) => {
+      }
+      function getSelectedOptionLabel(index) {
         if (index < 0 || index >= paramConfigs.value.length)
           return "";
         const value = getParamValue(index);
@@ -25124,8 +22812,8 @@
           return getOptionValue(item) == value;
         });
         return option == null ? value : getOptionLabel(option);
-      };
-      const openOptionSheet = (index) => {
+      }
+      function openOptionSheet(index) {
         if (isSending.value || index < 0 || index >= paramConfigs.value.length)
           return null;
         const param = paramConfigs.value[index];
@@ -25142,28 +22830,34 @@
         });
         optionActions.value = actions;
         optionSheetVisible.value = true;
-      };
-      const selectOption = (event = null) => {
-        const index = activeOptionIndex.value;
-        if (index < 0 || index >= paramValues.value.length || event == null)
+      }
+      function getEventItem(event = null) {
+        if (event == null || typeof event != "object")
           return null;
         const item = event["item"];
+        return item == null ? null : item;
+      }
+      function selectOption(event = null) {
+        const index = activeOptionIndex.value;
+        if (index < 0 || index >= paramValues.value.length)
+          return null;
+        const item = getEventItem(event);
         const value = item != null ? getString(item, "value") : "";
         if (value != "") {
           paramValues.value[index] = value;
           validateParam(index, true);
         }
         activeOptionIndex.value = -1;
-      };
-      const resetSelection = () => {
+      }
+      function resetSelection() {
         selectedCommand.value = null;
         selectedCommandId.value = "";
         paramConfigs.value = [];
         paramValues.value = [];
         paramErrors.value = [];
         paramConfigError.value = "";
-      };
-      const loadAvailableCommands = () => {
+      }
+      function loadAvailableCommands() {
         return __awaiter(this, void 0, void 0, function* () {
           if (deviceId.value == "" || isCommandLoading.value)
             return Promise.resolve(null);
@@ -25183,14 +22877,14 @@
               showAppToast({ title: response.msg != "" ? response.msg : "加载可用指令失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:452", "加载可用指令失败:", error);
+            uni.__log__("error", "at pages/cmd/cmd.uvue:473", "加载可用指令失败:", error);
             showAppToast({ title: "加载可用指令失败，请检查网络", icon: "none" });
           } finally {
             isCommandLoading.value = false;
           }
         });
-      };
-      const selectCommand = (command) => {
+      }
+      function selectCommand(command) {
         if (isSending.value)
           return null;
         if (!isCommandAllowed(command)) {
@@ -25205,8 +22899,8 @@
         paramErrors.value = configs.map((_param) => {
           return "";
         });
-      };
-      const buildCommandParams = () => {
+      }
+      function buildCommandParams() {
         const params = new UTSJSONObject();
         for (let index = 0; index < paramConfigs.value.length; index++) {
           const value = getParamValue(index).trim();
@@ -25214,114 +22908,8 @@
             params.set(getParamKey(paramConfigs.value[index], index), value);
         }
         return params;
-      };
-      const confirmSendCommand = () => {
-        if (selectedCommand.value == null) {
-          showAppToast({ title: "请选择要下发的指令", icon: "none" });
-          return null;
-        }
-        for (let index = 0; index < paramConfigs.value.length; index++)
-          validateParam(index, true);
-        if (!isFormValid.value) {
-          showAppToast({ title: "请检查指令参数", icon: "none" });
-          return null;
-        }
-        showAppModal(new UTSJSONObject({
-          title: "确认下发指令",
-          content: "即将向设备下发“" + getCommandName(selectedCommand.value) + "”。指令下发后可能影响车辆使用，请确认操作。",
-          confirmText: "确认下发",
-          cancelText: "取消",
-          success: (result) => {
-            if (result.confirm)
-              void sendSelectedCommand();
-          }
-        }));
-      };
-      const sendSelectedCommand = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          const command = selectedCommand.value;
-          if (command == null || deviceId.value == "" || isSending.value)
-            return Promise.resolve(null);
-          const cmdId = getValue(command, "cmdId");
-          if (cmdId == null || cmdId.toString() == "") {
-            showAppToast({ title: "指令模板信息不完整", icon: "none" });
-            return Promise.resolve(null);
-          }
-          const requestData = new UTSJSONObject();
-          requestData.set("deviceId", deviceId.value);
-          requestData.set("cmdId", cmdId);
-          const cmdCode = getCommandCode(command);
-          if (cmdCode != "")
-            requestData.set("cmdCode", cmdCode);
-          requestData.set("params", buildCommandParams());
-          try {
-            isSending.value = true;
-            const response = yield sendAppCommand(requestData);
-            if (response.code == 200) {
-              const requestIdText = response.data != "" ? "追踪编号：" + response.data : "请在指令记录中查看下发结果";
-              showAppToast({ title: "指令已提交，" + requestIdText, icon: "success", duration: 3500 });
-              yield reloadHistory();
-            } else {
-              showAppToast({ title: response.msg != "" ? response.msg : "指令下发失败", icon: "none", duration: 3e3 });
-            }
-          } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:528", "下发指令失败:", error);
-            showAppToast({ title: "指令下发失败，请检查网络", icon: "none" });
-          } finally {
-            isSending.value = false;
-          }
-        });
-      };
-      const getRecordKey = (record, index) => {
-        const id = getString(record, "id");
-        return id != "" ? id : "record_" + index.toString();
-      };
-      const getRecordName = (record = null) => {
-        const name2 = getString(record, "cmdName");
-        return name2 != "" ? name2 : getString(record, "commandType") != "" ? getString(record, "commandType") : "未知指令";
-      };
-      const getRecordTime = (record = null) => {
-        const time = getString(record, "sendTime");
-        return time != "" ? time : getString(record, "createTime");
-      };
-      const getRecordRetryCount = (record = null) => {
-        const count = getString(record, "retryCount");
-        return count != "" ? count : "0";
-      };
-      const getStatusValue = (record = null) => {
-        return getString(record, "sendStatus");
-      };
-      const getStatusText = (record = null) => {
-        const status = getStatusValue(record);
-        if (status == "1")
-          return "下发成功";
-        if (status == "2")
-          return "下发失败";
-        return "等待下发";
-      };
-      const getStatusClass = (record = null) => {
-        const status = getStatusValue(record);
-        if (status == "1")
-          return "status-success";
-        if (status == "2")
-          return "status-failed";
-        return "status-pending";
-      };
-      const getRecordSummary = (record = null) => {
-        const reason = getString(record, "reason");
-        return reason != "" ? reason : getString(record, "responseContent");
-      };
-      const reloadHistory = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          historyPageNum.value = 1;
-          historyRecords.value = [];
-          historyTotal.value = 0;
-          hasMoreHistory.value = true;
-          hasLoadedHistory.value = false;
-          yield loadHistoryPage(true);
-        });
-      };
-      const loadHistoryPage = (reset = false) => {
+      }
+      function loadHistoryPage(reset) {
         return __awaiter(this, void 0, void 0, function* () {
           if (deviceId.value == "" || isHistoryLoading.value || !reset && !hasMoreHistory.value)
             return Promise.resolve(null);
@@ -25346,19 +22934,117 @@
             historyPageNum.value = requestedPage + 1;
             hasMoreHistory.value = historyRecords.value.length < historyTotal.value && rows.length > 0;
           } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:599", "加载指令记录失败:", error);
+            uni.__log__("error", "at pages/cmd/cmd.uvue:524", "加载指令记录失败:", error);
             showAppToast({ title: "加载指令记录失败，请检查网络", icon: "none" });
           } finally {
             hasLoadedHistory.value = true;
             isHistoryLoading.value = false;
           }
         });
-      };
-      const loadMoreHistory = () => {
-        if (activeTab.value == "history")
-          void loadHistoryPage();
-      };
-      const showCommandDetail = (record) => {
+      }
+      function reloadHistory() {
+        return __awaiter(this, void 0, void 0, function* () {
+          hasReachedHistoryBottom.value = false;
+          historyPageNum.value = 1;
+          historyRecords.value = [];
+          historyTotal.value = 0;
+          hasMoreHistory.value = true;
+          hasLoadedHistory.value = false;
+          yield loadHistoryPage(true);
+        });
+      }
+      function sendSelectedCommand() {
+        return __awaiter(this, void 0, void 0, function* () {
+          const command = selectedCommand.value;
+          if (command == null || deviceId.value == "" || isSending.value)
+            return Promise.resolve(null);
+          const cmdId = getString(command, "cmdId");
+          if (cmdId == "") {
+            showAppToast({ title: "指令模板信息不完整", icon: "none" });
+            return Promise.resolve(null);
+          }
+          const requestData = new UTSJSONObject();
+          requestData.set("deviceId", deviceId.value);
+          requestData.set("cmdId", cmdId);
+          const cmdCode = getCommandCode(command);
+          if (cmdCode != "")
+            requestData.set("cmdCode", cmdCode);
+          requestData.set("params", buildCommandParams());
+          try {
+            isSending.value = true;
+            const response = yield sendAppCommand(requestData);
+            if (response.code == 200) {
+              const requestIdText = response.data != "" ? "追踪编号：" + response.data : "请在指令记录中查看下发结果";
+              showAppToast({ title: "指令已提交，" + requestIdText, icon: "success", duration: 3500 });
+              yield reloadHistory();
+            } else {
+              showAppToast({ title: response.msg != "" ? response.msg : "指令下发失败", icon: "none", duration: 3e3 });
+            }
+          } catch (error) {
+            uni.__log__("error", "at pages/cmd/cmd.uvue:567", "下发指令失败:", error);
+            showAppToast({ title: "指令下发失败，请检查网络", icon: "none" });
+          } finally {
+            isSending.value = false;
+          }
+        });
+      }
+      function confirmSendCommand() {
+        if (selectedCommand.value == null) {
+          showAppToast({ title: "请选择要下发的指令", icon: "none" });
+          return null;
+        }
+        for (let index = 0; index < paramConfigs.value.length; index++)
+          validateParam(index, true);
+        if (!isFormValid.value) {
+          showAppToast({ title: "请检查指令参数", icon: "none" });
+          return null;
+        }
+        showAppModal(new UTSJSONObject({
+          title: "确认下发指令",
+          content: "即将向设备下发“" + getCommandName(selectedCommand.value) + "”。指令下发后可能影响车辆使用，请确认操作。",
+          confirmText: "确认下发",
+          cancelText: "取消",
+          success: (result) => {
+            if (result.confirm)
+              void sendSelectedCommand();
+          }
+        }));
+      }
+      function getRecordKey(record, index) {
+        const id = getString(record, "id");
+        return id != "" ? id : "record_" + index.toString();
+      }
+      function getRecordName(record = null) {
+        const name2 = getString(record, "cmdName");
+        return name2 != "" ? name2 : getString(record, "commandType") != "" ? getString(record, "commandType") : "未知指令";
+      }
+      function getRecordTime(record = null) {
+        const time = getString(record, "sendTime");
+        return time != "" ? time : getString(record, "createTime");
+      }
+      function getRecordRetryCount(record = null) {
+        const count = getString(record, "retryCount");
+        return count != "" ? count : "0";
+      }
+      function getRecordSummary(record = null) {
+        const reason = getString(record, "reason");
+        return reason != "" ? reason : getString(record, "responseContent");
+      }
+      function markHistoryScroll(event) {
+        if (activeTab.value != "history")
+          return null;
+        if (event.detail.deltaY <= 0)
+          hasReachedHistoryBottom.value = false;
+      }
+      function loadMoreHistory() {
+        if (activeTab.value != "history")
+          return null;
+        if (hasReachedHistoryBottom.value)
+          return null;
+        hasReachedHistoryBottom.value = true;
+        void loadHistoryPage(false);
+      }
+      function showCommandDetail(record) {
         return __awaiter(this, void 0, void 0, function* () {
           const commandId = getString(record, "id");
           if (commandId == "")
@@ -25374,41 +23060,26 @@
               showAppToast({ title: response.msg != "" ? response.msg : "加载指令详情失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:625", "加载指令详情失败:", error);
+            uni.__log__("error", "at pages/cmd/cmd.uvue:647", "加载指令详情失败:", error);
             showAppToast({ title: "加载指令详情失败，请检查网络", icon: "none" });
           } finally {
             isDetailLoading.value = false;
           }
         });
-      };
-      const closeDetail = () => {
+      }
+      function closeDetail() {
         detailVisible.value = false;
-      };
-      const getDetailResponse = () => {
+      }
+      function getDetailResponse() {
         return getString(detailRecord.value, "responseContent");
-      };
-      const getDetailReason = () => {
+      }
+      function getDetailReason() {
         return getString(detailRecord.value, "reason");
-      };
-      const getDetailParams = () => {
+      }
+      function getDetailParams() {
         return getString(detailRecord.value, "commandParams");
-      };
-      const confirmRetryFromDetail = () => {
-        const commandId = getString(detailRecord.value, "id");
-        if (commandId == "" || isRetrying.value)
-          return null;
-        showAppModal(new UTSJSONObject({
-          title: "确认重试",
-          content: "将重新下发“" + getRecordName(detailRecord.value) + "”，请确认设备当前状态适合执行此操作。",
-          confirmText: "确认重试",
-          cancelText: "取消",
-          success: (result) => {
-            if (result.confirm)
-              void retryCommand(commandId);
-          }
-        }));
-      };
-      const retryCommand = (commandId) => {
+      }
+      function retryCommand(commandId) {
         return __awaiter(this, void 0, void 0, function* () {
           if (isRetrying.value)
             return Promise.resolve(null);
@@ -25423,38 +23094,35 @@
               showAppToast({ title: response.msg != "" ? response.msg : "重试下发失败", icon: "none", duration: 3e3 });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:666", "重试下发失败:", error);
+            uni.__log__("error", "at pages/cmd/cmd.uvue:674", "重试下发失败:", error);
             showAppToast({ title: "重试下发失败，请检查网络", icon: "none" });
           } finally {
             isRetrying.value = false;
           }
         });
-      };
-      const changeTab = (event = null) => {
-        if (event == null)
+      }
+      function confirmRetryFromDetail() {
+        const commandId = getString(detailRecord.value, "id");
+        if (commandId == "" || isRetrying.value)
           return null;
-        const value = event["value"] == null ? "" : event["value"].toString();
-        if (value == "")
+        showAppModal(new UTSJSONObject({
+          title: "确认重试",
+          content: "将重新下发“" + getRecordName(detailRecord.value) + "”，请确认设备当前状态适合执行此操作。",
+          confirmText: "确认重试",
+          cancelText: "取消",
+          success: (result) => {
+            if (result.confirm)
+              void retryCommand(commandId);
+          }
+        }));
+      }
+      function changeTab(value) {
+        if (value == "" || value == activeTab.value)
           return null;
         activeTab.value = value;
         if (value == "history" && !hasLoadedHistory.value)
           void reloadHistory();
-      };
-      const refreshCurrentTab = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (refreshing.value)
-            return Promise.resolve(null);
-          try {
-            refreshing.value = true;
-            if (activeTab.value == "history")
-              yield reloadHistory();
-            else
-              yield loadAvailableCommands();
-          } finally {
-            refreshing.value = false;
-          }
-        });
-      };
+      }
       vue.onLoad((options) => {
         var _a2, _b;
         imei.value = (_a2 = options.imei) !== null && _a2 !== void 0 ? _a2 : "";
@@ -25462,12 +23130,12 @@
         if (deviceId.value != "")
           void loadAvailableCommands();
       });
-      const __returned__ = { imei, deviceId, activeTab, tabItems, availableCommands, selectedCommand, selectedCommandId, paramConfigs, paramValues, paramErrors, paramConfigError, isCommandLoading, isSending, optionSheetVisible, optionSheetTitle, optionActions, activeOptionIndex, historyRecords, historyPageNum, historyPageSize, historyTotal, isHistoryLoading, hasLoadedHistory, hasMoreHistory, refreshing, detailVisible, isDetailLoading, detailRecord, isRetrying, displayDeviceIdentity, isHistoryInitialLoading, isFormValid, canRetryDetail, getValue, getString, getBoolean, getCommandKey, getCommandName, getCommandCode, getCommandRemark, isCommandAllowed, commandNeedsParams, isSelectedCommand, getParamKey, getParamLabel, getParamType, isParamRequired, getParamPlaceholder, getParamValue, getParamError, getParamOptions, getOptionValue, getOptionLabel, parseParamConfigs, initializeParamValues, validateParam, updateParamValue, getSelectedOptionLabel, openOptionSheet, selectOption, resetSelection, loadAvailableCommands, selectCommand, buildCommandParams, confirmSendCommand, sendSelectedCommand, getRecordKey, getRecordName, getRecordTime, getRecordRetryCount, getStatusValue, getStatusText, getStatusClass, getRecordSummary, reloadHistory, loadHistoryPage, loadMoreHistory, showCommandDetail, closeDetail, getDetailResponse, getDetailReason, getDetailParams, confirmRetryFromDetail, retryCommand, changeTab, refreshCurrentTab };
+      const __returned__ = { imei, deviceId, activeTab, tabItems, availableCommands, selectedCommand, selectedCommandId, paramConfigs, paramValues, paramErrors, paramConfigError, isCommandLoading, isSending, optionSheetVisible, optionSheetTitle, optionActions, activeOptionIndex, historyRecords, historyPageNum, historyPageSize, historyTotal, isHistoryLoading, hasLoadedHistory, hasMoreHistory, hasReachedHistoryBottom, detailVisible, isDetailLoading, detailRecord, isRetrying, getString, getBoolean, getCommandKey, getCommandName, getCommandCode, getCommandRemark, isCommandAllowed, commandNeedsParams, isSelectedCommand, getParamKey, getParamLabel, getParamType, isParamRequired, getParamPlaceholder, getParamValue, getParamError, getParamOptions, getOptionValue, getOptionLabel, parseNumber, validateParam, getStatusValue, getStatusText, getStatusClass, displayDeviceIdentity, isHistoryInitialLoading, isFormValid, canRetryDetail, parseParamConfigs, initializeParamValues, updateParamValue, getSelectedOptionLabel, openOptionSheet, getEventItem, selectOption, resetSelection, loadAvailableCommands, selectCommand, buildCommandParams, loadHistoryPage, reloadHistory, sendSelectedCommand, confirmSendCommand, getRecordKey, getRecordName, getRecordTime, getRecordRetryCount, getRecordSummary, markHistoryScroll, loadMoreHistory, showCommandDetail, closeDetail, getDetailResponse, getDetailReason, getDetailParams, retryCommand, confirmRetryFromDetail, changeTab };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$4 = { "page": { "": { "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fb" } }, "content-wrap": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0, "display": "flex", "flexDirection": "column" } }, "device-card": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "marginTop": "20rpx", "marginRight": "24rpx", "marginBottom": "16rpx", "marginLeft": "24rpx", "paddingTop": "28rpx", "paddingRight": "30rpx", "paddingBottom": "28rpx", "paddingLeft": "30rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundImage": "linear-gradient(135deg, #1769e0 0%, #3c97ff 100%)", "backgroundColor": "rgba(0,0,0,0)", "boxShadow": "0 10rpx 28rpx rgba(22, 119, 255, 0.22)" } }, "device-card-main": { "": { "display": "flex", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0, "flexDirection": "column" } }, "device-id-wrap": { "": { "display": "flex", "marginLeft": "20rpx", "flexDirection": "column", "alignItems": "flex-end" } }, "section-heading": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "marginBottom": "20rpx" } }, "command-card-top": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between" } }, "command-name-wrap": { "": { "display": "flex", "minWidth": 0, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "alignItems": "center" } }, "form-header": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "marginBottom": "12rpx" } }, "param-label-row": { "": { "display": "flex", "alignItems": "center", "marginBottom": "12rpx" } }, "history-card-top": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between" } }, "history-bottom": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "marginTop": "18rpx" } }, "detail-row": { "": { "display": "flex", "alignItems": "flex-start", "justifyContent": "space-between", "paddingTop": "9rpx", "paddingRight": 0, "paddingBottom": "9rpx", "paddingLeft": 0 } }, "device-title": { "": { "color": "rgba(255,255,255,0.76)", "fontSize": "23rpx" } }, "device-id-label": { "": { "color": "rgba(255,255,255,0.76)", "fontSize": "23rpx" } }, "device-imei": { "": { "marginTop": "8rpx", "color": "#ffffff", "fontSize": "32rpx", "fontWeight": 600 } }, "device-id-value": { "": { "marginTop": "8rpx", "color": "#ffffff", "fontSize": "25rpx" } }, "main-scroll": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0 } }, "tab-content": { "": { "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "44rpx", "paddingLeft": "24rpx" } }, "section-title": { "": { "color": "#1f2937", "fontSize": "32rpx", "fontWeight": 600 } }, "section-subtitle": { "": { "marginTop": "7rpx", "color": "#98a2b3", "fontSize": "23rpx" } }, "refresh-link": { "": { "color": "#1677ff", "fontSize": "25rpx" } }, "detail-link": { "": { "color": "#1677ff", "fontSize": "25rpx" } }, "state-card": { "": { "boxSizing": "border-box", "backgroundColor": "#ffffff", "borderTopLeftRadius": "18rpx", "borderTopRightRadius": "18rpx", "borderBottomRightRadius": "18rpx", "borderBottomLeftRadius": "18rpx", "marginTop": "32rpx", "marginRight": "24rpx", "marginBottom": "32rpx", "marginLeft": "24rpx", "paddingTop": "58rpx", "paddingRight": "38rpx", "paddingBottom": "58rpx", "paddingLeft": "38rpx", "alignItems": "center" } }, "form-card": { "": { "boxSizing": "border-box", "backgroundColor": "#ffffff", "borderTopLeftRadius": "18rpx", "borderTopRightRadius": "18rpx", "borderBottomRightRadius": "18rpx", "borderBottomLeftRadius": "18rpx", "marginTop": "24rpx", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "history-card": { "": { "boxSizing": "border-box", "backgroundColor": "#ffffff", "borderTopLeftRadius": "18rpx", "borderTopRightRadius": "18rpx", "borderBottomRightRadius": "18rpx", "borderBottomLeftRadius": "18rpx", "paddingTop": "26rpx", "paddingRight": "28rpx", "paddingBottom": "26rpx", "paddingLeft": "28rpx" }, ".history-card+": { "marginTop": "16rpx" } }, "compact-state": { "": { "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "paddingTop": "48rpx", "paddingRight": "32rpx", "paddingBottom": "48rpx", "paddingLeft": "32rpx" } }, "state-title": { "": { "color": "#344054", "fontSize": "30rpx", "fontWeight": 600, "textAlign": "center" } }, "state-text": { "": { "marginTop": "12rpx", "color": "#98a2b3", "fontSize": "25rpx", "lineHeight": "38rpx", "textAlign": "center" } }, "command-list": { "": { "display": "flex", "flexDirection": "column" } }, "history-list": { "": { "display": "flex", "flexDirection": "column" } }, "command-card": { "": { "paddingTop": "26rpx", "paddingRight": "28rpx", "paddingBottom": "26rpx", "paddingLeft": "28rpx", "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "backgroundColor": "#ffffff" }, ".command-card+": { "marginTop": "16rpx" }, ".selected": { "borderTopColor": "#1677ff", "borderRightColor": "#1677ff", "borderBottomColor": "#1677ff", "borderLeftColor": "#1677ff", "backgroundColor": "#f0f7ff" }, ".disabled": { "opacity": 0.58, "backgroundColor": "#f8fafc" } }, "command-name": { "": { "color": "#344054", "fontSize": "29rpx", "fontWeight": 600 } }, "history-name": { "": { "color": "#344054", "fontSize": "29rpx", "fontWeight": 600 } }, "command-code": { "": { "marginLeft": "14rpx", "paddingTop": "4rpx", "paddingRight": "10rpx", "paddingBottom": "4rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": "6rpx", "borderTopRightRadius": "6rpx", "borderBottomRightRadius": "6rpx", "borderBottomLeftRadius": "6rpx", "color": "#667085", "backgroundColor": "#f2f4f7", "fontSize": "20rpx" } }, "command-status": { "": { "marginLeft": "16rpx", "paddingTop": "6rpx", "paddingRight": "12rpx", "paddingBottom": "6rpx", "paddingLeft": "12rpx", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "color": "#1668dc", "backgroundColor": "#eaf3ff", "fontSize": "21rpx", "whiteSpace": "nowrap" }, ".blocked": { "color": "#98a2b3", "backgroundColor": "#eaecf0" } }, "history-status": { "": { "marginLeft": "16rpx", "paddingTop": "6rpx", "paddingRight": "12rpx", "paddingBottom": "6rpx", "paddingLeft": "12rpx", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "color": "#1668dc", "backgroundColor": "#eaf3ff", "fontSize": "21rpx", "whiteSpace": "nowrap" }, ".status-success": { "color": "#039855", "backgroundColor": "#ecfdf3" }, ".status-failed": { "color": "#d92d20", "backgroundColor": "#fef3f2" }, ".status-pending": { "color": "#b54708", "backgroundColor": "#fffaeb" } }, "command-remark": { "": { "color": "#98a2b3", "fontSize": "23rpx", "lineHeight": "36rpx", "marginTop": "12rpx" } }, "history-time": { "": { "color": "#98a2b3", "fontSize": "23rpx", "lineHeight": "36rpx", "marginTop": "12rpx" } }, "history-summary": { "": { "color": "#667085", "fontSize": "23rpx", "lineHeight": "36rpx", "marginTop": "8rpx" } }, "retry-count": { "": { "color": "#98a2b3", "fontSize": "23rpx", "lineHeight": "36rpx" } }, "form-error": { "": { "color": "#e34935", "fontSize": "23rpx", "lineHeight": "34rpx", "marginTop": "12rpx", "marginRight": 0, "marginBottom": "12rpx", "marginLeft": 0 } }, "param-error": { "": { "color": "#e34935", "fontSize": "23rpx", "lineHeight": "34rpx", "marginTop": "8rpx" } }, "param-row": { "": { "marginTop": "28rpx" } }, "param-label": { "": { "color": "#344054", "fontSize": "27rpx" } }, "required-mark": { "": { "marginLeft": "6rpx", "color": "#f04438", "fontSize": "28rpx" } }, "param-input": { "": { "boxSizing": "border-box", "width": "100%", "minHeight": "82rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#d0d5dd", "borderRightColor": "#d0d5dd", "borderBottomColor": "#d0d5dd", "borderLeftColor": "#d0d5dd", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "#ffffff" } }, "select-field": { "": { "boxSizing": "border-box", "width": "100%", "minHeight": "82rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#d0d5dd", "borderRightColor": "#d0d5dd", "borderBottomColor": "#d0d5dd", "borderLeftColor": "#d0d5dd", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "#ffffff", "display": "flex", "alignItems": "center", "justifyContent": "space-between", "paddingTop": 0, "paddingRight": "24rpx", "paddingBottom": 0, "paddingLeft": "24rpx", "color": "#344054", "fontSize": "27rpx" } }, "select-placeholder": { "": { "color": "#98a2b3" } }, "input-placeholder": { "": { "color": "#98a2b3" } }, "select-arrow": { "": { "color": "#98a2b3", "fontSize": "42rpx", "lineHeight": "42rpx" } }, "no-param-text": { "": { "marginTop": "26rpx", "color": "#98a2b3", "fontSize": "25rpx" } }, "send-button": { "": { "marginTop": "36rpx" } }, "history-footer": { "": { "paddingTop": "28rpx", "paddingRight": 0, "paddingBottom": "12rpx", "paddingLeft": 0, "color": "#98a2b3", "fontSize": "23rpx", "textAlign": "center" } }, "detail-loading": { "": { "display": "flex", "flexDirection": "column", "width": "100%", "alignItems": "center", "paddingTop": "28rpx", "paddingRight": 0, "paddingBottom": "28rpx", "paddingLeft": 0, "color": "#98a2b3", "fontSize": "25rpx" } }, "detail-content": { "": { "display": "flex", "flexDirection": "column", "width": "100%" } }, "detail-label": { "": { "width": "120rpx", "flexShrink": 0, "color": "#98a2b3", "fontSize": "23rpx" } }, "detail-value": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#344054", "fontSize": "23rpx", "lineHeight": "34rpx", "textAlign": "right" }, ".detail-long-row ": { "marginTop": "5rpx", "textAlign": "left" } }, "detail-long-row": { "": { "flexDirection": "column" } } };
+  const _style_0$4 = { "page": { "": { "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fb" } }, "content-wrap": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0, "display": "flex", "flexDirection": "column" } }, "device-card": { "": { "display": "flex", "justifyContent": "space-between", "marginTop": "20rpx", "marginRight": "24rpx", "marginBottom": "16rpx", "marginLeft": "24rpx", "paddingTop": "28rpx", "paddingRight": "30rpx", "paddingBottom": "28rpx", "paddingLeft": "30rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundImage": "linear-gradient(to right, #1769e0, #56a0f6)", "boxShadow": "0 10rpx 28rpx rgba(22, 119, 255, 0.22)" } }, "device-card-main": { "": { "display": "flex", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0, "flexDirection": "row", "alignItems": "center" } }, "device-id-wrap": { "": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "section-heading": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginBottom": "20rpx" } }, "command-card-top": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "command-name-wrap": { "": { "display": "flex", "minWidth": 0, "alignItems": "center" } }, "form-header": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "marginBottom": "12rpx" } }, "param-label-row": { "": { "display": "flex", "alignItems": "center", "marginBottom": "12rpx" } }, "history-card-top": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "history-bottom": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginTop": "18rpx" } }, "detail-row": { "": { "display": "flex", "alignItems": "flex-start", "justifyContent": "space-between", "paddingTop": "9rpx", "paddingRight": 0, "paddingBottom": "9rpx", "paddingLeft": 0 } }, "device-title": { "": { "color": "rgba(255,255,255,0.76)", "fontSize": "23rpx", "marginRight": "20rpx" } }, "device-id-label": { "": { "color": "rgba(255,255,255,0.76)", "fontSize": "23rpx", "marginRight": "20rpx" } }, "device-imei": { "": { "color": "#ffffff", "fontSize": "32rpx", "fontWeight": 600 } }, "device-id-value": { "": { "marginTop": "8rpx", "color": "#ffffff", "fontSize": "25rpx" } }, "main-scroll": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0 } }, "tab-content": { "": { "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "44rpx", "paddingLeft": "24rpx" } }, "section-title": { "": { "color": "#1f2937", "fontSize": "32rpx", "fontWeight": 600 } }, "section-subtitle": { "": { "marginTop": "7rpx", "color": "#98a2b3", "fontSize": "23rpx" } }, "refresh-link": { "": { "color": "#1677ff", "fontSize": "25rpx" } }, "detail-link": { "": { "color": "#1677ff", "fontSize": "25rpx" } }, "state-card": { "": { "boxSizing": "border-box", "backgroundColor": "#ffffff", "borderTopLeftRadius": "18rpx", "borderTopRightRadius": "18rpx", "borderBottomRightRadius": "18rpx", "borderBottomLeftRadius": "18rpx", "marginTop": "32rpx", "marginRight": "24rpx", "marginBottom": "32rpx", "marginLeft": "24rpx", "paddingTop": "58rpx", "paddingRight": "38rpx", "paddingBottom": "58rpx", "paddingLeft": "38rpx", "alignItems": "center" } }, "form-card": { "": { "boxSizing": "border-box", "backgroundColor": "#ffffff", "borderTopLeftRadius": "18rpx", "borderTopRightRadius": "18rpx", "borderBottomRightRadius": "18rpx", "borderBottomLeftRadius": "18rpx", "marginTop": "24rpx", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "history-card": { "": { "boxSizing": "border-box", "backgroundColor": "#ffffff", "borderTopLeftRadius": "18rpx", "borderTopRightRadius": "18rpx", "borderBottomRightRadius": "18rpx", "borderBottomLeftRadius": "18rpx", "paddingTop": "26rpx", "paddingRight": "28rpx", "paddingBottom": "26rpx", "paddingLeft": "28rpx" }, ".history-card+": { "marginTop": "16rpx" } }, "compact-state": { "": { "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "paddingTop": "48rpx", "paddingRight": "32rpx", "paddingBottom": "48rpx", "paddingLeft": "32rpx" } }, "state-title": { "": { "color": "#344054", "fontSize": "30rpx", "fontWeight": 600, "textAlign": "center" } }, "state-text": { "": { "marginTop": "12rpx", "color": "#98a2b3", "fontSize": "25rpx", "lineHeight": "38rpx", "textAlign": "center" } }, "command-list": { "": { "display": "flex", "flexDirection": "column" } }, "history-list": { "": { "display": "flex", "flexDirection": "column" } }, "command-card": { "": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "backgroundColor": "#ffffff", "flexDirection": "row" }, ".command-card+": { "marginTop": "16rpx" }, ".selected": { "borderTopColor": "#1677ff", "borderRightColor": "#1677ff", "borderBottomColor": "#1677ff", "borderLeftColor": "#1677ff", "backgroundColor": "#f0f7ff" }, ".disabled": { "opacity": 0.58, "justifyContent": "space-between" } }, "command-name": { "": { "color": "#344054", "fontSize": "29rpx", "fontWeight": 600 } }, "history-name": { "": { "color": "#344054", "fontSize": "29rpx", "fontWeight": 600 } }, "command-code": { "": { "marginLeft": "14rpx", "paddingTop": "4rpx", "paddingRight": "10rpx", "paddingBottom": "4rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": "6rpx", "borderTopRightRadius": "6rpx", "borderBottomRightRadius": "6rpx", "borderBottomLeftRadius": "6rpx", "color": "#667085", "backgroundColor": "#f2f4f7", "fontSize": "20rpx" } }, "command-status": { "": { "marginLeft": "16rpx", "paddingTop": "6rpx", "paddingRight": "12rpx", "paddingBottom": "6rpx", "paddingLeft": "12rpx", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "color": "#1668dc", "backgroundColor": "#eaf3ff", "fontSize": "21rpx", "whiteSpace": "nowrap" }, ".blocked": { "color": "#98a2b3", "backgroundColor": "#eaecf0" } }, "history-status": { "": { "marginLeft": "16rpx", "paddingTop": "6rpx", "paddingRight": "12rpx", "paddingBottom": "6rpx", "paddingLeft": "12rpx", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "color": "#1668dc", "backgroundColor": "#eaf3ff", "fontSize": "21rpx", "whiteSpace": "nowrap" }, ".status-success": { "color": "#039855", "backgroundColor": "#ecfdf3" }, ".status-failed": { "color": "#d92d20", "backgroundColor": "#fef3f2" }, ".status-pending": { "color": "#b54708", "backgroundColor": "#fffaeb" } }, "command-remark": { "": { "color": "#98a2b3", "fontSize": "23rpx", "lineHeight": "36rpx", "marginTop": "12rpx" } }, "history-time": { "": { "color": "#98a2b3", "fontSize": "23rpx", "lineHeight": "36rpx", "marginTop": "12rpx" } }, "history-summary": { "": { "color": "#667085", "fontSize": "23rpx", "lineHeight": "36rpx", "marginTop": "8rpx" } }, "retry-count": { "": { "color": "#98a2b3", "fontSize": "23rpx", "lineHeight": "36rpx" } }, "form-error": { "": { "color": "#e34935", "fontSize": "23rpx", "lineHeight": "34rpx", "marginTop": "12rpx", "marginRight": 0, "marginBottom": "12rpx", "marginLeft": 0 } }, "param-error": { "": { "color": "#e34935", "fontSize": "23rpx", "lineHeight": "34rpx", "marginTop": "8rpx" } }, "param-row": { "": { "marginTop": "28rpx" } }, "param-label": { "": { "color": "#344054", "fontSize": "27rpx" } }, "required-mark": { "": { "marginLeft": "6rpx", "color": "#f04438", "fontSize": "28rpx" } }, "param-input": { "": { "boxSizing": "border-box", "width": "100%", "minHeight": "82rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#d0d5dd", "borderRightColor": "#d0d5dd", "borderBottomColor": "#d0d5dd", "borderLeftColor": "#d0d5dd", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "#ffffff" } }, "select-field": { "": { "boxSizing": "border-box", "width": "100%", "minHeight": "82rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#d0d5dd", "borderRightColor": "#d0d5dd", "borderBottomColor": "#d0d5dd", "borderLeftColor": "#d0d5dd", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "#ffffff", "display": "flex", "alignItems": "center", "justifyContent": "space-between", "paddingTop": 0, "paddingRight": "24rpx", "paddingBottom": 0, "paddingLeft": "24rpx", "color": "#344054", "fontSize": "27rpx" } }, "select-placeholder": { "": { "color": "#98a2b3" } }, "input-placeholder": { "": { "color": "#98a2b3" } }, "select-arrow": { "": { "color": "#98a2b3", "fontSize": "42rpx", "lineHeight": "42rpx" } }, "no-param-text": { "": { "marginTop": "26rpx", "color": "#98a2b3", "fontSize": "25rpx" } }, "send-button": { "": { "marginTop": "36rpx" } }, "history-footer": { "": { "paddingTop": "28rpx", "paddingRight": 0, "paddingBottom": "12rpx", "paddingLeft": 0, "color": "#98a2b3", "fontSize": "23rpx", "textAlign": "center" } }, "loading-text": { "": { "color": "#999999", "fontSize": "25rpx", "textAlign": "center" } }, "no-more-text": { "": { "color": "#999999", "fontSize": "25rpx", "textAlign": "center" } }, "load-more-text": { "": { "color": "#999999", "fontSize": "25rpx", "textAlign": "center" } }, "detail-loading": { "": { "display": "flex", "flexDirection": "column", "width": "100%", "alignItems": "center", "paddingTop": "28rpx", "paddingRight": 0, "paddingBottom": "28rpx", "paddingLeft": 0, "color": "#98a2b3", "fontSize": "25rpx" } }, "detail-content": { "": { "display": "flex", "flexDirection": "column", "width": "100%" } }, "detail-label": { "": { "width": "120rpx", "flexShrink": 0, "color": "#98a2b3", "fontSize": "23rpx" } }, "detail-value": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#344054", "fontSize": "23rpx", "lineHeight": "34rpx", "textAlign": "right" }, ".detail-long-row ": { "marginTop": "5rpx", "textAlign": "left" } }, "detail-long-row": { "": { "flexDirection": "column" } } };
   function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
     const _component_i_tabs = resolveEasycom(vue.resolveDynamicComponent("i-tabs"), __easycom_1);
@@ -25517,71 +23185,87 @@
               activeColor: "#1677ff",
               inactiveColor: "#667085",
               bgColor: "#ffffff",
-              onChange: _cache[0] || (_cache[0] = ($event) => $setup.changeTab($event))
+              "onUpdate:value": $setup.changeTab
             }, null, 8, ["value"]),
-            vue.createElementVNode("scroll-view", {
-              class: "main-scroll",
-              "scroll-y": "true",
-              "show-scrollbar": false,
-              "refresher-enabled": "",
-              "refresher-triggered": $setup.refreshing,
-              "lower-threshold": 80,
-              onRefresherrefresh: $setup.refreshCurrentTab,
-              onScrolltolower: $setup.loadMoreHistory
-            }, [
-              $setup.deviceId == "" ? (vue.openBlock(), vue.createElementBlock("view", {
-                key: 0,
-                class: "state-card"
-              }, [
-                vue.createElementVNode("text", { class: "state-title" }, "无法加载指令"),
-                vue.createElementVNode("text", { class: "state-text" }, "未获取到设备 ID，请返回车辆详情后重新进入。")
-              ])) : $setup.activeTab == "send" ? (vue.openBlock(), vue.createElementBlock("view", {
-                key: 1,
-                class: "tab-content"
-              }, [
-                vue.createElementVNode("view", { class: "section-heading" }, [
-                  vue.createElementVNode("view", null, [
-                    vue.createElementVNode("text", { class: "section-title" }, "可用指令"),
-                    vue.createElementVNode("text", { class: "section-subtitle" }, "请选择要下发到设备的指令")
-                  ]),
-                  vue.createElementVNode("text", {
-                    class: "refresh-link",
-                    onClick: $setup.loadAvailableCommands
-                  }, "刷新")
-                ]),
-                $setup.isCommandLoading ? (vue.openBlock(), vue.createElementBlock("view", {
+            vue.createElementVNode(
+              "scroll-view",
+              {
+                class: "main-scroll",
+                "scroll-y": "true",
+                "show-scrollbar": false,
+                "lower-threshold": 80,
+                onScroll: $setup.markHistoryScroll,
+                onScrolltolower: $setup.loadMoreHistory
+              },
+              [
+                $setup.deviceId == "" ? (vue.openBlock(), vue.createElementBlock("view", {
                   key: 0,
-                  class: "state-card compact-state"
+                  class: "state-card"
                 }, [
-                  vue.createElementVNode("text", { class: "state-text" }, "正在加载可用指令...")
-                ])) : $setup.availableCommands.length == 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                  vue.createElementVNode("text", { class: "state-title" }, "无法加载指令"),
+                  vue.createElementVNode("text", { class: "state-text" }, "未获取到设备 ID，请返回车辆详情后重新进入。")
+                ])) : $setup.activeTab == "send" ? (vue.openBlock(), vue.createElementBlock("view", {
                   key: 1,
-                  class: "state-card compact-state"
+                  class: "tab-content"
                 }, [
-                  vue.createElementVNode("text", { class: "state-title" }, "暂无可用指令"),
-                  vue.createElementVNode("text", { class: "state-text" }, "请确认设备状态后重试。")
-                ])) : (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 2,
-                  class: "command-list"
-                }, [
-                  (vue.openBlock(true), vue.createElementBlock(
-                    vue.Fragment,
-                    null,
-                    vue.renderList($setup.availableCommands, (command, index) => {
-                      return vue.openBlock(), vue.createElementBlock("view", {
-                        key: $setup.getCommandKey(command, index),
-                        class: vue.normalizeClass(["command-card", { selected: $setup.isSelectedCommand(command), disabled: !$setup.isCommandAllowed(command) }]),
-                        onClick: ($event) => $setup.selectCommand(command)
-                      }, [
-                        vue.createElementVNode("view", { class: "command-card-top" }, [
-                          vue.createElementVNode("view", { class: "command-name-wrap" }, [
+                  vue.createElementVNode("view", { class: "section-heading" }, [
+                    vue.createElementVNode("view", null, [
+                      vue.createElementVNode("text", { class: "section-title" }, "可用指令"),
+                      vue.createElementVNode("text", { class: "section-subtitle" }, "请选择要下发到设备的指令")
+                    ]),
+                    vue.createElementVNode("text", {
+                      class: "refresh-link",
+                      onClick: $setup.loadAvailableCommands
+                    }, "刷新")
+                  ]),
+                  $setup.isCommandLoading ? (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 0,
+                    class: "state-card compact-state"
+                  }, [
+                    vue.createElementVNode("text", { class: "state-text" }, "正在加载可用指令...")
+                  ])) : $setup.availableCommands.length == 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 1,
+                    class: "state-card compact-state"
+                  }, [
+                    vue.createElementVNode("text", { class: "state-title" }, "暂无可用指令"),
+                    vue.createElementVNode("text", { class: "state-text" }, "请确认设备状态后重试。")
+                  ])) : (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 2,
+                    class: "command-list"
+                  }, [
+                    (vue.openBlock(true), vue.createElementBlock(
+                      vue.Fragment,
+                      null,
+                      vue.renderList($setup.availableCommands, (command, index) => {
+                        return vue.openBlock(), vue.createElementBlock("view", {
+                          key: $setup.getCommandKey(command, index),
+                          class: vue.normalizeClass(["command-card", { selected: $setup.isSelectedCommand(command), disabled: !$setup.isCommandAllowed(command) }]),
+                          onClick: ($event) => $setup.selectCommand(command)
+                        }, [
+                          vue.createElementVNode("view", { class: "command-card-top" }, [
+                            vue.createElementVNode("view", { class: "command-name-wrap" }, [
+                              vue.createElementVNode(
+                                "text",
+                                { class: "command-name" },
+                                vue.toDisplayString($setup.getCommandName(command)),
+                                1
+                                /* TEXT */
+                              )
+                            ]),
                             vue.createElementVNode(
                               "text",
-                              { class: "command-name" },
-                              vue.toDisplayString($setup.getCommandName(command)),
-                              1
-                              /* TEXT */
-                            ),
+                              {
+                                class: vue.normalizeClass(["command-status", { blocked: !$setup.isCommandAllowed(command) }])
+                              },
+                              vue.toDisplayString($setup.isCommandAllowed(command) ? $setup.commandNeedsParams(command) ? "需填写参数" : "无需参数" : "App 端不可下发"),
+                              3
+                              /* TEXT, CLASS */
+                            )
+                          ]),
+                          $setup.getCommandCode(command) != "" || $setup.getCommandRemark(command) != "" ? (vue.openBlock(), vue.createElementBlock("view", {
+                            key: 0,
+                            class: "command-card-meta"
+                          }, [
                             $setup.getCommandCode(command) != "" ? (vue.openBlock(), vue.createElementBlock(
                               "text",
                               {
@@ -25591,239 +23275,241 @@
                               vue.toDisplayString($setup.getCommandCode(command)),
                               1
                               /* TEXT */
+                            )) : vue.createCommentVNode("v-if", true),
+                            $setup.getCommandRemark(command) != "" ? (vue.openBlock(), vue.createElementBlock(
+                              "text",
+                              {
+                                key: 1,
+                                class: "command-remark"
+                              },
+                              vue.toDisplayString($setup.getCommandRemark(command)),
+                              1
+                              /* TEXT */
                             )) : vue.createCommentVNode("v-if", true)
-                          ]),
-                          vue.createElementVNode(
-                            "text",
-                            {
-                              class: vue.normalizeClass(["command-status", { blocked: !$setup.isCommandAllowed(command) }])
-                            },
-                            vue.toDisplayString($setup.isCommandAllowed(command) ? $setup.commandNeedsParams(command) ? "需填写参数" : "无需参数" : "App 端不可下发"),
-                            3
-                            /* TEXT, CLASS */
-                          )
-                        ]),
-                        $setup.getCommandRemark(command) != "" ? (vue.openBlock(), vue.createElementBlock(
-                          "text",
-                          {
-                            key: 0,
-                            class: "command-remark"
-                          },
-                          vue.toDisplayString($setup.getCommandRemark(command)),
-                          1
-                          /* TEXT */
-                        )) : vue.createCommentVNode("v-if", true)
-                      ], 10, ["onClick"]);
-                    }),
-                    128
-                    /* KEYED_FRAGMENT */
-                  ))
-                ])),
-                $setup.selectedCommand != null ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 3,
-                  class: "form-card"
-                }, [
-                  vue.createElementVNode("view", { class: "form-header" }, [
-                    vue.createElementVNode("view", null, [
-                      vue.createElementVNode(
-                        "text",
-                        { class: "section-title" },
-                        vue.toDisplayString($setup.getCommandName($setup.selectedCommand)),
-                        1
-                        /* TEXT */
-                      ),
-                      vue.createElementVNode("text", { class: "section-subtitle" }, "请确认参数后再下发")
-                    ])
-                  ]),
-                  $setup.paramConfigError != "" ? (vue.openBlock(), vue.createElementBlock(
-                    "text",
-                    {
-                      key: 0,
-                      class: "form-error"
-                    },
-                    vue.toDisplayString($setup.paramConfigError),
-                    1
-                    /* TEXT */
-                  )) : vue.createCommentVNode("v-if", true),
-                  (vue.openBlock(true), vue.createElementBlock(
-                    vue.Fragment,
-                    null,
-                    vue.renderList($setup.paramConfigs, (param, index) => {
-                      return vue.openBlock(), vue.createElementBlock("view", {
-                        key: $setup.getParamKey(param, index),
-                        class: "param-row"
-                      }, [
-                        vue.createElementVNode("view", { class: "param-label-row" }, [
-                          vue.createElementVNode(
-                            "text",
-                            { class: "param-label" },
-                            vue.toDisplayString($setup.getParamLabel(param)),
-                            1
-                            /* TEXT */
-                          ),
-                          $setup.isParamRequired(param) ? (vue.openBlock(), vue.createElementBlock("text", {
-                            key: 0,
-                            class: "required-mark"
-                          }, "*")) : vue.createCommentVNode("v-if", true)
-                        ]),
-                        $setup.getParamType(param) == "text" || $setup.getParamType(param) == "number" ? (vue.openBlock(), vue.createBlock(_component_i_input, {
-                          key: 0,
-                          class: "param-input",
-                          "model-value": $setup.getParamValue(index),
-                          type: $setup.getParamType(param) == "number" ? "number" : "text",
-                          placeholder: $setup.getParamPlaceholder(param),
-                          "placeholder-class": "input-placeholder",
-                          border: "none",
-                          "onUpdate:modelValue": ($event) => $setup.updateParamValue(index, $event)
-                        }, null, 8, ["model-value", "type", "placeholder", "onUpdate:modelValue"])) : $setup.getParamType(param) == "select" ? (vue.openBlock(), vue.createElementBlock("view", {
-                          key: 1,
-                          class: "select-field",
-                          onClick: ($event) => $setup.openOptionSheet(index)
-                        }, [
-                          vue.createElementVNode(
-                            "text",
-                            {
-                              class: vue.normalizeClass({ "select-placeholder": $setup.getSelectedOptionLabel(index) == "" })
-                            },
-                            vue.toDisplayString($setup.getSelectedOptionLabel(index) != "" ? $setup.getSelectedOptionLabel(index) : $setup.getParamPlaceholder(param)),
-                            3
-                            /* TEXT, CLASS */
-                          ),
-                          vue.createElementVNode("text", { class: "select-arrow" }, "›")
-                        ], 8, ["onClick"])) : vue.createCommentVNode("v-if", true),
-                        $setup.getParamError(index) != "" ? (vue.openBlock(), vue.createElementBlock(
-                          "text",
-                          {
-                            key: 2,
-                            class: "param-error"
-                          },
-                          vue.toDisplayString($setup.getParamError(index)),
-                          1
-                          /* TEXT */
-                        )) : vue.createCommentVNode("v-if", true)
-                      ]);
-                    }),
-                    128
-                    /* KEYED_FRAGMENT */
-                  )),
-                  $setup.paramConfigs.length == 0 && $setup.paramConfigError == "" ? (vue.openBlock(), vue.createElementBlock("text", {
-                    key: 1,
-                    class: "no-param-text"
-                  }, "该指令无需填写参数")) : vue.createCommentVNode("v-if", true),
-                  vue.createVNode(_component_i_button, {
-                    class: "send-button",
-                    type: "primary",
-                    text: "确认下发指令",
-                    loading: $setup.isSending,
-                    disabled: $setup.isSending || $setup.isCommandLoading || !$setup.isFormValid,
-                    onClick: $setup.confirmSendCommand
-                  }, null, 8, ["loading", "disabled"])
-                ])) : vue.createCommentVNode("v-if", true)
-              ])) : (vue.openBlock(), vue.createElementBlock("view", {
-                key: 2,
-                class: "tab-content history-content"
-              }, [
-                vue.createElementVNode("view", { class: "section-heading" }, [
-                  vue.createElementVNode("view", null, [
-                    vue.createElementVNode("text", { class: "section-title" }, "指令记录"),
-                    vue.createElementVNode("text", { class: "section-subtitle" }, "可查看下发结果或重新尝试失败指令")
-                  ]),
-                  vue.createElementVNode("text", {
-                    class: "refresh-link",
-                    onClick: $setup.reloadHistory
-                  }, "刷新")
-                ]),
-                $setup.isHistoryInitialLoading ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 0,
-                  class: "state-card compact-state"
-                }, [
-                  vue.createElementVNode("text", { class: "state-text" }, "正在加载指令记录...")
-                ])) : $setup.historyRecords.length == 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 1,
-                  class: "state-card compact-state"
-                }, [
-                  vue.createElementVNode("text", { class: "state-title" }, "暂无指令记录"),
-                  vue.createElementVNode("text", { class: "state-text" }, "成功下发指令后，记录将显示在这里。")
-                ])) : (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 2,
-                  class: "history-list"
-                }, [
-                  (vue.openBlock(true), vue.createElementBlock(
-                    vue.Fragment,
-                    null,
-                    vue.renderList($setup.historyRecords, (record, index) => {
-                      return vue.openBlock(), vue.createElementBlock("view", {
-                        key: $setup.getRecordKey(record, index),
-                        class: "history-card",
-                        onClick: ($event) => $setup.showCommandDetail(record)
-                      }, [
-                        vue.createElementVNode("view", { class: "history-card-top" }, [
-                          vue.createElementVNode(
-                            "text",
-                            { class: "history-name" },
-                            vue.toDisplayString($setup.getRecordName(record)),
-                            1
-                            /* TEXT */
-                          ),
-                          vue.createElementVNode(
-                            "text",
-                            {
-                              class: vue.normalizeClass(["history-status", $setup.getStatusClass(record)])
-                            },
-                            vue.toDisplayString($setup.getStatusText(record)),
-                            3
-                            /* TEXT, CLASS */
-                          )
-                        ]),
+                          ])) : vue.createCommentVNode("v-if", true)
+                        ], 10, ["onClick"]);
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    ))
+                  ])),
+                  $setup.selectedCommand != null ? (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 3,
+                    class: "form-card"
+                  }, [
+                    vue.createElementVNode("view", { class: "form-header" }, [
+                      vue.createElementVNode("view", null, [
                         vue.createElementVNode(
                           "text",
-                          { class: "history-time" },
-                          vue.toDisplayString($setup.getRecordTime(record)),
+                          { class: "section-title" },
+                          vue.toDisplayString($setup.getCommandName($setup.selectedCommand)),
                           1
                           /* TEXT */
                         ),
-                        $setup.getRecordSummary(record) != "" ? (vue.openBlock(), vue.createElementBlock(
-                          "text",
-                          {
+                        vue.createElementVNode("text", { class: "section-subtitle" }, "请确认参数后再下发")
+                      ])
+                    ]),
+                    $setup.paramConfigError != "" ? (vue.openBlock(), vue.createElementBlock(
+                      "text",
+                      {
+                        key: 0,
+                        class: "form-error"
+                      },
+                      vue.toDisplayString($setup.paramConfigError),
+                      1
+                      /* TEXT */
+                    )) : vue.createCommentVNode("v-if", true),
+                    (vue.openBlock(true), vue.createElementBlock(
+                      vue.Fragment,
+                      null,
+                      vue.renderList($setup.paramConfigs, (param, index) => {
+                        return vue.openBlock(), vue.createElementBlock("view", {
+                          key: $setup.getParamKey(param, index),
+                          class: "param-row"
+                        }, [
+                          vue.createElementVNode("view", { class: "param-label-row" }, [
+                            vue.createElementVNode(
+                              "text",
+                              { class: "param-label" },
+                              vue.toDisplayString($setup.getParamLabel(param)),
+                              1
+                              /* TEXT */
+                            ),
+                            $setup.isParamRequired(param) ? (vue.openBlock(), vue.createElementBlock("text", {
+                              key: 0,
+                              class: "required-mark"
+                            }, "*")) : vue.createCommentVNode("v-if", true)
+                          ]),
+                          $setup.getParamType(param) == "text" || $setup.getParamType(param) == "number" ? (vue.openBlock(), vue.createBlock(_component_i_input, {
                             key: 0,
-                            class: "history-summary"
-                          },
-                          vue.toDisplayString($setup.getRecordSummary(record)),
-                          1
-                          /* TEXT */
-                        )) : vue.createCommentVNode("v-if", true),
-                        vue.createElementVNode("view", { class: "history-bottom" }, [
+                            class: "param-input",
+                            "model-value": $setup.getParamValue(index),
+                            type: $setup.getParamType(param) == "number" ? "number" : "text",
+                            placeholder: $setup.getParamPlaceholder(param),
+                            "placeholder-class": "input-placeholder",
+                            border: "none",
+                            "onUpdate:modelValue": ($event) => $setup.updateParamValue(index, $event)
+                          }, null, 8, ["model-value", "type", "placeholder", "onUpdate:modelValue"])) : $setup.getParamType(param) == "select" ? (vue.openBlock(), vue.createElementBlock("view", {
+                            key: 1,
+                            class: "select-field",
+                            onClick: ($event) => $setup.openOptionSheet(index)
+                          }, [
+                            vue.createElementVNode(
+                              "text",
+                              {
+                                class: vue.normalizeClass({ "select-placeholder": $setup.getSelectedOptionLabel(index) == "" })
+                              },
+                              vue.toDisplayString($setup.getSelectedOptionLabel(index) != "" ? $setup.getSelectedOptionLabel(index) : $setup.getParamPlaceholder(param)),
+                              3
+                              /* TEXT, CLASS */
+                            ),
+                            vue.createElementVNode("text", { class: "select-arrow" }, "›")
+                          ], 8, ["onClick"])) : vue.createCommentVNode("v-if", true),
+                          $setup.getParamError(index) != "" ? (vue.openBlock(), vue.createElementBlock(
+                            "text",
+                            {
+                              key: 2,
+                              class: "param-error"
+                            },
+                            vue.toDisplayString($setup.getParamError(index)),
+                            1
+                            /* TEXT */
+                          )) : vue.createCommentVNode("v-if", true)
+                        ]);
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    )),
+                    $setup.paramConfigs.length == 0 && $setup.paramConfigError == "" ? (vue.openBlock(), vue.createElementBlock("text", {
+                      key: 1,
+                      class: "no-param-text"
+                    }, "该指令无需填写参数")) : vue.createCommentVNode("v-if", true),
+                    vue.createVNode(_component_i_button, {
+                      class: "send-button",
+                      type: "primary",
+                      text: "确认下发指令",
+                      loading: $setup.isSending,
+                      disabled: $setup.isSending || $setup.isCommandLoading || !$setup.isFormValid,
+                      onClick: $setup.confirmSendCommand
+                    }, null, 8, ["loading", "disabled"])
+                  ])) : vue.createCommentVNode("v-if", true)
+                ])) : (vue.openBlock(), vue.createElementBlock("view", {
+                  key: 2,
+                  class: "tab-content history-content"
+                }, [
+                  vue.createElementVNode("view", { class: "section-heading" }, [
+                    vue.createElementVNode("view", null, [
+                      vue.createElementVNode("text", { class: "section-title" }, "指令记录"),
+                      vue.createElementVNode("text", { class: "section-subtitle" }, "可查看下发结果或重新尝试失败指令")
+                    ]),
+                    vue.createElementVNode("text", {
+                      class: "refresh-link",
+                      onClick: $setup.reloadHistory
+                    }, "刷新")
+                  ]),
+                  $setup.isHistoryInitialLoading ? (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 0,
+                    class: "state-card compact-state"
+                  }, [
+                    vue.createElementVNode("text", { class: "state-text" }, "正在加载指令记录...")
+                  ])) : $setup.historyRecords.length == 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 1,
+                    class: "state-card compact-state"
+                  }, [
+                    vue.createElementVNode("text", { class: "state-title" }, "暂无指令记录"),
+                    vue.createElementVNode("text", { class: "state-text" }, "成功下发指令后，记录将显示在这里。")
+                  ])) : (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 2,
+                    class: "history-list"
+                  }, [
+                    (vue.openBlock(true), vue.createElementBlock(
+                      vue.Fragment,
+                      null,
+                      vue.renderList($setup.historyRecords, (record, index) => {
+                        return vue.openBlock(), vue.createElementBlock("view", {
+                          key: $setup.getRecordKey(record, index),
+                          class: "history-card",
+                          onClick: ($event) => $setup.showCommandDetail(record)
+                        }, [
+                          vue.createElementVNode("view", { class: "history-card-top" }, [
+                            vue.createElementVNode(
+                              "text",
+                              { class: "history-name" },
+                              vue.toDisplayString($setup.getRecordName(record)),
+                              1
+                              /* TEXT */
+                            ),
+                            vue.createElementVNode(
+                              "text",
+                              {
+                                class: vue.normalizeClass(["history-status", $setup.getStatusClass(record)])
+                              },
+                              vue.toDisplayString($setup.getStatusText(record)),
+                              3
+                              /* TEXT, CLASS */
+                            )
+                          ]),
                           vue.createElementVNode(
                             "text",
-                            { class: "retry-count" },
-                            "已重试 " + vue.toDisplayString($setup.getRecordRetryCount(record)) + " 次",
+                            { class: "history-time" },
+                            vue.toDisplayString($setup.getRecordTime(record)),
                             1
                             /* TEXT */
                           ),
-                          vue.createElementVNode("text", { class: "detail-link" }, "查看详情 ›")
-                        ])
-                      ], 8, ["onClick"]);
-                    }),
-                    128
-                    /* KEYED_FRAGMENT */
-                  ))
-                ])),
-                $setup.historyRecords.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 3,
-                  class: "history-footer"
-                }, [
-                  $setup.isHistoryLoading ? (vue.openBlock(), vue.createElementBlock("text", { key: 0 }, "加载中...")) : !$setup.hasMoreHistory ? (vue.openBlock(), vue.createElementBlock("text", { key: 1 }, "没有更多记录了")) : (vue.openBlock(), vue.createElementBlock("text", { key: 2 }, "上拉加载更多"))
-                ])) : vue.createCommentVNode("v-if", true)
-              ]))
-            ], 40, ["refresher-triggered"])
+                          $setup.getRecordSummary(record) != "" ? (vue.openBlock(), vue.createElementBlock(
+                            "text",
+                            {
+                              key: 0,
+                              class: "history-summary"
+                            },
+                            vue.toDisplayString($setup.getRecordSummary(record)),
+                            1
+                            /* TEXT */
+                          )) : vue.createCommentVNode("v-if", true),
+                          vue.createElementVNode("view", { class: "history-bottom" }, [
+                            vue.createElementVNode(
+                              "text",
+                              { class: "retry-count" },
+                              "已重试 " + vue.toDisplayString($setup.getRecordRetryCount(record)) + " 次",
+                              1
+                              /* TEXT */
+                            ),
+                            vue.createElementVNode("text", { class: "detail-link" }, "查看详情 ›")
+                          ])
+                        ], 8, ["onClick"]);
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    ))
+                  ])),
+                  $setup.historyRecords.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 3,
+                    class: "history-footer"
+                  }, [
+                    $setup.isHistoryLoading ? (vue.openBlock(), vue.createElementBlock("text", {
+                      key: 0,
+                      class: "loading-text"
+                    }, "加载中...")) : !$setup.hasMoreHistory ? (vue.openBlock(), vue.createElementBlock("text", {
+                      key: 1,
+                      class: "no-more-text"
+                    }, "没有更多记录了")) : (vue.openBlock(), vue.createElementBlock("text", {
+                      key: 2,
+                      class: "load-more-text"
+                    }, "上拉加载更多"))
+                  ])) : vue.createCommentVNode("v-if", true)
+                ]))
+              ],
+              32
+              /* NEED_HYDRATION */
+            )
           ]),
           vue.createVNode(_component_i_action_sheet, {
             show: $setup.optionSheetVisible,
-            "onUpdate:show": _cache[1] || (_cache[1] = ($event) => $setup.optionSheetVisible = $event),
+            "onUpdate:show": _cache[0] || (_cache[0] = ($event) => $setup.optionSheetVisible = $event),
             title: $setup.optionSheetTitle,
             actions: $setup.optionActions,
             cancelText: "取消",
-            onSelect: _cache[2] || (_cache[2] = ($event) => $setup.selectOption($event))
+            onSelect: _cache[1] || (_cache[1] = ($event) => $setup.selectOption($event))
           }, null, 8, ["show", "title", "actions"]),
           vue.createVNode(_component_i_modal, {
             show: $setup.detailVisible,
@@ -25977,19 +23663,19 @@
           });
         }
       });
-      const handleLoad = (e2 = null) => {
-        uni.__log__("log", "at pages/webview/webview.uvue:81", "网页加载成功", e2);
+      const handleLoad = (e = null) => {
+        uni.__log__("log", "at pages/webview/webview.uvue:81", "网页加载成功", e);
         uni.hideLoading();
       };
-      const handleError = (e2 = null) => {
-        uni.__log__("error", "at pages/webview/webview.uvue:87", "网页加载失败", e2);
+      const handleError = (e = null) => {
+        uni.__log__("error", "at pages/webview/webview.uvue:87", "网页加载失败", e);
         showAppToast({
           title: "页面加载失败",
           icon: "none"
         });
       };
-      const handleMessage = (e2) => {
-        const detail = e2.getJSON("detail");
+      const handleMessage = (e) => {
+        const detail = e.getJSON("detail");
         uni.__log__("log", "at pages/webview/webview.uvue:97", "接收网页消息:", detail);
       };
       const goBack = () => {
@@ -26315,10 +24001,9 @@
             if (from) {
               const params = new UTSJSONObject({ pageSize: 1e3 });
               const res = yield getUserDeviceList(params);
-              uni.__log__("log", "at pages/deviceList/deviceList.uvue:145", "获取设备列表:", res);
               const list = res.code == 200 && res.data != null ? res.data.list : null;
               if (list == null || !Array.isArray(list)) {
-                uni.__log__("warn", "at pages/deviceList/deviceList.uvue:148", "获取设备列表返回异常:", res);
+                uni.__log__("warn", "at pages/deviceList/deviceList.uvue:147", "获取设备列表返回异常:", res);
                 originalDeviceList.value = [];
                 markers.value = [];
                 return Promise.resolve(null);
@@ -26330,7 +24015,7 @@
             originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, "tencent");
             updateMarkers(originalDeviceList.value);
           } catch (err) {
-            uni.__log__("error", "at pages/deviceList/deviceList.uvue:159", "获取设备列表失败:", err);
+            uni.__log__("error", "at pages/deviceList/deviceList.uvue:158", "获取设备列表失败:", err);
             originalDeviceList.value = [];
             markers.value = [];
             showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -26356,14 +24041,14 @@
         });
       };
       const subMsg = () => {
-        uni.__log__("log", "at pages/deviceList/deviceList.uvue:186", "订阅消息");
+        uni.__log__("log", "at pages/deviceList/deviceList.uvue:185", "订阅消息");
         uni.requestSubscribeMessage(new UTSJSONObject({
           tmplIds: ["VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc"],
           success: (res = null) => {
-            uni.__log__("log", "at pages/deviceList/deviceList.uvue:190", "订阅成功:", res);
+            uni.__log__("log", "at pages/deviceList/deviceList.uvue:189", "订阅成功:", res);
           },
           fail: (err = null) => {
-            uni.__log__("log", "at pages/deviceList/deviceList.uvue:193", "订阅失败:", err);
+            uni.__log__("log", "at pages/deviceList/deviceList.uvue:192", "订阅失败:", err);
           }
         }));
       };
@@ -26378,7 +24063,7 @@
           return device["deviceId"] == markerId;
         });
         if (selectedDevice == null) {
-          uni.__log__("warn", "at pages/deviceList/deviceList.uvue:209", "未找到对应的设备信息", markerId);
+          uni.__log__("warn", "at pages/deviceList/deviceList.uvue:208", "未找到对应的设备信息", markerId);
           return null;
         }
         const imeiValue = (_a2 = selectedDevice["imei"]) !== null && _a2 !== void 0 ? _a2 : "";
@@ -26478,7 +24163,6 @@
   __definePage("pages/carInfoDetail/carInfoDetail", PagesCarInfoDetailCarInfoDetail);
   __definePage("pages/addCar/addCar", PagesAddCarAddCar);
   __definePage("pages/playBack/playBack", PagesPlayBackPlayBack);
-  __definePage("uni_modules/lime-action-sheet/pages/index", UniModulesLimeActionSheetPagesIndex);
   __definePage("pages/vehicleTracking/vehicleTracking", PagesVehicleTrackingVehicleTracking);
   __definePage("pages/mileageRecord/mileageRecord", PagesMileageRecordMileageRecord);
   __definePage("pages/stopRecord/stopRecord", PagesStopRecordStopRecord);
@@ -26586,9 +24270,6 @@
       style: new UTSJSONObject({
         navigationBarTitleText: "轨迹回放"
       })
-    }),
-    new UTSJSONObject({
-      path: "uni_modules/lime-action-sheet/pages/index"
     }),
     new UTSJSONObject({
       path: "pages/vehicleTracking/vehicleTracking",
@@ -26703,7 +24384,7 @@
     backgroundColor: "#F8F8F8"
   });
   const uniIdRouter = new UTSJSONObject({});
-  const e = new UTSJSONObject({
+  const t = new UTSJSONObject({
     easycom,
     pages,
     tabBar,
@@ -26711,17 +24392,17 @@
     uniIdRouter
   });
   var define_process_env_UNI_SECURE_NETWORK_CONFIG_default = [];
-  function t(e2) {
+  function n(e2) {
     return e2 && e2.__esModule && Object.prototype.hasOwnProperty.call(e2, "default") ? e2.default : e2;
   }
-  function n(e2, t2, n2) {
+  function s(e2, t2, n2) {
     return e2(n2 = { path: t2, exports: {}, require: function(e3, t3) {
       return function() {
         throw new Error("Dynamic requires are not currently supported by @rollup/plugin-commonjs");
       }(null == t3 && n2.path);
     } }, n2.exports), n2.exports;
   }
-  var s = n(function(e2, t2) {
+  var r = s(function(e2, t2) {
     var n2;
     e2.exports = (n2 = n2 || function(e3, t3) {
       var n3 = Object.create || /* @__PURE__ */ function() {
@@ -26800,7 +24481,7 @@
         for (var t4 = e4.length, n4 = [], s3 = 0; s3 < t4; s3++)
           n4[s3 >>> 2] |= (255 & e4.charCodeAt(s3)) << 24 - s3 % 4 * 8;
         return new o2.init(n4, t4);
-      } }, h2 = a2.Utf8 = { stringify: function(e4) {
+      } }, l2 = a2.Utf8 = { stringify: function(e4) {
         try {
           return decodeURIComponent(escape(u2.stringify(e4)));
         } catch (e5) {
@@ -26808,27 +24489,27 @@
         }
       }, parse: function(e4) {
         return u2.parse(unescape(encodeURIComponent(e4)));
-      } }, l2 = r2.BufferedBlockAlgorithm = i2.extend({ reset: function() {
+      } }, d2 = r2.BufferedBlockAlgorithm = i2.extend({ reset: function() {
         this._data = new o2.init(), this._nDataBytes = 0;
       }, _append: function(e4) {
-        "string" == typeof e4 && (e4 = h2.parse(e4)), this._data.concat(e4), this._nDataBytes += e4.sigBytes;
+        "string" == typeof e4 && (e4 = l2.parse(e4)), this._data.concat(e4), this._nDataBytes += e4.sigBytes;
       }, _process: function(t4) {
         var n4 = this._data, s3 = n4.words, r3 = n4.sigBytes, i3 = this.blockSize, a3 = r3 / (4 * i3), c3 = (a3 = t4 ? e3.ceil(a3) : e3.max((0 | a3) - this._minBufferSize, 0)) * i3, u3 = e3.min(4 * c3, r3);
         if (c3) {
-          for (var h3 = 0; h3 < c3; h3 += i3)
-            this._doProcessBlock(s3, h3);
-          var l3 = s3.splice(0, c3);
+          for (var l3 = 0; l3 < c3; l3 += i3)
+            this._doProcessBlock(s3, l3);
+          var d3 = s3.splice(0, c3);
           n4.sigBytes -= u3;
         }
-        return new o2.init(l3, u3);
+        return new o2.init(d3, u3);
       }, clone: function() {
         var e4 = i2.clone.call(this);
         return e4._data = this._data.clone(), e4;
       }, _minBufferSize: 0 });
-      r2.Hasher = l2.extend({ cfg: i2.extend(), init: function(e4) {
+      r2.Hasher = d2.extend({ cfg: i2.extend(), init: function(e4) {
         this.cfg = this.cfg.extend(e4), this.reset();
       }, reset: function() {
-        l2.reset.call(this), this._doReset();
+        d2.reset.call(this), this._doReset();
       }, update: function(e4) {
         return this._append(e4), this._process(), this;
       }, finalize: function(e4) {
@@ -26839,15 +24520,15 @@
         };
       }, _createHmacHelper: function(e4) {
         return function(t4, n4) {
-          return new d2.HMAC.init(e4, n4).finalize(t4);
+          return new h2.HMAC.init(e4, n4).finalize(t4);
         };
       } });
-      var d2 = s2.algo = {};
+      var h2 = s2.algo = {};
       return s2;
     }(Math), n2);
-  }), r = s, i = (n(function(e2, t2) {
+  }), i = r, o = (s(function(e2, t2) {
     var n2;
-    e2.exports = (n2 = r, function(e3) {
+    e2.exports = (n2 = i, function(e3) {
       var t3 = n2, s2 = t3.lib, r2 = s2.WordArray, i2 = s2.Hasher, o2 = t3.algo, a2 = [];
       !function() {
         for (var t4 = 0; t4 < 64; t4++)
@@ -26860,16 +24541,16 @@
           var s3 = t4 + n3, r3 = e4[s3];
           e4[s3] = 16711935 & (r3 << 8 | r3 >>> 24) | 4278255360 & (r3 << 24 | r3 >>> 8);
         }
-        var i3 = this._hash.words, o3 = e4[t4 + 0], c3 = e4[t4 + 1], p2 = e4[t4 + 2], f2 = e4[t4 + 3], g2 = e4[t4 + 4], m2 = e4[t4 + 5], y2 = e4[t4 + 6], _2 = e4[t4 + 7], w2 = e4[t4 + 8], v2 = e4[t4 + 9], I2 = e4[t4 + 10], S2 = e4[t4 + 11], b2 = e4[t4 + 12], k2 = e4[t4 + 13], A2 = e4[t4 + 14], T2 = e4[t4 + 15], C2 = i3[0], P2 = i3[1], O2 = i3[2], E2 = i3[3];
-        C2 = u2(C2, P2, O2, E2, o3, 7, a2[0]), E2 = u2(E2, C2, P2, O2, c3, 12, a2[1]), O2 = u2(O2, E2, C2, P2, p2, 17, a2[2]), P2 = u2(P2, O2, E2, C2, f2, 22, a2[3]), C2 = u2(C2, P2, O2, E2, g2, 7, a2[4]), E2 = u2(E2, C2, P2, O2, m2, 12, a2[5]), O2 = u2(O2, E2, C2, P2, y2, 17, a2[6]), P2 = u2(P2, O2, E2, C2, _2, 22, a2[7]), C2 = u2(C2, P2, O2, E2, w2, 7, a2[8]), E2 = u2(E2, C2, P2, O2, v2, 12, a2[9]), O2 = u2(O2, E2, C2, P2, I2, 17, a2[10]), P2 = u2(P2, O2, E2, C2, S2, 22, a2[11]), C2 = u2(C2, P2, O2, E2, b2, 7, a2[12]), E2 = u2(E2, C2, P2, O2, k2, 12, a2[13]), O2 = u2(O2, E2, C2, P2, A2, 17, a2[14]), C2 = h2(C2, P2 = u2(P2, O2, E2, C2, T2, 22, a2[15]), O2, E2, c3, 5, a2[16]), E2 = h2(E2, C2, P2, O2, y2, 9, a2[17]), O2 = h2(O2, E2, C2, P2, S2, 14, a2[18]), P2 = h2(P2, O2, E2, C2, o3, 20, a2[19]), C2 = h2(C2, P2, O2, E2, m2, 5, a2[20]), E2 = h2(E2, C2, P2, O2, I2, 9, a2[21]), O2 = h2(O2, E2, C2, P2, T2, 14, a2[22]), P2 = h2(P2, O2, E2, C2, g2, 20, a2[23]), C2 = h2(C2, P2, O2, E2, v2, 5, a2[24]), E2 = h2(E2, C2, P2, O2, A2, 9, a2[25]), O2 = h2(O2, E2, C2, P2, f2, 14, a2[26]), P2 = h2(P2, O2, E2, C2, w2, 20, a2[27]), C2 = h2(C2, P2, O2, E2, k2, 5, a2[28]), E2 = h2(E2, C2, P2, O2, p2, 9, a2[29]), O2 = h2(O2, E2, C2, P2, _2, 14, a2[30]), C2 = l2(C2, P2 = h2(P2, O2, E2, C2, b2, 20, a2[31]), O2, E2, m2, 4, a2[32]), E2 = l2(E2, C2, P2, O2, w2, 11, a2[33]), O2 = l2(O2, E2, C2, P2, S2, 16, a2[34]), P2 = l2(P2, O2, E2, C2, A2, 23, a2[35]), C2 = l2(C2, P2, O2, E2, c3, 4, a2[36]), E2 = l2(E2, C2, P2, O2, g2, 11, a2[37]), O2 = l2(O2, E2, C2, P2, _2, 16, a2[38]), P2 = l2(P2, O2, E2, C2, I2, 23, a2[39]), C2 = l2(C2, P2, O2, E2, k2, 4, a2[40]), E2 = l2(E2, C2, P2, O2, o3, 11, a2[41]), O2 = l2(O2, E2, C2, P2, f2, 16, a2[42]), P2 = l2(P2, O2, E2, C2, y2, 23, a2[43]), C2 = l2(C2, P2, O2, E2, v2, 4, a2[44]), E2 = l2(E2, C2, P2, O2, b2, 11, a2[45]), O2 = l2(O2, E2, C2, P2, T2, 16, a2[46]), C2 = d2(C2, P2 = l2(P2, O2, E2, C2, p2, 23, a2[47]), O2, E2, o3, 6, a2[48]), E2 = d2(E2, C2, P2, O2, _2, 10, a2[49]), O2 = d2(O2, E2, C2, P2, A2, 15, a2[50]), P2 = d2(P2, O2, E2, C2, m2, 21, a2[51]), C2 = d2(C2, P2, O2, E2, b2, 6, a2[52]), E2 = d2(E2, C2, P2, O2, f2, 10, a2[53]), O2 = d2(O2, E2, C2, P2, I2, 15, a2[54]), P2 = d2(P2, O2, E2, C2, c3, 21, a2[55]), C2 = d2(C2, P2, O2, E2, w2, 6, a2[56]), E2 = d2(E2, C2, P2, O2, T2, 10, a2[57]), O2 = d2(O2, E2, C2, P2, y2, 15, a2[58]), P2 = d2(P2, O2, E2, C2, k2, 21, a2[59]), C2 = d2(C2, P2, O2, E2, g2, 6, a2[60]), E2 = d2(E2, C2, P2, O2, S2, 10, a2[61]), O2 = d2(O2, E2, C2, P2, p2, 15, a2[62]), P2 = d2(P2, O2, E2, C2, v2, 21, a2[63]), i3[0] = i3[0] + C2 | 0, i3[1] = i3[1] + P2 | 0, i3[2] = i3[2] + O2 | 0, i3[3] = i3[3] + E2 | 0;
+        var i3 = this._hash.words, o3 = e4[t4 + 0], c3 = e4[t4 + 1], p2 = e4[t4 + 2], f2 = e4[t4 + 3], g2 = e4[t4 + 4], m2 = e4[t4 + 5], y2 = e4[t4 + 6], _2 = e4[t4 + 7], w2 = e4[t4 + 8], v2 = e4[t4 + 9], I2 = e4[t4 + 10], S2 = e4[t4 + 11], k2 = e4[t4 + 12], A2 = e4[t4 + 13], C2 = e4[t4 + 14], T2 = e4[t4 + 15], b2 = i3[0], P2 = i3[1], x2 = i3[2], O2 = i3[3];
+        b2 = u2(b2, P2, x2, O2, o3, 7, a2[0]), O2 = u2(O2, b2, P2, x2, c3, 12, a2[1]), x2 = u2(x2, O2, b2, P2, p2, 17, a2[2]), P2 = u2(P2, x2, O2, b2, f2, 22, a2[3]), b2 = u2(b2, P2, x2, O2, g2, 7, a2[4]), O2 = u2(O2, b2, P2, x2, m2, 12, a2[5]), x2 = u2(x2, O2, b2, P2, y2, 17, a2[6]), P2 = u2(P2, x2, O2, b2, _2, 22, a2[7]), b2 = u2(b2, P2, x2, O2, w2, 7, a2[8]), O2 = u2(O2, b2, P2, x2, v2, 12, a2[9]), x2 = u2(x2, O2, b2, P2, I2, 17, a2[10]), P2 = u2(P2, x2, O2, b2, S2, 22, a2[11]), b2 = u2(b2, P2, x2, O2, k2, 7, a2[12]), O2 = u2(O2, b2, P2, x2, A2, 12, a2[13]), x2 = u2(x2, O2, b2, P2, C2, 17, a2[14]), b2 = l2(b2, P2 = u2(P2, x2, O2, b2, T2, 22, a2[15]), x2, O2, c3, 5, a2[16]), O2 = l2(O2, b2, P2, x2, y2, 9, a2[17]), x2 = l2(x2, O2, b2, P2, S2, 14, a2[18]), P2 = l2(P2, x2, O2, b2, o3, 20, a2[19]), b2 = l2(b2, P2, x2, O2, m2, 5, a2[20]), O2 = l2(O2, b2, P2, x2, I2, 9, a2[21]), x2 = l2(x2, O2, b2, P2, T2, 14, a2[22]), P2 = l2(P2, x2, O2, b2, g2, 20, a2[23]), b2 = l2(b2, P2, x2, O2, v2, 5, a2[24]), O2 = l2(O2, b2, P2, x2, C2, 9, a2[25]), x2 = l2(x2, O2, b2, P2, f2, 14, a2[26]), P2 = l2(P2, x2, O2, b2, w2, 20, a2[27]), b2 = l2(b2, P2, x2, O2, A2, 5, a2[28]), O2 = l2(O2, b2, P2, x2, p2, 9, a2[29]), x2 = l2(x2, O2, b2, P2, _2, 14, a2[30]), b2 = d2(b2, P2 = l2(P2, x2, O2, b2, k2, 20, a2[31]), x2, O2, m2, 4, a2[32]), O2 = d2(O2, b2, P2, x2, w2, 11, a2[33]), x2 = d2(x2, O2, b2, P2, S2, 16, a2[34]), P2 = d2(P2, x2, O2, b2, C2, 23, a2[35]), b2 = d2(b2, P2, x2, O2, c3, 4, a2[36]), O2 = d2(O2, b2, P2, x2, g2, 11, a2[37]), x2 = d2(x2, O2, b2, P2, _2, 16, a2[38]), P2 = d2(P2, x2, O2, b2, I2, 23, a2[39]), b2 = d2(b2, P2, x2, O2, A2, 4, a2[40]), O2 = d2(O2, b2, P2, x2, o3, 11, a2[41]), x2 = d2(x2, O2, b2, P2, f2, 16, a2[42]), P2 = d2(P2, x2, O2, b2, y2, 23, a2[43]), b2 = d2(b2, P2, x2, O2, v2, 4, a2[44]), O2 = d2(O2, b2, P2, x2, k2, 11, a2[45]), x2 = d2(x2, O2, b2, P2, T2, 16, a2[46]), b2 = h2(b2, P2 = d2(P2, x2, O2, b2, p2, 23, a2[47]), x2, O2, o3, 6, a2[48]), O2 = h2(O2, b2, P2, x2, _2, 10, a2[49]), x2 = h2(x2, O2, b2, P2, C2, 15, a2[50]), P2 = h2(P2, x2, O2, b2, m2, 21, a2[51]), b2 = h2(b2, P2, x2, O2, k2, 6, a2[52]), O2 = h2(O2, b2, P2, x2, f2, 10, a2[53]), x2 = h2(x2, O2, b2, P2, I2, 15, a2[54]), P2 = h2(P2, x2, O2, b2, c3, 21, a2[55]), b2 = h2(b2, P2, x2, O2, w2, 6, a2[56]), O2 = h2(O2, b2, P2, x2, T2, 10, a2[57]), x2 = h2(x2, O2, b2, P2, y2, 15, a2[58]), P2 = h2(P2, x2, O2, b2, A2, 21, a2[59]), b2 = h2(b2, P2, x2, O2, g2, 6, a2[60]), O2 = h2(O2, b2, P2, x2, S2, 10, a2[61]), x2 = h2(x2, O2, b2, P2, p2, 15, a2[62]), P2 = h2(P2, x2, O2, b2, v2, 21, a2[63]), i3[0] = i3[0] + b2 | 0, i3[1] = i3[1] + P2 | 0, i3[2] = i3[2] + x2 | 0, i3[3] = i3[3] + O2 | 0;
       }, _doFinalize: function() {
         var t4 = this._data, n3 = t4.words, s3 = 8 * this._nDataBytes, r3 = 8 * t4.sigBytes;
         n3[r3 >>> 5] |= 128 << 24 - r3 % 32;
         var i3 = e3.floor(s3 / 4294967296), o3 = s3;
         n3[15 + (r3 + 64 >>> 9 << 4)] = 16711935 & (i3 << 8 | i3 >>> 24) | 4278255360 & (i3 << 24 | i3 >>> 8), n3[14 + (r3 + 64 >>> 9 << 4)] = 16711935 & (o3 << 8 | o3 >>> 24) | 4278255360 & (o3 << 24 | o3 >>> 8), t4.sigBytes = 4 * (n3.length + 1), this._process();
         for (var a3 = this._hash, c3 = a3.words, u3 = 0; u3 < 4; u3++) {
-          var h3 = c3[u3];
-          c3[u3] = 16711935 & (h3 << 8 | h3 >>> 24) | 4278255360 & (h3 << 24 | h3 >>> 8);
+          var l3 = c3[u3];
+          c3[u3] = 16711935 & (l3 << 8 | l3 >>> 24) | 4278255360 & (l3 << 24 | l3 >>> 8);
         }
         return a3;
       }, clone: function() {
@@ -26880,23 +24561,23 @@
         var a3 = e4 + (t4 & n3 | ~t4 & s3) + r3 + o3;
         return (a3 << i3 | a3 >>> 32 - i3) + t4;
       }
-      function h2(e4, t4, n3, s3, r3, i3, o3) {
+      function l2(e4, t4, n3, s3, r3, i3, o3) {
         var a3 = e4 + (t4 & s3 | n3 & ~s3) + r3 + o3;
         return (a3 << i3 | a3 >>> 32 - i3) + t4;
       }
-      function l2(e4, t4, n3, s3, r3, i3, o3) {
+      function d2(e4, t4, n3, s3, r3, i3, o3) {
         var a3 = e4 + (t4 ^ n3 ^ s3) + r3 + o3;
         return (a3 << i3 | a3 >>> 32 - i3) + t4;
       }
-      function d2(e4, t4, n3, s3, r3, i3, o3) {
+      function h2(e4, t4, n3, s3, r3, i3, o3) {
         var a3 = e4 + (n3 ^ (t4 | ~s3)) + r3 + o3;
         return (a3 << i3 | a3 >>> 32 - i3) + t4;
       }
       t3.MD5 = i2._createHelper(c2), t3.HmacMD5 = i2._createHmacHelper(c2);
     }(Math), n2.MD5);
-  }), n(function(e2, t2) {
+  }), s(function(e2, t2) {
     var n2;
-    e2.exports = (n2 = r, void function() {
+    e2.exports = (n2 = i, void function() {
       var e3 = n2, t3 = e3.lib.Base, s2 = e3.enc.Utf8;
       e3.algo.HMAC = t3.extend({ init: function(e4, t4) {
         e4 = this._hasher = new e4.init(), "string" == typeof t4 && (t4 = s2.parse(t4));
@@ -26915,13 +24596,13 @@
         return t4.reset(), t4.finalize(this._oKey.clone().concat(n3));
       } });
     }());
-  }), n(function(e2, t2) {
-    e2.exports = r.HmacMD5;
-  })), o = n(function(e2, t2) {
-    e2.exports = r.enc.Utf8;
-  }), a = n(function(e2, t2) {
+  }), s(function(e2, t2) {
+    e2.exports = i.HmacMD5;
+  })), a = s(function(e2, t2) {
+    e2.exports = i.enc.Utf8;
+  }), c = s(function(e2, t2) {
     var n2;
-    e2.exports = (n2 = r, function() {
+    e2.exports = (n2 = i, function() {
       var e3 = n2, t3 = e3.lib.WordArray;
       function s2(e4, n3, s3) {
         for (var r2 = [], i2 = 0, o2 = 0; o2 < n3; o2++)
@@ -26957,18 +24638,18 @@
         return s2(e4, t4, r2);
       }, _map: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=" };
     }(), n2.enc.Base64);
-  });
-  const c = "FUNCTION", u = "OBJECT", h = "CLIENT_DB", l = "pending", d = "fulfilled", p = "rejected";
-  function f(e2) {
+  }), u = c;
+  const l = "FUNCTION", d = "OBJECT", h = "CLIENT_DB", p = "pending", f = "fulfilled", g = "rejected";
+  function m(e2) {
     return Object.prototype.toString.call(e2).slice(8, -1).toLowerCase();
   }
-  function g(e2) {
-    return "object" === f(e2);
+  function y(e2) {
+    return "object" === m(e2);
   }
-  function m(e2) {
+  function _(e2) {
     return "function" == typeof e2;
   }
-  function y(e2) {
+  function w(e2) {
     return function() {
       try {
         return e2.apply(e2, arguments);
@@ -26977,41 +24658,43 @@
       }
     };
   }
-  const _ = "REJECTED", w = "NOT_PENDING";
-  class v {
-    constructor({ createPromise: e2, retryRule: t2 = _ } = {}) {
+  const v = "REJECTED", I = "NOT_PENDING";
+  class S {
+    constructor({ createPromise: e2, retryRule: t2 = v } = {}) {
       this.createPromise = e2, this.status = null, this.promise = null, this.retryRule = t2;
     }
     get needRetry() {
       if (!this.status)
         return true;
       switch (this.retryRule) {
-        case _:
-          return this.status === p;
-        case w:
-          return this.status !== l;
+        case v:
+          return this.status === g;
+        case I:
+          return this.status !== p;
       }
     }
     exec() {
-      return this.needRetry ? (this.status = l, this.promise = this.createPromise().then((e2) => (this.status = d, Promise.resolve(e2)), (e2) => (this.status = p, Promise.reject(e2))), this.promise) : this.promise;
+      return this.needRetry ? (this.status = p, this.promise = this.createPromise().then((e2) => (this.status = f, Promise.resolve(e2)), (e2) => (this.status = g, Promise.reject(e2))), this.promise) : this.promise;
     }
   }
-  function I(e2) {
+  function k(e2) {
     return e2 && "string" == typeof e2 ? JSON.parse(e2) : e2;
   }
-  const S = true, b = "app", k = I(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), A = b, T = I('{"address":["127.0.0.1","192.168.1.76"],"servePort":7001,"debugPort":9000,"initialLaunchType":"remote","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), C = I('[{"provider":"aliyun","spaceName":"zdiot-car","spaceId":"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff","clientSecret":"s9pFKgenncFnOUhRGOJpcw==","endpoint":"https://api.next.bspapp.com","failoverEndpoint":""}]') || [];
-  let O = "";
+  const A = true, C = "app", T = k(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), b = C, P = k('{"address":["127.0.0.1","192.168.1.76"],"servePort":7001,"debugPort":9000,"initialLaunchType":"remote","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), x = k('[{"provider":"aliyun","spaceName":"zdiot-car","spaceId":"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff","clientSecret":"s9pFKgenncFnOUhRGOJpcw==","endpoint":"https://api.next.bspapp.com","failoverEndpoint":""}]') || [];
+  let E = "";
   try {
-    O = "__UNI__662B0B4";
+    E = "__UNI__662B0B4";
   } catch (e2) {
   }
-  let E, x = {};
-  function L(e2, t2 = {}) {
+  let L, R = {};
+  if (R = uni._globalUniCloudObj ? uni._globalUniCloudObj : uni._globalUniCloudObj = {}, "mp-weixin" === b)
+    ;
+  function U(e2, t2 = {}) {
     var n2, s2;
-    return n2 = x, s2 = e2, Object.prototype.hasOwnProperty.call(n2, s2) || (x[e2] = t2), x[e2];
+    return n2 = R, s2 = e2, Object.prototype.hasOwnProperty.call(n2, s2) || (R[e2] = t2), R[e2];
   }
-  function R() {
-    return E || (E = function() {
+  function N() {
+    return L || (L = function() {
       if ("undefined" != typeof globalThis)
         return globalThis;
       if ("undefined" != typeof self)
@@ -27022,79 +24705,78 @@
         return this;
       }
       return void 0 !== e2() ? e2() : new Function("return this")();
-    }(), E);
+    }(), L);
   }
-  x = uni._globalUniCloudObj ? uni._globalUniCloudObj : uni._globalUniCloudObj = {};
-  const U = ["invoke", "success", "fail", "complete"], N = L("_globalUniCloudInterceptor");
-  function D(e2, t2) {
-    N[e2] || (N[e2] = {}), g(t2) && Object.keys(t2).forEach((n2) => {
-      U.indexOf(n2) > -1 && function(e3, t3, n3) {
-        let s2 = N[e3][t3];
-        s2 || (s2 = N[e3][t3] = []), -1 === s2.indexOf(n3) && m(n3) && s2.push(n3);
+  const D = ["invoke", "success", "fail", "complete"], M = U("_globalUniCloudInterceptor");
+  function F(e2, t2) {
+    M[e2] || (M[e2] = {}), y(t2) && Object.keys(t2).forEach((n2) => {
+      D.indexOf(n2) > -1 && function(e3, t3, n3) {
+        let s2 = M[e3][t3];
+        s2 || (s2 = M[e3][t3] = []), -1 === s2.indexOf(n3) && _(n3) && s2.push(n3);
       }(e2, n2, t2[n2]);
     });
   }
-  function M(e2, t2) {
-    N[e2] || (N[e2] = {}), g(t2) ? Object.keys(t2).forEach((n2) => {
-      U.indexOf(n2) > -1 && function(e3, t3, n3) {
-        const s2 = N[e3][t3];
+  function q(e2, t2) {
+    M[e2] || (M[e2] = {}), y(t2) ? Object.keys(t2).forEach((n2) => {
+      D.indexOf(n2) > -1 && function(e3, t3, n3) {
+        const s2 = M[e3][t3];
         if (!s2)
           return;
         const r2 = s2.indexOf(n3);
         r2 > -1 && s2.splice(r2, 1);
       }(e2, n2, t2[n2]);
-    }) : delete N[e2];
+    }) : delete M[e2];
   }
-  function q(e2, t2) {
+  function K(e2, t2) {
     return e2 && 0 !== e2.length ? e2.reduce((e3, n2) => e3.then(() => n2(t2)), Promise.resolve()) : Promise.resolve();
   }
-  function F(e2, t2) {
-    return N[e2] && N[e2][t2] || [];
+  function j(e2, t2) {
+    return M[e2] && M[e2][t2] || [];
   }
-  function K(e2) {
-    D("callObject", e2);
+  function B(e2) {
+    F("callObject", e2);
   }
-  const j = L("_globalUniCloudListener"), $ = "response", B = "needLogin", W = "refreshToken", H = "failover", J = "clientdb", z = "cloudfunction", V = "cloudobject";
-  function G(e2) {
-    return j[e2] || (j[e2] = []), j[e2];
-  }
-  function Q(e2, t2) {
-    const n2 = G(e2);
-    n2.includes(t2) || n2.push(t2);
-  }
-  function Y(e2, t2) {
-    const n2 = G(e2), s2 = n2.indexOf(t2);
-    -1 !== s2 && n2.splice(s2, 1);
+  const $ = U("_globalUniCloudListener"), H = "response", W = "needLogin", J = "refreshToken", z = "failover", V = "clientdb", G = "cloudfunction", Q = "cloudobject";
+  function Y(e2) {
+    return $[e2] || ($[e2] = []), $[e2];
   }
   function X(e2, t2) {
-    const n2 = G(e2);
+    const n2 = Y(e2);
+    n2.includes(t2) || n2.push(t2);
+  }
+  function Z(e2, t2) {
+    const n2 = Y(e2), s2 = n2.indexOf(t2);
+    -1 !== s2 && n2.splice(s2, 1);
+  }
+  function ee(e2, t2) {
+    const n2 = Y(e2);
     for (let e3 = 0; e3 < n2.length; e3++) {
       (0, n2[e3])(t2);
     }
   }
-  let Z, ee = false;
-  function te() {
-    return Z || (Z = new Promise((e2) => {
-      ee && e2(), function t2() {
+  let te, ne = false;
+  function se() {
+    return te || (te = new Promise((e2) => {
+      ne && e2(), function t2() {
         if ("function" == typeof getCurrentPages) {
           const t3 = getCurrentPages();
-          t3 && t3[0] && (ee = true, e2());
+          t3 && t3[0] && (ne = true, e2());
         }
-        ee || setTimeout(() => {
+        ne || setTimeout(() => {
           t2();
         }, 30);
       }();
-    }), Z);
+    }), te);
   }
-  function ne(e2) {
+  function re(e2) {
     const t2 = {};
     for (const n2 in e2) {
       const s2 = e2[n2];
-      m(s2) && (t2[n2] = y(s2));
+      _(s2) && (t2[n2] = w(s2));
     }
     return t2;
   }
-  class se extends Error {
+  class ie extends Error {
     constructor(e2) {
       const t2 = e2.message || e2.errMsg || "unknown system error";
       super(t2), this.errMsg = t2, this.code = this.errCode = e2.code || e2.errCode || "SYSTEM_ERROR", this.errSubject = this.subject = e2.subject || e2.errSubject, this.cause = e2.cause, this.requestId = e2.requestId;
@@ -27104,21 +24786,21 @@
         return e2++, { errCode: this.errCode, errMsg: this.errMsg, errSubject: this.errSubject, cause: this.cause && this.cause.toJson ? this.cause.toJson(e2) : this.cause };
     }
   }
-  var re = { request: (e2) => uni.request(e2), uploadFile: (e2) => uni.uploadFile(e2), setStorageSync: (e2, t2) => uni.setStorageSync(e2, t2), getStorageSync: (e2) => uni.getStorageSync(e2), removeStorageSync: (e2) => uni.removeStorageSync(e2), clearStorageSync: () => uni.clearStorageSync(), connectSocket: (e2) => uni.connectSocket(e2) };
-  function ie(e2) {
-    return e2 && ie(e2.__v_raw) || e2;
+  var oe = { request: (e2) => uni.request(e2), uploadFile: (e2) => uni.uploadFile(e2), setStorageSync: (e2, t2) => uni.setStorageSync(e2, t2), getStorageSync: (e2) => uni.getStorageSync(e2), removeStorageSync: (e2) => uni.removeStorageSync(e2), clearStorageSync: () => uni.clearStorageSync(), connectSocket: (e2) => uni.connectSocket(e2) };
+  function ae(e2) {
+    return e2 && ae(e2.__v_raw) || e2;
   }
-  function oe() {
-    return { token: re.getStorageSync("uni_id_token") || re.getStorageSync("uniIdToken"), tokenExpired: re.getStorageSync("uni_id_token_expired") };
+  function ce() {
+    return { token: oe.getStorageSync("uni_id_token") || oe.getStorageSync("uniIdToken"), tokenExpired: oe.getStorageSync("uni_id_token_expired") };
   }
-  function ae({ token: e2, tokenExpired: t2 } = {}) {
-    e2 && re.setStorageSync("uni_id_token", e2), t2 && re.setStorageSync("uni_id_token_expired", t2);
+  function ue({ token: e2, tokenExpired: t2 } = {}) {
+    e2 && oe.setStorageSync("uni_id_token", e2), t2 && oe.setStorageSync("uni_id_token_expired", t2);
   }
-  let ce, ue;
+  let le, de;
   function he() {
-    return ce || (ce = uni.getSystemInfoSync()), ce;
+    return le || (le = uni.getSystemInfoSync()), le;
   }
-  function le() {
+  function pe() {
     let e2, t2;
     try {
       if (uni.getLaunchOptionsSync) {
@@ -27131,21 +24813,21 @@
     }
     return { channel: e2, scene: t2 };
   }
-  let de = {};
-  function pe() {
+  let fe = {};
+  function ge() {
     const e2 = uni.getLocale && uni.getLocale() || "en";
-    if (ue)
-      return { ...de, ...ue, locale: e2, LOCALE: e2 };
+    if (de)
+      return { ...fe, ...de, locale: e2, LOCALE: e2 };
     const t2 = he(), { deviceId: n2, osName: s2, uniPlatform: r2, appId: i2 } = t2, o2 = ["appId", "appLanguage", "appName", "appVersion", "appVersionCode", "appWgtVersion", "browserName", "browserVersion", "deviceBrand", "deviceId", "deviceModel", "deviceType", "osName", "osVersion", "romName", "romVersion", "ua", "hostName", "hostVersion", "uniPlatform", "uniRuntimeVersion", "uniRuntimeVersionCode", "uniCompilerVersion", "uniCompilerVersionCode"];
     for (const e3 in t2)
       Object.hasOwnProperty.call(t2, e3) && -1 === o2.indexOf(e3) && delete t2[e3];
-    return ue = { PLATFORM: r2, OS: s2, APPID: i2, DEVICEID: n2, ...le(), ...t2 }, { ...de, ...ue, locale: e2, LOCALE: e2 };
+    return de = { PLATFORM: r2, OS: s2, APPID: i2, DEVICEID: n2, ...pe(), ...t2 }, { ...fe, ...de, locale: e2, LOCALE: e2 };
   }
-  var fe = { sign: function(e2, t2) {
+  var me = { sign: function(e2, t2) {
     let n2 = "";
     return Object.keys(e2).sort().forEach(function(t3) {
       e2[t3] && (n2 = n2 + "&" + t3 + "=" + e2[t3]);
-    }), n2 = n2.slice(1), i(n2, t2).toString();
+    }), n2 = n2.slice(1), o(n2, t2).toString();
   }, wrappedRequest: function(e2, t2) {
     return new Promise((n2, s2) => {
       t2(Object.assign(e2, { complete(e3) {
@@ -27153,27 +24835,27 @@
         const t3 = e3.data && e3.data.header && e3.data.header["x-serverless-request-id"] || e3.header && e3.header["request-id"];
         if (!e3.statusCode || e3.statusCode >= 400) {
           const n3 = e3.data && e3.data.error && e3.data.error.code || "SYS_ERR", r3 = e3.data && e3.data.error && e3.data.error.message || e3.errMsg || "request:fail";
-          return s2(new se({ code: n3, message: r3, requestId: t3 }));
+          return s2(new ie({ code: n3, message: r3, requestId: t3 }));
         }
         const r2 = e3.data;
         if (r2.error)
-          return s2(new se({ code: r2.error.code, message: r2.error.message, requestId: t3 }));
+          return s2(new ie({ code: r2.error.code, message: r2.error.message, requestId: t3 }));
         r2.result = r2.data, r2.requestId = t3, delete r2.data, n2(r2);
       } }));
     });
   }, toBase64: function(e2) {
-    return a.stringify(o.parse(e2));
+    return u.stringify(a.parse(e2));
   } };
-  var ge = class {
+  var ye = class {
     constructor(e2) {
       ["spaceId", "clientSecret"].forEach((t2) => {
         if (!Object.prototype.hasOwnProperty.call(e2, t2))
           throw new Error("".concat(t2, " required"));
-      }), this.config = Object.assign({}, { endpoint: 0 === e2.spaceId.indexOf("mp-") ? "https://api.next.bspapp.com" : "https://api.bspapp.com" }, e2), this.config.provider = "aliyun", this.config.requestUrl = this.config.endpoint + "/client", this.config.envType = this.config.envType || "public", this.config.accessTokenKey = "access_token_" + this.config.spaceId, this.adapter = re, this._getAccessTokenPromiseHub = new v({ createPromise: () => this.requestAuth(this.setupRequest({ method: "serverless.auth.user.anonymousAuthorize", params: "{}" }, "auth")).then((e3) => {
+      }), this.config = Object.assign({}, { endpoint: 0 === e2.spaceId.indexOf("mp-") ? "https://api.next.bspapp.com" : "https://api.bspapp.com" }, e2), this.config.provider = "aliyun", this.config.requestUrl = this.config.endpoint + "/client", this.config.envType = this.config.envType || "public", this.config.accessTokenKey = "access_token_" + this.config.spaceId, this.adapter = oe, this._getAccessTokenPromiseHub = new S({ createPromise: () => this.requestAuth(this.setupRequest({ method: "serverless.auth.user.anonymousAuthorize", params: "{}" }, "auth")).then((e3) => {
         if (!e3.result || !e3.result.accessToken)
-          throw new se({ code: "AUTH_FAILED", message: "获取accessToken失败" });
+          throw new ie({ code: "AUTH_FAILED", message: "获取accessToken失败" });
         this.setAccessToken(e3.result.accessToken);
-      }), retryRule: w });
+      }), retryRule: I });
     }
     get hasAccessToken() {
       return !!this.accessToken;
@@ -27182,7 +24864,7 @@
       this.accessToken = e2;
     }
     requestWrapped(e2) {
-      return fe.wrappedRequest(e2, this.adapter.request);
+      return me.wrappedRequest(e2, this.adapter.request);
     }
     requestAuth(e2) {
       return this.requestWrapped(e2);
@@ -27200,11 +24882,11 @@
     }
     rebuildRequest(e2) {
       const t2 = Object.assign({}, e2);
-      return t2.data.token = this.accessToken, t2.header["x-basement-token"] = this.accessToken, t2.header["x-serverless-sign"] = fe.sign(t2.data, this.config.clientSecret), t2;
+      return t2.data.token = this.accessToken, t2.header["x-basement-token"] = this.accessToken, t2.header["x-serverless-sign"] = me.sign(t2.data, this.config.clientSecret), t2;
     }
     setupRequest(e2, t2) {
       const n2 = Object.assign({}, e2, { spaceId: this.config.spaceId, timestamp: Date.now() }), s2 = { "Content-Type": "application/json" };
-      return "auth" !== t2 && (n2.token = this.accessToken, s2["x-basement-token"] = this.accessToken), s2["x-serverless-sign"] = fe.sign(n2, this.config.clientSecret), { url: this.config.requestUrl, method: "POST", data: n2, dataType: "json", header: s2 };
+      return "auth" !== t2 && (n2.token = this.accessToken, s2["x-basement-token"] = this.accessToken), s2["x-serverless-sign"] = me.sign(n2, this.config.clientSecret), { url: this.config.requestUrl, method: "POST", data: n2, dataType: "json", header: s2 };
     }
     getAccessToken() {
       return this._getAccessTokenPromiseHub.exec();
@@ -27223,9 +24905,9 @@
     uploadFileToOSS({ url: e2, formData: t2, name: n2, filePath: s2, fileType: r2, onUploadProgress: i2 }) {
       return new Promise((o2, a2) => {
         const c2 = this.adapter.uploadFile({ url: e2, formData: t2, name: n2, filePath: s2, fileType: r2, header: { "X-OSS-server-side-encrpytion": "AES256" }, success(e3) {
-          e3 && e3.statusCode < 400 ? o2(e3) : a2(new se({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
+          e3 && e3.statusCode < 400 ? o2(e3) : a2(new ie({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
         }, fail(e3) {
-          a2(new se({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
+          a2(new ie({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
         } });
         "function" == typeof i2 && c2 && "function" == typeof c2.onProgressUpdate && c2.onProgressUpdate((e3) => {
           i2({ loaded: e3.totalBytesSent, total: e3.totalBytesExpectedToSend });
@@ -27237,30 +24919,30 @@
       return this.request(this.setupRequest(t2));
     }
     async uploadFile({ filePath: e2, cloudPath: t2, fileType: n2 = "image", cloudPathAsRealPath: s2 = false, onUploadProgress: r2, config: i2 }) {
-      if ("string" !== f(t2))
-        throw new se({ code: "INVALID_PARAM", message: "cloudPath必须为字符串类型" });
+      if ("string" !== m(t2))
+        throw new ie({ code: "INVALID_PARAM", message: "cloudPath必须为字符串类型" });
       if (!(t2 = t2.trim()))
-        throw new se({ code: "INVALID_PARAM", message: "cloudPath不可为空" });
+        throw new ie({ code: "INVALID_PARAM", message: "cloudPath不可为空" });
       if (/:\/\//.test(t2))
-        throw new se({ code: "INVALID_PARAM", message: "cloudPath不合法" });
+        throw new ie({ code: "INVALID_PARAM", message: "cloudPath不合法" });
       const o2 = i2 && i2.envType || this.config.envType;
       if (s2 && ("/" !== t2[0] && (t2 = "/" + t2), t2.indexOf("\\") > -1))
-        throw new se({ code: "INVALID_PARAM", message: "使用cloudPath作为路径时，cloudPath不可包含“\\”" });
-      const a2 = (await this.getOSSUploadOptionsFromPath({ env: o2, filename: s2 ? t2.split("/").pop() : t2, fileId: s2 ? t2 : void 0 })).result, c2 = "https://" + a2.cdnDomain + "/" + a2.ossPath, { securityToken: u2, accessKeyId: h2, signature: l2, host: d2, ossPath: p2, id: g2, policy: m2, ossCallbackUrl: y2 } = a2, _2 = { "Cache-Control": "max-age=2592000", "Content-Disposition": "attachment", OSSAccessKeyId: h2, Signature: l2, host: d2, id: g2, key: p2, policy: m2, success_action_status: 200 };
+        throw new ie({ code: "INVALID_PARAM", message: "使用cloudPath作为路径时，cloudPath不可包含“\\”" });
+      const a2 = (await this.getOSSUploadOptionsFromPath({ env: o2, filename: s2 ? t2.split("/").pop() : t2, fileId: s2 ? t2 : void 0 })).result, c2 = "https://" + a2.cdnDomain + "/" + a2.ossPath, { securityToken: u2, accessKeyId: l2, signature: d2, host: h2, ossPath: p2, id: f2, policy: g2, ossCallbackUrl: y2 } = a2, _2 = { "Cache-Control": "max-age=2592000", "Content-Disposition": "attachment", OSSAccessKeyId: l2, Signature: d2, host: h2, id: f2, key: p2, policy: g2, success_action_status: 200 };
       if (u2 && (_2["x-oss-security-token"] = u2), y2) {
-        const e3 = JSON.stringify({ callbackUrl: y2, callbackBody: JSON.stringify({ fileId: g2, spaceId: this.config.spaceId }), callbackBodyType: "application/json" });
-        _2.callback = fe.toBase64(e3);
+        const e3 = JSON.stringify({ callbackUrl: y2, callbackBody: JSON.stringify({ fileId: f2, spaceId: this.config.spaceId }), callbackBodyType: "application/json" });
+        _2.callback = me.toBase64(e3);
       }
       const w2 = { url: "https://" + a2.host, formData: _2, fileName: "file", name: "file", filePath: e2, fileType: n2 };
       if (await this.uploadFileToOSS(Object.assign({}, w2, { onUploadProgress: r2 })), y2)
         return { success: true, filePath: e2, fileID: c2 };
-      if ((await this.reportOSSUpload({ id: g2 })).success)
+      if ((await this.reportOSSUpload({ id: f2 })).success)
         return { success: true, filePath: e2, fileID: c2 };
-      throw new se({ code: "UPLOAD_FAILED", message: "文件上传失败" });
+      throw new ie({ code: "UPLOAD_FAILED", message: "文件上传失败" });
     }
     getTempFileURL({ fileList: e2 } = {}) {
       return new Promise((t2, n2) => {
-        Array.isArray(e2) && 0 !== e2.length || n2(new se({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" })), this.getFileInfo({ fileList: e2 }).then((n3) => {
+        Array.isArray(e2) && 0 !== e2.length || n2(new ie({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" })), this.getFileInfo({ fileList: e2 }).then((n3) => {
           t2({ fileList: e2.map((e3, t3) => {
             const s2 = n3.fileList[t3];
             return { fileID: e3, tempFileURL: s2 && s2.url || e3 };
@@ -27270,13 +24952,13 @@
     }
     async getFileInfo({ fileList: e2 } = {}) {
       if (!Array.isArray(e2) || 0 === e2.length)
-        throw new se({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
+        throw new ie({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
       const t2 = { method: "serverless.file.resource.info", params: JSON.stringify({ id: e2.map((e3) => e3.split("?")[0]).join(",") }) };
       return { fileList: (await this.request(this.setupRequest(t2))).result };
     }
   };
-  var me = { init(e2) {
-    const t2 = new ge(e2), n2 = { signInAnonymously: function() {
+  var _e = { init(e2) {
+    const t2 = new ye(e2), n2 = { signInAnonymously: function() {
       return t2.authorize();
     }, getLoginState: function() {
       return Promise.resolve(false);
@@ -27285,15 +24967,15 @@
       return n2;
     }, t2.customAuth = t2.auth, t2;
   } };
-  const ye = "undefined" != typeof location && "http:" === location.protocol ? "http:" : "https:";
-  var _e;
+  const we = "undefined" != typeof location && "http:" === location.protocol ? "http:" : "https:";
+  var ve;
   !function(e2) {
     e2.local = "local", e2.none = "none", e2.session = "session";
-  }(_e || (_e = {}));
-  var we = function() {
-  }, ve = n(function(e2, t2) {
+  }(ve || (ve = {}));
+  var Ie = function() {
+  }, Se = s(function(e2, t2) {
     var n2;
-    e2.exports = (n2 = r, function(e3) {
+    e2.exports = (n2 = i, function(e3) {
       var t3 = n2, s2 = t3.lib, r2 = s2.WordArray, i2 = s2.Hasher, o2 = t3.algo, a2 = [], c2 = [];
       !function() {
         function t4(t5) {
@@ -27308,20 +24990,20 @@
         for (var s3 = 2, r3 = 0; r3 < 64; )
           t4(s3) && (r3 < 8 && (a2[r3] = n3(e3.pow(s3, 0.5))), c2[r3] = n3(e3.pow(s3, 1 / 3)), r3++), s3++;
       }();
-      var u2 = [], h2 = o2.SHA256 = i2.extend({ _doReset: function() {
+      var u2 = [], l2 = o2.SHA256 = i2.extend({ _doReset: function() {
         this._hash = new r2.init(a2.slice(0));
       }, _doProcessBlock: function(e4, t4) {
-        for (var n3 = this._hash.words, s3 = n3[0], r3 = n3[1], i3 = n3[2], o3 = n3[3], a3 = n3[4], h3 = n3[5], l2 = n3[6], d2 = n3[7], p2 = 0; p2 < 64; p2++) {
+        for (var n3 = this._hash.words, s3 = n3[0], r3 = n3[1], i3 = n3[2], o3 = n3[3], a3 = n3[4], l3 = n3[5], d2 = n3[6], h2 = n3[7], p2 = 0; p2 < 64; p2++) {
           if (p2 < 16)
             u2[p2] = 0 | e4[t4 + p2];
           else {
             var f2 = u2[p2 - 15], g2 = (f2 << 25 | f2 >>> 7) ^ (f2 << 14 | f2 >>> 18) ^ f2 >>> 3, m2 = u2[p2 - 2], y2 = (m2 << 15 | m2 >>> 17) ^ (m2 << 13 | m2 >>> 19) ^ m2 >>> 10;
             u2[p2] = g2 + u2[p2 - 7] + y2 + u2[p2 - 16];
           }
-          var _2 = s3 & r3 ^ s3 & i3 ^ r3 & i3, w2 = (s3 << 30 | s3 >>> 2) ^ (s3 << 19 | s3 >>> 13) ^ (s3 << 10 | s3 >>> 22), v2 = d2 + ((a3 << 26 | a3 >>> 6) ^ (a3 << 21 | a3 >>> 11) ^ (a3 << 7 | a3 >>> 25)) + (a3 & h3 ^ ~a3 & l2) + c2[p2] + u2[p2];
-          d2 = l2, l2 = h3, h3 = a3, a3 = o3 + v2 | 0, o3 = i3, i3 = r3, r3 = s3, s3 = v2 + (w2 + _2) | 0;
+          var _2 = s3 & r3 ^ s3 & i3 ^ r3 & i3, w2 = (s3 << 30 | s3 >>> 2) ^ (s3 << 19 | s3 >>> 13) ^ (s3 << 10 | s3 >>> 22), v2 = h2 + ((a3 << 26 | a3 >>> 6) ^ (a3 << 21 | a3 >>> 11) ^ (a3 << 7 | a3 >>> 25)) + (a3 & l3 ^ ~a3 & d2) + c2[p2] + u2[p2];
+          h2 = d2, d2 = l3, l3 = a3, a3 = o3 + v2 | 0, o3 = i3, i3 = r3, r3 = s3, s3 = v2 + (w2 + _2) | 0;
         }
-        n3[0] = n3[0] + s3 | 0, n3[1] = n3[1] + r3 | 0, n3[2] = n3[2] + i3 | 0, n3[3] = n3[3] + o3 | 0, n3[4] = n3[4] + a3 | 0, n3[5] = n3[5] + h3 | 0, n3[6] = n3[6] + l2 | 0, n3[7] = n3[7] + d2 | 0;
+        n3[0] = n3[0] + s3 | 0, n3[1] = n3[1] + r3 | 0, n3[2] = n3[2] + i3 | 0, n3[3] = n3[3] + o3 | 0, n3[4] = n3[4] + a3 | 0, n3[5] = n3[5] + l3 | 0, n3[6] = n3[6] + d2 | 0, n3[7] = n3[7] + h2 | 0;
       }, _doFinalize: function() {
         var t4 = this._data, n3 = t4.words, s3 = 8 * this._nDataBytes, r3 = 8 * t4.sigBytes;
         return n3[r3 >>> 5] |= 128 << 24 - r3 % 32, n3[14 + (r3 + 64 >>> 9 << 4)] = e3.floor(s3 / 4294967296), n3[15 + (r3 + 64 >>> 9 << 4)] = s3, t4.sigBytes = 4 * n3.length, this._process(), this._hash;
@@ -27329,18 +25011,18 @@
         var e4 = i2.clone.call(this);
         return e4._hash = this._hash.clone(), e4;
       } });
-      t3.SHA256 = i2._createHelper(h2), t3.HmacSHA256 = i2._createHmacHelper(h2);
+      t3.SHA256 = i2._createHelper(l2), t3.HmacSHA256 = i2._createHmacHelper(l2);
     }(Math), n2.SHA256);
-  }), Ie = ve, Se = n(function(e2, t2) {
-    e2.exports = r.HmacSHA256;
+  }), ke = Se, Ae = s(function(e2, t2) {
+    e2.exports = i.HmacSHA256;
   });
-  const be = () => {
+  const Ce = () => {
     let e2;
     if (!Promise) {
       e2 = () => {
       }, e2.promise = {};
       const t3 = () => {
-        throw new se({ message: 'Your Node runtime does support ES6 Promises. Set "global.Promise" to your preferred implementation of promises.' });
+        throw new ie({ message: 'Your Node runtime does support ES6 Promises. Set "global.Promise" to your preferred implementation of promises.' });
       };
       return Object.defineProperty(e2.promise, "then", { get: t3 }), Object.defineProperty(e2.promise, "catch", { get: t3 }), e2;
     }
@@ -27349,24 +25031,24 @@
     });
     return e2.promise = t2, e2;
   };
-  function ke(e2) {
+  function Te(e2) {
     return void 0 === e2;
   }
-  function Ae(e2) {
+  function be(e2) {
     return "[object Null]" === Object.prototype.toString.call(e2);
   }
-  function Te(e2 = "") {
+  function Pe(e2 = "") {
     return e2.replace(/([\s\S]+)\s+(请前往云开发AI小助手查看问题：.*)/, "$1");
   }
-  function Ce(e2 = 32) {
+  function xe(e2 = 32) {
     const t2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", n2 = t2.length;
     let s2 = "";
     for (let r2 = 0; r2 < e2; r2++)
       s2 += t2.charAt(Math.floor(Math.random() * n2));
     return s2;
   }
-  var Pe;
-  function Oe(e2) {
+  var Oe;
+  function Ee(e2) {
     const t2 = (n2 = e2, "[object Array]" === Object.prototype.toString.call(n2) ? e2 : [e2]);
     var n2;
     for (const e3 of t2) {
@@ -27377,39 +25059,39 @@
   }
   !function(e2) {
     e2.WEB = "web", e2.WX_MP = "wx_mp";
-  }(Pe || (Pe = {}));
-  const Ee = { adapter: null, runtime: void 0 }, xe = ["anonymousUuidKey"];
-  class Le extends we {
+  }(Oe || (Oe = {}));
+  const Le = { adapter: null, runtime: void 0 }, Re = ["anonymousUuidKey"];
+  class Ue extends Ie {
     constructor() {
-      super(), Ee.adapter.root.tcbObject || (Ee.adapter.root.tcbObject = {});
+      super(), Le.adapter.root.tcbObject || (Le.adapter.root.tcbObject = {});
     }
     setItem(e2, t2) {
-      Ee.adapter.root.tcbObject[e2] = t2;
+      Le.adapter.root.tcbObject[e2] = t2;
     }
     getItem(e2) {
-      return Ee.adapter.root.tcbObject[e2];
+      return Le.adapter.root.tcbObject[e2];
     }
     removeItem(e2) {
-      delete Ee.adapter.root.tcbObject[e2];
+      delete Le.adapter.root.tcbObject[e2];
     }
     clear() {
-      delete Ee.adapter.root.tcbObject;
+      delete Le.adapter.root.tcbObject;
     }
   }
-  function Re(e2, t2) {
+  function Ne(e2, t2) {
     switch (e2) {
       case "local":
-        return t2.localStorage || new Le();
+        return t2.localStorage || new Ue();
       case "none":
-        return new Le();
+        return new Ue();
       default:
-        return t2.sessionStorage || new Le();
+        return t2.sessionStorage || new Ue();
     }
   }
-  class Ue {
+  class De {
     constructor(e2) {
       if (!this._storage) {
-        this._persistence = Ee.adapter.primaryStorage || e2.persistence, this._storage = Re(this._persistence, Ee.adapter);
+        this._persistence = Le.adapter.primaryStorage || e2.persistence, this._storage = Ne(this._persistence, Le.adapter);
         const t2 = "access_token_".concat(e2.env), n2 = "access_token_expire_".concat(e2.env), s2 = "refresh_token_".concat(e2.env), r2 = "anonymous_uuid_".concat(e2.env), i2 = "login_type_".concat(e2.env), o2 = "device_id", a2 = "token_type_".concat(e2.env), c2 = "user_info_".concat(e2.env);
         this.keys = { accessTokenKey: t2, accessTokenExpireKey: n2, refreshTokenKey: s2, anonymousUuidKey: r2, loginTypeKey: i2, userInfoKey: c2, deviceIdKey: o2, tokenTypeKey: a2 };
       }
@@ -27419,13 +25101,13 @@
         return;
       const t2 = "local" === this._persistence;
       this._persistence = e2;
-      const n2 = Re(e2, Ee.adapter);
+      const n2 = Ne(e2, Le.adapter);
       for (const e3 in this.keys) {
         const s2 = this.keys[e3];
-        if (t2 && xe.includes(e3))
+        if (t2 && Re.includes(e3))
           continue;
         const r2 = this._storage.getItem(s2);
-        ke(r2) || Ae(r2) || (n2.setItem(s2, r2), this._storage.removeItem(s2));
+        Te(r2) || be(r2) || (n2.setItem(s2, r2), this._storage.removeItem(s2));
       }
       this._storage = n2;
     }
@@ -27459,21 +25141,21 @@
       this._storage.removeItem(e2);
     }
   }
-  const Ne = {}, De = {};
-  function Me(e2) {
-    return Ne[e2];
+  const Me = {}, Fe = {};
+  function qe(e2) {
+    return Me[e2];
   }
-  class qe {
+  class Ke {
     constructor(e2, t2) {
       this.data = t2 || null, this.name = e2;
     }
   }
-  class Fe extends qe {
+  class je extends Ke {
     constructor(e2, t2) {
       super("error", { error: e2, data: t2 }), this.error = e2;
     }
   }
-  const Ke = new class {
+  const Be = new class {
     constructor() {
       this._listeners = {};
     }
@@ -27491,9 +25173,9 @@
       }(e2, t2, this._listeners), this;
     }
     fire(e2, t2) {
-      if (e2 instanceof Fe)
+      if (e2 instanceof je)
         return console.error(e2.error), this;
-      const n2 = "string" == typeof e2 ? new qe(e2, t2 || {}) : e2;
+      const n2 = "string" == typeof e2 ? new Ke(e2, t2 || {}) : e2;
       const s2 = n2.name;
       if (this._listens(s2)) {
         n2.target = this;
@@ -27507,21 +25189,21 @@
       return this._listeners[e2] && this._listeners[e2].length > 0;
     }
   }();
-  function je(e2, t2) {
-    Ke.on(e2, t2);
+  function $e(e2, t2) {
+    Be.on(e2, t2);
   }
-  function $e(e2, t2 = {}) {
-    Ke.fire(e2, t2);
+  function He(e2, t2 = {}) {
+    Be.fire(e2, t2);
   }
-  function Be(e2, t2) {
-    Ke.off(e2, t2);
+  function We(e2, t2) {
+    Be.off(e2, t2);
   }
-  const We = "loginStateChanged", He = "loginStateExpire", Je = "loginTypeChanged", ze = "anonymousConverted", Ve = "refreshAccessToken";
-  var Ge;
+  const Je = "loginStateChanged", ze = "loginStateExpire", Ve = "loginTypeChanged", Ge = "anonymousConverted", Qe = "refreshAccessToken";
+  var Ye;
   !function(e2) {
     e2.ANONYMOUS = "ANONYMOUS", e2.WECHAT = "WECHAT", e2.WECHAT_PUBLIC = "WECHAT-PUBLIC", e2.WECHAT_OPEN = "WECHAT-OPEN", e2.CUSTOM = "CUSTOM", e2.EMAIL = "EMAIL", e2.USERNAME = "USERNAME", e2.NULL = "NULL";
-  }(Ge || (Ge = {}));
-  class Qe {
+  }(Ye || (Ye = {}));
+  class Xe {
     constructor() {
       this._fnPromiseMap = /* @__PURE__ */ new Map();
     }
@@ -27543,19 +25225,19 @@
       return Promise.resolve();
     }
   }
-  class Ye {
+  class Ze {
     constructor(e2) {
-      this._singlePromise = new Qe(), this._cache = Me(e2.env), this._baseURL = "https://".concat(e2.env, ".ap-shanghai.tcb-api.tencentcloudapi.com"), this._reqClass = new Ee.adapter.reqClass({ timeout: e2.timeout, timeoutMsg: "请求在".concat(e2.timeout / 1e3, "s内未完成，已中断"), restrictedMethods: ["post"] });
+      this._singlePromise = new Xe(), this._cache = qe(e2.env), this._baseURL = "https://".concat(e2.env, ".ap-shanghai.tcb-api.tencentcloudapi.com"), this._reqClass = new Le.adapter.reqClass({ timeout: e2.timeout, timeoutMsg: "请求在".concat(e2.timeout / 1e3, "s内未完成，已中断"), restrictedMethods: ["post"] });
     }
     _getDeviceId() {
       if (this._deviceID)
         return this._deviceID;
       const { deviceIdKey: e2 } = this._cache.keys;
       let t2 = this._cache.getStore(e2);
-      return "string" == typeof t2 && t2.length >= 16 && t2.length <= 48 || (t2 = Ce(), this._cache.setStore(e2, t2)), this._deviceID = t2, t2;
+      return "string" == typeof t2 && t2.length >= 16 && t2.length <= 48 || (t2 = xe(), this._cache.setStore(e2, t2)), this._deviceID = t2, t2;
     }
     async _request(e2, t2, n2 = {}) {
-      const s2 = { "x-request-id": Ce(), "x-device-id": this._getDeviceId() };
+      const s2 = { "x-request-id": xe(), "x-device-id": this._getDeviceId() };
       if (n2.withAccessToken) {
         const { tokenTypeKey: e3 } = this._cache.keys, t3 = await this.getAccessToken(), n3 = this._cache.getStore(e3);
         s2.authorization = "".concat(n3, " ").concat(t3);
@@ -27564,8 +25246,8 @@
     }
     async _fetchAccessToken() {
       const { loginTypeKey: e2, accessTokenKey: t2, accessTokenExpireKey: n2, tokenTypeKey: s2 } = this._cache.keys, r2 = this._cache.getStore(e2);
-      if (r2 && r2 !== Ge.ANONYMOUS)
-        throw new se({ code: "INVALID_OPERATION", message: "非匿名登录不支持刷新 access token" });
+      if (r2 && r2 !== Ye.ANONYMOUS)
+        throw new ie({ code: "INVALID_OPERATION", message: "非匿名登录不支持刷新 access token" });
       const i2 = await this._singlePromise.run("fetchAccessToken", async () => (await this._request("/auth/v1/signin/anonymously", {}, { method: "post" })).data), { access_token: o2, expires_in: a2, token_type: c2 } = i2;
       return this._cache.setStore(s2, c2), this._cache.setStore(t2, o2), this._cache.setStore(n2, Date.now() + 1e3 * a2), o2;
     }
@@ -27579,14 +25261,14 @@
     }
     async refreshAccessToken() {
       const { accessTokenKey: e2, accessTokenExpireKey: t2, loginTypeKey: n2 } = this._cache.keys;
-      return this._cache.removeStore(e2), this._cache.removeStore(t2), this._cache.setStore(n2, Ge.ANONYMOUS), this.getAccessToken();
+      return this._cache.removeStore(e2), this._cache.removeStore(t2), this._cache.setStore(n2, Ye.ANONYMOUS), this.getAccessToken();
     }
     async getUserInfo() {
       return this._singlePromise.run("getUserInfo", async () => (await this._request("/auth/v1/user/me", {}, { withAccessToken: true, method: "get" })).data);
     }
   }
-  const Xe = ["auth.getJwt", "auth.logout", "auth.signInWithTicket", "auth.signInAnonymously", "auth.signIn", "auth.fetchAccessTokenWithRefreshToken", "auth.signUpWithEmailAndPassword", "auth.activateEndUserMail", "auth.sendPasswordResetEmail", "auth.resetPasswordWithToken", "auth.isUsernameRegistered"], Ze = { "X-SDK-Version": "1.3.5" };
-  function et(e2, t2, n2) {
+  const et = ["auth.getJwt", "auth.logout", "auth.signInWithTicket", "auth.signInAnonymously", "auth.signIn", "auth.fetchAccessTokenWithRefreshToken", "auth.signUpWithEmailAndPassword", "auth.activateEndUserMail", "auth.sendPasswordResetEmail", "auth.resetPasswordWithToken", "auth.isUsernameRegistered"], tt = { "X-SDK-Version": "1.3.5" };
+  function nt(e2, t2, n2) {
     const s2 = e2[t2];
     e2[t2] = function(t3) {
       const r2 = {}, i2 = {};
@@ -27605,14 +25287,14 @@
       })(), t3.headers = { ...t3.headers || {}, ...i2 }, s2.call(e2, t3);
     };
   }
-  function tt() {
+  function st() {
     const e2 = Math.random().toString(16).slice(2);
-    return { data: { seqId: e2 }, headers: { ...Ze, "x-seqid": e2 } };
+    return { data: { seqId: e2 }, headers: { ...tt, "x-seqid": e2 } };
   }
-  class nt {
+  class rt {
     constructor(e2 = {}) {
       var t2;
-      this.config = e2, this._reqClass = new Ee.adapter.reqClass({ timeout: this.config.timeout, timeoutMsg: "请求在".concat(this.config.timeout / 1e3, "s内未完成，已中断"), restrictedMethods: ["post"] }), this._cache = Me(this.config.env), this._localCache = (t2 = this.config.env, De[t2]), this.oauth = new Ye(this.config), et(this._reqClass, "post", [tt]), et(this._reqClass, "upload", [tt]), et(this._reqClass, "download", [tt]);
+      this.config = e2, this._reqClass = new Le.adapter.reqClass({ timeout: this.config.timeout, timeoutMsg: "请求在".concat(this.config.timeout / 1e3, "s内未完成，已中断"), restrictedMethods: ["post"] }), this._cache = qe(this.config.env), this._localCache = (t2 = this.config.env, Fe[t2]), this.oauth = new Ze(this.config), nt(this._reqClass, "post", [st]), nt(this._reqClass, "upload", [st]), nt(this._reqClass, "download", [st]);
     }
     async post(e2) {
       return await this._reqClass.post(e2);
@@ -27640,27 +25322,27 @@
       this._cache.removeStore(e2), this._cache.removeStore(t2);
       let i2 = this._cache.getStore(n2);
       if (!i2)
-        throw new se({ message: "未登录CloudBase" });
+        throw new ie({ message: "未登录CloudBase" });
       const o2 = { refresh_token: i2 }, a2 = await this.request("auth.fetchAccessTokenWithRefreshToken", o2);
       if (a2.data.code) {
         const { code: e3 } = a2.data;
         if ("SIGN_PARAM_INVALID" === e3 || "REFRESH_TOKEN_EXPIRED" === e3 || "INVALID_REFRESH_TOKEN" === e3) {
-          if (this._cache.getStore(s2) === Ge.ANONYMOUS && "INVALID_REFRESH_TOKEN" === e3) {
+          if (this._cache.getStore(s2) === Ye.ANONYMOUS && "INVALID_REFRESH_TOKEN" === e3) {
             const e4 = this._cache.getStore(r2), t3 = this._cache.getStore(n2), s3 = await this.send("auth.signInAnonymously", { anonymous_uuid: e4, refresh_token: t3 });
             return this.setRefreshToken(s3.refresh_token), this._refreshAccessToken();
           }
-          $e(He), this._cache.removeStore(n2);
+          He(ze), this._cache.removeStore(n2);
         }
-        throw new se({ code: a2.data.code, message: "刷新access token失败：".concat(a2.data.code) });
+        throw new ie({ code: a2.data.code, message: "刷新access token失败：".concat(a2.data.code) });
       }
       if (a2.data.access_token)
-        return $e(Ve), this._cache.setStore(e2, a2.data.access_token), this._cache.setStore(t2, a2.data.access_token_expire + Date.now()), { accessToken: a2.data.access_token, accessTokenExpire: a2.data.access_token_expire };
+        return He(Qe), this._cache.setStore(e2, a2.data.access_token), this._cache.setStore(t2, a2.data.access_token_expire + Date.now()), { accessToken: a2.data.access_token, accessTokenExpire: a2.data.access_token_expire };
       a2.data.refresh_token && (this._cache.removeStore(n2), this._cache.setStore(n2, a2.data.refresh_token), this._refreshAccessToken());
     }
     async getAccessToken() {
       const { accessTokenKey: e2, accessTokenExpireKey: t2, refreshTokenKey: n2 } = this._cache.keys;
       if (!this._cache.getStore(n2))
-        throw new se({ message: "refresh token不存在，登录状态异常" });
+        throw new ie({ message: "refresh token不存在，登录状态异常" });
       let s2 = this._cache.getStore(e2), r2 = this._cache.getStore(t2), i2 = true;
       return this._shouldRefreshAccessTokenHook && !await this._shouldRefreshAccessTokenHook(s2, r2) && (i2 = false), (!s2 || !r2 || r2 < Date.now()) && i2 ? this.refreshAccessToken() : { accessToken: s2, accessTokenExpire: r2 };
     }
@@ -27669,7 +25351,7 @@
       let r2 = "application/x-www-form-urlencoded";
       const i2 = { action: e2, env: this.config.env, dataVersion: "2019-08-16", ...t2 };
       let o2;
-      if (-1 === Xe.indexOf(e2) && (this._cache.keys, i2.access_token = await this.oauth.getAccessToken()), "storage.uploadFile" === e2) {
+      if (-1 === et.indexOf(e2) && (this._cache.keys, i2.access_token = await this.oauth.getAccessToken()), "storage.uploadFile" === e2) {
         o2 = new FormData();
         for (let e3 in o2)
           o2.hasOwnProperty(e3) && void 0 !== o2[e3] && o2.append(e3, i2[e3]);
@@ -27683,33 +25365,33 @@
       n2 && n2.timeout && (a2.timeout = n2.timeout), n2 && n2.onUploadProgress && (a2.onUploadProgress = n2.onUploadProgress);
       const c2 = this._localCache.getStore(s2);
       c2 && (a2.headers["X-TCB-Trace"] = c2);
-      const { parse: u2, inQuery: h2, search: l2 } = t2;
-      let d2 = { env: this.config.env };
-      u2 && (d2.parse = true), h2 && (d2 = { ...h2, ...d2 });
+      const { parse: u2, inQuery: l2, search: d2 } = t2;
+      let h2 = { env: this.config.env };
+      u2 && (h2.parse = true), l2 && (h2 = { ...l2, ...h2 });
       let p2 = function(e3, t3, n3 = {}) {
         const s3 = /\?/.test(t3);
         let r3 = "";
         for (let e4 in n3)
           "" === r3 ? !s3 && (t3 += "?") : r3 += "&", r3 += "".concat(e4, "=").concat(encodeURIComponent(n3[e4]));
         return /^http(s)?\:\/\//.test(t3 += r3) ? t3 : "".concat(e3).concat(t3);
-      }(ye, "//tcb-api.tencentcloudapi.com/web", d2);
-      l2 && (p2 += l2);
+      }(we, "//tcb-api.tencentcloudapi.com/web", h2);
+      d2 && (p2 += d2);
       const f2 = await this.post({ url: p2, data: o2, ...a2 }), g2 = f2.header && f2.header["x-tcb-trace"];
       if (g2 && this._localCache.setStore(s2, g2), 200 !== Number(f2.status) && 200 !== Number(f2.statusCode) || !f2.data)
-        throw new se({ code: "NETWORK_ERROR", message: "network request error" });
+        throw new ie({ code: "NETWORK_ERROR", message: "network request error" });
       return f2;
     }
     async send(e2, t2 = {}, n2 = {}) {
       const s2 = await this.request(e2, t2, { ...n2, onUploadProgress: t2.onUploadProgress });
-      if (("ACCESS_TOKEN_DISABLED" === s2.data.code || "ACCESS_TOKEN_EXPIRED" === s2.data.code) && -1 === Xe.indexOf(e2)) {
+      if (("ACCESS_TOKEN_DISABLED" === s2.data.code || "ACCESS_TOKEN_EXPIRED" === s2.data.code) && -1 === et.indexOf(e2)) {
         await this.oauth.refreshAccessToken();
         const s3 = await this.request(e2, t2, { ...n2, onUploadProgress: t2.onUploadProgress });
         if (s3.data.code)
-          throw new se({ code: s3.data.code, message: Te(s3.data.message) });
+          throw new ie({ code: s3.data.code, message: Pe(s3.data.message) });
         return s3.data;
       }
       if (s2.data.code)
-        throw new se({ code: s2.data.code, message: Te(s2.data.message) });
+        throw new ie({ code: s2.data.code, message: Pe(s2.data.message) });
       return s2.data;
     }
     setRefreshToken(e2) {
@@ -27717,13 +25399,13 @@
       this._cache.removeStore(t2), this._cache.removeStore(n2), this._cache.setStore(s2, e2);
     }
   }
-  const st = {};
-  function rt(e2) {
-    return st[e2];
+  const it = {};
+  function ot(e2) {
+    return it[e2];
   }
-  class it {
+  class at {
     constructor(e2) {
-      this.config = e2, this._cache = Me(e2.env), this._request = rt(e2.env);
+      this.config = e2, this._cache = qe(e2.env), this._request = ot(e2.env);
     }
     setRefreshToken(e2) {
       const { accessTokenKey: t2, accessTokenExpireKey: n2, refreshTokenKey: s2 } = this._cache.keys;
@@ -27742,15 +25424,15 @@
       this._cache.setStore(t2, e2);
     }
   }
-  class ot {
+  class ct {
     constructor(e2) {
       if (!e2)
-        throw new se({ code: "PARAM_ERROR", message: "envId is not defined" });
-      this._envId = e2, this._cache = Me(this._envId), this._request = rt(this._envId), this.setUserInfo();
+        throw new ie({ code: "PARAM_ERROR", message: "envId is not defined" });
+      this._envId = e2, this._cache = qe(this._envId), this._request = ot(this._envId), this.setUserInfo();
     }
     linkWithTicket(e2) {
       if ("string" != typeof e2)
-        throw new se({ code: "PARAM_ERROR", message: "ticket must be string" });
+        throw new ie({ code: "PARAM_ERROR", message: "ticket must be string" });
       return this._request.send("auth.linkWithTicket", { ticket: e2 });
     }
     linkWithRedirect(e2) {
@@ -27764,7 +25446,7 @@
     }
     updateUsername(e2) {
       if ("string" != typeof e2)
-        throw new se({ code: "PARAM_ERROR", message: "username must be a string" });
+        throw new ie({ code: "PARAM_ERROR", message: "username must be a string" });
       return this._request.send("auth.updateUsername", { username: e2 });
     }
     async getLinkedUidList() {
@@ -27800,65 +25482,65 @@
       this._cache.setStore(t2, e2), this.setUserInfo();
     }
   }
-  class at {
+  class ut {
     constructor(e2) {
       if (!e2)
-        throw new se({ code: "PARAM_ERROR", message: "envId is not defined" });
-      this._cache = Me(e2);
+        throw new ie({ code: "PARAM_ERROR", message: "envId is not defined" });
+      this._cache = qe(e2);
       const { refreshTokenKey: t2, accessTokenKey: n2, accessTokenExpireKey: s2 } = this._cache.keys, r2 = this._cache.getStore(t2), i2 = this._cache.getStore(n2), o2 = this._cache.getStore(s2);
-      this.credential = { refreshToken: r2, accessToken: i2, accessTokenExpire: o2 }, this.user = new ot(e2);
+      this.credential = { refreshToken: r2, accessToken: i2, accessTokenExpire: o2 }, this.user = new ct(e2);
     }
     get isAnonymousAuth() {
-      return this.loginType === Ge.ANONYMOUS;
+      return this.loginType === Ye.ANONYMOUS;
     }
     get isCustomAuth() {
-      return this.loginType === Ge.CUSTOM;
+      return this.loginType === Ye.CUSTOM;
     }
     get isWeixinAuth() {
-      return this.loginType === Ge.WECHAT || this.loginType === Ge.WECHAT_OPEN || this.loginType === Ge.WECHAT_PUBLIC;
+      return this.loginType === Ye.WECHAT || this.loginType === Ye.WECHAT_OPEN || this.loginType === Ye.WECHAT_PUBLIC;
     }
     get loginType() {
       return this._cache.getStore(this._cache.keys.loginTypeKey);
     }
   }
-  class ct extends it {
+  class lt extends at {
     async signIn() {
-      this._cache.updatePersistence("local"), await this._request.oauth.getAccessToken(), $e(We), $e(Je, { env: this.config.env, loginType: Ge.ANONYMOUS, persistence: "local" });
-      const e2 = new at(this.config.env);
+      this._cache.updatePersistence("local"), await this._request.oauth.getAccessToken(), He(Je), He(Ve, { env: this.config.env, loginType: Ye.ANONYMOUS, persistence: "local" });
+      const e2 = new ut(this.config.env);
       return await e2.user.refresh(), e2;
     }
     async linkAndRetrieveDataWithTicket(e2) {
       const { anonymousUuidKey: t2, refreshTokenKey: n2 } = this._cache.keys, s2 = this._cache.getStore(t2), r2 = this._cache.getStore(n2), i2 = await this._request.send("auth.linkAndRetrieveDataWithTicket", { anonymous_uuid: s2, refresh_token: r2, ticket: e2 });
       if (i2.refresh_token)
-        return this._clearAnonymousUUID(), this.setRefreshToken(i2.refresh_token), await this._request.refreshAccessToken(), $e(ze, { env: this.config.env }), $e(Je, { loginType: Ge.CUSTOM, persistence: "local" }), { credential: { refreshToken: i2.refresh_token } };
-      throw new se({ message: "匿名转化失败" });
+        return this._clearAnonymousUUID(), this.setRefreshToken(i2.refresh_token), await this._request.refreshAccessToken(), He(Ge, { env: this.config.env }), He(Ve, { loginType: Ye.CUSTOM, persistence: "local" }), { credential: { refreshToken: i2.refresh_token } };
+      throw new ie({ message: "匿名转化失败" });
     }
     _setAnonymousUUID(e2) {
       const { anonymousUuidKey: t2, loginTypeKey: n2 } = this._cache.keys;
-      this._cache.removeStore(t2), this._cache.setStore(t2, e2), this._cache.setStore(n2, Ge.ANONYMOUS);
+      this._cache.removeStore(t2), this._cache.setStore(t2, e2), this._cache.setStore(n2, Ye.ANONYMOUS);
     }
     _clearAnonymousUUID() {
       this._cache.removeStore(this._cache.keys.anonymousUuidKey);
     }
   }
-  class ut extends it {
+  class dt extends at {
     async signIn(e2) {
       if ("string" != typeof e2)
-        throw new se({ code: "PARAM_ERROR", message: "ticket must be a string" });
+        throw new ie({ code: "PARAM_ERROR", message: "ticket must be a string" });
       const { refreshTokenKey: t2 } = this._cache.keys, n2 = await this._request.send("auth.signInWithTicket", { ticket: e2, refresh_token: this._cache.getStore(t2) || "" });
       if (n2.refresh_token)
-        return this.setRefreshToken(n2.refresh_token), await this._request.refreshAccessToken(), $e(We), $e(Je, { env: this.config.env, loginType: Ge.CUSTOM, persistence: this.config.persistence }), await this.refreshUserInfo(), new at(this.config.env);
-      throw new se({ message: "自定义登录失败" });
+        return this.setRefreshToken(n2.refresh_token), await this._request.refreshAccessToken(), He(Je), He(Ve, { env: this.config.env, loginType: Ye.CUSTOM, persistence: this.config.persistence }), await this.refreshUserInfo(), new ut(this.config.env);
+      throw new ie({ message: "自定义登录失败" });
     }
   }
-  class ht extends it {
+  class ht extends at {
     async signIn(e2, t2) {
       if ("string" != typeof e2)
-        throw new se({ code: "PARAM_ERROR", message: "email must be a string" });
+        throw new ie({ code: "PARAM_ERROR", message: "email must be a string" });
       const { refreshTokenKey: n2 } = this._cache.keys, s2 = await this._request.send("auth.signIn", { loginType: "EMAIL", email: e2, password: t2, refresh_token: this._cache.getStore(n2) || "" }), { refresh_token: r2, access_token: i2, access_token_expire: o2 } = s2;
       if (r2)
-        return this.setRefreshToken(r2), i2 && o2 ? this.setAccessToken(i2, o2) : await this._request.refreshAccessToken(), await this.refreshUserInfo(), $e(We), $e(Je, { env: this.config.env, loginType: Ge.EMAIL, persistence: this.config.persistence }), new at(this.config.env);
-      throw s2.code ? new se({ code: s2.code, message: "邮箱登录失败: ".concat(s2.message) }) : new se({ message: "邮箱登录失败" });
+        return this.setRefreshToken(r2), i2 && o2 ? this.setAccessToken(i2, o2) : await this._request.refreshAccessToken(), await this.refreshUserInfo(), He(Je), He(Ve, { env: this.config.env, loginType: Ye.EMAIL, persistence: this.config.persistence }), new ut(this.config.env);
+      throw s2.code ? new ie({ code: s2.code, message: "邮箱登录失败: ".concat(s2.message) }) : new ie({ message: "邮箱登录失败" });
     }
     async activate(e2) {
       return this._request.send("auth.activateEndUserMail", { token: e2 });
@@ -27867,20 +25549,20 @@
       return this._request.send("auth.resetPasswordWithToken", { token: e2, newPassword: t2 });
     }
   }
-  class lt extends it {
+  class pt extends at {
     async signIn(e2, t2) {
       if ("string" != typeof e2)
-        throw new se({ code: "PARAM_ERROR", message: "username must be a string" });
+        throw new ie({ code: "PARAM_ERROR", message: "username must be a string" });
       "string" != typeof t2 && (t2 = "", console.warn("password is empty"));
-      const { refreshTokenKey: n2 } = this._cache.keys, s2 = await this._request.send("auth.signIn", { loginType: Ge.USERNAME, username: e2, password: t2, refresh_token: this._cache.getStore(n2) || "" }), { refresh_token: r2, access_token_expire: i2, access_token: o2 } = s2;
+      const { refreshTokenKey: n2 } = this._cache.keys, s2 = await this._request.send("auth.signIn", { loginType: Ye.USERNAME, username: e2, password: t2, refresh_token: this._cache.getStore(n2) || "" }), { refresh_token: r2, access_token_expire: i2, access_token: o2 } = s2;
       if (r2)
-        return this.setRefreshToken(r2), o2 && i2 ? this.setAccessToken(o2, i2) : await this._request.refreshAccessToken(), await this.refreshUserInfo(), $e(We), $e(Je, { env: this.config.env, loginType: Ge.USERNAME, persistence: this.config.persistence }), new at(this.config.env);
-      throw s2.code ? new se({ code: s2.code, message: "用户名密码登录失败: ".concat(s2.message) }) : new se({ message: "用户名密码登录失败" });
+        return this.setRefreshToken(r2), o2 && i2 ? this.setAccessToken(o2, i2) : await this._request.refreshAccessToken(), await this.refreshUserInfo(), He(Je), He(Ve, { env: this.config.env, loginType: Ye.USERNAME, persistence: this.config.persistence }), new ut(this.config.env);
+      throw s2.code ? new ie({ code: s2.code, message: "用户名密码登录失败: ".concat(s2.message) }) : new ie({ message: "用户名密码登录失败" });
     }
   }
-  class dt {
+  class ft {
     constructor(e2) {
-      this.config = e2, this._cache = Me(e2.env), this._request = rt(e2.env), this._onAnonymousConverted = this._onAnonymousConverted.bind(this), this._onLoginTypeChanged = this._onLoginTypeChanged.bind(this), je(Je, this._onLoginTypeChanged);
+      this.config = e2, this._cache = qe(e2.env), this._request = ot(e2.env), this._onAnonymousConverted = this._onAnonymousConverted.bind(this), this._onLoginTypeChanged = this._onLoginTypeChanged.bind(this), $e(Ve, this._onLoginTypeChanged);
     }
     get currentUser() {
       const e2 = this.hasLoginState();
@@ -27890,38 +25572,38 @@
       return this._cache.getStore(this._cache.keys.loginTypeKey);
     }
     anonymousAuthProvider() {
-      return new ct(this.config);
+      return new lt(this.config);
     }
     customAuthProvider() {
-      return new ut(this.config);
+      return new dt(this.config);
     }
     emailAuthProvider() {
       return new ht(this.config);
     }
     usernameAuthProvider() {
-      return new lt(this.config);
+      return new pt(this.config);
     }
     async signInAnonymously() {
-      return new ct(this.config).signIn();
+      return new lt(this.config).signIn();
     }
     async signInWithEmailAndPassword(e2, t2) {
       return new ht(this.config).signIn(e2, t2);
     }
     signInWithUsernameAndPassword(e2, t2) {
-      return new lt(this.config).signIn(e2, t2);
+      return new pt(this.config).signIn(e2, t2);
     }
     async linkAndRetrieveDataWithTicket(e2) {
-      this._anonymousAuthProvider || (this._anonymousAuthProvider = new ct(this.config)), je(ze, this._onAnonymousConverted);
+      this._anonymousAuthProvider || (this._anonymousAuthProvider = new lt(this.config)), $e(Ge, this._onAnonymousConverted);
       return await this._anonymousAuthProvider.linkAndRetrieveDataWithTicket(e2);
     }
     async signOut() {
-      if (this.loginType === Ge.ANONYMOUS)
-        throw new se({ message: "匿名用户不支持登出操作" });
+      if (this.loginType === Ye.ANONYMOUS)
+        throw new ie({ message: "匿名用户不支持登出操作" });
       const { refreshTokenKey: e2, accessTokenKey: t2, accessTokenExpireKey: n2 } = this._cache.keys, s2 = this._cache.getStore(e2);
       if (!s2)
         return;
       const r2 = await this._request.send("auth.logout", { refresh_token: s2 });
-      return this._cache.removeStore(e2), this._cache.removeStore(t2), this._cache.removeStore(n2), $e(We), $e(Je, { env: this.config.env, loginType: Ge.NULL, persistence: this.config.persistence }), r2;
+      return this._cache.removeStore(e2), this._cache.removeStore(t2), this._cache.removeStore(n2), He(Je), He(Ve, { env: this.config.env, loginType: Ye.NULL, persistence: this.config.persistence }), r2;
     }
     async signUpWithEmailAndPassword(e2, t2) {
       return this._request.send("auth.signUpWithEmailAndPassword", { email: e2, password: t2 });
@@ -27930,7 +25612,7 @@
       return this._request.send("auth.sendPasswordResetEmail", { email: e2 });
     }
     onLoginStateChanged(e2) {
-      je(We, () => {
+      $e(Je, () => {
         const t3 = this.hasLoginState();
         e2.call(this, t3);
       });
@@ -27938,16 +25620,16 @@
       e2.call(this, t2);
     }
     onLoginStateExpired(e2) {
-      je(He, e2.bind(this));
+      $e(ze, e2.bind(this));
     }
     onAccessTokenRefreshed(e2) {
-      je(Ve, e2.bind(this));
+      $e(Qe, e2.bind(this));
     }
     onAnonymousConverted(e2) {
-      je(ze, e2.bind(this));
+      $e(Ge, e2.bind(this));
     }
     onLoginTypeChanged(e2) {
-      je(Je, () => {
+      $e(Ve, () => {
         const t2 = this.hasLoginState();
         e2.call(this, t2);
       });
@@ -27957,11 +25639,11 @@
     }
     hasLoginState() {
       const { accessTokenKey: e2, accessTokenExpireKey: t2 } = this._cache.keys, n2 = this._cache.getStore(e2), s2 = this._cache.getStore(t2);
-      return this._request.oauth.isAccessTokenExpired(n2, s2) ? null : new at(this.config.env);
+      return this._request.oauth.isAccessTokenExpired(n2, s2) ? null : new ut(this.config.env);
     }
     async isUsernameRegistered(e2) {
       if ("string" != typeof e2)
-        throw new se({ code: "PARAM_ERROR", message: "username must be a string" });
+        throw new ie({ code: "PARAM_ERROR", message: "username must be a string" });
       const { data: t2 } = await this._request.send("auth.isUsernameRegistered", { username: e2 });
       return t2 && t2.isRegistered;
     }
@@ -27969,7 +25651,7 @@
       return Promise.resolve(this.hasLoginState());
     }
     async signInWithTicket(e2) {
-      return new ut(this.config).signIn(e2);
+      return new dt(this.config).signIn(e2);
     }
     shouldRefreshAccessToken(e2) {
       this._request._shouldRefreshAccessTokenHook = e2.bind(this);
@@ -27990,63 +25672,63 @@
       s2 === this.config.env && (this._cache.updatePersistence(n2), this._cache.setStore(this._cache.keys.loginTypeKey, t2));
     }
   }
-  const pt = function(e2, t2) {
-    t2 = t2 || be();
-    const n2 = rt(this.config.env), { cloudPath: s2, filePath: r2, onUploadProgress: i2, fileType: o2 = "image" } = e2;
+  const gt = function(e2, t2) {
+    t2 = t2 || Ce();
+    const n2 = ot(this.config.env), { cloudPath: s2, filePath: r2, onUploadProgress: i2, fileType: o2 = "image" } = e2;
     return n2.send("storage.getUploadMetadata", { path: s2 }).then((e3) => {
-      const { data: { url: a2, authorization: c2, token: u2, fileId: h2, cosFileId: l2 }, requestId: d2 } = e3, p2 = { key: s2, signature: c2, "x-cos-meta-fileid": l2, success_action_status: "201", "x-cos-security-token": u2 };
+      const { data: { url: a2, authorization: c2, token: u2, fileId: l2, cosFileId: d2 }, requestId: h2 } = e3, p2 = { key: s2, signature: c2, "x-cos-meta-fileid": d2, success_action_status: "201", "x-cos-security-token": u2 };
       n2.upload({ url: a2, data: p2, file: r2, name: s2, fileType: o2, onUploadProgress: i2 }).then((e4) => {
-        201 === e4.statusCode ? t2(null, { fileID: h2, requestId: d2 }) : t2(new se({ code: "STORAGE_REQUEST_FAIL", message: "STORAGE_REQUEST_FAIL: ".concat(e4.data) }));
+        201 === e4.statusCode ? t2(null, { fileID: l2, requestId: h2 }) : t2(new ie({ code: "STORAGE_REQUEST_FAIL", message: "STORAGE_REQUEST_FAIL: ".concat(e4.data) }));
       }).catch((e4) => {
         t2(e4);
       });
     }).catch((e3) => {
       t2(e3);
     }), t2.promise;
-  }, ft = function(e2, t2) {
-    t2 = t2 || be();
-    const n2 = rt(this.config.env), { cloudPath: s2 } = e2;
+  }, mt = function(e2, t2) {
+    t2 = t2 || Ce();
+    const n2 = ot(this.config.env), { cloudPath: s2 } = e2;
     return n2.send("storage.getUploadMetadata", { path: s2 }).then((e3) => {
       t2(null, e3);
     }).catch((e3) => {
       t2(e3);
     }), t2.promise;
-  }, gt = function({ fileList: e2 }, t2) {
-    if (t2 = t2 || be(), !e2 || !Array.isArray(e2))
+  }, yt = function({ fileList: e2 }, t2) {
+    if (t2 = t2 || Ce(), !e2 || !Array.isArray(e2))
       return { code: "INVALID_PARAM", message: "fileList必须是非空的数组" };
     for (let t3 of e2)
       if (!t3 || "string" != typeof t3)
         return { code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" };
     const n2 = { fileid_list: e2 };
-    return rt(this.config.env).send("storage.batchDeleteFile", n2).then((e3) => {
+    return ot(this.config.env).send("storage.batchDeleteFile", n2).then((e3) => {
       e3.code ? t2(null, e3) : t2(null, { fileList: e3.data.delete_list, requestId: e3.requestId });
     }).catch((e3) => {
       t2(e3);
     }), t2.promise;
-  }, mt = function({ fileList: e2 }, t2) {
-    t2 = t2 || be(), e2 && Array.isArray(e2) || t2(null, { code: "INVALID_PARAM", message: "fileList必须是非空的数组" });
+  }, _t = function({ fileList: e2 }, t2) {
+    t2 = t2 || Ce(), e2 && Array.isArray(e2) || t2(null, { code: "INVALID_PARAM", message: "fileList必须是非空的数组" });
     let n2 = [];
     for (let s3 of e2)
       "object" == typeof s3 ? (s3.hasOwnProperty("fileID") && s3.hasOwnProperty("maxAge") || t2(null, { code: "INVALID_PARAM", message: "fileList的元素必须是包含fileID和maxAge的对象" }), n2.push({ fileid: s3.fileID, max_age: s3.maxAge })) : "string" == typeof s3 ? n2.push({ fileid: s3 }) : t2(null, { code: "INVALID_PARAM", message: "fileList的元素必须是字符串" });
     const s2 = { file_list: n2 };
-    return rt(this.config.env).send("storage.batchGetDownloadUrl", s2).then((e3) => {
+    return ot(this.config.env).send("storage.batchGetDownloadUrl", s2).then((e3) => {
       e3.code ? t2(null, e3) : t2(null, { fileList: e3.data.download_list, requestId: e3.requestId });
     }).catch((e3) => {
       t2(e3);
     }), t2.promise;
-  }, yt = async function({ fileID: e2 }, t2) {
-    const n2 = (await mt.call(this, { fileList: [{ fileID: e2, maxAge: 600 }] })).fileList[0];
+  }, wt = async function({ fileID: e2 }, t2) {
+    const n2 = (await _t.call(this, { fileList: [{ fileID: e2, maxAge: 600 }] })).fileList[0];
     if ("SUCCESS" !== n2.code)
       return t2 ? t2(n2) : new Promise((e3) => {
         e3(n2);
       });
-    const s2 = rt(this.config.env);
+    const s2 = ot(this.config.env);
     let r2 = n2.download_url;
     if (r2 = encodeURI(r2), !t2)
       return s2.download({ url: r2 });
     t2(await s2.download({ url: r2 }));
-  }, _t = function({ name: e2, data: t2, query: n2, parse: s2, search: r2, timeout: i2 }, o2) {
-    const a2 = o2 || be();
+  }, vt = function({ name: e2, data: t2, query: n2, parse: s2, search: r2, timeout: i2 }, o2) {
+    const a2 = o2 || Ce();
     let c2;
     try {
       c2 = t2 ? JSON.stringify(t2) : "";
@@ -28054,9 +25736,9 @@
       return Promise.reject(e3);
     }
     if (!e2)
-      return Promise.reject(new se({ code: "PARAM_ERROR", message: "函数名不能为空" }));
+      return Promise.reject(new ie({ code: "PARAM_ERROR", message: "函数名不能为空" }));
     const u2 = { inQuery: n2, parse: s2, search: r2, function_name: e2, request_data: c2 };
-    return rt(this.config.env).send("functions.invokeFunction", u2, { timeout: i2 }).then((e3) => {
+    return ot(this.config.env).send("functions.invokeFunction", u2, { timeout: i2 }).then((e3) => {
       if (e3.code)
         a2(null, e3);
       else {
@@ -28067,89 +25749,89 @@
           try {
             t3 = JSON.parse(e3.data.response_data), a2(null, { result: t3, requestId: e3.requestId });
           } catch (e4) {
-            a2(new se({ message: "response data must be json" }));
+            a2(new ie({ message: "response data must be json" }));
           }
       }
       return a2.promise;
     }).catch((e3) => {
       a2(e3);
     }), a2.promise;
-  }, wt = { timeout: 15e3, persistence: "session" }, vt = {};
-  class It {
+  }, It = { timeout: 15e3, persistence: "session" }, St = {};
+  class kt {
     constructor(e2) {
       this.config = e2 || this.config, this.authObj = void 0;
     }
     init(e2) {
-      switch (Ee.adapter || (this.requestClient = new Ee.adapter.reqClass({ timeout: e2.timeout || 5e3, timeoutMsg: "请求在".concat((e2.timeout || 5e3) / 1e3, "s内未完成，已中断") })), this.config = { ...wt, ...e2 }, true) {
+      switch (Le.adapter || (this.requestClient = new Le.adapter.reqClass({ timeout: e2.timeout || 5e3, timeoutMsg: "请求在".concat((e2.timeout || 5e3) / 1e3, "s内未完成，已中断") })), this.config = { ...It, ...e2 }, true) {
         case this.config.timeout > 6e5:
           console.warn("timeout大于可配置上限[10分钟]，已重置为上限数值"), this.config.timeout = 6e5;
           break;
         case this.config.timeout < 100:
           console.warn("timeout小于可配置下限[100ms]，已重置为下限数值"), this.config.timeout = 100;
       }
-      return new It(this.config);
+      return new kt(this.config);
     }
     auth({ persistence: e2 } = {}) {
       if (this.authObj)
         return this.authObj;
-      const t2 = e2 || Ee.adapter.primaryStorage || wt.persistence;
+      const t2 = e2 || Le.adapter.primaryStorage || It.persistence;
       var n2;
       return t2 !== this.config.persistence && (this.config.persistence = t2), function(e3) {
         const { env: t3 } = e3;
-        Ne[t3] = new Ue(e3), De[t3] = new Ue({ ...e3, persistence: "local" });
-      }(this.config), n2 = this.config, st[n2.env] = new nt(n2), this.authObj = new dt(this.config), this.authObj;
+        Me[t3] = new De(e3), Fe[t3] = new De({ ...e3, persistence: "local" });
+      }(this.config), n2 = this.config, it[n2.env] = new rt(n2), this.authObj = new ft(this.config), this.authObj;
     }
     on(e2, t2) {
-      return je.apply(this, [e2, t2]);
+      return $e.apply(this, [e2, t2]);
     }
     off(e2, t2) {
-      return Be.apply(this, [e2, t2]);
+      return We.apply(this, [e2, t2]);
     }
     callFunction(e2, t2) {
-      return _t.apply(this, [e2, t2]);
+      return vt.apply(this, [e2, t2]);
     }
     deleteFile(e2, t2) {
-      return gt.apply(this, [e2, t2]);
-    }
-    getTempFileURL(e2, t2) {
-      return mt.apply(this, [e2, t2]);
-    }
-    downloadFile(e2, t2) {
       return yt.apply(this, [e2, t2]);
     }
+    getTempFileURL(e2, t2) {
+      return _t.apply(this, [e2, t2]);
+    }
+    downloadFile(e2, t2) {
+      return wt.apply(this, [e2, t2]);
+    }
     uploadFile(e2, t2) {
-      return pt.apply(this, [e2, t2]);
+      return gt.apply(this, [e2, t2]);
     }
     getUploadMetadata(e2, t2) {
-      return ft.apply(this, [e2, t2]);
+      return mt.apply(this, [e2, t2]);
     }
     registerExtension(e2) {
-      vt[e2.name] = e2;
+      St[e2.name] = e2;
     }
     async invokeExtension(e2, t2) {
-      const n2 = vt[e2];
+      const n2 = St[e2];
       if (!n2)
-        throw new se({ message: "扩展".concat(e2, " 必须先注册") });
+        throw new ie({ message: "扩展".concat(e2, " 必须先注册") });
       return await n2.invoke(t2, this);
     }
     useAdapters(e2) {
-      const { adapter: t2, runtime: n2 } = Oe(e2) || {};
-      t2 && (Ee.adapter = t2), n2 && (Ee.runtime = n2);
+      const { adapter: t2, runtime: n2 } = Ee(e2) || {};
+      t2 && (Le.adapter = t2), n2 && (Le.runtime = n2);
     }
   }
-  var St = new It();
-  function bt(e2, t2, n2) {
+  var At = new kt();
+  function Ct(e2, t2, n2) {
     void 0 === n2 && (n2 = {});
     var s2 = /\?/.test(t2), r2 = "";
     for (var i2 in n2)
       "" === r2 ? !s2 && (t2 += "?") : r2 += "&", r2 += i2 + "=" + encodeURIComponent(n2[i2]);
     return /^http(s)?:\/\//.test(t2 += r2) ? t2 : "" + e2 + t2;
   }
-  class kt {
+  class Tt {
     get(e2) {
       const { url: t2, data: n2, headers: s2, timeout: r2 } = e2;
       return new Promise((e3, i2) => {
-        re.request({ url: bt("https:", t2), data: n2, method: "GET", header: s2, timeout: r2, success(t3) {
+        oe.request({ url: Ct("https:", t2), data: n2, method: "GET", header: s2, timeout: r2, success(t3) {
           e3(t3);
         }, fail(e4) {
           i2(e4);
@@ -28159,7 +25841,7 @@
     post(e2) {
       const { url: t2, data: n2, headers: s2, timeout: r2 } = e2;
       return new Promise((e3, i2) => {
-        re.request({ url: bt("https:", t2), data: n2, method: "POST", header: s2, timeout: r2, success(t3) {
+        oe.request({ url: Ct("https:", t2), data: n2, method: "POST", header: s2, timeout: r2, success(t3) {
           e3(t3);
         }, fail(e4) {
           i2(e4);
@@ -28168,7 +25850,7 @@
     }
     upload(e2) {
       return new Promise((t2, n2) => {
-        const { url: s2, file: r2, data: i2, headers: o2, fileType: a2 } = e2, c2 = re.uploadFile({ url: bt("https:", s2), name: "file", formData: Object.assign({}, i2), filePath: r2, fileType: a2, header: o2, success(e3) {
+        const { url: s2, file: r2, data: i2, headers: o2, fileType: a2 } = e2, c2 = oe.uploadFile({ url: Ct("https:", s2), name: "file", formData: Object.assign({}, i2), filePath: r2, fileType: a2, header: o2, success(e3) {
           const n3 = { statusCode: e3.statusCode, data: e3.data || {} };
           200 === e3.statusCode && i2.success_action_status && (n3.statusCode = parseInt(i2.success_action_status, 10)), t2(n3);
         }, fail(e3) {
@@ -28180,23 +25862,23 @@
       });
     }
   }
-  const At = { setItem(e2, t2) {
-    re.setStorageSync(e2, t2);
-  }, getItem: (e2) => re.getStorageSync(e2), removeItem(e2) {
-    re.removeStorageSync(e2);
+  const bt = { setItem(e2, t2) {
+    oe.setStorageSync(e2, t2);
+  }, getItem: (e2) => oe.getStorageSync(e2), removeItem(e2) {
+    oe.removeStorageSync(e2);
   }, clear() {
-    re.clearStorageSync();
+    oe.clearStorageSync();
   } };
-  var Tt = { genAdapter: function() {
-    return { root: {}, reqClass: kt, localStorage: At, primaryStorage: "local" };
+  var Pt = { genAdapter: function() {
+    return { root: {}, reqClass: Tt, localStorage: bt, primaryStorage: "local" };
   }, isMatch: function() {
     return true;
   }, runtime: "uni_app" };
-  St.useAdapters(Tt);
-  const Ct = St, Pt = Ct.init;
-  Ct.init = function(e2) {
+  At.useAdapters(Pt);
+  const xt = At, Ot = xt.init;
+  xt.init = function(e2) {
     e2.env = e2.spaceId;
-    const t2 = Pt.call(this, e2);
+    const t2 = Ot.call(this, e2);
     t2.config.provider = "tencent", t2.config.spaceId = e2.spaceId;
     const n2 = t2.auth;
     return t2.auth = function(e3) {
@@ -28205,7 +25887,7 @@
         var n3;
         t3[e4] = (n3 = t3[e4], function(e5) {
           e5 = e5 || {};
-          const { success: t4, fail: s2, complete: r2 } = ne(e5);
+          const { success: t4, fail: s2, complete: r2 } = re(e5);
           if (!(t4 || s2 || r2))
             return n3.call(this, e5);
           n3.call(this, e5).then((e6) => {
@@ -28217,12 +25899,12 @@
       }), t3;
     }, t2.customAuth = t2.auth, t2;
   };
-  var Ot = Ct;
-  async function Et(e2, t2) {
+  var Et = xt;
+  async function Lt(e2, t2) {
     const n2 = "http://".concat(e2, ":").concat(t2, "/system/ping");
     try {
       const e3 = await (s2 = { url: n2, timeout: 500 }, new Promise((e4, t3) => {
-        re.request({ ...s2, success(t4) {
+        oe.request({ ...s2, success(t4) {
           e4(t4);
         }, fail(e5) {
           t3(e5);
@@ -28234,33 +25916,37 @@
     }
     var s2;
   }
-  async function xt(e2, t2) {
+  async function Rt(e2, t2) {
     let n2;
     for (let s2 = 0; s2 < e2.length; s2++) {
       const r2 = e2[s2];
-      if (await Et(r2, t2)) {
+      if (await Lt(r2, t2)) {
         n2 = r2;
         break;
       }
     }
     return { address: n2, port: t2 };
   }
-  const Lt = { "serverless.file.resource.generateProximalSign": "storage/generate-proximal-sign", "serverless.file.resource.report": "storage/report", "serverless.file.resource.delete": "storage/delete", "serverless.file.resource.getTempFileURL": "storage/get-temp-file-url", "system/check-storage": "system/check-storage" };
-  var Rt = class {
+  const Ut = { "serverless.file.resource.generateProximalSign": "storage/generate-proximal-sign", "serverless.file.resource.report": "storage/report", "serverless.file.resource.delete": "storage/delete", "serverless.file.resource.getTempFileURL": "storage/get-temp-file-url", "system/check-storage": "system/check-storage" };
+  var Nt = class {
     constructor(e2) {
-      if (["spaceId", "clientSecret"].forEach((t2) => {
+      ["spaceId", "clientSecret"].forEach((t2) => {
         if (!Object.prototype.hasOwnProperty.call(e2, t2))
           throw new Error("".concat(t2, " required"));
-      }), !e2.endpoint)
-        throw new Error("集群空间未配置ApiEndpoint，配置后需要重新关联服务空间后生效");
-      this.config = Object.assign({}, e2), this.config.provider = "dcloud", this.config.requestUrl = this.config.endpoint + "/client", this.config.envType = this.config.envType || "public", this.adapter = re;
+      }), this.config = Object.assign({}, e2), this.config.provider = "dcloud", this.config.requestUrl = this.config.endpoint + "/client", this.config.envType = this.config.envType || "public", this.adapter = oe;
     }
     async request(e2, t2 = true) {
       const n2 = t2;
-      return Promise.resolve().then(() => n2 ? this.requestLocal(e2) : fe.wrappedRequest(this.setupRequest(e2), this.adapter.request));
+      return Promise.resolve().then(() => {
+        if (n2)
+          return this.requestLocal(e2);
+        if (!this.config.endpoint)
+          throw new Error("集群空间未配置ApiEndpoint，配置后需要重新关联服务空间后生效");
+        return me.wrappedRequest(this.setupRequest(e2), this.adapter.request);
+      });
     }
     async requestLocal(e2) {
-      const t2 = await this.setupLocalRequest({ method: "system/check-storage", platform: A, provider: this.config.provider, spaceId: this.config.spaceId });
+      const t2 = await this.setupLocalRequest({ method: "system/check-storage", platform: b, provider: this.config.provider, spaceId: this.config.spaceId });
       return new Promise((e3) => {
         this.adapter.request(Object.assign({}, t2, { success: (t3) => {
           e3(t3);
@@ -28270,16 +25956,16 @@
       }).then(({ data: e3 } = {}) => {
         const { code: t3, message: n2 } = e3 || {};
         return { code: 0 === t3 ? 0 : t3 || "SYS_ERR", message: n2 || "SYS_ERR" };
-      }).then(({ code: t3, message: n2 }) => 0 !== t3 ? (console.error(t3, n2), fe.wrappedRequest(this.setupRequest(e2), this.adapter.request)) : new Promise((t4, n3) => {
+      }).then(({ code: t3, message: n2 }) => 0 !== t3 ? (console.error(t3, n2), me.wrappedRequest(this.setupRequest(e2), this.adapter.request)) : new Promise((t4, n3) => {
         this.setupLocalRequest(e2).then((e3) => {
           this.adapter.request(Object.assign(e3, { complete(e4) {
             if (e4 || (e4 = {}), !e4.statusCode || e4.statusCode >= 400) {
               const t5 = e4.data && e4.data.code || "SYS_ERR", s3 = e4.data && e4.data.message || "request:fail";
-              return n3(new se({ code: t5, message: s3 }));
+              return n3(new ie({ code: t5, message: s3 }));
             }
             const s2 = e4.data;
             if (s2.error)
-              return n3(new se({ code: s2.error.code, message: s2.error.message }));
+              return n3(new ie({ code: s2.error.code, message: s2.error.message }));
             t4({ success: true, result: s2 });
           } }));
         });
@@ -28287,15 +25973,15 @@
     }
     setupRequest(e2) {
       const t2 = Object.assign({}, e2, { spaceId: this.config.spaceId, timestamp: Date.now() }), n2 = { "Content-Type": "application/json" };
-      n2["x-serverless-sign"] = fe.sign(t2, this.config.clientSecret);
-      const s2 = pe();
+      n2["x-serverless-sign"] = me.sign(t2, this.config.clientSecret);
+      const s2 = ge();
       n2["x-client-info"] = encodeURIComponent(JSON.stringify(s2));
-      const { token: r2 } = oe();
+      const { token: r2 } = ce();
       return n2["x-client-token"] = r2, { url: this.config.requestUrl, method: "POST", data: t2, dataType: "json", header: JSON.parse(JSON.stringify(n2)) };
     }
     async setupLocalRequest(e2) {
-      const t2 = pe(), { token: n2 } = oe(), s2 = Object.assign({}, e2, { spaceId: this.config.spaceId, timestamp: Date.now(), clientInfo: t2, token: n2 }), { address: r2, servePort: i2 } = this.__dev__ && this.__dev__.debugInfo || {}, { address: o2 } = await xt(r2, i2);
-      return { url: "http://".concat(o2, ":").concat(i2, "/").concat(Lt[e2.method]), method: "POST", data: s2, dataType: "json", header: JSON.parse(JSON.stringify({ "Content-Type": "application/json" })) };
+      const t2 = ge(), { token: n2 } = ce(), s2 = Object.assign({}, e2, { spaceId: this.config.spaceId, timestamp: Date.now(), clientInfo: t2, token: n2 }), { address: r2, servePort: i2 } = this.__dev__ && this.__dev__.debugInfo || {}, { address: o2 } = await Rt(r2, i2);
+      return { url: "http://".concat(o2, ":").concat(i2, "/").concat(Ut[e2.method]), method: "POST", data: s2, dataType: "json", header: JSON.parse(JSON.stringify({ "Content-Type": "application/json" })) };
     }
     callFunction(e2) {
       const t2 = { method: "serverless.function.runtime.invoke", params: JSON.stringify({ functionTarget: e2.name, functionArgs: e2.data || {} }) };
@@ -28311,22 +25997,22 @@
     }
     uploadFile({ filePath: e2, cloudPath: t2, fileType: n2 = "image", onUploadProgress: s2 }) {
       if (!t2)
-        throw new se({ code: "CLOUDPATH_REQUIRED", message: "cloudPath不可为空" });
+        throw new ie({ code: "CLOUDPATH_REQUIRED", message: "cloudPath不可为空" });
       let r2;
       return this.getUploadFileOptions({ cloudPath: t2 }).then((t3) => {
         const { url: i2, formData: o2, name: a2 } = t3.result;
         return r2 = t3.result.fileUrl, new Promise((t4, r3) => {
           const c2 = this.adapter.uploadFile({ url: i2, formData: o2, name: a2, filePath: e2, fileType: n2, success(e3) {
-            e3 && e3.statusCode < 400 ? t4(e3) : r3(new se({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
+            e3 && e3.statusCode < 400 ? t4(e3) : r3(new ie({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
           }, fail(e3) {
-            r3(new se({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
+            r3(new ie({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
           } });
           "function" == typeof s2 && c2 && "function" == typeof c2.onProgressUpdate && c2.onProgressUpdate((e3) => {
             s2({ loaded: e3.totalBytesSent, total: e3.totalBytesExpectedToSend });
           });
         });
       }).then(() => this.reportUploadFile({ cloudPath: t2 })).then((t3) => new Promise((n3, s3) => {
-        t3.success ? n3({ success: true, filePath: e2, fileID: r2 }) : s3(new se({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
+        t3.success ? n3({ success: true, filePath: e2, fileID: r2 }) : s3(new ie({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
       }));
     }
     deleteFile({ fileList: e2 }) {
@@ -28334,22 +26020,22 @@
       return this.request(t2).then((e3) => {
         if (e3.success)
           return e3.result;
-        throw new se({ code: "DELETE_FILE_FAILED", message: "删除文件失败" });
+        throw new ie({ code: "DELETE_FILE_FAILED", message: "删除文件失败" });
       });
     }
     getTempFileURL({ fileList: e2, maxAge: t2 } = {}) {
       if (!Array.isArray(e2) || 0 === e2.length)
-        throw new se({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
+        throw new ie({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
       const n2 = { method: "serverless.file.resource.getTempFileURL", params: JSON.stringify({ fileList: e2, maxAge: t2 }) };
       return this.request(n2).then((e3) => {
         if (e3.success)
           return { fileList: e3.result.fileList.map((e4) => ({ fileID: e4.fileID, tempFileURL: e4.tempFileURL })) };
-        throw new se({ code: "GET_TEMP_FILE_URL_FAILED", message: "获取临时文件链接失败" });
+        throw new ie({ code: "GET_TEMP_FILE_URL_FAILED", message: "获取临时文件链接失败" });
       });
     }
   };
-  var Ut = { init(e2) {
-    const t2 = new Rt(e2), n2 = { signInAnonymously: function() {
+  var Dt = { init(e2) {
+    const t2 = new Nt(e2), n2 = { signInAnonymously: function() {
       return Promise.resolve();
     }, getLoginState: function() {
       return Promise.resolve(false);
@@ -28357,81 +26043,81 @@
     return t2.auth = function() {
       return n2;
     }, t2.customAuth = t2.auth, t2;
-  } }, Nt = n(function(e2, t2) {
-    e2.exports = r.enc.Hex;
+  } }, Mt = s(function(e2, t2) {
+    e2.exports = i.enc.Hex;
   });
-  function Dt() {
+  function Ft() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(e2) {
       var t2 = 16 * Math.random() | 0;
       return ("x" === e2 ? t2 : 3 & t2 | 8).toString(16);
     });
   }
-  function Mt(e2) {
+  function qt(e2) {
     return "".concat(e2, ".api-hz.cloudbasefunction.cn");
   }
-  function qt(e2 = "", t2 = {}) {
-    const { data: n2, functionName: s2, method: r2, headers: i2, signHeaderKeys: o2 = [], endpoint: a2, config: c2 } = t2, u2 = String(Date.now()), h2 = Dt(), l2 = Object.assign({}, i2, { "x-from-app-id": c2.spaceAppId, "x-from-env-id": c2.spaceId, "x-to-env-id": c2.spaceId, "x-from-instance-id": u2, "x-from-function-name": s2, "x-client-timestamp": u2, "x-alipay-source": "client", "x-request-id": h2, "x-alipay-callid": h2, "x-trace-id": h2 }), d2 = ["x-from-app-id", "x-from-env-id", "x-to-env-id", "x-from-instance-id", "x-from-function-name", "x-client-timestamp"].concat(o2), [p2 = "", f2 = ""] = e2.split("?") || [], g2 = function(e3) {
-      const t3 = e3.signedHeaders.join(";"), n3 = e3.signedHeaders.map((t4) => "".concat(t4.toLowerCase(), ":").concat(e3.headers[t4], "\n")).join(""), s3 = Ie(e3.body).toString(Nt), r3 = "".concat(e3.method.toUpperCase(), "\n").concat(e3.path, "\n").concat(e3.query, "\n").concat(n3, "\n").concat(t3, "\n").concat(s3, "\n"), i3 = Ie(r3).toString(Nt), o3 = "HMAC-SHA256\n".concat(e3.timestamp, "\n").concat(i3, "\n"), a3 = Se(o3, e3.secretKey).toString(Nt);
+  function Kt(e2 = "", t2 = {}) {
+    const { data: n2, functionName: s2, method: r2, headers: i2, signHeaderKeys: o2 = [], endpoint: a2, config: c2 } = t2, u2 = String(Date.now()), l2 = Ft(), d2 = Object.assign({}, i2, { "x-from-app-id": c2.spaceAppId, "x-from-env-id": c2.spaceId, "x-to-env-id": c2.spaceId, "x-from-instance-id": u2, "x-from-function-name": s2, "x-client-timestamp": u2, "x-alipay-source": "client", "x-request-id": l2, "x-alipay-callid": l2, "x-trace-id": l2 }), h2 = ["x-from-app-id", "x-from-env-id", "x-to-env-id", "x-from-instance-id", "x-from-function-name", "x-client-timestamp"].concat(o2), [p2 = "", f2 = ""] = e2.split("?") || [], g2 = function(e3) {
+      const t3 = e3.signedHeaders.join(";"), n3 = e3.signedHeaders.map((t4) => "".concat(t4.toLowerCase(), ":").concat(e3.headers[t4], "\n")).join(""), s3 = ke(e3.body).toString(Mt), r3 = "".concat(e3.method.toUpperCase(), "\n").concat(e3.path, "\n").concat(e3.query, "\n").concat(n3, "\n").concat(t3, "\n").concat(s3, "\n"), i3 = ke(r3).toString(Mt), o3 = "HMAC-SHA256\n".concat(e3.timestamp, "\n").concat(i3, "\n"), a3 = Ae(o3, e3.secretKey).toString(Mt);
       return "HMAC-SHA256 Credential=".concat(e3.secretId, ", SignedHeaders=").concat(t3, ", Signature=").concat(a3);
-    }({ path: p2, query: f2, method: r2, headers: l2, timestamp: u2, body: JSON.stringify(n2), secretId: c2.accessKey, secretKey: c2.secretKey, signedHeaders: d2.sort() });
-    return { url: "".concat(a2 || c2.endpoint).concat(e2), headers: Object.assign({}, l2, { Authorization: g2 }) };
+    }({ path: p2, query: f2, method: r2, headers: d2, timestamp: u2, body: JSON.stringify(n2), secretId: c2.accessKey, secretKey: c2.secretKey, signedHeaders: h2.sort() });
+    return { url: "".concat(a2 || c2.endpoint).concat(e2), headers: Object.assign({}, d2, { Authorization: g2 }) };
   }
-  function Ft({ url: e2, data: t2, method: n2 = "POST", headers: s2 = {}, timeout: r2 }) {
+  function jt({ url: e2, data: t2, method: n2 = "POST", headers: s2 = {}, timeout: r2 }) {
     return new Promise((i2, o2) => {
-      re.request({ url: e2, method: n2, data: "object" == typeof t2 ? JSON.stringify(t2) : t2, header: s2, dataType: "json", timeout: r2, complete: (e3 = {}) => {
+      oe.request({ url: e2, method: n2, data: "object" == typeof t2 ? JSON.stringify(t2) : t2, header: s2, dataType: "json", timeout: r2, complete: (e3 = {}) => {
         const t3 = s2["x-trace-id"] || "";
         if (!e3.statusCode || e3.statusCode >= 400) {
           const { message: n3, errMsg: s3, trace_id: r3 } = e3.data || {};
-          return o2(new se({ code: "SYS_ERR", message: n3 || s3 || "request:fail", requestId: r3 || t3 }));
+          return o2(new ie({ code: "SYS_ERR", message: n3 || s3 || "request:fail", requestId: r3 || t3 }));
         }
         i2({ status: e3.statusCode, data: e3.data, headers: e3.header, requestId: t3 });
       } });
     });
   }
-  function Kt(e2, t2) {
-    const { path: n2, data: s2, method: r2 = "GET" } = e2, { url: i2, headers: o2 } = qt(n2, { functionName: "", data: s2, method: r2, headers: { "x-alipay-cloud-mode": "oss", "x-data-api-type": "oss", "x-expire-timestamp": String(Date.now() + 6e4) }, signHeaderKeys: ["x-data-api-type", "x-expire-timestamp"], config: t2, endpoint: "https://".concat(Mt(t2.spaceId)) });
-    return Ft({ url: i2, data: s2, method: r2, headers: o2 }).then((e3) => {
+  function Bt(e2, t2) {
+    const { path: n2, data: s2, method: r2 = "GET" } = e2, { url: i2, headers: o2 } = Kt(n2, { functionName: "", data: s2, method: r2, headers: { "x-alipay-cloud-mode": "oss", "x-data-api-type": "oss", "x-expire-timestamp": String(Date.now() + 6e4) }, signHeaderKeys: ["x-data-api-type", "x-expire-timestamp"], config: t2, endpoint: "https://".concat(qt(t2.spaceId)) });
+    return jt({ url: i2, data: s2, method: r2, headers: o2 }).then((e3) => {
       const t3 = e3.data || {};
       if (!t3.success)
-        throw new se({ code: e3.errCode, message: e3.errMsg, requestId: e3.requestId });
+        throw new ie({ code: e3.errCode, message: e3.errMsg, requestId: e3.requestId });
       return t3.data || {};
     }).catch((e3) => {
-      throw new se({ code: e3.errCode, message: e3.errMsg, requestId: e3.requestId });
+      throw new ie({ code: e3.errCode, message: e3.errMsg, requestId: e3.requestId });
     });
   }
-  function jt(e2 = "") {
+  function $t(e2 = "") {
     const t2 = e2.trim().replace(/^cloud:\/\//, ""), n2 = t2.indexOf("/");
     if (n2 <= 0)
-      throw new se({ code: "INVALID_PARAM", message: "fileID不合法" });
+      throw new ie({ code: "INVALID_PARAM", message: "fileID不合法" });
     const s2 = t2.substring(0, n2), r2 = t2.substring(n2 + 1);
     return s2 !== this.config.spaceId && console.warn("file ".concat(e2, " does not belong to env ").concat(this.config.spaceId)), r2;
   }
-  function $t(e2 = "") {
+  function Ht(e2 = "") {
     return "cloud://".concat(this.config.spaceId, "/").concat(e2.replace(/^\/+/, ""));
-  }
-  class Bt {
-    constructor(e2) {
-      this.config = e2;
-    }
-    signedURL(e2, t2 = {}) {
-      const n2 = "/ws/function/".concat(e2), s2 = this.config.wsEndpoint.replace(/^ws(s)?:\/\//, ""), r2 = Object.assign({}, t2, { accessKeyId: this.config.accessKey, signatureNonce: Dt(), timestamp: "" + Date.now() }), i2 = [n2, ["accessKeyId", "authorization", "signatureNonce", "timestamp"].sort().map(function(e3) {
-        return r2[e3] ? "".concat(e3, "=").concat(r2[e3]) : null;
-      }).filter(Boolean).join("&"), "host:".concat(s2)].join("\n"), o2 = ["HMAC-SHA256", Ie(i2).toString(Nt)].join("\n"), a2 = Se(o2, this.config.secretKey).toString(Nt), c2 = Object.keys(r2).map((e3) => "".concat(e3, "=").concat(encodeURIComponent(r2[e3]))).join("&");
-      return "".concat(this.config.wsEndpoint).concat(n2, "?").concat(c2, "&signature=").concat(a2);
-    }
   }
   class Wt {
     constructor(e2) {
       this.config = e2;
     }
     signedURL(e2, t2 = {}) {
-      const n2 = "/ws/sse/function/".concat(e2), s2 = this.config.endpoint.replace(/^http(s)?:\/\//, ""), r2 = Object.assign({}, t2, { accessKeyId: this.config.accessKey, signatureNonce: Dt(), timestamp: "" + Date.now() }), i2 = ["accessKeyId", "authorization", "signatureNonce", "timestamp"].sort().map(function(e3) {
+      const n2 = "/ws/function/".concat(e2), s2 = this.config.wsEndpoint.replace(/^ws(s)?:\/\//, ""), r2 = Object.assign({}, t2, { accessKeyId: this.config.accessKey, signatureNonce: Ft(), timestamp: "" + Date.now() }), i2 = [n2, ["accessKeyId", "authorization", "signatureNonce", "timestamp"].sort().map(function(e3) {
         return r2[e3] ? "".concat(e3, "=").concat(r2[e3]) : null;
-      }).filter(Boolean).join("&"), o2 = [n2.replace("/ws", ""), i2, "host:".concat(s2)].join("\n"), a2 = ["HMAC-SHA256", Ie(o2).toString(Nt)].join("\n"), c2 = Se(a2, this.config.secretKey).toString(Nt), u2 = Object.keys(r2).map((e3) => "".concat(e3, "=").concat(encodeURIComponent(r2[e3]))).join("&");
+      }).filter(Boolean).join("&"), "host:".concat(s2)].join("\n"), o2 = ["HMAC-SHA256", ke(i2).toString(Mt)].join("\n"), a2 = Ae(o2, this.config.secretKey).toString(Mt), c2 = Object.keys(r2).map((e3) => "".concat(e3, "=").concat(encodeURIComponent(r2[e3]))).join("&");
+      return "".concat(this.config.wsEndpoint).concat(n2, "?").concat(c2, "&signature=").concat(a2);
+    }
+  }
+  class Jt {
+    constructor(e2) {
+      this.config = e2;
+    }
+    signedURL(e2, t2 = {}) {
+      const n2 = "/ws/sse/function/".concat(e2), s2 = this.config.endpoint.replace(/^http(s)?:\/\//, ""), r2 = Object.assign({}, t2, { accessKeyId: this.config.accessKey, signatureNonce: Ft(), timestamp: "" + Date.now() }), i2 = ["accessKeyId", "authorization", "signatureNonce", "timestamp"].sort().map(function(e3) {
+        return r2[e3] ? "".concat(e3, "=").concat(r2[e3]) : null;
+      }).filter(Boolean).join("&"), o2 = [n2.replace("/ws", ""), i2, "host:".concat(s2)].join("\n"), a2 = ["HMAC-SHA256", ke(o2).toString(Mt)].join("\n"), c2 = Ae(a2, this.config.secretKey).toString(Mt), u2 = Object.keys(r2).map((e3) => "".concat(e3, "=").concat(encodeURIComponent(r2[e3]))).join("&");
       return "".concat(this.config.endpoint).concat(n2, "?").concat(u2, "&signature=").concat(c2);
     }
   }
-  var Ht = class {
+  var zt = class {
     constructor(e2) {
       if (["spaceId", "spaceAppId", "accessKey", "secretKey"].forEach((t2) => {
         if (!Object.prototype.hasOwnProperty.call(e2, t2))
@@ -28443,33 +26129,33 @@
           throw new Error("endpoint must start with https://");
         e2.endpoint = e2.endpoint.replace(/\/$/, "");
       }
-      this.config = Object.assign({}, e2, { endpoint: e2.endpoint || "https://".concat(Mt(e2.spaceId)), wsEndpoint: e2.wsEndpoint || "wss://".concat(Mt(e2.spaceId)) }), this._websocket = new Bt(this.config), this._sse = new Wt(this.config);
+      this.config = Object.assign({}, e2, { endpoint: e2.endpoint || "https://".concat(qt(e2.spaceId)), wsEndpoint: e2.wsEndpoint || "wss://".concat(qt(e2.spaceId)) }), this._websocket = new Wt(this.config), this._sse = new Jt(this.config);
     }
     callFunction(e2) {
       return function(e3, t2) {
         const { name: n2, data: s2, async: r2 = false, timeout: i2 } = e3, o2 = "POST", a2 = { "x-to-function-name": n2 };
         r2 && (a2["x-function-invoke-type"] = "async");
-        const { url: c2, headers: u2 } = qt("/functions/invokeFunction", { functionName: n2, data: s2, method: o2, headers: a2, signHeaderKeys: ["x-to-function-name"], config: t2 });
-        return Ft({ url: c2, data: s2, method: o2, headers: u2, timeout: i2 }).then((e4) => {
+        const { url: c2, headers: u2 } = Kt("/functions/invokeFunction", { functionName: n2, data: s2, method: o2, headers: a2, signHeaderKeys: ["x-to-function-name"], config: t2 });
+        return jt({ url: c2, data: s2, method: o2, headers: u2, timeout: i2 }).then((e4) => {
           let t3 = 0;
           if (r2) {
             const n3 = e4.data || {};
             t3 = "200" === n3.errCode ? 0 : n3.errCode, e4.data = n3.data || {}, e4.errMsg = n3.errMsg;
           }
           if (0 !== t3)
-            throw new se({ code: t3, message: e4.errMsg, requestId: e4.requestId });
+            throw new ie({ code: t3, message: e4.errMsg, requestId: e4.requestId });
           return { errCode: t3, success: 0 === t3, requestId: e4.requestId, result: e4.data };
         }).catch((e4) => {
-          throw new se({ code: e4.errCode, message: e4.errMsg, requestId: e4.requestId });
+          throw new ie({ code: e4.errCode, message: e4.errMsg, requestId: e4.requestId });
         });
       }(e2, this.config);
     }
     uploadFileToOSS({ url: e2, filePath: t2, fileType: n2, formData: s2, onUploadProgress: r2 }) {
       return new Promise((i2, o2) => {
-        const a2 = re.uploadFile({ url: e2, filePath: t2, fileType: n2, formData: s2, name: "file", success(e3) {
-          e3 && e3.statusCode < 400 ? i2(e3) : o2(new se({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
+        const a2 = oe.uploadFile({ url: e2, filePath: t2, fileType: n2, formData: s2, name: "file", success(e3) {
+          e3 && e3.statusCode < 400 ? i2(e3) : o2(new ie({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
         }, fail(e3) {
-          o2(new se({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
+          o2(new ie({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
         } });
         "function" == typeof r2 && a2 && "function" == typeof a2.onProgressUpdate && a2.onProgressUpdate((e3) => {
           r2({ loaded: e3.totalBytesSent, total: e3.totalBytesExpectedToSend });
@@ -28477,13 +26163,13 @@
       });
     }
     async uploadFile({ filePath: e2, cloudPath: t2 = "", fileType: n2 = "image", onUploadProgress: s2 }) {
-      if ("string" !== f(t2))
-        throw new se({ code: "INVALID_PARAM", message: "cloudPath必须为字符串类型" });
+      if ("string" !== m(t2))
+        throw new ie({ code: "INVALID_PARAM", message: "cloudPath必须为字符串类型" });
       if (!(t2 = t2.trim()))
-        throw new se({ code: "INVALID_PARAM", message: "cloudPath不可为空" });
+        throw new ie({ code: "INVALID_PARAM", message: "cloudPath不可为空" });
       if (/:\/\//.test(t2))
-        throw new se({ code: "INVALID_PARAM", message: "cloudPath不合法" });
-      const r2 = await Kt({ path: "/".concat(t2.replace(/^\//, ""), "?post_url") }, this.config), { file_id: i2, upload_url: o2, form_data: a2 } = r2, c2 = a2 && a2.reduce((e3, t3) => (e3[t3.key] = t3.value, e3), {});
+        throw new ie({ code: "INVALID_PARAM", message: "cloudPath不合法" });
+      const r2 = await Bt({ path: "/".concat(t2.replace(/^\//, ""), "?post_url") }, this.config), { file_id: i2, upload_url: o2, form_data: a2 } = r2, c2 = a2 && a2.reduce((e3, t3) => (e3[t3.key] = t3.value, e3), {});
       return this.uploadFileToOSS({ url: o2, filePath: e2, fileType: n2, formData: c2, onUploadProgress: s2 }).then(() => ({ fileID: i2 }));
     }
     async getTempFileURL({ fileList: e2 }) {
@@ -28492,33 +26178,33 @@
         const s2 = [];
         for (const n3 of e2) {
           let e3;
-          "string" !== f(n3) && t2({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
+          "string" !== m(n3) && t2({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
           try {
-            e3 = jt.call(this, n3);
+            e3 = $t.call(this, n3);
           } catch (t3) {
             console.warn(t3.errCode, t3.errMsg), e3 = n3;
           }
           s2.push({ file_id: e3, expire: 600 });
         }
-        Kt({ path: "/?download_url", data: { file_list: s2 }, method: "POST" }, this.config).then((e3) => {
+        Bt({ path: "/?download_url", data: { file_list: s2 }, method: "POST" }, this.config).then((e3) => {
           const { file_list: n3 = [] } = e3;
-          t2({ fileList: n3.map((e4) => ({ fileID: $t.call(this, e4.file_id), tempFileURL: e4.download_url })) });
+          t2({ fileList: n3.map((e4) => ({ fileID: Ht.call(this, e4.file_id), tempFileURL: e4.download_url })) });
         }).catch((e3) => n2(e3));
       });
     }
     async connectWebSocket(e2) {
       const { name: t2, query: n2 } = e2;
-      return re.connectSocket({ url: this._websocket.signedURL(t2, n2), complete: () => {
+      return oe.connectSocket({ url: this._websocket.signedURL(t2, n2), complete: () => {
       } });
     }
     requestSSE(e2) {
       const { name: t2, data: n2 } = e2;
-      return re.request({ method: "POST", url: this._sse.signedURL(t2), data: n2, header: { "content-type": "application/json" }, dataType: "json" });
+      return oe.request({ method: "POST", url: this._sse.signedURL(t2), data: n2, header: { "content-type": "application/json" }, dataType: "json" });
     }
   };
-  var Jt = { init: (e2) => {
+  var Vt = { init: (e2) => {
     e2.provider = "alipay";
-    const t2 = new Ht(e2);
+    const t2 = new zt(e2);
     return t2.auth = function() {
       return { signInAnonymously: function() {
         return Promise.resolve();
@@ -28527,54 +26213,54 @@
       } };
     }, t2;
   } };
-  function zt({ data: e2 }) {
+  function Gt({ data: e2 }) {
     let t2;
-    t2 = pe();
+    t2 = ge();
     const n2 = JSON.parse(JSON.stringify(e2 || {}));
     if (Object.assign(n2, { clientInfo: t2 }), !n2.uniIdToken) {
-      const { token: e3 } = oe();
+      const { token: e3 } = ce();
       e3 && (n2.uniIdToken = e3);
     }
     return n2;
   }
-  const Vt = { enable: false, interval: 0, space: {} };
-  let Gt = null, Qt = 0, Yt = false;
-  function Xt() {
-    return Array.isArray(C) && C.length ? C[0] : {};
-  }
-  function Zt(e2) {
-    return "".concat(e2, "_").concat(Xt().spaceId || "default");
-  }
+  const Qt = { enable: false, interval: 0, space: {} };
+  let Yt = null, Xt = 0, Zt = false;
   function en() {
-    if (Gt)
-      return Gt;
+    return Array.isArray(x) && x.length ? x[0] : {};
+  }
+  function tn(e2) {
+    return "".concat(e2, "_").concat(en().spaceId || "default");
+  }
+  function nn() {
+    if (Yt)
+      return Yt;
     try {
-      const e2 = re.getStorageSync(Zt("UNICLOUD_FAILOVER_CONFIG"));
-      if (g(e2))
-        return Gt = e2, e2;
+      const e2 = oe.getStorageSync(tn("UNICLOUD_FAILOVER_CONFIG"));
+      if (y(e2))
+        return Yt = e2, e2;
     } catch (e2) {
     }
     return null;
   }
-  function tn(e2) {
-    Qt = e2;
+  function sn(e2) {
+    Xt = e2;
     try {
-      re.setStorageSync(Zt("UNICLOUD_FAILOVER_LAST_REQUEST"), e2);
+      oe.setStorageSync(tn("UNICLOUD_FAILOVER_LAST_REQUEST"), e2);
     } catch (e3) {
     }
   }
-  function nn(e2) {
+  function rn(e2) {
     if (null === e2 || e2 < 0)
       return false;
     if (0 === e2)
       return true;
     const t2 = function() {
-      if (Qt)
-        return Qt;
+      if (Xt)
+        return Xt;
       try {
-        const e3 = re.getStorageSync(Zt("UNICLOUD_FAILOVER_LAST_REQUEST"));
+        const e3 = oe.getStorageSync(tn("UNICLOUD_FAILOVER_LAST_REQUEST"));
         if (e3 && "number" == typeof e3)
-          return Qt = e3, e3;
+          return Xt = e3, e3;
       } catch (e3) {
       }
       return 0;
@@ -28583,18 +26269,18 @@
       return true;
     return Date.now() - t2 >= e2;
   }
-  async function sn() {
-    const e2 = Xt(), { failoverEndpoint: t2 } = e2;
+  async function on() {
+    const e2 = en(), { failoverEndpoint: t2 } = e2;
     if (!t2)
       return null;
-    if (Yt)
-      return en();
-    Yt = true;
+    if (Zt)
+      return nn();
+    Zt = true;
     try {
-      const e3 = "".concat(t2, "/.unicloud/failover-cfg.json"), n2 = await re.request({ url: e3, method: "GET", dataType: "json", timeout: 5e3 });
-      if (tn(Date.now()), 200 !== n2.statusCode || !g(n2.data))
+      const e3 = "".concat(t2, "/.unicloud/failover-cfg.json"), n2 = await oe.request({ url: e3, method: "GET", dataType: "json", timeout: 5e3 });
+      if (sn(Date.now()), 200 !== n2.statusCode || !y(n2.data))
         return null;
-      const s2 = { ...Vt, ...n2.data }, { enable: r2 = false, interval: i2 = 0, space: o2 = {} } = s2, a2 = en(), c2 = a2 && a2.enable, u2 = function(e4, t3) {
+      const s2 = { ...Qt, ...n2.data }, { enable: r2 = false, interval: i2 = 0, space: o2 = {} } = s2, a2 = nn(), c2 = a2 && a2.enable, u2 = function(e4, t3) {
         if (!e4)
           return t3.enable;
         if (e4.enable !== t3.enable)
@@ -28609,21 +26295,21 @@
       }(a2, s2);
       return function(e4) {
         try {
-          Gt = e4, e4 && e4.enable ? re.setStorageSync(Zt("UNICLOUD_FAILOVER_CONFIG"), e4) : (re.removeStorageSync(Zt("UNICLOUD_FAILOVER_CONFIG")), re.removeStorageSync(Zt("UNICLOUD_FAILOVER_LAST_REQUEST")));
+          Yt = e4, e4 && e4.enable ? oe.setStorageSync(tn("UNICLOUD_FAILOVER_CONFIG"), e4) : (oe.removeStorageSync(tn("UNICLOUD_FAILOVER_CONFIG")), oe.removeStorageSync(tn("UNICLOUD_FAILOVER_LAST_REQUEST")));
         } catch (e5) {
         }
-      }({ enable: r2, interval: i2, space: o2, _lastModifiedAt: n2.data._lastModifiedAt || Date.now() }), u2 && X(H, { isEnabled: r2, hasStatusChanged: c2 !== r2, failoverSpace: o2 }), s2;
+      }({ enable: r2, interval: i2, space: o2, _lastModifiedAt: n2.data._lastModifiedAt || Date.now() }), u2 && ee(z, { isEnabled: r2, hasStatusChanged: c2 !== r2, failoverSpace: o2 }), s2;
     } catch (e3) {
-      return en();
+      return nn();
     } finally {
-      Yt = false;
+      Zt = false;
     }
   }
-  async function rn(e2 = {}) {
+  async function an(e2 = {}) {
     await this.__dev__.initLocalNetwork();
-    const { localAddress: t2, localPort: n2 } = this.__dev__, s2 = Xt(), r2 = { aliyun: "aliyun", tencent: "tcb", alipay: "alipay", dcloud: "dcloud" }[s2.provider], i2 = s2.spaceId, o2 = "http://".concat(t2, ":").concat(n2, "/system/check-function"), a2 = "http://".concat(t2, ":").concat(n2, "/cloudfunctions/").concat(e2.name);
+    const { localAddress: t2, localPort: n2 } = this.__dev__, s2 = en(), r2 = { aliyun: "aliyun", tencent: "tcb", alipay: "alipay", dcloud: "dcloud" }[s2.provider], i2 = s2.spaceId, o2 = "http://".concat(t2, ":").concat(n2, "/system/check-function"), a2 = "http://".concat(t2, ":").concat(n2, "/cloudfunctions/").concat(e2.name);
     return new Promise((t3, n3) => {
-      re.request({ method: "POST", url: o2, data: { name: e2.name, platform: A, provider: r2, spaceId: i2 }, timeout: 3e3, success(e3) {
+      oe.request({ method: "POST", url: o2, data: { name: e2.name, platform: b, provider: r2, spaceId: i2 }, timeout: 3e3, success(e3) {
         t3(e3);
       }, fail() {
         t3({ data: { code: "NETWORK_ERROR", message: "连接本地调试服务失败，请检查客户端是否和主机在同一局域网下，自动切换为已部署的云函数。" } });
@@ -28656,33 +26342,33 @@
         return this._callCloudFunction(e2);
       }
       return new Promise((t4, n4) => {
-        const s3 = zt.call(this, { data: e2.data });
-        re.request({ method: "POST", url: a2, data: { provider: r2, platform: A, param: s3 }, timeout: e2.timeout, success: ({ statusCode: e3, data: s4 } = {}) => !e3 || e3 >= 400 ? n4(new se({ code: s4.code || "SYS_ERR", message: s4.message || "request:fail" })) : t4({ result: s4 }), fail(e3) {
-          n4(new se({ code: e3.code || e3.errCode || "SYS_ERR", message: e3.message || e3.errMsg || "request:fail" }));
+        const s3 = Gt.call(this, { data: e2.data });
+        oe.request({ method: "POST", url: a2, data: { provider: r2, platform: b, param: s3 }, timeout: e2.timeout, success: ({ statusCode: e3, data: s4 } = {}) => !e3 || e3 >= 400 ? n4(new ie({ code: s4.code || "SYS_ERR", message: s4.message || "request:fail" })) : t4({ result: s4 }), fail(e3) {
+          n4(new ie({ code: e3.code || e3.errCode || "SYS_ERR", message: e3.message || e3.errMsg || "request:fail" }));
         } });
       });
     });
   }
-  const on = [{ rule: /fc_function_not_found|FUNCTION_NOT_FOUND/, content: "，云函数[{functionName}]在云端不存在，请检查此云函数名称是否正确以及该云函数是否已上传到服务空间", mode: "append" }];
-  var an = /[\\^$.*+?()[\]{}|]/g, cn = RegExp(an.source);
-  function un(e2, t2, n2) {
-    return e2.replace(new RegExp((s2 = t2) && cn.test(s2) ? s2.replace(an, "\\$&") : s2, "g"), n2);
+  const cn = [{ rule: /fc_function_not_found|FUNCTION_NOT_FOUND/, content: "，云函数[{functionName}]在云端不存在，请检查此云函数名称是否正确以及该云函数是否已上传到服务空间", mode: "append" }];
+  var un = /[\\^$.*+?()[\]{}|]/g, ln = RegExp(un.source);
+  function dn(e2, t2, n2) {
+    return e2.replace(new RegExp((s2 = t2) && ln.test(s2) ? s2.replace(un, "\\$&") : s2, "g"), n2);
     var s2;
   }
-  const hn = "none", ln = "request", dn = "response", pn = "both", fn = { code: 2e4, message: "System error" }, gn = { code: 20101, message: "Invalid client" }, yn = { 10001: "Secure network is not supported on current playground or unimpsdk", 10003: "Config missing in current app. If the problem pesist, please contact DCloud.", 10009: "Encrypt payload failed", 10010: "Decrypt response failed" };
-  function _n(e2) {
-    return new se({ subject: e2.errSubject || "uni-secure-network", code: e2.errCode || e2.code || fn.code, message: e2.errMsg || e2.message || fn.message });
+  const hn = "none", pn = "request", fn = "response", gn = "both", mn = { code: 2e4, message: "System error" }, yn = { code: 20101, message: "Invalid client" }, wn = { 10001: "Secure network is not supported on current playground or unimpsdk", 10003: "Config missing in current app. If the problem pesist, please contact DCloud.", 10009: "Encrypt payload failed", 10010: "Decrypt response failed" };
+  function vn(e2) {
+    return new ie({ subject: e2.errSubject || "uni-secure-network", code: e2.errCode || e2.code || mn.code, message: e2.errMsg || e2.message || mn.message });
   }
-  function wn(e2) {
+  function In(e2) {
     const { errSubject: t2, subject: n2, errCode: s2, errMsg: r2, code: i2, message: o2, cause: a2 } = e2 || {};
-    return new se({ subject: t2 || n2 || "uni-secure-network", code: s2 || i2 || fn.code, message: r2 || o2, cause: a2 });
+    return new ie({ subject: t2 || n2 || "uni-secure-network", code: s2 || i2 || mn.code, message: r2 || o2, cause: a2 });
   }
-  class vn {
+  class Sn {
     constructor({ secretType: e2, uniCloudIns: t2 } = {}) {
       this.clientType = "", this.secretType = e2 || hn, this.uniCloudIns = t2;
       const { provider: n2, spaceId: s2 } = this.uniCloudIns.config;
       var r2;
-      this.provider = n2, this.spaceId = s2, this.scopedGlobalCache = (r2 = this.uniCloudIns, L("_globalUniCloudSecureNetworkCache__{spaceId}".replace("{spaceId}", r2.config.spaceId)));
+      this.provider = n2, this.spaceId = s2, this.scopedGlobalCache = (r2 = this.uniCloudIns, U("_globalUniCloudSecureNetworkCache__{spaceId}".replace("{spaceId}", r2.config.spaceId)));
     }
     getSystemInfo() {
       return this._systemInfo || (this._systemInfo = he()), this._systemInfo;
@@ -28702,12 +26388,12 @@
       const { errCode: t2, errMsg: n2, content: s2 } = e2 || {};
       if (t2 || !s2) {
         if (t2)
-          throw _n({ errCode: t2, errMsg: n2 });
+          throw vn({ errCode: t2, errMsg: n2 });
         if (!s2)
-          throw _n();
+          throw vn();
         return e2;
       }
-      return this.secretType === ln ? s2 : this.platformDecryptResult(e2);
+      return this.secretType === pn ? s2 : this.platformDecryptResult(e2);
     }
     wrapVerifyClientCallFunction(e2) {
       const t2 = this;
@@ -28732,8 +26418,226 @@
       };
     }
   }
-  let ts, ns;
-  function is(e2) {
+  s(function(e2, t2) {
+    var n2, s2, r2, o2, a2, c2, u2, l2;
+    e2.exports = (s2 = (n2 = l2 = i).lib, r2 = s2.WordArray, o2 = s2.Hasher, a2 = n2.algo, c2 = [], u2 = a2.SHA1 = o2.extend({ _doReset: function() {
+      this._hash = new r2.init([1732584193, 4023233417, 2562383102, 271733878, 3285377520]);
+    }, _doProcessBlock: function(e3, t3) {
+      for (var n3 = this._hash.words, s3 = n3[0], r3 = n3[1], i2 = n3[2], o3 = n3[3], a3 = n3[4], u3 = 0; u3 < 80; u3++) {
+        if (u3 < 16)
+          c2[u3] = 0 | e3[t3 + u3];
+        else {
+          var l3 = c2[u3 - 3] ^ c2[u3 - 8] ^ c2[u3 - 14] ^ c2[u3 - 16];
+          c2[u3] = l3 << 1 | l3 >>> 31;
+        }
+        var d2 = (s3 << 5 | s3 >>> 27) + a3 + c2[u3];
+        d2 += u3 < 20 ? 1518500249 + (r3 & i2 | ~r3 & o3) : u3 < 40 ? 1859775393 + (r3 ^ i2 ^ o3) : u3 < 60 ? (r3 & i2 | r3 & o3 | i2 & o3) - 1894007588 : (r3 ^ i2 ^ o3) - 899497514, a3 = o3, o3 = i2, i2 = r3 << 30 | r3 >>> 2, r3 = s3, s3 = d2;
+      }
+      n3[0] = n3[0] + s3 | 0, n3[1] = n3[1] + r3 | 0, n3[2] = n3[2] + i2 | 0, n3[3] = n3[3] + o3 | 0, n3[4] = n3[4] + a3 | 0;
+    }, _doFinalize: function() {
+      var e3 = this._data, t3 = e3.words, n3 = 8 * this._nDataBytes, s3 = 8 * e3.sigBytes;
+      return t3[s3 >>> 5] |= 128 << 24 - s3 % 32, t3[14 + (s3 + 64 >>> 9 << 4)] = Math.floor(n3 / 4294967296), t3[15 + (s3 + 64 >>> 9 << 4)] = n3, e3.sigBytes = 4 * t3.length, this._process(), this._hash;
+    }, clone: function() {
+      var e3 = o2.clone.call(this);
+      return e3._hash = this._hash.clone(), e3;
+    } }), n2.SHA1 = o2._createHelper(u2), n2.HmacSHA1 = o2._createHmacHelper(u2), l2.SHA1);
+  }), s(function(e2, t2) {
+    var n2;
+    e2.exports = (n2 = i, function() {
+      var e3 = n2, t3 = e3.lib, s2 = t3.Base, r2 = t3.WordArray, i2 = e3.algo, o2 = i2.MD5, a2 = i2.EvpKDF = s2.extend({ cfg: s2.extend({ keySize: 4, hasher: o2, iterations: 1 }), init: function(e4) {
+        this.cfg = this.cfg.extend(e4);
+      }, compute: function(e4, t4) {
+        for (var n3 = this.cfg, s3 = n3.hasher.create(), i3 = r2.create(), o3 = i3.words, a3 = n3.keySize, c2 = n3.iterations; o3.length < a3; ) {
+          u2 && s3.update(u2);
+          var u2 = s3.update(e4).finalize(t4);
+          s3.reset();
+          for (var l2 = 1; l2 < c2; l2++)
+            u2 = s3.finalize(u2), s3.reset();
+          i3.concat(u2);
+        }
+        return i3.sigBytes = 4 * a3, i3;
+      } });
+      e3.EvpKDF = function(e4, t4, n3) {
+        return a2.create(n3).compute(e4, t4);
+      };
+    }(), n2.EvpKDF);
+  }), s(function(e2, t2) {
+    var n2;
+    e2.exports = void ((n2 = i).lib.Cipher || function(e3) {
+      var t3 = n2, s2 = t3.lib, r2 = s2.Base, i2 = s2.WordArray, o2 = s2.BufferedBlockAlgorithm, a2 = t3.enc;
+      a2.Utf8;
+      var c2 = a2.Base64, u2 = t3.algo.EvpKDF, l2 = s2.Cipher = o2.extend({ cfg: r2.extend(), createEncryptor: function(e4, t4) {
+        return this.create(this._ENC_XFORM_MODE, e4, t4);
+      }, createDecryptor: function(e4, t4) {
+        return this.create(this._DEC_XFORM_MODE, e4, t4);
+      }, init: function(e4, t4, n3) {
+        this.cfg = this.cfg.extend(n3), this._xformMode = e4, this._key = t4, this.reset();
+      }, reset: function() {
+        o2.reset.call(this), this._doReset();
+      }, process: function(e4) {
+        return this._append(e4), this._process();
+      }, finalize: function(e4) {
+        return e4 && this._append(e4), this._doFinalize();
+      }, keySize: 4, ivSize: 4, _ENC_XFORM_MODE: 1, _DEC_XFORM_MODE: 2, _createHelper: /* @__PURE__ */ function() {
+        function e4(e5) {
+          return "string" == typeof e5 ? w2 : y2;
+        }
+        return function(t4) {
+          return { encrypt: function(n3, s3, r3) {
+            return e4(s3).encrypt(t4, n3, s3, r3);
+          }, decrypt: function(n3, s3, r3) {
+            return e4(s3).decrypt(t4, n3, s3, r3);
+          } };
+        };
+      }() });
+      s2.StreamCipher = l2.extend({ _doFinalize: function() {
+        return this._process(true);
+      }, blockSize: 1 });
+      var d2 = t3.mode = {}, h2 = s2.BlockCipherMode = r2.extend({ createEncryptor: function(e4, t4) {
+        return this.Encryptor.create(e4, t4);
+      }, createDecryptor: function(e4, t4) {
+        return this.Decryptor.create(e4, t4);
+      }, init: function(e4, t4) {
+        this._cipher = e4, this._iv = t4;
+      } }), p2 = d2.CBC = function() {
+        var t4 = h2.extend();
+        function n3(t5, n4, s3) {
+          var r3 = this._iv;
+          if (r3) {
+            var i3 = r3;
+            this._iv = e3;
+          } else
+            i3 = this._prevBlock;
+          for (var o3 = 0; o3 < s3; o3++)
+            t5[n4 + o3] ^= i3[o3];
+        }
+        return t4.Encryptor = t4.extend({ processBlock: function(e4, t5) {
+          var s3 = this._cipher, r3 = s3.blockSize;
+          n3.call(this, e4, t5, r3), s3.encryptBlock(e4, t5), this._prevBlock = e4.slice(t5, t5 + r3);
+        } }), t4.Decryptor = t4.extend({ processBlock: function(e4, t5) {
+          var s3 = this._cipher, r3 = s3.blockSize, i3 = e4.slice(t5, t5 + r3);
+          s3.decryptBlock(e4, t5), n3.call(this, e4, t5, r3), this._prevBlock = i3;
+        } }), t4;
+      }(), f2 = (t3.pad = {}).Pkcs7 = { pad: function(e4, t4) {
+        for (var n3 = 4 * t4, s3 = n3 - e4.sigBytes % n3, r3 = s3 << 24 | s3 << 16 | s3 << 8 | s3, o3 = [], a3 = 0; a3 < s3; a3 += 4)
+          o3.push(r3);
+        var c3 = i2.create(o3, s3);
+        e4.concat(c3);
+      }, unpad: function(e4) {
+        var t4 = 255 & e4.words[e4.sigBytes - 1 >>> 2];
+        e4.sigBytes -= t4;
+      } };
+      s2.BlockCipher = l2.extend({ cfg: l2.cfg.extend({ mode: p2, padding: f2 }), reset: function() {
+        l2.reset.call(this);
+        var e4 = this.cfg, t4 = e4.iv, n3 = e4.mode;
+        if (this._xformMode == this._ENC_XFORM_MODE)
+          var s3 = n3.createEncryptor;
+        else
+          s3 = n3.createDecryptor, this._minBufferSize = 1;
+        this._mode && this._mode.__creator == s3 ? this._mode.init(this, t4 && t4.words) : (this._mode = s3.call(n3, this, t4 && t4.words), this._mode.__creator = s3);
+      }, _doProcessBlock: function(e4, t4) {
+        this._mode.processBlock(e4, t4);
+      }, _doFinalize: function() {
+        var e4 = this.cfg.padding;
+        if (this._xformMode == this._ENC_XFORM_MODE) {
+          e4.pad(this._data, this.blockSize);
+          var t4 = this._process(true);
+        } else
+          t4 = this._process(true), e4.unpad(t4);
+        return t4;
+      }, blockSize: 4 });
+      var g2 = s2.CipherParams = r2.extend({ init: function(e4) {
+        this.mixIn(e4);
+      }, toString: function(e4) {
+        return (e4 || this.formatter).stringify(this);
+      } }), m2 = (t3.format = {}).OpenSSL = { stringify: function(e4) {
+        var t4 = e4.ciphertext, n3 = e4.salt;
+        if (n3)
+          var s3 = i2.create([1398893684, 1701076831]).concat(n3).concat(t4);
+        else
+          s3 = t4;
+        return s3.toString(c2);
+      }, parse: function(e4) {
+        var t4 = c2.parse(e4), n3 = t4.words;
+        if (1398893684 == n3[0] && 1701076831 == n3[1]) {
+          var s3 = i2.create(n3.slice(2, 4));
+          n3.splice(0, 4), t4.sigBytes -= 16;
+        }
+        return g2.create({ ciphertext: t4, salt: s3 });
+      } }, y2 = s2.SerializableCipher = r2.extend({ cfg: r2.extend({ format: m2 }), encrypt: function(e4, t4, n3, s3) {
+        s3 = this.cfg.extend(s3);
+        var r3 = e4.createEncryptor(n3, s3), i3 = r3.finalize(t4), o3 = r3.cfg;
+        return g2.create({ ciphertext: i3, key: n3, iv: o3.iv, algorithm: e4, mode: o3.mode, padding: o3.padding, blockSize: e4.blockSize, formatter: s3.format });
+      }, decrypt: function(e4, t4, n3, s3) {
+        return s3 = this.cfg.extend(s3), t4 = this._parse(t4, s3.format), e4.createDecryptor(n3, s3).finalize(t4.ciphertext);
+      }, _parse: function(e4, t4) {
+        return "string" == typeof e4 ? t4.parse(e4, this) : e4;
+      } }), _2 = (t3.kdf = {}).OpenSSL = { execute: function(e4, t4, n3, s3) {
+        s3 || (s3 = i2.random(8));
+        var r3 = u2.create({ keySize: t4 + n3 }).compute(e4, s3), o3 = i2.create(r3.words.slice(t4), 4 * n3);
+        return r3.sigBytes = 4 * t4, g2.create({ key: r3, iv: o3, salt: s3 });
+      } }, w2 = s2.PasswordBasedCipher = y2.extend({ cfg: y2.cfg.extend({ kdf: _2 }), encrypt: function(e4, t4, n3, s3) {
+        var r3 = (s3 = this.cfg.extend(s3)).kdf.execute(n3, e4.keySize, e4.ivSize);
+        s3.iv = r3.iv;
+        var i3 = y2.encrypt.call(this, e4, t4, r3.key, s3);
+        return i3.mixIn(r3), i3;
+      }, decrypt: function(e4, t4, n3, s3) {
+        s3 = this.cfg.extend(s3), t4 = this._parse(t4, s3.format);
+        var r3 = s3.kdf.execute(n3, e4.keySize, e4.ivSize, t4.salt);
+        return s3.iv = r3.iv, y2.decrypt.call(this, e4, t4, r3.key, s3);
+      } });
+    }());
+  });
+  s(function(e2, t2) {
+    var n2;
+    e2.exports = (n2 = i, function() {
+      var e3 = n2, t3 = e3.lib.BlockCipher, s2 = e3.algo, r2 = [], i2 = [], o2 = [], a2 = [], c2 = [], u2 = [], l2 = [], d2 = [], h2 = [], p2 = [];
+      !function() {
+        for (var e4 = [], t4 = 0; t4 < 256; t4++)
+          e4[t4] = t4 < 128 ? t4 << 1 : t4 << 1 ^ 283;
+        var n3 = 0, s3 = 0;
+        for (t4 = 0; t4 < 256; t4++) {
+          var f3 = s3 ^ s3 << 1 ^ s3 << 2 ^ s3 << 3 ^ s3 << 4;
+          f3 = f3 >>> 8 ^ 255 & f3 ^ 99, r2[n3] = f3, i2[f3] = n3;
+          var g3 = e4[n3], m2 = e4[g3], y2 = e4[m2], _2 = 257 * e4[f3] ^ 16843008 * f3;
+          o2[n3] = _2 << 24 | _2 >>> 8, a2[n3] = _2 << 16 | _2 >>> 16, c2[n3] = _2 << 8 | _2 >>> 24, u2[n3] = _2, _2 = 16843009 * y2 ^ 65537 * m2 ^ 257 * g3 ^ 16843008 * n3, l2[f3] = _2 << 24 | _2 >>> 8, d2[f3] = _2 << 16 | _2 >>> 16, h2[f3] = _2 << 8 | _2 >>> 24, p2[f3] = _2, n3 ? (n3 = g3 ^ e4[e4[e4[y2 ^ g3]]], s3 ^= e4[e4[s3]]) : n3 = s3 = 1;
+        }
+      }();
+      var f2 = [0, 1, 2, 4, 8, 16, 32, 64, 128, 27, 54], g2 = s2.AES = t3.extend({ _doReset: function() {
+        if (!this._nRounds || this._keyPriorReset !== this._key) {
+          for (var e4 = this._keyPriorReset = this._key, t4 = e4.words, n3 = e4.sigBytes / 4, s3 = 4 * ((this._nRounds = n3 + 6) + 1), i3 = this._keySchedule = [], o3 = 0; o3 < s3; o3++)
+            if (o3 < n3)
+              i3[o3] = t4[o3];
+            else {
+              var a3 = i3[o3 - 1];
+              o3 % n3 ? n3 > 6 && o3 % n3 == 4 && (a3 = r2[a3 >>> 24] << 24 | r2[a3 >>> 16 & 255] << 16 | r2[a3 >>> 8 & 255] << 8 | r2[255 & a3]) : (a3 = r2[(a3 = a3 << 8 | a3 >>> 24) >>> 24] << 24 | r2[a3 >>> 16 & 255] << 16 | r2[a3 >>> 8 & 255] << 8 | r2[255 & a3], a3 ^= f2[o3 / n3 | 0] << 24), i3[o3] = i3[o3 - n3] ^ a3;
+            }
+          for (var c3 = this._invKeySchedule = [], u3 = 0; u3 < s3; u3++)
+            o3 = s3 - u3, a3 = u3 % 4 ? i3[o3] : i3[o3 - 4], c3[u3] = u3 < 4 || o3 <= 4 ? a3 : l2[r2[a3 >>> 24]] ^ d2[r2[a3 >>> 16 & 255]] ^ h2[r2[a3 >>> 8 & 255]] ^ p2[r2[255 & a3]];
+        }
+      }, encryptBlock: function(e4, t4) {
+        this._doCryptBlock(e4, t4, this._keySchedule, o2, a2, c2, u2, r2);
+      }, decryptBlock: function(e4, t4) {
+        var n3 = e4[t4 + 1];
+        e4[t4 + 1] = e4[t4 + 3], e4[t4 + 3] = n3, this._doCryptBlock(e4, t4, this._invKeySchedule, l2, d2, h2, p2, i2), n3 = e4[t4 + 1], e4[t4 + 1] = e4[t4 + 3], e4[t4 + 3] = n3;
+      }, _doCryptBlock: function(e4, t4, n3, s3, r3, i3, o3, a3) {
+        for (var c3 = this._nRounds, u3 = e4[t4] ^ n3[0], l3 = e4[t4 + 1] ^ n3[1], d3 = e4[t4 + 2] ^ n3[2], h3 = e4[t4 + 3] ^ n3[3], p3 = 4, f3 = 1; f3 < c3; f3++) {
+          var g3 = s3[u3 >>> 24] ^ r3[l3 >>> 16 & 255] ^ i3[d3 >>> 8 & 255] ^ o3[255 & h3] ^ n3[p3++], m2 = s3[l3 >>> 24] ^ r3[d3 >>> 16 & 255] ^ i3[h3 >>> 8 & 255] ^ o3[255 & u3] ^ n3[p3++], y2 = s3[d3 >>> 24] ^ r3[h3 >>> 16 & 255] ^ i3[u3 >>> 8 & 255] ^ o3[255 & l3] ^ n3[p3++], _2 = s3[h3 >>> 24] ^ r3[u3 >>> 16 & 255] ^ i3[l3 >>> 8 & 255] ^ o3[255 & d3] ^ n3[p3++];
+          u3 = g3, l3 = m2, d3 = y2, h3 = _2;
+        }
+        g3 = (a3[u3 >>> 24] << 24 | a3[l3 >>> 16 & 255] << 16 | a3[d3 >>> 8 & 255] << 8 | a3[255 & h3]) ^ n3[p3++], m2 = (a3[l3 >>> 24] << 24 | a3[d3 >>> 16 & 255] << 16 | a3[h3 >>> 8 & 255] << 8 | a3[255 & u3]) ^ n3[p3++], y2 = (a3[d3 >>> 24] << 24 | a3[h3 >>> 16 & 255] << 16 | a3[u3 >>> 8 & 255] << 8 | a3[255 & l3]) ^ n3[p3++], _2 = (a3[h3 >>> 24] << 24 | a3[u3 >>> 16 & 255] << 16 | a3[l3 >>> 8 & 255] << 8 | a3[255 & d3]) ^ n3[p3++], e4[t4] = g3, e4[t4 + 1] = m2, e4[t4 + 2] = y2, e4[t4 + 3] = _2;
+      }, keySize: 8 });
+      e3.AES = t3._createHelper(g2);
+    }(), n2.AES);
+  });
+  s(function(e2, t2) {
+    var n2;
+    e2.exports = ((n2 = i).pad.NoPadding = { pad: function() {
+    }, unpad: function() {
+    } }, n2.pad.NoPadding);
+  });
+  let On, En;
+  function Un(e2) {
     const t2 = ["hasClientKey", "encryptGetClientKeyPayload", "setClientKey", "encrypt", "decrypt"], n2 = {};
     for (let s2 = 0; s2 < t2.length; s2++) {
       const r2 = t2[s2];
@@ -28742,16 +26646,16 @@
           "function" == typeof e2[r2] ? e2[r2]({ ...t3[0], success(e3) {
             n3(e3);
           }, fail(e3) {
-            s3(wn({ errCode: e3.errCode, errMsg: yn[e3.errCode] || e3.errMsg || e3.message }));
-          } }) : s3(wn({ message: "请检查manifest.json内是否开启安全网络模块，另外注意标准基座不支持安全网络模块" }));
+            s3(In({ errCode: e3.errCode, errMsg: wn[e3.errCode] || e3.errMsg || e3.message }));
+          } }) : s3(In({ message: "请检查manifest.json内是否开启安全网络模块，另外注意标准基座不支持安全网络模块" }));
         });
       };
     }
     return n2;
   }
-  class os extends vn {
+  class Nn extends Sn {
     constructor(e2) {
-      super(e2), this.clientType = "app", this.appUtils = { ...is(uni.__getSecureNetworkManager()) }, this.systemInfo = ts || (ts = he());
+      super(e2), this.clientType = "app", this.appUtils = { ...Un(uni.__getSecureNetworkManager()) }, this.systemInfo = On || (On = he());
     }
     async hasClientKey() {
       return this._hasClientKey = await this.appUtils.hasClientKey({ provider: this.provider, spaceId: this.spaceId }), this._hasClientKey;
@@ -28759,17 +26663,17 @@
     async getAppClientKey() {
       const { data: e2, key: t2 } = await this.appUtils.encryptGetClientKeyPayload({ data: {} }), n2 = (await this.uniCloudIns.callFunction({ name: "DCloud-clientDB", data: { redirectTo: "encryption", action: "getAppClientKey", data: e2, key: t2 } })).result || {};
       if (0 !== n2.errCode)
-        throw _n(n2);
+        throw vn(n2);
       const { clientKey: s2, key: r2 } = n2;
       await this.appUtils.setClientKey({ provider: this.provider, spaceId: this.spaceId, clientKey: s2, key: r2 });
     }
     async ensureClientKey({ forceUpdate: e2 = false } = {}) {
       if (true !== await this.hasClientKey() || e2)
-        return e2 && this.scopedGlobalCache.initPromise && this.scopedGlobalCache.initStatus === l || !e2 && this.scopedGlobalCache.initPromise && this.scopedGlobalCache.initStatus !== p || (this.scopedGlobalCache.initPromise = this.getAppClientKey(), this.scopedGlobalCache.initPromise.then((e3) => {
-          this.scopedGlobalCache.initStatus = d;
+        return e2 && this.scopedGlobalCache.initPromise && this.scopedGlobalCache.initStatus === p || !e2 && this.scopedGlobalCache.initPromise && this.scopedGlobalCache.initStatus !== g || (this.scopedGlobalCache.initPromise = this.getAppClientKey(), this.scopedGlobalCache.initPromise.then((e3) => {
+          this.scopedGlobalCache.initStatus = f;
         }).catch((e3) => {
-          throw this.scopedGlobalCache.initStatus = p, e3;
-        }), this.scopedGlobalCache.initStatus = l), this.scopedGlobalCache.initPromise;
+          throw this.scopedGlobalCache.initStatus = g, e3;
+        }), this.scopedGlobalCache.initStatus = p), this.scopedGlobalCache.initPromise;
     }
     async prepare({ forceUpdate: e2 = false } = {}) {
       await this.ensureClientKey({ forceUpdate: e2 });
@@ -28780,7 +26684,7 @@
     }
     async platformEncryptData(e2) {
       const { data: t2, key: n2 } = await this.appUtils.encrypt({ provider: this.provider, spaceId: this.spaceId, data: JSON.stringify(e2) }), s2 = { secretType: this.secretType, encryptKeyId: n2 };
-      return this.secretType === dn ? { content: e2, _uniCloudOptions: s2 } : { content: t2, _uniCloudOptions: s2 };
+      return this.secretType === fn ? { content: e2, _uniCloudOptions: s2 } : { content: t2, _uniCloudOptions: s2 };
     }
     async platformDecryptResult(e2) {
       const { content: t2, _uniCloudOptions: n2 = {} } = e2, s2 = n2.encryptKeyId, r2 = await this.appUtils.decrypt({ provider: this.provider, spaceId: this.spaceId, data: t2, key: s2 });
@@ -28791,18 +26695,18 @@
       return 70009 === t2.errCode && "uni-secure-network" === t2.errSubject;
     }
   }
-  function as({ secretType: e2 } = {}) {
-    return e2 === ln || e2 === dn || e2 === pn;
+  function Dn({ secretType: e2 } = {}) {
+    return e2 === pn || e2 === fn || e2 === gn;
   }
-  function cs({ name: e2, data: t2 = {} } = {}) {
+  function Mn({ name: e2, data: t2 = {} } = {}) {
     return "DCloud-clientDB" === e2 && "encryption" === t2.redirectTo && "getAppClientKey" === t2.action;
   }
-  function us({ provider: e2, spaceId: t2, functionName: n2 } = {}) {
+  function Fn({ provider: e2, spaceId: t2, functionName: n2 } = {}) {
     const { appId: s2, uniPlatform: r2, osName: i2 } = he();
     let o2 = r2;
     "app" === r2 && (o2 = i2);
     const a2 = function({ provider: e3, spaceId: t3 } = {}) {
-      const n3 = k;
+      const n3 = T;
       if (!n3)
         return {};
       e3 = /* @__PURE__ */ function(e4) {
@@ -28816,7 +26720,7 @@
     const c2 = a2.accessControl.function || {}, u2 = Object.keys(c2);
     if (0 === u2.length)
       return true;
-    const h2 = function(e3, t3) {
+    const l2 = function(e3, t3) {
       let n3, s3, r3;
       for (let i3 = 0; i3 < e3.length; i3++) {
         const o3 = e3[i3];
@@ -28824,56 +26728,56 @@
       }
       return n3 || s3 || r3;
     }(u2, n2);
-    if (!h2)
+    if (!l2)
       return false;
-    if ((c2[h2] || []).find((e3 = {}) => e3.appId === s2 && (e3.platform || "").toLowerCase() === o2.toLowerCase()))
+    if ((c2[l2] || []).find((e3 = {}) => e3.appId === s2 && (e3.platform || "").toLowerCase() === o2.toLowerCase()))
       return true;
-    throw console.error("此应用[appId: ".concat(s2, ", platform: ").concat(o2, "]不在云端配置的允许访问的应用列表内，参考：https://uniapp.dcloud.net.cn/uniCloud/secure-network.html#verify-client")), wn(gn);
+    throw console.error("此应用[appId: ".concat(s2, ", platform: ").concat(o2, "]不在云端配置的允许访问的应用列表内，参考：https://uniapp.dcloud.net.cn/uniCloud/secure-network.html#verify-client")), In(yn);
   }
-  function hs({ functionName: e2, result: t2, logPvd: n2 }) {
+  function qn({ functionName: e2, result: t2, logPvd: n2 }) {
     if (this.__dev__.debugLog && t2 && t2.requestId) {
       const s2 = JSON.stringify({ spaceId: this.config.spaceId, functionName: e2, requestId: t2.requestId });
       console.log("[".concat(n2, "-request]").concat(s2, "[/").concat(n2, "-request]"));
     }
   }
-  function ls(e2) {
-    const t2 = e2.callFunction, n2 = function(n3) {
-      const s2 = n3.name;
-      n3.data = zt.call(e2, { data: n3.data });
-      const r2 = { aliyun: "aliyun", tencent: "tcb", tcb: "tcb", alipay: "alipay", dcloud: "dcloud" }[this.config.provider], i2 = as(n3), o2 = cs(n3), a2 = i2 || o2;
-      return t2.call(this, n3).then((e3) => (e3.errCode = 0, !a2 && hs.call(this, { functionName: s2, result: e3, logPvd: r2 }), Promise.resolve(e3)), (e3) => (!a2 && hs.call(this, { functionName: s2, result: e3, logPvd: r2 }), e3 && e3.message && (e3.message = function({ message: e4 = "", extraInfo: t3 = {}, formatter: n4 = [] } = {}) {
-        for (let s3 = 0; s3 < n4.length; s3++) {
-          const { rule: r3, content: i3, mode: o3 } = n4[s3], a3 = e4.match(r3);
+  function Kn(t2) {
+    const n2 = t2.callFunction, s2 = function(e2) {
+      const s3 = e2.name;
+      e2.data = Gt.call(t2, { data: e2.data });
+      const r2 = { aliyun: "aliyun", tencent: "tcb", tcb: "tcb", alipay: "alipay", dcloud: "dcloud" }[this.config.provider], i2 = Dn(e2), o2 = Mn(e2), a2 = i2 || o2;
+      return n2.call(this, e2).then((e3) => (e3.errCode = 0, !a2 && qn.call(this, { functionName: s3, result: e3, logPvd: r2 }), Promise.resolve(e3)), (t3) => (!a2 && qn.call(this, { functionName: s3, result: t3, logPvd: r2 }), t3 && t3.message && (t3.message = function({ message: e3 = "", extraInfo: t4 = {}, formatter: n3 = [] } = {}) {
+        for (let s4 = 0; s4 < n3.length; s4++) {
+          const { rule: r3, content: i3, mode: o3 } = n3[s4], a3 = e3.match(r3);
           if (!a3)
             continue;
           let c2 = i3;
-          for (let e5 = 1; e5 < a3.length; e5++)
-            c2 = un(c2, "{$".concat(e5, "}"), a3[e5]);
-          for (const e5 in t3)
-            c2 = un(c2, "{".concat(e5, "}"), t3[e5]);
-          return "replace" === o3 ? c2 : e4 + c2;
+          for (let e4 = 1; e4 < a3.length; e4++)
+            c2 = dn(c2, "{$".concat(e4, "}"), a3[e4]);
+          for (const e4 in t4)
+            c2 = dn(c2, "{".concat(e4, "}"), t4[e4]);
+          return "replace" === o3 ? c2 : e3 + c2;
         }
-        return e4;
-      }({ message: "[".concat(n3.name, "]: ").concat(e3.message), formatter: on, extraInfo: { functionName: s2 } })), Promise.reject(e3)));
+        return e3;
+      }({ message: "[".concat(e2.name, "]: ").concat(t3.message), formatter: cn, extraInfo: { functionName: s3 } })), Promise.reject(t3)));
     };
-    e2.callFunction = function(t3) {
-      const { provider: s2, spaceId: r2 } = e2.config, i2 = t3.name;
-      let o2, a2;
-      if (t3.data = t3.data || {}, e2.__dev__.debugInfo && !e2.__dev__.debugInfo.forceRemote && C && e2._isDefault ? (e2._callCloudFunction || (e2._callCloudFunction = n2, e2._callLocalFunction = rn), o2 = rn) : o2 = n2, o2 = o2.bind(e2), cs(t3))
-        a2 = n2.call(e2, t3);
-      else if (as(t3)) {
-        a2 = new ns({ secretType: t3.secretType, uniCloudIns: e2 }).wrapEncryptDataCallFunction(n2.bind(e2))(t3);
-      } else if (us({ provider: s2, spaceId: r2, functionName: i2 })) {
-        a2 = new ns({ secretType: t3.secretType, uniCloudIns: e2 }).wrapVerifyClientCallFunction(n2.bind(e2))(t3);
+    t2.callFunction = function(n3) {
+      const { provider: r2, spaceId: i2 } = t2.config, o2 = n3.name;
+      let a2, c2;
+      if (n3.data = n3.data || {}, t2.__dev__.debugInfo && !t2.__dev__.debugInfo.forceRemote && x && t2._isDefault ? (t2._callCloudFunction || (t2._callCloudFunction = s2, t2._callLocalFunction = an), a2 = an) : a2 = s2, a2 = a2.bind(t2), Mn(n3))
+        c2 = s2.call(t2, n3);
+      else if (Dn(n3)) {
+        c2 = new En({ secretType: n3.secretType, uniCloudIns: t2 }).wrapEncryptDataCallFunction(s2.bind(t2))(n3);
+      } else if (Fn({ provider: r2, spaceId: i2, functionName: o2 })) {
+        c2 = new En({ secretType: n3.secretType, uniCloudIns: t2 }).wrapVerifyClientCallFunction(s2.bind(t2))(n3);
       } else
-        a2 = o2(t3);
-      return Object.defineProperty(a2, "result", { get: () => (console.warn("当前返回结果为Promise类型，不可直接访问其result属性，详情请参考：https://uniapp.dcloud.net.cn/uniCloud/faq?id=promise"), {}) }), a2.then((e3) => (e3.result = UTS.JSON.parse(JSON.stringify(e3.result)), e3));
+        c2 = a2(n3);
+      return Object.defineProperty(c2, "result", { get: () => (console.warn("当前返回结果为Promise类型，不可直接访问其result属性，详情请参考：https://uniapp.dcloud.net.cn/uniCloud/faq?id=promise"), {}) }), c2.then((t3) => (t3.result = UTS$1.JSON.parse(JSON.stringify(t3.result)), t3));
     };
   }
-  ns = os;
-  const ds = Symbol("CLIENT_DB_INTERNAL");
-  function ps(e2, t2) {
-    return e2.then = "DoNotReturnProxyWithAFunctionNamedThen", e2._internalType = ds, e2.inspect = null, e2.__v_raw = void 0, new Proxy(e2, { get(e3, n2, s2) {
+  En = Nn;
+  const jn = Symbol("CLIENT_DB_INTERNAL");
+  function Bn(e2, t2) {
+    return e2.then = "DoNotReturnProxyWithAFunctionNamedThen", e2._internalType = jn, e2.inspect = null, e2.__v_raw = void 0, new Proxy(e2, { get(e3, n2, s2) {
       if ("_uniClient" === n2)
         return null;
       if ("symbol" == typeof n2)
@@ -28885,7 +26789,7 @@
       return t2.get(e3, n2, s2);
     } });
   }
-  function fs(e2) {
+  function $n(e2) {
     return { on: (t2, n2) => {
       e2[t2] = e2[t2] || [], e2[t2].indexOf(n2) > -1 || e2[t2].push(n2);
     }, off: (t2, n2) => {
@@ -28894,17 +26798,17 @@
       -1 !== s2 && e2[t2].splice(s2, 1);
     } };
   }
-  const gs = ["db.Geo", "db.command", "command.aggregate"];
-  function ms(e2, t2) {
-    return gs.indexOf("".concat(e2, ".").concat(t2)) > -1;
+  const Hn = ["db.Geo", "db.command", "command.aggregate"];
+  function Wn(e2, t2) {
+    return Hn.indexOf("".concat(e2, ".").concat(t2)) > -1;
   }
-  function ys(e2) {
-    switch (f(e2 = ie(e2))) {
+  function Jn(e2) {
+    switch (m(e2 = ae(e2))) {
       case "array":
-        return e2.map((e3) => ys(e3));
+        return e2.map((e3) => Jn(e3));
       case "object":
-        return e2._internalType === ds || Object.keys(e2).forEach((t2) => {
-          e2[t2] = ys(e2[t2]);
+        return e2._internalType === jn || Object.keys(e2).forEach((t2) => {
+          e2[t2] = Jn(e2[t2]);
         }), e2;
       case "regexp":
         return { $regexp: { source: e2.source, flags: e2.flags } };
@@ -28914,10 +26818,10 @@
         return e2;
     }
   }
-  function _s(e2) {
+  function zn(e2) {
     return e2 && e2.content && e2.content.$method;
   }
-  class ws {
+  class Vn {
     constructor(e2, t2, n2) {
       this.content = e2, this.prevStage = t2 || null, this.udb = null, this._database = n2;
     }
@@ -28926,7 +26830,7 @@
       const t2 = [e2.content];
       for (; e2.prevStage; )
         e2 = e2.prevStage, t2.push(e2.content);
-      return { $db: t2.reverse().map((e3) => ({ $method: e3.$method, $param: ys(e3.$param) })) };
+      return { $db: t2.reverse().map((e3) => ({ $method: e3.$method, $param: Jn(e3.$param) })) };
     }
     toString() {
       return JSON.stringify(this.toJSON());
@@ -28941,7 +26845,7 @@
     get isAggregate() {
       let e2 = this;
       for (; e2; ) {
-        const t2 = _s(e2), n2 = _s(e2.prevStage);
+        const t2 = zn(e2), n2 = zn(e2.prevStage);
         if ("aggregate" === t2 && "collection" === n2 || "pipeline" === t2)
           return true;
         e2 = e2.prevStage;
@@ -28951,7 +26855,7 @@
     get isCommand() {
       let e2 = this;
       for (; e2; ) {
-        if ("command" === _s(e2))
+        if ("command" === zn(e2))
           return true;
         e2 = e2.prevStage;
       }
@@ -28960,7 +26864,7 @@
     get isAggregateCommand() {
       let e2 = this;
       for (; e2; ) {
-        const t2 = _s(e2), n2 = _s(e2.prevStage);
+        const t2 = zn(e2), n2 = zn(e2.prevStage);
         if ("aggregate" === t2 && "command" === n2)
           return true;
         e2 = e2.prevStage;
@@ -28970,7 +26874,7 @@
     getNextStageFn(e2) {
       const t2 = this;
       return function() {
-        return vs({ $method: e2, $param: ys(Array.from(arguments)) }, t2, t2._database);
+        return Gn({ $method: e2, $param: Jn(Array.from(arguments)) }, t2, t2._database);
       };
     }
     get count() {
@@ -29004,22 +26908,22 @@
     }
     _send(e2, t2) {
       const n2 = this.getAction(), s2 = this.getCommand();
-      if (s2.$db.push({ $method: e2, $param: ys(t2) }), S) {
+      if (s2.$db.push({ $method: e2, $param: Jn(t2) }), A) {
         const e3 = s2.$db.find((e4) => "collection" === e4.$method), t3 = e3 && e3.$param;
         t3 && 1 === t3.length && "string" == typeof e3.$param[0] && e3.$param[0].indexOf(",") > -1 && console.warn("检测到使用JQL语法联表查询时，未使用getTemp先过滤主表数据，在主表数据量大的情况下可能会查询缓慢。\n- 如何优化请参考此文档：https://uniapp.dcloud.net.cn/uniCloud/jql?id=lookup-with-temp \n- 如果主表数据量很小请忽略此信息，项目发行时不会出现此提示。");
       }
       return this._database._callCloudFunction({ action: n2, command: s2 });
     }
   }
-  function vs(e2, t2, n2) {
-    return ps(new ws(e2, t2, n2), { get(e3, t3) {
+  function Gn(e2, t2, n2) {
+    return Bn(new Vn(e2, t2, n2), { get(e3, t3) {
       let s2 = "db";
-      return e3 && e3.content && (s2 = e3.content.$method), ms(s2, t3) ? vs({ $method: t3 }, e3, n2) : function() {
-        return vs({ $method: t3, $param: ys(Array.from(arguments)) }, e3, n2);
+      return e3 && e3.content && (s2 = e3.content.$method), Wn(s2, t3) ? Gn({ $method: t3 }, e3, n2) : function() {
+        return Gn({ $method: t3, $param: Jn(Array.from(arguments)) }, e3, n2);
       };
     } });
   }
-  function Is({ path: e2, method: t2 }) {
+  function Qn({ path: e2, method: t2 }) {
     return class {
       constructor() {
         this.param = Array.from(arguments);
@@ -29032,14 +26936,14 @@
       }
     };
   }
-  function Ss(e2, t2 = {}) {
-    return ps(new e2(t2), { get: (e3, t3) => ms("db", t3) ? vs({ $method: t3 }, null, e3) : function() {
-      return vs({ $method: t3, $param: ys(Array.from(arguments)) }, null, e3);
+  function Yn(e2, t2 = {}) {
+    return Bn(new e2(t2), { get: (e3, t3) => Wn("db", t3) ? Gn({ $method: t3 }, null, e3) : function() {
+      return Gn({ $method: t3, $param: Jn(Array.from(arguments)) }, null, e3);
     } });
   }
-  class bs extends class {
+  class Xn extends class {
     constructor({ uniClient: e2 = {}, isJQL: t2 = false } = {}) {
-      this._uniClient = e2, this._authCallBacks = {}, this._dbCallBacks = {}, e2._isDefault && (this._dbCallBacks = L("_globalUniCloudDatabaseCallback")), t2 || (this.auth = fs(this._authCallBacks)), this._isJQL = t2, Object.assign(this, fs(this._dbCallBacks)), this.env = ps({}, { get: (e3, t3) => ({ $env: t3 }) }), this.Geo = ps({}, { get: (e3, t3) => Is({ path: ["Geo"], method: t3 }) }), this.serverDate = Is({ path: [], method: "serverDate" }), this.RegExp = Is({ path: [], method: "RegExp" });
+      this._uniClient = e2, this._authCallBacks = {}, this._dbCallBacks = {}, e2._isDefault && (this._dbCallBacks = U("_globalUniCloudDatabaseCallback")), t2 || (this.auth = $n(this._authCallBacks)), this._isJQL = t2, Object.assign(this, $n(this._dbCallBacks)), this.env = Bn({}, { get: (e3, t3) => ({ $env: t3 }) }), this.Geo = Bn({}, { get: (e3, t3) => Qn({ path: ["Geo"], method: t3 }) }), this.serverDate = Qn({ path: [], method: "serverDate" }), this.RegExp = Qn({ path: [], method: "RegExp" });
     }
     getCloudEnv(e2) {
       if ("string" != typeof e2 || !e2.trim())
@@ -29090,9 +26994,9 @@
       }
       const i2 = this, o2 = this._isJQL ? "databaseForJQL" : "database";
       function a2(e3) {
-        return i2._callback("error", [e3]), q(F(o2, "fail"), e3).then(() => q(F(o2, "complete"), e3)).then(() => (r2(null, e3), X($, { type: J, content: e3 }), Promise.reject(e3)));
+        return i2._callback("error", [e3]), K(j(o2, "fail"), e3).then(() => K(j(o2, "complete"), e3)).then(() => (r2(null, e3), ee(H, { type: V, content: e3 }), Promise.reject(e3)));
       }
-      const c2 = q(F(o2, "invoke")), u2 = this._uniClient;
+      const c2 = K(j(o2, "invoke")), u2 = this._uniClient;
       return c2.then(() => u2.callFunction({ name: "DCloud-clientDB", type: h, data: { action: e2, command: t2, multiCommand: n2 } })).then((e3) => {
         const { code: t3, message: n3, token: s3, tokenExpired: c3, systemInfo: u3 = [] } = e3.result;
         if (u3)
@@ -29102,45 +27006,45 @@
             s4 && (i3 = "".concat(i3, "\n详细信息：").concat(s4)), r3(i3);
           }
         if (t3) {
-          return a2(new se({ code: t3, message: n3, requestId: e3.requestId }));
+          return a2(new ie({ code: t3, message: n3, requestId: e3.requestId }));
         }
-        e3.result.errCode = e3.result.errCode || e3.result.code, e3.result.errMsg = e3.result.errMsg || e3.result.message, s3 && c3 && (ae({ token: s3, tokenExpired: c3 }), this._callbackAuth("refreshToken", [{ token: s3, tokenExpired: c3 }]), this._callback("refreshToken", [{ token: s3, tokenExpired: c3 }]), X(W, { token: s3, tokenExpired: c3 }));
-        const h2 = [{ prop: "affectedDocs", tips: "affectedDocs不再推荐使用，请使用inserted/deleted/updated/data.length替代" }, { prop: "code", tips: "code不再推荐使用，请使用errCode替代" }, { prop: "message", tips: "message不再推荐使用，请使用errMsg替代" }];
-        for (let t4 = 0; t4 < h2.length; t4++) {
-          const { prop: n4, tips: s4 } = h2[t4];
+        e3.result.errCode = e3.result.errCode || e3.result.code, e3.result.errMsg = e3.result.errMsg || e3.result.message, s3 && c3 && (ue({ token: s3, tokenExpired: c3 }), this._callbackAuth("refreshToken", [{ token: s3, tokenExpired: c3 }]), this._callback("refreshToken", [{ token: s3, tokenExpired: c3 }]), ee(J, { token: s3, tokenExpired: c3 }));
+        const l2 = [{ prop: "affectedDocs", tips: "affectedDocs不再推荐使用，请使用inserted/deleted/updated/data.length替代" }, { prop: "code", tips: "code不再推荐使用，请使用errCode替代" }, { prop: "message", tips: "message不再推荐使用，请使用errMsg替代" }];
+        for (let t4 = 0; t4 < l2.length; t4++) {
+          const { prop: n4, tips: s4 } = l2[t4];
           if (n4 in e3.result) {
             const t5 = e3.result[n4];
             Object.defineProperty(e3.result, n4, { get: () => (console.warn(s4), t5) });
           }
         }
         return function(e4) {
-          return q(F(o2, "success"), e4).then(() => q(F(o2, "complete"), e4)).then(() => {
+          return K(j(o2, "success"), e4).then(() => K(j(o2, "complete"), e4)).then(() => {
             r2(e4, null);
             const t4 = i2._parseResult(e4);
-            return X($, { type: J, content: t4 }), Promise.resolve(t4);
+            return ee(H, { type: V, content: t4 }), Promise.resolve(t4);
           });
         }(e3);
       }, (e3) => {
         /fc_function_not_found|FUNCTION_NOT_FOUND/g.test(e3.message) && console.warn("clientDB未初始化，请在web控制台保存一次schema以开启clientDB");
-        return a2(new se({ code: e3.code || "SYSTEM_ERROR", message: e3.message, requestId: e3.requestId }));
+        return a2(new ie({ code: e3.code || "SYSTEM_ERROR", message: e3.message, requestId: e3.requestId }));
       });
     }
   }
-  const ks = "token无效，跳转登录页面", As = "token过期，跳转登录页面", Ts = { TOKEN_INVALID_TOKEN_EXPIRED: As, TOKEN_INVALID_INVALID_CLIENTID: ks, TOKEN_INVALID: ks, TOKEN_INVALID_WRONG_TOKEN: ks, TOKEN_INVALID_ANONYMOUS_USER: ks }, Cs = { "uni-id-token-expired": As, "uni-id-check-token-failed": ks, "uni-id-token-not-exist": ks, "uni-id-check-device-feature-failed": ks }, Ps = { ...Ts, ...Cs, default: "用户未登录或登录状态过期，自动跳转登录页面" };
-  function Os(e2, t2) {
+  const Zn = "token无效，跳转登录页面", es = "token过期，跳转登录页面", ts = { TOKEN_INVALID_TOKEN_EXPIRED: es, TOKEN_INVALID_INVALID_CLIENTID: Zn, TOKEN_INVALID: Zn, TOKEN_INVALID_WRONG_TOKEN: Zn, TOKEN_INVALID_ANONYMOUS_USER: Zn }, ns = { "uni-id-token-expired": es, "uni-id-check-token-failed": Zn, "uni-id-token-not-exist": Zn, "uni-id-check-device-feature-failed": Zn }, ss = { ...ts, ...ns, default: "用户未登录或登录状态过期，自动跳转登录页面" };
+  function rs(e2, t2) {
     let n2 = "";
     return n2 = e2 ? "".concat(e2, "/").concat(t2) : t2, n2.replace(/^\//, "");
   }
-  function Es(e2 = [], t2 = "") {
+  function is(e2 = [], t2 = "") {
     const n2 = [], s2 = [];
     return e2.forEach((e3) => {
-      true === e3.needLogin ? n2.push(Os(t2, e3.path)) : false === e3.needLogin && s2.push(Os(t2, e3.path));
+      true === e3.needLogin ? n2.push(rs(t2, e3.path)) : false === e3.needLogin && s2.push(rs(t2, e3.path));
     }), { needLoginPage: n2, notNeedLoginPage: s2 };
   }
-  function xs(e2) {
+  function os(e2) {
     return e2.split("?")[0].replace(/^\//, "");
   }
-  function Ls() {
+  function as() {
     return function(e2) {
       let t2 = e2 && e2.route;
       return t2 ? ("/" !== t2.charAt(0) && (t2 = "/" + t2), t2) : "";
@@ -29149,32 +27053,32 @@
       return e2[e2.length - 1];
     }());
   }
-  function Rs() {
-    return xs(Ls());
+  function cs() {
+    return os(as());
   }
-  function Us(e2 = "", t2 = {}) {
+  function us(e2 = "", t2 = {}) {
     if (!e2)
       return false;
     if (!(t2 && t2.list && t2.list.length))
       return false;
-    const n2 = t2.list, s2 = xs(e2);
+    const n2 = t2.list, s2 = os(e2);
     return n2.some((e3) => e3.pagePath === s2);
   }
-  const Ns = !!e.uniIdRouter;
-  const { loginPage: Ds, routerNeedLogin: Ms, resToLogin: qs, needLoginPage: Fs, notNeedLoginPage: Ks, loginPageInTabBar: js } = function({ pages: t2 = [], subPackages: n2 = [], uniIdRouter: s2 = {}, tabBar: r2 = {} } = e) {
-    const { loginPage: i2, needLogin: o2 = [], resToLogin: a2 = true } = s2, { needLoginPage: c2, notNeedLoginPage: u2 } = Es(t2), { needLoginPage: h2, notNeedLoginPage: l2 } = function(e2 = []) {
-      const t3 = [], n3 = [];
-      return e2.forEach((e3) => {
-        const { root: s3, pages: r3 = [] } = e3, { needLoginPage: i3, notNeedLoginPage: o3 } = Es(r3, s3);
-        t3.push(...i3), n3.push(...o3);
-      }), { needLoginPage: t3, notNeedLoginPage: n3 };
+  const ls = !!t.uniIdRouter;
+  const { loginPage: ds, routerNeedLogin: hs, resToLogin: ps, needLoginPage: fs, notNeedLoginPage: gs, loginPageInTabBar: ms } = function({ pages: e2 = [], subPackages: n2 = [], uniIdRouter: s2 = {}, tabBar: r2 = {} } = t) {
+    const { loginPage: i2, needLogin: o2 = [], resToLogin: a2 = true } = s2, { needLoginPage: c2, notNeedLoginPage: u2 } = is(e2), { needLoginPage: l2, notNeedLoginPage: d2 } = function(e3 = []) {
+      const t2 = [], n3 = [];
+      return e3.forEach((e4) => {
+        const { root: s3, pages: r3 = [] } = e4, { needLoginPage: i3, notNeedLoginPage: o3 } = is(r3, s3);
+        t2.push(...i3), n3.push(...o3);
+      }), { needLoginPage: t2, notNeedLoginPage: n3 };
     }(n2);
-    return { loginPage: i2, routerNeedLogin: o2, resToLogin: a2, needLoginPage: [...c2, ...h2], notNeedLoginPage: [...u2, ...l2], loginPageInTabBar: Us(i2, r2) };
+    return { loginPage: i2, routerNeedLogin: o2, resToLogin: a2, needLoginPage: [...c2, ...l2], notNeedLoginPage: [...u2, ...d2], loginPageInTabBar: us(i2, r2) };
   }();
-  if (Fs.indexOf(Ds) > -1)
-    throw new Error("Login page [".concat(Ds, '] should not be "needLogin", please check your pages.json'));
-  function $s(e2) {
-    const t2 = Rs();
+  if (fs.indexOf(ds) > -1)
+    throw new Error("Login page [".concat(ds, '] should not be "needLogin", please check your pages.json'));
+  function ys(e2) {
+    const t2 = cs();
     if ("/" === e2.charAt(0))
       return e2;
     const [n2, s2] = e2.split("?"), r2 = n2.replace(/^\//, "").split("/"), i2 = t2.split("/");
@@ -29185,69 +27089,69 @@
     }
     return "" === i2[0] && i2.shift(), "/" + i2.join("/") + (s2 ? "?" + s2 : "");
   }
-  function Bs(e2, t2) {
+  function _s(e2, t2) {
     return new RegExp(t2).test(e2);
   }
-  function Ws({ redirect: e2 }) {
-    const t2 = xs(e2), n2 = xs(Ds);
-    return Rs() !== n2 && t2 !== n2;
+  function ws({ redirect: e2 }) {
+    const t2 = os(e2), n2 = os(ds);
+    return cs() !== n2 && t2 !== n2;
   }
-  function Hs({ api: e2, redirect: t2 } = {}) {
-    if (!t2 || !Ws({ redirect: t2 }))
+  function vs({ api: e2, redirect: t2 } = {}) {
+    if (!t2 || !ws({ redirect: t2 }))
       return;
     const n2 = function(e3, t3) {
       return "/" !== e3.charAt(0) && (e3 = "/" + e3), t3 ? e3.indexOf("?") > -1 ? e3 + "&uniIdRedirectUrl=".concat(encodeURIComponent(t3)) : e3 + "?uniIdRedirectUrl=".concat(encodeURIComponent(t3)) : e3;
-    }(Ds, t2);
-    js ? "navigateTo" !== e2 && "redirectTo" !== e2 || (e2 = "switchTab") : "switchTab" === e2 && (e2 = "navigateTo");
+    }(ds, t2);
+    ms ? "navigateTo" !== e2 && "redirectTo" !== e2 || (e2 = "switchTab") : "switchTab" === e2 && (e2 = "navigateTo");
     const s2 = { navigateTo: uni.navigateTo, redirectTo: uni.redirectTo, switchTab: uni.switchTab, reLaunch: uni.reLaunch };
     setTimeout(() => {
       s2[e2]({ url: n2 });
     }, 0);
   }
-  function Js({ url: e2 } = {}) {
+  function Is({ url: e2 } = {}) {
     const t2 = { abortLoginPageJump: false, autoToLoginPage: false }, n2 = function() {
-      const { token: e3, tokenExpired: t3 } = oe();
+      const { token: e3, tokenExpired: t3 } = ce();
       let n3;
       if (e3) {
         if (t3 < Date.now()) {
           const e4 = "uni-id-token-expired";
-          n3 = { errCode: e4, errMsg: Ps[e4] };
+          n3 = { errCode: e4, errMsg: ss[e4] };
         }
       } else {
         const e4 = "uni-id-check-token-failed";
-        n3 = { errCode: e4, errMsg: Ps[e4] };
+        n3 = { errCode: e4, errMsg: ss[e4] };
       }
       return n3;
     }();
     if (function(e3) {
-      const t3 = xs($s(e3));
-      return !(Ks.indexOf(t3) > -1) && (Fs.indexOf(t3) > -1 || Ms.some((n3) => Bs(t3, n3) || Bs(e3, n3)));
+      const t3 = os(ys(e3));
+      return !(gs.indexOf(t3) > -1) && (fs.indexOf(t3) > -1 || hs.some((n3) => _s(t3, n3) || _s(e3, n3)));
     }(e2) && n2) {
       n2.uniIdRedirectUrl = e2;
-      if (G(B).length > 0)
+      if (Y(W).length > 0)
         return setTimeout(() => {
-          X(B, n2);
+          ee(W, n2);
         }, 0), t2.abortLoginPageJump = true, t2;
       t2.autoToLoginPage = true;
     }
     return t2;
   }
-  function zs() {
-    const e2 = Ls(), { abortLoginPageJump: t2, autoToLoginPage: n2 } = Js({ url: e2 });
-    t2 || n2 && Hs({ api: "redirectTo", redirect: e2 });
+  function Ss() {
+    const e2 = as(), { abortLoginPageJump: t2, autoToLoginPage: n2 } = Is({ url: e2 });
+    t2 || n2 && vs({ api: "redirectTo", redirect: e2 });
   }
-  function Vs() {
-    zs();
+  function ks() {
+    Ss();
     const e2 = ["navigateTo", "redirectTo", "reLaunch", "switchTab"];
     for (let t2 = 0; t2 < e2.length; t2++) {
       const n2 = e2[t2];
       uni.addInterceptor(n2, { invoke(e3) {
-        const { abortLoginPageJump: t3, autoToLoginPage: s2 } = Js({ url: e3.url });
-        return t3 ? e3 : s2 ? (Hs({ api: n2, redirect: $s(e3.url) }), false) : e3;
+        const { abortLoginPageJump: t3, autoToLoginPage: s2 } = Is({ url: e3.url });
+        return t3 ? e3 : s2 ? (vs({ api: n2, redirect: ys(e3.url) }), false) : e3;
       } });
     }
   }
-  function Gs() {
+  function As() {
     this.onResponse((e2) => {
       const { type: t2, content: n2 } = e2;
       let s2 = false;
@@ -29257,7 +27161,7 @@
             if ("object" != typeof e3)
               return false;
             const { errCode: t3 } = e3 || {};
-            return t3 in Ps;
+            return t3 in ss;
           }(n2);
           break;
         case "clientdb":
@@ -29265,87 +27169,87 @@
             if ("object" != typeof e3)
               return false;
             const { errCode: t3 } = e3 || {};
-            return t3 in Ts;
+            return t3 in ts;
           }(n2);
       }
       s2 && function(e3 = {}) {
-        const t3 = G(B);
-        te().then(() => {
-          const n3 = Ls();
-          if (n3 && Ws({ redirect: n3 }))
-            return t3.length > 0 ? X(B, Object.assign({ uniIdRedirectUrl: n3 }, e3)) : void (Ds && Hs({ api: "navigateTo", redirect: n3 }));
+        const t3 = Y(W);
+        se().then(() => {
+          const n3 = as();
+          if (n3 && ws({ redirect: n3 }))
+            return t3.length > 0 ? ee(W, Object.assign({ uniIdRedirectUrl: n3 }, e3)) : void (ds && vs({ api: "navigateTo", redirect: n3 }));
         });
       }(n2);
     });
   }
-  function Qs(e2) {
+  function Cs(e2) {
     e2.onNeedLogin = function(e3) {
-      Q(B, e3);
+      X(W, e3);
     }, e2.offNeedLogin = function(e3) {
-      Y(B, e3);
-    }, Ns && (L("_globalUniCloudStatus").needLoginInit || (L("_globalUniCloudStatus").needLoginInit = true, te().then(() => {
-      Vs.call(e2);
-    }), qs && Gs.call(e2)));
+      Z(W, e3);
+    }, ls && (U("_globalUniCloudStatus").needLoginInit || (U("_globalUniCloudStatus").needLoginInit = true, se().then(() => {
+      ks.call(e2);
+    }), ps && As.call(e2)));
   }
-  function Ys(e2) {
+  function Ts(e2) {
     e2.onFailover = function(e3) {
-      Q(H, e3);
+      X(z, e3);
     }, e2.offFailover = function(e3) {
-      Y(H, e3);
+      Z(z, e3);
     }, e2.refreshFailoverConfig = function() {
-      return e2.config, tn(0), sn();
+      return e2.config, sn(0), on();
     }, e2.clearFailoverConfig = function() {
       !function() {
-        Gt = null, Qt = 0;
+        Yt = null, Xt = 0;
         try {
-          re.removeStorageSync(Zt("UNICLOUD_FAILOVER_CONFIG")), re.removeStorageSync(Zt("UNICLOUD_FAILOVER_LAST_REQUEST"));
+          oe.removeStorageSync(tn("UNICLOUD_FAILOVER_CONFIG")), oe.removeStorageSync(tn("UNICLOUD_FAILOVER_LAST_REQUEST"));
         } catch (e3) {
         }
       }();
     };
   }
-  function Xs(e2) {
+  function bs(e2) {
     !function(e3) {
       e3.onResponse = function(e4) {
-        Q($, e4);
+        X(H, e4);
       }, e3.offResponse = function(e4) {
-        Y($, e4);
+        Z(H, e4);
       };
-    }(e2), Qs(e2), function(e3) {
+    }(e2), Cs(e2), function(e3) {
       e3.onRefreshToken = function(e4) {
-        Q(W, e4);
+        X(J, e4);
       }, e3.offRefreshToken = function(e4) {
-        Y(W, e4);
+        Z(J, e4);
       };
-    }(e2), Ys(e2);
+    }(e2), Ts(e2);
   }
-  const Zs = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", er = /^(?:[A-Za-z\d+/]{4})*?(?:[A-Za-z\d+/]{2}(?:==)?|[A-Za-z\d+/]{3}=?)?$/;
-  function tr(e2) {
+  const Ps = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", xs = /^(?:[A-Za-z\d+/]{4})*?(?:[A-Za-z\d+/]{2}(?:==)?|[A-Za-z\d+/]{3}=?)?$/;
+  function Os(e2) {
     return decodeURIComponent(function(e3) {
-      if (e3 = String(e3).replace(/[\t\n\f\r ]+/g, ""), !er.test(e3))
+      if (e3 = String(e3).replace(/[\t\n\f\r ]+/g, ""), !xs.test(e3))
         throw new Error("Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.");
       var t2;
       e3 += "==".slice(2 - (3 & e3.length));
       for (var n2, s2, r2 = "", i2 = 0; i2 < e3.length; )
-        t2 = Zs.indexOf(e3.charAt(i2++)) << 18 | Zs.indexOf(e3.charAt(i2++)) << 12 | (n2 = Zs.indexOf(e3.charAt(i2++))) << 6 | (s2 = Zs.indexOf(e3.charAt(i2++))), r2 += 64 === n2 ? String.fromCharCode(t2 >> 16 & 255) : 64 === s2 ? String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255) : String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255, 255 & t2);
+        t2 = Ps.indexOf(e3.charAt(i2++)) << 18 | Ps.indexOf(e3.charAt(i2++)) << 12 | (n2 = Ps.indexOf(e3.charAt(i2++))) << 6 | (s2 = Ps.indexOf(e3.charAt(i2++))), r2 += 64 === n2 ? String.fromCharCode(t2 >> 16 & 255) : 64 === s2 ? String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255) : String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255, 255 & t2);
       return r2;
     }(e2).split("").map(function(e3) {
       return "%" + ("00" + e3.charCodeAt(0).toString(16)).slice(-2);
     }).join(""));
   }
-  function nr() {
-    const e2 = oe().token || "", t2 = e2.split(".");
+  function Es() {
+    const e2 = ce().token || "", t2 = e2.split(".");
     if (!e2 || 3 !== t2.length)
       return { uid: null, role: [], permission: [], tokenExpired: 0 };
     let n2;
     try {
-      n2 = JSON.parse(tr(t2[1]));
+      n2 = JSON.parse(Os(t2[1]));
     } catch (e3) {
       throw new Error("获取当前用户信息出错，详细错误信息为：" + e3.message);
     }
     return n2.tokenExpired = 1e3 * n2.exp, delete n2.exp, delete n2.iat, n2;
   }
-  var sr = n(function(e2, t2) {
+  var Ls = s(function(e2, t2) {
     Object.defineProperty(t2, "__esModule", { value: true });
     const n2 = "chooseAndUploadFile:ok", s2 = "chooseAndUploadFile:fail";
     function r2(e3, t3) {
@@ -29420,9 +27324,9 @@
         }(t3), t3);
       };
     };
-  }), rr = t(sr);
-  const ir = "manual";
-  function or(e2) {
+  }), Rs = n(Ls);
+  const Us = "manual";
+  function Ns(e2) {
     return { props: { localdata: { type: Array, default: () => [] }, options: { type: [Object, Array], default: () => ({}) }, spaceInfo: { type: Object, default: () => ({}) }, collection: { type: [String, Array], default: "" }, action: { type: String, default: "" }, field: { type: String, default: "" }, orderby: { type: String, default: "" }, where: { type: [String, Object], default: "" }, pageData: { type: String, default: "add" }, pageCurrent: { type: Number, default: 1 }, pageSize: { type: Number, default: 20 }, getcount: { type: [Boolean, String], default: false }, gettree: { type: [Boolean, String], default: false }, gettreepath: { type: [Boolean, String], default: false }, startwith: { type: String, default: "" }, limitlevel: { type: Number, default: 10 }, groupby: { type: String, default: "" }, groupField: { type: String, default: "" }, distinct: { type: [Boolean, String], default: false }, foreignKey: { type: String, default: "" }, loadtime: { type: String, default: "auto" }, manual: { type: Boolean, default: false } }, data: () => ({ mixinDatacomLoading: false, mixinDatacomHasMore: false, mixinDatacomResData: [], mixinDatacomErrorMessage: "", mixinDatacomPage: {}, mixinDatacomError: null }), created() {
       this.mixinDatacomPage = { current: this.pageCurrent, size: this.pageSize, count: 0 }, this.$watch(() => {
         var e3 = [];
@@ -29430,7 +27334,7 @@
           e3.push(this[t2]);
         }), e3;
       }, (e3, t2) => {
-        if (this.loadtime === ir)
+        if (this.loadtime === Us)
           return;
         let n2 = false;
         const s2 = [];
@@ -29467,13 +27371,13 @@
       const u2 = t2.groupField || this.groupField;
       u2 && (n2 = n2.groupField(u2));
       true === (void 0 !== t2.distinct ? t2.distinct : this.distinct) && (n2 = n2.distinct());
-      const h2 = t2.orderby || this.orderby;
-      h2 && (n2 = n2.orderBy(h2));
-      const l2 = void 0 !== t2.pageCurrent ? t2.pageCurrent : this.mixinDatacomPage.current, d2 = void 0 !== t2.pageSize ? t2.pageSize : this.mixinDatacomPage.size, p2 = void 0 !== t2.getcount ? t2.getcount : this.getcount, f2 = void 0 !== t2.gettree ? t2.gettree : this.gettree, g2 = void 0 !== t2.gettreepath ? t2.gettreepath : this.gettreepath, m2 = { getCount: p2 }, y2 = { limitLevel: void 0 !== t2.limitlevel ? t2.limitlevel : this.limitlevel, startWith: void 0 !== t2.startwith ? t2.startwith : this.startwith };
-      return f2 && (m2.getTree = y2), g2 && (m2.getTreePath = y2), n2 = n2.skip(d2 * (l2 - 1)).limit(d2).get(m2), n2;
+      const l2 = t2.orderby || this.orderby;
+      l2 && (n2 = n2.orderBy(l2));
+      const d2 = void 0 !== t2.pageCurrent ? t2.pageCurrent : this.mixinDatacomPage.current, h2 = void 0 !== t2.pageSize ? t2.pageSize : this.mixinDatacomPage.size, p2 = void 0 !== t2.getcount ? t2.getcount : this.getcount, f2 = void 0 !== t2.gettree ? t2.gettree : this.gettree, g2 = void 0 !== t2.gettreepath ? t2.gettreepath : this.gettreepath, m2 = { getCount: p2 }, y2 = { limitLevel: void 0 !== t2.limitlevel ? t2.limitlevel : this.limitlevel, startWith: void 0 !== t2.startwith ? t2.startwith : this.startwith };
+      return f2 && (m2.getTree = y2), g2 && (m2.getTreePath = y2), n2 = n2.skip(h2 * (d2 - 1)).limit(h2).get(m2), n2;
     } } };
   }
-  function ar(e2) {
+  function Ds(e2) {
     return function(t2, n2 = {}) {
       n2 = function(e3, t3 = {}) {
         return e3.customUI = t3.customUI || e3.customUI, e3.parseSystemError = t3.parseSystemError || e3.parseSystemError, Object.assign(e3.loadingOptions, t3.loadingOptions), Object.assign(e3.errorOptions, t3.errorOptions), "object" == typeof t3.secretMethods && (e3.secretMethods = t3.secretMethods), e3;
@@ -29491,32 +27395,32 @@
             const r3 = n3 ? n3({ params: s4 }) : {};
             let i3, o3;
             try {
-              return await q(F(t3, "invoke"), { ...r3 }), i3 = await e3(...s4), await q(F(t3, "success"), { ...r3, result: i3 }), i3;
+              return await K(j(t3, "invoke"), { ...r3 }), i3 = await e3(...s4), await K(j(t3, "success"), { ...r3, result: i3 }), i3;
             } catch (e4) {
-              throw o3 = e4, await q(F(t3, "fail"), { ...r3, error: o3 }), o3;
+              throw o3 = e4, await K(j(t3, "fail"), { ...r3, error: o3 }), o3;
             } finally {
-              await q(F(t3, "complete"), o3 ? { ...r3, error: o3 } : { ...r3, result: i3 });
+              await K(j(t3, "complete"), o3 ? { ...r3, error: o3 } : { ...r3, result: i3 });
             }
           };
-        }({ fn: async function s4(...h2) {
+        }({ fn: async function s4(...u2) {
           let l2;
           a2 && uni.showLoading({ title: r2.title, mask: r2.mask });
-          const d2 = { name: t2, type: u, data: { method: c2, params: h2 } };
+          const h2 = { name: t2, type: d, data: { method: c2, params: u2 } };
           "object" == typeof n2.secretMethods && function(e3, t3) {
             const n3 = t3.data.method, s5 = e3.secretMethods || {}, r3 = s5[n3] || s5["*"];
             r3 && (t3.secretType = r3);
-          }(n2, d2);
+          }(n2, h2);
           let p2 = false;
           try {
-            l2 = await e2.callFunction(d2);
+            l2 = await e2.callFunction(h2);
           } catch (e3) {
-            p2 = true, l2 = { result: new se(e3) };
+            p2 = true, l2 = { result: new ie(e3) };
           }
           const { errSubject: f2, errCode: g2, errMsg: m2, newToken: y2 } = l2.result || {};
-          if (a2 && uni.hideLoading(), y2 && y2.token && y2.tokenExpired && (ae(y2), X(W, { ...y2 })), g2) {
+          if (a2 && uni.hideLoading(), y2 && y2.token && y2.tokenExpired && (ue(y2), ee(J, { ...y2 })), g2) {
             let e3 = m2;
             if (p2 && o2) {
-              e3 = (await o2({ objectName: t2, methodName: c2, params: h2, errSubject: f2, errCode: g2, errMsg: m2 })).errMsg || m2;
+              e3 = (await o2({ objectName: t2, methodName: c2, params: u2, errSubject: f2, errCode: g2, errMsg: m2 })).errMsg || m2;
             }
             if (a2)
               if ("toast" === i2.type)
@@ -29535,43 +27439,43 @@
                     });
                   }({ title: "提示", content: e3, showCancel: i2.retry, cancelText: "取消", confirmText: i2.retry ? "重试" : "确定" });
                   if (i2.retry && t3)
-                    return s4(...h2);
+                    return s4(...u2);
                 }
               }
-            const n3 = new se({ subject: f2, code: g2, message: m2, requestId: l2.requestId });
-            throw n3.detail = l2.result, X($, { type: V, content: n3 }), n3;
+            const n3 = new ie({ subject: f2, code: g2, message: m2, requestId: l2.requestId });
+            throw n3.detail = l2.result, ee(H, { type: Q, content: n3 }), n3;
           }
-          return X($, { type: V, content: l2.result }), l2.result;
+          return ee(H, { type: Q, content: l2.result }), l2.result;
         }, interceptorName: "callObject", getCallbackArgs: function({ params: e3 } = {}) {
           return { objectName: t2, methodName: c2, params: e3 };
         } });
       } });
     };
   }
-  function cr(e2) {
-    return L("_globalUniCloudSecureNetworkCache__{spaceId}".replace("{spaceId}", e2.config.spaceId));
+  function Ms(e2) {
+    return U("_globalUniCloudSecureNetworkCache__{spaceId}".replace("{spaceId}", e2.config.spaceId));
   }
-  async function ur({ openid: e2, callLoginByWeixin: t2 = false } = {}) {
-    cr(this);
-    throw new Error("[SecureNetwork] API `initSecureNetworkByWeixin` is not supported on platform `".concat(A, "`"));
+  async function Fs({ openid: e2, callLoginByWeixin: t2 = false } = {}) {
+    Ms(this);
+    throw new Error("[SecureNetwork] API `initSecureNetworkByWeixin` is not supported on platform `".concat(b, "`"));
   }
-  async function hr(e2) {
-    const t2 = cr(this);
-    return t2.initPromise || (t2.initPromise = ur.call(this, e2).then((e3) => e3).catch((e3) => {
+  async function qs(e2) {
+    const t2 = Ms(this);
+    return t2.initPromise || (t2.initPromise = Fs.call(this, e2).then((e3) => e3).catch((e3) => {
       throw delete t2.initPromise, e3;
     })), t2.initPromise;
   }
-  function lr(e2) {
+  function Ks(e2) {
     return function({ openid: t2, callLoginByWeixin: n2 = false } = {}) {
-      return hr.call(e2, { openid: t2, callLoginByWeixin: n2 });
+      return qs.call(e2, { openid: t2, callLoginByWeixin: n2 });
     };
   }
-  function dr(e2) {
+  function js(e2) {
     !function(e3) {
-      de = e3;
+      fe = e3;
     }(e2);
   }
-  function pr(e2) {
+  function Bs(e2) {
     const n2 = { getAppBaseInfo: uni.getSystemInfo, getPushClientId: uni.getPushClientId };
     return function(s2) {
       return new Promise((r2, i2) => {
@@ -29583,7 +27487,7 @@
       });
     };
   }
-  class fr extends class {
+  class $s extends class {
     constructor() {
       this._callback = {};
     }
@@ -29624,7 +27528,7 @@
       super(), this._uniPushMessageCallback = this._receivePushMessage.bind(this), this._currentMessageId = -1, this._payloadQueue = [];
     }
     init() {
-      return Promise.all([pr("getAppBaseInfo")(), pr("getPushClientId")()]).then(([{ appId: e2 } = {}, { cid: t2 } = {}] = []) => {
+      return Promise.all([Bs("getAppBaseInfo")(), Bs("getPushClientId")()]).then(([{ appId: e2 } = {}, { cid: t2 } = {}] = []) => {
         if (!e2)
           throw new Error("Invalid appId, please check the manifest.json file");
         if (!t2)
@@ -29680,7 +27584,7 @@
       this._destroy(), this.emit("close");
     }
   }
-  async function gr(e2) {
+  async function Hs(e2) {
     {
       const { osName: e3, osVersion: t3 } = he();
       "ios" === e3 && function(e4) {
@@ -29693,17 +27597,17 @@
     const t2 = e2.__dev__;
     if (!t2.debugInfo)
       return;
-    const { address: n2, servePort: s2 } = t2.debugInfo, { address: r2 } = await xt(n2, s2);
+    const { address: n2, servePort: s2 } = t2.debugInfo, { address: r2 } = await Rt(n2, s2);
     if (r2)
       return t2.localAddress = r2, void (t2.localPort = s2);
     const i2 = console["error"];
     let o2 = "";
-    if ("remote" === t2.debugInfo.initialLaunchType ? (t2.debugInfo.forceRemote = true, o2 = "当前客户端和HBuilderX不在同一局域网下（或其他网络原因无法连接HBuilderX），uniCloud本地调试服务不对当前客户端生效。\n- 如果不使用uniCloud本地调试服务，请直接忽略此信息。\n- 如需使用uniCloud本地调试服务，请将客户端与主机连接到同一局域网下并重新运行到客户端。") : o2 = "无法连接uniCloud本地调试服务，请检查当前客户端是否与主机在同一局域网下。\n- 如需使用uniCloud本地调试服务，请将客户端与主机连接到同一局域网下并重新运行到客户端。", o2 += "\n- 如果在HBuilderX开启的状态下切换过网络环境，请重启HBuilderX后再试\n- 检查系统防火墙是否拦截了HBuilderX自带的nodejs\n- 检查是否错误的使用拦截器修改uni.request方法的参数", 0 === A.indexOf("mp-") && (o2 += "\n- 小程序中如何使用uniCloud，请参考：https://uniapp.dcloud.net.cn/uniCloud/publish.html#useinmp"), !t2.debugInfo.forceRemote)
+    if ("remote" === t2.debugInfo.initialLaunchType ? (t2.debugInfo.forceRemote = true, o2 = "当前客户端和HBuilderX不在同一局域网下（或其他网络原因无法连接HBuilderX），uniCloud本地调试服务不对当前客户端生效。\n- 如果不使用uniCloud本地调试服务，请直接忽略此信息。\n- 如需使用uniCloud本地调试服务，请将客户端与主机连接到同一局域网下并重新运行到客户端。") : o2 = "无法连接uniCloud本地调试服务，请检查当前客户端是否与主机在同一局域网下。\n- 如需使用uniCloud本地调试服务，请将客户端与主机连接到同一局域网下并重新运行到客户端。", o2 += "\n- 如果在HBuilderX开启的状态下切换过网络环境，请重启HBuilderX后再试\n- 检查系统防火墙是否拦截了HBuilderX自带的nodejs\n- 检查是否错误的使用拦截器修改uni.request方法的参数", 0 === b.indexOf("mp-") && (o2 += "\n- 小程序中如何使用uniCloud，请参考：https://uniapp.dcloud.net.cn/uniCloud/publish.html#useinmp"), !t2.debugInfo.forceRemote)
       throw new Error(o2);
     i2(o2);
   }
-  function mr(e2) {
-    e2._initPromiseHub || (e2._initPromiseHub = new v({ createPromise: function() {
+  function Ws(e2) {
+    e2._initPromiseHub || (e2._initPromiseHub = new S({ createPromise: function() {
       let t2 = Promise.resolve();
       var n2;
       n2 = 1, t2 = new Promise((e3) => {
@@ -29715,25 +27619,25 @@
       return t2.then(() => s2.getLoginState()).then((e3) => e3 ? Promise.resolve() : s2.signInAnonymously());
     } }));
   }
-  const yr = { tcb: Ot, tencent: Ot, aliyun: me, private: Ut, dcloud: Ut, alipay: Jt };
-  let _r = new class {
+  const Js = { tcb: Et, tencent: Et, aliyun: _e, private: Dt, dcloud: Dt, alipay: Vt };
+  let zs = new class {
     init(e2) {
       let t2 = {};
-      const n2 = yr[e2.provider];
+      const n2 = Js[e2.provider];
       if (!n2)
         throw new Error("未提供正确的provider参数");
       t2 = n2.init(e2), function(e3) {
         const t3 = {};
-        e3.__dev__ = t3, t3.debugLog = "app" === A;
-        const n3 = T;
+        e3.__dev__ = t3, t3.debugLog = "app" === b;
+        const n3 = P;
         n3 && !n3.code && (t3.debugInfo = n3);
-        const s2 = new v({ createPromise: function() {
-          return gr(e3);
+        const s2 = new S({ createPromise: function() {
+          return Hs(e3);
         } });
         t3.initLocalNetwork = function() {
           return s2.exec();
         };
-      }(t2), mr(t2), ls(t2), function(e3) {
+      }(t2), Ws(t2), Kn(t2), function(e3) {
         const t3 = e3.uploadFile;
         e3.uploadFile = function(e4) {
           return t3.call(this, e4);
@@ -29744,20 +27648,20 @@
             return e3.init(t3).database();
           if (this._database)
             return this._database;
-          const n3 = Ss(bs, { uniClient: e3 });
+          const n3 = Yn(Xn, { uniClient: e3 });
           return this._database = n3, n3;
         }, e3.databaseForJQL = function(t3) {
           if (t3 && Object.keys(t3).length > 0)
             return e3.init(t3).databaseForJQL();
           if (this._databaseForJQL)
             return this._databaseForJQL;
-          const n3 = Ss(bs, { uniClient: e3, isJQL: true });
+          const n3 = Yn(Xn, { uniClient: e3, isJQL: true });
           return this._databaseForJQL = n3, n3;
         };
       }(t2), function(e3) {
-        e3.getCurrentUserInfo = nr, e3.chooseAndUploadFile = rr.initChooseAndUploadFile(e3), Object.assign(e3, { get mixinDatacom() {
-          return or(e3);
-        } }), e3.SSEChannel = fr, e3.initSecureNetworkByWeixin = lr(e3), e3.setCustomClientInfo = dr, e3.importObject = ar(e3);
+        e3.getCurrentUserInfo = Es, e3.chooseAndUploadFile = Rs.initChooseAndUploadFile(e3), Object.assign(e3, { get mixinDatacom() {
+          return Ns(e3);
+        } }), e3.SSEChannel = $s, e3.initSecureNetworkByWeixin = Ks(e3), e3.setCustomClientInfo = js, e3.importObject = Ds(e3);
       }(t2);
       return ["callFunction", "uploadFile", "deleteFile", "getTempFileURL", "downloadFile", "chooseAndUploadFile"].forEach((e3) => {
         if (!t2[e3])
@@ -29769,18 +27673,18 @@
           return function(n4) {
             let s2 = false;
             if ("callFunction" === t3) {
-              const e5 = n4 && n4.type || c;
-              s2 = e5 !== c;
+              const e5 = n4 && n4.type || l;
+              s2 = e5 !== l;
             }
             const r2 = "callFunction" === t3 && !s2, i2 = this._initPromiseHub.exec();
             n4 = n4 || {};
-            const { success: o2, fail: a2, complete: u2 } = ne(n4), h2 = i2.then(() => s2 ? Promise.resolve() : q(F(t3, "invoke"), n4)).then(() => e4.call(this, n4)).then((e5) => s2 ? Promise.resolve(e5) : q(F(t3, "success"), e5).then(() => q(F(t3, "complete"), e5)).then(() => (r2 && X($, { type: z, content: e5 }), Promise.resolve(e5))), (e5) => s2 ? Promise.reject(e5) : q(F(t3, "fail"), e5).then(() => q(F(t3, "complete"), e5)).then(() => (X($, { type: z, content: e5 }), Promise.reject(e5))));
-            if (!(o2 || a2 || u2))
-              return h2;
-            h2.then((e5) => {
-              o2 && o2(e5), u2 && u2(e5), r2 && X($, { type: z, content: e5 });
+            const { success: o2, fail: a2, complete: c2 } = re(n4), u2 = i2.then(() => s2 ? Promise.resolve() : K(j(t3, "invoke"), n4)).then(() => e4.call(this, n4)).then((e5) => s2 ? Promise.resolve(e5) : K(j(t3, "success"), e5).then(() => K(j(t3, "complete"), e5)).then(() => (r2 && ee(H, { type: G, content: e5 }), Promise.resolve(e5))), (e5) => s2 ? Promise.reject(e5) : K(j(t3, "fail"), e5).then(() => K(j(t3, "complete"), e5)).then(() => (ee(H, { type: G, content: e5 }), Promise.reject(e5))));
+            if (!(o2 || a2 || c2))
+              return u2;
+            u2.then((e5) => {
+              o2 && o2(e5), c2 && c2(e5), r2 && ee(H, { type: G, content: e5 });
             }, (e5) => {
-              a2 && a2(e5), u2 && u2(e5), r2 && X($, { type: z, content: e5 });
+              a2 && a2(e5), c2 && c2(e5), r2 && ee(H, { type: G, content: e5 });
             });
           };
         }(t2[e3], e3)).bind(t2);
@@ -29788,43 +27692,43 @@
     }
   }();
   (() => {
-    const e2 = Array.isArray(C) ? C.length : 0, t2 = function() {
-      const e3 = Xt(), t3 = en();
-      return t3 && t3.enable && g(t3.space) ? t3.space : e3;
+    const e2 = Array.isArray(x) ? x.length : 0, t2 = function() {
+      const e3 = en(), t3 = nn();
+      return t3 && t3.enable && y(t3.space) ? t3.space : e3;
     }();
     if (1 === e2)
-      _r = _r.init(t2), _r._isDefault = true;
+      zs = zs.init(t2), zs._isDefault = true;
     else {
       const t3 = ["database", "getCurrentUserInfo", "importObject"];
       let n2;
       n2 = e2 > 0 ? "应用有多个服务空间，请通过uniCloud.init方法指定要使用的服务空间" : "应用未关联服务空间，请在uniCloud目录右键关联服务空间", [...["auth", "callFunction", "uploadFile", "deleteFile", "getTempFileURL", "downloadFile"], ...t3].forEach((e3) => {
-        _r[e3] = function() {
+        zs[e3] = function() {
           if (console.error(n2), -1 === t3.indexOf(e3))
-            return Promise.reject(new se({ code: "SYS_ERR", message: n2 }));
+            return Promise.reject(new ie({ code: "SYS_ERR", message: n2 }));
           console.error(n2);
         };
       });
     }
-    if (Object.assign(_r, { get mixinDatacom() {
-      return or(_r);
-    } }), Xs(_r), _r.addInterceptor = D, _r.removeInterceptor = M, _r.interceptObject = K, uni.__uniCloud = _r, "app" === A) {
-      const e3 = R();
-      e3.uniCloud = _r, e3.UniCloudError = se;
+    if (Object.assign(zs, { get mixinDatacom() {
+      return Ns(zs);
+    } }), bs(zs), zs.addInterceptor = F, zs.removeInterceptor = q, zs.interceptObject = B, uni.__uniCloud = zs, "app" === b) {
+      const e3 = N();
+      e3.uniCloud = zs, e3.UniCloudError = ie;
     }
     !function() {
-      const { failoverEndpoint: e3 } = Xt();
+      const { failoverEndpoint: e3 } = en();
       if (!e3)
         return;
-      sn().catch((e4) => {
+      on().catch((e4) => {
         console.error("请求故障切换配置失败：", e4);
       });
       const t3 = { fail() {
-        const e4 = en();
-        nn(e4 && e4.interval || 0) && sn().catch((e5) => {
+        const e4 = nn();
+        rn(e4 && e4.interval || 0) && on().catch((e5) => {
           console.error("请求故障切换配置失败：", e5);
         });
       } };
-      D("callFunction", t3), D("database", t3), D("uploadFile", t3);
+      F("callFunction", t3), F("database", t3), F("uploadFile", t3);
     }();
   })();
   enableStyleIsolation();

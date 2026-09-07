@@ -83,6 +83,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return currentPickerType.value === "start" ? startTime.value : endTime.value;
     });
     const imei = common_vendor.ref("");
+    const minDate = common_vendor.computed(() => {
+      const now = /* @__PURE__ */ new Date();
+      return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime();
+    });
+    const maxDate = common_vendor.computed(() => {
+      return Date.now();
+    });
     const groupedTrips = common_vendor.computed(() => {
       const dateGroups = [];
       tripData.value.forEach((trip) => {
@@ -192,13 +199,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
             return Promise.resolve(null);
           }
-          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:209", "获取里程数据成功:", res);
+          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:225", "获取里程数据成功:", res);
           const trackData = res.data;
           if (trackData != null) {
             processTripData(trackData);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:215", "获取里程数据失败:", e);
+          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:231", "获取里程数据失败:", e);
           utils_toast.showAppToast({
             title: "数据加载失败",
             icon: "none"
@@ -246,11 +253,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       pickerTitle.value = type === "start" ? "选择开始时间" : "选择结束时间";
       showDateTimePicker.value = true;
     };
-    const onConfirm = (event = null) => {
-      const eventObject = event;
-      const timestampValue = eventObject["timestamp"];
-      const timestamp = timestampValue == null ? 0 : parseFloat(timestampValue.toString());
-      if (!isFinite(timestamp) || timestamp <= 0)
+    const getPickerTimestamp = (event) => {
+      return event.getNumber("timestamp", 0);
+    };
+    const onConfirm = (event) => {
+      const timestamp = getPickerTimestamp(event);
+      if (timestamp <= 0)
         return null;
       const value = utils_formateTime.formatTimesToMinute(timestamp);
       if (currentPickerType.value === "start") {
@@ -304,15 +312,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           fontSize: "15"
         }),
         k: common_vendor.o(onConfirm, "e0"),
-        l: common_vendor.o(onCancel, "20"),
-        m: common_vendor.o(onPickerShowChange, "7c"),
+        l: common_vendor.o(onCancel, "cc"),
+        m: common_vendor.o(onPickerShowChange, "4f"),
         n: common_vendor.p({
           show: showDateTimePicker.value,
           ["model-value"]: currentPickerValue.value,
           mode: "datetime",
           title: pickerTitle.value,
           ["cancel-text"]: "取消",
-          ["confirm-text"]: "确认"
+          ["confirm-text"]: "确认",
+          minDate: minDate.value,
+          maxDate: maxDate.value
         }),
         o: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
         p: common_vendor.t(totalTrips.value),

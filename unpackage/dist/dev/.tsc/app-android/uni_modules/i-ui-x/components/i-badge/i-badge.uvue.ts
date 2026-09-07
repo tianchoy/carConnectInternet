@@ -98,16 +98,16 @@ __ins.emit(event, ...do_not_transform_spread)
 }
 
 
+const bgColor = computed(() => {
+  return props.bgColor
+})
+
 function hasNumberValue() {
-  if (props.value != null && props.value.toString().length > 0) return true
-  return props.count > 0 || props.showZero
+  return (props.value).toString().length > 0 || props.count > 0 || props.showZero
 }
 
 function effectiveCount() {
-  if (props.value != null && props.value.toString().length > 0) {
-    if (typeof props.value == 'number') return props.value
-    return parseFloat(props.value as string)
-  }
+  if ((props.value).toString().length > 0) return parseFloat((props.value).toString())
   return props.count
 }
 
@@ -117,7 +117,7 @@ function getMaxCount() {
 }
 
 function effectiveBgColor() {
-  if (props.bgColor.length > 0) return props.bgColor
+  if (bgColor.value.length > 0) return bgColor.value
   return props.type
 }
 
@@ -126,9 +126,8 @@ function effectiveFontColor() {
   return props.fontColor
 }
 
-
 function normalizeTheme(value: string): string {
-  const text = value
+  const text = (value).toString()
   if (text == 'danger') return 'error'
   if (
     text == 'error' ||
@@ -142,7 +141,7 @@ function normalizeTheme(value: string): string {
 }
 
 function parseColor(value: string): string {
-  const text = value
+  const text = (value).toString()
   if (text == 'white') return '#ffffff'
   if (text == 'black') return '#000000'
   if (text == 'danger' || text == 'error') return '#f56c6c'
@@ -154,7 +153,7 @@ function parseColor(value: string): string {
 }
 
 function normalizePosition(value: string): string {
-  const text = value
+  const text = (value).toString()
   if (text == 'rightTop') return 'right'
   if (text == 'leftTop') return 'left'
   if (text == 'rightBottom') return 'bottomRight'
@@ -174,10 +173,9 @@ function normalizePosition(value: string): string {
 function getOffset(index: number): number {
   const offset = props.offset
   if (offset == null || offset.length <= index) return 0
-  const value = offset[index] as number | string | null
-  if (typeof value == 'number') return value as number
-  if (typeof value == 'string') return parseFloat(value as string)
-  return 0
+  const value = offset[index]
+  if (value == null) return 0
+  return parseFloat(value.toString())
 }
 
 function positionStyle() {
@@ -194,14 +192,10 @@ function positionStyle() {
 }
 
 function formatSize(value: string | number): string {
-  const text = value.toString()
+  const text = (value).toString()
   if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
   return text + 'px'
 }
-
-const bgColor = computed(() => {
-  return props.bgColor
-})
 const showBadge = computed(() => {
   if (props.hidden) return false
   if (props.label.length > 0) return true
@@ -217,7 +211,7 @@ const displayValue = computed(() => {
   const value = effectiveCount()
   const max = getMaxCount()
   if (value > max) return max + '+'
-  return value.toString()
+  return (value).toString()
 })
 
 const dot = computed(() => {
@@ -272,6 +266,17 @@ function handleClick() {
     position: props.position,
   })
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 return (): any | null => {

@@ -5,225 +5,209 @@
     "compiler_version": "5.25.2026082902-alpha"
   },
   "files": {
-    "pages/message/message.kt": {
-      "class": "GenPagesMessageMessage",
-      "md5": "9e1ce359a8ce78efcda83daa680466a768a8f742"
+    "pages/scancode/scancode.kt": {
+      "md5": "7864c3d5663c458e18d624152ffe6d6f2ad27dfe",
+      "class": "GenPagesScancodeScancode"
+    },
+    "pages/carInfoDetail/carInfoDetail.kt": {
+      "md5": "7accb821cb850050388e7c1c85379ad0ac40c002",
+      "class": "GenPagesCarInfoDetailCarInfoDetail"
+    },
+    "components/custom-navBar/custom-navBar.kt": {
+      "md5": "189f8ee178e9b7fd42f8f9ae6e842bf6187badda",
+      "class": "GenComponentsCustomNavBarCustomNavBar"
+    },
+    "uni_modules/i-ui-x/components/i-tabs/i-tabs.kt": {
+      "class": "GenUniModulesIUiXComponentsITabsITabs",
+      "md5": "e931ed04f54a283fcfd34bf36672ed4ac2aefd2f"
     },
     "pages/deviceList/deviceList.kt": {
-      "class": "GenPagesDeviceListDeviceList",
-      "md5": "e7ec2dc8c72f84efdaaf32342f3b74979966d1ec"
+      "md5": "e7ec2dc8c72f84efdaaf32342f3b74979966d1ec",
+      "class": "GenPagesDeviceListDeviceList"
     },
-    "pages/index/index.kt": {
-      "class": "GenPagesIndexIndex",
-      "md5": "eaeb5236eb0d2528ee9e4242abbb791975305855"
+    "uni_modules/i-ui-x/components/i-action-sheet/i-action-sheet.kt": {
+      "md5": "3e0b168d09295ad728b05b394dfa7ae678c783dc",
+      "class": "GenUniModulesIUiXComponentsIActionSheetIActionSheet"
     },
-    "components/sub-navBar/sub-navBar.kt": {
-      "md5": "9586d092abdd2088173cff3a93b84ae92b517f2f",
-      "class": "GenComponentsSubNavBarSubNavBar"
+    "components/app-modal/app-modal.kt": {
+      "class": "GenComponentsAppModalAppModal",
+      "md5": "cc5035df04d80372cf1b4d88746841a718146bf4"
+    },
+    "pages/login/personal-password-login.kt": {
+      "md5": "1f88c715d62f74c95f5f85999cf20d4173925c6b",
+      "class": "GenPagesLoginPersonalPasswordLogin"
+    },
+    "pages/login/forgot-password.kt": {
+      "md5": "f0bdc21715d129e4b875abd081b86ab25eae7b1c",
+      "class": "GenPagesLoginForgotPassword"
     },
     "pages/geofencing/geofencing.kt": {
       "md5": "07ff2a00a19ac26c09d9463cb082f81fcaa24557",
       "class": "GenPagesGeofencingGeofencing"
     },
-    "pages/userCenter/userCenter.kt": {
-      "md5": "81bf1e1ba9900b01f6660fabc54568e0f1548be9",
-      "class": "GenPagesUserCenterUserCenter"
+    "uni_modules/i-ui-x/components/i-button/i-button.kt": {
+      "md5": "def9defb8a81981bb2262ed3a6fcc575c8662d11",
+      "class": "GenUniModulesIUiXComponentsIButtonIButton"
     },
-    "uni_modules/lime-popup/components/l-popup/l-popup.kt": {
-      "md5": "9d85884a2e5a16c96f3aa30da5eb4cb98c45c644",
-      "class": "GenUniModulesLimePopupComponentsLPopupLPopup"
+    "uni_modules/i-ui-x/components/i-line-progress/i-line-progress.kt": {
+      "class": "GenUniModulesIUiXComponentsILineProgressILineProgress",
+      "md5": "bcec6230e835211eb8d8ee3bc11fec0a22d5dbc4"
+    },
+    "components/sub-navBar/sub-navBar.kt": {
+      "md5": "9586d092abdd2088173cff3a93b84ae92b517f2f",
+      "class": "GenComponentsSubNavBarSubNavBar"
+    },
+    "components/car-icons/car-icons.kt": {
+      "class": "GenComponentsCarIconsCarIcons",
+      "md5": "f67dd48e9b747dd590ac99bd99543f4fac856c29"
+    },
+    "uni_modules/i-ui-x/components/i-picker/i-picker.kt": {
+      "md5": "7c72675a506d62fbede178ba83e54674ace08ae9",
+      "class": "GenUniModulesIUiXComponentsIPickerIPicker"
+    },
+    "uni_modules/i-ui-x/components/i-empty/i-empty.kt": {
+      "class": "GenUniModulesIUiXComponentsIEmptyIEmpty",
+      "md5": "74961854f6340492b5f02dc945cbadc8084399eb"
+    },
+    "pages/mileageRecord/mileageRecord.kt": {
+      "md5": "10adc7f0365648b8df0be54777dc8683ee9835af",
+      "class": "GenPagesMileageRecordMileageRecord"
+    },
+    "pages/userCenter/carList/carList.kt": {
+      "class": "GenPagesUserCenterCarListCarList",
+      "md5": "476aea1246d94a849d6c9b07319ad867d6adf53b"
+    },
+    "uni_modules/i-ui-x/components/i-tag/i-tag.kt": {
+      "class": "GenUniModulesIUiXComponentsITagITag",
+      "md5": "02a1af6461bbe1ea6d44d3350ceb8d7ad082d5c0"
+    },
+    "components/app-toast/app-toast.kt": {
+      "class": "GenComponentsAppToastAppToast",
+      "md5": "505c88d5fbca4eb9b9145b00125a4deb36d343c7"
+    },
+    "uni_modules/i-ui-x/components/i-badge/i-badge.kt": {
+      "md5": "212ae34c8d9818c21424c15c3818dadc004dad23",
+      "class": "GenUniModulesIUiXComponentsIBadgeIBadge"
+    },
+    "components/indexListMode/indexListMode.kt": {
+      "class": "GenComponentsIndexListModeIndexListMode",
+      "md5": "286fb9d7dfe6e7dc0bd36976e66215803348fc71"
+    },
+    "uni_modules/i-ui-x/components/i-modal/i-modal.kt": {
+      "md5": "1158730245764beaa2afadb9c6b22be7108a5fec",
+      "class": "GenUniModulesIUiXComponentsIModalIModal"
+    },
+    "pages/playBack/playBack.kt": {
+      "class": "GenPagesPlayBackPlayBack",
+      "md5": "7bc4e32d81d7338eca03b5632c90e2b383b084bb"
+    },
+    "uni_modules/i-ui-x/components/i-form-item/i-form-item.kt": {
+      "class": "GenUniModulesIUiXComponentsIFormItemIFormItem",
+      "md5": "60190cfc92e34c25b5c2a646ca47a5982fd9d8be"
+    },
+    "uni_modules/i-ui-x/components/i-checkbox/i-checkbox.kt": {
+      "class": "GenUniModulesIUiXComponentsICheckboxICheckbox",
+      "md5": "2f587e047ac3a7cc2c9904f775c8b39a277e502d"
+    },
+    "uni_modules/i-ui-x/components/i-input/i-input.kt": {
+      "class": "GenUniModulesIUiXComponentsIInputIInput",
+      "md5": "9f0a93f09e844fff4363b0e49781abc80a0c0d45"
+    },
+    "pages/login/set-password.kt": {
+      "class": "GenPagesLoginSetPassword",
+      "md5": "b605471b8520a54fbf83ea9717dc3033e11af09b"
+    },
+    "pages/userCenter/payDeviceList/payDeviceList.kt": {
+      "md5": "e4dc5025721fa4bc6aa6588228b736748f6dab12",
+      "class": "GenPagesUserCenterPayDeviceListPayDeviceList"
+    },
+    "uni_modules/i-ui-x/components/i-slider/i-slider.kt": {
+      "class": "GenUniModulesIUiXComponentsISliderISlider",
+      "md5": "beab75815d38bdba0b04814170eea31b00c74610"
+    },
+    "pages/userCenter/userCenter.kt": {
+      "class": "GenPagesUserCenterUserCenter",
+      "md5": "81bf1e1ba9900b01f6660fabc54568e0f1548be9"
+    },
+    "uni_modules/i-ui-x/components/i-radio/i-radio.kt": {
+      "class": "GenUniModulesIUiXComponentsIRadioIRadio",
+      "md5": "dabbcc35005f434702aa84832464c7fb9e1e7495"
+    },
+    "pages/stopRecord/stopRecord.kt": {
+      "class": "GenPagesStopRecordStopRecord",
+      "md5": "f15af36b382607378a58f8834651b93809597cd3"
+    },
+    "uni_modules/i-ui-x/components/i-grid/i-grid.kt": {
+      "class": "GenUniModulesIUiXComponentsIGridIGrid",
+      "md5": "4041efd101e02ec44fc33fac75b1b867ca0e4641"
+    },
+    "pages/login/register.kt": {
+      "md5": "1320b55dcd5e653429ba4b5d079f77604034dbcc",
+      "class": "GenPagesLoginRegister"
     },
     "pages/vehicleTracking/vehicleTracking.kt": {
       "class": "GenPagesVehicleTrackingVehicleTracking",
       "md5": "aeb4e4d94141819b2b47f4d7709a7976e96768ce"
     },
-    "components/custom-navBar/custom-navBar.kt": {
-      "class": "GenComponentsCustomNavBarCustomNavBar",
-      "md5": "189f8ee178e9b7fd42f8f9ae6e842bf6187badda"
+    "uni_modules/i-ui-x/components/i-datetime-picker/i-datetime-picker.kt": {
+      "md5": "2fbe84b3ab0d66201e2e69cbb882304abe9a4155",
+      "class": "GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker"
+    },
+    "uni_modules/i-ui-x/components/i-switch/i-switch.kt": {
+      "md5": "66ffbb0435decb5ae2251a3d97fa35426eed1da5",
+      "class": "GenUniModulesIUiXComponentsISwitchISwitch"
+    },
+    "pages/index/index.kt": {
+      "class": "GenPagesIndexIndex",
+      "md5": "7127c7c8ec36e01cadae7b6f6dd664eae88208aa"
     },
     "pages/userCenter/editPassword/editPassword.kt": {
       "class": "GenPagesUserCenterEditPasswordEditPassword",
       "md5": "1ab7cf6bc07daa4098f61ebd595cff71c100d12e"
     },
     "uni_modules/i-ui-x/components/i-icon/i-icon.kt": {
-      "md5": "dcfe831b20f153e960102acec360d968ef61841a",
+      "md5": "0dd34e188de18d71e0351103198ea13a820acb8b",
       "class": "GenUniModulesIUiXComponentsIIconIIcon"
     },
-    "uni_modules/i-ui-x/components/i-popup/i-popup.kt": {
-      "md5": "66c1e5732b94fb3080fe55262b100e601257a341",
-      "class": "GenUniModulesIUiXComponentsIPopupIPopup"
-    },
-    "uni_modules/i-ui-x/components/i-action-sheet/i-action-sheet.kt": {
-      "md5": "1734640c5612372490c28071ea747b72c619f7b9",
-      "class": "GenUniModulesIUiXComponentsIActionSheetIActionSheet"
-    },
-    "uni_modules/i-ui-x/components/i-badge/i-badge.kt": {
-      "md5": "002726205de7e5b314b15d55a9c027f27b856ecf",
-      "class": "GenUniModulesIUiXComponentsIBadgeIBadge"
-    },
-    "uni_modules/i-ui-x/components/i-form-item/i-form-item.kt": {
-      "md5": "a73ac883731878a27d2a579dd5891c098201cada",
-      "class": "GenUniModulesIUiXComponentsIFormItemIFormItem"
-    },
-    "uni_modules/i-ui-x/components/i-tabs/i-tabs.kt": {
-      "class": "GenUniModulesIUiXComponentsITabsITabs",
-      "md5": "4d8f11d65af8f7907e6c73a96129a50b3f9a9fec"
-    },
-    "pages/stopRecord/stopRecord.kt": {
-      "class": "GenPagesStopRecordStopRecord",
-      "md5": "131b20916601bdc2b17073136022f4af88718e2f"
-    },
-    "uni_modules/i-ui-x/components/i-button/i-button.kt": {
-      "md5": "c7a8a3787b92d3bb77e1de4876d6ab81f1072408",
-      "class": "GenUniModulesIUiXComponentsIButtonIButton"
-    },
-    "pages/userCenter/carList/carList.kt": {
-      "md5": "476aea1246d94a849d6c9b07319ad867d6adf53b",
-      "class": "GenPagesUserCenterCarListCarList"
-    },
-    "uni_modules/lime-overlay/components/l-overlay/l-overlay.kt": {
-      "class": "GenUniModulesLimeOverlayComponentsLOverlayLOverlay",
-      "md5": "813a16a0412fd8e4676ff0eb01d1c819701c5dd6"
-    },
-    "uni_modules/lime-action-sheet/pages/index.kt": {
-      "md5": "a97b9bc8e0ad64a930a3358d8cc19687d8ddafd7",
-      "class": "GenUniModulesLimeActionSheetPagesIndex"
-    },
-    "uni_modules/i-ui-x/components/i-checkbox/i-checkbox.kt": {
-      "class": "GenUniModulesIUiXComponentsICheckboxICheckbox",
-      "md5": "f67b32008af405850887e4ed406b098e02198904"
-    },
-    "components/app-toast/app-toast.kt": {
-      "class": "GenComponentsAppToastAppToast",
-      "md5": "505c88d5fbca4eb9b9145b00125a4deb36d343c7"
-    },
-    "pages/userCenter/payDeviceList/payDeviceList.kt": {
-      "class": "GenPagesUserCenterPayDeviceListPayDeviceList",
-      "md5": "e4dc5025721fa4bc6aa6588228b736748f6dab12"
-    },
-    "uni_modules/i-ui-x/components/i-slider/i-slider.kt": {
-      "md5": "e33ee090573efa27471c270b380f66400a304f0e",
-      "class": "GenUniModulesIUiXComponentsISliderISlider"
-    },
-    "uni_modules/i-ui-x/components/i-empty/i-empty.kt": {
-      "md5": "27b7bf3bd629408c14683a8d30a84e7525d1b381",
-      "class": "GenUniModulesIUiXComponentsIEmptyIEmpty"
-    },
-    "pages/webview/webview.kt": {
-      "class": "GenPagesWebviewWebview",
-      "md5": "450c9c4a7a3ae6f9738a25c22b12787d40189cff"
-    },
-    "uni_modules/i-ui-x/components/i-grid/i-grid.kt": {
-      "class": "GenUniModulesIUiXComponentsIGridIGrid",
-      "md5": "7e1ec0ff315158ea4c84f38b629cded78ccaf90e"
-    },
-    "uni_modules/i-ui-x/components/i-tag/i-tag.kt": {
-      "md5": "8e508c912c20627afefdcf5c8a87946a672cee55",
-      "class": "GenUniModulesIUiXComponentsITagITag"
-    },
-    "uni_modules/lime-picker/components/l-picker/l-picker.kt": {
-      "md5": "2b2a0df80c1177b164bd281f44a77904ddd5e74f",
-      "class": "GenUniModulesLimePickerComponentsLPickerLPicker"
-    },
-    "index.kt": {
-      "md5": "06c34df3b0992f830847af44c0c7ead210f1785c",
-      "class": ""
-    },
-    "pages/login/set-password.kt": {
-      "md5": "b605471b8520a54fbf83ea9717dc3033e11af09b",
-      "class": "GenPagesLoginSetPassword"
-    },
-    "uni_modules/i-ui-x/components/i-datetime-picker/i-datetime-picker.kt": {
-      "md5": "0fb5f2e5f77c191e2a8299ae8f0f919f0bf552ab",
-      "class": "GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker"
-    },
-    "components/car-icons/car-icons.kt": {
-      "md5": "f67dd48e9b747dd590ac99bd99543f4fac856c29",
-      "class": "GenComponentsCarIconsCarIcons"
-    },
-    "pages/login/login.kt": {
-      "class": "GenPagesLoginLogin",
-      "md5": "641968250ca45547b76c22bf12e6272215d16e12"
-    },
-    "pages/login/personal-password-login.kt": {
-      "md5": "1f88c715d62f74c95f5f85999cf20d4173925c6b",
-      "class": "GenPagesLoginPersonalPasswordLogin"
-    },
-    "uni_modules/i-ui-x/components/i-form/i-form.kt": {
-      "class": "GenUniModulesIUiXComponentsIFormIForm",
-      "md5": "062d1f4e0e76dba0f649f2b84d604cbed5354379"
-    },
-    "pages/scancode/scancode.kt": {
-      "class": "GenPagesScancodeScancode",
-      "md5": "7864c3d5663c458e18d624152ffe6d6f2ad27dfe"
-    },
-    "pages/addCar/addCar.kt": {
-      "md5": "429be7055ee4ababa3bb2146d79e325aed9575c3",
-      "class": "GenPagesAddCarAddCar"
-    },
-    "pages/login/forgot-password.kt": {
-      "class": "GenPagesLoginForgotPassword",
-      "md5": "f0bdc21715d129e4b875abd081b86ab25eae7b1c"
-    },
-    "pages/userCenter/carDetail/carDetail.kt": {
-      "md5": "3fa42836d9e5f7940a59c302ef20063d1ea6d0d1",
-      "class": "GenPagesUserCenterCarDetailCarDetail"
-    },
-    "pages/carInfoDetail/carInfoDetail.kt": {
-      "class": "GenPagesCarInfoDetailCarInfoDetail",
-      "md5": "eb53c845eb225dc4c1366e98f5cbf4d0fe07ce43"
-    },
-    "uni_modules/lime-picker/components/l-picker-item/l-picker-item.kt": {
-      "md5": "47ff3cb7fe768424cbee2018bc3989baae1ef697",
-      "class": "GenUniModulesLimePickerComponentsLPickerItemLPickerItem"
-    },
-    "pages/mileageRecord/mileageRecord.kt": {
-      "md5": "4025d9c1aac1de5c8db11a5f70af0b86a829a582",
-      "class": "GenPagesMileageRecordMileageRecord"
-    },
-    "uni_modules/i-ui-x/components/i-modal/i-modal.kt": {
-      "class": "GenUniModulesIUiXComponentsIModalIModal",
-      "md5": "623e667f757c80b1d172610c5e8ad759315207a5"
-    },
-    "uni_modules/i-ui-x/components/i-switch/i-switch.kt": {
-      "class": "GenUniModulesIUiXComponentsISwitchISwitch",
-      "md5": "4aee8c522df848c375f06714b852fc911aee3a03"
-    },
-    "pages/playBack/playBack.kt": {
-      "md5": "cf0e490e64ba410ba67d66d60840bd88384b2504",
-      "class": "GenPagesPlayBackPlayBack"
-    },
-    "uni_modules/i-ui-x/components/i-radio/i-radio.kt": {
-      "class": "GenUniModulesIUiXComponentsIRadioIRadio",
-      "md5": "8111d6f0450aac1e82bb0aab4df6b7d5ae6790e2"
-    },
-    "uni_modules/i-ui-x/components/i-input/i-input.kt": {
-      "class": "GenUniModulesIUiXComponentsIInputIInput",
-      "md5": "481fbb0718d661ca6ea7052efba62beb7ae4c04b"
-    },
-    "components/indexListMode/indexListMode.kt": {
-      "md5": "286fb9d7dfe6e7dc0bd36976e66215803348fc71",
-      "class": "GenComponentsIndexListModeIndexListMode"
+    "pages/message/message.kt": {
+      "class": "GenPagesMessageMessage",
+      "md5": "9e1ce359a8ce78efcda83daa680466a768a8f742"
     },
     "pages/userCenter/userInfo/userInfo.kt": {
       "md5": "bd3958c368c958138980cc37c57f4713033a1ef5",
       "class": "GenPagesUserCenterUserInfoUserInfo"
     },
+    "uni_modules/i-ui-x/components/i-popup/i-popup.kt": {
+      "class": "GenUniModulesIUiXComponentsIPopupIPopup",
+      "md5": "2774d6f20e93031cdbc577a9d9d2189223e3e2ea"
+    },
+    "index.kt": {
+      "class": "",
+      "md5": "3b88f8e2b26ce9a1bac62fbf57e18188f06cfb2c"
+    },
+    "pages/userCenter/carDetail/carDetail.kt": {
+      "class": "GenPagesUserCenterCarDetailCarDetail",
+      "md5": "e3822d99b3f1b8c0f2d549eec1e87fbeda0dfe69"
+    },
+    "pages/addCar/addCar.kt": {
+      "class": "GenPagesAddCarAddCar",
+      "md5": "429be7055ee4ababa3bb2146d79e325aed9575c3"
+    },
+    "uni_modules/i-ui-x/components/i-form/i-form.kt": {
+      "md5": "c23d261dce5a1ba17097037464798e27c7b8cdc5",
+      "class": "GenUniModulesIUiXComponentsIFormIForm"
+    },
+    "pages/webview/webview.kt": {
+      "class": "GenPagesWebviewWebview",
+      "md5": "450c9c4a7a3ae6f9738a25c22b12787d40189cff"
+    },
     "pages/cmd/cmd.kt": {
-      "md5": "e145b0c8c9dddd30bef7f1fb16e424845f764a11",
-      "class": "GenPagesCmdCmd"
+      "class": "GenPagesCmdCmd",
+      "md5": "e145b0c8c9dddd30bef7f1fb16e424845f764a11"
     },
-    "uni_modules/i-ui-x/components/i-line-progress/i-line-progress.kt": {
-      "md5": "bcec6230e835211eb8d8ee3bc11fec0a22d5dbc4",
-      "class": "GenUniModulesIUiXComponentsILineProgressILineProgress"
-    },
-    "components/app-modal/app-modal.kt": {
-      "class": "GenComponentsAppModalAppModal",
-      "md5": "cc5035df04d80372cf1b4d88746841a718146bf4"
-    },
-    "pages/login/register.kt": {
-      "class": "GenPagesLoginRegister",
-      "md5": "1320b55dcd5e653429ba4b5d079f77604034dbcc"
+    "pages/login/login.kt": {
+      "class": "GenPagesLoginLogin",
+      "md5": "641968250ca45547b76c22bf12e6272215d16e12"
     }
   }
 }

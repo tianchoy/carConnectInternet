@@ -82,7 +82,7 @@ name: 'i-switch',
     default: 'loading',
   },
 },
-  emits: ['update:modelValue', 'update:value', 'change'],
+  emits: ["update:modelValue", "update:value", "change"],
   setup(__props) {
 const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
@@ -116,22 +116,20 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
-function initialValue(): any {
+function initialValue() : any {
   if (props.modelValue.toString().length > 0) return props.modelValue
   return props.value
 }
 
-function formatSize(value: any): string {
+function formatSize(value : any) : string {
   const text = value.toString()
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
   return text + 'px'
 }
 
-function numericSize(value: any, fallback: number): number {
+function numericSize(value : any, fallback : number) : number {
   const text = value.toString().replace('px', '').replace('rpx', '').replace('%', '')
-  const numberValue = parseFloat(text)
+  const numberValue = parseFloat(text.toString())
   if (isNaN(numberValue)) return fallback
   return numberValue
 }
@@ -139,7 +137,7 @@ function numericSize(value: any, fallback: number): number {
 const current = ref(initialValue())
 
 const checked = computed(() => {
-  return current.value.toString() == props.activeValue.toString()
+  return (current.value).toString() == (props.activeValue).toString()
 })
 
 const switchClass = computed(() => {
@@ -196,20 +194,20 @@ const loadingStyle = computed(() => {
 })
 
 watch(
-  (): any => props.modelValue,
-  (): void => {
+  () : any => props.modelValue,
+  () : void => {
     current.value = initialValue()
   },
 )
 
 watch(
-  (): any => props.value,
-  (): void => {
+  () : any => props.value,
+  () : void => {
     current.value = initialValue()
   },
 )
 
-function toggle() {
+function toggle() : void {
   if (props.disabled || props.loading) return
   const nextValue = checked.value ? props.inactiveValue : props.activeValue
   if (!props.asyncChange) current.value = nextValue

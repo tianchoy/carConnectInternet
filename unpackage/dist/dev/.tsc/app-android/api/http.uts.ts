@@ -2,6 +2,7 @@ import { clearPushSessionState } from '../services/push.uts'
 import { showAppToast } from '../utils/toast.uts'
 
 import AndroidLog from 'android.util.Log'
+import TimeZone from 'java.util.TimeZone'
 
 // 定义类型
 type RequestOptions = {
@@ -36,9 +37,43 @@ type RequestFailure = {
     data?: any
 }
 
-// const BASE_URL = 'https://car.zdiot.cn:18443/api'
 const BASE_URL = 'https://gpsapp.zdiot.cn'
 const CLIENT_ID = '428a8310cd442757ae699df5d894f051'
+const DEFAULT_TIME_ZONE = 'UTC'
+
+// 获取设备当前时区，返回 IANA 时区标识。每次请求时读取，支持用户运行中修改系统时区。
+function getDeviceTimeZone(): string {
+    let timeZone = ''
+
+
+
+
+
+
+
+
+
+
+
+    try {
+        timeZone = TimeZone.getDefault().getID()
+    } catch (error) {
+        __f__('warn','at api/http.uts:61','获取安卓时区失败', error)
+    }
+
+
+
+
+
+
+
+
+
+
+
+    const normalizedTimeZone = timeZone.trim()
+    return normalizedTimeZone.length > 0 ? normalizedTimeZone : DEFAULT_TIME_ZONE
+}
 
 // 处理token过期的函数
 let isHandlingTokenExpired = false
@@ -50,7 +85,7 @@ export function resetTokenExpiredState(): void {
 export function handleTokenExpired(): void {
     if (isHandlingTokenExpired) return
     isHandlingTokenExpired = true
-    __f__('log','at api/http.uts:53','检测到token过期，执行跳转登录页逻辑')
+    __f__('log','at api/http.uts:88','检测到token过期，执行跳转登录页逻辑')
     
     // 清除本地token
     uni.removeStorageSync('token')
@@ -65,14 +100,14 @@ export function handleTokenExpired(): void {
     
     // 使用定时器确保Toast显示完成后再跳转
     setTimeout(() => {
-        __f__('log','at api/http.uts:68','正在跳转到登录页...')
+        __f__('log','at api/http.uts:103','正在跳转到登录页...')
         uni.redirectTo({
             url: '/pages/login/login',
             success: () => {
-                __f__('log','at api/http.uts:72','跳转登录页成功')
+                __f__('log','at api/http.uts:107','跳转登录页成功')
             },
             fail: (err) => {
-                __f__('log','at api/http.uts:75','跳转登录页失败:', err)
+                __f__('log','at api/http.uts:110','跳转登录页失败:', err)
                 // 如果跳转失败，尝试使用 reLaunch
                 uni.reLaunch({
                     url: '/pages/login/login'
@@ -86,6 +121,8 @@ export function handleTokenExpired(): void {
 function requestInterceptor(config: RequestOptions): RequestOptions {
     const token = uni.getStorageSync('token')
     const authorization = 'Bearer ' + (token != null ? token.toString() : '')
+    const timeZone = getDeviceTimeZone()
+
 
 
 
@@ -101,6 +138,7 @@ function requestInterceptor(config: RequestOptions): RequestOptions {
     }
     config.header!.set('Authorization', authorization)
     config.header!.set('clientId', CLIENT_ID)
+    config.header!.set('x-time-zone', timeZone)
 
 
     // 显示加载中
@@ -124,7 +162,7 @@ function logHttpError(error: HttpError): void {
 
     AndroidLog.e('HttpRequest', detail)
 
-    __f__('error','at api/http.uts:127','[HttpRequest] ' + detail)
+    __f__('error','at api/http.uts:165','[HttpRequest] ' + detail)
 }
 
 // 错误处理

@@ -126,9 +126,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   function isArray(value = null) {
     return value != null && Array.isArray(value);
   }
+  function normalizedIndex(value, fallback) {
+    return isNaN(value) || !isFinite(value) ? fallback : Math.floor(value);
+  }
   function normalizeItem(item = null) {
     if (item != null && typeof item == "object") {
-      const object = item;
+      const serialized = common_vendor.UTS.JSON.stringify(item);
+      const object = common_vendor.UTS.JSON.parse(serialized);
       const rawText = object["text"];
       const rawValue = object["value"];
       const text = rawText != null ? rawText.toString() : rawValue == null ? "" : rawValue.toString();
@@ -152,6 +156,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   }
   const opened = common_vendor.ref(props.show);
   const currentIndexs = common_vendor.ref([]);
+  const pickerViewIndexes = common_vendor.ref([]);
+  let indexSyncGeneration = 0;
+  let pickerInitialized = false;
+  let pickerInternalChange = false;
+  function scheduleFrame(callback) {
+    setTimeout(callback, 16);
+  }
+  function copyIndexes(indexes) {
+    return indexes.slice();
+  }
+  function cancelIndexSync() {
+    indexSyncGeneration++;
+    pickerInternalChange = false;
+  }
   const normalizedColumns = common_vendor.computed(() => {
     const columns = props.columns;
     const options = props.options;
@@ -187,6 +205,36 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     if (index < 0 || index >= normalizedColumns.value.length)
       return [];
     return normalizedColumns.value[index];
+  }
+  function scheduleIndexSync(indexes, changedIndex = -1, initialize = false) {
+    const generation = ++indexSyncGeneration;
+    pickerInternalChange = true;
+    pickerViewIndexes.value = copyIndexes(indexes);
+    scheduleFrame(() => {
+      if (generation != indexSyncGeneration)
+        return null;
+      if (changedIndex >= 0 && changedIndex < indexes.length) {
+        const refreshed = copyIndexes(indexes);
+        const columns = normalizedColumns.value;
+        const optionCount = changedIndex < columns.length ? columns[changedIndex].length : 0;
+        if (optionCount > 1) {
+          refreshed[changedIndex] = indexes[changedIndex] > 0 ? indexes[changedIndex] - 1 : 1;
+        }
+        pickerViewIndexes.value = refreshed;
+      }
+      scheduleFrame(() => {
+        if (generation != indexSyncGeneration)
+          return null;
+        pickerViewIndexes.value = copyIndexes(indexes);
+        scheduleFrame(() => {
+          if (generation != indexSyncGeneration)
+            return null;
+          pickerInternalChange = false;
+          if (initialize)
+            pickerInitialized = true;
+        });
+      });
+    });
   }
   function visibleCountNumber() {
     const count = parseFloat(props.visibleItemCount.toString());
@@ -278,15 +326,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   }
   function defaultIndexAt(columnIndex) {
     const value = props.defaultIndex;
+    let index = 0;
     if (isArray(value)) {
       const values = value;
       if (values.length > columnIndex) {
         const item = values[columnIndex];
-        return item == null ? 0 : parseFloat(item.toString());
+        if (item != null)
+          index = parseFloat(item.toString());
       }
-      return 0;
+    } else if (columnIndex == 0) {
+      index = parseFloat(value.toString());
     }
-    return columnIndex == 0 ? parseFloat(value.toString()) : 0;
+    return normalizedIndex(index, 0);
   }
   function findValueIndex(column, value = null) {
     const valueText = value.toString();
@@ -343,6 +394,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     const value = activeModelValue();
     for (let i = 0; i < columns.length; i++) {
       const column = columns[i];
+      if (column.length == 0) {
+        result.push(0);
+        continue;
+      }
       const targetValue = columnTargetValue(value, i);
       let index = -1;
       if (targetValue != null && targetValue.toString().length > 0) {
@@ -357,8 +412,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       result.push(index);
     }
     currentIndexs.value = result;
+    scheduleIndexSync(result, -1, !pickerInitialized);
   }
   function close() {
+    cancelIndexSync();
+    pickerInitialized = false;
     if (!opened.value)
       return null;
     opened.value = false;
@@ -368,8 +426,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   function open() {
     if (opened.value)
       return null;
-    syncIndexs();
     opened.value = true;
+    syncIndexs();
     emit("open");
     emit("update:show", true);
   }
@@ -378,16 +436,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       open();
   }
   function cancel() {
+    cancelIndexSync();
     emit("cancel", buildChangeEvent(0, selectedIndexAt(0)));
     close();
   }
   function confirm() {
-    emit("confirm", buildConfirmEvent());
+    const event = buildConfirmEvent();
+    emit("confirm", event);
     emitSelectedValue();
+    cancelIndexSync();
     close();
   }
   function clear() {
     currentIndexs.value = [];
+    pickerViewIndexes.value = [];
     emit("clear");
     emit("change", buildChangeEvent(0, -1));
     emit("update:value", "");
@@ -397,32 +459,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     if (props.closeOnMask)
       close();
   }
-  function handlePickerChange(event = null) {
-    if (props.disabled || props.loading || event == null || typeof event != "object")
+  function handlePickerChange(event) {
+    if (props.disabled || props.loading || !pickerInitialized || pickerInternalChange)
       return null;
-    const detail = event["detail"];
-    if (detail == null || typeof detail != "object")
+    const values = event.detail.value;
+    if (values == null || !Array.isArray(values))
       return null;
-    const rawValues = detail["value"];
-    if (rawValues == null || !Array.isArray(rawValues))
-      return null;
-    const values = rawValues;
     const nextIndexs = [];
     let changedColumnIndex = 0;
     for (let i = 0; i < normalizedColumns.value.length; i++) {
       const column = normalizedColumns.value[i];
-      const oldIndex = selectedIndexAt(i);
-      let nextIndex = 0;
-      if (values.length > i) {
-        const rawIndex = values[i];
-        if (rawIndex != null)
-          nextIndex = parseFloat(rawIndex.toString());
+      if (column.length == 0) {
+        nextIndexs.push(0);
+        continue;
       }
+      const oldIndex = selectedIndexAt(i);
+      let nextIndex = normalizedIndex(values.length > i ? values[i] : 0, 0);
       if (nextIndex < 0)
         nextIndex = 0;
       if (nextIndex >= column.length)
         nextIndex = column.length - 1;
-      if (column.length > 0 && column[nextIndex].disabled)
+      if (column[nextIndex].disabled)
         nextIndex = oldIndex;
       if (oldIndex != nextIndex)
         changedColumnIndex = i;
@@ -620,9 +677,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       G: common_vendor.s(itemStyle.value)
     } : {}, {
       H: common_vendor.s(columnsStyle.value),
-      I: currentIndexs.value,
+      I: pickerViewIndexes.value,
       J: indicatorStyle.value,
-      K: common_vendor.o(handlePickerChange, "b2"),
+      K: common_vendor.o(handlePickerChange, "ae"),
       L: common_vendor.s(panelStyle.value),
       M: common_vendor.o(() => {
       }, "60"),

@@ -59,13 +59,40 @@ open class GenUniModulesIUiXComponentsIButtonIButton : VueComponent {
             val lastClickTime = ref(0)
             val loadingAngle = ref(0)
             var loadingTimer: Number = 0
-            fun formatSize(value: Any): String {
+            fun gen_normalizeAngle_fn(value: Number): Number {
+                var angle = value % 360
+                if (angle < 0) {
+                    angle = angle + 360
+                }
+                return angle
+            }
+            val normalizeAngle = ::gen_normalizeAngle_fn
+            fun gen_formatSize_fn(value: Any): String {
                 val text = value.toString()
                 if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
                     return text
                 }
                 return text + "px"
             }
+            val formatSize = ::gen_formatSize_fn
+            fun gen_startLoading_fn(): Unit {
+                if (loadingTimer > 0) {
+                    return
+                }
+                loadingTimer = setInterval(fun(){
+                    loadingAngle.value = normalizeAngle(loadingAngle.value + 24)
+                }
+                , 50)
+            }
+            val startLoading = ::gen_startLoading_fn
+            fun gen_stopLoading_fn(): Unit {
+                if (loadingTimer > 0) {
+                    clearInterval(loadingTimer)
+                    loadingTimer = 0
+                }
+                loadingAngle.value = 0
+            }
+            val stopLoading = ::gen_stopLoading_fn
             val normalizedType = computed(fun(): String {
                 if (props.type == "danger") {
                     return "error"
@@ -74,10 +101,11 @@ open class GenUniModulesIUiXComponentsIButtonIButton : VueComponent {
             }
             )
             val contentText = computed(fun(): String {
-                if (props.text == null) {
-                    return ""
+                return if (props.text.toString().length > 0) {
+                    props.text.toString()
+                } else {
+                    ""
                 }
-                return props.text.toString()
             }
             )
             val computedHoverClass = computed(fun(): String {
@@ -85,20 +113,6 @@ open class GenUniModulesIUiXComponentsIButtonIButton : VueComponent {
                     return "none"
                 }
                 return props.hoverClass
-            }
-            )
-            fun normalizeNumber(value: Any): Number {
-                if (UTSAndroid.`typeof`(value) == "number") {
-                    return value as Number
-                }
-                return UTSNumber.from(parseFloat(value as String))
-            }
-            val hoverStartTimeValue = computed(fun(): Number {
-                return normalizeNumber(props.hoverStartTime)
-            }
-            )
-            val hoverStayTimeValue = computed(fun(): Number {
-                return normalizeNumber(props.hoverStayTime)
             }
             )
             val useNativeButton = computed(fun(): Boolean {
@@ -226,28 +240,6 @@ open class GenUniModulesIUiXComponentsIButtonIButton : VueComponent {
                 return ("width:" + size + ";height:" + size + ";transform:rotate(" + loadingAngle.value.toString(10) + "deg);")
             }
             )
-            fun gen_startLoading_fn(): Unit {
-                if (loadingTimer > 0) {
-                    return
-                }
-                loadingTimer = setInterval(fun(){
-                    var angle = (loadingAngle.value + 24) % 360
-                    if (angle < 0) {
-                        angle = angle + 360
-                    }
-                    loadingAngle.value = angle
-                }
-                , 50)
-            }
-            val startLoading = ::gen_startLoading_fn
-            fun gen_stopLoading_fn(): Unit {
-                if (loadingTimer > 0) {
-                    clearInterval(loadingTimer)
-                    loadingTimer = 0
-                }
-                loadingAngle.value = 0
-            }
-            val stopLoading = ::gen_stopLoading_fn
             watch(fun(): Boolean {
                 return props.loading
             }
@@ -273,8 +265,8 @@ open class GenUniModulesIUiXComponentsIButtonIButton : VueComponent {
                 if (props.disabled || props.loading) {
                     return false
                 }
-                val wait = normalizeNumber(props.throttleTime)
-                if (wait <= 0 || isNaN(wait)) {
+                val wait = parseFloat(props.throttleTime.toString())
+                if (wait <= 0) {
                     return true
                 }
                 val now = Date.now()
@@ -285,40 +277,40 @@ open class GenUniModulesIUiXComponentsIButtonIButton : VueComponent {
                 return true
             }
             val canClick = ::gen_canClick_fn
-            fun gen_handleClick_fn(event: Any): Unit {
+            fun gen_handleClick_fn(event: Any) {
                 if (!canClick()) {
                     return
                 }
                 emit("click", event)
             }
             val handleClick = ::gen_handleClick_fn
-            fun gen_handleGetPhoneNumber_fn(event: Any): Unit {
+            fun gen_handleGetPhoneNumber_fn(event: Any) {
                 emit("getphonenumber", event)
             }
             val handleGetPhoneNumber = ::gen_handleGetPhoneNumber_fn
-            fun gen_handleGetUserInfo_fn(event: Any): Unit {
+            fun gen_handleGetUserInfo_fn(event: Any) {
                 emit("getuserinfo", event)
             }
             val handleGetUserInfo = ::gen_handleGetUserInfo_fn
-            fun gen_handleError_fn(event: Any): Unit {
+            fun gen_handleError_fn(event: Any) {
                 emit("error", event)
             }
             val handleError = ::gen_handleError_fn
-            fun gen_handleOpenSetting_fn(event: Any): Unit {
+            fun gen_handleOpenSetting_fn(event: Any) {
                 emit("opensetting", event)
             }
             val handleOpenSetting = ::gen_handleOpenSetting_fn
-            fun gen_handleLaunchApp_fn(event: Any): Unit {
+            fun gen_handleLaunchApp_fn(event: Any) {
                 emit("launchapp", event)
             }
             val handleLaunchApp = ::gen_handleLaunchApp_fn
-            fun gen_handleAgreePrivacyAuthorization_fn(event: Any): Unit {
+            fun gen_handleAgreePrivacyAuthorization_fn(event: Any) {
                 emit("agreeprivacyauthorization", event)
             }
             val handleAgreePrivacyAuthorization = ::gen_handleAgreePrivacyAuthorization_fn
             return fun(): Any? {
                 return if (isTrue(useNativeButton.value)) {
-                    _cE("button", _uM("key" to 0, "class" to _nC(buttonClass.value), "style" to _nS(buttonStyle.value), "disabled" to (_ctx.disabled || _ctx.loading), "form-type" to _ctx.formType, "open-type" to _ctx.openType, "app-parameter" to _ctx.appParameter, "hover-class" to computedHoverClass.value, "hover-stop-propagation" to _ctx.hoverStopPropagation, "hover-start-time" to hoverStartTimeValue.value, "hover-stay-time" to hoverStayTimeValue.value, "lang" to _ctx.lang, "session-from" to _ctx.sessionFrom, "send-message-title" to _ctx.sendMessageTitle, "send-message-path" to _ctx.sendMessagePath, "send-message-img" to _ctx.sendMessageImg, "show-message-card" to _ctx.showMessageCard, "data-name" to _ctx.dataName, "onClick" to handleClick, "onGetphonenumber" to handleGetPhoneNumber, "onGetuserinfo" to handleGetUserInfo, "onError" to handleError, "onOpensetting" to handleOpenSetting, "onLaunchapp" to handleLaunchApp, "onAgreeprivacyauthorization" to handleAgreePrivacyAuthorization), _uA(
+                    _cE("button", _uM("key" to 0, "class" to _nC(buttonClass.value), "style" to _nS(buttonStyle.value), "disabled" to (_ctx.disabled || _ctx.loading), "form-type" to _ctx.formType, "open-type" to _ctx.openType, "app-parameter" to _ctx.appParameter, "hover-class" to computedHoverClass.value, "hover-stop-propagation" to _ctx.hoverStopPropagation, "hover-start-time" to parseFloat(_ctx.hoverStartTime.toString()), "hover-stay-time" to parseFloat(_ctx.hoverStayTime.toString()), "lang" to _ctx.lang, "session-from" to _ctx.sessionFrom, "send-message-title" to _ctx.sendMessageTitle, "send-message-path" to _ctx.sendMessagePath, "send-message-img" to _ctx.sendMessageImg, "show-message-card" to _ctx.showMessageCard, "data-name" to _ctx.dataName, "onClick" to handleClick, "onGetphonenumber" to handleGetPhoneNumber, "onGetuserinfo" to handleGetUserInfo, "onError" to handleError, "onOpensetting" to handleOpenSetting, "onLaunchapp" to handleLaunchApp, "onAgreeprivacyauthorization" to handleAgreePrivacyAuthorization), _uA(
                         _cE("view", _uM("class" to "i-button__inner"), _uA(
                             if (isTrue(_ctx.loading)) {
                                 _cE("text", _uM("key" to 0, "class" to _nC(loadingClass.value), "style" to _nS(loadingStyle.value)), null, 6)
@@ -361,7 +353,7 @@ open class GenUniModulesIUiXComponentsIButtonIButton : VueComponent {
                         "data-name"
                     ))
                 } else {
-                    _cE("view", _uM("key" to 1, "class" to _nC(buttonClass.value), "style" to _nS(buttonStyle.value), "hover-class" to computedHoverClass.value, "hover-stop-propagation" to _ctx.hoverStopPropagation, "hover-start-time" to hoverStartTimeValue.value, "hover-stay-time" to hoverStayTimeValue.value, "data-name" to _ctx.dataName, "onClick" to handleClick), _uA(
+                    _cE("view", _uM("key" to 1, "class" to _nC(buttonClass.value), "style" to _nS(buttonStyle.value), "hover-class" to computedHoverClass.value, "hover-stop-propagation" to _ctx.hoverStopPropagation, "hover-start-time" to parseFloat(_ctx.hoverStartTime.toString()), "hover-stay-time" to parseFloat(_ctx.hoverStayTime.toString()), "data-name" to _ctx.dataName, "onClick" to handleClick), _uA(
                         _cE("view", _uM("class" to "i-button__inner"), _uA(
                             if (isTrue(_ctx.loading)) {
                                 _cE("text", _uM("key" to 0, "class" to _nC(loadingClass.value), "style" to _nS(loadingStyle.value)), null, 6)

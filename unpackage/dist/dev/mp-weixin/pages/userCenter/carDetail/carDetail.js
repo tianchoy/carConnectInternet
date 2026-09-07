@@ -220,14 +220,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           Icon: "/static/edit-pen.png",
           class: "data-v-36223569"
         }),
-        c: common_vendor.t(carInfo.value.getString("deviceId", "")),
+        c: common_vendor.t(carInfo.value.getString("deviceImei", "")),
         d: !isEditing.value
       }, !isEditing.value ? {
         e: common_vendor.t(carInfo.value.getString("deviceName", ""))
       } : {
         f: common_vendor.o(($event) => {
           return editInfo.value.deviceName = $event;
-        }, "fd"),
+        }, "a9"),
         g: common_vendor.p({
           border: "none",
           inputAlign: "right",
@@ -247,7 +247,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           fontSize: "18",
           class: "data-v-36223569"
         }),
-        m: common_vendor.o(openCarIconSelector, "09")
+        m: common_vendor.o(openCarIconSelector, "28")
       }, {
         n: !isEditing.value
       }, !isEditing.value ? {
@@ -255,7 +255,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {
         p: common_vendor.o(($event) => {
           return editInfo.value.plateNo = $event;
-        }, "03"),
+        }, "18"),
         q: common_vendor.p({
           border: "none",
           inputAlign: "right",
@@ -270,7 +270,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {
         t: common_vendor.o(($event) => {
           return editInfo.value.carVin = $event;
-        }, "70"),
+        }, "23"),
         v: common_vendor.p({
           border: "none",
           inputAlign: "right",
@@ -285,7 +285,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {
         y: common_vendor.o(($event) => {
           return editInfo.value.engineNum = $event;
-        }, "59"),
+        }, "e4"),
         z: common_vendor.p({
           border: "none",
           inputAlign: "right",
@@ -296,20 +296,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         A: isEditing.value
       }, isEditing.value ? {
-        B: common_vendor.o(saveChanges, "cf"),
+        B: common_vendor.o(saveChanges, "f8"),
         C: common_vendor.p({
           type: "primary",
           loading: saving.value,
           class: "action-button save-btn data-v-36223569"
         }),
-        D: common_vendor.o(cancelEdit, "75"),
+        D: common_vendor.o(cancelEdit, "79"),
         E: common_vendor.p({
           disabled: saving.value,
           class: "action-button cancel-btn data-v-36223569"
         })
       } : {}, {
-        F: common_vendor.o(updateCarIconSelectorVisible, "be"),
-        G: common_vendor.o(selectIcon, "f4"),
+        F: common_vendor.o(updateCarIconSelectorVisible, "59"),
+        G: common_vendor.o(selectIcon, "0e"),
         H: common_vendor.p({
           show: carIconSelectorVisible.value,
           class: "data-v-36223569"

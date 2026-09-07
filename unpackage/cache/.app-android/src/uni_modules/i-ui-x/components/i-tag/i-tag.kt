@@ -46,6 +46,14 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
+            fun gen_formatSize_fn(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
+            }
+            val formatSize = ::gen_formatSize_fn
             val bgColor = computed(fun(): String {
                 return props.bgColor
             }
@@ -172,6 +180,27 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
                 return (props.round as Any).toString().length > 0
             }
             )
+            val shadowStyle = computed(fun(): String {
+                val value = props.shadow
+                val text = value.toString()
+                if (text.length == 0 || text == "none") {
+                    return ""
+                }
+                if (UTSArray.isArray(value)) {
+                    val list = value as UTSArray<Any?>
+                    if (list.length >= 4) {
+                        val first = list[0]
+                        val second = list[1]
+                        val third = list[2]
+                        val fourth = list[3]
+                        if (first != null && second != null && third != null && fourth != null) {
+                            return "box-shadow:" + formatSize(first) + " " + formatSize(second) + " " + formatSize(third) + " " + fourth.toString() + ";"
+                        }
+                    }
+                }
+                return "box-shadow:0 " + formatSize(value) + " " + formatSize(parseFloat(value.toString()) * 2) + " rgba(0,0,0,0.12);"
+            }
+            )
             val tagClass = computed(fun(): String {
                 val classes = _uA(
                     "i-tag",
@@ -210,27 +239,6 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
                     classes.push("i-tag__close--xs")
                 }
                 return classes.join(" ")
-            }
-            )
-            fun gen_formatSize_fn(value: Any): String {
-                val text = value.toString()
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
-            val shadowStyle = computed(fun(): String {
-                val value = props.shadow
-                val text = value.toString()
-                if (text.length == 0 || text == "none") {
-                    return ""
-                }
-                if (UTSArray.isArray(value) && (value as UTSArray<*>).length >= 4) {
-                    val shadowValues = value as UTSArray<Any>
-                    return ("box-shadow:" + formatSize(shadowValues[0]) + " " + formatSize(shadowValues[1]) + " " + formatSize(shadowValues[2]) + " " + shadowValues[3].toString() + ";")
-                }
-                return "box-shadow:0 " + formatSize(value) + " " + formatSize(parseFloat(value.toString()) * 2) + " rgba(0,0,0,0.12);"
             }
             )
             val tagStyle = computed(fun(): String {
@@ -279,7 +287,7 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
                 return "color:" + computedTextColor.value + ";"
             }
             )
-            fun gen_handleClick_fn(event: Any): Unit {
+            fun gen_handleClick_fn() {
                 if (closeClicking.value) {
                     closeClicking.value = false
                     return
@@ -287,7 +295,7 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
                 if (props.disabled) {
                     return
                 }
-                emit("click", event)
+                emit("click", contentText.value)
             }
             val handleClick = ::gen_handleClick_fn
             fun gen_handleClose_fn() {
@@ -304,9 +312,7 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
             val handleClose = ::gen_handleClose_fn
             return fun(): Any? {
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
-                return _cE("view", _uM("class" to _nC(tagClass.value), "style" to _nS(tagStyle.value), "onClick" to withModifiers(handleClick, _uA(
-                    "stop"
-                ))), _uA(
+                return _cE("view", _uM("class" to _nC(tagClass.value), "style" to _nS(tagStyle.value), "onClick" to handleClick), _uA(
                     if (_ctx.icon.length > 0) {
                         _cV(_component_i_icon, _uM("key" to 0, "class" to "i-tag__icon", "name" to _ctx.icon, "fontSize" to computedIconSize.value, "color" to computedTextColor.value), null, 8, _uA(
                             "name",

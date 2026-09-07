@@ -7,6 +7,11 @@ export function formatTimes(timestamp: number): string {
     const d = new Date(timestamp);
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
+/** 时间戳格式化 yyyy-MM-dd HH:mm，供时间范围选择使用。 */
+export function formatTimesToMinute(timestamp: number): string {
+    const d = new Date(timestamp);
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 /**
  * 解析本地日期时间。支持 yyyy-MM-dd、yyyy/MM/dd 及其 HH:mm[:ss] 形式。
  * 不使用 Date 的字符串构造，避免部分 iOS 平台解析失败。

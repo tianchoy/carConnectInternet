@@ -2131,8 +2131,8 @@ val default__3 = "/static/dzwl.png"
 val default__4 = "/static/msg.png"
 val default__5 = "/static/pay.png"
 val default__6 = "/static/online.png"
-val default__7 = "/static/logout.png"
-val default__8 = "/static/del.png"
+val default__7 = "/static/del.png"
+val default__8 = "/static/logout.png"
 open class TodayTimeRange (
     @JsonNotNull
     open var nowTime: Number,
@@ -3609,18 +3609,6 @@ val GenUniModulesIUiXComponentsISliderISliderClass = CreateVueComponent(GenUniMo
     return GenUniModulesIUiXComponentsISliderISlider(instance)
 }
 )
-open class IDatetimePickerEvent (
-    @JsonNotNull
-    open var value: Any,
-    @JsonNotNull
-    open var date: String,
-    @JsonNotNull
-    open var time: String,
-    @JsonNotNull
-    open var timestamp: Number,
-    @JsonNotNull
-    open var mode: String,
-) : UTSObject()
 open class IWheelOption (
     @JsonNotNull
     open var value: Number,

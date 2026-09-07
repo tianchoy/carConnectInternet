@@ -154,6 +154,21 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 return text + "px"
             }
             val formatSize = ::gen_formatSize_fn
+            fun gen_clampTime_fn(value: String): String {
+                val text = normalizeTime(value)
+                val current = timeToMinutes(text)
+                val minValue = validHour(props.minHour) * 60 + validMinute(props.minMinute)
+                val maxValue = validHour(props.maxHour) * 60 + validMinute(props.maxMinute)
+                var nextValue = current
+                if (nextValue < minValue) {
+                    nextValue = minValue
+                }
+                if (nextValue > maxValue) {
+                    nextValue = maxValue
+                }
+                return padNumber(Math.floor(nextValue / 60)) + ":" + padNumber(nextValue % 60)
+            }
+            val clampTime = ::gen_clampTime_fn
             val opened = ref(props.show)
             val currentDate = ref(props.date)
             val currentTime = ref(props.time)
@@ -377,6 +392,160 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
             }
             )
             val wheelIndexes = ref(_uA<Number>())
+            var wheelSyncGeneration: Number = 0
+            var wheelReadyGeneration: Number = 0
+            var wheelInitialized = false
+            var wheelInternalChange = false
+            fun gen_scheduleFrame_fn(callback: () -> Unit): Unit {
+                setTimeout(callback, 16)
+            }
+            val scheduleFrame = ::gen_scheduleFrame_fn
+            fun gen_copyWheelIndexes_fn(indexes: UTSArray<Number>): UTSArray<Number> {
+                return indexes.slice()
+            }
+            val copyWheelIndexes = ::gen_copyWheelIndexes_fn
+            fun gen_findChangedWheelIndex_fn(nextIndexes: UTSArray<Number>, oldIndexes: UTSArray<Number>): Number {
+                val length = Math.max(nextIndexes.length, oldIndexes.length)
+                run {
+                    var index: Number = 0
+                    while(index < length){
+                        val nextValue = if (index < nextIndexes.length) {
+                            nextIndexes[index]
+                        } else {
+                            -1
+                        }
+                        val oldValue = if (index < oldIndexes.length) {
+                            oldIndexes[index]
+                        } else {
+                            -1
+                        }
+                        if (nextValue != oldValue) {
+                            return index
+                        }
+                        index++
+                    }
+                }
+                return -1
+            }
+            val findChangedWheelIndex = ::gen_findChangedWheelIndex_fn
+            fun gen_cancelWheelIndexSync_fn(): Unit {
+                wheelSyncGeneration++
+                wheelInternalChange = false
+            }
+            val cancelWheelIndexSync = ::gen_cancelWheelIndexSync_fn
+            fun gen_cancelWheelReady_fn(): Unit {
+                wheelReadyGeneration++
+            }
+            val cancelWheelReady = ::gen_cancelWheelReady_fn
+            fun gen_scheduleWheelReady_fn(): Unit {
+                val generation = ++wheelReadyGeneration
+                nextTick(fun(){
+                    scheduleFrame(fun(){
+                        scheduleFrame(fun(){
+                            scheduleFrame(fun(){
+                                if (generation != wheelReadyGeneration || !opened.value) {
+                                    return
+                                }
+                                wheelInitialized = true
+                                wheelInternalChange = false
+                            }
+                            )
+                        }
+                        )
+                    }
+                    )
+                }
+                )
+            }
+            val scheduleWheelReady = ::gen_scheduleWheelReady_fn
+            fun gen_syncNativeWheelIndexes_fn(indexes: UTSArray<Number>): Unit {
+                val generation = ++wheelSyncGeneration
+                wheelInternalChange = true
+                wheelIndexes.value = copyWheelIndexes(indexes)
+                scheduleFrame(fun(){
+                    if (generation != wheelSyncGeneration) {
+                        return
+                    }
+                    wheelIndexes.value = copyWheelIndexes(indexes)
+                    scheduleFrame(fun(){
+                        if (generation == wheelSyncGeneration) {
+                            wheelInternalChange = false
+                        }
+                    }
+                    )
+                }
+                )
+            }
+            val syncNativeWheelIndexes = ::gen_syncNativeWheelIndexes_fn
+            fun gen_forceWheelIndexRefresh_fn(indexes: UTSArray<Number>, changedIndex: Number, optionCount: Number): Unit {
+                val generation = ++wheelSyncGeneration
+                wheelInternalChange = true
+                wheelIndexes.value = copyWheelIndexes(indexes)
+                scheduleFrame(fun(){
+                    if (generation != wheelSyncGeneration) {
+                        return
+                    }
+                    if (changedIndex >= 0 && changedIndex < indexes.length && optionCount > 1) {
+                        val refreshed = copyWheelIndexes(indexes)
+                        val target = indexes[changedIndex]
+                        refreshed[changedIndex] = if (target > 0) {
+                            target - 1
+                        } else {
+                            1
+                        }
+                        wheelIndexes.value = refreshed
+                    }
+                    scheduleFrame(fun(){
+                        if (generation != wheelSyncGeneration) {
+                            return
+                        }
+                        wheelIndexes.value = copyWheelIndexes(indexes)
+                        scheduleFrame(fun(){
+                            if (generation == wheelSyncGeneration) {
+                                wheelInternalChange = false
+                            }
+                        }
+                        )
+                    }
+                    )
+                }
+                )
+            }
+            val forceWheelIndexRefresh = ::gen_forceWheelIndexRefresh_fn
+            fun gen_wheelOptionCountAt_fn(index: Number): Number {
+                var visibleIndex: Number = 0
+                if (showYearColumn.value) {
+                    if (visibleIndex == index) {
+                        return yearOptions.value.length
+                    }
+                    visibleIndex++
+                }
+                if (showMonthColumn.value) {
+                    if (visibleIndex == index) {
+                        return monthOptions.value.length
+                    }
+                    visibleIndex++
+                }
+                if (showDayColumn.value) {
+                    if (visibleIndex == index) {
+                        return dayOptions.value.length
+                    }
+                    visibleIndex++
+                }
+                if (showHourColumn.value) {
+                    if (visibleIndex == index) {
+                        return hourOptions.value.length
+                    }
+                    visibleIndex++
+                }
+                if (showMinuteColumn.value) {
+                    if (visibleIndex == index) {
+                        return minuteOptions.value.length
+                    }
+                }
+                return 0
+            }
+            val wheelOptionCountAt = ::gen_wheelOptionCountAt_fn
             fun gen_indexOfOption_fn(options: UTSArray<IWheelOption>, value: Number): Number {
                 run {
                     var index: Number = 0
@@ -390,7 +559,71 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 return 0
             }
             val indexOfOption = ::gen_indexOfOption_fn
-            fun gen_syncWheelIndexes_fn(): Unit {
+            fun gen_clampDraftParts_fn(): Unit {
+                if (normalizedMode.value == "time") {
+                    currentTime.value = clampTime(currentTime.value)
+                    return
+                }
+                val minDate = minDateParts()
+                val maxDate = maxDateParts()
+                var year = selectedYear()
+                var month = selectedMonth()
+                var day = selectedDay()
+                var hour = selectedHour()
+                var minute = selectedMinute()
+                if (year < minDate.getFullYear()) {
+                    year = minDate.getFullYear()
+                }
+                if (year > maxDate.getFullYear()) {
+                    year = maxDate.getFullYear()
+                }
+                val firstMonth = if (year == minDate.getFullYear()) {
+                    minDate.getMonth() + 1
+                } else {
+                    1
+                }
+                val lastMonth = if (year == maxDate.getFullYear()) {
+                    maxDate.getMonth() + 1
+                } else {
+                    12
+                }
+                if (month < firstMonth) {
+                    month = firstMonth
+                }
+                if (month > lastMonth) {
+                    month = lastMonth
+                }
+                var firstDay: Number = 1
+                var lastDay = daysInMonth(year, month)
+                if (year == minDate.getFullYear() && month == minDate.getMonth() + 1) {
+                    firstDay = minDate.getDate()
+                }
+                if (year == maxDate.getFullYear() && month == maxDate.getMonth() + 1) {
+                    lastDay = maxDate.getDate()
+                }
+                if (day < firstDay) {
+                    day = firstDay
+                }
+                if (day > lastDay) {
+                    day = lastDay
+                }
+                val timestamp = dateTimeToTimestamp(dateFromParts(year, month, day, hour, minute).split(" ")[0], padNumber(hour) + ":" + padNumber(minute))
+                if (timestamp < minDateValue()) {
+                    currentDate.value = formatDate(minDateValue())
+                    currentTime.value = formatTime(minDateValue())
+                    return
+                }
+                if (timestamp > maxDateValue()) {
+                    currentDate.value = formatDate(maxDateValue())
+                    currentTime.value = formatTime(maxDateValue())
+                    return
+                }
+                currentDate.value = year.toString(10) + "-" + padNumber(month) + "-" + padNumber(day)
+                currentTime.value = padNumber(hour) + ":" + padNumber(minute)
+            }
+            val clampDraftParts = ::gen_clampDraftParts_fn
+            fun syncWheelIndexes(syncNative: Boolean = true): UTSArray<Number> {
+                clampDraftParts()
                 val indexes: UTSArray<Number> = _uA()
                 if (showYearColumn.value) {
                     indexes.push(indexOfOption(yearOptions.value, selectedYear()))
@@ -407,9 +640,11 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 if (showMinuteColumn.value) {
                     indexes.push(indexOfOption(minuteOptions.value, selectedMinute()))
                 }
-                wheelIndexes.value = indexes
+                if (syncNative) {
+                    syncNativeWheelIndexes(indexes)
+                }
+                return indexes
             }
-            val syncWheelIndexes = ::gen_syncWheelIndexes_fn
             fun gen_selectedOptionValue_fn(options: UTSArray<IWheelOption>, index: Number, fallback: Number): Number {
                 if (options.length == 0) {
                     return fallback
@@ -424,11 +659,11 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 return options[safeIndex].value
             }
             val selectedOptionValue = ::gen_selectedOptionValue_fn
-            fun gen_wheelIndexAt_fn(values: UTSArray<Any?>, index: Number): Number {
+            fun gen_wheelIndexAt_fn(values: UTSArray<Number>, index: Number): Number {
                 if (values.length <= index || values[index] == null) {
                     return 0
                 }
-                val result = parseFloat(values[index].toString())
+                val result = parseFloat(values[index].toString(10))
                 if (isNaN(result) || result < 0) {
                     return 0
                 }
@@ -457,21 +692,6 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 return dateTimeToTimestamp(currentDate.value, currentTime.value)
             }
             val currentTimestamp = ::gen_currentTimestamp_fn
-            fun gen_clampTime_fn(value: String): String {
-                val text = normalizeTime(value)
-                val current = timeToMinutes(text)
-                val minValue = validHour(props.minHour) * 60 + validMinute(props.minMinute)
-                val maxValue = validHour(props.maxHour) * 60 + validMinute(props.maxMinute)
-                var nextValue = current
-                if (nextValue < minValue) {
-                    nextValue = minValue
-                }
-                if (nextValue > maxValue) {
-                    nextValue = maxValue
-                }
-                return padNumber(Math.floor(nextValue / 60)) + ":" + padNumber(nextValue % 60)
-            }
-            val clampTime = ::gen_clampTime_fn
             fun gen_outputValue_fn(): Any {
                 if (normalizedMode.value == "time") {
                     return currentTime.value
@@ -479,13 +699,13 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 return currentTimestamp()
             }
             val outputValue = ::gen_outputValue_fn
-            fun gen_buildEvent_fn(): IDatetimePickerEvent {
-                return IDatetimePickerEvent(value = outputValue(), date = currentDate.value, time = currentTime.value, timestamp = currentTimestamp(), mode = normalizedMode.value)
+            fun gen_buildEvent_fn(): UTSJSONObject {
+                return _uO("value" to outputValue(), "date" to currentDate.value, "time" to currentTime.value, "timestamp" to currentTimestamp(), "mode" to normalizedMode.value)
             }
             val buildEvent = ::gen_buildEvent_fn
             fun gen_emitValue_fn(): Unit {
                 val event = buildEvent()
-                emit("update:modelValue", event.value)
+                emit("update:modelValue", event["value"])
                 emit("update:date", currentDate.value)
                 emit("update:time", currentTime.value)
             }
@@ -538,6 +758,10 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
             }
             val clampCurrent = ::gen_clampCurrent_fn
             fun gen_syncFromProps_fn(): Unit {
+                cancelWheelIndexSync()
+                cancelWheelReady()
+                wheelInitialized = false
+                wheelInternalChange = true
                 val modelText = props.modelValue.toString()
                 if (modelText.length > 0) {
                     applyValue(props.modelValue)
@@ -547,14 +771,15 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 }
                 clampCurrent()
                 syncWheelIndexes()
+                scheduleWheelReady()
             }
             val syncFromProps = ::gen_syncFromProps_fn
             fun gen_open_fn(): Unit {
                 if (opened.value) {
                     return
                 }
-                syncFromProps()
                 opened.value = true
+                syncFromProps()
                 emit("open")
                 emit("update:show", true)
             }
@@ -567,6 +792,10 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
             }
             val openByTrigger = ::gen_openByTrigger_fn
             fun gen_close_fn(): Unit {
+                cancelWheelIndexSync()
+                cancelWheelReady()
+                wheelInitialized = false
+                wheelInternalChange = false
                 if (!opened.value) {
                     return
                 }
@@ -576,6 +805,7 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
             }
             val close = ::gen_close_fn
             fun gen_cancel_fn(): Unit {
+                cancelWheelIndexSync()
                 emit("cancel", buildEvent())
                 close()
             }
@@ -584,6 +814,7 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 val event = buildEvent()
                 emit("confirm", event)
                 emitValue()
+                cancelWheelIndexSync()
                 close()
             }
             val confirm = ::gen_confirm_fn
@@ -594,30 +825,30 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 close()
             }
             val handleOverlayClick = ::gen_handleOverlayClick_fn
-            fun gen_handleWheelChange_fn(event: Any): Unit {
-                if (props.disabled || props.loading || event == null || UTSAndroid.`typeof`(event) != "object") {
+            fun gen_handleWheelChange_fn(event: UniPickerViewChangeEvent): Unit {
+                if (props.disabled || props.loading || !wheelInitialized || wheelInternalChange) {
                     return
                 }
-                val detail = (event as UTSJSONObject)["detail"]
-                if (detail == null || UTSAndroid.`typeof`(detail) != "object") {
+                val values = event.detail.value as UTSArray<Number>
+                if (values == null || !UTSArray.isArray(values)) {
                     return
                 }
-                val rawValues = (detail as UTSJSONObject)["value"]
-                if (rawValues == null || !UTSArray.isArray(rawValues)) {
-                    return
-                }
-                val values = rawValues as UTSArray<Any?>
                 val previousYearOptions = yearOptions.value
                 val previousMonthOptions = monthOptions.value
                 val previousDayOptions = dayOptions.value
                 val previousHourOptions = hourOptions.value
                 val previousMinuteOptions = minuteOptions.value
                 var valueIndex: Number = 0
-                var year = selectedYear()
-                var month = selectedMonth()
-                var day = selectedDay()
-                var hour = selectedHour()
-                var minute = selectedMinute()
+                val oldYear = selectedYear()
+                val oldMonth = selectedMonth()
+                val oldDay = selectedDay()
+                val oldHour = selectedHour()
+                val oldMinute = selectedMinute()
+                var year = oldYear
+                var month = oldMonth
+                var day = oldDay
+                var hour = oldHour
+                var minute = oldMinute
                 if (showYearColumn.value) {
                     year = selectedOptionValue(previousYearOptions, wheelIndexAt(values, valueIndex), year)
                     valueIndex++
@@ -666,11 +897,19 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 currentDate.value = dateFromParts(year, month, day, hour, minute).split(" ")[0]
                 currentTime.value = padNumber(hour) + ":" + padNumber(minute)
                 clampCurrent()
-                syncWheelIndexes()
-                emit("change", buildEvent())
+                val indexes = syncWheelIndexes(false)
+                val dependentColumnChanged = year != oldYear || month != oldMonth
+                if (dependentColumnChanged) {
+                    val oldIndexes = copyWheelIndexes(wheelIndexes.value)
+                    val changedIndex = findChangedWheelIndex(indexes, oldIndexes)
+                    forceWheelIndexRefresh(indexes, changedIndex, wheelOptionCountAt(changedIndex))
+                } else {
+                    cancelWheelIndexSync()
+                }
                 if (!props.showToolbar) {
                     emitValue()
                 }
+                emit("change", buildEvent())
             }
             val handleWheelChange = ::gen_handleWheelChange_fn
             watch(fun(): Boolean {
@@ -721,7 +960,11 @@ open class GenUniModulesIUiXComponentsIDatetimePickerIDatetimePicker : VueCompon
                 return props.maxDate
             }
             , fun(): Unit {
-                clampCurrent()
+                syncFromProps()
+            }
+            )
+            onMounted(fun(){
+                syncFromProps()
             }
             )
             syncFromProps()

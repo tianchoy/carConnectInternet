@@ -171,7 +171,7 @@ open class GenPagesUserCenterCarDetailCarDetail : BasePage {
                         _cE("view", _uM("class" to "content"), _uA(
                             _cE("view", _uM("class" to "list"), _uA(
                                 _cE("text", _uM("class" to "title"), "设备ID"),
-                                _cE("text", _uM("class" to "info"), _tD(carInfo.value.getString("deviceId", "")), 1)
+                                _cE("text", _uM("class" to "info"), _tD(carInfo.value.getString("deviceImei", "")), 1)
                             )),
                             _cE("view", _uM("class" to "list"), _uA(
                                 _cE("text", _uM("class" to "title"), "设备名称"),

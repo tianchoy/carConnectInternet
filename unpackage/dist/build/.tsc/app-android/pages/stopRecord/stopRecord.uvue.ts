@@ -39,6 +39,22 @@ const carStatus = ref('在线')
 	const getStopNumber = (item: UTSJSONObject, key: string): number => item.getNumber(key, 0)
 	const getStopText = (item: UTSJSONObject, key: string): string => item.getString(key, '')
 
+	// 计算最小日期（当前时间前6个月）
+	const minDate = computed(() => {
+		const now = new Date()
+		return new Date(
+			now.getFullYear(),
+			now.getMonth() - 6,
+			now.getDate(),
+			0, 0, 0
+		).getTime()
+	})
+
+	// 最大日期（当前时间）
+	const maxDate = computed(() => {
+		return Date.now()
+	})
+
 	// 计算属性：按照时间倒序排列的停车记录
 	const sortedCarStopDetail = computed((): Array<StopRecord> => {
 		const sorted = carStopDetail.value.slice()
@@ -114,20 +130,23 @@ const carStatus = ref('在线')
 		showDateTimePicker.value = true
 	}
 
+	// 从跨端事件对象中读取时间戳，兼容 iOS/Android 的 UTS 对象访问方式
+	const getPickerTimestamp = (event : UTSJSONObject) : number => {
+		return event.getNumber('timestamp', 0)
+	}
+
 	// 确认选择时间
-	const onConfirm = (event : any) : void => {
-		const eventObject = event as UTSJSONObject
-		const timestampValue = eventObject['timestamp']
-		const timestamp = timestampValue == null ? 0 : parseFloat(timestampValue.toString())
-		if (!isFinite(timestamp) || timestamp <= 0) return
+	const onConfirm = (event : UTSJSONObject) : void => {
+		const timestamp = getPickerTimestamp(event)
+		if (timestamp <= 0) return
 		const value = formatTimesToMinute(timestamp)
 		if (currentPickerType.value === 'start') {
 			startTime.value = value
 		} else {
 			endTime.value = value
 		}
-		loadStopData()
 		showDateTimePicker.value = false
+		loadStopData()
 	}
 
 	const onCancel = () => {
@@ -209,6 +228,8 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           "cancel-text": "取消",
           "confirm-text": "确认",
           onConfirm: onConfirm,
+          minDate: minDate.value,
+          maxDate: maxDate.value,
           onCancel: onCancel,
           "onUpdate:show": onPickerShowChange
         }), _uM({
@@ -216,7 +237,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cE("view")
           ]),
           _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["show", "model-value", "title"])
+        }), 8 /* PROPS */, ["show", "model-value", "title", "minDate", "maxDate"])
       ]),
       _cE("scroll-view", _uM({
         class: "content-box",

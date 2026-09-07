@@ -39,19 +39,17 @@ open class GenUniModulesIUiXComponentsIBadgeIBadge : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
+            val bgColor = computed(fun(): String {
+                return props.bgColor
+            }
+            )
             fun gen_hasNumberValue_fn(): Boolean {
-                if (props.value != null && props.value.toString().length > 0) {
-                    return true
-                }
-                return props.count > 0 || props.showZero
+                return props.value.toString().length > 0 || props.count > 0 || props.showZero
             }
             val hasNumberValue = ::gen_hasNumberValue_fn
             fun gen_effectiveCount_fn(): Number {
-                if (props.value != null && props.value.toString().length > 0) {
-                    if (UTSAndroid.`typeof`(props.value) == "number") {
-                        return props.value as Number
-                    }
-                    return parseFloat(props.value as String)
+                if (props.value.toString().length > 0) {
+                    return parseFloat(props.value.toString())
                 }
                 return props.count
             }
@@ -64,8 +62,8 @@ open class GenUniModulesIUiXComponentsIBadgeIBadge : VueComponent {
             }
             val getMaxCount = ::gen_getMaxCount_fn
             fun gen_effectiveBgColor_fn(): String {
-                if (props.bgColor.length > 0) {
-                    return props.bgColor
+                if (bgColor.value.length > 0) {
+                    return bgColor.value
                 }
                 return props.type
             }
@@ -78,7 +76,7 @@ open class GenUniModulesIUiXComponentsIBadgeIBadge : VueComponent {
             }
             val effectiveFontColor = ::gen_effectiveFontColor_fn
             fun gen_normalizeTheme_fn(value: String): String {
-                val text = value
+                val text = value.toString()
                 if (text == "danger") {
                     return "error"
                 }
@@ -89,7 +87,7 @@ open class GenUniModulesIUiXComponentsIBadgeIBadge : VueComponent {
             }
             val normalizeTheme = ::gen_normalizeTheme_fn
             fun gen_parseColor_fn(value: String): String {
-                val text = value
+                val text = value.toString()
                 if (text == "white") {
                     return "#ffffff"
                 }
@@ -115,7 +113,7 @@ open class GenUniModulesIUiXComponentsIBadgeIBadge : VueComponent {
             }
             val parseColor = ::gen_parseColor_fn
             fun gen_normalizePosition_fn(value: String): String {
-                val text = value
+                val text = value.toString()
                 if (text == "rightTop") {
                     return "right"
                 }
@@ -139,14 +137,11 @@ open class GenUniModulesIUiXComponentsIBadgeIBadge : VueComponent {
                 if (offset == null || offset.length <= index) {
                     return 0
                 }
-                val value = offset[index] as Any?
-                if (UTSAndroid.`typeof`(value) == "number") {
-                    return value as Number
+                val value = offset[index]
+                if (value == null) {
+                    return 0
                 }
-                if (UTSAndroid.`typeof`(value) == "string") {
-                    return parseFloat(value as String)
-                }
-                return 0
+                return parseFloat(value.toString())
             }
             val getOffset = ::gen_getOffset_fn
             fun gen_positionStyle_fn(): String {
@@ -179,10 +174,6 @@ open class GenUniModulesIUiXComponentsIBadgeIBadge : VueComponent {
                 }
                 return text + "px"
             }
-            val bgColor = computed(fun(): String {
-                return props.bgColor
-            }
-            )
             val showBadge = computed(fun(): Boolean {
                 if (props.hidden) {
                     return false

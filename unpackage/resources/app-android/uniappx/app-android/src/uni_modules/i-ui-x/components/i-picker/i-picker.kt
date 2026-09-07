@@ -106,9 +106,18 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                 return value != null && UTSArray.isArray(value)
             }
             val isArray = ::gen_isArray_fn
+            fun gen_normalizedIndex_fn(value: Number, fallback: Number): Number {
+                return if (isNaN(value) || !isFinite(value)) {
+                    fallback
+                } else {
+                    Math.floor(value)
+                }
+            }
+            val normalizedIndex = ::gen_normalizedIndex_fn
             fun gen_normalizeItem_fn(item: Any?): IPickerItem {
                 if (item != null && UTSAndroid.`typeof`(item) == "object") {
-                    val kObject = item as UTSJSONObject
+                    val serialized = JSON.stringify(item)
+                    val kObject = JSON.parse(serialized) as UTSJSONObject
                     val rawText = kObject["text"]
                     val rawValue = kObject["value"]
                     val text = if (rawText != null) {
@@ -153,6 +162,47 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
             val normalizeColumn = ::gen_normalizeColumn_fn
             val opened = ref(props.show)
             val currentIndexs = ref(_uA<Number>())
+            val pickerViewIndexes = ref(_uA<Number>())
+            var indexSyncGeneration: Number = 0
+            var pickerInitialized = false
+            var pickerInternalChange = false
+            fun gen_scheduleFrame_fn(callback: () -> Unit): Unit {
+                setTimeout(callback, 16)
+            }
+            val scheduleFrame = ::gen_scheduleFrame_fn
+            fun gen_copyIndexes_fn(indexes: UTSArray<Number>): UTSArray<Number> {
+                return indexes.slice()
+            }
+            val copyIndexes = ::gen_copyIndexes_fn
+            fun gen_findChangedIndex_fn(nextIndexes: UTSArray<Number>, oldIndexes: UTSArray<Number>): Number {
+                val length = Math.max(nextIndexes.length, oldIndexes.length)
+                run {
+                    var index: Number = 0
+                    while(index < length){
+                        val nextValue = if (index < nextIndexes.length) {
+                            nextIndexes[index]
+                        } else {
+                            -1
+                        }
+                        val oldValue = if (index < oldIndexes.length) {
+                            oldIndexes[index]
+                        } else {
+                            -1
+                        }
+                        if (nextValue != oldValue) {
+                            return index
+                        }
+                        index++
+                    }
+                }
+                return -1
+            }
+            val findChangedIndex = ::gen_findChangedIndex_fn
+            fun gen_cancelIndexSync_fn(): Unit {
+                indexSyncGeneration++
+                pickerInternalChange = false
+            }
+            val cancelIndexSync = ::gen_cancelIndexSync_fn
             val normalizedColumns = computed(fun(): UTSArray<UTSArray<IPickerItem>> {
                 val columns = props.columns
                 val options = props.options
@@ -216,6 +266,51 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                 return normalizedColumns.value[index]
             }
             val columnAt = ::gen_columnAt_fn
+            fun scheduleIndexSync(indexes: UTSArray<Number>, changedIndex: Number = -1, initialize: Boolean = false): Unit {
+                val generation = ++indexSyncGeneration
+                pickerInternalChange = true
+                pickerViewIndexes.value = copyIndexes(indexes)
+                scheduleFrame(fun(){
+                    if (generation != indexSyncGeneration) {
+                        return
+                    }
+                    if (changedIndex >= 0 && changedIndex < indexes.length) {
+                        val refreshed = copyIndexes(indexes)
+                        val columns = normalizedColumns.value
+                        val optionCount = if (changedIndex < columns.length) {
+                            columns[changedIndex].length
+                        } else {
+                            0
+                        }
+                        if (optionCount > 1) {
+                            refreshed[changedIndex] = if (indexes[changedIndex] > 0) {
+                                indexes[changedIndex] - 1
+                            } else {
+                                1
+                            }
+                        }
+                        pickerViewIndexes.value = refreshed
+                    }
+                    scheduleFrame(fun(){
+                        if (generation != indexSyncGeneration) {
+                            return
+                        }
+                        pickerViewIndexes.value = copyIndexes(indexes)
+                        scheduleFrame(fun(){
+                            if (generation != indexSyncGeneration) {
+                                return
+                            }
+                            pickerInternalChange = false
+                            if (initialize) {
+                                pickerInitialized = true
+                            }
+                        }
+                        )
+                    }
+                    )
+                }
+                )
+            }
             fun gen_visibleCountNumber_fn(): Number {
                 val count = parseFloat(props.visibleItemCount.toString())
                 if (isNaN(count) || count <= 0) {
@@ -349,23 +444,19 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
             val columnTargetValue = ::gen_columnTargetValue_fn
             fun gen_defaultIndexAt_fn(columnIndex: Number): Number {
                 val value = props.defaultIndex
+                var index: Number = 0
                 if (isArray(value)) {
                     val values = value as UTSArray<Any?>
                     if (values.length > columnIndex) {
                         val item = values[columnIndex]
-                        return if (item == null) {
-                            0
-                        } else {
-                            parseFloat(item.toString())
+                        if (item != null) {
+                            index = parseFloat(item.toString())
                         }
                     }
-                    return 0
+                } else if (columnIndex == 0) {
+                    index = parseFloat(value.toString())
                 }
-                return if (columnIndex == 0) {
-                    parseFloat(value.toString())
-                } else {
-                    0
-                }
+                return normalizedIndex(index, 0)
             }
             val defaultIndexAt = ::gen_defaultIndexAt_fn
             fun gen_findValueIndex_fn(column: UTSArray<IPickerItem>, value: Any): Number {
@@ -442,6 +533,11 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                     var i: Number = 0
                     while(i < columns.length){
                         val column = columns[i]
+                        if (column.length == 0) {
+                            result.push(0)
+                            i++
+                            continue
+                        }
                         val targetValue = columnTargetValue(value, i)
                         var index: Number = -1
                         if (targetValue != null && targetValue.toString().length > 0) {
@@ -461,9 +557,12 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                     }
                 }
                 currentIndexs.value = result
+                scheduleIndexSync(result, -1, !pickerInitialized)
             }
             val syncIndexs = ::gen_syncIndexs_fn
             fun gen_close_fn(): Unit {
+                cancelIndexSync()
+                pickerInitialized = false
                 if (!opened.value) {
                     return
                 }
@@ -476,8 +575,8 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                 if (opened.value) {
                     return
                 }
-                syncIndexs()
                 opened.value = true
+                syncIndexs()
                 emit("open")
                 emit("update:show", true)
             }
@@ -489,18 +588,22 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
             }
             val openByTrigger = ::gen_openByTrigger_fn
             fun gen_cancel_fn(): Unit {
+                cancelIndexSync()
                 emit("cancel", buildChangeEvent(0, selectedIndexAt(0)))
                 close()
             }
             val cancel = ::gen_cancel_fn
             fun gen_confirm_fn(): Unit {
-                emit("confirm", buildConfirmEvent())
+                val event = buildConfirmEvent()
+                emit("confirm", event)
                 emitSelectedValue()
+                cancelIndexSync()
                 close()
             }
             val confirm = ::gen_confirm_fn
             fun gen_clear_fn(): Unit {
                 currentIndexs.value = _uA()
+                pickerViewIndexes.value = _uA()
                 emit("clear")
                 emit("change", buildChangeEvent(0, -1))
                 emit("update:value", "")
@@ -513,40 +616,39 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                 }
             }
             val handleOverlayClick = ::gen_handleOverlayClick_fn
-            fun gen_handlePickerChange_fn(event: Any): Unit {
-                if (props.disabled || props.loading || event == null || UTSAndroid.`typeof`(event) != "object") {
+            fun gen_handlePickerChange_fn(event: UniPickerViewChangeEvent): Unit {
+                if (props.disabled || props.loading || !pickerInitialized || pickerInternalChange) {
                     return
                 }
-                val detail = (event as UTSJSONObject)["detail"]
-                if (detail == null || UTSAndroid.`typeof`(detail) != "object") {
+                val values = event.detail.value
+                if (values == null || !UTSArray.isArray(values)) {
                     return
                 }
-                val rawValues = (detail as UTSJSONObject)["value"]
-                if (rawValues == null || !UTSArray.isArray(rawValues)) {
-                    return
-                }
-                val values = rawValues as UTSArray<Any?>
                 val nextIndexs: UTSArray<Number> = _uA()
                 var changedColumnIndex: Number = 0
                 run {
                     var i: Number = 0
                     while(i < normalizedColumns.value.length){
                         val column = normalizedColumns.value[i]
-                        val oldIndex = selectedIndexAt(i)
-                        var nextIndex: Number = 0
-                        if (values.length > i) {
-                            val rawIndex = values[i]
-                            if (rawIndex != null) {
-                                nextIndex = parseFloat(rawIndex.toString())
-                            }
+                        if (column.length == 0) {
+                            nextIndexs.push(0)
+                            i++
+                            continue
                         }
+                        val oldIndex = selectedIndexAt(i)
+                        var nextIndex = normalizedIndex(if (values.length > i) {
+                            values[i]
+                        } else {
+                            0
+                        }
+                        , 0)
                         if (nextIndex < 0) {
                             nextIndex = 0
                         }
                         if (nextIndex >= column.length) {
                             nextIndex = column.length - 1
                         }
-                        if (column.length > 0 && column[nextIndex].disabled) {
+                        if (column[nextIndex].disabled) {
                             nextIndex = oldIndex
                         }
                         if (oldIndex != nextIndex) {
@@ -705,7 +807,7 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                                 } else {
                                     _cC("v-if", true)
                                 },
-                                _cV(_component_picker_view, _uM("class" to "i-picker__columns", "style" to _nS(columnsStyle.value), "value" to currentIndexs.value, "indicator-style" to indicatorStyle.value, "onChange" to handlePickerChange), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                _cV(_component_picker_view, _uM("class" to "i-picker__columns", "style" to _nS(columnsStyle.value), "value" to pickerViewIndexes.value, "indicator-style" to indicatorStyle.value, "onChange" to handlePickerChange), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                     return _uA(
                                         if (columnCount.value > 0) {
                                             _cV(_component_picker_view_column, _uM("key" to 0, "class" to "i-picker__column"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {

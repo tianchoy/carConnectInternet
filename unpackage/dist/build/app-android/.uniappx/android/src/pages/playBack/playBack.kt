@@ -49,6 +49,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
             var playbackTimer: Number? = null
             var lastTimestamp: Number = 0
             var replaySessionId: Number = 0
+            val minDate = computed(fun(): Number {
+                val now = Date()
+                return Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime()
+            }
+            )
+            val maxDate = computed(fun(): Number {
+                return Date.now()
+            }
+            )
             fun gen_formatPlaybackTime_fn(timestamp: Number): String {
                 return formatTimesToMinute(timestamp) ?: ""
             }
@@ -550,15 +559,13 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 }
             }
             val togglePlayback = ::gen_togglePlayback_fn
-            fun gen_onConfirm_fn(event: Any): Unit {
-                val eventObject = event as UTSJSONObject
-                val timestampValue = eventObject["timestamp"]
-                val timestamp = if (timestampValue == null) {
-                    0
-                } else {
-                    parseFloat(timestampValue.toString())
-                }
-                if (!isFinite(timestamp) || timestamp <= 0) {
+            fun gen_getPickerTimestamp_fn(event: UTSJSONObject): Number {
+                return event.getNumber("timestamp", 0)
+            }
+            val getPickerTimestamp = ::gen_getPickerTimestamp_fn
+            fun gen_onConfirm_fn(event: UTSJSONObject): Unit {
+                val timestamp = getPickerTimestamp(event)
+                if (timestamp <= 0) {
                     return
                 }
                 val formattedValue = formatPlaybackTime(timestamp)
@@ -740,7 +747,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                                     _cE("text", _uM("class" to "info-label"), "里程")
                                 ))
                             )),
-                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "minDate" to minDate.value, "maxDate" to maxDate.value, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
                                     _cE("view")
                                 )
@@ -748,7 +755,9 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             ), "_" to 1), 8, _uA(
                                 "show",
                                 "model-value",
-                                "title"
+                                "title",
+                                "minDate",
+                                "maxDate"
                             ))
                         ))
                     )),

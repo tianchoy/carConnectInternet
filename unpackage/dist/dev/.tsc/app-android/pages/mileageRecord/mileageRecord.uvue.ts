@@ -7,7 +7,7 @@ import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
-	import { formatTimes, parseLocalDateTime } from '../../utils/formateTime.uts'
+	import { formatTimesToMinute, parseLocalDateTime } from '../../utils/formateTime.uts'
 	// import { getAddress } from '../../utils/getAdress.uts'
 
 	type GroupType = { __$originalPosition?: UTSSourceMapPosition<"GroupType", "pages/mileageRecord/mileageRecord.uvue", 77, 7>; date : string; trips : Array<UTSJSONObject>; totalDistance : number; }
@@ -39,6 +39,22 @@ const carStatus = ref('在线')
 		return currentPickerType.value === 'start' ? startTime.value : endTime.value
 	})
 	const imei = ref<string | null>('')
+
+	// 计算最小日期（当前时间前6个月）
+	const minDate = computed(() => {
+		const now = new Date()
+		return new Date(
+			now.getFullYear(),
+			now.getMonth() - 6,
+			now.getDate(),
+			0, 0, 0
+		).getTime()
+	})
+
+	// 最大日期（当前时间）
+	const maxDate = computed(() => {
+		return Date.now()
+	})
 
 	// 计算属性：按日期分组的行程数据
 	const groupedTrips = computed<Array<GroupType>>(() : Array<GroupType> => {
@@ -101,9 +117,9 @@ const carStatus = ref('在线')
 	// 初始化时间
 	const initDateTime = () => {
 		const now = new Date()
-		endTime.value = formatTimes(now.getTime())
+		endTime.value = formatTimesToMinute(now.getTime())
 		// 开始时间默认为当前时间前1天
-		startTime.value = formatTimes(now.getTime() - 3600000 * 24)
+		startTime.value = formatTimesToMinute(now.getTime() - 3600000 * 24)
 	}
 
 
@@ -136,7 +152,7 @@ const carStatus = ref('在线')
 		})
 		if (!imei.value) return;
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 195, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 211, 10),
 				imei: imei.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
@@ -150,13 +166,13 @@ const carStatus = ref('在线')
 				showAppToast({ title: res.msg || '数据加载失败', icon: 'none' });
 				return;
 			}
-			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:209");
+			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:225");
 			const trackData = res.data
 			if (trackData != null) {
 				processTripData(trackData)
 			}
 		} catch (e) {
-			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:215");
+			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:231");
 			showAppToast({
 				title: '数据加载失败',
 				icon: 'none',
@@ -223,11 +239,16 @@ const carStatus = ref('在线')
 		showDateTimePicker.value = true
 	}
 
+	// 从跨端事件对象中读取时间戳，兼容 iOS/Android 的 UTS 对象访问方式
+	const getPickerTimestamp = (event : UTSJSONObject) : number => {
+		return event.getNumber('timestamp', 0)
+	}
+
 	// 确认选择时间
 	const onConfirm = (event : UTSJSONObject) => {
-		const timestamp = event.getNumber('timestamp', 0)
-		if (!isFinite(timestamp) || timestamp <= 0) return
-		const value = formatTimes(timestamp)
+		const timestamp = getPickerTimestamp(event)
+		if (timestamp <= 0) return
+		const value = formatTimesToMinute(timestamp)
 		if (currentPickerType.value === 'start') {
 			startTime.value = value
 		} else {
@@ -302,6 +323,8 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           "cancel-text": "取消",
           "confirm-text": "确认",
           onConfirm: onConfirm,
+          minDate: minDate.value,
+          maxDate: maxDate.value,
           onCancel: onCancel,
           "onUpdate:show": onPickerShowChange
         }), _uM({
@@ -309,7 +332,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cE("view")
           ]),
           _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["show", "model-value", "title"])
+        }), 8 /* PROPS */, ["show", "model-value", "title", "minDate", "maxDate"])
       ]),
       _cE("view", _uM({ class: "summary-panel" }), [
         _cE("view", _uM({ class: "summary-item" }), [
@@ -391,4 +414,4 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
 
 })
 export default __sfc__
-const GenPagesMileageRecordMileageRecordStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"], ["paddingBottom", "20rpx"]]))], ["tools-panel", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#69c2f1"], ["borderRightColor", "#69c2f1"], ["borderBottomColor", "#69c2f1"], ["borderLeftColor", "#69c2f1"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "25rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["color", "#333333"]])]])], ["summary-panel", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-around"], ["backgroundColor", "#ffffff"], ["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"], ["boxShadow", "0 2rpx 10rpx rgba(0, 0, 0, 0.05)"]])]])], ["summary-item", _uM([[".container .summary-panel ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"]])]])], ["label", _uM([[".container .summary-panel .summary-item ", _uM([["fontSize", "24rpx"], ["color", "#999999"], ["marginBottom", "10rpx"]])]])], ["value", _uM([[".container .summary-panel .summary-item ", _uM([["fontSize", "28rpx"], ["color", "#333333"], ["fontWeight", "bold"]])]])], ["content", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["marginTop", 0], ["marginRight", "20rpx"], ["marginBottom", "20%"], ["marginLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["trip-list", _uM([[".container .content ", _uM([["width", "100%"], ["paddingBottom", "20rpx"]])]])], ["trip-group", _uM([[".container .content .trip-list ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["group-header", _uM([[".container .content .trip-list .trip-group ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "15rpx"], ["paddingRight", 0], ["paddingBottom", "15rpx"], ["paddingLeft", 0]])]])], ["group-header-title", _uM([[".container .content .trip-list .trip-group .group-header ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["group-date", _uM([[".container .content .trip-list .trip-group .group-header ", _uM([["fontSize", "30rpx"], ["color", "#333333"], ["marginRight", "30rpx"]])]])], ["group-separator", _uM([[".container .content .trip-list .trip-group ", _uM([["height", "1rpx"], ["backgroundColor", "#eeeeee"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "10rpx"], ["marginLeft", 0]])]])], ["trip-item", _uM([[".container .content .trip-list .trip-group ", _uM([["display", "flex"], ["paddingTop", "25rpx"], ["paddingRight", 0], ["paddingBottom", "25rpx"], ["paddingLeft", 0], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]])]])], ["trip-index", _uM([[".container .content .trip-list .trip-group .trip-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["paddingTop", "5rpx"]])]])], ["icon", _uM([[".container .content .trip-list .trip-group .trip-item .trip-index ", _uM([["width", "40rpx"], ["height", "40rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "24rpx"], ["marginRight", "20rpx"]])]])], ["trip-distance-time", _uM([[".container .content .trip-list .trip-group .trip-item .trip-index ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["trip-content", _uM([[".container .content .trip-list .trip-group .trip-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["icons", _uM([[".container .content .trip-list .trip-group .trip-item .trip-content .trip-locations ", _uM([["width", "50rpx"], ["height", "50rpx"]])]])]])]
+const GenPagesMileageRecordMileageRecordStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"], ["paddingBottom", "20rpx"]]))], ["tools-panel", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#69c2f1"], ["borderRightColor", "#69c2f1"], ["borderBottomColor", "#69c2f1"], ["borderLeftColor", "#69c2f1"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "25rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["color", "#333333"]])]])], ["summary-panel", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-around"], ["backgroundColor", "#ffffff"], ["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"], ["boxShadow", "0 2rpx 10rpx rgba(0, 0, 0, 0.05)"]])]])], ["summary-item", _uM([[".container .summary-panel ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"]])]])], ["label", _uM([[".container .summary-panel .summary-item ", _uM([["fontSize", "24rpx"], ["color", "#999999"], ["marginBottom", "10rpx"]])]])], ["value", _uM([[".container .summary-panel .summary-item ", _uM([["fontSize", "28rpx"], ["color", "#333333"], ["fontWeight", "bold"]])]])], ["content", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["marginTop", 0], ["marginRight", "20rpx"], ["marginBottom", "20%"], ["marginLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["trip-list", _uM([[".container .content ", _uM([["width", "100%"], ["paddingBottom", "20rpx"]])]])], ["trip-group", _uM([[".container .content .trip-list ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["group-header", _uM([[".container .content .trip-list .trip-group ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "15rpx"], ["paddingRight", 0], ["paddingBottom", "15rpx"], ["paddingLeft", 0]])]])], ["group-header-title", _uM([[".container .content .trip-list .trip-group .group-header ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["group-date", _uM([[".container .content .trip-list .trip-group .group-header ", _uM([["fontSize", "30rpx"], ["color", "#333333"], ["marginRight", "30rpx"]])]])], ["group-separator", _uM([[".container .content .trip-list .trip-group ", _uM([["height", "1rpx"], ["backgroundColor", "#eeeeee"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "10rpx"], ["marginLeft", 0]])]])], ["trip-item", _uM([[".container .content .trip-list .trip-group ", _uM([["display", "flex"], ["paddingTop", "25rpx"], ["paddingRight", 0], ["paddingBottom", "25rpx"], ["paddingLeft", 0], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]])]])], ["trip-index", _uM([[".container .content .trip-list .trip-group .trip-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["paddingTop", "5rpx"]])]])], ["icon", _uM([[".container .content .trip-list .trip-group .trip-item .trip-index ", _uM([["width", "40rpx"], ["height", "40rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "24rpx"], ["marginRight", "20rpx"]])]])], ["trip-distance-time", _uM([[".container .content .trip-list .trip-group .trip-item .trip-index ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["trip-content", _uM([[".container .content .trip-list .trip-group .trip-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["icons", _uM([[".container .content .trip-list .trip-group .trip-item .trip-content .trip-locations ", _uM([["width", "50rpx"], ["height", "50rpx"]])]])]])]

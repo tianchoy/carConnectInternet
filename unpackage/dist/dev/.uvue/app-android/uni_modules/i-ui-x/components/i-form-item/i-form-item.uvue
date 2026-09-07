@@ -78,26 +78,18 @@ const __sfc__ = defineComponent({
         function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
             __ins.emit(event, ...do_not_transform_spread);
         }
-        function formatSize(value: string | number): string {
-            const text = value.toString();
-            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+        function formatSize(value: any): string {
+            const text = (value).toString();
+            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0)
                 return text;
-            }
             return text + 'px';
         }
         function normalizeIdName(name: string): string {
+            const allowed = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
             let result = '';
             for (let i = 0; i < name.length; i++) {
                 const char = name.charAt(i);
-                const isNumber = char >= '0' && char <= '9';
-                const isUpper = char >= 'A' && char <= 'Z';
-                const isLower = char >= 'a' && char <= 'z';
-                if (isNumber || isUpper || isLower || char == '-' || char == '_') {
-                    result = result + char;
-                }
-                else {
-                    result = result + '-';
-                }
+                result += allowed.indexOf(char) >= 0 ? char : '-';
             }
             return result;
         }

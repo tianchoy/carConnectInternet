@@ -60,179 +60,38 @@ open class GenUniModulesIUiXComponentsIActionSheetIActionSheet : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
-            fun formatSize(value: Any): String {
+            val innerShow = ref(props.show)
+            fun gen_formatSize_fn(value: Any): String {
                 val text = value.toString()
                 if (text.length == 0) {
                     return "0px"
                 }
-                if (text.indexOf("vh") >= 0 || text.indexOf("vw") >= 0) {
-                    val parsed = parseFloat(text.replace("vh", "").replace("vw", ""))
-                    return (if (isNaN(parsed)) {
+                if (text.indexOf("vh") > -1 || text.indexOf("vw") > -1) {
+                    val numberValue = parseFloat(text.replace("vh", "").replace("vw", ""))
+                    return (if (isNaN(numberValue)) {
                         0
                     } else {
-                        UTSNumber.from(parsed)
+                        numberValue
                     }
-                    ).toString(10) + "px"
+                    ) + "px"
                 }
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+                if (text.indexOf("px") > -1 || text.indexOf("rpx") > -1 || text.indexOf("%") > -1) {
                     return text
                 }
                 return text + "px"
             }
-            fun gen_itemValue_fn(item: Any, keyName: String): String {
-                if (item == null) {
-                    return ""
-                }
-                if (UTSAndroid.`typeof`(item) == "object") {
-                    return (item as UTSJSONObject).getString(keyName, "")
-                }
-                if (keyName == "name" || keyName == "value") {
-                    return item.toString()
+            val formatSize = ::gen_formatSize_fn
+            val titleStyleText = computed(fun(): String {
+                if (UTSAndroid.`typeof`(props.titleStyle) == "string") {
+                    return props.titleStyle as String
                 }
                 return ""
             }
-            val itemValue = ::gen_itemValue_fn
-            fun gen_itemBoolean_fn(item: Any, keyName: String): Boolean {
-                if (item == null || UTSAndroid.`typeof`(item) != "object") {
-                    return false
-                }
-                return (item as UTSJSONObject).getBoolean(keyName, false)
-            }
-            val itemBoolean = ::gen_itemBoolean_fn
-            fun gen_getActionText_fn(item: Any): String {
-                return itemValue(item, "name")
-            }
-            val getActionText = ::gen_getActionText_fn
-            fun gen_getActionValue_fn(item: Any): String {
-                val value = itemValue(item, "value")
-                return if (value.length > 0) {
-                    value
-                } else {
-                    getActionText(item)
-                }
-            }
-            val getActionValue = ::gen_getActionValue_fn
-            fun gen_getSubname_fn(item: Any): String {
-                return itemValue(item, "subname")
-            }
-            val getSubname = ::gen_getSubname_fn
-            fun gen_getActionIcon_fn(item: Any): String {
-                return itemValue(item, "icon")
-            }
-            val getActionIcon = ::gen_getActionIcon_fn
-            fun gen_getActionColor_fn(item: Any): String {
-                val color = itemValue(item, "color")
-                return if (color.length > 0) {
-                    color
-                } else {
-                    "#303133"
-                }
-            }
-            val getActionColor = ::gen_getActionColor_fn
-            fun gen_isDisabled_fn(item: Any): Boolean {
-                return itemBoolean(item, "disabled")
-            }
-            val isDisabled = ::gen_isDisabled_fn
-            fun gen_isLoading_fn(item: Any): Boolean {
-                return itemBoolean(item, "loading")
-            }
-            val isLoading = ::gen_isLoading_fn
-            fun gen_getItemColor_fn(item: Any): String {
-                return if (isDisabled(item)) {
-                    "#b8b8b8"
-                } else {
-                    getActionColor(item)
-                }
-            }
-            val getItemColor = ::gen_getItemColor_fn
-            fun gen_getActionOpenType_fn(item: Any): String {
-                val itemOpenType = itemValue(item, "openType")
-                return if (itemOpenType.length > 0) {
-                    itemOpenType
-                } else {
-                    props.openType
-                }
-            }
-            val getActionOpenType = ::gen_getActionOpenType_fn
-            fun gen_getItemClass_fn(item: Any): String {
-                if (isDisabled(item)) {
-                    return "i-action-sheet__item i-action-sheet__item--disabled"
-                }
-                return if (isLoading(item)) {
-                    "i-action-sheet__item i-action-sheet__item--loading"
-                } else {
-                    "i-action-sheet__item"
-                }
-            }
-            val getItemClass = ::gen_getItemClass_fn
-            fun gen_buildPayload_fn(item: Any, index: Number): ActionPayload {
-                return ActionPayload(index = index, item = item, name = getActionText(item), value = getActionValue(item))
-            }
-            val buildPayload = ::gen_buildPayload_fn
-            val actionItems = computed(fun(): UTSArray<Any> {
-                val actions = props.actions
-                if (actions == null) {
-                    return _uA<Any>()
-                }
-                return actions as UTSArray<Any>
-            }
             )
-            val innerShow = ref<Boolean>(props.show)
-            fun gen_open_fn(): Unit {
-                if (innerShow.value) {
-                    return
-                }
-                innerShow.value = true
-                emit("update:show", true)
-            }
-            val open = ::gen_open_fn
-            fun gen_closeSilently_fn(): Unit {
-                if (!innerShow.value) {
-                    return
-                }
-                innerShow.value = false
-                emit("update:show", false)
-            }
-            val closeSilently = ::gen_closeSilently_fn
-            fun gen_closeByUser_fn(): Unit {
-                if (!innerShow.value) {
-                    return
-                }
-                innerShow.value = false
-                emit("close")
-                emit("update:show", false)
-            }
-            val closeByUser = ::gen_closeByUser_fn
-            fun gen_handleOverlayClick_fn(): Unit {
-                if (props.closeOnMask) {
-                    closeByUser()
-                }
-            }
-            val handleOverlayClick = ::gen_handleOverlayClick_fn
-            fun gen_handleSelect_fn(item: Any, index: Number): Unit {
-                if (isDisabled(item) || isLoading(item)) {
-                    return
-                }
-                emit("select", buildPayload(item, index))
-                if (props.closeOnClickAction) {
-                    closeSilently()
-                }
-            }
-            val handleSelect = ::gen_handleSelect_fn
-            fun gen_handleOpenEvent_fn(name: String, event: Any): Unit {
-                emit(name, event)
-            }
-            val handleOpenEvent = ::gen_handleOpenEvent_fn
-            val titleStyleText = computed<String>(fun(): String {
-                return if (UTSAndroid.`typeof`(props.titleStyle) == "string") {
-                    props.titleStyle as String
-                } else {
-                    ""
-                }
-            }
-            )
-            val panelStyle = computed<String>(fun(): String {
-                var style = "border-top-left-radius:" + formatSize(props.round) + ";border-top-right-radius:" + formatSize(props.round) + ";"
+            val panelStyle = computed(fun(): String {
+                var style = ""
+                style += "border-top-left-radius:" + formatSize(props.round) + ";"
+                style += "border-top-right-radius:" + formatSize(props.round) + ";"
                 if (props.height.toString().length > 0) {
                     style += "height:" + formatSize(props.height) + ";"
                 }
@@ -249,6 +108,149 @@ open class GenUniModulesIUiXComponentsIActionSheetIActionSheet : VueComponent {
                 innerShow.value = value
             }
             )
+            fun gen_itemValue_fn(item: Any?, keyName: String): String {
+                if (item == null) {
+                    return ""
+                }
+                if (UTSAndroid.`typeof`(item) == "object") {
+                    val kObject = item as UTSJSONObject
+                    val value = kObject[keyName]
+                    if (value == null) {
+                        return ""
+                    }
+                    return value.toString()
+                }
+                if (keyName == "name" || keyName == "value") {
+                    return item.toString()
+                }
+                return ""
+            }
+            val itemValue = ::gen_itemValue_fn
+            fun gen_getActionText_fn(item: Any?): String {
+                return itemValue(item, "name")
+            }
+            val getActionText = ::gen_getActionText_fn
+            fun gen_getActionValue_fn(item: Any?): String {
+                val value = itemValue(item, "value")
+                if (value.length > 0) {
+                    return value
+                }
+                return getActionText(item)
+            }
+            val getActionValue = ::gen_getActionValue_fn
+            fun gen_getSubname_fn(item: Any?): String {
+                return itemValue(item, "subname")
+            }
+            val getSubname = ::gen_getSubname_fn
+            fun gen_getActionIcon_fn(item: Any?): String {
+                return itemValue(item, "icon")
+            }
+            val getActionIcon = ::gen_getActionIcon_fn
+            fun gen_getActionColor_fn(item: Any?): String {
+                val color = itemValue(item, "color")
+                if (color.length > 0) {
+                    return color
+                }
+                return "#303133"
+            }
+            val getActionColor = ::gen_getActionColor_fn
+            fun gen_isDisabled_fn(item: Any?): Boolean {
+                if (item == null) {
+                    return false
+                }
+                if (UTSAndroid.`typeof`(item) == "object") {
+                    val kObject = item as UTSJSONObject
+                    return kObject["disabled"] == true
+                }
+                return false
+            }
+            val isDisabled = ::gen_isDisabled_fn
+            fun gen_isLoading_fn(item: Any?): Boolean {
+                if (item == null) {
+                    return false
+                }
+                if (UTSAndroid.`typeof`(item) == "object") {
+                    val kObject = item as UTSJSONObject
+                    return kObject["loading"] == true
+                }
+                return false
+            }
+            val isLoading = ::gen_isLoading_fn
+            fun gen_getItemColor_fn(item: Any?): String {
+                if (isDisabled(item)) {
+                    return "#b8b8b8"
+                }
+                return getActionColor(item)
+            }
+            val getItemColor = ::gen_getItemColor_fn
+            fun gen_getActionOpenType_fn(item: Any?): String {
+                val itemOpenType = itemValue(item, "openType")
+                if (itemOpenType.length > 0) {
+                    return itemOpenType
+                }
+                return props.openType
+            }
+            val getActionOpenType = ::gen_getActionOpenType_fn
+            fun gen_getItemClass_fn(item: Any?): String {
+                if (isDisabled(item)) {
+                    return "i-action-sheet__item i-action-sheet__item--disabled"
+                }
+                if (isLoading(item)) {
+                    return "i-action-sheet__item i-action-sheet__item--loading"
+                }
+                return "i-action-sheet__item"
+            }
+            val getItemClass = ::gen_getItemClass_fn
+            fun gen_open_fn() {
+                if (innerShow.value) {
+                    return
+                }
+                innerShow.value = true
+                emit("update:show", true)
+            }
+            val open = ::gen_open_fn
+            fun gen_closeSilently_fn() {
+                if (!innerShow.value) {
+                    return
+                }
+                innerShow.value = false
+                emit("update:show", false)
+            }
+            val closeSilently = ::gen_closeSilently_fn
+            fun gen_closeByUser_fn() {
+                if (!innerShow.value) {
+                    return
+                }
+                innerShow.value = false
+                emit("close")
+                emit("update:show", false)
+            }
+            val closeByUser = ::gen_closeByUser_fn
+            fun gen_handleOverlayClick_fn() {
+                if (!props.closeOnMask) {
+                    return
+                }
+                closeByUser()
+            }
+            val handleOverlayClick = ::gen_handleOverlayClick_fn
+            fun gen_buildPayload_fn(item: Any?, index: Number): UTSJSONObject {
+                return _uO("index" to index, "item" to item, "name" to getActionText(item), "value" to getActionValue(item))
+            }
+            val buildPayload = ::gen_buildPayload_fn
+            fun gen_handleSelect_fn(item: Any?, index: Number) {
+                if (isDisabled(item) || isLoading(item)) {
+                    return
+                }
+                emit("select", buildPayload(item, index))
+                if (props.closeOnClickAction) {
+                    closeSilently()
+                }
+            }
+            val handleSelect = ::gen_handleSelect_fn
+            fun gen_handleOpenEvent_fn(name: String, event: Any) {
+                emit(name, event)
+            }
+            val handleOpenEvent = ::gen_handleOpenEvent_fn
             __expose(_uM("open" to open, "close" to closeByUser))
             return fun(): Any? {
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
@@ -293,8 +295,8 @@ open class GenUniModulesIUiXComponentsIActionSheetIActionSheet : VueComponent {
                                 _cC("v-if", true)
                             },
                             _cE("scroll-view", _uM("scroll-y" to "true", "class" to "i-action-sheet__scroll"), _uA(
-                                _cE(Fragment, null, RenderHelpers.renderList(actionItems.value, fun(item, index, __index, _cached): Any {
-                                    return _cE("button", _uM("key" to (index.toString(10) + "-" + getActionText(item)), "class" to _nC(getItemClass(item)), "disabled" to (isDisabled(item) || isLoading(item)), "open-type" to getActionOpenType(item), "app-parameter" to _ctx.appParameter, "lang" to _ctx.lang, "session-from" to _ctx.sessionFrom, "send-message-title" to _ctx.sendMessageTitle, "send-message-path" to _ctx.sendMessagePath, "send-message-img" to _ctx.sendMessageImg, "show-message-card" to _ctx.showMessageCard, "onClick" to fun(){
+                                _cE(Fragment, null, RenderHelpers.renderList(_ctx.actions, fun(item, index, __index, _cached): Any {
+                                    return _cE("button", _uM("key" to (index.toString() + "-" + getActionText(item)), "class" to _nC(getItemClass(item)), "disabled" to (isDisabled(item) || isLoading(item)), "open-type" to getActionOpenType(item), "app-parameter" to _ctx.appParameter, "lang" to _ctx.lang, "session-from" to _ctx.sessionFrom, "send-message-title" to _ctx.sendMessageTitle, "send-message-path" to _ctx.sendMessagePath, "send-message-img" to _ctx.sendMessageImg, "show-message-card" to _ctx.showMessageCard, "onClick" to fun(){
                                         handleSelect(item, index)
                                     }, "onGetuserinfo" to fun(`$event`: Any){
                                         handleOpenEvent("getuserinfo", `$event`)
@@ -329,7 +331,7 @@ open class GenUniModulesIUiXComponentsIActionSheetIActionSheet : VueComponent {
                                                 _cC("v-if", true)
                                             },
                                             if (isTrue(isLoading(item))) {
-                                                _cE("text", _uM("key" to 1, "class" to "i-action-sheet__loading"), "加载中")
+                                                _cE("text", _uM("key" to 1, "class" to "i-action-sheet__loading"), " 加载中 ")
                                             } else {
                                                 _cC("v-if", true)
                                             }

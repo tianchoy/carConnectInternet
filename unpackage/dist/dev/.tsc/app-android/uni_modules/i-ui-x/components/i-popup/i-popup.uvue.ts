@@ -162,141 +162,70 @@ const touching = ref(false)
 let closeTimer = 0
 let lazyTimer = 0
 
-const drawerPosition = computed(() => {
+const rootStyle = computed(() => {
+  return 'z-index:' + (props.zIndex).toString() + ';'
+})
+
+const drawerPosition = computed(() : string => {
   if (props.position.length > 0) return props.position
   return props.mode
 })
 
-const normalizedMode = computed(() => {
+const normalizedMode = computed(() : string => {
   if (
     drawerPosition.value == 'left' ||
     drawerPosition.value == 'right' ||
     drawerPosition.value == 'top' ||
     drawerPosition.value == 'center'
-  ) {
-    return drawerPosition.value
-  }
+  ) return drawerPosition.value
   return 'bottom'
 })
 
-function shouldCoverCenter(): boolean {
-  return (
-    props.widthCoverCenter &&
-    (normalizedMode.value == 'top' || normalizedMode.value == 'bottom') &&
-    props.width.toString().length > 0
-  )
+function isVerticalMode() : boolean {
+  return normalizedMode.value == 'top' || normalizedMode.value == 'bottom'
 }
 
-function stringifyStyle(value: any): string {
+function shouldCoverCenter() : boolean {
+  return props.widthCoverCenter && isVerticalMode() && props.width.toString().length > 0
+}
+
+function formatSize(value : any) : string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function stringifyStyle(value : any | null) : string {
   if (value == null) return ''
   const text = value.toString()
-  if (text == '[object Object]') return ''
-  if (text.length == 0) return ''
+  if (text == '[object Object]' || text.length == 0) return ''
   return text.endsWith(';') ? text : text + ';'
 }
 
-function formatMs(value: any): string {
+function formatMs(value : any) : string {
   const text = value.toString()
   if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0) return text
   return text + 'ms'
 }
 
-function formatSize(value: any): string {
-  const text = value.toString()
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
+function animationDuration() : number {
+  const text = props.duration.toString()
+  if (text.indexOf('ms') >= 0) return parseFloat(text.replace('ms', ''))
+  if (text.indexOf('s') >= 0) return parseFloat(text.replace('s', '')) * 1000
+  const duration = parseFloat(text)
+  return isNaN(duration) ? 300 : duration
 }
 
-const rootStyle = computed(() => {
-  return 'z-index:' + props.zIndex.toString() + ';'
-})
-
-const panelClass = computed(() => {
-  const classes = ['i-popup__panel']
-  classes.push('i-popup__panel--' + normalizedMode.value)
-  if (shouldCoverCenter()) classes.push('i-popup__panel--cover-center')
-  return classes.join(' ')
-})
-
-const overlayComputedStyle = computed(() => {
-  let bgColor = 'rgba(0,0,0,' + props.overlayOpacity.toString() + ')'
-  if (props.overflayBgColor.length > 0) bgColor = props.overflayBgColor
-  let style = 'background-color:' + bgColor + ';'
-  style = style + 'opacity:' + (active.value ? '1' : '0') + ';'
-  style = style + 'transition-duration:' + formatMs(props.duration) + ';'
-  style = style + stringifyStyle(props.overlayStyle)
-  return style
-})
-
-const titleStyleText = computed(() => {
-  return stringifyStyle(props.titleStyle)
-})
-
-
-function marginStyle(): string {
-  const margin = formatSize(props.margin)
-  if (margin == '0px') return ''
-  return 'margin:' + margin + ';'
+function normalizeClosePos() : string {
+  if (
+    props.closeIconPos == 'top-left' ||
+    props.closeIconPos == 'bottom-left' ||
+    props.closeIconPos == 'bottom-right'
+  ) return props.closeIconPos
+  return 'top-right'
 }
 
-function sizeStyle(): string {
-  let style = ''
-  const size = props.size.toString()
-  if (normalizedMode.value == 'left' || normalizedMode.value == 'right') {
-    if (props.width.toString().length > 0) {
-      style = style + 'width:' + formatSize(props.width) + ';'
-    } else if (size.length > 0) {
-      style = style + 'width:' + formatSize(size) + ';'
-    }
-  } else if (normalizedMode.value == 'top' || normalizedMode.value == 'bottom') {
-    if (props.width.toString().length == 0 && !shouldCoverCenter()) {
-      style = style + 'width:100%;'
-    }
-    if (props.height.toString().length > 0) {
-      style = style + 'height:' + formatSize(props.height) + ';'
-    } else if (size.length > 0) {
-      style = style + 'height:' + formatSize(size) + ';'
-    }
-    if (props.width.toString().length > 0) style = style + 'width:' + formatSize(props.width) + ';'
-  } else {
-    if (props.width.toString().length > 0) style = style + 'width:' + formatSize(props.width) + ';'
-    if (props.height.toString().length > 0) style = style + 'height:' + formatSize(props.height) + ';'
-  }
-  if (normalizedMode.value == 'top') {
-    if (props.navbarHeight > 0) style = style + 'top:' + props.navbarHeight.toString() + 'px;'
-    if (props.offsetTop.toString().length > 0) style = style + 'top:' + formatSize(props.offsetTop) + ';'
-  }
-  if (normalizedMode.value == 'bottom' && props.offsetBottom.toString().length > 0) {
-    style = style + 'bottom:' + formatSize(props.offsetBottom) + ';'
-  }
-  return style
-}
-
-
-function roundStyle(): string {
-  const round = formatSize(props.round)
-  if (normalizedMode.value == 'top') return 'border-radius:0 0 ' + round + ' ' + round + ';'
-  if (normalizedMode.value == 'bottom') return 'border-radius:' + round + ' ' + round + ' 0 0;'
-  if (normalizedMode.value == 'left') return 'border-radius:0 ' + round + ' ' + round + ' 0;'
-  if (normalizedMode.value == 'right') return 'border-radius:' + round + ' 0 0 ' + round + ';'
-  if (normalizedMode.value == 'center') return 'border-radius:' + round + ';'
-  return ''
-}
-
-function safeAreaStyle(): string {
-  let style = ''
-  if (props.safeTop && normalizedMode.value == 'top') {
-    style = style + 'padding-top:env(safe-area-inset-top);'
-  }
-  if (props.safeBottom && normalizedMode.value == 'bottom') {
-    style = style + 'padding-bottom:env(safe-area-inset-bottom);'
-  }
-  return style
-}
-
-function transformStyle(): string {
+function transformStyle() : string {
   const x = offsetX.value.toString()
   const y = offsetY.value.toString()
   if (normalizedMode.value == 'center') {
@@ -316,6 +245,72 @@ function transformStyle(): string {
   return ''
 }
 
+function marginStyle() : string {
+  const margin = formatSize(props.margin)
+  return margin == '0px' ? '' : 'margin:' + margin + ';'
+}
+
+function sizeStyle() : string {
+  let style = ''
+  const size = props.size.toString()
+  if (normalizedMode.value == 'left' || normalizedMode.value == 'right') {
+    if (props.width.toString().length > 0) style += 'width:' + formatSize(props.width) + ';'
+    else if (size.length > 0) style += 'width:' + formatSize(size) + ';'
+  } else if (normalizedMode.value == 'top' || normalizedMode.value == 'bottom') {
+    if (props.width.toString().length == 0 && !shouldCoverCenter()) style += 'width:100%;'
+    if (props.height.toString().length > 0) style += 'height:' + formatSize(props.height) + ';'
+    else if (size.length > 0) style += 'height:' + formatSize(size) + ';'
+    if (props.width.toString().length > 0) style += 'width:' + formatSize(props.width) + ';'
+  } else {
+    if (props.width.toString().length > 0) style += 'width:' + formatSize(props.width) + ';'
+    if (props.height.toString().length > 0) style += 'height:' + formatSize(props.height) + ';'
+  }
+  if (normalizedMode.value == 'top') {
+    if (props.navbarHeight > 0) style += 'top:' + props.navbarHeight.toString() + 'px;'
+    if (props.offsetTop.toString().length > 0) style += 'top:' + formatSize(props.offsetTop) + ';'
+  }
+  if (normalizedMode.value == 'bottom' && props.offsetBottom.toString().length > 0) style += 'bottom:' + formatSize(props.offsetBottom) + ';'
+  return style
+}
+
+function roundStyle() : string {
+  const round = formatSize(props.round)
+  if (normalizedMode.value == 'top') return 'border-radius:0 0 ' + round + ' ' + round + ';'
+  if (normalizedMode.value == 'bottom') return 'border-radius:' + round + ' ' + round + ' 0 0;'
+  if (normalizedMode.value == 'left') return 'border-radius:0 ' + round + ' ' + round + ' 0;'
+  if (normalizedMode.value == 'right') return 'border-radius:' + round + ' 0 0 ' + round + ';'
+  if (normalizedMode.value == 'center') return 'border-radius:' + round + ';'
+  return ''
+}
+
+function safeAreaStyle() : string {
+  let style = ''
+  if (props.safeTop && normalizedMode.value == 'top') style += 'padding-top:env(safe-area-inset-top);'
+  if (props.safeBottom && normalizedMode.value == 'bottom') style += 'padding-bottom:env(safe-area-inset-bottom);'
+  return style
+}
+
+const panelClass = computed(() => {
+  const classes = ['i-popup__panel']
+  classes.push('i-popup__panel--' + normalizedMode.value)
+  if (shouldCoverCenter()) classes.push('i-popup__panel--cover-center')
+  return classes.join(' ')
+})
+
+const overlayComputedStyle = computed(() => {
+  let bgColor = 'rgba(0,0,0,' + (props.overlayOpacity).toString() + ')'
+  if (props.overflayBgColor.length > 0) bgColor = props.overflayBgColor
+  let style = 'background-color:' + bgColor + ';'
+  style = style + 'opacity:' + (active.value ? '1' : '0') + ';'
+  style = style + 'transition-duration:' + formatMs(props.duration) + ';'
+  style = style + stringifyStyle(props.overlayStyle)
+  return style
+})
+
+const titleStyleText = computed(() => {
+  return stringifyStyle(props.titleStyle)
+})
+
 const panelStyle = computed(() => {
   let style = 'background-color:' + bgColor.value + ';'
   style = style + 'transition-duration:' + formatMs(props.duration) + ';'
@@ -331,7 +326,7 @@ const panelStyle = computed(() => {
 
 const bodyStyle = computed(() => {
   let style = 'padding:' + formatSize(props.contentMargin) + ';'
-  if (props.maxHeight.toString().length > 0) style = style + 'max-height:' + formatSize(props.maxHeight) + ';'
+  if ((props.maxHeight).toString().length > 0) style = style + 'max-height:' + formatSize(props.maxHeight) + ';'
   return style
 })
 
@@ -358,15 +353,7 @@ const contentVisible = computed(() => {
 
 const closeClass = computed(() => {
   const classes = ['i-popup__close']
-  let position = 'top-right'
-  if (
-    props.closeIconPos == 'top-left' ||
-    props.closeIconPos == 'bottom-left' ||
-    props.closeIconPos == 'bottom-right'
-  ) {
-    position = props.closeIconPos
-  }
-  classes.push('i-popup__close--' + position)
+  classes.push('i-popup__close--' + normalizeClosePos())
   return classes.join(' ')
 })
 
@@ -379,7 +366,7 @@ const closeIconText = computed(() => {
   return props.closeIcon
 })
 
-const clearTimers = (): void => {
+function clearTimers() : void {
   if (closeTimer > 0) {
     clearTimeout(closeTimer)
     closeTimer = 0
@@ -390,22 +377,13 @@ const clearTimers = (): void => {
   }
 }
 
-const resetOffset = (): void => {
+function resetOffset() : void {
   offsetX.value = 0
   offsetY.value = 0
   touching.value = false
 }
 
-const animationDuration = (): number => {
-  const text = props.duration.toString()
-  if (text.indexOf('ms') >= 0) return parseFloat(text.replace('ms', ''))
-  if (text.indexOf('s') >= 0) return parseFloat(text.replace('s', '')) * 1000
-  const duration = parseFloat(text)
-  if (isNaN(duration)) return 300
-  return duration
-}
-
-const openPanel = (shouldEmitUpdate: boolean): void => {
+function openPanel(shouldEmitUpdate : boolean) : void {
   if (props.disabled) return
   if (opened.value && active.value) return
   clearTimers()
@@ -413,10 +391,10 @@ const openPanel = (shouldEmitUpdate: boolean): void => {
   opened.value = true
   resetOffset()
   if (!props.lazy) contentReady.value = true
-  setTimeout(() => {
+  setTimeout(() : void => {
     active.value = true
     if (props.lazy) {
-      lazyTimer = setTimeout(() => {
+      lazyTimer = setTimeout(() : void => {
         contentReady.value = true
         lazyTimer = 0
       }, animationDuration())
@@ -426,14 +404,14 @@ const openPanel = (shouldEmitUpdate: boolean): void => {
   }, 20)
 }
 
-const closePanel = (shouldEmitUpdate: boolean): void => {
+function closePanel(shouldEmitUpdate : boolean) : void {
   if (!opened.value && !active.value) return
   clearTimers()
   emit('beforeClose')
   active.value = false
   if (props.lazy) contentReady.value = false
   resetOffset()
-  closeTimer = setTimeout(() => {
+  closeTimer = setTimeout(() : void => {
     opened.value = false
     closeTimer = 0
     emit('close')
@@ -441,22 +419,11 @@ const closePanel = (shouldEmitUpdate: boolean): void => {
   }, animationDuration())
 }
 
-watch(
-  (): boolean => props.show,
-  (nextValue: boolean) => {
-    if (nextValue) {
-      openPanel(false)
-    } else {
-      closePanel(false)
-    }
-  },
-)
-
-function open() {
+function open() : void {
   openPanel(true)
 }
 
-function close() {
+function close() : void {
   closePanel(true)
 }
 
@@ -477,50 +444,37 @@ function confirm() {
   close()
 }
 
-const readTouchX = (event: UniTouchEvent): number => {
-  let point: UniTouch | null = null
-  if (event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
-  }
-  if (point == null) return 0
-  return point.clientX
+function readTouchX(event : UniTouchEvent) : number {
+  if (event.touches.length > 0) return event.touches[0].clientX
+  if (event.changedTouches.length > 0) return event.changedTouches[0].clientX
+  return 0
 }
 
-const readTouchY = (event: UniTouchEvent): number => {
-  let point: UniTouch | null = null
-  if (event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
-  }
-  if (point == null) return 0
-  return point.clientY
+function readTouchY(event : UniTouchEvent) : number {
+  if (event.touches.length > 0) return event.touches[0].clientY
+  if (event.changedTouches.length > 0) return event.changedTouches[0].clientY
+  return 0
 }
 
-const handleTouchStart = (event: UniTouchEvent): void => {
+function handleTouchStart(event : UniTouchEvent) : void {
   if (!props.swipeClose) return
   touching.value = true
   startX.value = readTouchX(event)
   startY.value = readTouchY(event)
 }
 
-function handleContentTouchStart(event: UniTouchEvent) {
-  if (!props.contentDraggable) return
+function handleContentTouchStart(event : UniTouchEvent) : void {
+  if (props.swipeClose && props.contentDraggable) handleTouchStart(event)
+}
+
+function handleHandleTouchStart(event : UniTouchEvent) : void {
   handleTouchStart(event)
 }
 
-function handleHandleTouchStart(event: UniTouchEvent) {
-  handleTouchStart(event)
-}
-
-function handleTouchMove(event: UniTouchEvent) {
+function handleTouchMove(event : UniTouchEvent) : void {
   if (!props.swipeClose || !touching.value) return
-  const currentX = readTouchX(event)
-  const currentY = readTouchY(event)
-  const deltaX = currentX - startX.value
-  const deltaY = currentY - startY.value
+  const deltaX = readTouchX(event) - startX.value
+  const deltaY = readTouchY(event) - startY.value
   if (normalizedMode.value == 'bottom' && deltaY > 0) offsetY.value = deltaY
   if (normalizedMode.value == 'top' && deltaY < 0) offsetY.value = deltaY
   if (normalizedMode.value == 'left' && deltaX < 0) offsetX.value = deltaX
@@ -528,7 +482,7 @@ function handleTouchMove(event: UniTouchEvent) {
   if (normalizedMode.value == 'center' && deltaY > 0) offsetY.value = deltaY
 }
 
-function handleTouchEnd() {
+function handleTouchEnd() : void {
   if (!touching.value) return
   touching.value = false
   const threshold = parseFloat(props.swipeCloseThreshold.toString())
@@ -538,6 +492,24 @@ function handleTouchEnd() {
   }
   resetOffset()
 }
+
+function handleContentTouchMove(event : UniTouchEvent) : void {
+  if (!props.contentDraggable) return
+  handleTouchMove(event)
+}
+
+function handleContentTouchEnd() : void {
+  if (!props.contentDraggable) return
+  handleTouchEnd()
+}
+
+watch(
+  () : boolean => props.show,
+  (nextValue : boolean) : void => {
+    if (nextValue) openPanel(false)
+    else closePanel(false)
+  },
+)
 
 __expose({
   open,
@@ -570,7 +542,11 @@ return (): any | null => {
           _cE("view", _uM({
             class: _nC(panelClass.value),
             style: _nS(panelStyle.value),
-            onClick: withModifiers(() => {}, ["stop"])
+            onClick: withModifiers(() => {}, ["stop"]),
+            onTouchstart: handleContentTouchStart,
+            onTouchmove: handleContentTouchMove,
+            onTouchend: handleContentTouchEnd,
+            onTouchcancel: handleContentTouchEnd
           }), [
             renderSlot(_ctx.$slots, "bg"),
             isTrue(_ctx.swipeClose && _ctx.swipeHandle)
@@ -607,13 +583,11 @@ return (): any | null => {
               ? _cE("view", _uM({
                   key: 2,
                   class: _nC(closeClass.value),
+                  style: _nS(closeStyle.value),
                   onClick: close
                 }), [
-                  _cE("text", _uM({
-                    class: "i-popup__close-text",
-                    style: _nS(closeStyle.value)
-                  }), _tD(closeIconText.value), 5 /* TEXT, STYLE */)
-                ], 2 /* CLASS */)
+                  _cE("text", _uM({ class: "i-popup__close-text" }), _tD(closeIconText.value), 1 /* TEXT */)
+                ], 6 /* CLASS, STYLE */)
               : _cC("v-if", true),
             isTrue(_ctx.disabledScroll)
               ? _cE("view", _uM({
@@ -671,15 +645,13 @@ return (): any | null => {
               ? _cE("view", _uM({
                   key: 5,
                   class: _nC(closeClass.value),
+                  style: _nS(closeStyle.value),
                   onClick: close
                 }), [
-                  _cE("text", _uM({
-                    class: "i-popup__close-text",
-                    style: _nS(closeStyle.value)
-                  }), _tD(closeIconText.value), 5 /* TEXT, STYLE */)
-                ], 2 /* CLASS */)
+                  _cE("text", _uM({ class: "i-popup__close-text" }), _tD(closeIconText.value), 1 /* TEXT */)
+                ], 6 /* CLASS, STYLE */)
               : _cC("v-if", true)
-          ], 14 /* CLASS, STYLE, PROPS */, ["onClick"])
+          ], 46 /* CLASS, STYLE, PROPS, NEED_HYDRATION */, ["onClick"])
         ], 4 /* STYLE */)
       : _cC("v-if", true)
   ])

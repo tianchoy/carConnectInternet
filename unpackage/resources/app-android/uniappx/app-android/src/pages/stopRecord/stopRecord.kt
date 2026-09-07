@@ -39,6 +39,15 @@ open class GenPagesStopRecordStopRecord : BasePage {
             val imei = ref<String?>("")
             val currentDateTime = ref("")
             val carStopDetail = ref(_uA<StopRecord>())
+            val minDate = computed(fun(): Number {
+                val now = Date()
+                return Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime()
+            }
+            )
+            val maxDate = computed(fun(): Number {
+                return Date.now()
+            }
+            )
             val sortedCarStopDetail = computed(fun(): UTSArray<StopRecord> {
                 val sorted = carStopDetail.value.slice()
                 sorted.sort(fun(a: StopRecord, b: StopRecord): Number {
@@ -120,15 +129,12 @@ open class GenPagesStopRecordStopRecord : BasePage {
                 }
                 showDateTimePicker.value = true
             }
-            val onConfirm = fun(event: Any): Unit {
-                val eventObject = event as UTSJSONObject
-                val timestampValue = eventObject["timestamp"]
-                val timestamp = if (timestampValue == null) {
-                    0
-                } else {
-                    parseFloat(timestampValue.toString())
-                }
-                if (!isFinite(timestamp) || timestamp <= 0) {
+            val getPickerTimestamp = fun(event: UTSJSONObject): Number {
+                return event.getNumber("timestamp", 0)
+            }
+            val onConfirm = fun(event: UTSJSONObject): Unit {
+                val timestamp = getPickerTimestamp(event)
+                if (timestamp <= 0) {
                     return
                 }
                 val value = formatTimesToMinute(timestamp)
@@ -137,8 +143,8 @@ open class GenPagesStopRecordStopRecord : BasePage {
                 } else {
                     endTime.value = value
                 }
-                loadStopData()
                 showDateTimePicker.value = false
+                loadStopData()
             }
             val onCancel = fun(){
                 showDateTimePicker.value = false
@@ -195,7 +201,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
                                     ))
                                 ))
                             )),
-                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "minDate" to minDate.value, "maxDate" to maxDate.value, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
                                     _cE("view")
                                 )
@@ -203,7 +209,9 @@ open class GenPagesStopRecordStopRecord : BasePage {
                             ), "_" to 1), 8, _uA(
                                 "show",
                                 "model-value",
-                                "title"
+                                "title",
+                                "minDate",
+                                "maxDate"
                             ))
                         )),
                         _cE("scroll-view", _uM("class" to "content-box", "scroll-y" to "true"), _uA(

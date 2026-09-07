@@ -43,6 +43,15 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             }
             )
             val imei = ref<String?>("")
+            val minDate = computed(fun(): Number {
+                val now = Date()
+                return Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime()
+            }
+            )
+            val maxDate = computed(fun(): Number {
+                return Date.now()
+            }
+            )
             val groupedTrips = computed<UTSArray<GroupType>>(fun(): UTSArray<GroupType> {
                 val dateGroups: UTSArray<DateTripGroup> = _uA()
                 tripData.value.forEach(fun(trip: UTSJSONObject): Unit {
@@ -239,15 +248,12 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                 }
                 showDateTimePicker.value = true
             }
-            val onConfirm = fun(event: Any){
-                val eventObject = event as UTSJSONObject
-                val timestampValue = eventObject["timestamp"]
-                val timestamp = if (timestampValue == null) {
-                    0
-                } else {
-                    parseFloat(timestampValue.toString())
-                }
-                if (!isFinite(timestamp) || timestamp <= 0) {
+            val getPickerTimestamp = fun(event: UTSJSONObject): Number {
+                return event.getNumber("timestamp", 0)
+            }
+            val onConfirm = fun(event: UTSJSONObject){
+                val timestamp = getPickerTimestamp(event)
+                if (timestamp <= 0) {
                     return
                 }
                 val value = formatTimesToMinute(timestamp)
@@ -306,7 +312,7 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                                     ))
                                 ))
                             )),
-                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_datetime_picker, _uM("show" to showDateTimePicker.value, "model-value" to currentPickerValue.value, "mode" to "datetime", "title" to pickerTitle.value, "cancel-text" to "取消", "confirm-text" to "确认", "onConfirm" to onConfirm, "minDate" to minDate.value, "maxDate" to maxDate.value, "onCancel" to onCancel, "onUpdate:show" to onPickerShowChange), _uM("trigger" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
                                     _cE("view")
                                 )
@@ -314,7 +320,9 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                             ), "_" to 1), 8, _uA(
                                 "show",
                                 "model-value",
-                                "title"
+                                "title",
+                                "minDate",
+                                "maxDate"
                             ))
                         )),
                         _cE("view", _uM("class" to "summary-panel"), _uA(

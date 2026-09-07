@@ -1,12 +1,4 @@
-import { computed, ref, watch } from 'vue'
-
-type IDatetimePickerEvent = {
-  value : any,
-  date : string,
-  time : string,
-  timestamp : number,
-  mode : string,
-}
+import { computed, ref, watch, onMounted, nextTick } from 'vue'
 
 type IWheelOption = {
   value : number,
@@ -236,6 +228,16 @@ function formatSize(value : any) : string {
   return text + 'px'
 }
 
+function clampTime(value : string) : string {
+  const text = normalizeTime(value)
+  const current = timeToMinutes(text)
+  const minValue = validHour(props.minHour) * 60 + validMinute(props.minMinute)
+  const maxValue = validHour(props.maxHour) * 60 + validMinute(props.maxMinute)
+  let nextValue = current
+  if (nextValue < minValue) nextValue = minValue
+  if (nextValue > maxValue) nextValue = maxValue
+  return padNumber(Math.floor(nextValue / 60)) + ':' + padNumber(nextValue % 60)
+}
 
 const opened = ref(props.show)
 const currentDate = ref(props.date)
@@ -400,6 +402,120 @@ const minuteOptions = computed(() : Array<IWheelOption> => {
 })
 
 const wheelIndexes = ref<Array<number>>([])
+let wheelSyncGeneration = 0
+let wheelReadyGeneration = 0
+let wheelInitialized = false
+let wheelInternalChange = false
+
+function scheduleFrame(callback : () => void) : void {
+  setTimeout(callback, 16)
+}
+
+function copyWheelIndexes(indexes : Array<number>) : Array<number> {
+  return indexes.slice()
+}
+
+function findChangedWheelIndex(nextIndexes : Array<number>, oldIndexes : Array<number>) : number {
+  const length = Math.max(nextIndexes.length, oldIndexes.length)
+  for (let index = 0; index < length; index++) {
+    const nextValue = index < nextIndexes.length ? nextIndexes[index] : -1
+    const oldValue = index < oldIndexes.length ? oldIndexes[index] : -1
+    if (nextValue != oldValue) return index
+  }
+  return -1
+}
+
+function cancelWheelIndexSync() : void {
+  wheelSyncGeneration++
+  wheelInternalChange = false
+}
+
+function cancelWheelReady() : void {
+  wheelReadyGeneration++
+}
+
+function scheduleWheelReady() : void {
+  const generation = ++wheelReadyGeneration
+  nextTick(() => {
+    scheduleFrame(() => {
+      scheduleFrame(() => {
+        scheduleFrame(() => {
+          if (generation != wheelReadyGeneration || !opened.value) return
+          wheelInitialized = true
+          wheelInternalChange = false
+        })
+      })
+    })
+  })
+}
+
+function syncNativeWheelIndexes(indexes : Array<number>) : void {
+  const generation = ++wheelSyncGeneration
+  wheelInternalChange = true
+  wheelIndexes.value = copyWheelIndexes(indexes)
+
+  // A second assignment after the native view has consumed the first one is
+  // intentional: iOS picker-view otherwise sometimes keeps its old offset.
+  scheduleFrame(() => {
+    if (generation != wheelSyncGeneration) return
+    wheelIndexes.value = copyWheelIndexes(indexes)
+    scheduleFrame(() => {
+      if (generation == wheelSyncGeneration) wheelInternalChange = false
+    })
+  })
+}
+
+function forceWheelIndexRefresh(indexes : Array<number>, changedIndex : number, optionCount : number) : void {
+  const generation = ++wheelSyncGeneration
+  wheelInternalChange = true
+  wheelIndexes.value = copyWheelIndexes(indexes)
+
+  scheduleFrame(() => {
+    if (generation != wheelSyncGeneration) return
+
+    // Force a real native value transition, but always keep the temporary
+    // index inside the changed column's bounds. A negative index is rejected
+    // by iOS and leaves the column between two rows.
+    if (changedIndex >= 0 && changedIndex < indexes.length && optionCount > 1) {
+      const refreshed = copyWheelIndexes(indexes)
+      const target = indexes[changedIndex]
+      refreshed[changedIndex] = target > 0 ? target - 1 : 1
+      wheelIndexes.value = refreshed
+    }
+
+    scheduleFrame(() => {
+      if (generation != wheelSyncGeneration) return
+      wheelIndexes.value = copyWheelIndexes(indexes)
+      scheduleFrame(() => {
+        if (generation == wheelSyncGeneration) wheelInternalChange = false
+      })
+    })
+  })
+}
+
+function wheelOptionCountAt(index : number) : number {
+  let visibleIndex = 0
+  if (showYearColumn.value) {
+    if (visibleIndex == index) return yearOptions.value.length
+    visibleIndex++
+  }
+  if (showMonthColumn.value) {
+    if (visibleIndex == index) return monthOptions.value.length
+    visibleIndex++
+  }
+  if (showDayColumn.value) {
+    if (visibleIndex == index) return dayOptions.value.length
+    visibleIndex++
+  }
+  if (showHourColumn.value) {
+    if (visibleIndex == index) return hourOptions.value.length
+    visibleIndex++
+  }
+  if (showMinuteColumn.value) {
+    if (visibleIndex == index) return minuteOptions.value.length
+  }
+  return 0
+}
 
 function indexOfOption(options : Array<IWheelOption>, value : number) : number {
   for (let index = 0; index < options.length; index++) {
@@ -408,14 +524,64 @@ function indexOfOption(options : Array<IWheelOption>, value : number) : number {
   return 0
 }
 
-function syncWheelIndexes() : void {
+function clampDraftParts() : void {
+  if (normalizedMode.value == 'time') {
+    currentTime.value = clampTime(currentTime.value)
+    return
+  }
+
+  const minDate = minDateParts()
+  const maxDate = maxDateParts()
+  let year = selectedYear()
+  let month = selectedMonth()
+  let day = selectedDay()
+  let hour = selectedHour()
+  let minute = selectedMinute()
+
+  if (year < minDate.getFullYear()) year = minDate.getFullYear()
+  if (year > maxDate.getFullYear()) year = maxDate.getFullYear()
+
+  const firstMonth = year == minDate.getFullYear() ? minDate.getMonth() + 1 : 1
+  const lastMonth = year == maxDate.getFullYear() ? maxDate.getMonth() + 1 : 12
+  if (month < firstMonth) month = firstMonth
+  if (month > lastMonth) month = lastMonth
+
+  let firstDay = 1
+  let lastDay = daysInMonth(year, month)
+  if (year == minDate.getFullYear() && month == minDate.getMonth() + 1) firstDay = minDate.getDate()
+  if (year == maxDate.getFullYear() && month == maxDate.getMonth() + 1) lastDay = maxDate.getDate()
+  if (day < firstDay) day = firstDay
+  if (day > lastDay) day = lastDay
+
+  const timestamp = dateTimeToTimestamp(
+    dateFromParts(year, month, day, hour, minute).split(' ')[0],
+    padNumber(hour) + ':' + padNumber(minute)
+  )
+  if (timestamp < minDateValue()) {
+    currentDate.value = formatDate(minDateValue())
+    currentTime.value = formatTime(minDateValue())
+    return
+  }
+  if (timestamp > maxDateValue()) {
+    currentDate.value = formatDate(maxDateValue())
+    currentTime.value = formatTime(maxDateValue())
+    return
+  }
+
+  currentDate.value = year.toString() + '-' + padNumber(month) + '-' + padNumber(day)
+  currentTime.value = padNumber(hour) + ':' + padNumber(minute)
+}
+
+function syncWheelIndexes(syncNative : boolean = true) : Array<number> {
+  clampDraftParts()
   const indexes : Array<number> = []
   if (showYearColumn.value) indexes.push(indexOfOption(yearOptions.value, selectedYear()))
   if (showMonthColumn.value) indexes.push(indexOfOption(monthOptions.value, selectedMonth()))
   if (showDayColumn.value) indexes.push(indexOfOption(dayOptions.value, selectedDay()))
   if (showHourColumn.value) indexes.push(indexOfOption(hourOptions.value, selectedHour()))
   if (showMinuteColumn.value) indexes.push(indexOfOption(minuteOptions.value, selectedMinute()))
-  wheelIndexes.value = indexes
+  if (syncNative) syncNativeWheelIndexes(indexes)
+  return indexes
 }
 
 function selectedOptionValue(options : Array<IWheelOption>, index : number, fallback : number) : number {
@@ -426,7 +592,7 @@ function selectedOptionValue(options : Array<IWheelOption>, index : number, fall
   return options[safeIndex].value
 }
 
-function wheelIndexAt(values : Array<any | null>, index : number) : number {
+function wheelIndexAt(values : Array<number>, index : number) : number {
   if (values.length <= index || values[index] == null) return 0
   const result = parseFloat(values[index].toString())
   if (isNaN(result) || result < 0) return 0
@@ -449,23 +615,12 @@ function currentTimestamp() : number {
   return dateTimeToTimestamp(currentDate.value, currentTime.value)
 }
 
-function clampTime(value : string) : string {
-  const text = normalizeTime(value)
-  const current = timeToMinutes(text)
-  const minValue = validHour(props.minHour) * 60 + validMinute(props.minMinute)
-  const maxValue = validHour(props.maxHour) * 60 + validMinute(props.maxMinute)
-  let nextValue = current
-  if (nextValue < minValue) nextValue = minValue
-  if (nextValue > maxValue) nextValue = maxValue
-  return padNumber(Math.floor(nextValue / 60)) + ':' + padNumber(nextValue % 60)
-}
-
 function outputValue() : any {
   if (normalizedMode.value == 'time') return currentTime.value
   return currentTimestamp()
 }
 
-function buildEvent() : IDatetimePickerEvent {
+function buildEvent() : UTSJSONObject {
   return {
     value: outputValue(),
     date: currentDate.value,
@@ -497,6 +652,7 @@ function applyValue(value : any) : void {
   }
 
   const text = (value).toString()
+  // 支持纯数字字符串（如页面传入的毫秒时间戳字符串）
   if (/^\d+$/.test(text)) {
     const timestamp = parseFloat(text)
     if (!isNaN(timestamp) && timestamp > 0) {
@@ -525,6 +681,10 @@ function clampCurrent() : void {
 }
 
 function syncFromProps() : void {
+  cancelWheelIndexSync()
+  cancelWheelReady()
+  wheelInitialized = false
+  wheelInternalChange = true
   const modelText = (props.modelValue).toString()
   if (modelText.length > 0) {
     applyValue(props.modelValue)
@@ -534,12 +694,13 @@ function syncFromProps() : void {
   }
   clampCurrent()
   syncWheelIndexes()
+  scheduleWheelReady()
 }
 
 function open() : void {
   if (opened.value) return
-  syncFromProps()
   opened.value = true
+  syncFromProps()
   emit('open')
   emit('update:show', true)
 }
@@ -550,6 +711,10 @@ function openByTrigger() : void {
 }
 
 function close() : void {
+  cancelWheelIndexSync()
+  cancelWheelReady()
+  wheelInitialized = false
+  wheelInternalChange = false
   if (!opened.value) return
   opened.value = false
   emit('close')
@@ -557,6 +722,7 @@ function close() : void {
 }
 
 function cancel() : void {
+  cancelWheelIndexSync()
   emit('cancel', buildEvent())
   close()
 }
@@ -565,6 +731,7 @@ function confirm() : void {
   const event = buildEvent()
   emit('confirm', event)
   emitValue()
+  cancelWheelIndexSync()
   close()
 }
 
@@ -573,13 +740,10 @@ function handleOverlayClick() : void {
   close()
 }
 
-function handleWheelChange(event : any) : void {
-  if (props.disabled || props.loading || event == null || typeof event != 'object') return
-  const detail = (event as UTSJSONObject)['detail']
-  if (detail == null || typeof detail != 'object') return
-  const rawValues = (detail as UTSJSONObject)['value']
-  if (rawValues == null || !Array.isArray(rawValues)) return
-  const values = rawValues as Array<any | null>
+function handleWheelChange(event : UniPickerViewChangeEvent) : void {
+  if (props.disabled || props.loading || !wheelInitialized || wheelInternalChange) return
+  const values = event.detail.value as Array<number>
+  if (values == null || !Array.isArray(values)) return
 
   // Keep the option lists from before the change. Year/month changes alter the
   // dependent columns, so the received indexes must be mapped before updating state.
@@ -589,11 +753,16 @@ function handleWheelChange(event : any) : void {
   const previousHourOptions = hourOptions.value
   const previousMinuteOptions = minuteOptions.value
   let valueIndex = 0
-  let year = selectedYear()
-  let month = selectedMonth()
-  let day = selectedDay()
-  let hour = selectedHour()
-  let minute = selectedMinute()
+  const oldYear = selectedYear()
+  const oldMonth = selectedMonth()
+  const oldDay = selectedDay()
+  const oldHour = selectedHour()
+  const oldMinute = selectedMinute()
+  let year = oldYear
+  let month = oldMonth
+  let day = oldDay
+  let hour = oldHour
+  let minute = oldMinute
 
   if (showYearColumn.value) {
     year = selectedOptionValue(previousYearOptions, wheelIndexAt(values, valueIndex), year)
@@ -626,12 +795,24 @@ function handleWheelChange(event : any) : void {
   if (day < 1) day = 1
   if (day > maxDay) day = maxDay
 
+  // Update the draft only. Rebuild dependent columns without continuously writing the
+  // controlled picker value while the native iOS wheel is still settling.
   currentDate.value = dateFromParts(year, month, day, hour, minute).split(' ')[0]
   currentTime.value = padNumber(hour) + ':' + padNumber(minute)
   clampCurrent()
-  syncWheelIndexes()
-  emit('change', buildEvent())
+  const indexes = syncWheelIndexes(false)
+  // The native wheel already owns the current gesture. Only synchronize when a
+  // dependent option list changed; the generation prevents stale callbacks.
+  const dependentColumnChanged = year != oldYear || month != oldMonth
+  if (dependentColumnChanged) {
+    const oldIndexes = copyWheelIndexes(wheelIndexes.value)
+    const changedIndex = findChangedWheelIndex(indexes, oldIndexes)
+    forceWheelIndexRefresh(indexes, changedIndex, wheelOptionCountAt(changedIndex))
+  } else {
+    cancelWheelIndexSync()
+  }
   if (!props.showToolbar) emitValue()
+  emit('change', buildEvent())
 }
 
 watch(
@@ -679,9 +860,13 @@ watch(
 watch(
   () : number => props.maxDate,
   () : void => {
-    clampCurrent()
+    syncFromProps()
   },
 )
+
+onMounted(() => {
+  syncFromProps()
+})
 
 syncFromProps()
 

@@ -158,6 +158,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     let playbackTimer = null;
     let lastTimestamp = 0;
     let replaySessionId = 0;
+    const minDate = common_vendor.computed(() => {
+      const now2 = /* @__PURE__ */ new Date();
+      return new Date(now2.getFullYear(), now2.getMonth() - 6, now2.getDate(), 0, 0, 0).getTime();
+    });
+    const maxDate = common_vendor.computed(() => {
+      return Date.now();
+    });
     function formatPlaybackTime(timestamp) {
       var _a;
       return (_a = utils_formateTime.formatTimesToMinute(timestamp)) !== null && _a !== void 0 ? _a : "";
@@ -207,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:208", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:224", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -568,7 +575,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:694", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:710", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -637,12 +644,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         startPlayback();
       }
     }
-    function onConfirm(event = null) {
+    function getPickerTimestamp(event) {
+      return event.getNumber("timestamp", 0);
+    }
+    function onConfirm(event) {
       var _a, _b;
-      const eventObject = event;
-      const timestampValue = eventObject["timestamp"];
-      const timestamp = timestampValue == null ? 0 : parseFloat(timestampValue.toString());
-      if (!isFinite(timestamp) || timestamp <= 0)
+      const timestamp = getPickerTimestamp(event);
+      if (timestamp <= 0)
         return null;
       const formattedValue = formatPlaybackTime(timestamp);
       if (currentPickerType.value == "start") {
@@ -690,7 +698,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
       sTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
       eTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:830", sTime.value, eTime.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:849", sTime.value, eTime.value);
       const routeStartTime = resolveRouteDateTime(sTime.value);
       const routeEndTime = resolveRouteDateTime(eTime.value);
       if (routeStartTime != null && routeEndTime != null) {
@@ -786,15 +794,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         C: common_vendor.t(currentSpeed.value),
         D: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
         E: common_vendor.o(onConfirm, "9f"),
-        F: common_vendor.o(onCancel, "8e"),
-        G: common_vendor.o(onPickerShowChange, "3e"),
+        F: common_vendor.o(onCancel, "02"),
+        G: common_vendor.o(onPickerShowChange, "36"),
         H: common_vendor.p({
           show: showDateTimePicker.value,
           ["model-value"]: currentPickerValue.value,
           mode: "datetime",
           title: pickerTitle.value,
           ["cancel-text"]: "取消",
-          ["confirm-text"]: "确认"
+          ["confirm-text"]: "确认",
+          minDate: minDate.value,
+          maxDate: maxDate.value
         }),
         I: `${_ctx.u_s_b_h}px`,
         J: `${_ctx.u_s_a_i_b}px`

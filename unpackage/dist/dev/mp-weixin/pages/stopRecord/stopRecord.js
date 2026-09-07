@@ -38,6 +38,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const imei = common_vendor.ref("");
     common_vendor.ref("");
     const carStopDetail = common_vendor.ref([]);
+    const minDate = common_vendor.computed(() => {
+      const now = /* @__PURE__ */ new Date();
+      return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime();
+    });
+    const maxDate = common_vendor.computed(() => {
+      return Date.now();
+    });
     const sortedCarStopDetail = common_vendor.computed(() => {
       const sorted = carStopDetail.value.slice();
       sorted.sort((a, b) => {
@@ -92,7 +99,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           carStopDetail.value = stopsWithAddress;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:135", "获取停车数据失败:", error);
+          common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:151", "获取停车数据失败:", error);
           utils_toast.showAppToast({ title: "数据加载失败", icon: "none" });
         } finally {
           common_vendor.index.hideLoading();
@@ -108,11 +115,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       pickerTitle.value = type === "start" ? "选择开始时间" : "选择结束时间";
       showDateTimePicker.value = true;
     };
-    const onConfirm = (event = null) => {
-      const eventObject = event;
-      const timestampValue = eventObject["timestamp"];
-      const timestamp = timestampValue == null ? 0 : parseFloat(timestampValue.toString());
-      if (!isFinite(timestamp) || timestamp <= 0)
+    const getPickerTimestamp = (event) => {
+      return event.getNumber("timestamp", 0);
+    };
+    const onConfirm = (event) => {
+      const timestamp = getPickerTimestamp(event);
+      if (timestamp <= 0)
         return null;
       const value = utils_formateTime.formatTimesToMinute(timestamp);
       if (currentPickerType.value === "start") {
@@ -120,8 +128,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } else {
         endTime.value = value;
       }
-      loadStopData();
       showDateTimePicker.value = false;
+      loadStopData();
     };
     const onCancel = () => {
       showDateTimePicker.value = false;
@@ -179,15 +187,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           fontSize: "15"
         }),
         k: common_vendor.o(onConfirm, "ca"),
-        l: common_vendor.o(onCancel, "1a"),
-        m: common_vendor.o(onPickerShowChange, "68"),
+        l: common_vendor.o(onCancel, "c1"),
+        m: common_vendor.o(onPickerShowChange, "f2"),
         n: common_vendor.p({
           show: showDateTimePicker.value,
           ["model-value"]: currentPickerValue.value,
           mode: "datetime",
           title: pickerTitle.value,
           ["cancel-text"]: "取消",
-          ["confirm-text"]: "确认"
+          ["confirm-text"]: "确认",
+          minDate: minDate.value,
+          maxDate: maxDate.value
         }),
         o: sortedCarStopDetail.value.length == 0
       }, sortedCarStopDetail.value.length == 0 ? {

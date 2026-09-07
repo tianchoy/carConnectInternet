@@ -104,6 +104,10 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
             val touching = ref(false)
             var closeTimer: Number = 0
             var lazyTimer: Number = 0
+            val rootStyle = computed(fun(): String {
+                return "z-index:" + props.zIndex.toString() + ";"
+            }
+            )
             val drawerPosition = computed(fun(): String {
                 if (props.position.length > 0) {
                     return props.position
@@ -118,19 +122,28 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 return "bottom"
             }
             )
+            fun gen_isVerticalMode_fn(): Boolean {
+                return normalizedMode.value == "top" || normalizedMode.value == "bottom"
+            }
+            val isVerticalMode = ::gen_isVerticalMode_fn
             fun gen_shouldCoverCenter_fn(): Boolean {
-                return (props.widthCoverCenter && (normalizedMode.value == "top" || normalizedMode.value == "bottom") && props.width.toString().length > 0)
+                return props.widthCoverCenter && isVerticalMode() && props.width.toString().length > 0
             }
             val shouldCoverCenter = ::gen_shouldCoverCenter_fn
-            fun gen_stringifyStyle_fn(value: Any): String {
+            fun gen_formatSize_fn(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
+            }
+            val formatSize = ::gen_formatSize_fn
+            fun gen_stringifyStyle_fn(value: Any?): String {
                 if (value == null) {
                     return ""
                 }
                 val text = value.toString()
-                if (text == "[object Object]") {
-                    return ""
-                }
-                if (text.length == 0) {
+                if (text == "[object Object]" || text.length == 0) {
                     return ""
                 }
                 return if (isTruthy(text.endsWith(";"))) {
@@ -148,132 +161,29 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 return text + "ms"
             }
             val formatMs = ::gen_formatMs_fn
-            fun gen_formatSize_fn(value: Any): String {
-                val text = value.toString()
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-                    return text
+            fun gen_animationDuration_fn(): Number {
+                val text = props.duration.toString()
+                if (text.indexOf("ms") >= 0) {
+                    return parseFloat(text.replace("ms", ""))
                 }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
-            val rootStyle = computed(fun(): String {
-                return "z-index:" + props.zIndex.toString() + ";"
-            }
-            )
-            val panelClass = computed(fun(): String {
-                val classes = _uA(
-                    "i-popup__panel"
-                )
-                classes.push("i-popup__panel--" + normalizedMode.value)
-                if (shouldCoverCenter()) {
-                    classes.push("i-popup__panel--cover-center")
+                if (text.indexOf("s") >= 0) {
+                    return parseFloat(text.replace("s", "")) * 1000
                 }
-                return classes.join(" ")
-            }
-            )
-            val overlayComputedStyle = computed(fun(): String {
-                var bgColor = "rgba(0,0,0," + props.overlayOpacity.toString() + ")"
-                if (props.overflayBgColor.length > 0) {
-                    bgColor = props.overflayBgColor
-                }
-                var style = "background-color:" + bgColor + ";"
-                style = style + "opacity:" + (if (active.value) {
-                    "1"
+                val duration = parseFloat(text)
+                return if (isNaN(duration)) {
+                    300
                 } else {
-                    "0"
+                    duration
                 }
-                ) + ";"
-                style = style + "transition-duration:" + formatMs(props.duration) + ";"
-                style = style + stringifyStyle(props.overlayStyle)
-                return style
             }
-            )
-            val titleStyleText = computed(fun(): String {
-                return stringifyStyle(props.titleStyle)
+            val animationDuration = ::gen_animationDuration_fn
+            fun gen_normalizeClosePos_fn(): String {
+                if (props.closeIconPos == "top-left" || props.closeIconPos == "bottom-left" || props.closeIconPos == "bottom-right") {
+                    return props.closeIconPos
+                }
+                return "top-right"
             }
-            )
-            fun gen_marginStyle_fn(): String {
-                val margin = formatSize(props.margin)
-                if (margin == "0px") {
-                    return ""
-                }
-                return "margin:" + margin + ";"
-            }
-            val marginStyle = ::gen_marginStyle_fn
-            fun gen_sizeStyle_fn(): String {
-                var style = ""
-                val size = props.size.toString()
-                if (normalizedMode.value == "left" || normalizedMode.value == "right") {
-                    if (props.width.toString().length > 0) {
-                        style = style + "width:" + formatSize(props.width) + ";"
-                    } else if (size.length > 0) {
-                        style = style + "width:" + formatSize(size) + ";"
-                    }
-                } else if (normalizedMode.value == "top" || normalizedMode.value == "bottom") {
-                    if (props.width.toString().length == 0 && !shouldCoverCenter()) {
-                        style = style + "width:100%;"
-                    }
-                    if (props.height.toString().length > 0) {
-                        style = style + "height:" + formatSize(props.height) + ";"
-                    } else if (size.length > 0) {
-                        style = style + "height:" + formatSize(size) + ";"
-                    }
-                    if (props.width.toString().length > 0) {
-                        style = style + "width:" + formatSize(props.width) + ";"
-                    }
-                } else {
-                    if (props.width.toString().length > 0) {
-                        style = style + "width:" + formatSize(props.width) + ";"
-                    }
-                    if (props.height.toString().length > 0) {
-                        style = style + "height:" + formatSize(props.height) + ";"
-                    }
-                }
-                if (normalizedMode.value == "top") {
-                    if (props.navbarHeight > 0) {
-                        style = style + "top:" + props.navbarHeight.toString(10) + "px;"
-                    }
-                    if (props.offsetTop.toString().length > 0) {
-                        style = style + "top:" + formatSize(props.offsetTop) + ";"
-                    }
-                }
-                if (normalizedMode.value == "bottom" && props.offsetBottom.toString().length > 0) {
-                    style = style + "bottom:" + formatSize(props.offsetBottom) + ";"
-                }
-                return style
-            }
-            val sizeStyle = ::gen_sizeStyle_fn
-            fun gen_roundStyle_fn(): String {
-                val round = formatSize(props.round)
-                if (normalizedMode.value == "top") {
-                    return "border-radius:0 0 " + round + " " + round + ";"
-                }
-                if (normalizedMode.value == "bottom") {
-                    return "border-radius:" + round + " " + round + " 0 0;"
-                }
-                if (normalizedMode.value == "left") {
-                    return "border-radius:0 " + round + " " + round + " 0;"
-                }
-                if (normalizedMode.value == "right") {
-                    return "border-radius:" + round + " 0 0 " + round + ";"
-                }
-                if (normalizedMode.value == "center") {
-                    return "border-radius:" + round + ";"
-                }
-                return ""
-            }
-            val roundStyle = ::gen_roundStyle_fn
-            fun gen_safeAreaStyle_fn(): String {
-                var style = ""
-                if (props.safeTop && normalizedMode.value == "top") {
-                    style = style + "padding-top:env(safe-area-inset-top);"
-                }
-                if (props.safeBottom && normalizedMode.value == "bottom") {
-                    style = style + "padding-bottom:env(safe-area-inset-bottom);"
-                }
-                return style
-            }
-            val safeAreaStyle = ::gen_safeAreaStyle_fn
+            val normalizeClosePos = ::gen_normalizeClosePos_fn
             fun gen_transformStyle_fn(): String {
                 val x = offsetX.value.toString(10)
                 val y = offsetY.value.toString(10)
@@ -339,6 +249,121 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 return ""
             }
             val transformStyle = ::gen_transformStyle_fn
+            fun gen_marginStyle_fn(): String {
+                val margin = formatSize(props.margin)
+                return if (margin == "0px") {
+                    ""
+                } else {
+                    "margin:" + margin + ";"
+                }
+            }
+            val marginStyle = ::gen_marginStyle_fn
+            fun gen_sizeStyle_fn(): String {
+                var style = ""
+                val size = props.size.toString()
+                if (normalizedMode.value == "left" || normalizedMode.value == "right") {
+                    if (props.width.toString().length > 0) {
+                        style += "width:" + formatSize(props.width) + ";"
+                    } else if (size.length > 0) {
+                        style += "width:" + formatSize(size) + ";"
+                    }
+                } else if (normalizedMode.value == "top" || normalizedMode.value == "bottom") {
+                    if (props.width.toString().length == 0 && !shouldCoverCenter()) {
+                        style += "width:100%;"
+                    }
+                    if (props.height.toString().length > 0) {
+                        style += "height:" + formatSize(props.height) + ";"
+                    } else if (size.length > 0) {
+                        style += "height:" + formatSize(size) + ";"
+                    }
+                    if (props.width.toString().length > 0) {
+                        style += "width:" + formatSize(props.width) + ";"
+                    }
+                } else {
+                    if (props.width.toString().length > 0) {
+                        style += "width:" + formatSize(props.width) + ";"
+                    }
+                    if (props.height.toString().length > 0) {
+                        style += "height:" + formatSize(props.height) + ";"
+                    }
+                }
+                if (normalizedMode.value == "top") {
+                    if (props.navbarHeight > 0) {
+                        style += "top:" + props.navbarHeight.toString(10) + "px;"
+                    }
+                    if (props.offsetTop.toString().length > 0) {
+                        style += "top:" + formatSize(props.offsetTop) + ";"
+                    }
+                }
+                if (normalizedMode.value == "bottom" && props.offsetBottom.toString().length > 0) {
+                    style += "bottom:" + formatSize(props.offsetBottom) + ";"
+                }
+                return style
+            }
+            val sizeStyle = ::gen_sizeStyle_fn
+            fun gen_roundStyle_fn(): String {
+                val round = formatSize(props.round)
+                if (normalizedMode.value == "top") {
+                    return "border-radius:0 0 " + round + " " + round + ";"
+                }
+                if (normalizedMode.value == "bottom") {
+                    return "border-radius:" + round + " " + round + " 0 0;"
+                }
+                if (normalizedMode.value == "left") {
+                    return "border-radius:0 " + round + " " + round + " 0;"
+                }
+                if (normalizedMode.value == "right") {
+                    return "border-radius:" + round + " 0 0 " + round + ";"
+                }
+                if (normalizedMode.value == "center") {
+                    return "border-radius:" + round + ";"
+                }
+                return ""
+            }
+            val roundStyle = ::gen_roundStyle_fn
+            fun gen_safeAreaStyle_fn(): String {
+                var style = ""
+                if (props.safeTop && normalizedMode.value == "top") {
+                    style += "padding-top:env(safe-area-inset-top);"
+                }
+                if (props.safeBottom && normalizedMode.value == "bottom") {
+                    style += "padding-bottom:env(safe-area-inset-bottom);"
+                }
+                return style
+            }
+            val safeAreaStyle = ::gen_safeAreaStyle_fn
+            val panelClass = computed(fun(): String {
+                val classes = _uA(
+                    "i-popup__panel"
+                )
+                classes.push("i-popup__panel--" + normalizedMode.value)
+                if (shouldCoverCenter()) {
+                    classes.push("i-popup__panel--cover-center")
+                }
+                return classes.join(" ")
+            }
+            )
+            val overlayComputedStyle = computed(fun(): String {
+                var bgColor = "rgba(0,0,0," + props.overlayOpacity.toString() + ")"
+                if (props.overflayBgColor.length > 0) {
+                    bgColor = props.overflayBgColor
+                }
+                var style = "background-color:" + bgColor + ";"
+                style = style + "opacity:" + (if (active.value) {
+                    "1"
+                } else {
+                    "0"
+                }
+                ) + ";"
+                style = style + "transition-duration:" + formatMs(props.duration) + ";"
+                style = style + stringifyStyle(props.overlayStyle)
+                return style
+            }
+            )
+            val titleStyleText = computed(fun(): String {
+                return stringifyStyle(props.titleStyle)
+            }
+            )
             val panelStyle = computed(fun(): String {
                 var style = "background-color:" + bgColor.value + ";"
                 style = style + "transition-duration:" + formatMs(props.duration) + ";"
@@ -397,11 +422,7 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 val classes = _uA(
                     "i-popup__close"
                 )
-                var position = "top-right"
-                if (props.closeIconPos == "top-left" || props.closeIconPos == "bottom-left" || props.closeIconPos == "bottom-right") {
-                    position = props.closeIconPos
-                }
-                classes.push("i-popup__close--" + position)
+                classes.push("i-popup__close--" + normalizeClosePos())
                 return classes.join(" ")
             }
             )
@@ -416,7 +437,7 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 return props.closeIcon
             }
             )
-            val clearTimers = fun(): Unit {
+            fun gen_clearTimers_fn(): Unit {
                 if (closeTimer > 0) {
                     clearTimeout(closeTimer)
                     closeTimer = 0
@@ -426,26 +447,14 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                     lazyTimer = 0
                 }
             }
-            val resetOffset = fun(): Unit {
+            val clearTimers = ::gen_clearTimers_fn
+            fun gen_resetOffset_fn(): Unit {
                 offsetX.value = 0
                 offsetY.value = 0
                 touching.value = false
             }
-            val animationDuration = fun(): Number {
-                val text = props.duration.toString()
-                if (text.indexOf("ms") >= 0) {
-                    return parseFloat(text.replace("ms", ""))
-                }
-                if (text.indexOf("s") >= 0) {
-                    return parseFloat(text.replace("s", "")) * 1000
-                }
-                val duration = parseFloat(text)
-                if (isNaN(duration)) {
-                    return 300
-                }
-                return duration
-            }
-            val openPanel = fun(shouldEmitUpdate: Boolean): Unit {
+            val resetOffset = ::gen_resetOffset_fn
+            fun gen_openPanel_fn(shouldEmitUpdate: Boolean): Unit {
                 if (props.disabled) {
                     return
                 }
@@ -459,10 +468,10 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 if (!props.lazy) {
                     contentReady.value = true
                 }
-                setTimeout(fun(){
+                setTimeout(fun(): Unit {
                     active.value = true
                     if (props.lazy) {
-                        lazyTimer = setTimeout(fun(){
+                        lazyTimer = setTimeout(fun(): Unit {
                             contentReady.value = true
                             lazyTimer = 0
                         }
@@ -475,7 +484,8 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 }
                 , 20)
             }
-            val closePanel = fun(shouldEmitUpdate: Boolean): Unit {
+            val openPanel = ::gen_openPanel_fn
+            fun gen_closePanel_fn(shouldEmitUpdate: Boolean): Unit {
                 if (!opened.value && !active.value) {
                     return
                 }
@@ -486,7 +496,7 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                     contentReady.value = false
                 }
                 resetOffset()
-                closeTimer = setTimeout(fun(){
+                closeTimer = setTimeout(fun(): Unit {
                     opened.value = false
                     closeTimer = 0
                     emit("close")
@@ -496,22 +506,12 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 }
                 , animationDuration())
             }
-            watch(fun(): Boolean {
-                return props.show
-            }
-            , fun(nextValue: Boolean){
-                if (nextValue) {
-                    openPanel(false)
-                } else {
-                    closePanel(false)
-                }
-            }
-            )
-            fun gen_open_fn() {
+            val closePanel = ::gen_closePanel_fn
+            fun gen_open_fn(): Unit {
                 openPanel(true)
             }
             val open = ::gen_open_fn
-            fun gen_close_fn() {
+            fun gen_close_fn(): Unit {
                 closePanel(true)
             }
             val close = ::gen_close_fn
@@ -536,31 +536,27 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 close()
             }
             val confirm = ::gen_confirm_fn
-            val readTouchX = fun(event: UniTouchEvent): Number {
-                var point: UniTouch? = null
+            fun gen_readTouchX_fn(event: UniTouchEvent): Number {
                 if (event.touches.length > 0) {
-                    point = event.touches[0]
-                } else if (event.changedTouches.length > 0) {
-                    point = event.changedTouches[0]
+                    return event.touches[0].clientX
                 }
-                if (point == null) {
-                    return 0
+                if (event.changedTouches.length > 0) {
+                    return event.changedTouches[0].clientX
                 }
-                return point.clientX
+                return 0
             }
-            val readTouchY = fun(event: UniTouchEvent): Number {
-                var point: UniTouch? = null
+            val readTouchX = ::gen_readTouchX_fn
+            fun gen_readTouchY_fn(event: UniTouchEvent): Number {
                 if (event.touches.length > 0) {
-                    point = event.touches[0]
-                } else if (event.changedTouches.length > 0) {
-                    point = event.changedTouches[0]
+                    return event.touches[0].clientY
                 }
-                if (point == null) {
-                    return 0
+                if (event.changedTouches.length > 0) {
+                    return event.changedTouches[0].clientY
                 }
-                return point.clientY
+                return 0
             }
-            val handleTouchStart = fun(event: UniTouchEvent): Unit {
+            val readTouchY = ::gen_readTouchY_fn
+            fun gen_handleTouchStart_fn(event: UniTouchEvent): Unit {
                 if (!props.swipeClose) {
                     return
                 }
@@ -568,25 +564,23 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 startX.value = readTouchX(event)
                 startY.value = readTouchY(event)
             }
-            fun gen_handleContentTouchStart_fn(event: UniTouchEvent) {
-                if (!props.contentDraggable) {
-                    return
+            val handleTouchStart = ::gen_handleTouchStart_fn
+            fun gen_handleContentTouchStart_fn(event: UniTouchEvent): Unit {
+                if (props.swipeClose && props.contentDraggable) {
+                    handleTouchStart(event)
                 }
-                handleTouchStart(event)
             }
             val handleContentTouchStart = ::gen_handleContentTouchStart_fn
-            fun gen_handleHandleTouchStart_fn(event: UniTouchEvent) {
+            fun gen_handleHandleTouchStart_fn(event: UniTouchEvent): Unit {
                 handleTouchStart(event)
             }
             val handleHandleTouchStart = ::gen_handleHandleTouchStart_fn
-            fun gen_handleTouchMove_fn(event: UniTouchEvent) {
+            fun gen_handleTouchMove_fn(event: UniTouchEvent): Unit {
                 if (!props.swipeClose || !touching.value) {
                     return
                 }
-                val currentX = readTouchX(event)
-                val currentY = readTouchY(event)
-                val deltaX = currentX - startX.value
-                val deltaY = currentY - startY.value
+                val deltaX = readTouchX(event) - startX.value
+                val deltaY = readTouchY(event) - startY.value
                 if (normalizedMode.value == "bottom" && deltaY > 0) {
                     offsetY.value = deltaY
                 }
@@ -604,7 +598,7 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 }
             }
             val handleTouchMove = ::gen_handleTouchMove_fn
-            fun gen_handleTouchEnd_fn() {
+            fun gen_handleTouchEnd_fn(): Unit {
                 if (!touching.value) {
                     return
                 }
@@ -617,6 +611,31 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                 resetOffset()
             }
             val handleTouchEnd = ::gen_handleTouchEnd_fn
+            fun gen_handleContentTouchMove_fn(event: UniTouchEvent): Unit {
+                if (!props.contentDraggable) {
+                    return
+                }
+                handleTouchMove(event)
+            }
+            val handleContentTouchMove = ::gen_handleContentTouchMove_fn
+            fun gen_handleContentTouchEnd_fn(): Unit {
+                if (!props.contentDraggable) {
+                    return
+                }
+                handleTouchEnd()
+            }
+            val handleContentTouchEnd = ::gen_handleContentTouchEnd_fn
+            watch(fun(): Boolean {
+                return props.show
+            }
+            , fun(nextValue: Boolean): Unit {
+                if (nextValue) {
+                    openPanel(false)
+                } else {
+                    closePanel(false)
+                }
+            }
+            )
             __expose(_uM("open" to open, "close" to close))
             return fun(): Any? {
                 return _cE("view", null, _uA(
@@ -632,7 +651,7 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                             },
                             _cE("view", _uM("class" to _nC(panelClass.value), "style" to _nS(panelStyle.value), "onClick" to withModifiers(fun(){}, _uA(
                                 "stop"
-                            ))), _uA(
+                            )), "onTouchstart" to handleContentTouchStart, "onTouchmove" to handleContentTouchMove, "onTouchend" to handleContentTouchEnd, "onTouchcancel" to handleContentTouchEnd), _uA(
                                 renderSlot(_ctx.`$slots`, "bg"),
                                 if (isTrue(if (isTruthy(_ctx.swipeClose)) {
                                     _ctx.swipeHandle
@@ -679,9 +698,9 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                                     )
                                 }),
                                 if (isTrue(_ctx.showClose)) {
-                                    _cE("view", _uM("key" to 2, "class" to _nC(closeClass.value), "onClick" to close), _uA(
-                                        _cE("text", _uM("class" to "i-popup__close-text", "style" to _nS(closeStyle.value)), _tD(closeIconText.value), 5)
-                                    ), 2)
+                                    _cE("view", _uM("key" to 2, "class" to _nC(closeClass.value), "style" to _nS(closeStyle.value), "onClick" to close), _uA(
+                                        _cE("text", _uM("class" to "i-popup__close-text"), _tD(closeIconText.value), 1)
+                                    ), 6)
                                 } else {
                                     _cC("v-if", true)
                                 },
@@ -731,13 +750,13 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                                 } else {
                                     _ctx.closeable
                                 })) {
-                                    _cE("view", _uM("key" to 5, "class" to _nC(closeClass.value), "onClick" to close), _uA(
-                                        _cE("text", _uM("class" to "i-popup__close-text", "style" to _nS(closeStyle.value)), _tD(closeIconText.value), 5)
-                                    ), 2)
+                                    _cE("view", _uM("key" to 5, "class" to _nC(closeClass.value), "style" to _nS(closeStyle.value), "onClick" to close), _uA(
+                                        _cE("text", _uM("class" to "i-popup__close-text"), _tD(closeIconText.value), 1)
+                                    ), 6)
                                 } else {
                                     _cC("v-if", true)
                                 }
-                            ), 14, _uA(
+                            ), 46, _uA(
                                 "onClick"
                             ))
                         ), 4)

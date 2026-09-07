@@ -62,6 +62,7 @@ open class GenPagesIndexIndex : BasePage {
             val navBarHeight = ref(44)
             val deviceList = ref(_uA<Device>())
             val showPicker = ref(false)
+            val pickerDefaultIndex = ref(_uA<Number>(0))
             val pickerValue = ref("")
             val currentCarImei = ref("")
             val currentCarDeptId = ref("")
@@ -319,7 +320,13 @@ open class GenPagesIndexIndex : BasePage {
                 } else {
                     selectedDevice.deviceId
                 }
-                showPicker.value = true
+                pickerDefaultIndex.value = _uA(
+                    selectedIndex
+                )
+                nextTick(fun(){
+                    showPicker.value = true
+                }
+                )
             }
             val createMarker = fun(id: Number, lat: Number, lng: Number, type: String, title: String?): Marker {
                 val isOnline = currentCarConnectionStatus.value == "online"
@@ -1058,35 +1065,27 @@ open class GenPagesIndexIndex : BasePage {
                                         ))
                                     ))
                                 )),
-                                if (isTrue(if (safeDeviceDetail.value.deviceStatus.batteryPercent != 0) {
-                                    safeDeviceDetail.value.deviceStatus.voltage
-                                } else {
-                                    safeDeviceDetail.value.deviceStatus.batteryPercent
-                                }
-                                )) {
-                                    _cE("view", _uM("key" to 0, "class" to "device-info"), _uA(
-                                        if (isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)) {
-                                            _cV(_component_i_line_progress, _uM("key" to 0, "percent" to safeDeviceDetail.value.deviceStatus.batteryPercent), null, 8, _uA(
-                                                "percent"
-                                            ))
-                                        } else {
-                                            _cC("v-if", true)
-                                        },
-                                        if (isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)) {
-                                            _cE("view", _uM("key" to 1, "class" to "info"), "电量: " + _tD(safeDeviceDetail.value.deviceStatus.batteryPercent) + "%", 1)
-                                        } else {
-                                            _cC("v-if", true)
-                                        },
-                                        if (isTrue(safeDeviceDetail.value.deviceStatus.voltage)) {
-                                            _cE("view", _uM("key" to 2, "class" to "info"), "电压: " + _tD(safeDeviceDetail.value.deviceStatus.voltage) + "V", 1)
-                                        } else {
-                                            _cC("v-if", true)
-                                        }
-                                    ))
-                                } else {
-                                    _cC("v-if", true)
-                                }
-                                ,
+                                _cE("view", _uM("class" to "device-info"), _uA(
+                                    if (isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)) {
+                                        _cV(_component_i_line_progress, _uM("key" to 0, "percent" to safeDeviceDetail.value.deviceStatus.batteryPercent), null, 8, _uA(
+                                            "percent"
+                                        ))
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
+                                    ,
+                                    if (isTrue(safeDeviceDetail.value.deviceStatus.batteryPercent)) {
+                                        _cE("view", _uM("key" to 1, "class" to "info"), "电量: " + _tD(safeDeviceDetail.value.deviceStatus.batteryPercent) + "%", 1)
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
+                                    ,
+                                    if (isTrue(safeDeviceDetail.value.deviceStatus.voltage)) {
+                                        _cE("view", _uM("key" to 2, "class" to "info"), "电压: " + _tD(safeDeviceDetail.value.deviceStatus.voltage) + "V", 1)
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
+                                )),
                                 _cE("view", _uM("class" to "banner"), _uA(
                                     _cE("image", _uM("src" to `default`, "mode" to "aspectFit", "class" to "banner-image"))
                                 )),
@@ -1250,23 +1249,28 @@ open class GenPagesIndexIndex : BasePage {
                                             _cE("image", _uM("src" to default__6, "mode" to "aspectFit", "class" to "icon-image")),
                                             _cE("text", _uM("class" to "item-title"), "在线客服")
                                         )),
-                                        _cE("view", _uM("class" to "service-item", "onClick" to logout__1), _uA(
-                                            _cE("image", _uM("src" to default__7, "mode" to "aspectFit", "class" to "icon-image")),
-                                            _cE("text", _uM("class" to "item-title", "style" to _nS(_uM("color" to "#EE793A"))), "退出登录", 4)
-                                        )),
                                         _cE("view", _uM("class" to "service-item", "onClick" to unbindDevice), _uA(
-                                            _cE("image", _uM("src" to default__8, "mode" to "aspectFit", "class" to "icon-image")),
+                                            _cE("image", _uM("src" to default__7, "mode" to "aspectFit", "class" to "icon-image")),
                                             _cE("text", _uM("class" to "item-title", "style" to _nS(_uM("color" to "#d81e06"))), "删除设备", 4)
+                                        )),
+                                        _cE("view", _uM("class" to "service-item", "onClick" to logout__1), _uA(
+                                            _cE("image", _uM("src" to default__8, "mode" to "aspectFit", "class" to "icon-image")),
+                                            _cE("text", _uM("class" to "item-title", "style" to _nS(_uM("color" to "#EE793A"))), "退出登录", 4)
                                         ))
                                     ))
                                 ))
                             ))
                         )),
-                        _cV(_component_i_picker, _uM("show" to showPicker.value, "model-value" to pickerValue.value, "columns" to pickerColumns.value, "cancel-text" to "取消", "confirm-text" to "确认", "close-on-mask" to false, "show-input" to false, "onCancel" to closePicker, "onConfirm" to handlePickerConfirm, "onUpdate:show" to onPickerShowChange), null, 8, _uA(
-                            "show",
-                            "model-value",
-                            "columns"
-                        ))
+                        if (isTrue(showPicker.value)) {
+                            _cV(_component_i_picker, _uM("key" to 0, "show" to showPicker.value, "model-value" to pickerValue.value, "columns" to pickerColumns.value, "default-index" to pickerDefaultIndex.value, "cancel-text" to "取消", "confirm-text" to "确认", "close-on-mask" to false, "show-input" to false, "onCancel" to closePicker, "onConfirm" to handlePickerConfirm, "onUpdate:show" to onPickerShowChange), null, 8, _uA(
+                                "show",
+                                "model-value",
+                                "columns",
+                                "default-index"
+                            ))
+                        } else {
+                            _cC("v-if", true)
+                        }
                     )),
                     _cV(_component_app_toast),
                     _cV(_component_app_modal)
