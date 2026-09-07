@@ -189,7 +189,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 20rpx 0;
+  height: 100rpx;
 }
 .container .tools-panel .imei-box .signal-container .signal-item[class] {
   display: flex;
@@ -255,6 +255,7 @@
   background: #f0f8ff;
   padding: 10rpx 20rpx;
   border-radius: 10rpx;
+  margin-right: 10rpx;
 }
 .container .tools-panel .imei-box .signal-container .satellite-item-h .satellite-icon[class] {
   width: 47rpx;
@@ -281,6 +282,7 @@
   background: #f0f8ff;
   padding: 10rpx 20rpx;
   border-radius: 10rpx;
+  margin-right: 10rpx;
 }
 .container .tools-panel .imei-box .signal-container .power .satellite-text[class],
 .container .tools-panel .imei-box .signal-container .battery .satellite-text[class] {

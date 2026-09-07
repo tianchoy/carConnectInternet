@@ -30,15 +30,12 @@
 				<view class="pos-adress">
 					<view class="address-row">
 						<text class="address-label" style="margin-right:10rpx; font-size: 22rpx;">当前位置:</text>
-						<text v-if="address" class="address-text">{{address}}</text>
-						<text class="address-text" v-else>{{center.latitude}} , {{center.longitude}}</text>
-						<text v-if="!address" style="color: #007AFF; margin-left: 20rpx;font-weight: bold; font-size: 22rpx;"
-							@click="refreshAdress">中文地址</text>
+						<text v-if="currentCarInfo.address" class="address-text">{{currentCarInfo.address}}</text>
 					</view>
 				</view>
 				<!-- 信号强度显示区域 -->
 				<view class="signal-container">
-					<view v-if="signalRssi != null" class="signal-item">
+					<view class="signal-item">
 						<view class="mobile-signal">
 							<view class="signal-bars-horizontal">
 								<view class="signal-bar-h signal-bar-h-1"
@@ -64,18 +61,18 @@
 							</view>
 						</view>
 					</view>
-					<view v-if="signalSat != null" class="satellite-item-h">
+					<view class="satellite-item-h">
 						<image class="satellite-icon" src="/static/sate.png"></image>
 						<text class="satellite-text">{{signalSat}}</text>
 					</view>
-					<view class="power" v-if="carVoltage">
+					<view class="power">
 						<image class="power-icon" src="/static/v.png" />
-						<text class="satellite-text">{{carVoltage}}V</text>
+						<text class="satellite-text">{{carVoltage || 0}}V</text>
 					</view>
-					<view class="battery" v-if="batteryPercent"
+					<view class="battery"
 						:style="{ color: getBatteryColor(batteryPercent) }">
 						<image class="battery-icon" src="/static/pow.png" alt="" />
-						<text class="satellite-text">{{batteryPercent}}%</text>
+						<text class="satellite-text">{{batteryPercent || 0}}%</text>
 					</view>
 				</view>
 			</view>
@@ -1068,7 +1065,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 					display: flex;
 					flex-direction: row;
 					align-items: center;
-					padding: 20rpx 0;
+					height: 100rpx;
 
 
 					.signal-item {
@@ -1131,6 +1128,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 						background: #f0f8ff;
 						padding: 10rpx 20rpx;
 						border-radius: 10rpx;
+						margin-right: 10rpx;
 
 						.satellite-icon {
 							width: 47rpx;
@@ -1161,6 +1159,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 						background: #f0f8ff;
 						padding: 10rpx 20rpx;
 						border-radius: 10rpx;
+						margin-right: 10rpx;
 						
 						.satellite-text {
 							font-size: 24rpx;

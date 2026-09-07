@@ -197,8 +197,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     const lat = common_vendor.ref("");
     const lng = common_vendor.ref("");
-    const sTime = common_vendor.ref("");
-    const eTime = common_vendor.ref("");
     const markers = common_vendor.ref([]);
     function safeParseDate(dateStr) {
       var _a;
@@ -216,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:224", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:222", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -577,7 +575,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:710", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:708", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -689,11 +687,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       carType.value = (_d = option.carType) !== null && _d !== void 0 ? _d : "";
       lat.value = (_f = option.lat) !== null && _f !== void 0 ? _f : null;
       lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
-      sTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
-      eTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:839", "startTime:", sTime.value, "endTime:", eTime.value);
-      const routeStartTime = resolveRouteDateTime(sTime.value);
-      const routeEndTime = resolveRouteDateTime(eTime.value);
+      startTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
+      endTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:837", "startTime:", startTime.value, "endTime:", endTime.value);
+      const routeStartTime = resolveRouteDateTime(startTime.value);
+      const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {
         setPlaybackTimeRange(routeStartTime, routeEndTime);
         loadTrackPos();

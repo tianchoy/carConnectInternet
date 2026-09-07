@@ -109,8 +109,6 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val setPlaybackTimeRange = ::gen_setPlaybackTimeRange_fn
             val lat = ref<String?>("")
             val lng = ref<String?>("")
-            val sTime = ref("")
-            val eTime = ref("")
             val markers = ref(_uA<MapMarker>())
             fun gen_safeParseDate_fn(dateStr: String): Number {
                 return parseLocalDateTime(dateStr) ?: 0
@@ -611,11 +609,11 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 carType.value = option["carType"] ?: ""
                 lat.value = option["lat"] ?: null
                 lng.value = option["lng"] ?: null
-                sTime.value = option["startTime"] ?: ""
-                eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value)
-                val routeStartTime = resolveRouteDateTime(sTime.value)
-                val routeEndTime = resolveRouteDateTime(eTime.value)
+                startTime.value = option["startTime"] ?: ""
+                endTime.value = option["endTime"] ?: ""
+                console.log("startTime:", startTime.value, "endTime:", endTime.value)
+                val routeStartTime = resolveRouteDateTime(startTime.value)
+                val routeEndTime = resolveRouteDateTime(endTime.value)
                 if (routeStartTime != null && routeEndTime != null) {
                     setPlaybackTimeRange(routeStartTime, routeEndTime)
                     loadTrackPos()

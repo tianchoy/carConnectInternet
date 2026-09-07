@@ -6,22 +6,20 @@ const utils_formateTime = require("../../utils/formateTime.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
-  const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
-  const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
+  const _component_l_date_time_picker = common_vendor.resolveComponent("l-date-time-picker");
+  const _component_l_popup = common_vendor.resolveComponent("l-popup");
   const _easycom_i_empty_1 = common_vendor.resolveComponent("i-empty");
   const _easycom_i_tag_1 = common_vendor.resolveComponent("i-tag");
   const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
-  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_i_empty_1 + _easycom_i_tag_1 + _easycom_app_toast_1)();
+  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _component_l_date_time_picker + _component_l_popup + _easycom_i_empty_1 + _easycom_i_tag_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
-const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js";
-const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
 const _easycom_i_empty = () => "../../uni_modules/i-ui-x/components/i-empty/i-empty.js";
 const _easycom_i_tag = () => "../../uni_modules/i-ui-x/components/i-tag/i-tag.js";
 const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_i_empty + _easycom_i_tag + _easycom_app_toast)();
+  (_easycom_custom_navBar + _easycom_i_icon + _easycom_i_empty + _easycom_i_tag + _easycom_app_toast)();
 }
 class GroupType extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {

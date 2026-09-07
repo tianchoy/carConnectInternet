@@ -14,20 +14,18 @@ const utils_cars = require("../../utils/cars.js");
 if (!Array) {
   const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
   const _easycom_i_line_progress_1 = common_vendor.resolveComponent("i-line-progress");
-  const _easycom_l_picker_1 = common_vendor.resolveComponent("l-picker");
-  const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
+  const _component_l_picker = common_vendor.resolveComponent("l-picker");
+  const _component_l_popup = common_vendor.resolveComponent("l-popup");
   const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
   const _easycom_app_modal_1 = common_vendor.resolveComponent("app-modal");
-  (_easycom_i_icon_1 + _easycom_i_line_progress_1 + _easycom_l_picker_1 + _easycom_l_popup_1 + _easycom_app_toast_1 + _easycom_app_modal_1)();
+  (_easycom_i_icon_1 + _easycom_i_line_progress_1 + _component_l_picker + _component_l_popup + _easycom_app_toast_1 + _easycom_app_modal_1)();
 }
 const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
 const _easycom_i_line_progress = () => "../../uni_modules/i-ui-x/components/i-line-progress/i-line-progress.js";
-const _easycom_l_picker = () => "../../uni_modules/lime-picker/components/l-picker/l-picker.js";
-const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
 const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 const _easycom_app_modal = () => "../../components/app-modal/app-modal.js";
 if (!Math) {
-  (_easycom_i_icon + _easycom_i_line_progress + _easycom_l_picker + _easycom_l_popup + _easycom_app_toast + _easycom_app_modal)();
+  (_easycom_i_icon + _easycom_i_line_progress + _easycom_app_toast + _easycom_app_modal)();
 }
 class Device extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {

@@ -98,6 +98,7 @@
 
 	// 定时器相关
 	let checkTimer: number = 0
+	let scrollResumeTimer: number | null = null
 	const isPageActive = ref(false)
 	// 停止新消息检查
 	function stopNewMessageCheck() : void {
@@ -106,6 +107,24 @@
 			clearInterval(checkTimer)
 			checkTimer = 0
 		}
+	}
+
+	function stopScrollResumeTimer() : void {
+		if (scrollResumeTimer != null) {
+			clearTimeout(scrollResumeTimer)
+			scrollResumeTimer = null
+		}
+	}
+
+	function pauseNewMessageCheckWhileScrolling() : void {
+		stopNewMessageCheck()
+		stopScrollResumeTimer()
+		scrollResumeTimer = setTimeout(() => {
+			scrollResumeTimer = null
+			if (!isPageActive.value) return
+			startNewMessageCheck()
+			void checkNewMessages()
+		}, 10000)
 	}
 
 	// 震动报警函数
@@ -309,9 +328,11 @@
 	const finishPageLifecycle = (): void => {
 		isPageActive.value = false
 		stopNewMessageCheck()
+		stopScrollResumeTimer()
 	}
 
 	const resumePageLifecycle = (): void => {
+		stopScrollResumeTimer()
 		isPageActive.value = true
 		startNewMessageCheck()
 		void openPendingPushMessage()
@@ -381,6 +402,7 @@
 	}
 
 	const onMessageScroll = (event : UniScrollEvent) : void => {
+		pauseNewMessageCheckWhileScrolling()
 		// #ifdef APP-IOS
 		const viewportHeight = messageScrollViewportHeight.value
 		if (viewportHeight <= 0) return

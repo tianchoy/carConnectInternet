@@ -147,8 +147,6 @@ const center = reactive({
 
 	const lat = ref<string | null>('')
 	const lng = ref<string | null>('')
-	const sTime = ref('')
-	const eTime = ref('')
 
 	// 标记点集合
 	const markers = ref<Array<MapMarker>>([])
@@ -783,11 +781,11 @@ const center = reactive({
 		carType.value = option.carType ?? ''
 		lat.value = option.lat ?? null
 		lng.value = option.lng ?? null
-		sTime.value = option.startTime ?? ''
-		eTime.value = option.endTime ?? ''
-		console.log(sTime.value, eTime.value)
-		const routeStartTime = resolveRouteDateTime(sTime.value)
-		const routeEndTime = resolveRouteDateTime(eTime.value)
+		startTime.value = option.startTime ?? ''
+		endTime.value = option.endTime ?? ''
+		console.log('startTime:', startTime.value, 'endTime:', endTime.value)
+		const routeStartTime = resolveRouteDateTime(startTime.value)
+		const routeEndTime = resolveRouteDateTime(endTime.value)
 		if (routeStartTime != null && routeEndTime != null) {
 			setPlaybackTimeRange(routeStartTime, routeEndTime)
 			loadTrackPos()

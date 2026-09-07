@@ -959,8 +959,9 @@ function isCarSelected() : boolean {
 const toRecordDetail = () => {
     if (!isLogin()) return
     if (!isCarSelected()) return
+    const timeRange = getTodayZeroTime()
     uni.navigateTo({
-        url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude,
+        url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude + '&startTime=' + formatTimes(timeRange.todayZero) + '&endTime=' + formatTimes(timeRange.nowTime),
         fail: (err) => {
             if (err.errMsg.indexOf('locked') < 0) console.error('跳转轨迹详情失败:', err)
         }

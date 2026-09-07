@@ -843,7 +843,8 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isCarSelected()) {
                     return
                 }
-                uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude, fail = fun(err){
+                val timeRange = getTodayZeroTime()
+                uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude + "&startTime=" + formatTimes(timeRange.todayZero) + "&endTime=" + formatTimes(timeRange.nowTime), fail = fun(err){
                     if (err.errMsg.indexOf("locked") < 0) {
                         console.error("跳转轨迹详情失败:", err)
                     }
