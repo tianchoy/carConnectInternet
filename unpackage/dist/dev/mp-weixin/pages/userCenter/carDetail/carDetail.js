@@ -102,7 +102,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return new VehicleEditInfo({
         deviceName: carInfo.value.getString("deviceName", ""),
         carType,
-        carTypeValue: carType,
+        carTypeValue: carTitle.value,
         plateNo: carInfo.value.getString("plateNo", ""),
         carVin: carInfo.value.getString("carVin", ""),
         engineNum: carInfo.value.getString("engineNum", "")
