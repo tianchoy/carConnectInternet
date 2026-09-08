@@ -447,6 +447,35 @@
   flex-direction: column;
   align-items: center;
 }
+.container .page-bg .content .service .service-content .service-item .message-icon-wrap[class].data-v-00a60067 {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80rpx;
+  height: 80rpx;
+  overflow: visible;
+}
+.container .page-bg .content .service .service-content .service-item .message-unread-badge[class].data-v-00a60067 {
+  position: absolute;
+  top: 0;
+  right: -5rpx;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30rpx;
+  height: 30rpx;
+  box-sizing: border-box;
+  padding: 0 6rpx;
+  border-radius: 14rpx;
+  background-color: #f44;
+  color: #fff;
+  font-size: 18rpx;
+  line-height: 28rpx;
+  text-align: center;
+  white-space: nowrap;
+}
 .container .page-bg .content .service .service-content .service-item .icon-image[class].data-v-00a60067 {
   width: 60rpx;
   height: 60rpx;

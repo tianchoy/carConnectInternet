@@ -43,6 +43,7 @@ const _cache = __ins.renderCache;
 
 	// 定时器相关
 	let checkTimer: number = 0
+	let scrollResumeTimer: number | null = null
 	const isPageActive = ref(false)
 	// 停止新消息检查
 	function stopNewMessageCheck() : void {
@@ -50,6 +51,14 @@ const _cache = __ins.renderCache;
 			console.log('停止定时消息检查')
 			clearInterval(checkTimer)
 			checkTimer = 0
+		}
+	}
+
+	function stopScrollResumeTimer() : void {
+		const timer: number | null = scrollResumeTimer
+		if (timer != null) {
+			clearTimeout(timer)
+			scrollResumeTimer = null
 		}
 	}
 
@@ -64,21 +73,30 @@ const _cache = __ins.renderCache;
 		if (isListLoading.value || isCheckingNewMessages.value) return 0
 		isCheckingNewMessages.value = true
 		try {
-			const res = await getUserMsgList({ page: 1, pageSize: 50 })
+			const res = await getUserMsgList({ page: 1, pageSize: 10 })
 			const pageData = res.data
 			if (res.code != 200 || pageData == null) return 0
 			const latestList : Array<UTSJSONObject> = pageData.list
 
 			const existingIds = new Set<string>()
+			let latestLoadedTime : number | null = null
 			msgList.value.forEach((message : UTSJSONObject) : void => {
 				const messageId = message.getString('messageId', '')
 				if (messageId != '') existingIds.add(messageId)
+				const messageTime = parseLocalDateTime(message.getString('createTime', ''))
+				if (messageTime != null && (latestLoadedTime == null || messageTime > latestLoadedTime)) {
+					latestLoadedTime = messageTime
+				}
 			})
 
 			const latestMessages : Array<UTSJSONObject> = []
 			latestList.forEach((message : UTSJSONObject) : void => {
 				const messageId = message.getString('messageId', '')
-				if (messageId != '' && !existingIds.has(messageId)) {
+				const messageTime = parseLocalDateTime(message.getString('createTime', ''))
+				const isNewerThanLoaded = latestLoadedTime == null
+					? msgList.value.length == 0
+					: messageTime != null && messageTime > latestLoadedTime
+				if (messageId != '' && !existingIds.has(messageId) && isNewerThanLoaded) {
 					existingIds.add(messageId)
 					latestMessages.push(message)
 				}
@@ -120,6 +138,17 @@ const _cache = __ins.renderCache;
 				console.log('定时检查新消息...')
 				checkNewMessages()
 			}
+		}, 10000)
+	}
+
+	function pauseNewMessageCheckWhileScrolling() : void {
+		stopNewMessageCheck()
+		stopScrollResumeTimer()
+		scrollResumeTimer = setTimeout(() => {
+			scrollResumeTimer = null
+			if (!isPageActive.value) return
+			startNewMessageCheck()
+			void checkNewMessages()
 		}, 10000)
 	}
 
@@ -254,9 +283,11 @@ const _cache = __ins.renderCache;
 	const finishPageLifecycle = (): void => {
 		isPageActive.value = false
 		stopNewMessageCheck()
+		stopScrollResumeTimer()
 	}
 
 	const resumePageLifecycle = (): void => {
+		stopScrollResumeTimer()
 		isPageActive.value = true
 		startNewMessageCheck()
 		void openPendingPushMessage()
@@ -326,6 +357,7 @@ const _cache = __ins.renderCache;
 	}
 
 	const onMessageScroll = (event : UniScrollEvent) : void => {
+		pauseNewMessageCheckWhileScrolling()
 
 
 

@@ -2,8 +2,12 @@
 const common_vendor = require("../../../common/vendor.js");
 if (!Array) {
   const _component_l_icon = common_vendor.resolveComponent("l-icon");
-  const _component_l_popup = common_vendor.resolveComponent("l-popup");
-  (_component_l_icon + _component_l_popup)();
+  const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
+  (_component_l_icon + _easycom_l_popup_1)();
+}
+const _easycom_l_popup = () => "../../lime-popup/components/l-popup/l-popup.js";
+if (!Math) {
+  _easycom_l_popup();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",

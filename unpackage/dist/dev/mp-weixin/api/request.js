@@ -35,6 +35,7 @@ const appCommandListUrl = "/app/command/list";
 const appCommandDetailUrl = "/app/command/";
 const appCommandRetryUrl = "/app/command/retry/";
 const pushUnbindUrl = "/app/push/unbind";
+const messageUnreadCountUrl = "/app/message/unreadCount";
 class BasicResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -651,6 +652,29 @@ class MessageResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class MessageUnreadCountResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: Number, optional: false }
+        };
+      },
+      name: "MessageUnreadCountResponse"
+    };
+  }
+  constructor(options, metadata = MessageUnreadCountResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
 function basicResponse(raw = null) {
   const response = api_response.asJSONObject(raw);
   return new BasicResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response) });
@@ -857,6 +881,16 @@ const setMsgState = (msgId) => {
     return basicResponse(raw);
   });
 };
+const getMessageUnreadCount = () => {
+  return api_http.getSilently(messageUnreadCountUrl).then((raw = null) => {
+    const response = api_response.asJSONObject(raw);
+    return new MessageUnreadCountResponse({
+      code: api_response.getResponseCode(response),
+      msg: api_response.getResponseMessage(response),
+      data: response.getNumber("data", 0)
+    });
+  });
+};
 const editDeviceInfo = (data) => {
   return api_http.put(updateDevice, data).then((raw = null) => {
     return basicResponse(raw);
@@ -963,6 +997,7 @@ exports.getBoundDevices = getBoundDevices;
 exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
 exports.getGeofenceList = getGeofenceList;
+exports.getMessageUnreadCount = getMessageUnreadCount;
 exports.getTrackPos = getTrackPos;
 exports.getUnboundDevices = getUnboundDevices;
 exports.getUserDeviceList = getUserDeviceList;

@@ -48,6 +48,7 @@ open class GenPagesMessageMessage : BasePage {
             }
             )
             var checkTimer: Number = 0
+            var scrollResumeTimer: Number? = null
             val isPageActive = ref(false)
             fun gen_stopNewMessageCheck_fn(): Unit {
                 if (checkTimer > 0) {
@@ -57,6 +58,14 @@ open class GenPagesMessageMessage : BasePage {
                 }
             }
             val stopNewMessageCheck = ::gen_stopNewMessageCheck_fn
+            fun gen_stopScrollResumeTimer_fn(): Unit {
+                val timer: Number? = scrollResumeTimer
+                if (timer != null) {
+                    clearTimeout(timer)
+                    scrollResumeTimer = null
+                }
+            }
+            val stopScrollResumeTimer = ::gen_stopScrollResumeTimer_fn
             fun gen_vibrateAlert_fn(): Unit {
                 run {
                     var i: Number = 0
@@ -74,24 +83,35 @@ open class GenPagesMessageMessage : BasePage {
                         }
                         isCheckingNewMessages.value = true
                         try {
-                            val res = await(getUserMsgList(_uO("page" to 1, "pageSize" to 50)))
+                            val res = await(getUserMsgList(_uO("page" to 1, "pageSize" to 10)))
                             val pageData = res.data
                             if (res.code != 200 || pageData == null) {
                                 return@w1 0
                             }
                             val latestList: UTSArray<UTSJSONObject> = pageData.list
                             val existingIds = Set<String>()
+                            var latestLoadedTime: Number? = null
                             msgList.value.forEach(fun(message: UTSJSONObject): Unit {
                                 val messageId = message.getString("messageId", "")
                                 if (messageId != "") {
                                     existingIds.add(messageId)
+                                }
+                                val messageTime = parseLocalDateTime(message.getString("createTime", ""))
+                                if (messageTime != null && (latestLoadedTime == null || messageTime > latestLoadedTime)) {
+                                    latestLoadedTime = messageTime
                                 }
                             }
                             )
                             val latestMessages: UTSArray<UTSJSONObject> = _uA()
                             latestList.forEach(fun(message: UTSJSONObject): Unit {
                                 val messageId = message.getString("messageId", "")
-                                if (messageId != "" && !existingIds.has(messageId)) {
+                                val messageTime = parseLocalDateTime(message.getString("createTime", ""))
+                                val isNewerThanLoaded = if (latestLoadedTime == null) {
+                                    msgList.value.length == 0
+                                } else {
+                                    messageTime != null && messageTime > latestLoadedTime
+                                }
+                                if (messageId != "" && !existingIds.has(messageId) && isNewerThanLoaded) {
                                     existingIds.add(messageId)
                                     latestMessages.push(message)
                                 }
@@ -140,6 +160,20 @@ open class GenPagesMessageMessage : BasePage {
                 , 10000)
             }
             val startNewMessageCheck = ::gen_startNewMessageCheck_fn
+            fun gen_pauseNewMessageCheckWhileScrolling_fn(): Unit {
+                stopNewMessageCheck()
+                stopScrollResumeTimer()
+                scrollResumeTimer = setTimeout(fun(){
+                    scrollResumeTimer = null
+                    if (!isPageActive.value) {
+                        return
+                    }
+                    startNewMessageCheck()
+                    checkNewMessages()
+                }
+                , 10000)
+            }
+            val pauseNewMessageCheckWhileScrolling = ::gen_pauseNewMessageCheckWhileScrolling_fn
             fun loadMsgList(isInit: Boolean = false): UTSPromise<Boolean> {
                 return wrapUTSPromise(suspend w1@{
                         if (isListLoading.value || isCheckingNewMessages.value) {
@@ -306,8 +340,10 @@ open class GenPagesMessageMessage : BasePage {
             val finishPageLifecycle = fun(): Unit {
                 isPageActive.value = false
                 stopNewMessageCheck()
+                stopScrollResumeTimer()
             }
             val resumePageLifecycle = fun(): Unit {
+                stopScrollResumeTimer()
                 isPageActive.value = true
                 startNewMessageCheck()
                 openPendingPushMessage()
@@ -377,7 +413,9 @@ open class GenPagesMessageMessage : BasePage {
                     loadMore()
                 }
             }
-            val onMessageScroll = fun(event: UniScrollEvent): Unit {}
+            val onMessageScroll = fun(event: UniScrollEvent): Unit {
+                pauseNewMessageCheckWhileScrolling()
+            }
             val ReadIt = fun(){
                 modal.value = false
             }

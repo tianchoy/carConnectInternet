@@ -162,7 +162,10 @@
                     <text class="service-header">服务中心</text>
                     <view class="service-content">
                         <view class="service-item" @click="toMsgCenter">
-                            <image src="../../static/msg.png" mode="aspectFit" class="icon-image"></image>
+                            <view class="message-icon-wrap">
+                                <image src="../../static/msg.png" mode="aspectFit" class="icon-image"></image>
+                                <text v-if="unreadMessageCount > 0" class="message-unread-badge">{{unreadMessageBadgeText}}</text>
+                            </view>
                             <text class="item-title">警报消息</text>
                         </view>
                         <view class="service-item" @tap="toPay(currentCarIccId,currentCarSimMerchant)">
@@ -214,7 +217,7 @@ import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { clearPushSessionState } from '../../services/push.uts'
 import { unbindPushDeviceOnLogout } from '../../services/push-binding.uts'
-import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest } from '../../api/request.uts'
+import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
@@ -291,6 +294,8 @@ const currentCarSimMerchant = ref('')
 const currentCarConnectionStatus = ref('')
 const currentCarCarType = ref('')
 const currentCarPlateNo = ref('')
+const unreadMessageCount = ref(0)
+const unreadMessageBadgeText = computed<string>(() => unreadMessageCount.value > 99 ? '99+' : unreadMessageCount.value.toString())
 
 type DeviceStatus = {
     batteryPercent: number
@@ -1141,6 +1146,22 @@ function isCarSelected() : boolean {
     return true
 }
 
+async function loadUnreadMessageCount(): Promise<void> {
+    if (!checkToken()) {
+        unreadMessageCount.value = 0
+        return
+    }
+    try {
+        const res = await getMessageUnreadCount()
+        console.log('加载未读消息数量:', res)
+        if (checkToken() && res.code == 200 && res.data >= 0) {
+            unreadMessageCount.value = res.data
+        }
+    } catch (error) {
+        console.error('加载未读消息数量失败:', error)
+    }
+}
+
 // 跳转轨迹详情
 const toRecordDetail = () => {
     if (!isLogin()) return
@@ -1356,6 +1377,7 @@ const logout = (): void => {
 
 onShow(async () => {
     if (checkToken()) {
+        await loadUnreadMessageCount()
         const needRefresh = uni.getStorageSync('needRefreshHome')
         if (needRefresh) {
             await loadDeviceList()
@@ -1376,6 +1398,7 @@ onLoad(() => {
     initDimensions()
 
     if (checkToken()) {
+        loadUnreadMessageCount()
         loadDeviceList()
     }
 })
@@ -1831,6 +1854,35 @@ onLoad(() => {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
+                    .message-icon-wrap {
+                        position: relative;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 80rpx;
+                        height: 80rpx;
+                        overflow: visible;
+                    }
+                    .message-unread-badge {
+                        position: absolute;
+                        top: 0;
+                        right: -5rpx;
+                        z-index: 10;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-width: 30rpx;
+                        height: 30rpx;
+                        box-sizing: border-box;
+                        padding: 0 6rpx;
+                        border-radius: 14rpx;
+                        background-color: #f44;
+                        color: #fff;
+                        font-size: 18rpx;
+                        line-height: 28rpx;
+                        text-align: center;
+                        white-space: nowrap;
+                    }
                     .icon-image{
                         width: 60rpx;
                         height: 60rpx;

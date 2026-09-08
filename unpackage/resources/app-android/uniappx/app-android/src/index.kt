@@ -736,6 +736,9 @@ fun request(options: RequestOptions__1): UTSPromise<Any> {
 fun get(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
     return request(RequestOptions__1(url = url, method = "GET", data = data, header = options.header, showLoading = options.showLoading, showError = options.showError))
 }
+fun getSilently(url: String, data: Any = _uO()): UTSPromise<Any> {
+    return request(RequestOptions__1(url = url, method = "GET", data = data, showLoading = false, showError = false))
+}
 fun post(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
     return request(RequestOptions__1(url = url, method = "POST", data = data, header = options.header, showLoading = options.showLoading, showError = options.showError))
 }
@@ -813,6 +816,7 @@ val appCommandDetailUrl = "/app/command/"
 val appCommandRetryUrl = "/app/command/retry/"
 val pushBindUrl = "/app/push/bind"
 val pushUnbindUrl = "/app/push/unbind"
+val messageUnreadCountUrl = "/app/message/unreadCount"
 open class BasicResponse (
     @JsonNotNull
     open var code: Number,
@@ -1007,6 +1011,14 @@ open class MessageResponse (
     open var msg: String,
     @JsonNotNull
     open var data: UserDeviceListData,
+) : UTSObject()
+open class MessageUnreadCountResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: Number,
 ) : UTSObject()
 fun basicResponse(raw: Any): BasicResponse {
     val response = asJSONObject(raw)
@@ -1243,6 +1255,13 @@ val getUserMsgList = fun(data: UTSJSONObject?): UTSPromise<MessageResponse> {
 val setMsgState = fun(msgId: String): UTSPromise<BasicResponse> {
     return get("" + msgState + msgId).then(fun(raw: Any): BasicResponse {
         return basicResponse(raw)
+    }
+    )
+}
+val getMessageUnreadCount = fun(): UTSPromise<MessageUnreadCountResponse> {
+    return getSilently(messageUnreadCountUrl).then(fun(raw: Any): MessageUnreadCountResponse {
+        val response = asJSONObject(raw)
+        return MessageUnreadCountResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = response.getNumber("data", 0))
     }
     )
 }
@@ -6049,43 +6068,6 @@ val GenUniModulesIUiXComponentsIGridIGridClass = CreateVueComponent(GenUniModule
     return GenUniModulesIUiXComponentsIGridIGrid(instance)
 }
 )
-val DEFAULT_TK = "1e3374be3d63de65d44dbfdc7b311afb"
-open class AddressResult (
-    @JsonNotNull
-    open var formatted_address: String,
-) : UTSObject()
-open class AddressResponse (
-    @JsonNotNull
-    open var result: AddressResult,
-) : UTSObject()
-fun getAddress(latitude: Number, longitude: Number, tk: String = DEFAULT_TK): UTSPromise<AddressResponse> {
-    return UTSPromise<AddressResponse>(fun(resolve, reject){
-        val postStr = JSON.stringify(_uO("lon" to longitude, "lat" to latitude, "ver" to 1))
-        uni_request<Any>(RequestOptions(url = "https://api.tianditu.gov.cn/geocoder?postStr=" + encodeURIComponent(postStr) + "&type=geocode&tk=" + tk, method = "GET", header = _uO("User-Agent" to "Mozilla/5.0"), success = fun(res: RequestSuccess<Any>){
-            if (res.statusCode != 200 || res.data == null) {
-                reject(UTSError("获取地址信息失败，状态码：" + res.statusCode))
-                return
-            }
-            val response = res.data as UTSJSONObject
-            val result = response.getJSON("result")
-            if (result == null) {
-                reject(UTSError("获取地址信息失败：" + response.getString("msg", "响应缺少结果")))
-                return
-            }
-            val formattedAddress = result.getString("formatted_address", "")
-            if (formattedAddress == "") {
-                reject(UTSError("获取地址信息失败：响应缺少地址"))
-                return
-            }
-            resolve(AddressResponse(result = AddressResult(formatted_address = formattedAddress)))
-        }
-        , fail = fun(err: RequestFail){
-            reject(err)
-        }
-        ))
-    }
-    )
-}
 fun __uts_large_list_fill_fill_1(__arr: UTSArray<UTSJSONObject>): Unit {
     __arr.push(_uO("image" to "/static/gjhf.png", "text" to "轨迹回放"))
     __arr.push(_uO("image" to "/static/clgz.png", "text" to "车辆跟踪"))

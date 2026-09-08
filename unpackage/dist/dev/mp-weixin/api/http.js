@@ -283,6 +283,15 @@ function get(url, data = new common_vendor.UTSJSONObject({}), options = new Requ
     showError: options.showError
   }));
 }
+function getSilently(url, data = new common_vendor.UTSJSONObject({})) {
+  return request(new common_vendor.UTSJSONObject({
+    url,
+    method: "GET",
+    data,
+    showLoading: false,
+    showError: false
+  }));
+}
 function post(url, data = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
   url: null,
   method: null,
@@ -344,6 +353,7 @@ function remove(url, data = new common_vendor.UTSJSONObject({}), options = new R
   }));
 }
 exports.get = get;
+exports.getSilently = getSilently;
 exports.post = post;
 exports.postSilently = postSilently;
 exports.put = put;

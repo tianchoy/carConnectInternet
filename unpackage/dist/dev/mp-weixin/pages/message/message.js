@@ -51,21 +51,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     function stopScrollResumeTimer() {
-      if (scrollResumeTimer != null) {
-        clearTimeout(scrollResumeTimer);
+      const timer = scrollResumeTimer;
+      if (timer != null) {
+        clearTimeout(timer);
         scrollResumeTimer = null;
       }
-    }
-    function pauseNewMessageCheckWhileScrolling() {
-      stopNewMessageCheck();
-      stopScrollResumeTimer();
-      scrollResumeTimer = setTimeout(() => {
-        scrollResumeTimer = null;
-        if (!isPageActive.value)
-          return null;
-        startNewMessageCheck();
-        void checkNewMessages();
-      }, 1e4);
     }
     function vibrateAlert() {
       for (let i = 0; i < 3; i++) {
@@ -78,21 +68,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return 0;
         isCheckingNewMessages.value = true;
         try {
-          const res = yield api_request.getUserMsgList(new common_vendor.UTSJSONObject({ page: 1, pageSize: 50 }));
+          const res = yield api_request.getUserMsgList(new common_vendor.UTSJSONObject({ page: 1, pageSize: 10 }));
           const pageData = res.data;
           if (res.code != 200 || pageData == null)
             return 0;
           const latestList = pageData.list;
           const existingIds = /* @__PURE__ */ new Set();
+          let latestLoadedTime = null;
           msgList.value.forEach((message) => {
             const messageId = message.getString("messageId", "");
             if (messageId != "")
               existingIds.add(messageId);
+            const messageTime = utils_formateTime.parseLocalDateTime(message.getString("createTime", ""));
+            if (messageTime != null && (latestLoadedTime == null || messageTime > latestLoadedTime)) {
+              latestLoadedTime = messageTime;
+            }
           });
           const latestMessages = [];
           latestList.forEach((message) => {
             const messageId = message.getString("messageId", "");
-            if (messageId != "" && !existingIds.has(messageId)) {
+            const messageTime = utils_formateTime.parseLocalDateTime(message.getString("createTime", ""));
+            const isNewerThanLoaded = latestLoadedTime == null ? msgList.value.length == 0 : messageTime != null && messageTime > latestLoadedTime;
+            if (messageId != "" && !existingIds.has(messageId) && isNewerThanLoaded) {
               existingIds.add(messageId);
               latestMessages.push(message);
             }
@@ -102,7 +99,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           return latestMessages.length;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/message/message.uvue:166", "检查新消息失败:", error);
+          common_vendor.index.__f__("error", "at pages/message/message.uvue:165", "检查新消息失败:", error);
           return 0;
         } finally {
           isCheckingNewMessages.value = false;
@@ -125,12 +122,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (checkTimer > 0) {
         stopNewMessageCheck();
       }
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:190", "启动定时消息检查");
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:189", "启动定时消息检查");
       checkTimer = setInterval(() => {
         if (isPageActive.value) {
-          common_vendor.index.__f__("log", "at pages/message/message.uvue:194", "定时检查新消息...");
+          common_vendor.index.__f__("log", "at pages/message/message.uvue:193", "定时检查新消息...");
           checkNewMessages();
         }
+      }, 1e4);
+    }
+    function pauseNewMessageCheckWhileScrolling() {
+      stopNewMessageCheck();
+      stopScrollResumeTimer();
+      scrollResumeTimer = setTimeout(() => {
+        scrollResumeTimer = null;
+        if (!isPageActive.value)
+          return null;
+        startNewMessageCheck();
+        void checkNewMessages();
       }, 1e4);
     }
     function loadMsgList(isInit = false) {
@@ -189,7 +197,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return true;
         } catch (error) {
           loadStatus.value = "loadmore";
-          common_vendor.index.__f__("error", "at pages/message/message.uvue:251", "请求异常:", error);
+          common_vendor.index.__f__("error", "at pages/message/message.uvue:261", "请求异常:", error);
           return false;
         } finally {
           isListLoading.value = false;
@@ -198,11 +206,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function loadNewMessages() {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/message/message.uvue:260", "加载新消息");
+        common_vendor.index.__f__("log", "at pages/message/message.uvue:270", "加载新消息");
         yield prependLatestMessages();
         hasNewMessages.value = false;
         newMessageCount.value = 0;
-        common_vendor.index.__f__("log", "at pages/message/message.uvue:264", "新消息加载完成");
+        common_vendor.index.__f__("log", "at pages/message/message.uvue:274", "新消息加载完成");
       });
     }
     common_vendor.onLoad(() => {
@@ -244,7 +252,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               }
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/message/message.uvue:307", "更新状态失败:", error);
+            common_vendor.index.__f__("error", "at pages/message/message.uvue:317", "更新状态失败:", error);
           }
         }
       });
@@ -286,30 +294,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onShow(() => {
       if (!Login.value)
         return null;
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:345", "页面显示 - 启动自动刷新");
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:355", "页面显示 - 启动自动刷新");
       measureMessageScrollViewport();
       resumePageLifecycle();
     });
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:351", "页面隐藏 - 停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:361", "页面隐藏 - 停止自动刷新");
       finishPageLifecycle();
     });
     common_vendor.onUnload(() => {
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:356", "页面卸载 - 清理资源");
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:366", "页面卸载 - 清理资源");
       finishPageLifecycle();
     });
     common_vendor.onActivated(() => {
       if (!Login.value)
         return null;
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:362", "页面激活 - 启动自动刷新");
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:372", "页面激活 - 启动自动刷新");
       resumePageLifecycle();
     });
     common_vendor.onDeactivated(() => {
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:367", "页面停用 - 停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:377", "页面停用 - 停止自动刷新");
       finishPageLifecycle();
     });
     const onRefresherRefresh = () => {
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:373", "下拉刷新触发");
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:383", "下拉刷新触发");
       refresherTriggered.value = true;
       loadMsgList(true).then(() => {
         refresherTriggered.value = false;

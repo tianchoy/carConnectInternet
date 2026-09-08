@@ -245,6 +245,17 @@ export function get(url: string, data: any = {}, options: RequestOptions = {} as
     })
 }
 
+// 静默发送 GET 请求
+export function getSilently(url: string, data: any = {}): Promise<any> {
+    return request({
+        url: url,
+        method: 'GET',
+        data: data,
+        showLoading: false,
+        showError: false
+    })
+}
+
 export function post(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<any> {
     return request({
         url: url,
