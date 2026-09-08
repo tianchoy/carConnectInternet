@@ -83,8 +83,11 @@ import { showAppToast } from '../../utils/toast.uts'
 	const isMapReady = ref(false)
 	const temporaryRenderPoints = ref<Array<CoordinatePoint>>([])
 	const TRACKING_POLL_INTERVAL_MS = 1000
-	const TRACKING_ANIMATION_DURATION_MS = 900
 	const MAX_POSITION_JUMP_DISTANCE = 500
+	const TRACKING_FRAME_INTERVAL_MS = 30
+	const MIN_TRACKING_ANIMATION_DURATION_MS = 500
+	const MAX_TRACKING_ANIMATION_DURATION_MS = 2800
+	const FALLBACK_TRACKING_SPEED_KMH = 20
 	// #ifdef APP-ANDROID
 	const polyline = ref<Array<Polyline>>([])
 	// #endif
@@ -308,31 +311,11 @@ import { showAppToast } from '../../utils/toast.uts'
 		return R * c
 	}
 
-	// 根据实际速度和距离计算动画时长
+	// 根据两点距离和车辆速度计算动画时长，确保车辆以近似真实速度匀速移动。
 	const calculateRealisticAnimationDuration = (distance : number, speedKmh : number) : number => {
-		if (speedKmh <= 0 || distance <= 0) {
-			return 2000 // 静止状态使用固定时长
-		}
-
-		// 将速度从 km/h 转换为 m/s
-		const speedMs = speedKmh / 3.6
-
-		// 计算真实需要的时间
-		const realTimeSeconds = distance / speedMs
-
-		// 转换为毫秒，并限制在合理范围内
-		let duration = realTimeSeconds * 1000
-
-		// 限制最小和最大动画时长
-		if (duration < 1000) duration = 1000 // 最小1秒
-		if (duration > 2800) duration = 2800 // 小于轮询周期，避免过期定位在队列中滞后播放
-
-		// 低速运动
-		if (speedKmh < 10 && duration < 2000) {
-			duration = 2000
-		}
-
-		return duration
+		const validSpeed = speedKmh > 0 && isFinite(speedKmh) ? speedKmh : FALLBACK_TRACKING_SPEED_KMH
+		const duration = distance / (validSpeed / 3.6) * 1000
+		return Math.min(MAX_TRACKING_ANIMATION_DURATION_MS, Math.max(MIN_TRACKING_ANIMATION_DURATION_MS, duration))
 	}
 
 	// 计算最短旋转路径
@@ -400,30 +383,45 @@ import { showAppToast } from '../../utils/toast.uts'
 		polyline.value = []
 	}
 
-	const startPositionAnimation = (duration : number, sessionId : number, done : () => void) => {
+	const startPositionAnimation = (distance : number, speedKmh : number, sessionId : number, done : () => void) => {
 		if (animationTimer.value != null) clearInterval(animationTimer.value as number)
 		isAnimating.value = true
+		const duration = calculateRealisticAnimationDuration(distance, speedKmh)
 		const begin = Date.now(), lat = currentPosition.latitude, lng = currentPosition.longitude, rot = currentRotation.value
 		const latDiff = targetPosition.latitude - lat, lngDiff = targetPosition.longitude - lng, rotDiff = calculateShortestRotation(rot, targetRotation.value)
 		let lastDraw = begin
-				animationTimer.value = setInterval(() => {
+		animationTimer.value = setInterval(() => {
 			if (!isTracking.value || sessionId != trackingSessionId) return
 			const now = Date.now(), progress = Math.min((now - begin) / duration, 1)
-			currentPosition.latitude = lat + latDiff * progress; currentPosition.longitude = lng + lngDiff * progress
-			currentRotation.value = normalizeRotation(rot + rotDiff * progress); center.latitude = currentPosition.latitude; center.longitude = currentPosition.longitude
+			currentPosition.latitude = lat + latDiff * progress
+			currentPosition.longitude = lng + lngDiff * progress
+			currentRotation.value = normalizeRotation(rot + rotDiff * progress)
+			center.latitude = currentPosition.latitude
+			center.longitude = currentPosition.longitude
 			if (now - lastDraw >= MARKER_UPDATE_INTERVAL || progress >= 1) {
 				updateMarkerSmooth()
 				updateTrackingPolyline()
 				lastDraw = now
 			}
-			if (progress >= 1) { clearInterval(animationTimer.value as number); animationTimer.value = null; isAnimating.value = false; currentPosition.latitude = targetPosition.latitude; currentPosition.longitude = targetPosition.longitude; currentRotation.value = normalizeRotation(targetRotation.value); updateMarkerSmooth(); appendTemporaryRenderPoint(currentPosition); done() }
-		}, 30) as number
+			if (progress >= 1) {
+				clearInterval(animationTimer.value as number)
+				animationTimer.value = null
+				isAnimating.value = false
+				currentPosition.latitude = targetPosition.latitude
+				currentPosition.longitude = targetPosition.longitude
+				currentRotation.value = normalizeRotation(targetRotation.value)
+				updateMarkerSmooth()
+				appendTemporaryRenderPoint(currentPosition)
+				done()
+			}
+		}, TRACKING_FRAME_INTERVAL_MS) as number
 	}
 	function processAnimationQueue(sessionId : number) : void {
 		if (!isTracking.value || sessionId != trackingSessionId || animationQueue.value.length == 0) { isProcessingQueue.value = false; return }
 		isProcessingQueue.value = true; const next = animationQueue.value.shift() as AnimationQueueItem
 		targetPosition.latitude = next.position.latitude; targetPosition.longitude = next.position.longitude; targetRotation.value = next.rotation; currentSpeed.value = next.speed; currentAddress.value = next.address; connectionStatus.value = next.connectionStatus
-		startPositionAnimation(TRACKING_ANIMATION_DURATION_MS, sessionId, () => { if (!isTracking.value || sessionId != trackingSessionId) return; isProcessingQueue.value = false; if (animationQueue.value.length > 0) setTimeout(() => processAnimationQueue(sessionId), 50) })
+		const distance = calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude)
+		startPositionAnimation(distance, next.speed, sessionId, () => { if (!isTracking.value || sessionId != trackingSessionId) return; isProcessingQueue.value = false; if (animationQueue.value.length > 0) setTimeout(() => processAnimationQueue(sessionId), 50) })
 	}
 	function acceptLivePosition(item : UTSJSONObject, position : CoordinatePoint, positionTime : string, sessionId : number) : void {
 		const direction = item.getNumber('direction', lastDirection.value)

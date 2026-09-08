@@ -100,8 +100,11 @@ class MpPolylineData extends common_vendor.UTS.UTSType {
   }
 }
 const TRACKING_POLL_INTERVAL_MS = 1e3;
-const TRACKING_ANIMATION_DURATION_MS = 900;
 const MAX_POSITION_JUMP_DISTANCE = 500;
+const TRACKING_FRAME_INTERVAL_MS = 30;
+const MIN_TRACKING_ANIMATION_DURATION_MS = 500;
+const MAX_TRACKING_ANIMATION_DURATION_MS = 2800;
+const FALLBACK_TRACKING_SPEED_KMH = 20;
 const MARKER_UPDATE_INTERVAL = 30;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "vehicleTracking",
@@ -244,7 +247,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:248", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:251", "获取初始位置失败:", err);
           utils_toast.showAppToast({
             title: "网络请求失败",
             icon: "none"
@@ -261,7 +264,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const marker = createVehicleMarker(iconPath);
       markers.value = [marker];
       markerInitialized.value = true;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:269", "初始化标记点完成");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:272", "初始化标记点完成");
     }
     function calculateMapRotation(direction) {
       let rotation = direction;
@@ -280,7 +283,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     common_vendor.onLoad((option) => {
       var _a, _b, _c, _d, _f;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:290", "option", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:293", "option", option);
       connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
       imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
       currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
@@ -295,6 +298,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
+    };
+    const calculateRealisticAnimationDuration = (distance, speedKmh) => {
+      const validSpeed = speedKmh > 0 && isFinite(speedKmh) ? speedKmh : FALLBACK_TRACKING_SPEED_KMH;
+      const duration = distance / (validSpeed / 3.6) * 1e3;
+      return Math.min(MAX_TRACKING_ANIMATION_DURATION_MS, Math.max(MIN_TRACKING_ANIMATION_DURATION_MS, duration));
     };
     function calculateShortestRotation(from, to) {
       let diff = to - from;
@@ -357,10 +365,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       temporaryRenderPoints.value = [];
       polyline.value = [];
     }
-    const startPositionAnimation = (duration, sessionId, done) => {
+    const startPositionAnimation = (distance, speedKmh, sessionId, done) => {
       if (animationTimer.value != null)
         clearInterval(animationTimer.value);
       isAnimating.value = true;
+      const duration = calculateRealisticAnimationDuration(distance, speedKmh);
       const begin = Date.now(), lat = currentPosition.latitude, lng = currentPosition.longitude, rot = currentRotation.value;
       const latDiff = targetPosition.latitude - lat, lngDiff = targetPosition.longitude - lng, rotDiff = calculateShortestRotation(rot, targetRotation.value);
       let lastDraw = begin;
@@ -389,7 +398,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           appendTemporaryRenderPoint(currentPosition);
           done();
         }
-      }, 30);
+      }, TRACKING_FRAME_INTERVAL_MS);
     };
     function processAnimationQueue(sessionId) {
       if (!isTracking.value || sessionId != trackingSessionId || animationQueue.value.length == 0) {
@@ -404,7 +413,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentSpeed.value = next.speed;
       currentAddress.value = next.address;
       connectionStatus.value = next.connectionStatus;
-      startPositionAnimation(TRACKING_ANIMATION_DURATION_MS, sessionId, () => {
+      const distance = calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude);
+      startPositionAnimation(distance, next.speed, sessionId, () => {
         if (!isTracking.value || sessionId != trackingSessionId)
           return null;
         isProcessingQueue.value = false;
@@ -502,7 +512,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pendingJumpTime = "";
           acceptLivePosition(item, position, positionTime, sessionId);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:488", "获取跟踪位置失败:", error);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:486", "获取跟踪位置失败:", error);
         } finally {
           if (sessionId == trackingSessionId)
             isTrackRequestPending = false;

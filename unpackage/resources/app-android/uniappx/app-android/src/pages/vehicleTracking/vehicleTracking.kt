@@ -32,8 +32,11 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             val isMapReady = ref(false)
             val temporaryRenderPoints = ref(_uA<CoordinatePoint>())
             val TRACKING_POLL_INTERVAL_MS: Number = 1000
-            val TRACKING_ANIMATION_DURATION_MS: Number = 900
             val MAX_POSITION_JUMP_DISTANCE: Number = 500
+            val TRACKING_FRAME_INTERVAL_MS: Number = 30
+            val MIN_TRACKING_ANIMATION_DURATION_MS: Number = 500
+            val MAX_TRACKING_ANIMATION_DURATION_MS: Number = 2800
+            val FALLBACK_TRACKING_SPEED_KMH: Number = 20
             val polyline = ref(_uA<Polyline>())
             val isAnimating = ref(false)
             val animationTimer = ref<Number?>(null)
@@ -196,6 +199,15 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
                 return R * c
             }
+            val calculateRealisticAnimationDuration = fun(distance: Number, speedKmh: Number): Number {
+                val validSpeed = if (speedKmh > 0 && isFinite(speedKmh)) {
+                    speedKmh
+                } else {
+                    FALLBACK_TRACKING_SPEED_KMH
+                }
+                val duration = distance / (validSpeed / 3.6) * 1000
+                return Math.min(MAX_TRACKING_ANIMATION_DURATION_MS, Math.max(MIN_TRACKING_ANIMATION_DURATION_MS, duration))
+            }
             fun gen_calculateShortestRotation_fn(from: Number, to: Number): Number {
                 var diff = to - from
                 if (diff > 180) {
@@ -292,11 +304,12 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 polyline.value = _uA()
             }
             val clearTemporaryRoute = ::gen_clearTemporaryRoute_fn
-            val startPositionAnimation = fun(duration: Number, sessionId: Number, done: () -> Unit){
+            val startPositionAnimation = fun(distance: Number, speedKmh: Number, sessionId: Number, done: () -> Unit){
                 if (animationTimer.value != null) {
                     clearInterval(animationTimer.value as Number)
                 }
                 isAnimating.value = true
+                val duration = calculateRealisticAnimationDuration(distance, speedKmh)
                 val begin = Date.now()
                 val lat = currentPosition.latitude
                 val lng = currentPosition.longitude
@@ -333,7 +346,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                         done()
                     }
                 }
-                , 30) as Number
+                , TRACKING_FRAME_INTERVAL_MS) as Number
             }
             fun gen_processAnimationQueue_fn(sessionId: Number): Unit {
                 if (!isTracking.value || sessionId != trackingSessionId || animationQueue.value.length == 0) {
@@ -348,7 +361,8 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 currentSpeed.value = next.speed
                 currentAddress.value = next.address
                 connectionStatus.value = next.connectionStatus
-                startPositionAnimation(TRACKING_ANIMATION_DURATION_MS, sessionId, fun(){
+                val distance = calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude)
+                startPositionAnimation(distance, next.speed, sessionId, fun(){
                     if (!isTracking.value || sessionId != trackingSessionId) {
                         return
                     }

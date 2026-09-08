@@ -1,7 +1,7 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
-import { ref, computed, onActivated, onDeactivated } from 'vue'
+import { ref, computed, nextTick, onActivated, onDeactivated } from 'vue'
 	import { getUserMsgList, setMsgState } from '../../api/request.uts'
 	import { consumePendingMessageId, consumePushStaleFlag } from '../../services/push.uts'
 	import { parseLocalDateTime } from '../../utils/formateTime.uts'
@@ -29,12 +29,18 @@ const _cache = __ins.renderCache;
 	const hasLoadedInitial = ref(false) // 首次列表请求是否完成
 	const hasNewMessages = ref(false) // 是否有新消息
 	const newMessageCount = ref(0)   // 新消息数量
+	const pendingNewMessages = ref<UTSJSONObject[]>([]) // 等待用户确认展示的新消息
+	const messageScrollTop = ref(0)
 	const Login = ref(false)
 	const messageScrollViewportHeight = ref(0)
 	const isNearMessageListBottom = ref(false)
 
 	const isInitialLoading = computed<boolean>(() => {
 		return isListLoading.value && !hasLoadedInitial.value && msgList.value.length == 0
+	})
+
+	const isMessageListEmpty = computed<boolean>(() => {
+		return hasLoadedInitial.value && msgList.value.length == 0 && !hasNewMessages.value
 	})
 
 	const showLoadMore = computed<boolean>(() => {
@@ -44,6 +50,8 @@ const _cache = __ins.renderCache;
 	// 定时器相关
 	let checkTimer: number = 0
 	let scrollResumeTimer: number | null = null
+	const NEW_MESSAGE_CHECK_INTERVAL = 10000
+	const SCROLL_RESUME_DELAY = 1500
 	const isPageActive = ref(false)
 	// 停止新消息检查
 	function stopNewMessageCheck() : void {
@@ -69,32 +77,36 @@ const _cache = __ins.renderCache;
 		}
 	}
 
-	async function prependLatestMessages() : Promise<number> {
-		if (isListLoading.value || isCheckingNewMessages.value) return 0
+	async function findLatestMessages() : Promise<Array<UTSJSONObject>> {
+		if (isListLoading.value || isCheckingNewMessages.value) return []
 		isCheckingNewMessages.value = true
 		try {
 			const res = await getUserMsgList({ page: 1, pageSize: 10 })
 			const pageData = res.data
-			if (res.code != 200 || pageData == null) return 0
+			if (res.code != 200 || pageData == null) return []
 			const latestList : Array<UTSJSONObject> = pageData.list
 
 			const existingIds = new Set<string>()
 			let latestLoadedTime : number | null = null
-			msgList.value.forEach((message : UTSJSONObject) : void => {
+			const rememberMessage = (message : UTSJSONObject) : void => {
 				const messageId = message.getString('messageId', '')
 				if (messageId != '') existingIds.add(messageId)
 				const messageTime = parseLocalDateTime(message.getString('createTime', ''))
-				if (messageTime != null && (latestLoadedTime == null || messageTime > latestLoadedTime)) {
+				const currentLatestLoadedTime = latestLoadedTime
+				if (messageTime != null && (currentLatestLoadedTime == null || messageTime > currentLatestLoadedTime)) {
 					latestLoadedTime = messageTime
 				}
-			})
+			}
+
+			msgList.value.forEach(rememberMessage)
+			pendingNewMessages.value.forEach(rememberMessage)
 
 			const latestMessages : Array<UTSJSONObject> = []
 			latestList.forEach((message : UTSJSONObject) : void => {
 				const messageId = message.getString('messageId', '')
 				const messageTime = parseLocalDateTime(message.getString('createTime', ''))
 				const isNewerThanLoaded = latestLoadedTime == null
-					? msgList.value.length == 0
+					? msgList.value.length == 0 && pendingNewMessages.value.length == 0
 					: messageTime != null && messageTime > latestLoadedTime
 				if (messageId != '' && !existingIds.has(messageId) && isNewerThanLoaded) {
 					existingIds.add(messageId)
@@ -102,25 +114,23 @@ const _cache = __ins.renderCache;
 				}
 			})
 
-			if (latestMessages.length > 0) {
-				msgList.value = [...latestMessages, ...msgList.value]
-			}
-			return latestMessages.length
+			return latestMessages
 		} catch (error) {
 			console.error('检查新消息失败:', error)
-			return 0
+			return []
 		} finally {
 			isCheckingNewMessages.value = false
 		}
 	}
 
-	// 检查新消息
+	// 检查新消息，只暂存结果，避免打断用户当前的阅读位置
 	async function checkNewMessages() : Promise<void> {
 		if (!isPageActive.value || isListLoading.value || isCheckingNewMessages.value) return
-		const insertedCount = await prependLatestMessages()
-		if (insertedCount > 0) {
+		const latestMessages = await findLatestMessages()
+		if (latestMessages.length > 0) {
+			pendingNewMessages.value = [...pendingNewMessages.value, ...latestMessages]
 			hasNewMessages.value = true
-			newMessageCount.value += insertedCount
+			newMessageCount.value = pendingNewMessages.value.length
 			vibrateAlert()
 		}
 	}
@@ -136,9 +146,9 @@ const _cache = __ins.renderCache;
 		checkTimer = setInterval(() => {
 			if (isPageActive.value) {
 				console.log('定时检查新消息...')
-				checkNewMessages()
+				void checkNewMessages()
 			}
-		}, 10000)
+		}, NEW_MESSAGE_CHECK_INTERVAL)
 	}
 
 	function pauseNewMessageCheckWhileScrolling() : void {
@@ -149,7 +159,7 @@ const _cache = __ins.renderCache;
 			if (!isPageActive.value) return
 			startNewMessageCheck()
 			void checkNewMessages()
-		}, 10000)
+		}, SCROLL_RESUME_DELAY)
 	}
 
 
@@ -159,7 +169,11 @@ const _cache = __ins.renderCache;
 		if (isInit) {
 			currPage.value = 1
 			msgList.value = []
-				hasLoadedInitial.value = false
+			hasLoadedInitial.value = false
+			pendingNewMessages.value = []
+			hasNewMessages.value = false
+			newMessageCount.value = 0
+			messageScrollTop.value = 0
 			loadStatus.value = 'loadmore'
 			isNearMessageListBottom.value = false
 		}
@@ -178,7 +192,12 @@ const _cache = __ins.renderCache;
 			if (data == null) {
 				totalPage.value = currPage.value
 				loadStatus.value = 'nomore'
-				if (isInit) hasLoadedInitial.value = true
+				if (isInit) {
+					hasLoadedInitial.value = true
+					pendingNewMessages.value = []
+					hasNewMessages.value = false
+					newMessageCount.value = 0
+				}
 				return true
 			}
 			const totalPages = data.totalPage > 0 ? data.totalPage : 1
@@ -188,6 +207,9 @@ const _cache = __ins.renderCache;
 			if (isInit) {
 				msgList.value = newData
 				hasLoadedInitial.value = true
+				pendingNewMessages.value = []
+				hasNewMessages.value = false
+				newMessageCount.value = 0
 			} else {
 				newData.forEach((item : UTSJSONObject) : void => {
 					const messageId = item.getString('messageId', '')
@@ -196,10 +218,6 @@ const _cache = __ins.renderCache;
 				})
 			}
 			loadStatus.value = isEmptyInitial || currPage.value >= totalPage.value ? 'nomore' : 'loadmore'
-			if (isInit) {
-				hasNewMessages.value = false
-				newMessageCount.value = 0
-			}
 			return true
 		} catch (error) {
 			loadStatus.value = 'loadmore'
@@ -210,10 +228,18 @@ const _cache = __ins.renderCache;
 		}
 	}
 
-	// 加载新消息
+	// 加载新消息：先补查一次，再一次性展示所有暂存消息
 	async function loadNewMessages() : Promise<void> {
+		if (isListLoading.value || isCheckingNewMessages.value) return
 		console.log('加载新消息')
-		await prependLatestMessages()
+		await checkNewMessages()
+		if (pendingNewMessages.value.length > 0) {
+			msgList.value = [...pendingNewMessages.value, ...msgList.value]
+			pendingNewMessages.value = []
+			messageScrollTop.value = 1
+			await nextTick()
+			messageScrollTop.value = 0
+		}
 		hasNewMessages.value = false
 		newMessageCount.value = 0
 		console.log('新消息加载完成')
@@ -447,9 +473,19 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
       isShowStyle: true
     })),
     _cE("view", _uM({ class: "container" }), [
+      isTrue(hasNewMessages.value)
+        ? _cE("view", _uM({
+            key: 0,
+            class: "new-message-tip",
+            onClick: loadNewMessages
+          }), [
+            _cE("text", _uM({ class: "new-message-text" }), "有 " + _tD(newMessageCount.value) + " 条新消息，点击查看", 1 /* TEXT */)
+          ])
+        : _cC("v-if", true),
       _cE("scroll-view", _uM({
         "scroll-y": "true",
         "show-scrollbar": false,
+        "scroll-top": messageScrollTop.value,
         class: "scroll-container",
         id: "message-scroll-container",
         "refresher-enabled": "",
@@ -467,7 +503,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               }), [
                 _cE("text", _uM({ class: "empty-state-text" }), "加载中...")
               ])
-            : isTrue(hasLoadedInitial.value && msgList.value.length == 0)
+            : isTrue(isMessageListEmpty.value)
               ? _cE("view", _uM({
                   key: 1,
                   class: "empty-state"
@@ -475,15 +511,6 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
                   _cE("text", _uM({ class: "empty-state-text" }), "暂无消息")
                 ])
               : _cC("v-if", true),
-          isTrue(hasNewMessages.value)
-            ? _cE("view", _uM({
-                key: 2,
-                class: "new-message-tip",
-                onClick: loadNewMessages
-              }), [
-                _cE("text", null, "有 " + _tD(newMessageCount.value) + " 条新消息，点击查看", 1 /* TEXT */)
-              ])
-            : _cC("v-if", true),
           _cE(Fragment, null, RenderHelpers.renderList(msgList.value, (item, index, __index, _cached): any => {
             return _cE("view", _uM({
               key: getMessageId(item, index),
@@ -509,7 +536,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           }), 128 /* KEYED_FRAGMENT */),
           isTrue(showLoadMore.value)
             ? _cE("view", _uM({
-                key: 3,
+                key: 2,
                 class: "load-more"
               }), [
                 isTrue(isListLoading.value)
@@ -529,7 +556,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               ])
             : _cC("v-if", true)
         ])
-      ], 40 /* PROPS, NEED_HYDRATION */, ["refresher-triggered"]),
+      ], 40 /* PROPS, NEED_HYDRATION */, ["scroll-top", "refresher-triggered"]),
       _cV(_component_i_modal, _uM({
         show: modal.value,
         title: getMessageTypeText(modalContent.value.getNumber('messageType', 0)),
@@ -544,4 +571,4 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
 
 })
 export default __sfc__
-const GenPagesMessageMessageStyles = [_uM([["container", _pS(_uM([["width", "100%"], ["position", "fixed"], ["top", "170rpx"], ["bottom", 0], ["backgroundColor", "#f5f5f5"]]))], ["scroll-container", _uM([[".container ", _uM([["height", "100%"], ["width", "100%"]])]])], ["list-box", _uM([[".container ", _uM([["width", "100%"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["position", "relative"]])]])], ["message-item", _uM([[".container .list-box ", _uM([["marginBottom", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#ffffff"]])]])], ["message-header", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["message-content-row", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginTop", "16rpx"]])]])], ["message-title", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "30rpx"], ["color", "#333333"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["message-content", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "26rpx"], ["color", "#666666"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["unread-box", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexShrink", 0], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "4rpx"], ["paddingRight", "12rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "12rpx"], ["backgroundColor", "#f56c6c"], ["marginLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["unread-badge", _uM([[".container .list-box .unread-box ", _uM([["color", "#ffffff"], ["fontSize", "22rpx"]])]])], ["empty-state", _uM([[".container .list-box ", _uM([["display", "flex"], ["justifyContent", "center"], ["paddingTop", "50rpx"], ["paddingRight", 0], ["paddingBottom", "50rpx"], ["paddingLeft", 0]])]])], ["empty-state-text", _uM([[".container .list-box .empty-state ", _uM([["color", "#999999"], ["fontSize", "28rpx"], ["textAlign", "center"]])]])], ["new-message-tip", _uM([[".container .list-box ", _uM([["backgroundImage", "linear-gradient(135deg, #2979ff, #07c160)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#FFFFFF"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["textAlign", "center"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginBottom", "20rpx"], ["fontSize", "26rpx"]])]])], ["load-more", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0]])]])], ["tips-text", _uM([[".container .list-box .load-more ", _uM([["color", "#999999"], ["fontSize", "26rpx"], ["textAlign", "center"]])]])]])]
+const GenPagesMessageMessageStyles = [_uM([["container", _pS(_uM([["width", "100%"], ["position", "fixed"], ["top", "170rpx"], ["bottom", 0], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f5f5"]]))], ["new-message-tip", _uM([[".container ", _uM([["flexShrink", 0], ["backgroundImage", "linear-gradient(135deg, #2979ff, #07c160)"], ["backgroundColor", "rgba(0,0,0,0)"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["textAlign", "center"], ["fontSize", "26rpx"]])]])], ["new-message-text", _uM([[".container ", _uM([["color", "#ffffff"]])]])], ["scroll-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["minHeight", 0], ["width", "100%"]])]])], ["list-box", _uM([[".container ", _uM([["width", "100%"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["position", "relative"]])]])], ["message-item", _uM([[".container .list-box ", _uM([["marginBottom", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#ffffff"]])]])], ["message-header", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["message-content-row", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginTop", "16rpx"]])]])], ["message-title", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "30rpx"], ["color", "#333333"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["message-content", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "26rpx"], ["color", "#666666"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["unread-box", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexShrink", 0], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "4rpx"], ["paddingRight", "12rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "12rpx"], ["backgroundColor", "#f56c6c"], ["marginLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["unread-badge", _uM([[".container .list-box .unread-box ", _uM([["color", "#ffffff"], ["fontSize", "22rpx"]])]])], ["empty-state", _uM([[".container .list-box ", _uM([["display", "flex"], ["justifyContent", "center"], ["paddingTop", "50rpx"], ["paddingRight", 0], ["paddingBottom", "50rpx"], ["paddingLeft", 0]])]])], ["empty-state-text", _uM([[".container .list-box .empty-state ", _uM([["color", "#999999"], ["fontSize", "28rpx"], ["textAlign", "center"]])]])], ["load-more", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0]])]])], ["tips-text", _uM([[".container .list-box .load-more ", _uM([["color", "#999999"], ["fontSize", "26rpx"], ["textAlign", "center"]])]])]])]
