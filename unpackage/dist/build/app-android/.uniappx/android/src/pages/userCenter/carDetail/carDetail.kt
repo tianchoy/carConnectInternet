@@ -44,7 +44,7 @@ open class GenPagesUserCenterCarDetailCarDetail : BasePage {
             )
             val createEditInfo = fun(): VehicleEditInfo {
                 val carType = carInfo.value.getString("carType", "")
-                return VehicleEditInfo(deviceName = carInfo.value.getString("deviceName", ""), carType = carType, carTypeValue = carType, plateNo = carInfo.value.getString("plateNo", ""), carVin = carInfo.value.getString("carVin", ""), engineNum = carInfo.value.getString("engineNum", ""))
+                return VehicleEditInfo(deviceName = carInfo.value.getString("deviceName", ""), carType = carType, carTypeValue = carTitle.value, plateNo = carInfo.value.getString("plateNo", ""), carVin = carInfo.value.getString("carVin", ""), engineNum = carInfo.value.getString("engineNum", ""))
             }
             val toggleEdit = fun(): Unit {
                 if (loadingDetail.value || saving.value) {

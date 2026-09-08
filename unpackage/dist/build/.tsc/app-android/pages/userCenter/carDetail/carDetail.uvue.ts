@@ -77,7 +77,7 @@ const _cache = __ins.renderCache;
 		return {
 			deviceName: carInfo.value.getString('deviceName', ''),
 			carType: carType,
-			carTypeValue: carType,
+			carTypeValue: carTitle.value,
 			plateNo: carInfo.value.getString('plateNo', ''),
 			carVin: carInfo.value.getString('carVin', ''),
 			engineNum: carInfo.value.getString('engineNum', '')
