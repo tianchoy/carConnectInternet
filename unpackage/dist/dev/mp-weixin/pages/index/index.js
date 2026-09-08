@@ -1283,9 +1283,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         aa: common_assets._imports_8,
         ab: common_vendor.o(contactCustomerService, "e7"),
         ac: common_assets._imports_9,
-        ad: common_vendor.o(logout, "1b"),
+        ad: common_vendor.o(unbindDevice, "c8"),
         ae: common_assets._imports_10,
-        af: common_vendor.o(unbindDevice, "a0"),
+        af: common_vendor.o(logout, "33"),
         ag: common_vendor.o(closePicker, "1e"),
         ah: common_vendor.o(handlePickerConfirm, "1d"),
         ai: common_vendor.o(($event) => {

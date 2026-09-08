@@ -46,40 +46,27 @@
 	const scanFunctionIsUseable = ref(true)
 
 	const handleScan = (e: any) => {
-		if (scanFunctionIsUseable.value && e.detail.result) {
-			uni.vibrateLong()
-			scanFunctionIsUseable.value = false
-			const scanResult = e.detail.result
-			console.log('扫码结果:', scanResult)
-			
-			// 获取页面栈
-			const pages = getCurrentPages()
-			if (pages.length >= 2) {
-				const prevPage = pages[pages.length - 2] // 获取上一页实例
-				
-				// 直接给上一页面的carInfo.imei赋值
-				if (prevPage && prevPage.carInfo) {
-					prevPage.carInfo.imei = scanResult
-					console.log('已设置上一页面IMEI:', scanResult)
-				} else {
-					// 如果直接赋值失败
-					uni.$emit('scanCodeResult', { result: scanResult })
-				}
-			}
-			
-			uni.showToast({
-				title: '扫码成功',
-				icon: 'success',
-				duration: 1000
+		if (!scanFunctionIsUseable.value || e.detail.result == null) return
+		const scanResult = e.detail.result.toString()
+		if (scanResult.length == 0) return
+
+		uni.vibrateLong()
+		scanFunctionIsUseable.value = false
+		console.log('扫码结果:', scanResult)
+		uni.setStorageSync('scanCodeResult', scanResult)
+
+		uni.showToast({
+			title: '扫码成功',
+			icon: 'success',
+			duration: 1000
+		})
+
+		// 延迟返回上一页
+		setTimeout(() => {
+			uni.navigateBack({
+				delta: 1
 			})
-			
-			// 延迟返回上一页
-			setTimeout(() => {
-				uni.navigateBack({
-					delta: 1
-				})
-			}, 1000)
-		}
+		}, 1000)
 	}
 
 	const error = (e: any) => {

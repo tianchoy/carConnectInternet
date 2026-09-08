@@ -131,6 +131,10 @@ class MpPolylineData extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+const PLAYBACK_FRAME_INTERVAL_MS = 30;
+const MIN_SEGMENT_DURATION_MS = 500;
+const MAX_SEGMENT_DURATION_MS = 6e3;
+const FALLBACK_SPEED_KMH = 20;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "playBack",
   setup(__props) {
@@ -151,15 +155,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const polyline = common_vendor.ref([]);
     const isPlaying = common_vendor.ref(false);
     const isTrackPlayable = common_vendor.ref(false);
-    const playbackSpeed = common_vendor.ref(5);
+    const playbackSpeed = common_vendor.ref(1);
     const totalDistance = common_vendor.ref(0);
     const currentSpeed = common_vendor.ref(0);
     const currentTime = common_vendor.ref("");
     const currentIndex = common_vendor.ref(0);
     const carMarker = common_vendor.ref(null);
+    const renderedPoint = common_vendor.reactive(new TrackPoint({
+      latitude: 0,
+      longitude: 0,
+      rotation: 0,
+      deviceTime: "",
+      speed: 0
+    }));
+    const activeSegmentTargetIndex = common_vendor.ref(-1);
     let playbackTimer = null;
-    let lastTimestamp = 0;
     let replaySessionId = 0;
+    function copyTrackPoint(point) {
+      return new TrackPoint({
+        latitude: point.latitude,
+        longitude: point.longitude,
+        rotation: point.rotation,
+        deviceTime: point.deviceTime,
+        speed: point.speed
+      });
+    }
+    function resetRenderedPoint(point) {
+      renderedPoint.latitude = point.latitude;
+      renderedPoint.longitude = point.longitude;
+      renderedPoint.rotation = point.rotation;
+      renderedPoint.deviceTime = point.deviceTime;
+      renderedPoint.speed = point.speed;
+    }
     function formatPlaybackTime(timestamp) {
       var _a;
       return (_a = utils_formateTime.formatTimes(timestamp)) !== null && _a !== void 0 ? _a : "";
@@ -214,7 +241,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:222", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:251", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -348,8 +375,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         polyline.value = [];
         return null;
       }
+      const isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value;
+      const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1);
+      if (isAnimatingSegment) {
+        playedPoints.push(copyTrackPoint(renderedPoint));
+      }
+      const unplayedStartIndex = isAnimatingSegment ? activeSegmentTargetIndex.value : currentIndex.value;
       const lines = [];
-      const unplayedPoints = trackPoints.value.slice(currentIndex.value);
+      const unplayedPoints = trackPoints.value.slice(unplayedStartIndex);
+      if (isAnimatingSegment) {
+        unplayedPoints.unshift(copyTrackPoint(renderedPoint));
+      }
       if (unplayedPoints.length >= 2) {
         lines.push(new MpPolylineData({
           points: toMpPoints(unplayedPoints),
@@ -361,9 +397,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           borderWidth: 1
         }));
       }
-      if (currentIndex.value > 0) {
+      if (playedPoints.length >= 2) {
         lines.push(new MpPolylineData({
-          points: toMpPoints(trackPoints.value.slice(0, currentIndex.value + 1)),
+          points: toMpPoints(playedPoints),
           color: "#1890FF",
           width: 6,
           dottedLine: false,
@@ -380,24 +416,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function updateCarPosition() {
       const marker = carMarker.value;
       if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
-        const point = trackPoints.value[currentIndex.value];
         const updatedMarker = {
           id: marker.id,
-          latitude: point.latitude,
-          longitude: point.longitude,
+          latitude: renderedPoint.latitude,
+          longitude: renderedPoint.longitude,
           iconPath: marker.iconPath,
           width: marker.width,
           height: marker.height,
-          rotate: point.rotation,
+          rotate: renderedPoint.rotation,
           anchor: marker.anchor,
           callout: marker.callout,
           label: marker.label
         };
         carMarker.value = updatedMarker;
         markers.value = [updatedMarker, ...markers.value.slice(1)];
-        if (currentIndex.value % 5 == 0 || currentIndex.value == 0 || currentIndex.value == trackPoints.value.length - 1) {
-          center.latitude = point.latitude;
-          center.longitude = point.longitude;
+        if (currentIndex.value % 5 == 0 || currentIndex.value == trackPoints.value.length - 1) {
+          center.latitude = renderedPoint.latitude;
+          center.longitude = renderedPoint.longitude;
         }
       }
     }
@@ -451,6 +486,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         anchor: { x: 0.5, y: 0.5 }
       };
       carMarker.value = marker;
+      resetRenderedPoint(currentPoint);
       markers.value = [marker];
       isMapReady.value = true;
     }
@@ -459,6 +495,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       trackPoints.value = [];
       isTrackPlayable.value = false;
       currentIndex.value = 0;
+      activeSegmentTargetIndex.value = -1;
+      renderedPoint.latitude = 0;
+      renderedPoint.longitude = 0;
+      renderedPoint.rotation = 0;
+      renderedPoint.deviceTime = "";
+      renderedPoint.speed = 0;
       currentSpeed.value = 0;
       currentTime.value = "";
       totalDistance.value = 0;
@@ -466,17 +508,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       markers.value = [];
       polyline.value = [];
     }
-    function pausePlayback() {
-      isPlaying.value = false;
+    function clearPlaybackTimer() {
       const timer = playbackTimer;
       if (timer != null) {
         clearTimeout(timer);
         playbackTimer = null;
       }
     }
+    function pausePlayback() {
+      isPlaying.value = false;
+      clearPlaybackTimer();
+    }
     function renderPlaybackIndex() {
       if (trackPoints.value.length == 0)
         return null;
+      if (activeSegmentTargetIndex.value <= currentIndex.value) {
+        resetRenderedPoint(trackPoints.value[currentIndex.value]);
+      }
       updateCarPosition();
       updatePolyline();
       const point = trackPoints.value[currentIndex.value];
@@ -523,6 +571,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       trackPoints.value = processedPoints;
       isTrackPlayable.value = processedPoints.length > 1;
       currentIndex.value = 0;
+      activeSegmentTargetIndex.value = -1;
+      if (processedPoints.length == 0)
+        return null;
+      resetRenderedPoint(processedPoints[0]);
       calculateTrackDistance();
       initCarMarker();
       initPolyline();
@@ -575,7 +627,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:708", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:769", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -590,37 +642,80 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function resetPlayback() {
       pausePlayback();
       currentIndex.value = 0;
+      activeSegmentTargetIndex.value = -1;
       renderPlaybackIndex();
     }
-    function playNextPoint() {
-      if (currentIndex.value >= trackPoints.value.length - 1) {
-        pausePlayback();
-        utils_toast.showAppToast({
-          title: "轨迹回放完成",
-          icon: "none",
-          duration: 1500
-        });
-        return false;
-      }
-      currentIndex.value++;
-      renderPlaybackIndex();
-      return true;
+    function getShortestRotationDifference(from, to) {
+      let difference = to - from;
+      if (difference > 180)
+        difference -= 360;
+      else if (difference < -180)
+        difference += 360;
+      return difference;
     }
-    function playbackStep(sessionId) {
+    function getSegmentDuration(start, end) {
+      const distance = getDistance(start.latitude, start.longitude, end.latitude, end.longitude);
+      const recordedSpeed = start.speed > 0 && isFinite(start.speed) ? start.speed : end.speed;
+      const speed = recordedSpeed > 0 && isFinite(recordedSpeed) ? recordedSpeed : FALLBACK_SPEED_KMH;
+      const duration = distance / (speed / 3.6) * 1e3 / playbackSpeed.value;
+      return Math.min(MAX_SEGMENT_DURATION_MS, Math.max(MIN_SEGMENT_DURATION_MS, duration));
+    }
+    function finishPlayback() {
+      pausePlayback();
+      activeSegmentTargetIndex.value = -1;
+      utils_toast.showAppToast({
+        title: "轨迹回放完成",
+        icon: "none",
+        duration: 1500
+      });
+    }
+    function animateNextSegment(sessionId) {
       if (!isPlaying.value || sessionId != replaySessionId)
         return null;
-      const now2 = Date.now();
-      const elapsed = now2 - lastTimestamp;
-      const interval = 1e3 / playbackSpeed.value;
-      if (elapsed >= interval) {
-        playNextPoint();
-        lastTimestamp = now2 - elapsed % interval;
+      if (currentIndex.value >= trackPoints.value.length - 1) {
+        finishPlayback();
+        return null;
       }
-      if (isPlaying.value && sessionId == replaySessionId) {
-        playbackTimer = setTimeout(() => {
-          playbackStep(sessionId);
-        }, 16);
-      }
+      const startPoint = new TrackPoint({
+        latitude: renderedPoint.latitude,
+        longitude: renderedPoint.longitude,
+        rotation: renderedPoint.rotation,
+        deviceTime: renderedPoint.deviceTime,
+        speed: renderedPoint.speed
+      });
+      const targetIndex = currentIndex.value + 1;
+      const targetPoint = trackPoints.value[targetIndex];
+      const rotationDifference = getShortestRotationDifference(startPoint.rotation, targetPoint.rotation);
+      const duration = getSegmentDuration(startPoint, targetPoint);
+      const startedAt = Date.now();
+      activeSegmentTargetIndex.value = targetIndex;
+      let renderFrame = null;
+      renderFrame = () => {
+        if (!isPlaying.value || sessionId != replaySessionId)
+          return null;
+        const progress = Math.min((Date.now() - startedAt) / duration, 1);
+        renderedPoint.latitude = startPoint.latitude + (targetPoint.latitude - startPoint.latitude) * progress;
+        renderedPoint.longitude = startPoint.longitude + (targetPoint.longitude - startPoint.longitude) * progress;
+        renderedPoint.rotation = (startPoint.rotation + rotationDifference * progress + 360) % 360;
+        renderedPoint.deviceTime = targetPoint.deviceTime;
+        renderedPoint.speed = targetPoint.speed;
+        updateCarPosition();
+        updatePolyline();
+        if (progress >= 1) {
+          currentIndex.value = targetIndex;
+          activeSegmentTargetIndex.value = -1;
+          resetRenderedPoint(targetPoint);
+          renderPlaybackIndex();
+          animateNextSegment(sessionId);
+          return null;
+        }
+        if (renderFrame != null) {
+          playbackTimer = setTimeout(() => {
+            renderFrame === null || renderFrame === void 0 ? null : renderFrame();
+          }, PLAYBACK_FRAME_INTERVAL_MS);
+        }
+      };
+      renderFrame === null || renderFrame === void 0 ? null : renderFrame();
     }
     function startPlayback() {
       if (!isTrackPlayable.value) {
@@ -630,12 +725,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (currentIndex.value >= trackPoints.value.length - 1) {
         resetPlayback();
       }
+      activeSegmentTargetIndex.value = -1;
       isPlaying.value = true;
       const sessionId = ++replaySessionId;
-      if (!playNextPoint())
-        return null;
-      lastTimestamp = Date.now();
-      playbackStep(sessionId);
+      animateNextSegment(sessionId);
     }
     function togglePlayback() {
       if (isPlaying.value) {
@@ -662,19 +755,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function applyPlaybackSpeed(value) {
       if (!isFinite(value))
         return null;
-      playbackSpeed.value = Math.min(50, Math.max(5, value));
+      playbackSpeed.value = Math.min(30, Math.max(1, value));
       if (!isPlaying.value)
         return null;
-      const timer = playbackTimer;
-      if (timer != null) {
-        clearTimeout(timer);
-        playbackTimer = null;
-      }
-      lastTimestamp = Date.now();
-      const sessionId = replaySessionId;
-      playbackTimer = setTimeout(() => {
-        playbackStep(sessionId);
-      }, 16);
+      clearPlaybackTimer();
+      const sessionId = ++replaySessionId;
+      animateNextSegment(sessionId);
     }
     function setPlaybackSpeedFromValue(value) {
       applyPlaybackSpeed(value);
@@ -689,7 +775,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
       startTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
       endTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:837", "startTime:", startTime.value, "endTime:", endTime.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:934", "startTime:", startTime.value, "endTime:", endTime.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {
@@ -775,9 +861,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return playbackSpeed.value = $event;
         }, "8d"),
         z: common_vendor.p({
-          min: 5,
-          max: 50,
-          step: 5,
+          min: 1,
+          max: 30,
+          step: 1,
           modelValue: playbackSpeed.value
         }),
         A: common_vendor.t(playbackSpeed.value),

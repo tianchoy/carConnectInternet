@@ -14,35 +14,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const scanFunctionIsUseable = common_vendor.ref(true);
     const handleScan = (e = null) => {
-      if (scanFunctionIsUseable.value && e.detail.result) {
-        common_vendor.index.vibrateLong();
-        scanFunctionIsUseable.value = false;
-        const scanResult = e.detail.result;
-        common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:53", "扫码结果:", scanResult);
-        const pages = getCurrentPages();
-        if (pages.length >= 2) {
-          const prevPage = pages[pages.length - 2];
-          if (prevPage && prevPage.carInfo) {
-            prevPage.carInfo.imei = scanResult;
-            common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:63", "已设置上一页面IMEI:", scanResult);
-          } else {
-            common_vendor.index.$emit("scanCodeResult", new common_vendor.UTSJSONObject({ result: scanResult }));
-          }
-        }
-        common_vendor.index.showToast({
-          title: "扫码成功",
-          icon: "success",
-          duration: 1e3
-        });
-        setTimeout(() => {
-          common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
-            delta: 1
-          }));
-        }, 1e3);
-      }
+      if (!scanFunctionIsUseable.value || e.detail.result == null)
+        return null;
+      const scanResult = e.detail.result.toString();
+      if (scanResult.length == 0)
+        return null;
+      common_vendor.index.vibrateLong();
+      scanFunctionIsUseable.value = false;
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:55", "扫码结果:", scanResult);
+      common_vendor.index.setStorageSync("scanCodeResult", scanResult);
+      common_vendor.index.showToast({
+        title: "扫码成功",
+        icon: "success",
+        duration: 1e3
+      });
+      setTimeout(() => {
+        common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
+          delta: 1
+        }));
+      }, 1e3);
     };
     const error = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:86", "摄像头错误:", e);
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:73", "摄像头错误:", e);
       common_vendor.index.showToast({
         title: "摄像头初始化失败",
         icon: "none"
@@ -52,13 +45,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.getSetting(new common_vendor.UTSJSONObject({
         success: (res = null) => {
           if (res.authSetting["scope.camera"]) {
-            common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:97", "已有摄像头权限");
+            common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:84", "已有摄像头权限");
             return null;
           }
           common_vendor.index.authorize(new common_vendor.UTSJSONObject({
             scope: "scope.camera",
             success: () => {
-              common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:104", "摄像头权限授权成功");
+              common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:91", "摄像头权限授权成功");
             },
             fail: () => {
               common_vendor.index.showModal(new common_vendor.UTSJSONObject({

@@ -41,6 +41,7 @@
           "meizu": {},
           "honor": {}
         },
+        "uni-event": {},
         "uni-getSystemInfo": {},
         "uni-vibrate": {},
         "uni-storage": {},
@@ -49,7 +50,6 @@
         "uni-getAppBaseInfo": {},
         "uni-exit": {},
         "uni-showLoading": {},
-        "uni-event": {},
         "uni-dialogPage": {},
         "uni-network": {},
         "uni-cloud-client": {},

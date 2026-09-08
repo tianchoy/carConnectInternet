@@ -259,6 +259,9 @@ const isRequestingCameraPermission = ref<boolean>(false)
 	onShow(() => {
 		isNavigatingToScanner.value = false
 		const rawResult = uni.getStorageSync('scanCodeResult')
+		console.log('onShow:', rawResult)
+		const scanCodeResultListener = uni.$on('scanCodeResult', handleScanResult)
+		console.log('scanCodeResultListener:', scanCodeResultListener)
 			const result = rawResult != null ? rawResult.toString() : ''
 		if (result.length > 0) {
 			uni.removeStorageSync('scanCodeResult')

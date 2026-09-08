@@ -87,15 +87,44 @@ const center = reactive({
 
 	const isPlaying = ref(false)
 	const isTrackPlayable = ref(false)
-	const playbackSpeed = ref(5)
+	const playbackSpeed = ref(1)
 	const totalDistance = ref(0)
 	const currentSpeed = ref(0)
 	const currentTime = ref('')
 	const currentIndex = ref(0)
 	const carMarker = ref<MapMarker | null>(null)
+	const PLAYBACK_FRAME_INTERVAL_MS = 30
+	const MIN_SEGMENT_DURATION_MS = 500
+	const MAX_SEGMENT_DURATION_MS = 6000
+	const FALLBACK_SPEED_KMH = 20
+	const renderedPoint = reactive<TrackPoint>({
+		latitude: 0,
+		longitude: 0,
+		rotation: 0,
+		deviceTime: '',
+		speed: 0
+	})
+	const activeSegmentTargetIndex = ref(-1)
 	let playbackTimer : number | null = null
-	let lastTimestamp = 0
 	let replaySessionId = 0
+
+	function copyTrackPoint(point : TrackPoint) : TrackPoint {
+		return {
+			latitude: point.latitude,
+			longitude: point.longitude,
+			rotation: point.rotation,
+			deviceTime: point.deviceTime,
+			speed: point.speed
+		}
+	}
+
+	function resetRenderedPoint(point : TrackPoint) : void {
+		renderedPoint.latitude = point.latitude
+		renderedPoint.longitude = point.longitude
+		renderedPoint.rotation = point.rotation
+		renderedPoint.deviceTime = point.deviceTime
+		renderedPoint.speed = point.speed
+	}
 
 	function formatPlaybackTime(timestamp : number) : string {
 		return formatTimes(timestamp) ?? ''
@@ -361,10 +390,29 @@ const center = reactive({
 		const currentPlayedPolyline = playedPolyline
 		if (trackPoints.value.length == 0 || currentUnplayedPolyline == null || currentPlayedPolyline == null) return
 
-		currentUnplayedPolyline.points = toNativePoints(trackPoints.value.slice(currentIndex.value))
-		currentPlayedPolyline.points = toNativePoints(trackPoints.value.slice(0, currentIndex.value + 1))
+		const isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value
+		const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
+		if (isAnimatingSegment) {
+			playedPoints.push(copyTrackPoint(renderedPoint))
+		}
+		const unplayedStartIndex = isAnimatingSegment ? activeSegmentTargetIndex.value : currentIndex.value
+		const unplayedPoints = trackPoints.value.slice(unplayedStartIndex)
+		if (isAnimatingSegment) {
+			unplayedPoints.unshift(copyTrackPoint(renderedPoint))
+		}
+		currentUnplayedPolyline.points = toNativePoints(unplayedPoints)
+		currentPlayedPolyline.points = toNativePoints(playedPoints)
 		polyline.value = [currentUnplayedPolyline, currentPlayedPolyline]
 	}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -417,16 +465,14 @@ const center = reactive({
 	function updateCarPosition() {
 		const marker = carMarker.value
 		if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
-			const point = trackPoints.value[currentIndex.value]
-
 			const updatedMarker : MapMarker = {
 				id: marker.id,
-				latitude: point.latitude,
-				longitude: point.longitude,
+				latitude: renderedPoint.latitude,
+				longitude: renderedPoint.longitude,
 				iconPath: marker.iconPath,
 				width: marker.width,
 				height: marker.height,
-				rotate: point.rotation,
+				rotate: renderedPoint.rotation,
 				anchor: marker.anchor,
 				callout: marker.callout,
 				label: marker.label
@@ -434,12 +480,10 @@ const center = reactive({
 			carMarker.value = updatedMarker
 			markers.value = [updatedMarker, ...markers.value.slice(1)]
 
-			// 每5个点更新一次中心点
 			if (currentIndex.value % 5 == 0 ||
-				currentIndex.value == 0 ||
 				currentIndex.value == trackPoints.value.length - 1) {
-				center.latitude = point.latitude
-				center.longitude = point.longitude
+				center.latitude = renderedPoint.latitude
+				center.longitude = renderedPoint.longitude
 			}
 		}
 	}
@@ -501,6 +545,7 @@ const center = reactive({
 			anchor: { x: 0.5, y: 0.5 }
 		}
 		carMarker.value = marker
+		resetRenderedPoint(currentPoint)
 
 		// 设置标记点
 		markers.value = [marker]
@@ -513,6 +558,12 @@ const center = reactive({
 		trackPoints.value = []
 		isTrackPlayable.value = false
 		currentIndex.value = 0
+		activeSegmentTargetIndex.value = -1
+		renderedPoint.latitude = 0
+		renderedPoint.longitude = 0
+		renderedPoint.rotation = 0
+		renderedPoint.deviceTime = ''
+		renderedPoint.speed = 0
 		currentSpeed.value = 0
 		currentTime.value = ''
 		totalDistance.value = 0
@@ -528,8 +579,7 @@ const center = reactive({
 
 	}
 
-	function pausePlayback() {
-		isPlaying.value = false
+	function clearPlaybackTimer() : void {
 		const timer = playbackTimer
 		if (timer != null) {
 			clearTimeout(timer)
@@ -537,8 +587,16 @@ const center = reactive({
 		}
 	}
 
+	function pausePlayback() : void {
+		isPlaying.value = false
+		clearPlaybackTimer()
+	}
+
 	function renderPlaybackIndex() : void {
 		if (trackPoints.value.length == 0) return
+		if (activeSegmentTargetIndex.value <= currentIndex.value) {
+			resetRenderedPoint(trackPoints.value[currentIndex.value])
+		}
 		updateCarPosition()
 		updatePolyline()
 		const point = trackPoints.value[currentIndex.value]
@@ -603,6 +661,9 @@ const center = reactive({
 		trackPoints.value = processedPoints
 		isTrackPlayable.value = processedPoints.length > 1
 		currentIndex.value = 0
+		activeSegmentTargetIndex.value = -1
+		if (processedPoints.length == 0) return
+		resetRenderedPoint(processedPoints[0])
 		calculateTrackDistance()
 		initCarMarker()
 		initPolyline()
@@ -669,40 +730,82 @@ const center = reactive({
 	function resetPlayback() {
 		pausePlayback()
 		currentIndex.value = 0
+		activeSegmentTargetIndex.value = -1
 		renderPlaybackIndex()
 	}
 
-	function playNextPoint() : boolean {
-		if (currentIndex.value >= trackPoints.value.length - 1) {
-			pausePlayback()
-			showAppToast({
-				title: '轨迹回放完成',
-				icon: 'none',
-				duration: 1500
-			})
-			return false
-		}
-
-		currentIndex.value++
-		renderPlaybackIndex()
-		return true
+	function getShortestRotationDifference(from : number, to : number) : number {
+		let difference = to - from
+		if (difference > 180) difference -= 360
+		else if (difference < -180) difference += 360
+		return difference
 	}
 
-	function playbackStep(sessionId : number) {
+	function getSegmentDuration(start : TrackPoint, end : TrackPoint) : number {
+		const distance = getDistance(start.latitude, start.longitude, end.latitude, end.longitude)
+		const recordedSpeed = start.speed > 0 && isFinite(start.speed) ? start.speed : end.speed
+		const speed = recordedSpeed > 0 && isFinite(recordedSpeed) ? recordedSpeed : FALLBACK_SPEED_KMH
+		const duration = distance / (speed / 3.6) * 1000 / playbackSpeed.value
+		return Math.min(MAX_SEGMENT_DURATION_MS, Math.max(MIN_SEGMENT_DURATION_MS, duration))
+	}
+
+	function finishPlayback() : void {
+		pausePlayback()
+		activeSegmentTargetIndex.value = -1
+		showAppToast({
+			title: '轨迹回放完成',
+			icon: 'none',
+			duration: 1500
+		})
+	}
+
+	function animateNextSegment(sessionId : number) : void {
 		if (!isPlaying.value || sessionId != replaySessionId) return
-
-		const now = Date.now()
-		const elapsed = now - lastTimestamp
-		const interval = 1000 / playbackSpeed.value
-
-		if (elapsed >= interval) {
-			playNextPoint()
-			lastTimestamp = now - (elapsed % interval)
+		if (currentIndex.value >= trackPoints.value.length - 1) {
+			finishPlayback()
+			return
 		}
 
-		if (isPlaying.value && sessionId == replaySessionId) {
-			playbackTimer = setTimeout(() => { playbackStep(sessionId) }, 16)
+		const startPoint : TrackPoint = {
+			latitude: renderedPoint.latitude,
+			longitude: renderedPoint.longitude,
+			rotation: renderedPoint.rotation,
+			deviceTime: renderedPoint.deviceTime,
+			speed: renderedPoint.speed
 		}
+		const targetIndex = currentIndex.value + 1
+		const targetPoint = trackPoints.value[targetIndex]
+		const rotationDifference = getShortestRotationDifference(startPoint.rotation, targetPoint.rotation)
+		const duration = getSegmentDuration(startPoint, targetPoint)
+		const startedAt = Date.now()
+		activeSegmentTargetIndex.value = targetIndex
+
+		let renderFrame : (() => void) | null = null
+		renderFrame = () : void => {
+			if (!isPlaying.value || sessionId != replaySessionId) return
+			const progress = Math.min((Date.now() - startedAt) / duration, 1)
+			renderedPoint.latitude = startPoint.latitude + (targetPoint.latitude - startPoint.latitude) * progress
+			renderedPoint.longitude = startPoint.longitude + (targetPoint.longitude - startPoint.longitude) * progress
+			renderedPoint.rotation = (startPoint.rotation + rotationDifference * progress + 360) % 360
+			renderedPoint.deviceTime = targetPoint.deviceTime
+			renderedPoint.speed = targetPoint.speed
+			updateCarPosition()
+			updatePolyline()
+
+			if (progress >= 1) {
+				currentIndex.value = targetIndex
+				activeSegmentTargetIndex.value = -1
+				resetRenderedPoint(targetPoint)
+				renderPlaybackIndex()
+				animateNextSegment(sessionId)
+				return
+			}
+			if (renderFrame != null) {
+				playbackTimer = setTimeout(() => { renderFrame?.() }, PLAYBACK_FRAME_INTERVAL_MS)
+			}
+		}
+
+		renderFrame?.()
 	}
 
 	function startPlayback() {
@@ -715,11 +818,10 @@ const center = reactive({
 			resetPlayback()
 		}
 
+		activeSegmentTargetIndex.value = -1
 		isPlaying.value = true
 		const sessionId = ++replaySessionId
-		if (!playNextPoint()) return
-		lastTimestamp = Date.now()
-		playbackStep(sessionId)
+		animateNextSegment(sessionId)
 	}
 	// 播放控制
 	function togglePlayback() {
@@ -752,17 +854,12 @@ const center = reactive({
 
 	function applyPlaybackSpeed(value : number) : void {
 		if (!isFinite(value)) return
-		playbackSpeed.value = Math.min(50, Math.max(5, value))
+		playbackSpeed.value = Math.min(30, Math.max(1, value))
 		if (!isPlaying.value) return
 
-		const timer = playbackTimer
-		if (timer != null) {
-			clearTimeout(timer)
-			playbackTimer = null
-		}
-		lastTimestamp = Date.now()
-		const sessionId = replaySessionId
-		playbackTimer = setTimeout(() => { playbackStep(sessionId) }, 16)
+		clearPlaybackTimer()
+		const sessionId = ++replaySessionId
+		animateNextSegment(sessionId)
 	}
 
 	// i-slider 对外发送数值，原生 slider 发送事件对象
@@ -901,9 +998,9 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cV(_component_i_slider, _uM({
               modelValue: playbackSpeed.value,
               "onUpdate:modelValue": $event => {(playbackSpeed).value = $event},
-              min: 5,
-              max: 50,
-              step: 5,
+              min: 1,
+              max: 30,
+              step: 1,
               onChange: setPlaybackSpeedFromValue
             }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
           ]),

@@ -13,6 +13,7 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.`$emit` as uni__emit
+import io.dcloud.uniapp.extapi.`$on` as uni__on
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
@@ -162,6 +163,9 @@ open class GenPagesAddCarAddCar : BasePage {
             onShow(fun(){
                 isNavigatingToScanner.value = false
                 val rawResult = uni_getStorageSync("scanCodeResult")
+                console.log("onShow:", rawResult)
+                val scanCodeResultListener = uni__on("scanCodeResult", handleScanResult)
+                console.log("scanCodeResultListener:", scanCodeResultListener)
                 val result = if (rawResult != null) {
                     rawResult.toString()
                 } else {

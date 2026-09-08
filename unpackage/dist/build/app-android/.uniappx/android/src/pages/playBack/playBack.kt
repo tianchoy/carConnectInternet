@@ -40,15 +40,32 @@ open class GenPagesPlayBackPlayBack : BasePage {
             var playedPolyline: Polyline? = null
             val isPlaying = ref(false)
             val isTrackPlayable = ref(false)
-            val playbackSpeed = ref(5)
+            val playbackSpeed = ref(1)
             val totalDistance = ref(0)
             val currentSpeed = ref(0)
             val currentTime = ref("")
             val currentIndex = ref(0)
             val carMarker = ref<MapMarker?>(null)
+            val PLAYBACK_FRAME_INTERVAL_MS: Number = 30
+            val MIN_SEGMENT_DURATION_MS: Number = 500
+            val MAX_SEGMENT_DURATION_MS: Number = 6000
+            val FALLBACK_SPEED_KMH: Number = 20
+            val renderedPoint = reactive<TrackPoint>(TrackPoint(latitude = 0, longitude = 0, rotation = 0, deviceTime = "", speed = 0))
+            val activeSegmentTargetIndex = ref(-1)
             var playbackTimer: Number? = null
-            var lastTimestamp: Number = 0
             var replaySessionId: Number = 0
+            fun gen_copyTrackPoint_fn(point: TrackPoint): TrackPoint {
+                return TrackPoint(latitude = point.latitude, longitude = point.longitude, rotation = point.rotation, deviceTime = point.deviceTime, speed = point.speed)
+            }
+            val copyTrackPoint = ::gen_copyTrackPoint_fn
+            fun gen_resetRenderedPoint_fn(point: TrackPoint): Unit {
+                renderedPoint.latitude = point.latitude
+                renderedPoint.longitude = point.longitude
+                renderedPoint.rotation = point.rotation
+                renderedPoint.deviceTime = point.deviceTime
+                renderedPoint.speed = point.speed
+            }
+            val resetRenderedPoint = ::gen_resetRenderedPoint_fn
             fun gen_formatPlaybackTime_fn(timestamp: Number): String {
                 return formatTimes(timestamp) ?: ""
             }
@@ -293,8 +310,22 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 if (trackPoints.value.length == 0 || currentUnplayedPolyline == null || currentPlayedPolyline == null) {
                     return
                 }
-                currentUnplayedPolyline.points = toNativePoints(trackPoints.value.slice(currentIndex.value))
-                currentPlayedPolyline.points = toNativePoints(trackPoints.value.slice(0, currentIndex.value + 1))
+                val isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value
+                val playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
+                if (isAnimatingSegment) {
+                    playedPoints.push(copyTrackPoint(renderedPoint))
+                }
+                val unplayedStartIndex = if (isAnimatingSegment) {
+                    activeSegmentTargetIndex.value
+                } else {
+                    currentIndex.value
+                }
+                val unplayedPoints = trackPoints.value.slice(unplayedStartIndex)
+                if (isAnimatingSegment) {
+                    unplayedPoints.unshift(copyTrackPoint(renderedPoint))
+                }
+                currentUnplayedPolyline.points = toNativePoints(unplayedPoints)
+                currentPlayedPolyline.points = toNativePoints(playedPoints)
                 polyline.value = _uA(
                     currentUnplayedPolyline,
                     currentPlayedPolyline
@@ -304,15 +335,14 @@ open class GenPagesPlayBackPlayBack : BasePage {
             fun gen_updateCarPosition_fn() {
                 val marker = carMarker.value
                 if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
-                    val point = trackPoints.value[currentIndex.value]
-                    val updatedMarker = MapMarker(id = marker.id, latitude = point.latitude, longitude = point.longitude, iconPath = marker.iconPath, width = marker.width, height = marker.height, rotate = point.rotation, anchor = marker.anchor, callout = marker.callout, label = marker.label)
+                    val updatedMarker = MapMarker(id = marker.id, latitude = renderedPoint.latitude, longitude = renderedPoint.longitude, iconPath = marker.iconPath, width = marker.width, height = marker.height, rotate = renderedPoint.rotation, anchor = marker.anchor, callout = marker.callout, label = marker.label)
                     carMarker.value = updatedMarker
                     markers.value = _uA(
                         updatedMarker
                     ).concat(markers.value.slice(1))
-                    if (currentIndex.value % 5 == 0 || currentIndex.value == 0 || currentIndex.value == trackPoints.value.length - 1) {
-                        center["latitude"] = point.latitude
-                        center["longitude"] = point.longitude
+                    if (currentIndex.value % 5 == 0 || currentIndex.value == trackPoints.value.length - 1) {
+                        center["latitude"] = renderedPoint.latitude
+                        center["longitude"] = renderedPoint.longitude
                     }
                 }
             }
@@ -345,6 +375,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 val currentPoint = TrackPoint(latitude = convertedCoord.lat, longitude = convertedCoord.lng, rotation = 0, deviceTime = Date().toLocaleString(), speed = 0)
                 val marker = MapMarker(id = 999, latitude = currentPoint.latitude, longitude = currentPoint.longitude, iconPath = getDeviceIcon(carStatus.value ?: "", carType.value ?: ""), width = 25, height = 25, rotate = 0, anchor = Anchor(x = 0.5, y = 0.5))
                 carMarker.value = marker
+                resetRenderedPoint(currentPoint)
                 markers.value = _uA(
                     marker
                 )
@@ -356,6 +387,12 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 trackPoints.value = _uA()
                 isTrackPlayable.value = false
                 currentIndex.value = 0
+                activeSegmentTargetIndex.value = -1
+                renderedPoint.latitude = 0
+                renderedPoint.longitude = 0
+                renderedPoint.rotation = 0
+                renderedPoint.deviceTime = ""
+                renderedPoint.speed = 0
                 currentSpeed.value = 0
                 currentTime.value = ""
                 totalDistance.value = 0
@@ -366,18 +403,25 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 polyline.value = _uA()
             }
             val clearTrackDisplay = ::gen_clearTrackDisplay_fn
-            fun gen_pausePlayback_fn() {
-                isPlaying.value = false
+            fun gen_clearPlaybackTimer_fn(): Unit {
                 val timer = playbackTimer
                 if (timer != null) {
                     clearTimeout(timer)
                     playbackTimer = null
                 }
             }
+            val clearPlaybackTimer = ::gen_clearPlaybackTimer_fn
+            fun gen_pausePlayback_fn(): Unit {
+                isPlaying.value = false
+                clearPlaybackTimer()
+            }
             val pausePlayback = ::gen_pausePlayback_fn
             fun gen_renderPlaybackIndex_fn(): Unit {
                 if (trackPoints.value.length == 0) {
                     return
+                }
+                if (activeSegmentTargetIndex.value <= currentIndex.value) {
+                    resetRenderedPoint(trackPoints.value[currentIndex.value])
                 }
                 updateCarPosition()
                 updatePolyline()
@@ -431,6 +475,11 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 trackPoints.value = processedPoints
                 isTrackPlayable.value = processedPoints.length > 1
                 currentIndex.value = 0
+                activeSegmentTargetIndex.value = -1
+                if (processedPoints.length == 0) {
+                    return
+                }
+                resetRenderedPoint(processedPoints[0])
                 calculateTrackDistance()
                 initCarMarker()
                 initPolyline()
@@ -499,39 +548,88 @@ open class GenPagesPlayBackPlayBack : BasePage {
             fun gen_resetPlayback_fn() {
                 pausePlayback()
                 currentIndex.value = 0
+                activeSegmentTargetIndex.value = -1
                 renderPlaybackIndex()
             }
             val resetPlayback = ::gen_resetPlayback_fn
-            fun gen_playNextPoint_fn(): Boolean {
-                if (currentIndex.value >= trackPoints.value.length - 1) {
-                    pausePlayback()
-                    showAppToast(ShowToastOptions(title = "轨迹回放完成", icon = "none", duration = 1500))
-                    return false
+            fun gen_getShortestRotationDifference_fn(from: Number, to: Number): Number {
+                var difference = to - from
+                if (difference > 180) {
+                    difference -= 360
+                } else if (difference < -180) {
+                    difference += 360
                 }
-                currentIndex.value++
-                renderPlaybackIndex()
-                return true
+                return difference
             }
-            val playNextPoint = ::gen_playNextPoint_fn
-            fun gen_playbackStep_fn(sessionId: Number) {
+            val getShortestRotationDifference = ::gen_getShortestRotationDifference_fn
+            fun gen_getSegmentDuration_fn(start: TrackPoint, end: TrackPoint): Number {
+                val distance = getDistance(start.latitude, start.longitude, end.latitude, end.longitude)
+                val recordedSpeed = if (start.speed > 0 && isFinite(start.speed)) {
+                    start.speed
+                } else {
+                    end.speed
+                }
+                val speed = if (recordedSpeed > 0 && isFinite(recordedSpeed)) {
+                    recordedSpeed
+                } else {
+                    FALLBACK_SPEED_KMH
+                }
+                val duration = distance / (speed / 3.6) * 1000 / playbackSpeed.value
+                return Math.min(MAX_SEGMENT_DURATION_MS, Math.max(MIN_SEGMENT_DURATION_MS, duration))
+            }
+            val getSegmentDuration = ::gen_getSegmentDuration_fn
+            fun gen_finishPlayback_fn(): Unit {
+                pausePlayback()
+                activeSegmentTargetIndex.value = -1
+                showAppToast(ShowToastOptions(title = "轨迹回放完成", icon = "none", duration = 1500))
+            }
+            val finishPlayback = ::gen_finishPlayback_fn
+            fun gen_animateNextSegment_fn(sessionId: Number): Unit {
                 if (!isPlaying.value || sessionId != replaySessionId) {
                     return
                 }
-                val now = Date.now()
-                val elapsed = now - lastTimestamp
-                val interval = (1000 as Number) / playbackSpeed.value
-                if (elapsed >= interval) {
-                    playNextPoint()
-                    lastTimestamp = now - (elapsed % interval)
+                if (currentIndex.value >= trackPoints.value.length - 1) {
+                    finishPlayback()
+                    return
                 }
-                if (isPlaying.value && sessionId == replaySessionId) {
-                    playbackTimer = setTimeout(fun(){
-                        gen_playbackStep_fn(sessionId)
+                val startPoint = TrackPoint(latitude = renderedPoint.latitude, longitude = renderedPoint.longitude, rotation = renderedPoint.rotation, deviceTime = renderedPoint.deviceTime, speed = renderedPoint.speed)
+                val targetIndex = currentIndex.value + 1
+                val targetPoint = trackPoints.value[targetIndex]
+                val rotationDifference = getShortestRotationDifference(startPoint.rotation, targetPoint.rotation)
+                val duration = getSegmentDuration(startPoint, targetPoint)
+                val startedAt = Date.now()
+                activeSegmentTargetIndex.value = targetIndex
+                var renderFrame: (() -> Unit)? = null
+                renderFrame = fun(): Unit {
+                    if (!isPlaying.value || sessionId != replaySessionId) {
+                        return
                     }
-                    , 16)
+                    val progress = Math.min((Date.now() - startedAt) / duration, 1)
+                    renderedPoint.latitude = startPoint.latitude + (targetPoint.latitude - startPoint.latitude) * progress
+                    renderedPoint.longitude = startPoint.longitude + (targetPoint.longitude - startPoint.longitude) * progress
+                    renderedPoint.rotation = (startPoint.rotation + rotationDifference * progress + 360) % 360
+                    renderedPoint.deviceTime = targetPoint.deviceTime
+                    renderedPoint.speed = targetPoint.speed
+                    updateCarPosition()
+                    updatePolyline()
+                    if (progress >= 1) {
+                        currentIndex.value = targetIndex
+                        activeSegmentTargetIndex.value = -1
+                        resetRenderedPoint(targetPoint)
+                        renderPlaybackIndex()
+                        gen_animateNextSegment_fn(sessionId)
+                        return
+                    }
+                    if (renderFrame != null) {
+                        playbackTimer = setTimeout(fun(){
+                            renderFrame?.invoke()
+                        }
+                        , PLAYBACK_FRAME_INTERVAL_MS)
+                    }
                 }
+                renderFrame?.invoke()
             }
-            val playbackStep = ::gen_playbackStep_fn
+            val animateNextSegment = ::gen_animateNextSegment_fn
             fun gen_startPlayback_fn() {
                 if (!isTrackPlayable.value) {
                     showAppToast(ShowToastOptions(title = "没有轨迹数据", icon = "none"))
@@ -540,13 +638,10 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 if (currentIndex.value >= trackPoints.value.length - 1) {
                     resetPlayback()
                 }
+                activeSegmentTargetIndex.value = -1
                 isPlaying.value = true
                 val sessionId = ++replaySessionId
-                if (!playNextPoint()) {
-                    return
-                }
-                lastTimestamp = Date.now()
-                playbackStep(sessionId)
+                animateNextSegment(sessionId)
             }
             val startPlayback = ::gen_startPlayback_fn
             fun gen_togglePlayback_fn() {
@@ -577,21 +672,13 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 if (!isFinite(value)) {
                     return
                 }
-                playbackSpeed.value = Math.min(50, Math.max(5, value))
+                playbackSpeed.value = Math.min(30, Math.max(1, value))
                 if (!isPlaying.value) {
                     return
                 }
-                val timer = playbackTimer
-                if (timer != null) {
-                    clearTimeout(timer)
-                    playbackTimer = null
-                }
-                lastTimestamp = Date.now()
-                val sessionId = replaySessionId
-                playbackTimer = setTimeout(fun(){
-                    playbackStep(sessionId)
-                }
-                , 16)
+                clearPlaybackTimer()
+                val sessionId = ++replaySessionId
+                animateNextSegment(sessionId)
             }
             val applyPlaybackSpeed = ::gen_applyPlaybackSpeed_fn
             fun gen_setPlaybackSpeedFromValue_fn(value: Number): Unit {
@@ -713,7 +800,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                                     _cV(_component_i_slider, _uM("modelValue" to playbackSpeed.value, "onUpdate:modelValue" to fun(`$event`: Number){
                                         playbackSpeed.value = `$event`
                                     }
-                                    , "min" to 5, "max" to 50, "step" to 5, "onChange" to setPlaybackSpeedFromValue), null, 8, _uA(
+                                    , "min" to 1, "max" to 30, "step" to 1, "onChange" to setPlaybackSpeedFromValue), null, 8, _uA(
                                         "modelValue",
                                         "onUpdate:modelValue"
                                     ))

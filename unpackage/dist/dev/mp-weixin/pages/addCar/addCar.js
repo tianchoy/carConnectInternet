@@ -245,6 +245,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onShow(() => {
       isNavigatingToScanner.value = false;
       const rawResult = common_vendor.index.getStorageSync("scanCodeResult");
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:296", "onShow:", rawResult);
+      const scanCodeResultListener = common_vendor.index.$on("scanCodeResult", handleScanResult);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:298", "scanCodeResultListener:", scanCodeResultListener);
       const result = rawResult != null ? rawResult.toString() : "";
       if (result.length > 0) {
         common_vendor.index.removeStorageSync("scanCodeResult");
