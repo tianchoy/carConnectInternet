@@ -510,18 +510,6 @@ const imei = ref<string | null>(null)
 		}
 	}
 
-	// 获取围栏类型（根据area字段判断）
-
-
-	// 将围栏数据渲染到地图上
-
-
-	// 解析POLYGON字符串为坐标数组
-
-
-	// 解析CIRCLE字符串为圆心和半径
-
-
 	// 生成POLYGON字符串
 	const generatePolygonString = (points : Array<Coordinate>) : string => {
 		const coords = points.map((point : Coordinate) : string => {
@@ -977,6 +965,7 @@ const imei = ref<string | null>(null)
 				} else {
 					await loadUnboundDevices(currentFenceId.value)
 				}
+				loadGeofenceList()
 			} else {
 				showAppToast({ title: result.msg || '操作失败', icon: 'none' })
 			}

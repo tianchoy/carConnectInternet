@@ -421,44 +421,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const baseList = common_vendor.computed(() => {
-      const list = [
-        new common_vendor.UTSJSONObject({
-          image: "/static/gjhf.png",
-          text: "轨迹回放"
-        }),
-        new common_vendor.UTSJSONObject({
-          image: "/static/clgz.png",
-          text: "车辆跟踪"
-        }),
-        new common_vendor.UTSJSONObject({
-          image: "/static/lcjl.png",
-          text: "里程记录"
-        }),
-        new common_vendor.UTSJSONObject({
-          image: "/static/tcjl.png",
-          text: "停车记录"
-        }),
-        new common_vendor.UTSJSONObject({
-          image: "/static/dzwl.png",
-          text: "电子围栏"
-        }),
-        new common_vendor.UTSJSONObject({
-          image: "/static/navto.png",
-          text: "一键寻车"
-        }),
-        new common_vendor.UTSJSONObject({
-          image: "/static/power.png",
-          text: "恢复油电"
-        }),
-        new common_vendor.UTSJSONObject({
-          image: "/static/offpower.png",
-          text: "断开油电"
-        })
-        // {
-        // 		image: '/static/cmd.png',
-        // 		text: '发送指令'
-        // 	}
-      ];
+      const list = [new common_vendor.UTSJSONObject({
+        image: "/static/gjhf.png",
+        text: "轨迹回放"
+      }), new common_vendor.UTSJSONObject({
+        image: "/static/clgz.png",
+        text: "车辆跟踪"
+      }), new common_vendor.UTSJSONObject({
+        image: "/static/lcjl.png",
+        text: "里程记录"
+      }), new common_vendor.UTSJSONObject({
+        image: "/static/tcjl.png",
+        text: "停车记录"
+      }), new common_vendor.UTSJSONObject({
+        image: "/static/dzwl.png",
+        text: "电子围栏"
+      }), new common_vendor.UTSJSONObject({
+        image: "/static/navto.png",
+        text: "一键寻车"
+      }), new common_vendor.UTSJSONObject({
+        image: "/static/power.png",
+        text: "恢复油电"
+      }), new common_vendor.UTSJSONObject({
+        image: "/static/offpower.png",
+        text: "断开油电"
+      }), new common_vendor.UTSJSONObject({
+        image: "/static/share.png",
+        text: "分享设备"
+      })];
       const productId = currentCarInfo.value.productId;
       if (productId == "product-1141811865601576960" || productId == "product-1183161303028600832") {
         list.push(new common_vendor.UTSJSONObject({
@@ -625,6 +615,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: "/pages/cmd/cmd?imei=" + imei.value + "&deviceId=" + deviceId.value
         });
       }
+      if (itemTo == "分享设备") {
+        stopAutoRefresh();
+        common_vendor.index.navigateTo({
+          url: "/pages/deviceShare/deviceShare?imei=" + imei.value + "&deviceId=" + deviceId.value + "&deviceName=" + currentCarInfo.value.deviceName
+        });
+      }
     };
     const loadDeviceDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -636,7 +632,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "获取设备详情失败", icon: "none" });
           }
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:826", "设备id获取失败");
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:832", "设备id获取失败");
         }
       });
     };
@@ -661,17 +657,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     });
     common_vendor.onShow(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:860", "页面显示，检查自动刷新状态");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:866", "页面显示，检查自动刷新状态");
       if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
         setupAutoRefresh(currentTime.value);
       }
     });
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:869", "页面隐藏时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:875", "页面隐藏时停止自动刷新");
       stopAutoRefresh();
     });
     common_vendor.onUnmounted(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:874", "页面卸载时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:880", "页面卸载时停止自动刷新");
       stopAutoRefresh();
     });
     return (_ctx, _cache) => {

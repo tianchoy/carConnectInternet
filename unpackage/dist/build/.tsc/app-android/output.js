@@ -118,4 +118,6 @@ const indexListMode_uvue_vue_type_style_index_0_lang = {};
 
 const deviceList_uvue_vue_type_style_index_0_lang = {};
 
+const deviceShare_uvue_vue_type_style_index_0_lang = {};
+
 const App_uvue_vue_type_style_index_0_lang = {};

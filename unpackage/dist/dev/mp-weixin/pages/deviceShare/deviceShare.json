@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "设备分享",
+  "usingComponents": {
+    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
+    "app-toast": "../../components/app-toast/app-toast",
+    "app-modal": "../../components/app-modal/app-modal"
+  }
+}

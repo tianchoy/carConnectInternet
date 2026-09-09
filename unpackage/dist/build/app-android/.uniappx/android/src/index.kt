@@ -631,6 +631,9 @@ val pushBindUrl = "/app/push/bind"
 val pushUnbindUrl = "/app/push/unbind"
 val messageUnreadCountUrl = "/app/message/unreadCount"
 val geocoderAddressUrl = "/geocoder/address"
+val deviceShareUrl = "/share/device"
+val deviceShareSentUrl = "/share/device/sent"
+val deviceShareEnabledUrl = "/share/device/enabled"
 open class BasicResponse (
     @JsonNotNull
     open var code: Number,
@@ -842,6 +845,69 @@ open class GeocoderAddressResponse (
     @JsonNotNull
     open var data: UTSJSONObject,
 ) : UTSObject()
+open class DeviceSharePageData (
+    @JsonNotNull
+    open var list: UTSArray<UTSJSONObject>,
+    @JsonNotNull
+    open var pageSize: Number,
+    @JsonNotNull
+    open var totalCount: Number,
+    @JsonNotNull
+    open var totalPage: Number,
+    @JsonNotNull
+    open var currPage: Number,
+) : UTSObject()
+open class DeviceSharePageResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: DeviceSharePageData,
+) : UTSObject()
+open class DeviceShareEnabledResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
+) : UTSObject()
+open class DeviceShareCreateRequest (
+    @JsonNotNull
+    open var deviceId: Any,
+    open var targetPhone: String? = null,
+    open var targetUserNo: String? = null,
+    open var role: String? = null,
+    open var expireTime: Number? = null,
+) : UTSObject()
+open class DeviceShareCreateResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
+) : UTSObject()
+fun deviceSharePageResponse(raw: Any): DeviceSharePageResponse {
+    val response = asJSONObject(raw)
+    val data = getResponseDataObject(response)
+    val list = data.getArray<UTSJSONObject>("list")
+    return DeviceSharePageResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = DeviceSharePageData(list = if (list != null) {
+        list
+    } else {
+        _uA()
+    }
+    , pageSize = data.getNumber("pageSize", 1000), totalCount = data.getNumber("totalCount", 0), totalPage = data.getNumber("totalPage", 1), currPage = data.getNumber("currPage", 1)))
+}
+fun deviceShareEnabledResponse(raw: Any): DeviceShareEnabledResponse {
+    val response = asJSONObject(raw)
+    return DeviceShareEnabledResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataObject(response))
+}
+fun deviceShareCreateResponse(raw: Any): DeviceShareCreateResponse {
+    val response = asJSONObject(raw)
+    return DeviceShareCreateResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataObject(response))
+}
 fun basicResponse(raw: Any): BasicResponse {
     val response = asJSONObject(raw)
     return BasicResponse(code = getResponseCode(response), msg = getResponseMessage(response))
@@ -1202,6 +1268,53 @@ val bindPushDevice = fun(data: PushDeviceBindRequest): UTSPromise<BasicResponse>
     requestData.set("deviceName", data.deviceName)
     requestData.set("appVersion", data.appVersion)
     return postSilently(pushBindUrl, requestData).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getDeviceShareEnabled = fun(): UTSPromise<DeviceShareEnabledResponse> {
+    return get(deviceShareEnabledUrl).then(fun(raw: Any): DeviceShareEnabledResponse {
+        return deviceShareEnabledResponse(raw)
+    }
+    )
+}
+val createDeviceShare = fun(data: DeviceShareCreateRequest): UTSPromise<DeviceShareCreateResponse> {
+    val requestData = UTSJSONObject()
+    requestData.set("deviceId", data.deviceId)
+    if (data.targetPhone != null && data.targetPhone != "") {
+        requestData.set("targetPhone", data.targetPhone)
+    }
+    if (data.targetUserNo != null && data.targetUserNo != "") {
+        requestData.set("targetUserNo", data.targetUserNo)
+    }
+    requestData.set("role", if (data.role != null && data.role != "") {
+        data.role
+    } else {
+        "view"
+    }
+    )
+    if (data.expireTime != null) {
+        requestData.set("expireTime", data.expireTime)
+    }
+    return post(deviceShareUrl, requestData).then(fun(raw: Any): DeviceShareCreateResponse {
+        return deviceShareCreateResponse(raw)
+    }
+    )
+}
+val getSentDeviceShares = fun(params: UTSJSONObject): UTSPromise<DeviceSharePageResponse> {
+    return get(deviceShareSentUrl, params).then(fun(raw: Any): DeviceSharePageResponse {
+        return deviceSharePageResponse(raw)
+    }
+    )
+}
+val getDeviceSharees = fun(deviceId: Any, params: UTSJSONObject): UTSPromise<DeviceSharePageResponse> {
+    return get("" + deviceShareUrl + "/" + deviceId.toString() + "/sharees", params).then(fun(raw: Any): DeviceSharePageResponse {
+        return deviceSharePageResponse(raw)
+    }
+    )
+}
+val revokeDeviceShare = fun(shareId: Any): UTSPromise<BasicResponse> {
+    return remove("" + deviceShareUrl + "/" + shareId.toString()).then(fun(raw: Any): BasicResponse {
         return basicResponse(raw)
     }
     )
@@ -5906,6 +6019,7 @@ fun __uts_large_list_fill_fill_1(__arr: UTSArray<UTSJSONObject>): Unit {
     __arr.push(_uO("image" to "/static/navto.png", "text" to "一键寻车"))
     __arr.push(_uO("image" to "/static/power.png", "text" to "恢复油电"))
     __arr.push(_uO("image" to "/static/offpower.png", "text" to "断开油电"))
+    __arr.push(_uO("image" to "/static/share.png", "text" to "分享设备"))
 }
 fun __uts_large_list_build_0(): UTSArray<UTSJSONObject> {
     val __arr = _uA<UTSJSONObject>()
@@ -9593,6 +9707,16 @@ val GenPagesDeviceListDeviceListClass = CreateVueComponent(GenPagesDeviceListDev
     return GenPagesDeviceListDeviceList(instance, renderer)
 }
 )
+val GenPagesDeviceShareDeviceShareClass = CreateVueComponent(GenPagesDeviceShareDeviceShare::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesDeviceShareDeviceShare.inheritAttrs, inject = GenPagesDeviceShareDeviceShare.inject, props = GenPagesDeviceShareDeviceShare.props, propsNeedCastKeys = GenPagesDeviceShareDeviceShare.propsNeedCastKeys, emits = GenPagesDeviceShareDeviceShare.emits, components = GenPagesDeviceShareDeviceShare.components, styles = GenPagesDeviceShareDeviceShare.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesDeviceShareDeviceShare.setup(props as GenPagesDeviceShareDeviceShare)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesDeviceShareDeviceShare {
+    return GenPagesDeviceShareDeviceShare(instance, renderer)
+}
+)
 fun createApp(): UTSJSONObject {
     val app = createSSRApp(GenAppClass)
     return _uO("app" to app)
@@ -9606,8 +9730,8 @@ fun main(app: IApp) {
 open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
     override var name: String = "中导物联"
     override var appid: String = "__UNI__662B0B4"
-    override var versionName: String = "1.0.1"
-    override var versionCode: String = "101"
+    override var versionName: String = "1.0.5"
+    override var versionCode: String = "105"
     override var uniCompilerVersion: String = "5.25"
     constructor() : super() {}
 }
@@ -9637,6 +9761,7 @@ fun definePageRoutes() {
     __uniRoutes.push(UniPageRoute(path = "pages/cmd/cmd", component = GenPagesCmdCmdClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "")))
     __uniRoutes.push(UniPageRoute(path = "pages/webview/webview", component = GenPagesWebviewWebviewClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "")))
     __uniRoutes.push(UniPageRoute(path = "pages/deviceList/deviceList", component = GenPagesDeviceListDeviceListClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "设备列表")))
+    __uniRoutes.push(UniPageRoute(path = "pages/deviceShare/deviceShare", component = GenPagesDeviceShareDeviceShareClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "设备分享")))
 }
 val __uniTabBar: Map<String, Any?>? = _uM("color" to "#2c2c2c", "selectedColor" to "#d81e06", "borderStyle" to "black", "backgroundColor" to "#ffffff", "list" to _uA(
     _uM("pagePath" to "pages/index/index", "iconPath" to "/static/tabBar/home.png", "selectedIconPath" to "/static/tabBar/home1.png", "text" to "首页"),

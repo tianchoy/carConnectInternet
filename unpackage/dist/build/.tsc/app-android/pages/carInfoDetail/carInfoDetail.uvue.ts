@@ -514,10 +514,10 @@ const deptId = ref<string | null>('')
 				image: '/static/offpower.png',
 				text: '断开油电'
 			},
-			// {
-			// 		image: '/static/cmd.png',
-			// 		text: '发送指令'
-			// 	}
+			{
+				image: '/static/share.png',
+				text: '分享设备'
+			}
 		]
 
 		// 根据 productId 决定是否添加发送指令选项
@@ -712,6 +712,12 @@ const deptId = ref<string | null>('')
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
 				url: '/pages/cmd/cmd?imei=' + imei.value + '&deviceId=' + deviceId.value
+			})
+		}
+		if (itemTo == '分享设备') {
+			stopAutoRefresh() // 停止刷新
+			uni.navigateTo({
+				url: '/pages/deviceShare/deviceShare?imei=' + imei.value + '&deviceId=' + deviceId.value + '&deviceName=' + currentCarInfo.value.deviceName
 			})
 		}
 

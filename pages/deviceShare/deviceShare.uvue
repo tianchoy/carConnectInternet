@@ -1,0 +1,338 @@
+<template>
+	<view class="page">
+		<custom-navBar title="设备分享" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false"></custom-navBar>
+		<scroll-view class="content" scroll-y="true" @scrolltolower="loadMore">
+			<view v-if="loadingEnabled" class="state-card"><text>加载中...</text></view>
+			<view v-else-if="!enabled" class="state-card">
+				<text class="state-title">分享功能暂未开放</text>
+				<text class="state-desc">请稍后再试</text>
+			</view>
+			<view v-else>
+				<view class="share-form card">
+					<view class="form-row">
+						<text class="form-label">分享设备</text>
+						<text class="form-value">{{deviceName}}</text>
+					</view>
+					<view class="form-row input-row">
+						<text class="form-label">手机号</text>
+						<input class="form-input" v-model="targetPhone" type="number" maxlength="20" placeholder="请输入被分享者手机号" placeholder-style="font-size: 24rpx; color: #c0c4cc;" />
+					</view>
+					<view class="form-row">
+						<text class="form-label">有效期</text>
+						<view class="expire-actions">
+							<text class="form-value" v-if="expireDate == ''">永久</text>
+							<!-- <text class="form-value" v-else>{{expireDate}}</text>
+							<picker mode="date" :value="expireDate" :start="minExpireDate" @change="onExpireDateChange">
+								<text class="date-button">{{expireDate == '' ? '选择日期' : '更改'}}</text>
+							</picker>
+							<text v-if="expireDate != ''" class="clear-date" @click="clearExpireDate">永久</text> -->
+						</view>
+					</view>
+					<view style="margin-top: 20rpx;">
+						<button class="primary-button" :class="{ 'button-disabled': submitting || !canSubmit }" :disabled="submitting || !canSubmit" @click="submitShare">{{submitting ? '提交中...' : '确认分享'}}</button>
+					</view>
+				</view>
+
+				<view class="tabs card">
+					<text class="tab tab-active">我发起的 {{sentTotalCount}}</text>
+				</view>
+
+				<view class="list-section">
+					<view v-if="sentLoading && sentShares.length == 0" class="state-card"><text>加载中...</text></view>
+					<view v-else-if="sentShares.length == 0" class="state-card"><text style="color: #999;">暂无发起的分享</text></view>
+					<view v-for="item in sentShares" :key="item.getString('shareId', '')" class="share-card card">
+						<view class="share-card-header">
+							<view class="device-meta"><text class="device-title">{{displayDevice(item)}}</text><text class="plate">{{item.getString('plateNo', '')}}</text></view>
+							<text class="status" :class="statusClass(item.getString('status', ''))">{{statusText(item.getString('status', ''))}}</text>
+						</view>
+						<view class="detail-line"><text>分享给</text><text class="detail-value">{{getSharePerson(item, 'targetNickName', 'targetPhoneMasked')}}</text></view>
+						<view class="detail-line"><text>角色</text><text class="detail-value">{{item.getString('role', 'view')}}</text></view>
+						<view class="detail-line"><text>分享时间</text><text class="detail-value">{{formatTimestamp(item.getNumber('shareTime', 0))}}</text></view>
+						<view class="detail-line"><text>到期时间</text><text class="detail-value">{{formatExpireTime(item)}}</text></view>
+						<view class="card-actions">
+							<button class="plain-button" @click="showSharees(item)">查看被分享者</button>
+							<button v-if="item.getString('status', '') == 'active'" class="danger-button" @click="confirmRevoke(item)">撤销分享</button>
+						</view>
+					</view>
+					<button v-if="sentHasMore" class="more-button" :disabled="sentLoading" @click="loadMore">{{sentLoading ? '加载中...' : '加载更多'}}</button>
+				</view>
+			</view>
+		</scroll-view>
+
+		<view v-if="shareesVisible" class="modal-mask" @click="shareesVisible = false">
+			<view class="sharees-modal" @click.stop>
+				<view class="modal-header"><text class="section-title">被分享者</text><text class="modal-close" @click="shareesVisible = false">×</text></view>
+				<scroll-view class="sharees-list" scroll-y="true">
+					<view v-if="shareesLoading" class="state-card"><text>加载中...</text></view>
+					<view v-else-if="sharees.length == 0" class="state-card"><text>暂无被分享者</text></view>
+					<view v-for="item in sharees" :key="item.getString('shareId', '')" class="sharee-row">
+						<view><text class="device-title">{{getSharePerson(item, 'targetNickName', '')}}</text><text class="masked-phone">{{item.getString('targetPhoneMasked', '')}}</text></view>
+						<text class="status" :class="statusClass(item.getString('status', ''))">{{statusText(item.getString('status', ''))}}</text>
+					</view>
+				</scroll-view>
+			</view>
+		</view>
+	</view>
+	<app-toast></app-toast>
+	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
+	<app-modal></app-modal>
+	<!-- #endif -->
+</template>
+
+<script setup lang="uts">
+import { ref, computed } from 'vue'
+import { showAppToast } from '../../utils/toast.uts'
+import { showAppModal } from '../../utils/modal.uts'
+import { getDeviceShareEnabled, createDeviceShare, getSentDeviceShares, getDeviceSharees, revokeDeviceShare } from '../../api/request.uts'
+
+const enabled = ref(false)
+const loadingEnabled = ref(true)
+const deviceId = ref('')
+const deviceName = ref('')
+const targetPhone = ref('')
+const expireDate = ref('')
+const submitting = ref(false)
+const sentShares = ref<Array<UTSJSONObject>>([])
+const sentTotalCount = ref(0)
+const sentPage = ref(1)
+const sentHasMore = ref(false)
+const sentLoading = ref(false)
+const sharees = ref<Array<UTSJSONObject>>([])
+const shareesVisible = ref(false)
+const shareesLoading = ref(false)
+
+const canSubmit = computed((): boolean => targetPhone.value.trim() != '')
+
+const minExpireDate = computed((): string => {
+	const now = new Date()
+	const month = (now.getMonth() + 1).toString().padStart(2, '0')
+	const day = now.getDate().toString().padStart(2, '0')
+	return `${now.getFullYear()}-${month}-${day}`
+})
+
+const requestPageSize = 1000
+const permanentExpireDate = '2099-12-31'
+const displayDevice = (item: UTSJSONObject): string => {
+	const name = item.getString('deviceName', '')
+	if (name != '') return name
+	const plate = item.getString('plateNo', '')
+	if (plate != '') return plate
+	return item.getString('deviceId', '设备')
+}
+const getSharePerson = (item: UTSJSONObject, nameKey: string, phoneKey: string): string => {
+	const name = item.getString(nameKey, '')
+	if (name != '') return name
+	if (phoneKey != '') {
+		const phone = item.getString(phoneKey, '')
+		if (phone != '') return phone
+	}
+	return '--'
+}
+const statusText = (status: string): string => {
+	if (status == 'active') return '生效中'
+	if (status == 'exited') return '已退出'
+	if (status == 'revoked') return '已撤销'
+	if (status == 'expired') return '已过期'
+	return status != '' ? status : '未知状态'
+}
+const statusClass = (status: string): string => status == 'active' ? 'status-active' : 'status-inactive'
+const formatTimestamp = (timestamp: number): string => {
+	if (timestamp <= 0) return '--'
+	const date = new Date(timestamp * 1000)
+	return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+}
+const formatExpireTime = (item: UTSJSONObject): string => {
+	const value = item['expireTime'] as number | null
+	return value == null || value <= 0 ? '永久' : formatTimestamp(value)
+}
+
+const loadSent = async (reset: boolean): Promise<void> => {
+	if (sentLoading.value) return
+	if (reset) {
+		sentPage.value = 1
+		sentHasMore.value = false
+		sentShares.value = []
+		sentTotalCount.value = 0
+	}
+	sentLoading.value = true
+	try {
+		const res = await getSentDeviceShares({ pageNum: sentPage.value, pageSize: requestPageSize } as UTSJSONObject)
+		if (res.code != 200) {
+			showAppToast({ title: res.msg || '获取分享列表失败', icon: 'none' })
+			return
+		}
+		const data = res.data
+		sentTotalCount.value = data.totalCount
+		sentShares.value = reset ? data.list : [...sentShares.value, ...data.list]
+		const currentPage = data.currPage > 0 ? data.currPage : sentPage.value
+		const totalPage = data.totalPage > 0 ? data.totalPage : 1
+		sentHasMore.value = currentPage < totalPage
+		if (sentHasMore.value) sentPage.value = currentPage + 1
+	} catch (error) {
+		console.error('获取发起分享列表失败:', error)
+		showAppToast({ title: '获取分享列表失败，请重试', icon: 'none' })
+	} finally {
+		sentLoading.value = false
+	}
+}
+
+const onExpireDateChange = (event: any): void => {
+	const value = event != null && event.detail != null ? event.detail.value : ''
+	expireDate.value = value == null ? '' : value.toString()
+}
+const clearExpireDate = (): void => { expireDate.value = '' }
+
+const submitShare = async (): Promise<void> => {
+	if (submitting.value) return
+	if (deviceId.value == '') {
+		showAppToast({ title: '设备ID不能为空', icon: 'none' })
+		return
+	}
+	const phone = targetPhone.value.trim()
+	if (phone == '') {
+		showAppToast({ title: '请填写手机号', icon: 'none' })
+		return
+	}
+	if (!/^1[3-9]\d{9}$/.test(phone)) {
+		showAppToast({ title: '请输入正确的手机号', icon: 'none' })
+		return
+	}
+	const dateValue = expireDate.value == '' ? permanentExpireDate : expireDate.value
+	const expireTime = Math.floor(new Date(`${dateValue}T23:59:59`).getTime() / 1000)
+	if (expireTime <= Math.floor(new Date().getTime() / 1000)) {
+		showAppToast({ title: '到期时间必须晚于当前时间', icon: 'none' })
+		return
+	}
+	submitting.value = true
+	try {
+		const res = await createDeviceShare({
+			deviceId: deviceId.value,
+			targetPhone: phone,
+			expireTime: expireTime
+		})
+		if (res.code == 200) {
+			showAppToast({ title: '分享成功', icon: 'success' })
+			targetPhone.value = ''
+			expireDate.value = ''
+			await loadSent(true)
+		} else {
+			showAppToast({ title: res.msg || '分享失败', icon: 'none' })
+		}
+	} catch (error) {
+		console.error('发起设备分享失败:', error)
+		showAppToast({ title: '分享失败，请重试', icon: 'none' })
+	} finally {
+		submitting.value = false
+	}
+}
+
+const revokeShare = async (shareId: string): Promise<void> => {
+	if (shareId == '') return
+	try {
+		const res = await revokeDeviceShare(shareId)
+		if (res.code == 200) {
+			showAppToast({ title: '撤销成功', icon: 'success' })
+			await loadSent(true)
+		} else showAppToast({ title: res.msg || '撤销失败', icon: 'none' })
+	} catch (error) {
+		console.error('撤销设备分享失败:', error)
+		showAppToast({ title: '撤销失败，请重试', icon: 'none' })
+	}
+}
+const confirmRevoke = (item: UTSJSONObject): void => {
+	showAppModal({
+		title: '撤销分享',
+		content: `确定撤销“${displayDevice(item)}”的分享吗？`,
+		showCancel: true,
+		success: (result) => { if (result.confirm) void revokeShare(item.getString('shareId', '')) }
+	})
+}
+const showSharees = async (item: UTSJSONObject): Promise<void> => {
+	sharees.value = []
+	shareesVisible.value = true
+	shareesLoading.value = true
+	try {
+		const res = await getDeviceSharees(item.getString('deviceId', ''), { pageNum: 1, pageSize: requestPageSize } as UTSJSONObject)
+		if (res.code == 200) sharees.value = res.data.list
+		else showAppToast({ title: res.msg || '获取被分享者失败', icon: 'none' })
+	} catch (error) {
+		console.error('获取被分享者失败:', error)
+		showAppToast({ title: '获取被分享者失败，请重试', icon: 'none' })
+	} finally {
+		shareesLoading.value = false
+	}
+}
+const loadMore = (): void => {
+	if (sentHasMore.value) void loadSent(false)
+}
+
+const initializeDeviceShare = async (): Promise<void> => {
+	try {
+		const res = await getDeviceShareEnabled()
+		if (res.code == 200) {
+			enabled.value = res.data.getBoolean('enabled', false)
+		} else {
+			showAppToast({ title: res.msg || '获取分享开关失败', icon: 'none' })
+		}
+		if (enabled.value) await loadSent(true)
+	} catch (error) {
+		console.error('初始化设备分享失败:', error)
+		showAppToast({ title: '加载分享功能失败，请重试', icon: 'none' })
+	} finally {
+		loadingEnabled.value = false
+	}
+}
+
+onLoad((options) => {
+	deviceId.value = options.deviceId as string ?? ''
+	deviceName.value = options.deviceName as string ?? ''
+	void initializeDeviceShare()
+})
+</script>
+
+<style lang="scss" scoped>
+.page { height: 100%; background-color: #f5f7fa; display: flex; flex-direction: column; }
+.content { flex: 1; padding: 24rpx; box-sizing: border-box; }
+.card { background-color: #fff; border-radius: 16rpx; margin-bottom: 20rpx; }
+.share-form { padding: 28rpx; }
+.section-title { color: #303133; font-size: 32rpx; font-weight: 600; }
+.form-row { min-height: 82rpx; display: flex; flex-direction: row; align-items: center; border-bottom: 1rpx solid #f0f0f0; }
+.form-label { width: 160rpx; color: #606266; font-size: 28rpx; }
+.form-value { flex: 1; color: #303133; font-size: 28rpx; text-align: right; }
+.input-row { align-items: center; }
+.form-input { flex: 1; height: 76rpx; color: #303133; font-size: 28rpx; text-align: right; }
+.expire-actions { flex: 1; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; }
+.date-button, .clear-date { color: #2979ff; font-size: 26rpx; margin-left: 18rpx; }
+.clear-date { color: #999; }
+.form-tip { color: #999; font-size: 24rpx; padding: 20rpx 0; }
+.primary-button, .plain-button, .danger-button, .more-button { border: 0; border-radius: 10rpx; font-size: 27rpx; line-height: 76rpx; height: 76rpx; }
+.primary-button { background-color: #2979ff; color: #fff; width: 100%; }
+.button-disabled { opacity: .6; }
+.tabs { height: 84rpx; display: flex; flex-direction: row; }
+.tab { flex: 1; text-align: center; line-height: 84rpx; color: #909399; font-size: 29rpx; }
+.tab-active { color: #2979ff; font-weight: 600; }
+.share-card { padding: 26rpx; }
+.share-card-header { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start; margin-bottom: 18rpx; }
+.device-meta { flex: 1; }
+.device-title { color: #303133; font-size: 30rpx; font-weight: 600; }
+.plate, .masked-phone { color: #909399; font-size: 24rpx; margin-top: 8rpx; }
+.plate, .masked-phone { display: flex; }
+.status { padding: 6rpx 14rpx; border-radius: 20rpx; font-size: 23rpx; }
+.status-active { color: #19a15f; background-color: #e8f8ef; }
+.status-inactive { color: #909399; background-color: #f0f1f3; }
+.detail-line { display: flex; flex-direction: row; justify-content: space-between; padding: 10rpx 0; color: #909399; font-size: 25rpx; }
+.detail-value { color: #606266; }
+.card-actions { display: flex; flex-direction: row; justify-content: flex-end; margin-top: 16rpx; }
+.plain-button { color: #2979ff; background-color: #eef5ff; margin-right: 16rpx; padding: 0 20rpx; }
+.danger-button { color: #e45656; background-color: #fff0f0; padding: 0 20rpx; }
+.more-button { width: 100%; color: #2979ff; background-color: #fff; margin-bottom: 24rpx; }
+.state-card { padding: 70rpx 30rpx; text-align: center; color: #909399; font-size: 27rpx; background-color: #fff; border-radius: 16rpx; margin-bottom: 20rpx; }
+.state-title { color: #606266; font-size: 34rpx; font-weight: 600; margin-bottom: 16rpx; }
+.state-desc { color: #909399; }
+.modal-mask { position: fixed; left: 0; right: 0; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, .5); z-index: 1000; }
+.sharees-modal { width: 680rpx; max-height: 1200rpx; background-color: #fff; border-radius: 18rpx; overflow: hidden; }
+.modal-header { display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 28rpx; border-bottom: 1rpx solid #eee; }
+.modal-close { color: #909399; font-size: 46rpx; line-height: 36rpx; }
+.sharees-list { max-height: 700rpx; }
+.sharee-row { display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 24rpx 28rpx; border-bottom: 1rpx solid #f0f0f0; }
+</style>

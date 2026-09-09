@@ -152,6 +152,12 @@
 			"style": {
 				"navigationBarTitleText": "设备列表"
 			}
+		},
+		{
+			"path": "pages/deviceShare/deviceShare",
+			"style": {
+				"navigationBarTitleText": "设备分享"
+			}
 		}
 	],
 	"tabBar": {

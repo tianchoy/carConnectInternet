@@ -749,7 +749,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: result.msg || "删除失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:858", "删除围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:846", "删除围栏失败:", error);
           utils_toast.showAppToast({ title: "删除失败", icon: "none" });
         }
       });
@@ -838,7 +838,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:969", "保存围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:957", "保存围栏失败:", error);
           utils_toast.showAppToast({ title: "保存失败，请重试", icon: "none" });
         }
       });
@@ -941,7 +941,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const switchTab = (tab) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1073", "switchTab", tab, currentFenceId.value);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1061", "switchTab", tab, currentFenceId.value);
         if (activeTab.value === tab)
           return Promise.resolve(null);
         activeTab.value = tab;
@@ -949,7 +949,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         deviceList.value = [];
         initPagination(tab);
         if (tab === "bind") {
-          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1085", "switchTab,bind:", currentFenceId.value);
+          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1073", "switchTab,bind:", currentFenceId.value);
           yield loadBoundDevices(currentFenceId.value);
         } else {
           yield loadUnboundDevices(currentFenceId.value);
@@ -967,14 +967,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const toggleDeviceBinding = (deviceImei, bound) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1105", "toggleDeviceBinding", deviceImei, bound);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1093", "toggleDeviceBinding", deviceImei, bound);
         loading.value = true;
         try {
           const params = new common_vendor.UTSJSONObject({
             geofenceId: currentFenceId.value,
             imeis: [deviceImei]
           });
-          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1112", "toggleDeviceBindingparams", params);
+          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1100", "toggleDeviceBindingparams", params);
           let result = null;
           if (bound) {
             result = yield api_request.bindDevices(params);
@@ -990,11 +990,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             } else {
               yield loadUnboundDevices(currentFenceId.value);
             }
+            loadGeofenceList();
           } else {
             utils_toast.showAppToast({ title: result.msg || "操作失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:1135", "设备绑定操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:1124", "设备绑定操作失败:", error);
           utils_toast.showAppToast({ title: "操作失败", icon: "none" });
         } finally {
           loading.value = false;
@@ -1050,10 +1051,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.$callMethod("close");
       const fence = selectedFence.value;
-      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1202", "删除电子围栏", fence);
+      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1191", "删除电子围栏", fence);
       if (fence != null) {
         const fenceId = fence.getString("id", "");
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1206", "删除电子围栏ID", fenceId);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1195", "删除电子围栏ID", fenceId);
         if (fenceId !== "") {
           deleteFence(fenceId);
         } else {
@@ -1139,7 +1140,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1356", "加载参数", option);
+      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1345", "加载参数", option);
       connectionStatus.value = option.connectionStatus;
       imei.value = option.imei;
       currentCar.value = option.plateNo || option.deviceName;

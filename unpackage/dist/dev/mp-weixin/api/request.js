@@ -37,6 +37,9 @@ const appCommandRetryUrl = "/app/command/retry/";
 const pushUnbindUrl = "/app/push/unbind";
 const messageUnreadCountUrl = "/app/message/unreadCount";
 const geocoderAddressUrl = "/geocoder/address";
+const deviceShareUrl = "/share/device";
+const deviceShareSentUrl = "/share/device/sent";
+const deviceShareEnabledUrl = "/share/device/enabled";
 class BasicResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -699,6 +702,161 @@ class GeocoderAddressResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class DeviceSharePageData extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          list: { type: "Unknown", optional: false },
+          pageSize: { type: Number, optional: false },
+          totalCount: { type: Number, optional: false },
+          totalPage: { type: Number, optional: false },
+          currPage: { type: Number, optional: false }
+        };
+      },
+      name: "DeviceSharePageData"
+    };
+  }
+  constructor(options, metadata = DeviceSharePageData.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.list = this.__props__.list;
+    this.pageSize = this.__props__.pageSize;
+    this.totalCount = this.__props__.totalCount;
+    this.totalPage = this.__props__.totalPage;
+    this.currPage = this.__props__.currPage;
+    delete this.__props__;
+  }
+}
+class DeviceSharePageResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: DeviceSharePageData, optional: false }
+        };
+      },
+      name: "DeviceSharePageResponse"
+    };
+  }
+  constructor(options, metadata = DeviceSharePageResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
+class DeviceShareEnabledResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: "Unknown", optional: false }
+        };
+      },
+      name: "DeviceShareEnabledResponse"
+    };
+  }
+  constructor(options, metadata = DeviceShareEnabledResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
+class DeviceShareCreateRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          deviceId: { type: "Unknown", optional: false },
+          targetPhone: { type: String, optional: true },
+          targetUserNo: { type: String, optional: true },
+          role: { type: String, optional: true },
+          expireTime: { type: Number, optional: true }
+        };
+      },
+      name: "DeviceShareCreateRequest"
+    };
+  }
+  constructor(options, metadata = DeviceShareCreateRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.deviceId = this.__props__.deviceId;
+    this.targetPhone = this.__props__.targetPhone;
+    this.targetUserNo = this.__props__.targetUserNo;
+    this.role = this.__props__.role;
+    this.expireTime = this.__props__.expireTime;
+    delete this.__props__;
+  }
+}
+class DeviceShareCreateResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: "Unknown", optional: false }
+        };
+      },
+      name: "DeviceShareCreateResponse"
+    };
+  }
+  constructor(options, metadata = DeviceShareCreateResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
+function deviceSharePageResponse(raw = null) {
+  const response = api_response.asJSONObject(raw);
+  const data = api_response.getResponseDataObject(response);
+  const list = data.getArray("list");
+  return new DeviceSharePageResponse({
+    code: api_response.getResponseCode(response),
+    msg: api_response.getResponseMessage(response),
+    data: new DeviceSharePageData({
+      list: list != null ? list : [],
+      pageSize: data.getNumber("pageSize", 1e3),
+      totalCount: data.getNumber("totalCount", 0),
+      totalPage: data.getNumber("totalPage", 1),
+      currPage: data.getNumber("currPage", 1)
+    })
+  });
+}
+function deviceShareEnabledResponse(raw = null) {
+  const response = api_response.asJSONObject(raw);
+  return new DeviceShareEnabledResponse({
+    code: api_response.getResponseCode(response),
+    msg: api_response.getResponseMessage(response),
+    data: api_response.getResponseDataObject(response)
+  });
+}
+function deviceShareCreateResponse(raw = null) {
+  const response = api_response.asJSONObject(raw);
+  return new DeviceShareCreateResponse({
+    code: api_response.getResponseCode(response),
+    msg: api_response.getResponseMessage(response),
+    data: api_response.getResponseDataObject(response)
+  });
+}
 function basicResponse(raw = null) {
   const response = api_response.asJSONObject(raw);
   return new BasicResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response) });
@@ -1006,7 +1164,42 @@ const unbindPushDevice = (registrationId) => {
     return basicResponse(raw);
   });
 };
+const getDeviceShareEnabled = () => {
+  return api_http.get(deviceShareEnabledUrl).then((raw = null) => {
+    return deviceShareEnabledResponse(raw);
+  });
+};
+const createDeviceShare = (data) => {
+  const requestData = new common_vendor.UTSJSONObject();
+  requestData.set("deviceId", data.deviceId);
+  if (data.targetPhone != null && data.targetPhone != "")
+    requestData.set("targetPhone", data.targetPhone);
+  if (data.targetUserNo != null && data.targetUserNo != "")
+    requestData.set("targetUserNo", data.targetUserNo);
+  requestData.set("role", data.role != null && data.role != "" ? data.role : "view");
+  if (data.expireTime != null)
+    requestData.set("expireTime", data.expireTime);
+  return api_http.post(deviceShareUrl, requestData).then((raw = null) => {
+    return deviceShareCreateResponse(raw);
+  });
+};
+const getSentDeviceShares = (params) => {
+  return api_http.get(deviceShareSentUrl, params).then((raw = null) => {
+    return deviceSharePageResponse(raw);
+  });
+};
+const getDeviceSharees = (deviceId, params) => {
+  return api_http.get(`${deviceShareUrl}/${deviceId.toString()}/sharees`, params).then((raw = null) => {
+    return deviceSharePageResponse(raw);
+  });
+};
+const revokeDeviceShare = (shareId) => {
+  return api_http.remove(`${deviceShareUrl}/${shareId.toString()}`).then((raw = null) => {
+    return basicResponse(raw);
+  });
+};
 exports.ChangePasswordRequest = ChangePasswordRequest;
+exports.DeviceShareCreateRequest = DeviceShareCreateRequest;
 exports.ForgotPasswordResetRequest = ForgotPasswordResetRequest;
 exports.LegacyEnterpriseLoginRequest = LegacyEnterpriseLoginRequest;
 exports.PersonalPasswordLoginRequest = PersonalPasswordLoginRequest;
@@ -1017,6 +1210,7 @@ exports.WechatLoginRequest = WechatLoginRequest;
 exports.addDevice = addDevice;
 exports.addGeofence = addGeofence;
 exports.bindDevices = bindDevices;
+exports.createDeviceShare = createDeviceShare;
 exports.delDevice = delDevice;
 exports.deleteGeofence = deleteGeofence;
 exports.editDeviceInfo = editDeviceInfo;
@@ -1026,9 +1220,12 @@ exports.getAppCommandHistory = getAppCommandHistory;
 exports.getBoundDevices = getBoundDevices;
 exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
+exports.getDeviceShareEnabled = getDeviceShareEnabled;
+exports.getDeviceSharees = getDeviceSharees;
 exports.getGeocoderAddress = getGeocoderAddress;
 exports.getGeofenceList = getGeofenceList;
 exports.getMessageUnreadCount = getMessageUnreadCount;
+exports.getSentDeviceShares = getSentDeviceShares;
 exports.getTrackPos = getTrackPos;
 exports.getUnboundDevices = getUnboundDevices;
 exports.getUserDeviceList = getUserDeviceList;
@@ -1040,6 +1237,7 @@ exports.personalPasswordLogin = personalPasswordLogin;
 exports.registerPersonalUser = registerPersonalUser;
 exports.resetForgotPassword = resetForgotPassword;
 exports.retryAppCommand = retryAppCommand;
+exports.revokeDeviceShare = revokeDeviceShare;
 exports.sendAppCommand = sendAppCommand;
 exports.sendCommand = sendCommand;
 exports.sendSmsForgotPasswordCode = sendSmsForgotPasswordCode;

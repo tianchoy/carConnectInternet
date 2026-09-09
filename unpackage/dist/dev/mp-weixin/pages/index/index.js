@@ -1183,7 +1183,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.hideTabBar();
       initDimensions();
       if (checkToken()) {
-        loadUnreadMessageCount();
         loadDeviceList();
       }
     });
@@ -1239,7 +1238,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         w: hasDevice.value && safeDeviceDetail.value.connectionStatus == "online" ? 1 : "",
         x: common_vendor.t(hasDevice.value ? devicePositionUpdateTime.value : "暂无位置"),
         y: statusBarHeight.value + 43 + "px",
-        z: common_vendor.o(refreshLocation, "3f"),
+        z: common_vendor.o(refreshLocation, "73"),
         A: isMapReady.value
       }, isMapReady.value ? {
         B: common_vendor.sei("myMap", "map"),
@@ -1248,7 +1247,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         E: mapScale.value,
         F: markers.value
       } : {}, {
-        G: common_vendor.o(toRecordDetail, "0c"),
+        G: common_vendor.o(toRecordDetail, "83"),
         H: common_vendor.t(totalTrips.value),
         I: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
         J: common_assets._imports_3,
@@ -1257,42 +1256,42 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           fontSize: "15",
           class: "data-v-00a60067"
         }),
-        L: common_vendor.o(toDeviceDetail, "94"),
+        L: common_vendor.o(toDeviceDetail, "85"),
         M: common_assets._imports_4,
         N: common_vendor.p({
           name: "/static/arrow-right.png",
           fontSize: "15",
           class: "data-v-00a60067"
         }),
-        O: common_vendor.o(toFindCar, "e4"),
+        O: common_vendor.o(toFindCar, "ee"),
         P: common_assets._imports_5,
         Q: common_vendor.p({
           name: "/static/arrow-right.png",
           fontSize: "15",
           class: "data-v-00a60067"
         }),
-        R: common_vendor.o(toFence, "59"),
+        R: common_vendor.o(toFence, "63"),
         S: common_assets._imports_6,
         T: unreadMessageCount.value > 0
       }, unreadMessageCount.value > 0 ? {
         U: common_vendor.t(unreadMessageBadgeText.value)
       } : {}, {
-        V: common_vendor.o(toMsgCenter, "e2"),
+        V: common_vendor.o(toMsgCenter, "70"),
         W: common_assets._imports_7,
         X: common_vendor.o(($event) => {
           return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-        }, "4f"),
+        }, "f9"),
         Y: common_assets._imports_8,
-        Z: common_vendor.o(contactCustomerService, "c6"),
+        Z: common_vendor.o(contactCustomerService, "a9"),
         aa: common_assets._imports_9,
-        ab: common_vendor.o(unbindDevice, "c5"),
+        ab: common_vendor.o(unbindDevice, "27"),
         ac: common_assets._imports_10,
-        ad: common_vendor.o(logout, "44"),
-        ae: common_vendor.o(closePicker, "41"),
-        af: common_vendor.o(handlePickerConfirm, "bb"),
+        ad: common_vendor.o(logout, "7f"),
+        ae: common_vendor.o(closePicker, "0b"),
+        af: common_vendor.o(handlePickerConfirm, "6c"),
         ag: common_vendor.o(($event) => {
           return pickerValues.value = $event;
-        }, "d6"),
+        }, "df"),
         ah: common_vendor.p({
           ["cancel-btn"]: "取消",
           ["confirm-btn"]: "确认",
@@ -1302,7 +1301,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ai: common_vendor.o(($event) => {
           return showPicker.value = $event;
-        }, "ec"),
+        }, "25"),
         aj: common_vendor.p({
           position: "bottom",
           closeable: false,

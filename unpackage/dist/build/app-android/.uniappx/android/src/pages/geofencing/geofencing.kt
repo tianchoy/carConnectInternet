@@ -882,6 +882,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 } else {
                                     await(loadUnboundDevices(currentFenceId.value))
                                 }
+                                loadGeofenceList()
                             } else {
                                 showAppToast(ShowToastOptions(title = if (isTruthy(result.msg)) {
                                     result.msg

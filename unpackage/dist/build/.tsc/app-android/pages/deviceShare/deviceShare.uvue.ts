@@ -1,0 +1,435 @@
+import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
+import { ref, computed } from 'vue'
+import { showAppToast } from '../../utils/toast.uts'
+import { showAppModal } from '../../utils/modal.uts'
+import { getDeviceShareEnabled, createDeviceShare, getSentDeviceShares, getDeviceSharees, revokeDeviceShare } from '../../api/request.uts'
+
+
+const __sfc__ = defineComponent({
+  __name: 'deviceShare',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const enabled = ref(false)
+const loadingEnabled = ref(true)
+const deviceId = ref('')
+const deviceName = ref('')
+const targetPhone = ref('')
+const expireDate = ref('')
+const submitting = ref(false)
+const sentShares = ref<Array<UTSJSONObject>>([])
+const sentTotalCount = ref(0)
+const sentPage = ref(1)
+const sentHasMore = ref(false)
+const sentLoading = ref(false)
+const sharees = ref<Array<UTSJSONObject>>([])
+const shareesVisible = ref(false)
+const shareesLoading = ref(false)
+
+const canSubmit = computed((): boolean => targetPhone.value.trim() != '')
+
+const minExpireDate = computed((): string => {
+	const now = new Date()
+	const month = (now.getMonth() + 1).toString().padStart(2, '0')
+	const day = now.getDate().toString().padStart(2, '0')
+	return `${now.getFullYear()}-${month}-${day}`
+})
+
+const requestPageSize = 1000
+const permanentExpireDate = '2099-12-31'
+const displayDevice = (item: UTSJSONObject): string => {
+	const name = item.getString('deviceName', '')
+	if (name != '') return name
+	const plate = item.getString('plateNo', '')
+	if (plate != '') return plate
+	return item.getString('deviceId', '设备')
+}
+const getSharePerson = (item: UTSJSONObject, nameKey: string, phoneKey: string): string => {
+	const name = item.getString(nameKey, '')
+	if (name != '') return name
+	if (phoneKey != '') {
+		const phone = item.getString(phoneKey, '')
+		if (phone != '') return phone
+	}
+	return '--'
+}
+const statusText = (status: string): string => {
+	if (status == 'active') return '生效中'
+	if (status == 'exited') return '已退出'
+	if (status == 'revoked') return '已撤销'
+	if (status == 'expired') return '已过期'
+	return status != '' ? status : '未知状态'
+}
+const statusClass = (status: string): string => status == 'active' ? 'status-active' : 'status-inactive'
+const formatTimestamp = (timestamp: number): string => {
+	if (timestamp <= 0) return '--'
+	const date = new Date(timestamp * 1000)
+	return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+}
+const formatExpireTime = (item: UTSJSONObject): string => {
+	const value = item['expireTime'] as number | null
+	return value == null || value <= 0 ? '永久' : formatTimestamp(value)
+}
+
+const loadSent = async (reset: boolean): Promise<void> => {
+	if (sentLoading.value) return
+	if (reset) {
+		sentPage.value = 1
+		sentHasMore.value = false
+		sentShares.value = []
+		sentTotalCount.value = 0
+	}
+	sentLoading.value = true
+	try {
+		const res = await getSentDeviceShares({ pageNum: sentPage.value, pageSize: requestPageSize } as UTSJSONObject)
+		if (res.code != 200) {
+			showAppToast({ title: res.msg || '获取分享列表失败', icon: 'none' })
+			return
+		}
+		const data = res.data
+		sentTotalCount.value = data.totalCount
+		sentShares.value = reset ? data.list : [...sentShares.value, ...data.list]
+		const currentPage = data.currPage > 0 ? data.currPage : sentPage.value
+		const totalPage = data.totalPage > 0 ? data.totalPage : 1
+		sentHasMore.value = currentPage < totalPage
+		if (sentHasMore.value) sentPage.value = currentPage + 1
+	} catch (error) {
+		console.error('获取发起分享列表失败:', error)
+		showAppToast({ title: '获取分享列表失败，请重试', icon: 'none' })
+	} finally {
+		sentLoading.value = false
+	}
+}
+
+const onExpireDateChange = (event: any): void => {
+	const value = event != null && event.detail != null ? event.detail.value : ''
+	expireDate.value = value == null ? '' : value.toString()
+}
+const clearExpireDate = (): void => { expireDate.value = '' }
+
+const submitShare = async (): Promise<void> => {
+	if (submitting.value) return
+	if (deviceId.value == '') {
+		showAppToast({ title: '设备ID不能为空', icon: 'none' })
+		return
+	}
+	const phone = targetPhone.value.trim()
+	if (phone == '') {
+		showAppToast({ title: '请填写手机号', icon: 'none' })
+		return
+	}
+	if (!/^1[3-9]\d{9}$/.test(phone)) {
+		showAppToast({ title: '请输入正确的手机号', icon: 'none' })
+		return
+	}
+	const dateValue = expireDate.value == '' ? permanentExpireDate : expireDate.value
+	const expireTime = Math.floor(new Date(`${dateValue}T23:59:59`).getTime() / 1000)
+	if (expireTime <= Math.floor(new Date().getTime() / 1000)) {
+		showAppToast({ title: '到期时间必须晚于当前时间', icon: 'none' })
+		return
+	}
+	submitting.value = true
+	try {
+		const res = await createDeviceShare({
+			deviceId: deviceId.value,
+			targetPhone: phone,
+			expireTime: expireTime
+		})
+		if (res.code == 200) {
+			showAppToast({ title: '分享成功', icon: 'success' })
+			targetPhone.value = ''
+			expireDate.value = ''
+			await loadSent(true)
+		} else {
+			showAppToast({ title: res.msg || '分享失败', icon: 'none' })
+		}
+	} catch (error) {
+		console.error('发起设备分享失败:', error)
+		showAppToast({ title: '分享失败，请重试', icon: 'none' })
+	} finally {
+		submitting.value = false
+	}
+}
+
+const revokeShare = async (shareId: string): Promise<void> => {
+	if (shareId == '') return
+	try {
+		const res = await revokeDeviceShare(shareId)
+		if (res.code == 200) {
+			showAppToast({ title: '撤销成功', icon: 'success' })
+			await loadSent(true)
+		} else showAppToast({ title: res.msg || '撤销失败', icon: 'none' })
+	} catch (error) {
+		console.error('撤销设备分享失败:', error)
+		showAppToast({ title: '撤销失败，请重试', icon: 'none' })
+	}
+}
+const confirmRevoke = (item: UTSJSONObject): void => {
+	showAppModal({
+		title: '撤销分享',
+		content: `确定撤销“${displayDevice(item)}”的分享吗？`,
+		showCancel: true,
+		success: (result) => { if (result.confirm) void revokeShare(item.getString('shareId', '')) }
+	})
+}
+const showSharees = async (item: UTSJSONObject): Promise<void> => {
+	sharees.value = []
+	shareesVisible.value = true
+	shareesLoading.value = true
+	try {
+		const res = await getDeviceSharees(item.getString('deviceId', ''), { pageNum: 1, pageSize: requestPageSize } as UTSJSONObject)
+		if (res.code == 200) sharees.value = res.data.list
+		else showAppToast({ title: res.msg || '获取被分享者失败', icon: 'none' })
+	} catch (error) {
+		console.error('获取被分享者失败:', error)
+		showAppToast({ title: '获取被分享者失败，请重试', icon: 'none' })
+	} finally {
+		shareesLoading.value = false
+	}
+}
+const loadMore = (): void => {
+	if (sentHasMore.value) void loadSent(false)
+}
+
+const initializeDeviceShare = async (): Promise<void> => {
+	try {
+		const res = await getDeviceShareEnabled()
+		if (res.code == 200) {
+			enabled.value = res.data.getBoolean('enabled', false)
+		} else {
+			showAppToast({ title: res.msg || '获取分享开关失败', icon: 'none' })
+		}
+		if (enabled.value) await loadSent(true)
+	} catch (error) {
+		console.error('初始化设备分享失败:', error)
+		showAppToast({ title: '加载分享功能失败，请重试', icon: 'none' })
+	} finally {
+		loadingEnabled.value = false
+	}
+}
+
+onLoad((options) => {
+	deviceId.value = options.deviceId as string ?? ''
+	deviceName.value = options.deviceName as string ?? ''
+	void initializeDeviceShare()
+})
+
+return (): any | null => {
+
+const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
+const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal)
+
+  return _cE(Fragment, null, [
+    _cE("view", _uM({ class: "page" }), [
+      _cV(_component_custom_navBar, _uM({
+        title: "设备分享",
+        "show-back": true,
+        backgroundColor: "#fff",
+        textColor: "#333",
+        showCapsule: false
+      })),
+      _cE("scroll-view", _uM({
+        class: "content",
+        "scroll-y": "true",
+        onScrolltolower: loadMore
+      }), [
+        isTrue(loadingEnabled.value)
+          ? _cE("view", _uM({
+              key: 0,
+              class: "state-card"
+            }), [
+              _cE("text", null, "加载中...")
+            ])
+          : isTrue(!enabled.value)
+            ? _cE("view", _uM({
+                key: 1,
+                class: "state-card"
+              }), [
+                _cE("text", _uM({ class: "state-title" }), "分享功能暂未开放"),
+                _cE("text", _uM({ class: "state-desc" }), "请稍后再试")
+              ])
+            : _cE("view", _uM({ key: 2 }), [
+                _cE("view", _uM({ class: "share-form card" }), [
+                  _cE("view", _uM({ class: "form-row" }), [
+                    _cE("text", _uM({ class: "form-label" }), "分享设备"),
+                    _cE("text", _uM({ class: "form-value" }), _tD(deviceName.value), 1 /* TEXT */)
+                  ]),
+                  _cE("view", _uM({ class: "form-row input-row" }), [
+                    _cE("text", _uM({ class: "form-label" }), "手机号"),
+                    _cE("input", _uM({
+                      class: "form-input",
+                      modelValue: targetPhone.value,
+                      onInput: ($event: UniInputEvent) => {(targetPhone).value = $event.detail.value},
+                      type: "number",
+                      maxlength: "20",
+                      placeholder: "请输入被分享者手机号",
+                      "placeholder-style": "font-size: 24rpx; color: #c0c4cc;"
+                    }), null, 40 /* PROPS, NEED_HYDRATION */, ["modelValue", "onInput"])
+                  ]),
+                  _cE("view", _uM({ class: "form-row" }), [
+                    _cE("text", _uM({ class: "form-label" }), "有效期"),
+                    _cE("view", _uM({ class: "expire-actions" }), [
+                      expireDate.value == ''
+                        ? _cE("text", _uM({
+                            key: 0,
+                            class: "form-value"
+                          }), "永久")
+                        : _cC("v-if", true)
+                    ])
+                  ]),
+                  _cE("view", _uM({
+                    style: _nS(_uM({"margin-top":"20rpx"}))
+                  }), [
+                    _cE("button", _uM({
+                      class: _nC(["primary-button", _uM({ 'button-disabled': submitting.value || !canSubmit.value })]),
+                      disabled: submitting.value || !canSubmit.value,
+                      onClick: submitShare
+                    }), _tD(submitting.value ? '提交中...' : '确认分享'), 11 /* TEXT, CLASS, PROPS */, ["disabled"])
+                  ], 4 /* STYLE */)
+                ]),
+                _cE("view", _uM({ class: "tabs card" }), [
+                  _cE("text", _uM({ class: "tab tab-active" }), "我发起的 " + _tD(sentTotalCount.value), 1 /* TEXT */)
+                ]),
+                _cE("view", _uM({ class: "list-section" }), [
+                  isTrue(sentLoading.value && sentShares.value.length == 0)
+                    ? _cE("view", _uM({
+                        key: 0,
+                        class: "state-card"
+                      }), [
+                        _cE("text", null, "加载中...")
+                      ])
+                    : sentShares.value.length == 0
+                      ? _cE("view", _uM({
+                          key: 1,
+                          class: "state-card"
+                        }), [
+                          _cE("text", _uM({
+                            style: _nS(_uM({"color":"#999"}))
+                          }), "暂无发起的分享", 4 /* STYLE */)
+                        ])
+                      : _cC("v-if", true),
+                  _cE(Fragment, null, RenderHelpers.renderList(sentShares.value, (item, __key, __index, _cached): any => {
+                    return _cE("view", _uM({
+                      key: item.getString('shareId', ''),
+                      class: "share-card card"
+                    }), [
+                      _cE("view", _uM({ class: "share-card-header" }), [
+                        _cE("view", _uM({ class: "device-meta" }), [
+                          _cE("text", _uM({ class: "device-title" }), _tD(displayDevice(item)), 1 /* TEXT */),
+                          _cE("text", _uM({ class: "plate" }), _tD(item.getString('plateNo', '')), 1 /* TEXT */)
+                        ]),
+                        _cE("text", _uM({
+                          class: _nC(["status", statusClass(item.getString('status', ''))])
+                        }), _tD(statusText(item.getString('status', ''))), 3 /* TEXT, CLASS */)
+                      ]),
+                      _cE("view", _uM({ class: "detail-line" }), [
+                        _cE("text", null, "分享给"),
+                        _cE("text", _uM({ class: "detail-value" }), _tD(getSharePerson(item, 'targetNickName', 'targetPhoneMasked')), 1 /* TEXT */)
+                      ]),
+                      _cE("view", _uM({ class: "detail-line" }), [
+                        _cE("text", null, "角色"),
+                        _cE("text", _uM({ class: "detail-value" }), _tD(item.getString('role', 'view')), 1 /* TEXT */)
+                      ]),
+                      _cE("view", _uM({ class: "detail-line" }), [
+                        _cE("text", null, "分享时间"),
+                        _cE("text", _uM({ class: "detail-value" }), _tD(formatTimestamp(item.getNumber('shareTime', 0))), 1 /* TEXT */)
+                      ]),
+                      _cE("view", _uM({ class: "detail-line" }), [
+                        _cE("text", null, "到期时间"),
+                        _cE("text", _uM({ class: "detail-value" }), _tD(formatExpireTime(item)), 1 /* TEXT */)
+                      ]),
+                      _cE("view", _uM({ class: "card-actions" }), [
+                        _cE("button", _uM({
+                          class: "plain-button",
+                          onClick: () => {showSharees(item)}
+                        }), "查看被分享者", 8 /* PROPS */, ["onClick"]),
+                        item.getString('status', '') == 'active'
+                          ? _cE("button", _uM({
+                              key: 0,
+                              class: "danger-button",
+                              onClick: () => {confirmRevoke(item)}
+                            }), "撤销分享", 8 /* PROPS */, ["onClick"])
+                          : _cC("v-if", true)
+                      ])
+                    ])
+                  }), 128 /* KEYED_FRAGMENT */),
+                  isTrue(sentHasMore.value)
+                    ? _cE("button", _uM({
+                        key: 2,
+                        class: "more-button",
+                        disabled: sentLoading.value,
+                        onClick: loadMore
+                      }), _tD(sentLoading.value ? '加载中...' : '加载更多'), 9 /* TEXT, PROPS */, ["disabled"])
+                    : _cC("v-if", true)
+                ])
+              ])
+      ], 32 /* NEED_HYDRATION */),
+      isTrue(shareesVisible.value)
+        ? _cE("view", _uM({
+            key: 0,
+            class: "modal-mask",
+            onClick: () => {shareesVisible.value = false}
+          }), [
+            _cE("view", _uM({
+              class: "sharees-modal",
+              onClick: withModifiers(() => {}, ["stop"])
+            }), [
+              _cE("view", _uM({ class: "modal-header" }), [
+                _cE("text", _uM({ class: "section-title" }), "被分享者"),
+                _cE("text", _uM({
+                  class: "modal-close",
+                  onClick: () => {shareesVisible.value = false}
+                }), "×", 8 /* PROPS */, ["onClick"])
+              ]),
+              _cE("scroll-view", _uM({
+                class: "sharees-list",
+                "scroll-y": "true"
+              }), [
+                isTrue(shareesLoading.value)
+                  ? _cE("view", _uM({
+                      key: 0,
+                      class: "state-card"
+                    }), [
+                      _cE("text", null, "加载中...")
+                    ])
+                  : sharees.value.length == 0
+                    ? _cE("view", _uM({
+                        key: 1,
+                        class: "state-card"
+                      }), [
+                        _cE("text", null, "暂无被分享者")
+                      ])
+                    : _cC("v-if", true),
+                _cE(Fragment, null, RenderHelpers.renderList(sharees.value, (item, __key, __index, _cached): any => {
+                  return _cE("view", _uM({
+                    key: item.getString('shareId', ''),
+                    class: "sharee-row"
+                  }), [
+                    _cE("view", null, [
+                      _cE("text", _uM({ class: "device-title" }), _tD(getSharePerson(item, 'targetNickName', '')), 1 /* TEXT */),
+                      _cE("text", _uM({ class: "masked-phone" }), _tD(item.getString('targetPhoneMasked', '')), 1 /* TEXT */)
+                    ]),
+                    _cE("text", _uM({
+                      class: _nC(["status", statusClass(item.getString('status', ''))])
+                    }), _tD(statusText(item.getString('status', ''))), 3 /* TEXT, CLASS */)
+                  ])
+                }), 128 /* KEYED_FRAGMENT */)
+              ])
+            ], 8 /* PROPS */, ["onClick"])
+          ], 8 /* PROPS */, ["onClick"])
+        : _cC("v-if", true)
+    ]),
+    _cV(_component_app_toast),
+    _cV(_component_app_modal)
+  ], 64 /* STABLE_FRAGMENT */)
+}
+}
+
+})
+export default __sfc__
+const GenPagesDeviceShareDeviceShareStyles = [_uM([["page", _pS(_uM([["height", "100%"], ["backgroundColor", "#f5f7fa"], ["display", "flex"], ["flexDirection", "column"]]))], ["content", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["boxSizing", "border-box"]]))], ["card", _pS(_uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["marginBottom", "20rpx"]]))], ["share-form", _pS(_uM([["paddingTop", "28rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "28rpx"]]))], ["section-title", _pS(_uM([["color", "#303133"], ["fontSize", "32rpx"], ["fontWeight", 600]]))], ["form-row", _pS(_uM([["minHeight", "82rpx"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"]]))], ["form-label", _pS(_uM([["width", "160rpx"], ["color", "#606266"], ["fontSize", "28rpx"]]))], ["form-value", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["color", "#303133"], ["fontSize", "28rpx"], ["textAlign", "right"]]))], ["input-row", _pS(_uM([["alignItems", "center"]]))], ["form-input", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["height", "76rpx"], ["color", "#303133"], ["fontSize", "28rpx"], ["textAlign", "right"]]))], ["expire-actions", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "flex-end"]]))], ["date-button", _pS(_uM([["color", "#2979ff"], ["fontSize", "26rpx"], ["marginLeft", "18rpx"]]))], ["clear-date", _pS(_uM([["color", "#999999"], ["fontSize", "26rpx"], ["marginLeft", "18rpx"]]))], ["form-tip", _pS(_uM([["color", "#999999"], ["fontSize", "24rpx"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0]]))], ["primary-button", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["fontSize", "27rpx"], ["lineHeight", "76rpx"], ["height", "76rpx"], ["backgroundColor", "#2979ff"], ["color", "#ffffff"], ["width", "100%"]]))], ["plain-button", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["fontSize", "27rpx"], ["lineHeight", "76rpx"], ["height", "76rpx"], ["color", "#2979ff"], ["backgroundColor", "#eef5ff"], ["marginRight", "16rpx"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "20rpx"]]))], ["danger-button", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["fontSize", "27rpx"], ["lineHeight", "76rpx"], ["height", "76rpx"], ["color", "#e45656"], ["backgroundColor", "#fff0f0"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "20rpx"]]))], ["more-button", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["fontSize", "27rpx"], ["lineHeight", "76rpx"], ["height", "76rpx"], ["width", "100%"], ["color", "#2979ff"], ["backgroundColor", "#ffffff"], ["marginBottom", "24rpx"]]))], ["button-disabled", _pS(_uM([["opacity", 0.6]]))], ["tabs", _pS(_uM([["height", "84rpx"], ["display", "flex"], ["flexDirection", "row"]]))], ["tab", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["lineHeight", "84rpx"], ["color", "#909399"], ["fontSize", "29rpx"]]))], ["tab-active", _pS(_uM([["color", "#2979ff"], ["fontWeight", 600]]))], ["share-card", _pS(_uM([["paddingTop", "26rpx"], ["paddingRight", "26rpx"], ["paddingBottom", "26rpx"], ["paddingLeft", "26rpx"]]))], ["share-card-header", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "flex-start"], ["marginBottom", "18rpx"]]))], ["device-meta", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["device-title", _pS(_uM([["color", "#303133"], ["fontSize", "30rpx"], ["fontWeight", 600]]))], ["plate", _pS(_uM([["color", "#909399"], ["fontSize", "24rpx"], ["marginTop", "8rpx"], ["display", "flex"]]))], ["masked-phone", _pS(_uM([["color", "#909399"], ["fontSize", "24rpx"], ["marginTop", "8rpx"], ["display", "flex"]]))], ["status", _pS(_uM([["paddingTop", "6rpx"], ["paddingRight", "14rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "14rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["fontSize", "23rpx"]]))], ["status-active", _pS(_uM([["color", "#19a15f"], ["backgroundColor", "#e8f8ef"]]))], ["status-inactive", _pS(_uM([["color", "#909399"], ["backgroundColor", "#f0f1f3"]]))], ["detail-line", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["color", "#909399"], ["fontSize", "25rpx"]]))], ["detail-value", _pS(_uM([["color", "#606266"]]))], ["card-actions", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-end"], ["marginTop", "16rpx"]]))], ["state-card", _pS(_uM([["paddingTop", "70rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "70rpx"], ["paddingLeft", "30rpx"], ["textAlign", "center"], ["color", "#909399"], ["fontSize", "27rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["marginBottom", "20rpx"]]))], ["state-title", _pS(_uM([["color", "#606266"], ["fontSize", "34rpx"], ["fontWeight", 600], ["marginBottom", "16rpx"]]))], ["state-desc", _pS(_uM([["color", "#909399"]]))], ["modal-mask", _pS(_uM([["position", "fixed"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["backgroundColor", "rgba(0,0,0,0.5)"], ["zIndex", 1000]]))], ["sharees-modal", _pS(_uM([["width", "680rpx"], ["maxHeight", "1200rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["overflow", "hidden"]]))], ["modal-header", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "28rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "28rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]]))], ["modal-close", _pS(_uM([["color", "#909399"], ["fontSize", "46rpx"], ["lineHeight", "36rpx"]]))], ["sharees-list", _pS(_uM([["maxHeight", "700rpx"]]))], ["sharee-row", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "28rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"]]))]])]

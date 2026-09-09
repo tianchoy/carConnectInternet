@@ -9,7 +9,6 @@
     @click="handlePopupClick"
   >
     <scroll-view class="icon-selector" scroll-y>
-      
 			  <i-grid
 				:items="iconList"
 				:col="4"

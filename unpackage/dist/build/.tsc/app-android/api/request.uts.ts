@@ -46,6 +46,11 @@ const pushBindUrl = '/app/push/bind'
 const pushUnbindUrl = '/app/push/unbind'
 const messageUnreadCountUrl = '/app/message/unreadCount'
 const geocoderAddressUrl = '/geocoder/address'
+const deviceShareUrl = '/share/device'
+const deviceShareSentUrl = '/share/device/sent'
+const deviceShareReceivedUrl = '/share/device/received'
+const deviceShareEnabledUrl = '/share/device/enabled'
+const deviceShareExitUrl = '/share/device/exit'
 
 export type BasicResponse = { code: number, msg: string }
 export type PushDeviceBindRequest = {
@@ -81,6 +86,58 @@ export type ChangePasswordRequest = { oldPassword: string, newPassword: string, 
 export type MessageResponse = { code: number, msg: string, data: UserDeviceListData }
 export type MessageUnreadCountResponse = { code: number, msg: string, data: number }
 export type GeocoderAddressResponse = { code: number, msg: string, data: UTSJSONObject }
+export type DeviceSharePageData = {
+    list: Array<UTSJSONObject>
+    pageSize: number
+    totalCount: number
+    totalPage: number
+    currPage: number
+}
+export type DeviceSharePageResponse = { code: number, msg: string, data: DeviceSharePageData }
+export type DeviceShareEnabledResponse = { code: number, msg: string, data: UTSJSONObject }
+export type DeviceShareCreateRequest = {
+    deviceId: string | number
+    targetPhone?: string
+    targetUserNo?: string
+    role?: string
+    expireTime?: number | null
+}
+export type DeviceShareCreateResponse = { code: number, msg: string, data: UTSJSONObject }
+
+function deviceSharePageResponse(raw: any): DeviceSharePageResponse {
+    const response = asJSONObject(raw)
+    const data = getResponseDataObject(response)
+    const list = data.getArray<UTSJSONObject>('list')
+    return {
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: {
+            list: list != null ? list : [],
+            pageSize: data.getNumber('pageSize', 1000),
+            totalCount: data.getNumber('totalCount', 0),
+            totalPage: data.getNumber('totalPage', 1),
+            currPage: data.getNumber('currPage', 1)
+        }
+    }
+}
+
+function deviceShareEnabledResponse(raw: any): DeviceShareEnabledResponse {
+    const response = asJSONObject(raw)
+    return {
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: getResponseDataObject(response)
+    }
+}
+
+function deviceShareCreateResponse(raw: any): DeviceShareCreateResponse {
+    const response = asJSONObject(raw)
+    return {
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: getResponseDataObject(response)
+    }
+}
 
 function basicResponse(raw: any): BasicResponse {
     const response = asJSONObject(raw)
@@ -344,3 +401,39 @@ export const bindPushDevice = (data: PushDeviceBindRequest): Promise<BasicRespon
     requestData.set('appVersion', data.appVersion)
     return postSilently(pushBindUrl, requestData).then((raw: any): BasicResponse => { return basicResponse(raw) })
 }
+
+export const getDeviceShareEnabled = (): Promise<DeviceShareEnabledResponse> => get(deviceShareEnabledUrl).then((raw: any): DeviceShareEnabledResponse => {
+    return deviceShareEnabledResponse(raw)
+})
+
+export const createDeviceShare = (data: DeviceShareCreateRequest): Promise<DeviceShareCreateResponse> => {
+    const requestData = new UTSJSONObject()
+    requestData.set('deviceId', data.deviceId)
+    if (data.targetPhone != null && data.targetPhone != '') requestData.set('targetPhone', data.targetPhone)
+    if (data.targetUserNo != null && data.targetUserNo != '') requestData.set('targetUserNo', data.targetUserNo)
+    requestData.set('role', data.role != null && data.role != '' ? data.role : 'view')
+    if (data.expireTime != null) requestData.set('expireTime', data.expireTime)
+    return post(deviceShareUrl, requestData).then((raw: any): DeviceShareCreateResponse => {
+        return deviceShareCreateResponse(raw)
+    })
+}
+
+export const getSentDeviceShares = (params: UTSJSONObject): Promise<DeviceSharePageResponse> => get(deviceShareSentUrl, params).then((raw: any): DeviceSharePageResponse => {
+    return deviceSharePageResponse(raw)
+})
+
+export const getReceivedDeviceShares = (params: UTSJSONObject): Promise<DeviceSharePageResponse> => get(deviceShareReceivedUrl, params).then((raw: any): DeviceSharePageResponse => {
+    return deviceSharePageResponse(raw)
+})
+
+export const getDeviceSharees = (deviceId: string | number, params: UTSJSONObject): Promise<DeviceSharePageResponse> => get(`${deviceShareUrl}/${deviceId.toString()}/sharees`, params).then((raw: any): DeviceSharePageResponse => {
+    return deviceSharePageResponse(raw)
+})
+
+export const revokeDeviceShare = (shareId: string | number): Promise<BasicResponse> => remove(`${deviceShareUrl}/${shareId.toString()}`).then((raw: any): BasicResponse => {
+    return basicResponse(raw)
+})
+
+export const exitDeviceShare = (deviceId: string | number): Promise<BasicResponse> => post(deviceShareExitUrl, { deviceId } as UTSJSONObject).then((raw: any): BasicResponse => {
+    return basicResponse(raw)
+})

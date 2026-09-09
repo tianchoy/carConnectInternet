@@ -24,7 +24,8 @@
     "pages/userCenter/payDeviceList/payDeviceList",
     "pages/cmd/cmd",
     "pages/webview/webview",
-    "pages/deviceList/deviceList"
+    "pages/deviceList/deviceList",
+    "pages/deviceShare/deviceShare"
   ],
   "window": {
     "navigationStyle": "custom",

@@ -55,19 +55,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleSelect = (item = null) => {
       const selected = item;
-      common_vendor.index.__f__("log", "at components/car-icons/car-icons.uvue:93", "选择的图标:", selected);
+      common_vendor.index.__f__("log", "at components/car-icons/car-icons.uvue:92", "选择的图标:", selected);
       emit("select", selected);
       close();
     };
     const handlePopupClick = () => {
-      common_vendor.index.__f__("log", "at components/car-icons/car-icons.uvue:100", "Popup clicked");
+      common_vendor.index.__f__("log", "at components/car-icons/car-icons.uvue:99", "Popup clicked");
     };
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
         a: common_vendor.o(($event) => {
           return handleSelect($event);
-        }, "29"),
+        }, "7b"),
         b: common_vendor.p({
           items: iconList,
           col: 4,

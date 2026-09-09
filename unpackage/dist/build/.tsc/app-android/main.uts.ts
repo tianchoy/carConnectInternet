@@ -17,8 +17,8 @@ export function main(app: IApp) {
 export class UniAppConfig extends io.dcloud.uniapp.appframe.AppConfig {
     override name: string = "中导物联"
     override appid: string = "__UNI__662B0B4"
-    override versionName: string = "1.0.1"
-    override versionCode: string = "101"
+    override versionName: string = "1.0.5"
+    override versionCode: string = "105"
     override uniCompilerVersion: string = "5.25"
     
     constructor() { super() }
@@ -49,6 +49,7 @@ import GenPagesUserCenterPayDeviceListPayDeviceListClass from './pages/userCente
 import GenPagesCmdCmdClass from './pages/cmd/cmd.uvue'
 import GenPagesWebviewWebviewClass from './pages/webview/webview.uvue'
 import GenPagesDeviceListDeviceListClass from './pages/deviceList/deviceList.uvue'
+import GenPagesDeviceShareDeviceShareClass from './pages/deviceShare/deviceShare.uvue'
 function definePageRoutes() {
 __uniRoutes.push({ path: "pages/index/index", component: GenPagesIndexIndexClass, meta: { isQuit: true } as UniPageMeta, style: _uM([["navigationBarTitleText","车联网"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/message/message", component: GenPagesMessageMessageClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","消息"]]) } as UniPageRoute)
@@ -75,6 +76,7 @@ __uniRoutes.push({ path: "pages/userCenter/payDeviceList/payDeviceList", compone
 __uniRoutes.push({ path: "pages/cmd/cmd", component: GenPagesCmdCmdClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/webview/webview", component: GenPagesWebviewWebviewClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/deviceList/deviceList", component: GenPagesDeviceListDeviceListClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","设备列表"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "pages/deviceShare/deviceShare", component: GenPagesDeviceShareDeviceShareClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","设备分享"]]) } as UniPageRoute)
 }
 const __uniTabBar: Map<string, any | null> | null = _uM([["color","#2c2c2c"],["selectedColor","#d81e06"],["borderStyle","black"],["backgroundColor","#ffffff"],["list",[_uM([["pagePath","pages/index/index"],["iconPath","/static/tabBar/home.png"],["selectedIconPath","/static/tabBar/home1.png"],["text","首页"]]),_uM([["pagePath","pages/message/message"],["iconPath","/static/tabBar/message.png"],["selectedIconPath","/static/tabBar/message1.png"],["text","消息"]]),_uM([["pagePath","pages/userCenter/userCenter"],["iconPath","/static/tabBar/userCenter.png"],["selectedIconPath","/static/tabBar/userCenter1.png"],["text","我的"]])]]])
 const __uniLaunchPage: Map<string, any | null> = _uM([["url","pages/index/index"],["style",_uM([["navigationBarTitleText","车联网"]])]])

@@ -475,7 +475,6 @@
   align-items: center;
   justify-content: center;
   width: 80rpx;
-  height: 80rpx;
   overflow: visible;
 }
 .container .page-bg .content .service .service-content .service-item .message-unread-badge[class].data-v-00a60067 {

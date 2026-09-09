@@ -451,6 +451,10 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                     stopAutoRefresh()
                     uni_navigateTo(NavigateToOptions(url = "/pages/cmd/cmd?imei=" + imei.value + "&deviceId=" + deviceId.value))
                 }
+                if (itemTo == "分享设备") {
+                    stopAutoRefresh()
+                    uni_navigateTo(NavigateToOptions(url = "/pages/deviceShare/deviceShare?imei=" + imei.value + "&deviceId=" + deviceId.value + "&deviceName=" + currentCarInfo.value["deviceName"]))
+                }
             }
             val loadDeviceDetail = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {

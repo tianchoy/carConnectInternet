@@ -8204,8 +8204,8 @@ function populateParameters(fromRes, toRes) {
   const parameters = {
     appId: "__UNI__662B0B4",
     appName: "中导物联",
-    appVersion: "1.0.1",
-    appVersionCode: "101",
+    appVersion: "1.0.5",
+    appVersionCode: "105",
     appLanguage: getAppLanguage(hostLanguage),
     uniCompileVersion: "5.25",
     uniCompilerVersion: "5.25",
@@ -8366,8 +8366,8 @@ const getAppBaseInfo = {
     const parameters = {
       appId: "__UNI__662B0B4",
       appName: "中导物联",
-      appVersion: "1.0.1",
-      appVersionCode: "101",
+      appVersion: "1.0.5",
+      appVersionCode: "105",
       appLanguage: getAppLanguage(hostLanguage),
       hostVersion: version2,
       hostLanguage,
@@ -9231,7 +9231,7 @@ const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.1.121";
   const port = "8090";
-  const id = "mp-weixin_p-nYBC";
+  const id = "mp-weixin_8pycCE";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {
@@ -10649,6 +10649,12 @@ const pages = [
     path: "pages/deviceList/deviceList",
     style: new UTSJSONObject({
       navigationBarTitleText: "设备列表"
+    })
+  }),
+  new UTSJSONObject({
+    path: "pages/deviceShare/deviceShare",
+    style: new UTSJSONObject({
+      navigationBarTitleText: "设备分享"
     })
   })
 ];

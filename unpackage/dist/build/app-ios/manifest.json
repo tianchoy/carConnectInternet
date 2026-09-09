@@ -3,8 +3,8 @@
   "name": "中导物联",
   "description": "",
   "version": {
-    "name": "1.0.1",
-    "code": "101"
+    "name": "1.0.5",
+    "code": "105"
   },
   "uni-app-x": {
     "styleIsolationVersion": "2",
@@ -38,10 +38,10 @@
         "uni-showLoading": {},
         "uni-prompt": {},
         "uni-oauth": {},
-        "uni-dialogPage": {},
         "uni-event": {},
         "uni-location": {},
         "uni-vibrate": {},
+        "uni-dialogPage": {},
         "uni-openLocation": {},
         "uni-rpx2px": {},
         "uni-cloud-client": {},

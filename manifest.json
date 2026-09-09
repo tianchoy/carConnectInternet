@@ -2,14 +2,14 @@
 	"name": "中导物联",
 	"appid": "__UNI__662B0B4",
 	"description": "",
-	"versionName": "1.0.1",
-	"versionCode": "101",
+	"versionName": "1.0.5",
+	"versionCode": "105",
 	"uni-app-x": {
 		"styleIsolationVersion": "2"
 	},
 	"quickapp": {},
 	"mp-weixin": {
-		"appid": "wx197f5f7e9b9833bc",
+		"appid": "wx2ebcdca9a6dfc8f0",
 		"embeddedAppIdList": [
 			"wx1d647f2cfdc089e6"
 		],

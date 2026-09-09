@@ -28,6 +28,7 @@ if (!Math) {
   "./pages/cmd/cmd.js";
   "./pages/webview/webview.js";
   "./pages/deviceList/deviceList.js";
+  "./pages/deviceShare/deviceShare.js";
 }
 let updateManager = null;
 function checkForUpdates() {
