@@ -69,14 +69,6 @@
 				},
 				"uni-location": {
 					"system": {}
-				},
-				"uni-push": {
-					"hms": {},
-					"oppo": {},
-					"vivo": {},
-					"xiaomi": {},
-					"meizu": {},
-					"honor": {}
 				}
 			},
 			"icons": {
@@ -165,7 +157,6 @@
 				"NSCameraUsageDescription": "需要使用您的摄像头扫描设备二维码"
 			},
 			"modules": {
-				"uni-push": {},
 				"uni-verify": {},
 				"uni-barcode-scanning": {},
 				"uni-map": {

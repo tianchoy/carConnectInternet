@@ -27,10 +27,23 @@
                         </view>
                     </view>
                 </view>
-                <view class="device-info" v-if="safeDeviceDetail.deviceStatus.batteryPercent && safeDeviceDetail.deviceStatus.voltage">
-                    <i-line-progress v-if="safeDeviceDetail.deviceStatus.batteryPercent" :percent="safeDeviceDetail.deviceStatus.batteryPercent"></i-line-progress>
-                    <view class="info" v-if="safeDeviceDetail.deviceStatus.batteryPercent">电量: {{safeDeviceDetail.deviceStatus.batteryPercent}}%</view>
-                    <view class="info" v-if="safeDeviceDetail.deviceStatus.voltage">电压: {{safeDeviceDetail.deviceStatus.voltage}}V</view>
+                <view class="device-info" v-if="hasDevice && batteryPercent > 0">
+                    <view class="batteryPercent-info">
+                        <text class="battery-label">电量</text>
+                        <view class="battery-progress">
+                            <i-line-progress
+                                :percent="batteryPercent"
+                                :show-text="false"
+                                active-color="#19be6b"
+                                inactive-color="#ebeef5"
+                                :height="8"
+                            ></i-line-progress>
+                        </view>
+                        <text class="battery-value">{{batteryPercent}}%</text>
+                    </view>
+                    <view class="info" v-if="safeDeviceDetail.deviceStatus.voltage > 0">
+                        电压: {{safeDeviceDetail.deviceStatus.voltage}}V
+                    </view>
                 </view>
                 <view class="banner">
                     <image src="../../static/banner.png" mode="aspectFit" class="banner-image"></image>
@@ -342,6 +355,11 @@ const safeDeviceDetail = computed<DeviceDetailState>(() => {
         connectionStatus: detail.connectionStatus,
         lastUpdateTime: detail.lastUpdateTime
     }
+})
+
+const batteryPercent = computed<number>(() : number => {
+    const percent = safeDeviceDetail.value.deviceStatus.batteryPercent
+    return Math.max(0, Math.min(100, Math.round(percent)))
 })
 
 
@@ -1512,6 +1530,28 @@ onLoad(() => {
             padding: 20rpx;
             border-radius: 16rpx;
             width: 50%;
+            .batteryPercent-info{
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                width: 100%;
+            }
+            .battery-label {
+                flex-shrink: 0;
+                margin-right: 12rpx;
+                font-size: 26rpx;
+                color: #333;
+            }
+            .battery-progress {
+                flex: 1;
+                min-width: 0;
+            }
+            .battery-value {
+                flex-shrink: 0;
+                margin-left: 12rpx;
+                font-size: 24rpx;
+                color: #333;
+            }
 
             .info + .info { margin-top: 16rpx; }
             .info {

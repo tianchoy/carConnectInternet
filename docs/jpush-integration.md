@@ -1,6 +1,6 @@
 # App 推送前后端对接说明
 
-> 当前 Android 与 iOS 均使用 **JPush** 作为运行时推送 provider，设备标识为 JPush `RegistrationID`。服务端必须通过 JPush 向该 RegistrationID 发送，不能将其当作 UniPush CID。
+> 当前 Android 与 iOS 均使用 **JPush** 作为运行时推送 provider，设备标识为 JPush `RegistrationID`。服务端必须通过 JPush 向该 RegistrationID 发送，不能将其当作其他推送平台的设备标识。
 >
 > Android 已启用华为 JPush 厂商通道：华为/HMS 设备由 JPush 选择华为通道送达；这不是第二个前端 provider，应用也不会直接调用华为 Push Kit。iOS 继续使用 JPush/APNs。
 
@@ -11,7 +11,7 @@
 | Android | `jpush` | JPush `RegistrationID` | `jg-jpush-u` | JPush（华为设备可走华为厂商通道） |
 | iOS | `jpush` | JPush `RegistrationID` | `jg-jpush-u` | JPush / APNs |
 
-[services/push.uts](../services/push.uts) 默认选择 `jpush`。Android 会在初始化 JPush 前加载 `jg-jpush-u-huawei`，使其原生 Gradle 配置与华为依赖参与构建；iOS 不加载该 Android 专用模块。
+[services/push.uts](../services/push.uts) 固定使用 `jpush`。Android 会在初始化 JPush 前加载 `jg-jpush-u-huawei`，使其原生 Gradle 配置与华为依赖参与构建；iOS 不加载该 Android 专用模块。
 
 ## 2. Android 华为厂商通道配置
 
@@ -47,7 +47,7 @@ JPush Android AppKey 和 channel 继续通过 [nativeResources/android/manifestP
 - 注册 JPush 事件回调后初始化 Android/iOS JPush；
 - Android 会先加载华为厂商插件，再初始化 JPush 核心 SDK；
 - RegistrationID 为空时每 3 秒重试，最多 5 次；
-- RegistrationID、待处理 `messageId`、消息刷新标记和登录会话状态按 provider 维度缓存；
+- RegistrationID、待处理 `messageId`、消息刷新标记和登录会话状态按 JPush 维度缓存；
 - RegistrationID 就绪后，若存在有效业务登录 token，前端会异步调用后端设备绑定接口；如果 Android 的 RegistrationID 早于登录获得，登录成功会立即使用已缓存的 RegistrationID 补发绑定。请求不阻塞登录或页面跳转，失败后可在下一次 RegistrationID 刷新时重试；
 
 RegistrationID 属于设备推送标识，生产 logcat 不输出其具体值；仅在受控开发或联调环境中通过安全渠道核验。

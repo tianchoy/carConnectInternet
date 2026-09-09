@@ -45,6 +45,7 @@ const appCommandRetryUrl = '/app/command/retry/'
 const pushBindUrl = '/app/push/bind'
 const pushUnbindUrl = '/app/push/unbind'
 const messageUnreadCountUrl = '/app/message/unreadCount'
+const geocoderAddressUrl = '/geocoder/address'
 
 export type BasicResponse = { code: number, msg: string }
 export type PushDeviceBindRequest = {
@@ -79,6 +80,7 @@ export type AppCommandDetailResponse = { code: number, msg: string, data: UTSJSO
 export type ChangePasswordRequest = { oldPassword: string, newPassword: string, confirmPassword: string }
 export type MessageResponse = { code: number, msg: string, data: UserDeviceListData }
 export type MessageUnreadCountResponse = { code: number, msg: string, data: number }
+export type GeocoderAddressResponse = { code: number, msg: string, data: UTSJSONObject }
 
 function basicResponse(raw: any): BasicResponse {
     const response = asJSONObject(raw)
@@ -179,6 +181,11 @@ export const getDevicePos = (data: UTSJSONObject): Promise<DevicePositionRespons
         msg: getResponseMessage(response),
         data: getResponseDataArray(response)
     }
+})
+
+export const getGeocoderAddress = (data: UTSJSONObject): Promise<GeocoderAddressResponse> => get(geocoderAddressUrl, data).then((raw: any): GeocoderAddressResponse => {
+    const response = asJSONObject(raw)
+    return { code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataObject(response) }
 })
 
 export const getTrackPos = (data: UTSJSONObject): Promise<TrackPosResponse> => get(trackPos, data).then((raw: any): TrackPosResponse => {

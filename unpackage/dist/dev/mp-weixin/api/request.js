@@ -36,6 +36,7 @@ const appCommandDetailUrl = "/app/command/";
 const appCommandRetryUrl = "/app/command/retry/";
 const pushUnbindUrl = "/app/push/unbind";
 const messageUnreadCountUrl = "/app/message/unreadCount";
+const geocoderAddressUrl = "/geocoder/address";
 class BasicResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -675,6 +676,29 @@ class MessageUnreadCountResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class GeocoderAddressResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: "Unknown", optional: false }
+        };
+      },
+      name: "GeocoderAddressResponse"
+    };
+  }
+  constructor(options, metadata = GeocoderAddressResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
 function basicResponse(raw = null) {
   const response = api_response.asJSONObject(raw);
   return new BasicResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response) });
@@ -773,6 +797,12 @@ const getDevicePos = (data) => {
       msg: api_response.getResponseMessage(response),
       data: api_response.getResponseDataArray(response)
     });
+  });
+};
+const getGeocoderAddress = (data) => {
+  return api_http.get(geocoderAddressUrl, data).then((raw = null) => {
+    const response = api_response.asJSONObject(raw);
+    return new GeocoderAddressResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response), data: api_response.getResponseDataObject(response) });
   });
 };
 const getTrackPos = (data) => {
@@ -996,6 +1026,7 @@ exports.getAppCommandHistory = getAppCommandHistory;
 exports.getBoundDevices = getBoundDevices;
 exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
+exports.getGeocoderAddress = getGeocoderAddress;
 exports.getGeofenceList = getGeofenceList;
 exports.getMessageUnreadCount = getMessageUnreadCount;
 exports.getTrackPos = getTrackPos;

@@ -20,7 +20,6 @@ import uts.sdk.modules.jgJpushU.EventCallBackParams
 import uts.sdk.modules.externalMapNavigation.ExternalMapNavigationParams
 import io.dcloud.uniapp.extapi.exit as uni_exit
 import io.dcloud.uniapp.extapi.getAppBaseInfo as uni_getAppBaseInfo
-import io.dcloud.uniapp.extapi.getPushClientId as uni_getPushClientId
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
@@ -29,7 +28,6 @@ import uts.sdk.modules.jgJpushU.setEventCallBack as setJPushEventCallBack
 import uts.sdk.modules.jgJpushU.getRegistrationId as getAndroidJPushRegistrationId
 import uts.sdk.modules.jgJpushU.setBadgeNumber as setAndroidJPushBadgeNumber
 import uts.sdk.modules.jgJpushUHuawei.init as initHuaweiJPushVendor
-import io.dcloud.uniapp.extapi.onPushMessage as uni_onPushMessage
 import uts.sdk.modules.externalMapNavigation.openExternalMap
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.redirectTo as uni_redirectTo
@@ -45,11 +43,8 @@ val runBlock1 = run {
         return GenApp.styles
     }
 }
-typealias PushProviderName = String
 typealias PushEventKind = String
 open class NormalizedPushEvent (
-    @JsonNotNull
-    open var provider: PushProviderName,
     @JsonNotNull
     open var kind: PushEventKind,
     @JsonNotNull
@@ -59,36 +54,15 @@ typealias PushRegistrationIdReadyListener = (registrationId: String) -> Unit
 typealias PushSessionAuthenticatedListener = (registrationId: String) -> Unit
 val pushRegistrationIdReadyListeners: UTSArray<PushRegistrationIdReadyListener> = _uA()
 val pushSessionAuthenticatedListeners: UTSArray<PushSessionAuthenticatedListener> = _uA()
-val PUSH_PROVIDER_KEY = "push_provider"
-val PUSH_LOCAL_PROVIDER_OVERRIDE_KEY = "push_local_provider_override"
-val PUSH_PENDING_MESSAGE_ID_KEY_PREFIX = "push.pending_message_id."
-val PUSH_MESSAGE_STALE_KEY_PREFIX = "push.message_stale."
-val PUSH_SESSION_KEY_PREFIX = "push.session."
-val PUSH_REGISTRATION_ID_KEY_PREFIX = "push.registration_id."
-val LEGACY_PUSH_CLIENT_ID_KEY = "push_client_id"
-val LEGACY_PUSH_PENDING_MESSAGE_ID_KEY = "push_pending_message_id"
-val LEGACY_PUSH_MESSAGE_STALE_KEY = "push_message_stale"
-val LEGACY_PUSH_SESSION_KEY = "push_session_key"
+val PUSH_PENDING_MESSAGE_ID_KEY = "push.pending_message_id.jpush"
+val PUSH_MESSAGE_STALE_KEY = "push.message_stale.jpush"
+val PUSH_SESSION_KEY = "push.session.jpush"
+val PUSH_REGISTRATION_ID_KEY = "push.registration_id.jpush"
 val PUSH_REGISTRATION_ID_MAX_RETRY_COUNT: Number = 5
 val PUSH_REGISTRATION_ID_RETRY_DELAY: Number = 3000
-val PUSH_REGISTRATION_ID_REQUEST_TIMEOUT: Number = 18000
-val DEFAULT_PUSH_PROVIDER: PushProviderName = "jpush"
-val ENABLE_LOCAL_PROVIDER_SWITCH = false
-fun registrationIdKey(provider: PushProviderName): String {
-    return PUSH_REGISTRATION_ID_KEY_PREFIX + provider
-}
-fun pendingMessageIdKey(provider: PushProviderName): String {
-    return PUSH_PENDING_MESSAGE_ID_KEY_PREFIX + provider
-}
-fun messageStaleKey(provider: PushProviderName): String {
-    return PUSH_MESSAGE_STALE_KEY_PREFIX + provider
-}
-fun sessionKey(provider: PushProviderName): String {
-    return PUSH_SESSION_KEY_PREFIX + provider
-}
-fun pushDebug(provider: PushProviderName, message: String): Unit {
-    AndroidLog.e("PushManager", "[" + provider + "] " + message)
-    console.error("[PushManager][" + provider + "] " + message)
+fun pushDebug(message: String): Unit {
+    AndroidLog.e("PushManager", message)
+    console.error("[PushManager] " + message)
 }
 fun notifyPushRegistrationIdReady(registrationId: String): Unit {
     run {
@@ -194,98 +168,11 @@ fun pushMessageId(payload: Any): String {
     }
     return id
 }
-fun selectedPushProvider(): PushProviderName {
-    return DEFAULT_PUSH_PROVIDER
-}
-fun migrateLegacyStorage(provider: PushProviderName): Unit {
-    if (provider != "unipush") {
-        return
-    }
-    if (storageString(registrationIdKey(provider)) == "") {
-        val legacyId = storageString(LEGACY_PUSH_CLIENT_ID_KEY)
-        if (legacyId != "") {
-            uni_setStorageSync(registrationIdKey(provider), legacyId)
-        }
-    }
-    if (storageString(pendingMessageIdKey(provider)) == "") {
-        val legacyPendingId = storageString(LEGACY_PUSH_PENDING_MESSAGE_ID_KEY)
-        if (legacyPendingId != "") {
-            uni_setStorageSync(pendingMessageIdKey(provider), legacyPendingId)
-        }
-    }
-    if (storageString(messageStaleKey(provider)) == "") {
-        val legacyStale = storageString(LEGACY_PUSH_MESSAGE_STALE_KEY)
-        if (legacyStale != "") {
-            uni_setStorageSync(messageStaleKey(provider), legacyStale)
-        }
-    }
-    if (storageString(sessionKey(provider)) == "") {
-        val legacySession = storageString(LEGACY_PUSH_SESSION_KEY)
-        if (legacySession != "") {
-            uni_setStorageSync(sessionKey(provider), legacySession)
-        }
-    }
-    uni_removeStorageSync(LEGACY_PUSH_CLIENT_ID_KEY)
-    uni_removeStorageSync(LEGACY_PUSH_PENDING_MESSAGE_ID_KEY)
-    uni_removeStorageSync(LEGACY_PUSH_MESSAGE_STALE_KEY)
-    uni_removeStorageSync(LEGACY_PUSH_SESSION_KEY)
-}
 interface PushAdapter {
-    var provider: PushProviderName
     fun init(onEvent: (event: NormalizedPushEvent) -> Unit, onRegistrationAvailable: () -> Unit, onRegistrationId: (registrationId: String, reason: String) -> Unit)
     fun getRegistrationId(): String
 }
-open class UniPushAdapter : PushAdapter {
-    override var provider: PushProviderName = "unipush"
-    private var initialized = false
-    override fun init(onEvent: (event: NormalizedPushEvent) -> Unit, onRegistrationAvailable: () -> Unit, onRegistrationId: (registrationId: String, reason: String) -> Unit): Unit {
-        if (this.initialized) {
-            return
-        }
-        this.initialized = true
-        try {
-            uni_onPushMessage(fun(event: Any){
-                val eventType = payloadValue(event, "type").toLowerCase()
-                onEvent(NormalizedPushEvent(provider = this.provider, kind = if (eventType == "click") {
-                    "clicked"
-                } else {
-                    "received"
-                }
-                , payload = event))
-            }
-            , null)
-            onRegistrationAvailable()
-        }
-         catch (error: Throwable) {
-            pushDebug(this.provider, "注册 UniPush 监听失败: " + error.toString())
-        }
-    }
-    override fun getRegistrationId(): String {
-        return ""
-    }
-    open fun requestRegistrationId(onSuccess: (registrationId: String) -> Unit, onFailure: (reason: String) -> Unit): Unit {
-        try {
-            uni_getPushClientId(GetPushClientIdOptions(success = fun(result){
-                val registrationId = result.cid
-                if (registrationId == "") {
-                    onFailure("CID 为空")
-                    return
-                }
-                pushDebug(this.provider, "UniPush CID 已就绪")
-                onSuccess(registrationId)
-            }
-            , fail = fun(error: Any){
-                onFailure("调用失败: " + error.toString())
-            }
-            ))
-        }
-         catch (error: Throwable) {
-            onFailure("调用异常: " + error.toString())
-        }
-    }
-}
 open class JPushAdapter : PushAdapter {
-    override var provider: PushProviderName = "jpush"
     private var initialized = false
     override fun init(onEvent: (event: NormalizedPushEvent) -> Unit, onRegistrationAvailable: () -> Unit, onRegistrationId: (registrationId: String, reason: String) -> Unit): Unit {
         if (this.initialized) {
@@ -301,15 +188,15 @@ open class JPushAdapter : PushAdapter {
                     return
                 }
                 if (eventName == "onNotifyMessageArrived") {
-                    onEvent(NormalizedPushEvent(provider = this.provider, kind = "received", payload = eventData))
+                    onEvent(NormalizedPushEvent(kind = "received", payload = eventData))
                     return
                 }
                 if (eventName == "onCustomMessage") {
-                    onEvent(NormalizedPushEvent(provider = this.provider, kind = "custom", payload = eventData))
+                    onEvent(NormalizedPushEvent(kind = "custom", payload = eventData))
                     return
                 }
                 if (eventName == "onClickMessage") {
-                    onEvent(NormalizedPushEvent(provider = this.provider, kind = "clicked", payload = eventData))
+                    onEvent(NormalizedPushEvent(kind = "clicked", payload = eventData))
                 }
             }
             ))
@@ -318,7 +205,7 @@ open class JPushAdapter : PushAdapter {
             onRegistrationAvailable()
         }
          catch (error: Throwable) {
-            pushDebug(this.provider, "初始化 JPush 失败: " + error.toString())
+            pushDebug("初始化 JPush 失败: " + error.toString())
         }
     }
     override fun getRegistrationId(): String {
@@ -326,39 +213,24 @@ open class JPushAdapter : PushAdapter {
             return getAndroidJPushRegistrationId()
         }
          catch (error: Throwable) {
-            pushDebug(this.provider, "获取 RegistrationID 失败: " + error.toString())
+            pushDebug("获取 JPush RegistrationID 失败: " + error.toString())
         }
         return ""
     }
 }
 open class PushManager {
-    private var provider: PushProviderName = "unipush"
     private var adapter: PushAdapter? = null
     private var initialized = false
     private var registrationRequesting = false
     private var registrationRetryCount: Number = 0
     private var registrationRetryTimer: Number = 0
-    private var registrationRequestTimeout: Number = 0
-    private var registrationRequestGeneration: Number = 0
     open fun init(): Unit {
-        val selectedProvider = selectedPushProvider()
-        if (this.initialized && this.provider == selectedProvider) {
+        if (this.initialized) {
             this.refreshRegistrationId()
             return
         }
-        if (this.initialized) {
-            pushDebug(this.provider, "运行中不能切换推送 provider，请重启应用后生效")
-            return
-        }
-        this.provider = selectedProvider
-        pushDebug(this.provider, "已选择推送 provider: " + this.provider)
-        migrateLegacyStorage(this.provider)
-        uni_setStorageSync(PUSH_PROVIDER_KEY, this.provider)
-        this.adapter = if (this.provider == "jpush") {
-            JPushAdapter()
-        } else {
-            UniPushAdapter()
-        }
+        pushDebug("已选择推送 provider: jpush")
+        this.adapter = JPushAdapter()
         this.initialized = true
         this.adapter!!.init(fun(event){
             this.handlePushEvent(event)
@@ -367,7 +239,7 @@ open class PushManager {
             this.refreshRegistrationId()
         }
         , fun(registrationId, reason){
-            if (!this.initialized || this.provider != "jpush") {
+            if (!this.initialized) {
                 return
             }
             if (registrationId != "") {
@@ -375,7 +247,7 @@ open class PushManager {
                 return
             }
             if (reason != "") {
-                pushDebug(this.provider, reason)
+                pushDebug(reason)
                 this.scheduleRegistrationRetry(reason)
             }
         }
@@ -389,68 +261,51 @@ open class PushManager {
         if (this.adapter == null || this.registrationRequesting) {
             return
         }
-        if (this.provider == "unipush") {
-            this.requestUniPushRegistrationId(this.adapter as UniPushAdapter)
-            return
-        }
         this.saveJPushRegistrationId()
     }
     open fun markAuthenticated(): Unit {
         if (!this.initialized) {
             this.init()
         }
-        uni_setStorageSync(sessionKey(this.provider), "authenticated")
+        uni_setStorageSync(PUSH_SESSION_KEY, "authenticated")
         val cachedRegistrationId = this.getCachedRegistrationId()
         this.refreshRegistrationId()
         notifyPushSessionAuthenticated(cachedRegistrationId)
     }
     open fun clearSessionState(): Unit {
-        uni_removeStorageSync(sessionKey(this.provider))
-        uni_removeStorageSync(pendingMessageIdKey(this.provider))
-        uni_removeStorageSync(messageStaleKey(this.provider))
-        uni_removeStorageSync(LEGACY_PUSH_SESSION_KEY)
-        uni_removeStorageSync(LEGACY_PUSH_PENDING_MESSAGE_ID_KEY)
-        uni_removeStorageSync(LEGACY_PUSH_MESSAGE_STALE_KEY)
+        uni_removeStorageSync(PUSH_SESSION_KEY)
+        uni_removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY)
+        uni_removeStorageSync(PUSH_MESSAGE_STALE_KEY)
     }
     open fun consumePendingMessageId(): String {
-        val value = storageString(pendingMessageIdKey(this.provider))
-        uni_removeStorageSync(pendingMessageIdKey(this.provider))
+        val value = storageString(PUSH_PENDING_MESSAGE_ID_KEY)
+        uni_removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY)
         return value
     }
     open fun consumeStaleFlag(): Boolean {
-        val value = storageString(messageStaleKey(this.provider))
-        uni_removeStorageSync(messageStaleKey(this.provider))
+        val value = storageString(PUSH_MESSAGE_STALE_KEY)
+        uni_removeStorageSync(PUSH_MESSAGE_STALE_KEY)
         return value == "true"
     }
     open fun getCachedRegistrationId(): String {
-        return storageString(registrationIdKey(this.provider))
-    }
-    open fun setLocalProviderForTesting(provider: PushProviderName): Unit {
-        if (!ENABLE_LOCAL_PROVIDER_SWITCH) {
-            return
-        }
-        if (provider != "unipush" && provider != "jpush") {
-            return
-        }
-        uni_setStorageSync(PUSH_LOCAL_PROVIDER_OVERRIDE_KEY, provider)
-        pushDebug(provider, "本地测试 provider 已设置；请完全重启应用后生效")
+        return storageString(PUSH_REGISTRATION_ID_KEY)
     }
     open fun clearBadge(): Unit {
         try {
             setAndroidJPushBadgeNumber(0)
         }
          catch (error: Throwable) {
-            pushDebug(this.provider, "清除 Android 应用角标失败: " + error.toString())
+            pushDebug("清除 Android 应用角标失败: " + error.toString())
         }
     }
     private fun handlePushEvent(event: NormalizedPushEvent): Unit {
         this.clearBadge()
         val messageId = pushMessageId(event.payload)
         if (messageId != "") {
-            uni_setStorageSync(pendingMessageIdKey(event.provider), messageId)
+            uni_setStorageSync(PUSH_PENDING_MESSAGE_ID_KEY, messageId)
         }
         if (event.kind == "received" || event.kind == "clicked" || event.kind == "custom") {
-            uni_setStorageSync(messageStaleKey(event.provider), true)
+            uni_setStorageSync(PUSH_MESSAGE_STALE_KEY, true)
         }
         if (event.kind == "clicked") {
             uni_switchTab(SwitchTabOptions(url = "/pages/message/message"))
@@ -461,14 +316,10 @@ open class PushManager {
             clearTimeout(this.registrationRetryTimer)
             this.registrationRetryTimer = 0
         }
-        if (this.registrationRequestTimeout > 0) {
-            clearTimeout(this.registrationRequestTimeout)
-            this.registrationRequestTimeout = 0
-        }
     }
     private fun scheduleRegistrationRetry(reason: String): Unit {
         if (this.registrationRetryCount >= PUSH_REGISTRATION_ID_MAX_RETRY_COUNT) {
-            pushDebug(this.provider, "设备注册 ID 获取超时，已停止重试。原因: " + reason)
+            pushDebug("设备注册 ID 获取超时，已停止重试。原因: " + reason)
             return
         }
         if (this.registrationRetryTimer > 0) {
@@ -489,44 +340,9 @@ open class PushManager {
             return
         }
         this.registrationRetryCount = 0
-        uni_setStorageSync(registrationIdKey(this.provider), registrationId)
-        val registrationIdLabel = if (this.provider == "unipush") {
-            "UniPush CID 已就绪"
-        } else {
-            "JPush RegistrationID 已就绪"
-        }
-        pushDebug(this.provider, registrationIdLabel)
+        uni_setStorageSync(PUSH_REGISTRATION_ID_KEY, registrationId)
+        pushDebug("JPush RegistrationID 已就绪")
         notifyPushRegistrationIdReady(registrationId)
-    }
-    private fun requestUniPushRegistrationId(adapter: UniPushAdapter): Unit {
-        this.registrationRequesting = true
-        this.clearRegistrationTimers()
-        val requestGeneration = this.registrationRequestGeneration + 1
-        this.registrationRequestGeneration = requestGeneration
-        this.registrationRequestTimeout = setTimeout(fun(){
-            if (requestGeneration != this.registrationRequestGeneration || !this.registrationRequesting) {
-                return
-            }
-            this.registrationRequesting = false
-            this.registrationRequestTimeout = 0
-            this.scheduleRegistrationRetry("UniPush 回调超时")
-        }
-        , PUSH_REGISTRATION_ID_REQUEST_TIMEOUT)
-        adapter.requestRegistrationId(fun(registrationId){
-            if (requestGeneration != this.registrationRequestGeneration || !this.registrationRequesting) {
-                return
-            }
-            this.saveRegistrationId(registrationId)
-        }
-        , fun(reason){
-            if (requestGeneration != this.registrationRequestGeneration || !this.registrationRequesting) {
-                return
-            }
-            this.clearRegistrationTimers()
-            this.registrationRequesting = false
-            this.scheduleRegistrationRetry(reason)
-        }
-        )
     }
     private fun saveJPushRegistrationId(): Unit {
         if (this.adapter == null) {
@@ -551,9 +367,6 @@ fun refreshPushRegistrationId(): Unit {
 }
 fun clearPushBadge(): Unit {
     pushManager.clearBadge()
-}
-fun refreshPushClientId(): Unit {
-    refreshPushRegistrationId()
 }
 fun markPushSessionAuthenticated(): Unit {
     pushManager.markAuthenticated()
@@ -817,6 +630,7 @@ val appCommandRetryUrl = "/app/command/retry/"
 val pushBindUrl = "/app/push/bind"
 val pushUnbindUrl = "/app/push/unbind"
 val messageUnreadCountUrl = "/app/message/unreadCount"
+val geocoderAddressUrl = "/geocoder/address"
 open class BasicResponse (
     @JsonNotNull
     open var code: Number,
@@ -1020,6 +834,14 @@ open class MessageUnreadCountResponse (
     @JsonNotNull
     open var data: Number,
 ) : UTSObject()
+open class GeocoderAddressResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
+) : UTSObject()
 fun basicResponse(raw: Any): BasicResponse {
     val response = asJSONObject(raw)
     return BasicResponse(code = getResponseCode(response), msg = getResponseMessage(response))
@@ -1081,6 +903,13 @@ val getDevicePos = fun(data: UTSJSONObject): UTSPromise<DevicePositionResponse> 
     return get(devicePos, data).then(fun(raw: Any): DevicePositionResponse {
         val response = asJSONObject(raw)
         return DevicePositionResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
+    }
+    )
+}
+val getGeocoderAddress = fun(data: UTSJSONObject): UTSPromise<GeocoderAddressResponse> {
+    return get(geocoderAddressUrl, data).then(fun(raw: Any): GeocoderAddressResponse {
+        val response = asJSONObject(raw)
+        return GeocoderAddressResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataObject(response))
     }
     )
 }
@@ -1568,7 +1397,7 @@ fun refreshInitializedPushServices(): Unit {
     if (!pushServicesInitialized) {
         return
     }
-    refreshPushClientId()
+    refreshPushRegistrationId()
 }
 fun clearInitializedPushBadge(): Unit {
     if (!pushServicesInitialized) {

@@ -1,8 +1,6 @@
-export type PushProviderName = 'unipush' | 'jpush'
 type PushEventKind = 'received' | 'clicked' | 'custom'
 
 type NormalizedPushEvent = {
-	provider: PushProviderName
 	kind: PushEventKind
 	payload: any
 }
@@ -13,27 +11,13 @@ export type PushSessionAuthenticatedListener = (registrationId: string) => void
 const pushRegistrationIdReadyListeners: Array<PushRegistrationIdReadyListener> = []
 const pushSessionAuthenticatedListeners: Array<PushSessionAuthenticatedListener> = []
 
-const PUSH_PROVIDER_KEY = 'push_provider'
-const PUSH_LOCAL_PROVIDER_OVERRIDE_KEY = 'push_local_provider_override'
-const PUSH_PENDING_MESSAGE_ID_KEY_PREFIX = 'push.pending_message_id.'
-const PUSH_MESSAGE_STALE_KEY_PREFIX = 'push.message_stale.'
-const PUSH_SESSION_KEY_PREFIX = 'push.session.'
-const PUSH_REGISTRATION_ID_KEY_PREFIX = 'push.registration_id.'
-
-// Compatibility keys written by older builds. They are read once only for UniPush.
-const LEGACY_PUSH_CLIENT_ID_KEY = 'push_client_id'
-const LEGACY_PUSH_PENDING_MESSAGE_ID_KEY = 'push_pending_message_id'
-const LEGACY_PUSH_MESSAGE_STALE_KEY = 'push_message_stale'
-const LEGACY_PUSH_SESSION_KEY = 'push_session_key'
+const PUSH_PENDING_MESSAGE_ID_KEY = 'push.pending_message_id.jpush'
+const PUSH_MESSAGE_STALE_KEY = 'push.message_stale.jpush'
+const PUSH_SESSION_KEY = 'push.session.jpush'
+const PUSH_REGISTRATION_ID_KEY = 'push.registration_id.jpush'
 
 const PUSH_REGISTRATION_ID_MAX_RETRY_COUNT = 5
 const PUSH_REGISTRATION_ID_RETRY_DELAY = 3000
-const PUSH_REGISTRATION_ID_REQUEST_TIMEOUT = 18000
-
-// UniPush is the active provider on both Android and iOS. JPush remains in the
-// project for later diagnostics, but its RegistrationID is not a UniPush CID.
-const DEFAULT_PUSH_PROVIDER: PushProviderName = 'jpush'
-const ENABLE_LOCAL_PROVIDER_SWITCH = false
 
 // Release/TestFlight/App Store packages must use APNs production. Development-signed
 // packages can set a local override to false before launch when testing the sandbox.
@@ -65,27 +49,11 @@ import {
 const JPUSH_APP_KEY = 'a53c28d734057573f67e16f7'
 const JPUSH_CHANNEL = 'developer-default'
 
-function registrationIdKey(provider: PushProviderName): string {
-	return PUSH_REGISTRATION_ID_KEY_PREFIX + provider
-}
+function pushDebug(message: string): void {
 
-function pendingMessageIdKey(provider: PushProviderName): string {
-	return PUSH_PENDING_MESSAGE_ID_KEY_PREFIX + provider
-}
+	AndroidLog.e('PushManager', message)
 
-function messageStaleKey(provider: PushProviderName): string {
-	return PUSH_MESSAGE_STALE_KEY_PREFIX + provider
-}
-
-function sessionKey(provider: PushProviderName): string {
-	return PUSH_SESSION_KEY_PREFIX + provider
-}
-
-function pushDebug(provider: PushProviderName, message: string): void {
-
-	AndroidLog.e('PushManager', '[' + provider + '] ' + message)
-
-	console.error('[PushManager][' + provider + '] ' + message)
+	console.error('[PushManager] ' + message)
 }
 
 function notifyPushRegistrationIdReady(registrationId: string): void {
@@ -166,38 +134,7 @@ function jpushIosIsProduction(): boolean {
 	return DEFAULT_JPUSH_IOS_IS_PRODUCTION
 }
 
-function selectedPushProvider(): PushProviderName {
-	return DEFAULT_PUSH_PROVIDER
-}
-
-function migrateLegacyStorage(provider: PushProviderName): void {
-	// Older versions only had UniPush state. Keep it intact until UniPush is selected,
-	// otherwise a first JPush test run would consume another provider's pending state.
-	if (provider != 'unipush') return
-	if (storageString(registrationIdKey(provider)) == '') {
-		const legacyId = storageString(LEGACY_PUSH_CLIENT_ID_KEY)
-		if (legacyId != '') uni.setStorageSync(registrationIdKey(provider), legacyId)
-	}
-	if (storageString(pendingMessageIdKey(provider)) == '') {
-		const legacyPendingId = storageString(LEGACY_PUSH_PENDING_MESSAGE_ID_KEY)
-		if (legacyPendingId != '') uni.setStorageSync(pendingMessageIdKey(provider), legacyPendingId)
-	}
-	if (storageString(messageStaleKey(provider)) == '') {
-		const legacyStale = storageString(LEGACY_PUSH_MESSAGE_STALE_KEY)
-		if (legacyStale != '') uni.setStorageSync(messageStaleKey(provider), legacyStale)
-	}
-	if (storageString(sessionKey(provider)) == '') {
-		const legacySession = storageString(LEGACY_PUSH_SESSION_KEY)
-		if (legacySession != '') uni.setStorageSync(sessionKey(provider), legacySession)
-	}
-	uni.removeStorageSync(LEGACY_PUSH_CLIENT_ID_KEY)
-	uni.removeStorageSync(LEGACY_PUSH_PENDING_MESSAGE_ID_KEY)
-	uni.removeStorageSync(LEGACY_PUSH_MESSAGE_STALE_KEY)
-	uni.removeStorageSync(LEGACY_PUSH_SESSION_KEY)
-}
-
 interface PushAdapter {
-	provider: PushProviderName
 	init(
 		onEvent: (event: NormalizedPushEvent) => void,
 		onRegistrationAvailable: () => void,
@@ -206,64 +143,7 @@ interface PushAdapter {
 	getRegistrationId(): string
 }
 
-class UniPushAdapter implements PushAdapter {
-	provider: PushProviderName = 'unipush'
-	private initialized = false
-
-	init(
-		onEvent: (event: NormalizedPushEvent) => void,
-		onRegistrationAvailable: () => void,
-		onRegistrationId: (registrationId: string, reason: string) => void
-	): void {
-		if (this.initialized) return
-		this.initialized = true
-
-		try {
-			uni.onPushMessage((event: any) => {
-				const eventType = payloadValue(event, 'type').toLowerCase()
-				onEvent({
-					provider: this.provider,
-					kind: eventType == 'click' ? 'clicked' : 'received',
-					payload: event
-				})
-			})
-			onRegistrationAvailable()
-		} catch (error) {
-			pushDebug(this.provider, '注册 UniPush 监听失败: ' + error.toString())
-		}
-
-	}
-
-	getRegistrationId(): string {
-		return ''
-	}
-
-	requestRegistrationId(onSuccess: (registrationId: string) => void, onFailure: (reason: string) => void): void {
-
-		try {
-			uni.getPushClientId({
-				success: (result) => {
-					const registrationId = result.cid
-					if (registrationId == '') {
-						onFailure('CID 为空')
-						return
-					}
-					pushDebug(this.provider, 'UniPush CID 已就绪')
-					onSuccess(registrationId)
-				},
-				fail: (error: any) => {
-					onFailure('调用失败: ' + error.toString())
-				}
-			})
-		} catch (error) {
-			onFailure('调用异常: ' + error.toString())
-		}
-
-	}
-}
-
 class JPushAdapter implements PushAdapter {
-	provider: PushProviderName = 'jpush'
 	private initialized = false
 
 	init(
@@ -286,15 +166,15 @@ class JPushAdapter implements PushAdapter {
 						return
 					}
 					if (eventName == 'onNotifyMessageArrived') {
-						onEvent({ provider: this.provider, kind: 'received', payload: eventData })
+						onEvent({ kind: 'received', payload: eventData })
 						return
 					}
 					if (eventName == 'onCustomMessage') {
-						onEvent({ provider: this.provider, kind: 'custom', payload: eventData })
+						onEvent({ kind: 'custom', payload: eventData })
 						return
 					}
 					if (eventName == 'onClickMessage') {
-						onEvent({ provider: this.provider, kind: 'clicked', payload: eventData })
+						onEvent({ kind: 'clicked', payload: eventData })
 					}
 				}
 			})
@@ -323,7 +203,7 @@ class JPushAdapter implements PushAdapter {
 
 			onRegistrationAvailable()
 		} catch (error) {
-			pushDebug(this.provider, '初始化 JPush 失败: ' + error.toString())
+			pushDebug('初始化 JPush 失败: ' + error.toString())
 		}
 
 	}
@@ -333,7 +213,7 @@ class JPushAdapter implements PushAdapter {
 		try {
 			return getAndroidJPushRegistrationId()
 		} catch (error) {
-			pushDebug(this.provider, '获取 RegistrationID 失败: ' + error.toString())
+			pushDebug('获取 JPush RegistrationID 失败: ' + error.toString())
 		}
 
 
@@ -348,30 +228,19 @@ class JPushAdapter implements PushAdapter {
 }
 
 class PushManager {
-	private provider: PushProviderName = 'unipush'
 	private adapter: PushAdapter | null = null
 	private initialized = false
 	private registrationRequesting = false
 	private registrationRetryCount = 0
 	private registrationRetryTimer: number = 0
-	private registrationRequestTimeout: number = 0
-	private registrationRequestGeneration = 0
 
 	init(): void {
-		const selectedProvider = selectedPushProvider()
-		if (this.initialized && this.provider == selectedProvider) {
+		if (this.initialized) {
 			this.refreshRegistrationId()
 			return
 		}
-		if (this.initialized) {
-			pushDebug(this.provider, '运行中不能切换推送 provider，请重启应用后生效')
-			return
-		}
-		this.provider = selectedProvider
-		pushDebug(this.provider, '已选择推送 provider: ' + this.provider)
-		migrateLegacyStorage(this.provider)
-		uni.setStorageSync(PUSH_PROVIDER_KEY, this.provider)
-		this.adapter = this.provider == 'jpush' ? new JPushAdapter() : new UniPushAdapter()
+		pushDebug('已选择推送 provider: jpush')
+		this.adapter = new JPushAdapter()
 		this.initialized = true
 		this.adapter.init((event) => {
 			this.handlePushEvent(event)
@@ -379,14 +248,13 @@ class PushManager {
 			this.refreshRegistrationId()
 		}, (registrationId, reason) => {
 			// iOS returns the RegistrationID asynchronously after JPush network registration.
-			// Ignore callbacks from a provider that is no longer active.
-			if (!this.initialized || this.provider != 'jpush') return
+			if (!this.initialized) return
 			if (registrationId != '') {
 				this.saveRegistrationId(registrationId)
 				return
 			}
 			if (reason != '') {
-				pushDebug(this.provider, reason)
+				pushDebug(reason)
 				this.scheduleRegistrationRetry(reason)
 			}
 		})
@@ -396,51 +264,37 @@ class PushManager {
 	refreshRegistrationId(): void {
 		if (!this.initialized) this.init()
 		if (this.adapter == null || this.registrationRequesting) return
-		if (this.provider == 'unipush') {
-			this.requestUniPushRegistrationId(this.adapter as UniPushAdapter)
-			return
-		}
 		this.saveJPushRegistrationId()
 	}
 
 	markAuthenticated(): void {
 		if (!this.initialized) this.init()
-		uni.setStorageSync(sessionKey(this.provider), 'authenticated')
+		uni.setStorageSync(PUSH_SESSION_KEY, 'authenticated')
 		const cachedRegistrationId = this.getCachedRegistrationId()
 		this.refreshRegistrationId()
 		notifyPushSessionAuthenticated(cachedRegistrationId)
 	}
 
 	clearSessionState(): void {
-		uni.removeStorageSync(sessionKey(this.provider))
-		uni.removeStorageSync(pendingMessageIdKey(this.provider))
-		uni.removeStorageSync(messageStaleKey(this.provider))
-		uni.removeStorageSync(LEGACY_PUSH_SESSION_KEY)
-		uni.removeStorageSync(LEGACY_PUSH_PENDING_MESSAGE_ID_KEY)
-		uni.removeStorageSync(LEGACY_PUSH_MESSAGE_STALE_KEY)
+		uni.removeStorageSync(PUSH_SESSION_KEY)
+		uni.removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY)
+		uni.removeStorageSync(PUSH_MESSAGE_STALE_KEY)
 	}
 
 	consumePendingMessageId(): string {
-		const value = storageString(pendingMessageIdKey(this.provider))
-		uni.removeStorageSync(pendingMessageIdKey(this.provider))
+		const value = storageString(PUSH_PENDING_MESSAGE_ID_KEY)
+		uni.removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY)
 		return value
 	}
 
 	consumeStaleFlag(): boolean {
-		const value = storageString(messageStaleKey(this.provider))
-		uni.removeStorageSync(messageStaleKey(this.provider))
+		const value = storageString(PUSH_MESSAGE_STALE_KEY)
+		uni.removeStorageSync(PUSH_MESSAGE_STALE_KEY)
 		return value == 'true'
 	}
 
 	getCachedRegistrationId(): string {
-		return storageString(registrationIdKey(this.provider))
-	}
-
-	setLocalProviderForTesting(provider: PushProviderName): void {
-		if (!ENABLE_LOCAL_PROVIDER_SWITCH) return
-		if (provider != 'unipush' && provider != 'jpush') return
-		uni.setStorageSync(PUSH_LOCAL_PROVIDER_OVERRIDE_KEY, provider)
-		pushDebug(provider, '本地测试 provider 已设置；请完全重启应用后生效')
+		return storageString(PUSH_REGISTRATION_ID_KEY)
 	}
 
 	clearBadge(): void {
@@ -455,7 +309,7 @@ class PushManager {
 		try {
 			setAndroidJPushBadgeNumber(0)
 		} catch (error) {
-			pushDebug(this.provider, '清除 Android 应用角标失败: ' + error.toString())
+			pushDebug('清除 Android 应用角标失败: ' + error.toString())
 		}
 
 	}
@@ -463,9 +317,9 @@ class PushManager {
 	private handlePushEvent(event: NormalizedPushEvent): void {
 		this.clearBadge()
 		const messageId = pushMessageId(event.payload)
-		if (messageId != '') uni.setStorageSync(pendingMessageIdKey(event.provider), messageId)
+		if (messageId != '') uni.setStorageSync(PUSH_PENDING_MESSAGE_ID_KEY, messageId)
 		if (event.kind == 'received' || event.kind == 'clicked' || event.kind == 'custom') {
-			uni.setStorageSync(messageStaleKey(event.provider), true)
+			uni.setStorageSync(PUSH_MESSAGE_STALE_KEY, true)
 		}
 		if (event.kind == 'clicked') {
 			uni.switchTab({ url: '/pages/message/message' })
@@ -477,15 +331,11 @@ class PushManager {
 			clearTimeout(this.registrationRetryTimer)
 			this.registrationRetryTimer = 0
 		}
-		if (this.registrationRequestTimeout > 0) {
-			clearTimeout(this.registrationRequestTimeout)
-			this.registrationRequestTimeout = 0
-		}
 	}
 
 	private scheduleRegistrationRetry(reason: string): void {
 		if (this.registrationRetryCount >= PUSH_REGISTRATION_ID_MAX_RETRY_COUNT) {
-			pushDebug(this.provider, '设备注册 ID 获取超时，已停止重试。原因: ' + reason)
+			pushDebug('设备注册 ID 获取超时，已停止重试。原因: ' + reason)
 			return
 		}
 		if (this.registrationRetryTimer > 0) return
@@ -504,32 +354,9 @@ class PushManager {
 			return
 		}
 		this.registrationRetryCount = 0
-		uni.setStorageSync(registrationIdKey(this.provider), registrationId)
-		const registrationIdLabel = this.provider == 'unipush' ? 'UniPush CID 已就绪' : 'JPush RegistrationID 已就绪'
-		pushDebug(this.provider, registrationIdLabel)
+		uni.setStorageSync(PUSH_REGISTRATION_ID_KEY, registrationId)
+		pushDebug('JPush RegistrationID 已就绪')
 		notifyPushRegistrationIdReady(registrationId)
-	}
-
-	private requestUniPushRegistrationId(adapter: UniPushAdapter): void {
-		this.registrationRequesting = true
-		this.clearRegistrationTimers()
-		const requestGeneration = this.registrationRequestGeneration + 1
-		this.registrationRequestGeneration = requestGeneration
-		this.registrationRequestTimeout = setTimeout(() => {
-			if (requestGeneration != this.registrationRequestGeneration || !this.registrationRequesting) return
-			this.registrationRequesting = false
-			this.registrationRequestTimeout = 0
-			this.scheduleRegistrationRetry('UniPush 回调超时')
-		}, PUSH_REGISTRATION_ID_REQUEST_TIMEOUT)
-		adapter.requestRegistrationId((registrationId) => {
-			if (requestGeneration != this.registrationRequestGeneration || !this.registrationRequesting) return
-			this.saveRegistrationId(registrationId)
-		}, (reason) => {
-			if (requestGeneration != this.registrationRequestGeneration || !this.registrationRequesting) return
-			this.clearRegistrationTimers()
-			this.registrationRequesting = false
-			this.scheduleRegistrationRetry(reason)
-		})
 	}
 
 	private saveJPushRegistrationId(): void {
@@ -565,10 +392,6 @@ export function clearPushBadge(): void {
 
 }
 
-export function refreshPushClientId(): void {
-	refreshPushRegistrationId()
-}
-
 export function markPushSessionAuthenticated(): void {
 
 	pushManager.markAuthenticated()
@@ -597,16 +420,4 @@ export function onPushRegistrationIdReady(listener: PushRegistrationIdReadyListe
 
 export function onPushSessionAuthenticated(listener: PushSessionAuthenticatedListener): void {
 	pushSessionAuthenticatedListeners.push(listener)
-}
-
-// Compatibility alias: this value is a UniPush CID only when UniPush is selected;
-// with JPush it is the JPush RegistrationID.
-export function getCachedPushClientId(): string {
-	return getCachedPushRegistrationId()
-}
-
-// Development-only hook. This does not switch the active iOS JPush provider;
-// Android provider switching remains disabled in normal builds.
-export function setLocalPushProviderForTesting(provider: PushProviderName): void {
-	pushManager.setLocalProviderForTesting(provider)
 }

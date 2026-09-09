@@ -90,7 +90,6 @@ public class RegistrationIdResult : NSObject, UTSObject {
     }
 }
 public var TAG = "| JIGUANG | JPUSH-uni-"
-public var ENABLE_JPUSH_IOS_APNS_HOOK = true
 public func log(_ message: String, _ spreadArgs: Any...) -> Void {
     var args = Array(spreadArgs)
     var fullMessage = message
@@ -189,19 +188,11 @@ public class JGPushIOSPlugin : NSObject, UTSiOSHookProxy {
         log("JGPushIOSPlugin onCreate")
     }
     public func applicationDidFinishLaunchingWithOptions(_ application: UIApplication?, _ launchOptions: Map<UIApplication.LaunchOptionsKey, Any>? = nil) -> Bool {
-        if (!ENABLE_JPUSH_IOS_APNS_HOOK) {
-            log("JGPush iOS APNs hook disabled; UniPush owns notification handling")
-            return true
-        }
         log("JGPushIOSPlugin captured launch options")
         JGPushTool.launchOptions = launchOptions
         return true
     }
     public func didRegisterForRemoteNotifications(_ deviceToken: Data?) {
-        if (!ENABLE_JPUSH_IOS_APNS_HOOK) {
-            log("JGPush iOS APNs token hook disabled; UniPush owns notification handling")
-            return
-        }
         log("JGPushIOSPlugin received APNs device token")
         JGPushTool.registerDeviceToken(deviceToken)
     }

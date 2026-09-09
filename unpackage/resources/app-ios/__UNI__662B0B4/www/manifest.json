@@ -20,7 +20,6 @@
         "NSCameraUsageDescription": "需要使用您的摄像头扫描设备二维码"
       },
       "modules": {
-        "uni-push": {},
         "uni-verify": {},
         "uni-barcode-scanning": {},
         "uni-map": {
@@ -39,9 +38,9 @@
         "uni-showLoading": {},
         "uni-prompt": {},
         "uni-oauth": {},
-        "uni-location": {},
         "uni-dialogPage": {},
         "uni-event": {},
+        "uni-location": {},
         "uni-vibrate": {},
         "uni-openLocation": {},
         "uni-rpx2px": {},

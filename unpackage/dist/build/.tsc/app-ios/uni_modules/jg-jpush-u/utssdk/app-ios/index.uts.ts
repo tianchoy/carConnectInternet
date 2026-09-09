@@ -18,8 +18,7 @@ import { EventCallBackParams, EventCallBack, RegistrationIdResult } from '../int
 
 const TAG = "| JIGUANG | JPUSH-uni-"
 
-// JPush must own APNs lifecycle callbacks in JPush-enabled iOS packages.
-const ENABLE_JPUSH_IOS_APNS_HOOK = true
+// JPush owns the APNs lifecycle callbacks in JPush-enabled iOS packages.
 
 // 统一日志方法
 function log(message : string, ...args : any[]) : void {
@@ -121,11 +120,6 @@ export class JGPushIOSPlugin implements UTSiOSHookProxy {
 	 * 极光推送初始化
 	 */
 	applicationDidFinishLaunchingWithOptions(application : UIApplication | null, launchOptions : Map<UIApplication.LaunchOptionsKey, any> | null = null) : boolean {
-		if (!ENABLE_JPUSH_IOS_APNS_HOOK) {
-			log("JGPush iOS APNs hook disabled; UniPush owns notification handling")
-			return true
-		}
-
 		log("JGPushIOSPlugin captured launch options")
 		// JPush is configured and requests notification permission only after the
 		// UniApp runtime starts and a root view controller is available.
@@ -139,11 +133,6 @@ export class JGPushIOSPlugin implements UTSiOSHookProxy {
 	 * 极光推送：将deviceToken发送给服务端
 	 */
 	didRegisterForRemoteNotifications(deviceToken : Data | null) {
-		if (!ENABLE_JPUSH_IOS_APNS_HOOK) {
-			log("JGPush iOS APNs token hook disabled; UniPush owns notification handling")
-			return
-		}
-
 		log("JGPushIOSPlugin received APNs device token")
 		JGPushTool.registerDeviceToken(deviceToken)
 	}

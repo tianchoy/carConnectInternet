@@ -203,7 +203,7 @@ print -- "[2/7] 同步 iOS 原生包版本"
 sync_xcode_version "${IOS_PROJECT_FILE}"
 validate_xcode_version "${IOS_PROJECT_FILE}"
 
-print -- "[3/7] 同步 JPush iOS 桥接并切换 APNs Hook"
+print -- "[3/7] 同步 JPush iOS 桥接并校验 APNs Hook"
 python3 - "${SOURCE_JPUSH_CONFIG}" "${SOURCE_JPUSH_SWIFT}" "${TARGET_JPUSH_DEVICE_CONFIG}" "${TARGET_JPUSH_SIMULATOR_CONFIG}" <<'PY'
 import json
 from pathlib import Path
@@ -211,7 +211,6 @@ import sys
 
 source_config, source_swift, *target_configs = map(Path, sys.argv[1:])
 jpush_hook = 'UTSSDKModulesJgJpushUJGPushIOSPlugin'
-unipush_hook = 'UTSSDKModulesDCloudUniPushHookProxy'
 
 config = json.loads(source_config.read_text(encoding='utf-8'))
 if config.get('hooksClass') != jpush_hook:
@@ -220,7 +219,6 @@ if config.get('hooksClass') != jpush_hook:
 swift = source_swift.read_text(encoding='utf-8')
 required = [
     '@objc(UTSSDKModulesJgJpushUJGPushIOSPlugin)',
-    'public var ENABLE_JPUSH_IOS_APNS_HOOK = true',
     'applicationDidFinishLaunchingWithOptions',
     'didRegisterForRemoteNotifications',
     'registerDeviceToken',
@@ -243,13 +241,8 @@ for target in target_configs:
     if not isinstance(hooks, list) or not all(isinstance(value, str) for value in hooks):
         raise SystemExit(f'{target} 的 hooksClasses 格式无效')
 
-    runtime['hooksClasses'] = [
-        value for value in hooks if value not in (unipush_hook, jpush_hook)
-    ] + [jpush_hook]
-    target.write_text(
-        json.dumps(runtime, ensure_ascii=False, indent=2) + '\n',
-        encoding='utf-8',
-    )
+    if hooks.count(jpush_hook) != 1:
+        raise SystemExit(f'{target} 的 JPush APNs Hook 必须恰好配置一次')
 PY
 cp "${SOURCE_JPUSH_SWIFT}" "${TARGET_JPUSH_SWIFT}"
 
@@ -316,11 +309,10 @@ from pathlib import Path
 import sys
 
 jpush_hook = 'UTSSDKModulesJgJpushUJGPushIOSPlugin'
-unipush_hook = 'UTSSDKModulesDCloudUniPushHookProxy'
 for value in sys.argv[1:]:
     path = Path(value)
     hooks = json.loads(path.read_text(encoding='utf-8')).get('hooksClasses', [])
-    if hooks.count(jpush_hook) != 1 or unipush_hook in hooks:
+    if hooks.count(jpush_hook) != 1:
         raise SystemExit(f'{path} 的 APNs Hook 配置校验失败')
 PY
 

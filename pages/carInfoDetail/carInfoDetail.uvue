@@ -30,7 +30,9 @@
 				<view class="pos-adress">
 					<view class="address-row">
 						<text class="address-label" style="margin-right:10rpx; font-size: 22rpx;">当前位置:</text>
-						<text v-if="currentCarInfo.address" class="address-text">{{currentCarInfo.address}}</text>
+						<text v-if="address" class="address-text">{{address}}</text>
+						<text v-if="!address" style="color: #007AFF; margin-left: 20rpx;font-weight: bold; font-size: 22rpx;"
+							@click="refreshAdress">查看中文地址</text>
 					</view>
 				</view>
 				<!-- 信号强度显示区域 -->
@@ -109,8 +111,7 @@
 <script setup lang="uts">
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
-	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand } from '../../api/request.uts'
-	import { getAddress } from '../../utils/getAdress.uts'
+	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand ,getGeocoderAddress} from '../../api/request.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -395,7 +396,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 							convertedLat,
 							convertedLng,
 							'device',
-							currentCarInfo.value['deviceName'] as string | null
+							currentCarInfo.value.getString('deviceName', '当前位置')
 						);
 
 						// 使用强制响应式更新
@@ -716,13 +717,14 @@ import { openLocation } from '../../utils/openLocation.uts'
 		})
 	}
 
-
-
-
 	const refreshAdress = async (): Promise<void> => {
 		try {
-			const addr = await getAddress(center.latitude, center.longitude);
-			address.value = addr.result.formatted_address;
+			const addr = await getGeocoderAddress({
+				lat: center.latitude,
+				lng: center.longitude,
+				deviceId: deviceId.value
+			});
+			address.value = addr.data.getString('address', '');
 		} catch (error) {
 			console.error('获取地址信息失败:', error);
 		}
@@ -1034,8 +1036,8 @@ import { openLocation } from '../../utils/openLocation.uts'
 						display: flex;
 						flex-direction: row;
 						justify-content: flex-start;
-						align-items: center;
 						margin: 20rpx 0 0;
+						flex:1;
 
 						.address-label {
 							font-size: 22rpx;
@@ -1043,11 +1045,8 @@ import { openLocation } from '../../utils/openLocation.uts'
 						}
 
 						.address-text {
-
+							flex:1;
 							font-size: 22rpx;
-
-							max-width: 490rpx;
-
 							line-height: 1.4;
 						}
 

@@ -1,6 +1,6 @@
 import {
 	initPush,
-	refreshPushClientId,
+	refreshPushRegistrationId,
 	clearPushBadge,
 	markPushSessionAuthenticated
 } from './push.uts'
@@ -65,7 +65,7 @@ export function schedulePostLoginInitialization(): void {
 
 export function refreshInitializedPushServices(): void {
 	if (!pushServicesInitialized) return
-	refreshPushClientId()
+	refreshPushRegistrationId()
 }
 
 export function clearInitializedPushBadge(): void {

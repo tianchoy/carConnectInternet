@@ -5,6 +5,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
 }
 .i-title {
   color: #303133;

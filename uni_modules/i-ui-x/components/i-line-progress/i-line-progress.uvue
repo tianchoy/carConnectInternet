@@ -16,7 +16,7 @@
   </view>
 </template>
 <script setup lang="uts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 defineOptions({ name: 'i-line-progress' })
 
@@ -54,6 +54,13 @@ const normalized = computed(() => {
   return Math.round(current.value)
 })
 
+watch(
+  () : number => props.percent,
+  (nextValue: number) : void => {
+    current.value = nextValue
+  },
+)
+
 function step(delta: number) {
   current.value = Math.min(100, Math.max(0, current.value + delta))
   emit('change', current.value)
@@ -70,6 +77,7 @@ function emitClick() {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
   }
 .i-title {
   color: #303133;

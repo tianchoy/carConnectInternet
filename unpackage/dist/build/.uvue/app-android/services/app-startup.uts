@@ -1,4 +1,4 @@
-import { initPush, refreshPushClientId, clearPushBadge, markPushSessionAuthenticated } from './push.uts';
+import { initPush, refreshPushRegistrationId, clearPushBadge, markPushSessionAuthenticated } from './push.uts';
 import { initPushBinding } from './push-binding.uts';
 const POST_LOGIN_INITIALIZATION_DELAY = 1200;
 let pushServicesInitialized = false;
@@ -54,7 +54,7 @@ export function schedulePostLoginInitialization(): void {
 export function refreshInitializedPushServices(): void {
     if (!pushServicesInitialized)
         return;
-    refreshPushClientId();
+    refreshPushRegistrationId();
 }
 export function clearInitializedPushBadge(): void {
     if (!pushServicesInitialized)

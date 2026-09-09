@@ -9229,9 +9229,9 @@ function isConsoleWritable() {
 }
 const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.1.76";
+  const hosts = "127.0.0.1,192.168.1.121";
   const port = "8090";
-  const id = "mp-weixin_crdgeZ";
+  const id = "mp-weixin_p-nYBC";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {
@@ -10982,7 +10982,7 @@ class S {
 function k(e2) {
   return e2 && "string" == typeof e2 ? JSON.parse(e2) : e2;
 }
-const A = true, C = "mp-weixin", T = k(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), b = C, P = k('{"address":["127.0.0.1","192.168.1.76"],"servePort":7001,"debugPort":9000,"initialLaunchType":"remote","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), x = k('[{"provider":"aliyun","spaceName":"zdiot-car","spaceId":"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff","clientSecret":"s9pFKgenncFnOUhRGOJpcw==","endpoint":"https://api.next.bspapp.com","failoverEndpoint":""}]') || [];
+const A = true, C = "mp-weixin", T = k(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), b = C, P = k('{"address":["127.0.0.1","192.168.1.121"],"servePort":7001,"debugPort":9000,"initialLaunchType":"remote","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), x = k('[{"provider":"aliyun","spaceName":"zdiot-car","spaceId":"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff","clientSecret":"s9pFKgenncFnOUhRGOJpcw==","endpoint":"https://api.next.bspapp.com","failoverEndpoint":""}]') || [];
 let E = "";
 try {
   E = "__UNI__662B0B4";

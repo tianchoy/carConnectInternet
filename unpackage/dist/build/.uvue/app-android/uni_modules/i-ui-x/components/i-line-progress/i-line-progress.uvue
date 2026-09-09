@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 const __sfc__ = defineComponent({
     __name: 'i-line-progress',
     name: 'i-line-progress',
@@ -42,6 +42,9 @@ const __sfc__ = defineComponent({
                 return 100;
             return Math.round(current.value);
         });
+        watch((): number => props.percent, (nextValue: number): void => {
+            current.value = nextValue;
+        });
         function step(delta: number) {
             current.value = Math.min(100, Math.max(0, current.value + delta));
             emit('change', current.value);
@@ -79,4 +82,4 @@ const __sfc__ = defineComponent({
 });
 export default __sfc__;
 export type ILineProgressComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesIUiXComponentsILineProgressILineProgressStyles = [_uM([["i-card", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]]))], ["i-title", _pS(_uM([["color", "#303133"], ["fontSize", 15], ["fontWeight", 600], ["lineHeight", "22px"]]))], ["i-muted", _pS(_uM([["color", "#909399"], ["fontSize", 12], ["lineHeight", "18px"]]))], ["i-row", _pS(_uM([["flexDirection", "row"], ["alignItems", "center"], ["flexWrap", "wrap"]]))], ["i-btn", _pS(_uM([["minHeight", 34], ["marginTop", 10], ["marginRight", 8], ["paddingTop", 0], ["paddingRight", 12], ["paddingBottom", 0], ["paddingLeft", 12], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["backgroundColor", "#ecf5ff"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-btn--plain", _pS(_uM([["backgroundColor", "#f5f7fa"]]))], ["i-btn--danger", _pS(_uM([["backgroundColor", "#fef0f0"]]))], ["i-btn-text", _pS(_uM([["color", "#2979ff"], ["fontSize", 13], ["lineHeight", "18px"]]))], ["i-danger", _pS(_uM([["color", "#f56c6c"]]))], ["i-head", _pS(_uM([["justifyContent", "space-between"]]))], ["i-track", _pS(_uM([["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["marginRight", 5], ["overflow", "hidden"]]))], ["i-fill", _pS(_uM([["height", "100%"], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999]]))]])];
+const GenUniModulesIUiXComponentsILineProgressILineProgressStyles = [_uM([["i-card", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["width", "100%"]]))], ["i-title", _pS(_uM([["color", "#303133"], ["fontSize", 15], ["fontWeight", 600], ["lineHeight", "22px"]]))], ["i-muted", _pS(_uM([["color", "#909399"], ["fontSize", 12], ["lineHeight", "18px"]]))], ["i-row", _pS(_uM([["flexDirection", "row"], ["alignItems", "center"], ["flexWrap", "wrap"]]))], ["i-btn", _pS(_uM([["minHeight", 34], ["marginTop", 10], ["marginRight", 8], ["paddingTop", 0], ["paddingRight", 12], ["paddingBottom", 0], ["paddingLeft", 12], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["backgroundColor", "#ecf5ff"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-btn--plain", _pS(_uM([["backgroundColor", "#f5f7fa"]]))], ["i-btn--danger", _pS(_uM([["backgroundColor", "#fef0f0"]]))], ["i-btn-text", _pS(_uM([["color", "#2979ff"], ["fontSize", 13], ["lineHeight", "18px"]]))], ["i-danger", _pS(_uM([["color", "#f56c6c"]]))], ["i-head", _pS(_uM([["justifyContent", "space-between"]]))], ["i-track", _pS(_uM([["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["marginRight", 5], ["overflow", "hidden"]]))], ["i-fill", _pS(_uM([["height", "100%"], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999]]))]])];
