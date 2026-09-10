@@ -4,7 +4,7 @@ import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import { ref, computed } from 'vue'
 import { showAppToast } from '../../utils/toast.uts'
 import { showAppModal } from '../../utils/modal.uts'
-import { getDeviceShareEnabled, createDeviceShare, getSentDeviceShares, getDeviceSharees, revokeDeviceShare } from '../../api/request.uts'
+import { getDeviceShareEnabled, createDeviceShare, getDeviceSharees, revokeDeviceShare } from '../../api/request.uts'
 
 
 const __sfc__ = defineComponent({
@@ -18,6 +18,7 @@ const enabled = ref(false)
 const loadingEnabled = ref(true)
 const deviceId = ref('')
 const deviceName = ref('')
+const imei = ref('')
 const targetPhone = ref('')
 const expireDate = ref('')
 const submitting = ref(false)
@@ -30,6 +31,19 @@ const sharees = ref<Array<UTSJSONObject>>([])
 const shareesVisible = ref(false)
 const shareesLoading = ref(false)
 
+const normalizeRouteValue = (value: any): string => {
+	if (value == null) return ''
+	const text = value.toString().trim()
+	if (text == '' || text == 'null' || text == 'undefined') return ''
+	return text
+}
+
+const displayDeviceName = computed((): string => {
+	if (deviceName.value != '' && deviceName.value != 'null' && deviceName.value != 'undefined') return deviceName.value
+	if (imei.value != '' && imei.value != 'null' && imei.value != 'undefined') return imei.value
+	return '--'
+})
+
 const canSubmit = computed((): boolean => targetPhone.value.trim() != '')
 
 const minExpireDate = computed((): string => {
@@ -39,7 +53,7 @@ const minExpireDate = computed((): string => {
 	return `${now.getFullYear()}-${month}-${day}`
 })
 
-const requestPageSize = 1000
+const requestPageSize = 10
 const permanentExpireDate = '2099-12-31'
 const displayDevice = (item: UTSJSONObject): string => {
 	const name = item.getString('deviceName', '')
@@ -85,7 +99,7 @@ const loadSent = async (reset: boolean): Promise<void> => {
 	}
 	sentLoading.value = true
 	try {
-		const res = await getSentDeviceShares({ pageNum: sentPage.value, pageSize: requestPageSize } as UTSJSONObject)
+		const res = await getDeviceSharees(deviceId.value, { pageNum: sentPage.value, pageSize: requestPageSize } as UTSJSONObject)
 		if (res.code != 200) {
 			showAppToast({ title: res.msg || '获取分享列表失败', icon: 'none' })
 			return
@@ -213,8 +227,10 @@ const initializeDeviceShare = async (): Promise<void> => {
 }
 
 onLoad((options) => {
-	deviceId.value = options.deviceId as string ?? ''
-	deviceName.value = options.deviceName as string ?? ''
+	deviceId.value = normalizeRouteValue(options.deviceId ?? '')
+	deviceName.value = normalizeRouteValue(options.deviceName ?? '')
+	imei.value = normalizeRouteValue(options.imei ?? '')
+	console.log('imei:', imei.value)
 	void initializeDeviceShare()
 })
 
@@ -257,7 +273,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                 _cE("view", _uM({ class: "share-form card" }), [
                   _cE("view", _uM({ class: "form-row" }), [
                     _cE("text", _uM({ class: "form-label" }), "分享设备"),
-                    _cE("text", _uM({ class: "form-value" }), _tD(deviceName.value), 1 /* TEXT */)
+                    _cE("text", _uM({ class: "form-value" }), _tD(displayDeviceName.value), 1 /* TEXT */)
                   ]),
                   _cE("view", _uM({ class: "form-row input-row" }), [
                     _cE("text", _uM({ class: "form-label" }), "手机号"),

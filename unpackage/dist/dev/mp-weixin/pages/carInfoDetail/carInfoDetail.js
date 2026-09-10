@@ -554,6 +554,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     }
     const handleGridClick = (event = null) => {
+      var _a, _b;
       const name = event;
       const itemTo = name.text;
       if (itemTo == "轨迹回放") {
@@ -617,8 +618,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       if (itemTo == "分享设备") {
         stopAutoRefresh();
+        const shareImei = (_a = imei.value) !== null && _a !== void 0 ? _a : "";
+        const shareDeviceId = (_b = deviceId.value) !== null && _b !== void 0 ? _b : "";
+        const shareDeviceName = currentCarInfo.value.getString("deviceName", "");
         common_vendor.index.navigateTo({
-          url: "/pages/deviceShare/deviceShare?imei=" + imei.value + "&deviceId=" + deviceId.value + "&deviceName=" + currentCarInfo.value.deviceName
+          url: "/pages/deviceShare/deviceShare?imei=" + encodeURIComponent(shareImei) + "&deviceId=" + encodeURIComponent(shareDeviceId) + "&deviceName=" + encodeURIComponent(shareDeviceName)
         });
       }
     };
@@ -632,7 +636,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "获取设备详情失败", icon: "none" });
           }
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:832", "设备id获取失败");
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:835", "设备id获取失败");
         }
       });
     };
@@ -657,17 +661,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     });
     common_vendor.onShow(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:866", "页面显示，检查自动刷新状态");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:869", "页面显示，检查自动刷新状态");
       if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
         setupAutoRefresh(currentTime.value);
       }
     });
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:875", "页面隐藏时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:878", "页面隐藏时停止自动刷新");
       stopAutoRefresh();
     });
     common_vendor.onUnmounted(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:880", "页面卸载时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:883", "页面卸载时停止自动刷新");
       stopAutoRefresh();
     });
     return (_ctx, _cache) => {

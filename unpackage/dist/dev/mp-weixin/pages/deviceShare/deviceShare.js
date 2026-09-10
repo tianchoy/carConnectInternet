@@ -15,7 +15,7 @@ const _easycom_app_modal = () => "../../components/app-modal/app-modal.js";
 if (!Math) {
   (_easycom_custom_navBar + _easycom_app_toast + _easycom_app_modal)();
 }
-const requestPageSize = 1e3;
+const requestPageSize = 10;
 const permanentExpireDate = "2099-12-31";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "deviceShare",
@@ -24,6 +24,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadingEnabled = common_vendor.ref(true);
     const deviceId = common_vendor.ref("");
     const deviceName = common_vendor.ref("");
+    const imei = common_vendor.ref("");
     const targetPhone = common_vendor.ref("");
     const expireDate = common_vendor.ref("");
     const submitting = common_vendor.ref(false);
@@ -35,6 +36,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const sharees = common_vendor.ref([]);
     const shareesVisible = common_vendor.ref(false);
     const shareesLoading = common_vendor.ref(false);
+    const normalizeRouteValue = (value = null) => {
+      if (value == null)
+        return "";
+      const text = value.toString().trim();
+      if (text == "" || text == "null" || text == "undefined")
+        return "";
+      return text;
+    };
+    const displayDeviceName = common_vendor.computed(() => {
+      if (deviceName.value != "" && deviceName.value != "null" && deviceName.value != "undefined")
+        return deviceName.value;
+      if (imei.value != "" && imei.value != "null" && imei.value != "undefined")
+        return imei.value;
+      return "--";
+    });
     const canSubmit = common_vendor.computed(() => {
       return targetPhone.value.trim() != "";
     });
@@ -100,7 +116,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         sentLoading.value = true;
         try {
-          const res = yield api_request.getSentDeviceShares(new common_vendor.UTSJSONObject({ pageNum: sentPage.value, pageSize: requestPageSize }));
+          const res = yield api_request.getDeviceSharees(deviceId.value, new common_vendor.UTSJSONObject({ pageNum: sentPage.value, pageSize: requestPageSize }));
           if (res.code != 200) {
             utils_toast.showAppToast({ title: res.msg || "获取分享列表失败", icon: "none" });
             return Promise.resolve(null);
@@ -114,7 +130,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (sentHasMore.value)
             sentPage.value = currentPage + 1;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:172", "获取发起分享列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:186", "获取发起分享列表失败:", error);
           utils_toast.showAppToast({ title: "获取分享列表失败，请重试", icon: "none" });
         } finally {
           sentLoading.value = false;
@@ -162,7 +178,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "分享失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:222", "发起设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:236", "发起设备分享失败:", error);
           utils_toast.showAppToast({ title: "分享失败，请重试", icon: "none" });
         } finally {
           submitting.value = false;
@@ -181,7 +197,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           } else
             utils_toast.showAppToast({ title: res.msg || "撤销失败", icon: "none" });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:238", "撤销设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:252", "撤销设备分享失败:", error);
           utils_toast.showAppToast({ title: "撤销失败，请重试", icon: "none" });
         }
       });
@@ -209,7 +225,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           else
             utils_toast.showAppToast({ title: res.msg || "获取被分享者失败", icon: "none" });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:259", "获取被分享者失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:273", "获取被分享者失败:", error);
           utils_toast.showAppToast({ title: "获取被分享者失败，请重试", icon: "none" });
         } finally {
           shareesLoading.value = false;
@@ -232,7 +248,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (enabled.value)
             yield loadSent(true);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:279", "初始化设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:293", "初始化设备分享失败:", error);
           utils_toast.showAppToast({ title: "加载分享功能失败，请重试", icon: "none" });
         } finally {
           loadingEnabled.value = false;
@@ -240,9 +256,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad((options) => {
-      var _a, _b;
-      deviceId.value = (_a = options.deviceId) !== null && _a !== void 0 ? _a : "";
-      deviceName.value = (_b = options.deviceName) !== null && _b !== void 0 ? _b : "";
+      var _a, _b, _c;
+      deviceId.value = normalizeRouteValue((_a = options.deviceId) !== null && _a !== void 0 ? _a : "");
+      deviceName.value = normalizeRouteValue((_b = options.deviceName) !== null && _b !== void 0 ? _b : "");
+      imei.value = normalizeRouteValue((_c = options.imei) !== null && _c !== void 0 ? _c : "");
+      common_vendor.index.__f__("log", "at pages/deviceShare/deviceShare.uvue:304", "imei:", imei.value);
       void initializeDeviceShare();
     });
     return (_ctx, _cache) => {
@@ -258,17 +276,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: loadingEnabled.value
       }, loadingEnabled.value ? {} : !enabled.value ? {} : common_vendor.e({
-        d: common_vendor.t(deviceName.value),
+        d: common_vendor.t(displayDeviceName.value),
         e: targetPhone.value,
         f: common_vendor.o(($event) => {
           return targetPhone.value = $event.detail.value;
-        }, "5f"),
+        }, "92"),
         g: expireDate.value == ""
       }, expireDate.value == "" ? {} : {}, {
         h: common_vendor.t(submitting.value ? "提交中..." : "确认分享"),
         i: submitting.value || !canSubmit.value ? 1 : "",
         j: submitting.value || !canSubmit.value,
-        k: common_vendor.o(submitShare, "eb"),
+        k: common_vendor.o(submitShare, "6d"),
         l: common_vendor.t(sentTotalCount.value),
         m: sentLoading.value && sentShares.value.length == 0
       }, sentLoading.value && sentShares.value.length == 0 ? {} : sentShares.value.length == 0 ? {} : {}, {
@@ -299,7 +317,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, sentHasMore.value ? {
         q: common_vendor.t(sentLoading.value ? "加载中..." : "加载更多"),
         r: sentLoading.value,
-        s: common_vendor.o(loadMore, "1b")
+        s: common_vendor.o(loadMore, "d3")
       } : {}), {
         c: !enabled.value,
         t: common_vendor.o(loadMore, "88"),
@@ -307,7 +325,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, shareesVisible.value ? common_vendor.e({
         w: common_vendor.o(($event) => {
           return shareesVisible.value = false;
-        }, "7d"),
+        }, "cd"),
         x: shareesLoading.value
       }, shareesLoading.value ? {} : sharees.value.length == 0 ? {} : {}, {
         y: sharees.value.length == 0,
@@ -321,10 +339,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         }),
         A: common_vendor.o(() => {
-        }, "17"),
+        }, "bc"),
         B: common_vendor.o(($event) => {
           return shareesVisible.value = false;
-        }, "74")
+        }, "55")
       }) : {}, {
         C: `${_ctx.u_s_b_h}px`,
         D: `${_ctx.u_s_a_i_b}px`,

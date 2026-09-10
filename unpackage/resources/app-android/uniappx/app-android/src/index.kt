@@ -632,7 +632,6 @@ val pushUnbindUrl = "/app/push/unbind"
 val messageUnreadCountUrl = "/app/message/unreadCount"
 val geocoderAddressUrl = "/geocoder/address"
 val deviceShareUrl = "/share/device"
-val deviceShareSentUrl = "/share/device/sent"
 val deviceShareEnabledUrl = "/share/device/enabled"
 open class BasicResponse (
     @JsonNotNull
@@ -1298,12 +1297,6 @@ val createDeviceShare = fun(data: DeviceShareCreateRequest): UTSPromise<DeviceSh
     }
     return post(deviceShareUrl, requestData).then(fun(raw: Any): DeviceShareCreateResponse {
         return deviceShareCreateResponse(raw)
-    }
-    )
-}
-val getSentDeviceShares = fun(params: UTSJSONObject): UTSPromise<DeviceSharePageResponse> {
-    return get(deviceShareSentUrl, params).then(fun(raw: Any): DeviceSharePageResponse {
-        return deviceSharePageResponse(raw)
     }
     )
 }

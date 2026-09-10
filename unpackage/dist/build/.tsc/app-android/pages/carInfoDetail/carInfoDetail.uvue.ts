@@ -716,8 +716,11 @@ const deptId = ref<string | null>('')
 		}
 		if (itemTo == '分享设备') {
 			stopAutoRefresh() // 停止刷新
+			const shareImei = imei.value ?? ''
+			const shareDeviceId = deviceId.value ?? ''
+			const shareDeviceName = currentCarInfo.value.getString('deviceName', '')
 			uni.navigateTo({
-				url: '/pages/deviceShare/deviceShare?imei=' + imei.value + '&deviceId=' + deviceId.value + '&deviceName=' + currentCarInfo.value.deviceName
+				url: '/pages/deviceShare/deviceShare?imei=' + encodeURIComponent(shareImei) + '&deviceId=' + encodeURIComponent(shareDeviceId) + '&deviceName=' + encodeURIComponent(shareDeviceName)
 			})
 		}
 

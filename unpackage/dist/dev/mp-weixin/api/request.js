@@ -38,7 +38,6 @@ const pushUnbindUrl = "/app/push/unbind";
 const messageUnreadCountUrl = "/app/message/unreadCount";
 const geocoderAddressUrl = "/geocoder/address";
 const deviceShareUrl = "/share/device";
-const deviceShareSentUrl = "/share/device/sent";
 const deviceShareEnabledUrl = "/share/device/enabled";
 class BasicResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -1183,11 +1182,6 @@ const createDeviceShare = (data) => {
     return deviceShareCreateResponse(raw);
   });
 };
-const getSentDeviceShares = (params) => {
-  return api_http.get(deviceShareSentUrl, params).then((raw = null) => {
-    return deviceSharePageResponse(raw);
-  });
-};
 const getDeviceSharees = (deviceId, params) => {
   return api_http.get(`${deviceShareUrl}/${deviceId.toString()}/sharees`, params).then((raw = null) => {
     return deviceSharePageResponse(raw);
@@ -1225,7 +1219,6 @@ exports.getDeviceSharees = getDeviceSharees;
 exports.getGeocoderAddress = getGeocoderAddress;
 exports.getGeofenceList = getGeofenceList;
 exports.getMessageUnreadCount = getMessageUnreadCount;
-exports.getSentDeviceShares = getSentDeviceShares;
 exports.getTrackPos = getTrackPos;
 exports.getUnboundDevices = getUnboundDevices;
 exports.getUserDeviceList = getUserDeviceList;

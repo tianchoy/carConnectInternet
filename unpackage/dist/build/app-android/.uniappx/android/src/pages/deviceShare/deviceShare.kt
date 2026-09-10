@@ -24,6 +24,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
             val loadingEnabled = ref(true)
             val deviceId = ref("")
             val deviceName = ref("")
+            val imei = ref("")
             val targetPhone = ref("")
             val expireDate = ref("")
             val submitting = ref(false)
@@ -35,6 +36,26 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
             val sharees = ref(_uA<UTSJSONObject>())
             val shareesVisible = ref(false)
             val shareesLoading = ref(false)
+            val normalizeRouteValue = fun(value: Any): String {
+                if (value == null) {
+                    return ""
+                }
+                val text = value.toString().trim()
+                if (text == "" || text == "null" || text == "undefined") {
+                    return ""
+                }
+                return text
+            }
+            val displayDeviceName = computed(fun(): String {
+                if (deviceName.value != "" && deviceName.value != "null" && deviceName.value != "undefined") {
+                    return deviceName.value
+                }
+                if (imei.value != "" && imei.value != "null" && imei.value != "undefined") {
+                    return imei.value
+                }
+                return "--"
+            }
+            )
             val canSubmit = computed(fun(): Boolean {
                 return targetPhone.value.trim() != ""
             }
@@ -46,7 +67,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                 return "" + now.getFullYear() + "-" + month + "-" + day
             }
             )
-            val requestPageSize: Number = 1000
+            val requestPageSize: Number = 10
             val permanentExpireDate = "2099-12-31"
             val displayDevice = fun(item: UTSJSONObject): String {
                 val name = item.getString("deviceName", "")
@@ -126,7 +147,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                         }
                         sentLoading.value = true
                         try {
-                            val res = await(getSentDeviceShares(_uO("pageNum" to sentPage.value, "pageSize" to requestPageSize)))
+                            val res = await(getDeviceSharees(deviceId.value, _uO("pageNum" to sentPage.value, "pageSize" to requestPageSize)))
                             if (res.code != 200) {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
@@ -314,8 +335,10 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                 })
             }
             onLoad(fun(options){
-                deviceId.value = options["deviceId"] as String ?: ""
-                deviceName.value = options["deviceName"] as String ?: ""
+                deviceId.value = normalizeRouteValue(options["deviceId"] ?: "")
+                deviceName.value = normalizeRouteValue(options["deviceName"] ?: "")
+                imei.value = normalizeRouteValue(options["imei"] ?: "")
+                console.log("imei:", imei.value)
                 initializeDeviceShare()
             }
             )
@@ -342,7 +365,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                                         _cE("view", _uM("class" to "share-form card"), _uA(
                                             _cE("view", _uM("class" to "form-row"), _uA(
                                                 _cE("text", _uM("class" to "form-label"), "分享设备"),
-                                                _cE("text", _uM("class" to "form-value"), _tD(deviceName.value), 1)
+                                                _cE("text", _uM("class" to "form-value"), _tD(displayDeviceName.value), 1)
                                             )),
                                             _cE("view", _uM("class" to "form-row input-row"), _uA(
                                                 _cE("text", _uM("class" to "form-label"), "手机号"),
