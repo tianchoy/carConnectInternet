@@ -1035,7 +1035,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function getDeviceDisplayName(device) {
       const deviceName2 = device.getString("deviceName", "");
-      return deviceName2 ? deviceName2 : device.getString("plateNo", "");
+      return deviceName2 ? deviceName2 : device.getString("plateNo", "") ? device.getString("plateNo", "") : device.getString("imei", "");
     }
     function getSelectedFenceName() {
       const fence = selectedFence.value;

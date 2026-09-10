@@ -35,7 +35,16 @@ const __sfc__ = defineComponent({
             const text = value.toString().trim();
             if (text == '' || text == 'null' || text == 'undefined')
                 return '';
-            return text;
+            // 微信小程序接收通过 encodeURIComponent 传递的参数时，可能不会自动解码。
+            // 统一在页面入口解码，避免设备名称显示为 %E5%85... 这样的编码字符串。
+            try {
+                const decoded = decodeURIComponent(text);
+                return decoded == null ? text : decoded.trim();
+            }
+            catch (error: any) {
+                // 参数中包含非法编码时保留原值，避免影响页面正常加载。
+                return text;
+            }
         };
         const displayDeviceName = computed((): string => {
             if (deviceName.value != '' && deviceName.value != 'null' && deviceName.value != 'undefined')
@@ -253,7 +262,7 @@ const __sfc__ = defineComponent({
             deviceId.value = normalizeRouteValue(options["deviceId"] ?? '');
             deviceName.value = normalizeRouteValue(options["deviceName"] ?? '');
             imei.value = normalizeRouteValue(options["imei"] ?? '');
-            console.log('imei:', imei.value);
+            console.log('imei:', imei.value, deviceName.value);
             void initializeDeviceShare();
         });
         return (): any | null => {

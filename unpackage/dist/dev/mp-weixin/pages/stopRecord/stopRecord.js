@@ -220,7 +220,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: index
           });
         }),
-        s: common_assets._imports_0$2,
+        s: common_assets._imports_0$3,
         t: common_assets._imports_1$2,
         v: common_assets._imports_2$2,
         w: common_assets._imports_3$1

@@ -17,11 +17,8 @@
                         <i-icon name="/static/right-bottom.png" fontSize="7"></i-icon>
                     </view>
                     <view class="nav-tools">
-                        <view class="exit" @click="logout" v-if="false">
-                            <image src="../../static/exit.png" mode="aspectFit" class="exit-icon"></image>
-                        </view>
                         <i-icon name="/static/reload.png" fontSize="18" @click="handleReload"></i-icon>
-                        <i-icon class="nav-tool-spacing" name="/static/maps.png" fontSize="20"  @click="toDeviceList"></i-icon>
+                        <i-icon class="nav-tool-spacing" name="/static/maps.png" fontSize="18"  @click="toDeviceList"></i-icon>
                         <view class="nav-tool-spacing nav-tool-add" @click="toAdd">
                             <image src="/static/addNew.png" mode="aspectFit" class="nav-tool-add-image"></image>
                         </view>
@@ -1493,7 +1490,7 @@ onLoad(() => {
                 align-items: center;
                 .nav-tool-spacing {
                     flex-shrink: 0;
-                    margin-left: 30rpx;
+                    margin-left: 20rpx;
                 }
                 .nav-tool-add {
                     display: flex;

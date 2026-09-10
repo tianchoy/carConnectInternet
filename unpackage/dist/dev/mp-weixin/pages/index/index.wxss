@@ -84,7 +84,7 @@
 }
 .container .page-bg .top .device-car .nav-tools .nav-tool-spacing[class].data-v-00a60067 {
   flex-shrink: 0;
-  margin-left: 30rpx;
+  margin-left: 20rpx;
 }
 .container .page-bg .top .device-car .nav-tools .nav-tool-add[class].data-v-00a60067 {
   display: flex;

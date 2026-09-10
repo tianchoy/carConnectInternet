@@ -729,7 +729,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         z: getSignalDetail(common_vendor.unref(signalRssi)).color,
         A: common_vendor.t(common_vendor.unref(signalRssi)),
         B: getSignalDetail(common_vendor.unref(signalRssi)).color,
-        C: common_assets._imports_0$1,
+        C: common_assets._imports_0$2,
         D: common_vendor.t(common_vendor.unref(signalSat)),
         E: common_assets._imports_1$1,
         F: common_vendor.t(common_vendor.unref(carVoltage) || 0),

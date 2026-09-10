@@ -1019,7 +1019,7 @@ const imei = ref<string | null>(null)
 
 	function getDeviceDisplayName(device : UTSJSONObject) : string {
 		const deviceName = device.getString('deviceName', '')
-		return deviceName ? deviceName : device.getString('plateNo', '')
+		return deviceName ? deviceName : device.getString('plateNo', '') ? device.getString('plateNo', '') : device.getString('imei', '')
 	}
 
 	function getSelectedFenceName() : string {

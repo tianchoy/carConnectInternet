@@ -941,7 +941,11 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return if (deviceName != "") {
                     deviceName
                 } else {
-                    device.getString("plateNo", "")
+                    if (device.getString("plateNo", "") != "") {
+                        device.getString("plateNo", "")
+                    } else {
+                        device.getString("imei", "")
+                    }
                 }
             }
             val getDeviceDisplayName = ::gen_getDeviceDisplayName_fn

@@ -149,7 +149,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-30c39099"
         }),
-        b: common_assets._imports_0,
+        b: common_assets._imports_0$1,
         c: common_vendor.o(($event) => {
           return form.value.username = $event;
         }, "42"),

@@ -44,7 +44,17 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                 if (text == "" || text == "null" || text == "undefined") {
                     return ""
                 }
-                return text
+                try {
+                    val decoded = decodeURIComponent(text)
+                    return if (decoded == null) {
+                        text
+                    } else {
+                        decoded.trim()
+                    }
+                }
+                 catch (error: Throwable) {
+                    return text
+                }
             }
             val displayDeviceName = computed(fun(): String {
                 if (deviceName.value != "" && deviceName.value != "null" && deviceName.value != "undefined") {
@@ -338,7 +348,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                 deviceId.value = normalizeRouteValue(options["deviceId"] ?: "")
                 deviceName.value = normalizeRouteValue(options["deviceName"] ?: "")
                 imei.value = normalizeRouteValue(options["imei"] ?: "")
-                console.log("imei:", imei.value)
+                console.log("imei:", imei.value, deviceName.value)
                 initializeDeviceShare()
             }
             )
