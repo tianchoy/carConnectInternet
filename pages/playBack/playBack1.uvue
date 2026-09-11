@@ -1,0 +1,1341 @@
+<template>
+	<view class="container">
+		<custom-navBar title="轨迹回放" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		</custom-navBar>
+		<view class="map-container">
+			<map v-if="isMapReady" id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
+				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="false" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
+				</map>
+				<sub-navBar class="sub-nav-overlay" :showTime="false" :currentCar="plateNo" :showCar="true" :carStatus='carStatus'></sub-navBar>
+		</view>
+
+		<view class="tools-panel">
+			<view class="Datetime-box">
+				<view class="date-box">
+					<i-icon name="/static/rili.png" fontSize="15"></i-icon>
+					<view class="date-time-control" @click="showPicker('start')">
+						<text class="date-part">{{getPlaybackDate(startTime)}} {{getPlaybackClock(startTime)}}</text>
+					</view>
+					<i-icon class="date-arrow" name="/static/xiangxia.png" fontSize="15" @click="showPicker('start')"></i-icon>
+					<text class="date-separator">至</text>
+					<view class="date-time-control" @click="showPicker('end')">
+						<text class="date-part">{{getPlaybackDate(endTime)}} {{getPlaybackClock(endTime)}}</text>
+					</view>
+					<i-icon class="date-arrow" name="/static/xiangxia.png" fontSize="15" @click="showPicker('end')"></i-icon>
+				</view>
+			</view>
+			<view class="tool-tag-item">
+				<i-button type="primary" @click="togglePlayback" size="small" :text="isPlaying ? '暂停':'播放'"></i-button>
+				<view class="slider">
+					<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
+					<i-slider v-model="playbackSpeed" :min="1" :max="30" :step="1"
+						@change="setPlaybackSpeedFromValue">
+					</i-slider>
+					<!-- #endif -->
+					<!-- #ifdef APP-IOS -->
+					<slider :value="playbackSpeed" :min="1" :max="30" :step="1"
+						@changing="setPlaybackSpeed" @change="setPlaybackSpeed">
+					</slider>
+					<!-- #endif -->
+				</view>
+				<text class="speed-label">{{playbackSpeed}}x</text>
+			</view>
+				<view class="track-progress">
+					<text class="progress-time">{{getPlaybackClock(startTime)}}</text>
+					<view class="progress-slider">
+						<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
+						<i-slider v-model="playbackProgress" :min="0" :max="100" :step="0.1"
+							:disabled="!isTrackPlayable" trackColor="#1890FF"
+							@dragStart="startPlaybackScrub" @changing="handlePlaybackProgressChanging"
+							@dragEnd="finishPlaybackScrub">
+						</i-slider>
+						<!-- #endif -->
+						<!-- #ifdef APP-IOS -->
+						<slider :value="playbackProgress" :min="0" :max="100" :step="0.1"
+							:disabled="!isTrackPlayable" activeColor="#1890FF"
+							@changing="setPlaybackProgress" @change="finishNativePlaybackScrub">
+						</slider>
+						<!-- #endif -->
+					</view>
+					<text class="progress-time">{{getPlaybackClock(endTime)}}</text>
+				</view>
+			<view class="play-back-info">
+				<view class="item-info">
+					<text class="info-label">{{currentTime}}</text>
+					<text class="info-label">时间</text>
+				</view>
+				<view class="item-info">
+					<text class="info-label">{{currentSpeed.toFixed(2)}}Km/h</text>
+					<text class="info-label">速度</text>
+				</view>
+				<view class="item-info">
+					<text class="info-label">{{(totalDistance/1000).toFixed(1)}}Km</text>
+					<text class="info-label">里程</text>
+				</view>
+			</view>
+			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
+				<l-date-time-picker confirm-btn="确认" cancel-btn="取消" :start="pickerMinTime" :end="pickerMaxTime" :value="pickerValue" :title="pickerTitle" :mode="63" format="YYYY-MM-DD HH:mm:ss" 
+					@confirm="onConfirm" @cancel="onCancel">
+				</l-date-time-picker>
+			</l-popup>
+		</view>
+	</view>
+	<app-toast></app-toast>
+</template>
+
+<script setup lang="uts">
+import { showAppToast } from '../../utils/toast.uts'
+	import { ref, reactive, onMounted, watch } from 'vue'
+	import { getTrackPos } from '../../api/request.uts'
+	import { formatTimes, normalizeLocalDateTime, parseLocalDateTime } from '../../utils/formateTime.uts'
+	import { getDeviceIcon } from '../../utils/cars'
+	// 导入坐标转换插件
+	import CoordTransform from '../../utils/coordTransform.uts'
+	// #ifdef APP-ANDROID
+	import Polyline from 'uts.sdk.modules.DCloudUniMapTencent.Polyline'
+	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
+	// #endif
+
+	type TrackPoint = {
+		latitude : number;
+		longitude : number;
+		rotation : number;
+		deviceTime : string;
+		speed : number;
+	}
+
+	type TrackBounds = {
+		minLat : number;
+		maxLat : number;
+		minLng : number;
+		maxLng : number;
+	}
+
+	type MapPolylinePoint = {
+		latitude: number
+		longitude: number
+	}
+
+	type PlaybackPosition = {
+		index : number;
+		fraction : number;
+	}
+
+	type MpPolylineData = {
+		points: Array<MapPolylinePoint>
+		color: string
+		width: number
+		dottedLine: boolean
+		arrowLine: boolean
+		borderColor: string
+		borderWidth: number
+	}
+
+	// 地图状态
+	const center = reactive({
+		latitude: 39.90469,
+		longitude: 116.40717
+	})
+	const mapScale = ref(12)
+	const isMapReady = ref(false)
+	const imei = ref<string | null>('')
+	const carStatus = ref<string | null>('')
+	const plateNo = ref<string | null>('')
+	const carType = ref<string | null>('')
+
+	// 日期时间选择器相关
+	const showDateTimePicker = ref(false)
+	const currentPickerType = ref('start') // 'start' or 'end'
+	const pickerTitle = ref('选择开始时间')
+
+	// 轨迹回放相关
+	type MapMarker = Marker
+
+	const trackPoints = ref<Array<TrackPoint>>([])
+	// #ifdef APP-ANDROID
+	const polyline = ref<Array<Polyline>>([])
+	let unplayedPolyline : Polyline | null = null
+	let playedPolyline : Polyline | null = null
+	// #endif
+	// #ifdef MP-WEIXIN || APP-IOS
+	const polyline = ref<Array<MpPolylineData>>([])
+	// #endif
+	const isPlaying = ref(false)
+	const isTrackPlayable = ref(false)
+	const playbackSpeed = ref(1)
+	const totalDistance = ref(0)
+	const currentSpeed = ref(0)
+	const currentTime = ref('')
+	const playbackProgress = ref(0)
+	const currentIndex = ref(0)
+	const cumulativeDistances = ref<Array<number>>([])
+	const isScrubbing = ref(false)
+	let wasPlayingBeforeScrub = false
+	let scrubRenderTimer : number | null = null
+	let pendingScrubProgress : number | null = null
+	const carMarker = ref<MapMarker | null>(null)
+	const PLAYBACK_FRAME_INTERVAL_MS = 30
+	const MIN_SEGMENT_DURATION_MS = 500
+	const MAX_SEGMENT_DURATION_MS = 6000
+	const FALLBACK_SPEED_KMH = 20
+	const renderedPoint = reactive<TrackPoint>({
+		latitude: 0,
+		longitude: 0,
+		rotation: 0,
+		deviceTime: '',
+		speed: 0
+	})
+	const activeSegmentTargetIndex = ref(-1)
+	let playbackTimer : number | null = null
+	let replaySessionId = 0
+
+	function copyTrackPoint(point : TrackPoint) : TrackPoint {
+		return {
+			latitude: point.latitude,
+			longitude: point.longitude,
+			rotation: point.rotation,
+			deviceTime: point.deviceTime,
+			speed: point.speed
+		}
+	}
+
+	function resetRenderedPoint(point : TrackPoint) : void {
+		renderedPoint.latitude = point.latitude
+		renderedPoint.longitude = point.longitude
+		renderedPoint.rotation = point.rotation
+		renderedPoint.deviceTime = point.deviceTime
+		renderedPoint.speed = point.speed
+	}
+
+	function formatPlaybackTime(timestamp : number) : string {
+		return formatTimes(timestamp) ?? ''
+	}
+	const now = new Date()
+	const initialEndTime = formatTimes(now.getTime())
+	const initialStartTime = formatTimes(now.getTime() - 3600000 * 6)
+	const startTime = ref(initialStartTime)
+	const endTime = ref(initialEndTime)
+
+	function normalizePlaybackTime(value : string, fallback : string) : string {
+		const milliseconds = parseLocalDateTime(value)
+		return milliseconds == null ? fallback : formatPlaybackTime(milliseconds)
+	}
+
+	const pickerValue = computed(() : string => {
+		return currentPickerType.value == 'start' ? startTime.value : endTime.value
+	})
+
+	const pickerMinTime = computed(() => {
+		const now = new Date()
+		return new Date(
+			now.getFullYear(),
+			now.getMonth() - 6,
+			now.getDate(),
+			0, 0, 0
+		).getTime()
+	})
+
+	// 最大日期（当前时间）
+	const pickerMaxTime = computed(() => {
+		return Date.now()
+	})
+
+	function getPlaybackDate(value : string) : string {
+		const parts = value.split(' ')
+		return parts.length > 1 ? parts[0] : value
+	}
+
+	function getPlaybackClock(value : string) : string {
+		const parts = value.split(' ')
+		return parts.length > 1 ? parts[1] : ''
+	}
+
+	function setPlaybackTimeRange(startValue : string, endValue : string) : void {
+		startTime.value = normalizePlaybackTime(startValue, startTime.value)
+		endTime.value = normalizePlaybackTime(endValue, endTime.value)
+	}
+
+	const lat = ref<string | null>('')
+	const lng = ref<string | null>('')
+
+	// 标记点集合
+	const markers = ref<Array<MapMarker>>([])
+
+	// 日期函数
+	function safeParseDate(dateStr : string) : number {
+		return parseLocalDateTime(dateStr) ?? 0
+	}
+
+	// 规范化日期时间，确保展示和接口查询均精确到秒
+	function normalizeDateTime(dateStr : string) : string {
+		return normalizeLocalDateTime(dateStr)
+	}
+
+	function resolveRouteDateTime(dateStr : string) : string | null {
+		if (dateStr == '') return null
+		try {
+			const decoded = (decodeURIComponent(dateStr) ?? '').replace(/\+/g, ' ').replace('T', ' ')
+			const milliseconds = parseLocalDateTime(decoded)
+			return milliseconds == null ? null : formatPlaybackTime(milliseconds)
+		} catch (error) {
+			console.error('解析回放时间失败:', error)
+			return null
+		}
+	}
+
+	// 格式化日期显示
+	function formatTimeForDisplay(dateStr : string) : string {
+		const milliseconds = parseLocalDateTime(dateStr)
+		return milliseconds == null ? dateStr : formatPlaybackTime(milliseconds)
+	}
+
+	function formatDateForDisplay(dateStr : string) : string {
+		return normalizeDateTime(dateStr)
+	}
+
+	// 计算两点之间的方向角
+	function calculateBearing(lat1 : number, lng1 : number, lat2 : number, lng2 : number) : number {
+		const degToRad = (d : number) => d * Math.PI / 180
+		const radToDeg = (r : number) => r * 180 / Math.PI
+
+		const φ1 = degToRad(lat1)
+		const φ2 = degToRad(lat2)
+		const Δλ = degToRad(lng2 - lng1)
+
+		const y = Math.sin(Δλ) * Math.cos(φ2)
+		const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ)
+		const θ = Math.atan2(y, x)
+
+		return (radToDeg(θ) + 360) % 360
+	}
+
+	// 计算两点间距离（米）
+	function getDistance(lat1 : number, lng1 : number, lat2 : number, lng2 : number) {
+		const rad = (d : number) => d * Math.PI / 180.0
+		const radLat1 = rad(lat1)
+		const radLat2 = rad(lat2)
+		const a = radLat1 - radLat2
+		const b = rad(lng1) - rad(lng2)
+		const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) +
+			Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)))
+		return s * 6378.137 * 1000
+	}
+
+	// 计算轨迹边界
+	function calculateTrackBounds() : TrackBounds | null {
+		if (trackPoints.value.length == 0) return null
+
+		let minLat = trackPoints.value[0].latitude
+		let maxLat = trackPoints.value[0].latitude
+		let minLng = trackPoints.value[0].longitude
+		let maxLng = trackPoints.value[0].longitude
+
+		trackPoints.value.forEach((point : TrackPoint) : void => {
+			minLat = Math.min(minLat, point.latitude)
+			maxLat = Math.max(maxLat, point.latitude)
+			minLng = Math.min(minLng, point.longitude)
+			maxLng = Math.max(maxLng, point.longitude)
+		})
+
+		return {
+			minLat: minLat,
+			maxLat: maxLat,
+			minLng: minLng,
+			maxLng: maxLng
+		}
+	}
+
+	// 调整地图以适应轨迹
+	function adjustMapToFitTrack() {
+		const nullableBounds = calculateTrackBounds()
+		if (nullableBounds == null) return
+		const bounds = nullableBounds
+
+		center.latitude = (bounds.minLat + bounds.maxLat) / 2
+		center.longitude = (bounds.minLng + bounds.maxLng) / 2
+
+		const latDiff = bounds.maxLat - bounds.minLat
+		const lngDiff = bounds.maxLng - bounds.minLng
+		const maxDiff = Math.max(latDiff, lngDiff)
+
+		if (maxDiff > 0.1) mapScale.value = 10
+		else if (maxDiff > 0.05) mapScale.value = 12
+		else if (maxDiff > 0.02) mapScale.value = 15
+		else mapScale.value = 16
+	}
+
+	// 计算轨迹总距离
+	function calculateTrackDistance() {
+		totalDistance.value = 0
+		const distances : Array<number> = [0]
+		for (let i = 1; i < trackPoints.value.length; i++) {
+			const segmentDistance = getDistance(
+				trackPoints.value[i - 1].latitude,
+				trackPoints.value[i - 1].longitude,
+				trackPoints.value[i].latitude,
+				trackPoints.value[i].longitude
+			)
+			totalDistance.value += segmentDistance
+			distances.push(totalDistance.value)
+		}
+		cumulativeDistances.value = distances
+	}
+
+	function clampPlaybackProgress(value : number) : number {
+		if (!isFinite(value)) return 0
+		return Math.min(100, Math.max(0, value))
+	}
+
+	function getProgressForIndex(index : number) : number {
+		if (trackPoints.value.length <= 1 || totalDistance.value <= 0) {
+			return index >= trackPoints.value.length - 1 ? 100 : 0
+		}
+		const distance = cumulativeDistances.value[index] ?? 0
+		return clampPlaybackProgress(distance / totalDistance.value * 100)
+	}
+
+	function updatePlaybackProgressFromRenderedPoint() : void {
+		if (trackPoints.value.length <= 1 || totalDistance.value <= 0) {
+			playbackProgress.value = currentIndex.value >= trackPoints.value.length - 1 ? 100 : 0
+			return
+		}
+		const baseDistance = cumulativeDistances.value[currentIndex.value] ?? 0
+		const currentPoint = trackPoints.value[currentIndex.value]
+		const distanceFromBase = getDistance(
+			currentPoint.latitude,
+			currentPoint.longitude,
+			renderedPoint.latitude,
+			renderedPoint.longitude
+		)
+		playbackProgress.value = clampPlaybackProgress((baseDistance + distanceFromBase) / totalDistance.value * 100)
+	}
+
+	function findPlaybackPosition(progress : number) : PlaybackPosition {
+		const normalizedProgress = clampPlaybackProgress(progress)
+		if (trackPoints.value.length <= 1 || totalDistance.value <= 0) {
+			return {
+				index: normalizedProgress >= 100 ? Math.max(0, trackPoints.value.length - 1) : 0,
+				fraction: 0
+			}
+		}
+		if (normalizedProgress <= 0) return { index: 0, fraction: 0 }
+		if (normalizedProgress >= 100) return { index: trackPoints.value.length - 1, fraction: 0 }
+
+		const targetDistance = totalDistance.value * normalizedProgress / 100
+		let left = 0
+		let right = cumulativeDistances.value.length - 1
+		while (left < right) {
+			const middle = Math.floor((left + right) / 2)
+			if ((cumulativeDistances.value[middle] ?? 0) < targetDistance) left = middle + 1
+			else right = middle
+		}
+		const targetIndex = Math.max(1, left)
+		const startDistance = cumulativeDistances.value[targetIndex - 1] ?? 0
+		const segmentDistance = (cumulativeDistances.value[targetIndex] ?? startDistance) - startDistance
+		return {
+			index: targetIndex - 1,
+			fraction: segmentDistance <= 0 ? 0 : (targetDistance - startDistance) / segmentDistance
+		}
+	}
+
+	function formatInterpolatedTime(start : TrackPoint, end : TrackPoint, fraction : number) : string {
+		const startTimeValue = parseLocalDateTime(start.deviceTime)
+		const endTimeValue = parseLocalDateTime(end.deviceTime)
+		if (startTimeValue == null || endTimeValue == null) return fraction >= 0.5 ? end.deviceTime : start.deviceTime
+		return formatPlaybackTime(startTimeValue + (endTimeValue - startTimeValue) * fraction)
+	}
+
+	// 初始化时间
+	function initDateTime() {
+		const now = new Date()
+		setPlaybackTimeRange(
+			formatPlaybackTime(now.getTime() - 3600000 * 6),
+			formatPlaybackTime(now.getTime())
+		)
+	}
+
+	// 初始化小车标记
+	function initCarMarker() {
+		if (trackPoints.value.length == 0) return
+
+		const firstPoint = trackPoints.value[0]
+		const marker : MapMarker = {
+			id: 999,
+			latitude: firstPoint.latitude,
+			longitude: firstPoint.longitude,
+			iconPath: getDeviceIcon(carStatus.value ?? '', carType.value ?? ''),
+			width: 25,
+			height: 25,
+			rotate: firstPoint.rotation,
+			anchor: { x: 0.5, y: 0.5 }
+		}
+		carMarker.value = marker
+
+		const startMarker : MapMarker = {
+			id: 1000,
+			latitude: firstPoint.latitude,
+			longitude: firstPoint.longitude,
+			iconPath: '/static/start.png',
+			width: 24,
+			height: 24,
+			anchor: { x: 0.5, y: 0.5 },
+			callout: { content: '起点', borderRadius: 5, padding: 5, display: 'BYCLICK' }
+		}
+		const lastPoint = trackPoints.value[trackPoints.value.length - 1]
+		const endMarker : MapMarker = {
+			id: 1001,
+			latitude: lastPoint.latitude,
+			longitude: lastPoint.longitude,
+			iconPath: '/static/end.png',
+			width: 24,
+			height: 24,
+			anchor: { x: 0.5, y: 0.5 },
+			callout: { content: '终点', borderRadius: 5, padding: 5, display: 'BYCLICK' }
+		}
+		markers.value = [marker, startMarker, endMarker]
+	}
+
+	// #ifdef APP-ANDROID
+	function toNativePoints(points : Array<TrackPoint>) : Array<LocationObject> {
+		return points.map((point : TrackPoint) : LocationObject => {
+			return new LocationObject(point.latitude, point.longitude)
+		})
+	}
+
+	function initPolyline() {
+		if (trackPoints.value.length < 2) {
+			unplayedPolyline = null
+			playedPolyline = null
+			polyline.value = []
+			return
+		}
+
+		const initialUnplayedPolyline = new Polyline(
+			toNativePoints(trackPoints.value), '#888787', 3, true, false, '', '#888787', 0, []
+		)
+		initialUnplayedPolyline.color = '#888787'
+		initialUnplayedPolyline.width = 3
+		initialUnplayedPolyline.dottedLine = true
+		initialUnplayedPolyline.arrowLine = false
+		initialUnplayedPolyline.borderColor = '#888787'
+		initialUnplayedPolyline.borderWidth = 0
+
+		const initialPlayedPolyline = new Polyline(
+			toNativePoints(trackPoints.value.slice(0, 1)), '#3c5cff', 5, false, true, '', '#FFFFFF', 1, []
+		)
+		initialPlayedPolyline.color = '#3c5cff'
+		initialPlayedPolyline.width = 5
+		initialPlayedPolyline.dottedLine = false
+		initialPlayedPolyline.arrowLine = true
+		initialPlayedPolyline.borderColor = '#FFFFFF'
+		initialPlayedPolyline.borderWidth = 1
+		unplayedPolyline = initialUnplayedPolyline
+		playedPolyline = initialPlayedPolyline
+		polyline.value = [initialUnplayedPolyline, initialPlayedPolyline]
+	}
+
+	function updatePolyline() {
+		const currentUnplayedPolyline = unplayedPolyline
+		const currentPlayedPolyline = playedPolyline
+		if (trackPoints.value.length == 0 || currentUnplayedPolyline == null || currentPlayedPolyline == null) return
+
+		const isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value
+		const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
+		if (isAnimatingSegment) {
+			playedPoints.push(copyTrackPoint(renderedPoint))
+		}
+		const unplayedStartIndex = isAnimatingSegment ? activeSegmentTargetIndex.value : currentIndex.value
+		const unplayedPoints = trackPoints.value.slice(unplayedStartIndex)
+		if (isAnimatingSegment) {
+			unplayedPoints.unshift(copyTrackPoint(renderedPoint))
+		}
+		currentUnplayedPolyline.points = toNativePoints(unplayedPoints)
+		currentPlayedPolyline.points = toNativePoints(playedPoints)
+		polyline.value = [currentUnplayedPolyline, currentPlayedPolyline]
+	}
+	// #endif
+
+	// #ifdef MP-WEIXIN || APP-IOS
+	function toMpPoints(points : Array<TrackPoint>) : Array<MapPolylinePoint> {
+		return points.map((point : TrackPoint) : MapPolylinePoint => ({
+			latitude: point.latitude,
+			longitude: point.longitude
+		}))
+	}
+
+	function updatePolyline() {
+		if (trackPoints.value.length < 2) {
+			polyline.value = []
+			return
+		}
+
+		const isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value
+		const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
+		if (isAnimatingSegment) {
+			playedPoints.push(copyTrackPoint(renderedPoint))
+		}
+		const unplayedStartIndex = isAnimatingSegment ? activeSegmentTargetIndex.value : currentIndex.value
+		const lines : Array<MpPolylineData> = []
+		const unplayedPoints = trackPoints.value.slice(unplayedStartIndex)
+		if (isAnimatingSegment) {
+			unplayedPoints.unshift(copyTrackPoint(renderedPoint))
+		}
+		if (unplayedPoints.length >= 2) {
+			lines.push({
+				points: toMpPoints(unplayedPoints),
+				color: '#999999',
+				width: 3,
+				dottedLine: true,
+				arrowLine: false,
+				borderColor: '#FFFFFF',
+				borderWidth: 1
+			})
+		}
+		if (playedPoints.length >= 2) {
+			lines.push({
+				points: toMpPoints(playedPoints),
+				color: '#1890FF',
+				width: 6,
+				dottedLine: false,
+				arrowLine: true,
+				borderColor: '#FFFFFF',
+				borderWidth: 1
+			})
+		}
+		polyline.value = lines
+	}
+
+	function initPolyline() {
+		updatePolyline()
+	}
+	// #endif
+
+	// 更新小车位置
+	function updateCarPosition() {
+		const marker = carMarker.value
+		if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
+			const updatedMarker : MapMarker = {
+				id: marker.id,
+				latitude: renderedPoint.latitude,
+				longitude: renderedPoint.longitude,
+				iconPath: marker.iconPath,
+				width: marker.width,
+				height: marker.height,
+				rotate: renderedPoint.rotation,
+				anchor: marker.anchor,
+				callout: marker.callout,
+				label: marker.label
+			}
+			carMarker.value = updatedMarker
+			markers.value = [updatedMarker, ...markers.value.slice(1)]
+
+			if (currentIndex.value % 5 == 0 ||
+				currentIndex.value == trackPoints.value.length - 1) {
+				center.latitude = renderedPoint.latitude
+				center.longitude = renderedPoint.longitude
+			}
+		}
+	}
+
+	function getShortestRotationDifference(from : number, to : number) : number {
+		let difference = to - from
+		if (difference > 180) difference -= 360
+		else if (difference < -180) difference += 360
+		return difference
+	}
+
+	function setRenderedPlaybackPosition(progress : number, shouldUpdateMap : boolean) : void {
+		if (trackPoints.value.length == 0) return
+		const normalizedProgress = clampPlaybackProgress(progress)
+		const position = findPlaybackPosition(normalizedProgress)
+		const point = trackPoints.value[position.index]
+		if (position.index >= trackPoints.value.length - 1) {
+			currentIndex.value = trackPoints.value.length - 1
+			activeSegmentTargetIndex.value = -1
+			resetRenderedPoint(trackPoints.value[trackPoints.value.length - 1])
+		} else if (position.fraction <= 0.000001) {
+			currentIndex.value = position.index
+			activeSegmentTargetIndex.value = -1
+			resetRenderedPoint(point)
+		} else if (position.fraction >= 0.999999) {
+			currentIndex.value = position.index + 1
+			activeSegmentTargetIndex.value = -1
+			resetRenderedPoint(trackPoints.value[position.index + 1])
+		} else {
+			const targetPoint = trackPoints.value[position.index + 1]
+			const rotationDifference = getShortestRotationDifference(point.rotation, targetPoint.rotation)
+			currentIndex.value = position.index
+			activeSegmentTargetIndex.value = position.index + 1
+			renderedPoint.latitude = point.latitude + (targetPoint.latitude - point.latitude) * position.fraction
+			renderedPoint.longitude = point.longitude + (targetPoint.longitude - point.longitude) * position.fraction
+			renderedPoint.rotation = (point.rotation + rotationDifference * position.fraction + 360) % 360
+			renderedPoint.deviceTime = formatInterpolatedTime(point, targetPoint, position.fraction)
+			renderedPoint.speed = point.speed + (targetPoint.speed - point.speed) * position.fraction
+		}
+		playbackProgress.value = normalizedProgress
+		currentSpeed.value = renderedPoint.speed
+		currentTime.value = renderedPoint.deviceTime
+		if (shouldUpdateMap) {
+			updateCarPosition()
+			updatePolyline()
+		}
+	}
+	// 显示日期时间选择器
+	function showPicker(type : string) {
+		currentPickerType.value = type
+		pickerTitle.value = type == 'start' ? '选择开始时间' : '选择结束时间'
+		showDateTimePicker.value = true
+	}
+
+	// 显示当前位置
+	function showCurrentPosition() {
+		isTrackPlayable.value = false
+		const originalLatText = lat.value ?? ''
+		const originalLngText = lng.value ?? ''
+		const originalLat = parseFloat(originalLatText)
+		const originalLng = parseFloat(originalLngText)
+		if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
+			showAppToast({
+				title: '这段时间没有数据',
+				icon: 'none',
+				duration: 2000
+			})
+			return
+		}
+
+		showAppToast({
+			title: '这段时间没有数据',
+			icon: 'none',
+			duration: 2000
+		})
+		// 转换坐标到腾讯地图坐标系
+		const convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
+
+		// 设置地图中心点
+		center.latitude = convertedCoord.lat
+		center.longitude = convertedCoord.lng
+		mapScale.value = 15
+
+		// 创建当前位置标记
+		const currentPoint : TrackPoint = {
+			latitude: convertedCoord.lat,
+			longitude: convertedCoord.lng,
+			rotation: 0,
+			deviceTime: new Date().toLocaleString(),
+			speed: 0
+		}
+
+		// 初始化小车标记
+		const marker : MapMarker = {
+			id: 999,
+			latitude: currentPoint.latitude,
+			longitude: currentPoint.longitude,
+			iconPath: getDeviceIcon(carStatus.value ?? '', carType.value ?? ''),
+			width: 25,
+			height: 25,
+			rotate: 0,
+			anchor: { x: 0.5, y: 0.5 }
+		}
+		carMarker.value = marker
+		resetRenderedPoint(currentPoint)
+
+		// 设置标记点
+		markers.value = [marker]
+		isMapReady.value = true
+	}
+
+
+	function clearTrackDisplay() : void {
+		isMapReady.value = false
+		trackPoints.value = []
+		isTrackPlayable.value = false
+		currentIndex.value = 0
+		activeSegmentTargetIndex.value = -1
+		renderedPoint.latitude = 0
+		renderedPoint.longitude = 0
+		renderedPoint.rotation = 0
+		renderedPoint.deviceTime = ''
+		renderedPoint.speed = 0
+		currentSpeed.value = 0
+		currentTime.value = ''
+		playbackProgress.value = 0
+		cumulativeDistances.value = []
+		isScrubbing.value = false
+		wasPlayingBeforeScrub = false
+		pendingScrubProgress = null
+		const scrubTimer = scrubRenderTimer
+		if (scrubTimer != null) {
+			clearTimeout(scrubTimer)
+		}
+		scrubRenderTimer = null
+		totalDistance.value = 0
+		carMarker.value = null
+		markers.value = []
+		// #ifdef APP-ANDROID
+		unplayedPolyline = null
+		playedPolyline = null
+		polyline.value = []
+		// #endif
+		// #ifdef MP-WEIXIN || APP-IOS
+		polyline.value = []
+		// #endif
+	}
+
+	function clearPlaybackTimer() : void {
+		const timer = playbackTimer
+		if (timer != null) {
+			clearTimeout(timer)
+			playbackTimer = null
+		}
+	}
+
+	function pausePlayback() : void {
+		isPlaying.value = false
+		clearPlaybackTimer()
+	}
+
+	function renderPlaybackIndex() : void {
+		if (trackPoints.value.length == 0) return
+		if (activeSegmentTargetIndex.value <= currentIndex.value) {
+			resetRenderedPoint(trackPoints.value[currentIndex.value])
+		}
+		updateCarPosition()
+		updatePolyline()
+		currentSpeed.value = renderedPoint.speed
+		currentTime.value = renderedPoint.deviceTime
+		updatePlaybackProgressFromRenderedPoint()
+	}
+
+
+	// 处理轨迹数据
+	function processTrackData(positions : Array<UTSJSONObject>) : void {
+		const processedPoints : Array<TrackPoint> = []
+		let lastRetainedLat : number | null = null
+		let lastRetainedLng : number | null = null
+
+		for (let i = 0; i < positions.length; i++) {
+			const point = positions[i]
+			const deviceTimeStr = point.getString('deviceTime', '')
+			const originalLat = point.getNumber('latitude', 0)
+			const originalLng = point.getNumber('longitude', 0)
+
+			if (originalLat == 0 || originalLng == 0 ||
+				!isFinite(originalLat) || !isFinite(originalLng) ||
+				deviceTimeStr == '' || safeParseDate(deviceTimeStr) == 0) {
+				continue
+			}
+
+			if (lastRetainedLat != null && lastRetainedLng != null &&
+				originalLat == lastRetainedLat && originalLng == lastRetainedLng) {
+				continue
+			}
+
+			const convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
+			if (!isFinite(convertedCoord.lat) || !isFinite(convertedCoord.lng)) {
+				continue
+			}
+
+			lastRetainedLat = originalLat
+			lastRetainedLng = originalLng
+			processedPoints.push({
+				latitude: convertedCoord.lat,
+				longitude: convertedCoord.lng,
+				rotation: 0,
+				deviceTime: formatDateForDisplay(deviceTimeStr),
+				speed: point.getNumber('speed', 0)
+			})
+		}
+
+		for (let i = 1; i < processedPoints.length; i++) {
+			const previousPoint = processedPoints[i - 1]
+			const currentPoint = processedPoints[i]
+			currentPoint.rotation = calculateBearing(
+				previousPoint.latitude, previousPoint.longitude,
+				currentPoint.latitude, currentPoint.longitude
+			)
+		}
+
+		if (processedPoints.length > 1) {
+			processedPoints[processedPoints.length - 1].rotation =
+				processedPoints[processedPoints.length - 2].rotation
+		}
+
+		trackPoints.value = processedPoints
+		isTrackPlayable.value = processedPoints.length > 1
+		currentIndex.value = 0
+		activeSegmentTargetIndex.value = -1
+		if (processedPoints.length == 0) return
+		resetRenderedPoint(processedPoints[0])
+		calculateTrackDistance()
+		initCarMarker()
+		initPolyline()
+		adjustMapToFitTrack()
+		const firstPoint = trackPoints.value[0]
+		center.latitude = firstPoint.latitude
+		center.longitude = firstPoint.longitude
+		playbackProgress.value = 0
+		renderPlaybackIndex()
+		isMapReady.value = true
+	}
+	const loadTrackPos = async () => {
+		pausePlayback()
+		const requestId = ++replaySessionId
+		clearTrackDisplay()
+		uni.showLoading({ title: '加载中...' })
+		const data = {
+			imei: imei.value,
+			startTime: startTime.value.replace(/\//g, '-'),
+			endTime: endTime.value.replace(/\//g, '-'),
+			minParkTime: 2,
+			withStop: false,
+			withPos: true,
+			withTrip: false,
+		}
+
+		try {
+			const res = await getTrackPos(data)
+			if (requestId != replaySessionId) return
+
+			if (res.code != 200) {
+				showAppToast({ title: res.msg || '轨迹加载失败', icon: 'none' })
+				showCurrentPosition()
+				return
+			}
+
+			const trackData = res.data
+			if (trackData == null) {
+				showCurrentPosition()
+				return
+			}
+			const positions = trackData.getArray<UTSJSONObject>('positions')
+			if (positions != null && positions.length > 0) {
+				processTrackData(positions)
+				if (trackPoints.value.length == 0) {
+					showCurrentPosition()
+				}
+			} else {
+				showCurrentPosition()
+			}
+		} catch (error) {
+			if (requestId != replaySessionId) return
+			console.error('加载轨迹失败:', error)
+			showAppToast({ title: '轨迹加载失败', icon: 'none' })
+			if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
+				showCurrentPosition()
+			}
+		} finally {
+			if (requestId == replaySessionId) {
+				uni.hideLoading()
+			}
+		}
+	}
+
+	function resetPlayback() {
+		pausePlayback()
+		isScrubbing.value = false
+		wasPlayingBeforeScrub = false
+		pendingScrubProgress = null
+		const scrubTimer = scrubRenderTimer
+		if (scrubTimer != null) {
+			clearTimeout(scrubTimer)
+		}
+		scrubRenderTimer = null
+		currentIndex.value = 0
+		activeSegmentTargetIndex.value = -1
+		renderPlaybackIndex()
+	}
+
+	function getSegmentDuration(start : TrackPoint, end : TrackPoint) : number {
+		const distance = getDistance(start.latitude, start.longitude, end.latitude, end.longitude)
+		const recordedSpeed = start.speed > 0 && isFinite(start.speed) ? start.speed : end.speed
+		const speed = recordedSpeed > 0 && isFinite(recordedSpeed) ? recordedSpeed : FALLBACK_SPEED_KMH
+		const duration = distance / (speed / 3.6) * 1000 / playbackSpeed.value
+		return Math.min(MAX_SEGMENT_DURATION_MS, Math.max(MIN_SEGMENT_DURATION_MS, duration))
+	}
+
+	function finishPlayback() : void {
+		pausePlayback()
+		activeSegmentTargetIndex.value = -1
+		showAppToast({
+			title: '轨迹回放完成',
+			icon: 'none',
+			duration: 1500
+		})
+	}
+
+	function animateNextSegment(sessionId : number) : void {
+		if (!isPlaying.value || sessionId != replaySessionId) return
+		if (currentIndex.value >= trackPoints.value.length - 1) {
+			finishPlayback()
+			return
+		}
+
+		const startPoint : TrackPoint = {
+			latitude: renderedPoint.latitude,
+			longitude: renderedPoint.longitude,
+			rotation: renderedPoint.rotation,
+			deviceTime: renderedPoint.deviceTime,
+			speed: renderedPoint.speed
+		}
+		const targetIndex = currentIndex.value + 1
+		const targetPoint = trackPoints.value[targetIndex]
+		const rotationDifference = getShortestRotationDifference(startPoint.rotation, targetPoint.rotation)
+		const duration = getSegmentDuration(startPoint, targetPoint)
+		const startedAt = Date.now()
+		activeSegmentTargetIndex.value = targetIndex
+
+		let renderFrame : (() => void) | null = null
+		renderFrame = () : void => {
+			if (!isPlaying.value || sessionId != replaySessionId) return
+			const progress = Math.min((Date.now() - startedAt) / duration, 1)
+			renderedPoint.latitude = startPoint.latitude + (targetPoint.latitude - startPoint.latitude) * progress
+			renderedPoint.longitude = startPoint.longitude + (targetPoint.longitude - startPoint.longitude) * progress
+			renderedPoint.rotation = (startPoint.rotation + rotationDifference * progress + 360) % 360
+			renderedPoint.deviceTime = formatInterpolatedTime(startPoint, targetPoint, progress)
+			renderedPoint.speed = startPoint.speed + (targetPoint.speed - startPoint.speed) * progress
+			updateCarPosition()
+			updatePolyline()
+			updatePlaybackProgressFromRenderedPoint()
+			currentSpeed.value = renderedPoint.speed
+			currentTime.value = renderedPoint.deviceTime
+
+			if (progress >= 1) {
+				currentIndex.value = targetIndex
+				activeSegmentTargetIndex.value = -1
+				resetRenderedPoint(targetPoint)
+				renderPlaybackIndex()
+				animateNextSegment(sessionId)
+				return
+			}
+			if (renderFrame != null) {
+				playbackTimer = setTimeout(() => { renderFrame?.() }, PLAYBACK_FRAME_INTERVAL_MS)
+			}
+		}
+
+		renderFrame?.()
+	}
+
+	function startPlayback() {
+		if (!isTrackPlayable.value) {
+			showAppToast({ title: '没有轨迹数据', icon: 'none' })
+			return
+		}
+
+		if (currentIndex.value >= trackPoints.value.length - 1) {
+			resetPlayback()
+		}
+
+		activeSegmentTargetIndex.value = -1
+		isPlaying.value = true
+		const sessionId = ++replaySessionId
+		animateNextSegment(sessionId)
+	}
+	// 播放控制
+	function togglePlayback() {
+		if (isPlaying.value) {
+			pausePlayback()
+		} else {
+			startPlayback()
+		}
+	}
+
+	function startPlaybackScrub() : void {
+		if (!isTrackPlayable.value || isScrubbing.value) return
+		wasPlayingBeforeScrub = isPlaying.value
+		isScrubbing.value = true
+		pausePlayback()
+		++replaySessionId
+	}
+
+	function renderScrubProgress(progress : number) : void {
+		pendingScrubProgress = clampPlaybackProgress(progress)
+		if (scrubRenderTimer != null) return
+
+		let renderScrubFrame : (() => void) | null = null
+		renderScrubFrame = () : void => {
+			scrubRenderTimer = null
+			const nextProgress = pendingScrubProgress
+			pendingScrubProgress = null
+			if (!isScrubbing.value || nextProgress == null) return
+			setRenderedPlaybackPosition(nextProgress, true)
+			if (pendingScrubProgress != null) {
+				scrubRenderTimer = setTimeout(() => {
+					renderScrubFrame?.()
+				}, PLAYBACK_FRAME_INTERVAL_MS)
+			}
+		}
+		renderScrubFrame?.()
+	}
+	function handlePlaybackProgressChanging(value : number) : void {
+		if (!isTrackPlayable.value) return
+		const normalizedValue = clampPlaybackProgress(value)
+		playbackProgress.value = normalizedValue
+		const position = findPlaybackPosition(normalizedValue)
+		if (trackPoints.value.length > 1 && position.index < trackPoints.value.length - 1) {
+			const startPoint = trackPoints.value[position.index]
+			const targetPoint = trackPoints.value[position.index + 1]
+			currentTime.value = formatInterpolatedTime(startPoint, targetPoint, position.fraction)
+		}
+		renderScrubProgress(normalizedValue)
+	}
+
+	function setPlaybackProgress(event : UniSliderChangeEvent) : void {
+		startPlaybackScrub()
+		handlePlaybackProgressChanging(event.detail.value)
+	}
+
+	function finishPlaybackScrub() : void {
+		if (!isScrubbing.value) return
+		const finalProgress = playbackProgress.value
+		const scrubTimer = scrubRenderTimer
+		if (scrubTimer != null) {
+			clearTimeout(scrubTimer)
+		}
+		scrubRenderTimer = null
+		pendingScrubProgress = null
+		setRenderedPlaybackPosition(finalProgress, true)
+		isScrubbing.value = false
+		const shouldResume = wasPlayingBeforeScrub
+		wasPlayingBeforeScrub = false
+		if (shouldResume && currentIndex.value < trackPoints.value.length - 1) {
+			startPlayback()
+		}
+	}
+
+	function finishNativePlaybackScrub(event : UniSliderChangeEvent) : void {
+		setPlaybackProgress(event)
+		finishPlaybackScrub()
+	}
+
+	// 确认选择时间
+	function onConfirm(value : string) {
+		const formattedValue = normalizeDateTime(value)
+
+		if (currentPickerType.value == 'start') {
+			setPlaybackTimeRange(formattedValue, endTime.value ?? '')
+		} else {
+			setPlaybackTimeRange(startTime.value ?? '', formattedValue)
+		}
+		resetPlayback()
+		void loadTrackPos()
+		showDateTimePicker.value = false
+	}
+	// 取消选择时间
+	function onCancel() {
+		showDateTimePicker.value = false
+	}
+
+	// 重置回放
+
+	function applyPlaybackSpeed(value : number) : void {
+		if (!isFinite(value)) return
+		playbackSpeed.value = Math.min(30, Math.max(1, value))
+		if (!isPlaying.value) return
+
+		clearPlaybackTimer()
+		const sessionId = ++replaySessionId
+		animateNextSegment(sessionId)
+	}
+
+	// i-slider 对外发送数值，原生 slider 发送事件对象
+	function setPlaybackSpeedFromValue(value : number) : void {
+		applyPlaybackSpeed(value)
+	}
+
+	function setPlaybackSpeed(event : UniSliderChangeEvent) : void {
+		applyPlaybackSpeed(event.detail.value)
+	}
+
+	onLoad((option) => {
+		imei.value = option.imei ?? null
+		carStatus.value = option.connectionStatus ?? ''
+		plateNo.value = option.plateNo ?? ''
+		carType.value = option.carType ?? ''
+		lat.value = option.lat ?? null
+		lng.value = option.lng ?? null
+		startTime.value = option.startTime ?? ''
+		endTime.value = option.endTime ?? ''
+		console.log('startTime:', startTime.value, 'endTime:', endTime.value)
+		const routeStartTime = resolveRouteDateTime(startTime.value)
+		const routeEndTime = resolveRouteDateTime(endTime.value)
+		if (routeStartTime != null && routeEndTime != null) {
+			setPlaybackTimeRange(routeStartTime, routeEndTime)
+			loadTrackPos()
+		} else {
+			initDateTime()
+			loadTrackPos()
+		}
+
+	})
+
+	onHide(() => {
+		pausePlayback()
+		++replaySessionId
+	})
+
+	onUnload(() => {
+		pausePlayback()
+		++replaySessionId
+	})
+
+
+
+</script>
+
+<style lang="scss">
+	.container {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		background-color: #f5f7fa;
+
+		.map-container {
+			flex: 1;
+			width: 100%;
+			position: relative;
+
+			.sub-nav-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				z-index: 100;
+			}
+		}
+
+		.tools-panel {
+			width: 100%;
+			box-sizing: border-box;
+			background-color: #fff;
+			padding: 50rpx 20rpx;
+			box-shadow: 0 -10rpx 20rpx rgba(0, 0, 0, 0.1);
+
+			.Datetime-box {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 30rpx;
+
+				.date-box {
+					display: flex;
+					box-sizing: border-box;
+					flex-direction: row;
+					align-items: center;
+
+					.date-time-control {
+						flex: 1;
+						min-width: 0;
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						justify-content: center;
+						border-radius: 5rpx;
+						padding: 6rpx 4rpx;
+					}
+
+					.date-part,
+					.time-part {
+						font-size: 24rpx;
+						line-height: 32rpx;
+						white-space: nowrap;
+					}
+
+					.date-arrow,
+					.date-separator {
+						flex-shrink: 0;
+					}
+
+					.date-separator {
+						margin: 0 20rpx;
+						font-size: 26rpx;
+					}
+				}
+
+				.playbackdetail {
+					font-size: 25rpx;
+					color: #1890FF;
+				}
+			}
+
+			.tool-tag-item {
+				padding: 40rpx 20rpx;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+
+				.speed-label {
+					border: 2rpx solid #1890FF;
+					font-size: 25rpx;
+					color: #1890FF;
+
+					padding: 5rpx 15rpx;
+					border-radius: 30rpx;
+					margin-left: 20rpx;
+				}
+
+				.slider {
+					flex: 1;
+					padding: 0 20rpx 0 30rpx;
+					overflow: visible;
+				}
+
+				.play-btn {
+					font-size: 25rpx;
+					color: #fff;
+					padding: 10rpx 25rpx;
+					border-radius: 10rpx;
+					margin-left: 20rpx;
+					background-color: #1890FF;
+				}
+			}
+
+			.track-progress {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				padding: 0 20rpx;
+
+				.progress-slider {
+					flex: 1;
+					padding: 0 16rpx;
+				}
+
+				.progress-time {
+					min-width: 76rpx;
+					font-size: 21rpx;
+					color: #999;
+					text-align: center;
+				}
+			}
+
+			.play-back-info {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				padding: 20rpx;
+				margin-top: 20rpx;
+				background-color: #f9f9f9;
+				border-radius: 15rpx;
+
+				.item-info {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+
+				}
+
+				.info-label {
+					font-size: 24rpx;
+					padding: 10rpx 0;
+					color: #999;
+				}
+			}
+		}
+	}
+</style>
