@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 const utils_formateTime = require("../../utils/formateTime.js");
@@ -241,7 +242,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:251", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:252", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -605,7 +606,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_request.getTrackPos(data);
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          if (res.code != 200) {
+          if (!api_response.isBusinessSuccessCode(res.code)) {
             utils_toast.showAppToast({ title: res.msg || "轨迹加载失败", icon: "none" });
             showCurrentPosition();
             return Promise.resolve(null);
@@ -627,7 +628,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:769", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:770", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -775,7 +776,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
       startTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
       endTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:934", "startTime:", startTime.value, "endTime:", endTime.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:935", "startTime:", startTime.value, "endTime:", endTime.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {

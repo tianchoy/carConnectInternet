@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_request = require("../../api/request.js");
+const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const utils_modal = require("../../utils/modal.js");
 if (!Array) {
@@ -122,7 +123,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         sentLoading.value = true;
         try {
           const res = yield api_request.getDeviceSharees(deviceId.value, new common_vendor.UTSJSONObject({ pageNum: sentPage.value, pageSize: requestPageSize }));
-          if (res.code != 200) {
+          if (!api_response.isBusinessSuccessCode(res.code)) {
             utils_toast.showAppToast({ title: res.msg || "获取分享列表失败", icon: "none" });
             return Promise.resolve(null);
           }
@@ -135,7 +136,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (sentHasMore.value)
             sentPage.value = currentPage + 1;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:195", "获取发起分享列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:196", "获取发起分享列表失败:", error);
           utils_toast.showAppToast({ title: "获取分享列表失败，请重试", icon: "none" });
         } finally {
           sentLoading.value = false;
@@ -174,7 +175,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             targetPhone: phone,
             expireTime
           }));
-          if (res.code == 200) {
+          if (api_response.isBusinessSuccessCode(res.code)) {
             utils_toast.showAppToast({ title: "分享成功", icon: "success" });
             targetPhone.value = "";
             expireDate.value = "";
@@ -183,7 +184,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "分享失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:245", "发起设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:246", "发起设备分享失败:", error);
           utils_toast.showAppToast({ title: "分享失败，请重试", icon: "none" });
         } finally {
           submitting.value = false;
@@ -196,13 +197,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         try {
           const res = yield api_request.revokeDeviceShare(shareId);
-          if (res.code == 200) {
+          if (api_response.isBusinessSuccessCode(res.code)) {
             utils_toast.showAppToast({ title: "撤销成功", icon: "success" });
             yield loadSent(true);
           } else
             utils_toast.showAppToast({ title: res.msg || "撤销失败", icon: "none" });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:261", "撤销设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:262", "撤销设备分享失败:", error);
           utils_toast.showAppToast({ title: "撤销失败，请重试", icon: "none" });
         }
       });
@@ -225,12 +226,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         shareesLoading.value = true;
         try {
           const res = yield api_request.getDeviceSharees(item.getString("deviceId", ""), new common_vendor.UTSJSONObject({ pageNum: 1, pageSize: requestPageSize }));
-          if (res.code == 200)
+          if (api_response.isBusinessSuccessCode(res.code))
             sharees.value = res.data.list;
           else
             utils_toast.showAppToast({ title: res.msg || "获取被分享者失败", icon: "none" });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:282", "获取被分享者失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:283", "获取被分享者失败:", error);
           utils_toast.showAppToast({ title: "获取被分享者失败，请重试", icon: "none" });
         } finally {
           shareesLoading.value = false;
@@ -245,7 +246,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
           const res = yield api_request.getDeviceShareEnabled();
-          if (res.code == 200) {
+          if (api_response.isBusinessSuccessCode(res.code)) {
             enabled.value = res.data.getBoolean("enabled", false);
           } else {
             utils_toast.showAppToast({ title: res.msg || "获取分享开关失败", icon: "none" });
@@ -253,7 +254,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (enabled.value)
             yield loadSent(true);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:302", "初始化设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:303", "初始化设备分享失败:", error);
           utils_toast.showAppToast({ title: "加载分享功能失败，请重试", icon: "none" });
         } finally {
           loadingEnabled.value = false;
@@ -265,7 +266,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       deviceId.value = normalizeRouteValue((_a = options.deviceId) !== null && _a !== void 0 ? _a : "");
       deviceName.value = normalizeRouteValue((_b = options.deviceName) !== null && _b !== void 0 ? _b : "");
       imei.value = normalizeRouteValue((_c = options.imei) !== null && _c !== void 0 ? _c : "");
-      common_vendor.index.__f__("log", "at pages/deviceShare/deviceShare.uvue:313", "imei:", imei.value, deviceName.value);
+      common_vendor.index.__f__("log", "at pages/deviceShare/deviceShare.uvue:314", "imei:", imei.value, deviceName.value);
       void initializeDeviceShare();
     });
     return (_ctx, _cache) => {

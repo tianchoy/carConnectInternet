@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 const utils_cars = require("../../utils/cars.js");
@@ -188,7 +189,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           const res = yield api_request.getDevicePos(data);
           const positions = res.data;
-          if ((res === null || res === void 0 ? null : res.code) != 200 || positions == null || positions.length == 0) {
+          if (res == null || !api_response.isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
             utils_toast.showAppToast({
               title: "获取位置失败",
               icon: "none"
@@ -247,7 +248,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:251", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:252", "获取初始位置失败:", err);
           utils_toast.showAppToast({
             title: "网络请求失败",
             icon: "none"
@@ -264,7 +265,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const marker = createVehicleMarker(iconPath);
       markers.value = [marker];
       markerInitialized.value = true;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:272", "初始化标记点完成");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:273", "初始化标记点完成");
     }
     function calculateMapRotation(direction) {
       let rotation = direction;
@@ -283,7 +284,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     common_vendor.onLoad((option) => {
       var _a, _b, _c, _d, _f;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:293", "option", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:294", "option", option);
       connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
       imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
       currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
@@ -471,7 +472,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const res = yield api_request.getDevicePos(new common_vendor.UTSJSONObject({ deptId: deptId.value, deviceids: imei.value }));
           const positions = res.data;
-          if (!isTracking.value || sessionId != trackingSessionId || (res === null || res === void 0 ? null : res.code) != 200 || positions == null)
+          if (!isTracking.value || sessionId != trackingSessionId || res == null || !api_response.isBusinessSuccessCode(res.code) || positions == null)
             return Promise.resolve(null);
           const item = common_vendor.UTS.arrayFind(positions, (value) => {
             return value.getString("imei", "") == imei.value;
@@ -512,7 +513,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pendingJumpTime = "";
           acceptLivePosition(item, position, positionTime, sessionId);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:486", "获取跟踪位置失败:", error);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:487", "获取跟踪位置失败:", error);
         } finally {
           if (sessionId == trackingSessionId)
             isTrackRequestPending = false;

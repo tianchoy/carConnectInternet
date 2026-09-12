@@ -109,6 +109,7 @@
 	<app-toast></app-toast>
 </template>
 <script setup lang="uts">
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand ,getGeocoderAddress} from '../../api/request.uts'
@@ -335,7 +336,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 
 				// 检查返回结果是否有效
 				const positions = res.data
-				if (res.code != 200 || positions == null || positions.length == 0) {
+				if (!isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
 					throw new Error(res.msg || '返回数据为空');
 				}
 
@@ -671,7 +672,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 			uni.hideLoading()
 
 			// 根据响应处理结果
-			if (res.code == 200) {
+			if (isBusinessSuccessCode(res.code)) {
 				showAppToast({
 					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
 					icon: 'success'
@@ -826,7 +827,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 	const loadDeviceDetail = async () => {
 		if (deviceId.value !== null) {
 			const res = await getDeviceDetail(deviceId.value)
-			if (res.code == 200 && res.data != null) {
+			if (isBusinessSuccessCode(res.code) && res.data != null) {
 				currentCarInfo.value = res.data
 			} else {
 				showAppToast({ title: res.msg || '获取设备详情失败', icon: 'none' })

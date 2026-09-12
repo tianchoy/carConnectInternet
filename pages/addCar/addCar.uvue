@@ -47,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import {
@@ -253,7 +254,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			uni.hideLoading()
 			loading.value = false
 
-			if (res.code == 200) {
+			if (isBusinessSuccessCode(res.code)) {
 				showAppToast({
 					title: '添加成功',
 					icon: 'success'

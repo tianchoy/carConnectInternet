@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="uts">
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 	import { getUserInfo, getUserDeviceList } from '../../api/request';
 
@@ -70,7 +71,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		const params = {} as UTSJSONObject
 		try {
 			const res = await getUserInfo()
-			if (res.code == 200 && res.data != null) {
+			if (isBusinessSuccessCode(res.code) && res.data != null) {
 				userInfo.value = {
 					avatar: res.data.getString('avatar', '/static/avatar.png'),
 					nickname: res.data.getString('nickname', '')
@@ -80,7 +81,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			}
 
 			const resCars = await getUserDeviceList(params)
-			if (resCars.code == 200 && resCars.data != null) {
+			if (isBusinessSuccessCode(resCars.code) && resCars.data != null) {
 				carsnumber.value = resCars.data.totalCount
 			} else {
 				showAppToast({ title: resCars.msg || '获取车辆数量失败', icon: 'none' })

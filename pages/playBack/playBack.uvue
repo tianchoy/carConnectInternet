@@ -65,6 +65,7 @@
 </template>
 
 <script setup lang="uts">
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, watch } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
@@ -744,7 +745,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			const res = await getTrackPos(data)
 			if (requestId != replaySessionId) return
 
-			if (res.code != 200) {
+			if (!isBusinessSuccessCode(res.code)) {
 				showAppToast({ title: res.msg || '轨迹加载失败', icon: 'none' })
 				showCurrentPosition()
 				return

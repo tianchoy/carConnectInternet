@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
@@ -37,7 +38,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const params = new common_vendor.UTSJSONObject({});
         try {
           const res = yield api_request.getUserInfo();
-          if (res.code == 200 && res.data != null) {
+          if (api_response.isBusinessSuccessCode(res.code) && res.data != null) {
             userInfo.value = {
               avatar: res.data.getString("avatar", "/static/avatar.png"),
               nickname: res.data.getString("nickname", "")
@@ -46,13 +47,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "获取用户信息失败", icon: "none" });
           }
           const resCars = yield api_request.getUserDeviceList(params);
-          if (resCars.code == 200 && resCars.data != null) {
+          if (api_response.isBusinessSuccessCode(resCars.code) && resCars.data != null) {
             carsnumber.value = resCars.data.totalCount;
           } else {
             utils_toast.showAppToast({ title: resCars.msg || "获取车辆数量失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/userCenter/userCenter.uvue:89", "加载用户中心数据失败:", error);
+          common_vendor.index.__f__("error", "at pages/userCenter/userCenter.uvue:90", "加载用户中心数据失败:", error);
           utils_toast.showAppToast({ title: "加载用户信息失败", icon: "none" });
         }
       });
@@ -79,7 +80,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
         corpId: "ww686122ec6a4db85a",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:127", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:128", res);
         }
       }));
     };

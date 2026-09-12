@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 const utils_formateTime = require("../../utils/formateTime.js");
@@ -197,17 +198,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             withTrip: true
           });
           const res = yield api_request.getTrackPos(data);
-          if (res.code != 200) {
+          if (!api_response.isBusinessSuccessCode(res.code)) {
             utils_toast.showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
             return Promise.resolve(null);
           }
-          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:226", "获取里程数据成功:", res);
+          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:227", "获取里程数据成功:", res);
           const trackData = res.data;
           if (trackData != null) {
             processTripData(trackData);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:232", "获取里程数据失败:", e);
+          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:233", "获取里程数据失败:", e);
           utils_toast.showAppToast({
             title: "数据加载失败",
             icon: "none"

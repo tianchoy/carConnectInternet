@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_response = require("../../api/response.js");
 const api_request = require("../../api/request.js");
 const utils_modal = require("../../utils/modal.js");
 const utils_toast = require("../../utils/toast.js");
@@ -227,7 +228,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         return configs;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:380", "解析指令参数配置失败:", error);
+        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:381", "解析指令参数配置失败:", error);
         paramConfigError.value = "指令参数配置无效";
         return [];
       }
@@ -308,7 +309,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           isCommandLoading.value = true;
           const response = yield api_request.getAppAvailableCommands(deviceId.value);
-          if (response.code == 200) {
+          if (api_response.isBusinessSuccessCode(response.code)) {
             availableCommands.value = response.data;
             const stillSelected = selectedCommandId.value != "" ? common_vendor.UTS.arrayFind(response.data, (command) => {
               return getCommandKey(command, 0) == selectedCommandId.value;
@@ -321,7 +322,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载可用指令失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:473", "加载可用指令失败:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:474", "加载可用指令失败:", error);
           utils_toast.showAppToast({ title: "加载可用指令失败，请检查网络", icon: "none" });
         } finally {
           isCommandLoading.value = false;
@@ -365,7 +366,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           query.set("pageNum", requestedPage);
           query.set("pageSize", historyPageSize);
           const response = yield api_request.getAppCommandHistory(query);
-          if (response.code != 200) {
+          if (!api_response.isBusinessSuccessCode(response.code)) {
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令记录失败", icon: "none" });
             return Promise.resolve(null);
           }
@@ -378,7 +379,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           historyPageNum.value = requestedPage + 1;
           hasMoreHistory.value = historyRecords.value.length < historyTotal.value && rows.length > 0;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:524", "加载指令记录失败:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:525", "加载指令记录失败:", error);
           utils_toast.showAppToast({ title: "加载指令记录失败，请检查网络", icon: "none" });
         } finally {
           hasLoadedHistory.value = true;
@@ -417,7 +418,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           isSending.value = true;
           const response = yield api_request.sendAppCommand(requestData);
-          if (response.code == 200) {
+          if (api_response.isBusinessSuccessCode(response.code)) {
             const requestIdText = response.data != "" ? "追踪编号：" + response.data : "请在指令记录中查看下发结果";
             utils_toast.showAppToast({ title: "指令已提交，" + requestIdText, icon: "success", duration: 3500 });
             yield reloadHistory();
@@ -425,7 +426,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令下发失败", icon: "none", duration: 3e3 });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:567", "下发指令失败:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:568", "下发指令失败:", error);
           utils_toast.showAppToast({ title: "指令下发失败，请检查网络", icon: "none" });
         } finally {
           isSending.value = false;
@@ -493,13 +494,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         isDetailLoading.value = true;
         try {
           const response = yield api_request.getAppCommandDetail(commandId);
-          if (response.code == 200 && response.data != null) {
+          if (api_response.isBusinessSuccessCode(response.code) && response.data != null) {
             detailRecord.value = response.data;
           } else {
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令详情失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:647", "加载指令详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:648", "加载指令详情失败:", error);
           utils_toast.showAppToast({ title: "加载指令详情失败，请检查网络", icon: "none" });
         } finally {
           isDetailLoading.value = false;
@@ -525,7 +526,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           isRetrying.value = true;
           const response = yield api_request.retryAppCommand(commandId);
-          if (response.code == 200) {
+          if (api_response.isBusinessSuccessCode(response.code)) {
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "已重新提交指令", icon: "success" });
             detailVisible.value = false;
             yield reloadHistory();
@@ -533,7 +534,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "重试下发失败", icon: "none", duration: 3e3 });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:674", "重试下发失败:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:675", "重试下发失败:", error);
           utils_toast.showAppToast({ title: "重试下发失败，请检查网络", icon: "none" });
         } finally {
           isRetrying.value = false;

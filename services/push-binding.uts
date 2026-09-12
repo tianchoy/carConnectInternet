@@ -1,5 +1,5 @@
+import { isBusinessSuccessCode } from '../api/response.uts'
 import { bindPushDevice, unbindPushDevice, type PushDeviceBindRequest } from '../api/request.uts'
-import { handleTokenExpired } from '../api/http.uts'
 import { getCachedPushRegistrationId, onPushRegistrationIdReady, onPushSessionAuthenticated } from './push.uts'
 // #ifdef APP-ANDROID
 import AndroidLog from 'android.util.Log'
@@ -86,14 +86,9 @@ function bindRegistrationId(registrationId: string): void {
 
 	pushBindingDebug('开始绑定推送设备，platform=' + platform)
 	bindPushDevice(data).then((response) => {
-		if (response.code == 200) {
+		if (isBusinessSuccessCode(response.code)) {
 			boundSessionKey = sessionKey
 			pushBindingDebug('推送设备绑定成功，platform=' + platform)
-			return
-		}
-		if (response.code == 500) {
-			pushBindingWarn('推送设备绑定返回 500，登录状态已失效，跳转登录页。msg=' + response.msg)
-			handleTokenExpired()
 			return
 		}
 		pushBindingWarn('推送设备绑定失败，稍后将重试。code=' + response.code + ', msg=' + response.msg)
@@ -117,7 +112,7 @@ export async function unbindPushDeviceOnLogout(): Promise<void> {
 	try {
 		pushBindingDebug('退出登录时解绑推送设备')
 		const response = await unbindPushDevice(registrationId)
-		if (response.code == 200) {
+		if (isBusinessSuccessCode(response.code)) {
 			pushBindingDebug('推送设备解绑成功')
 			return
 		}

@@ -68,6 +68,7 @@
 </template>
 
 <script setup lang="uts">
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
@@ -219,7 +220,7 @@ import { showAppToast } from '../../utils/toast.uts'
 				withTrip: true,
 			};
 			const res = await getTrackPos(data);
-			if (res.code != 200) {
+			if (!isBusinessSuccessCode(res.code)) {
 				showAppToast({ title: res.msg || '数据加载失败', icon: 'none' });
 				return;
 			}

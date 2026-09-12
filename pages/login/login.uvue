@@ -178,6 +178,7 @@
 </template>
 
 <script setup lang="uts">
+	import { isBusinessSuccessCode } from '../../api/response.uts'
 	import { ref, computed, onUnmounted } from 'vue'
 	import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
@@ -298,7 +299,7 @@
 				password: personalForm.value.password
 			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
-			if (response.code == 200 && token != '') {
+			if (isBusinessSuccessCode(response.code) && token != '') {
 				completeLogin(token)
 				return
 			}
@@ -360,7 +361,7 @@
 		try {
 			smsSending.value = true
 			const response = await sendSmsLoginCode({ phonenumber: smsMobile.value })
-			if (response.code != 200) {
+			if (!isBusinessSuccessCode(response.code)) {
 				showAppToast({ title: response.msg || '验证码发送失败', icon: 'none' })
 				return
 			}
@@ -384,7 +385,7 @@
 				smsCode: smsCode.value
 			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
-			if (response.code == 200 && token != '') {
+			if (isBusinessSuccessCode(response.code) && token != '') {
 				smsCode.value = ''
 				completeLogin(token)
 				return
@@ -478,7 +479,7 @@
 				iv: e.detail.iv
 			})
 			const loginData = res.data
-			if (res.code != 200 || loginData == null) {
+			if (!isBusinessSuccessCode(res.code) || loginData == null) {
 				showAppToast({ title: res.msg || '登录失败', icon: 'none' })
 				return
 			}
@@ -549,7 +550,7 @@
 				password: enterpriseForm.value.password
 			})
 			const token = response.data != null ? response.data.getString('access_token', response.data.getString('token', '')) : ''
-			if (response.code == 200 && token != '') {
+			if (isBusinessSuccessCode(response.code) && token != '') {
 				saveEnterpriseAccount()
 				completeLogin(token)
 				return
@@ -616,7 +617,7 @@
 	 *   loading.value = true
 	 *   const res = await login({ username: form.value.username, password: form.value.password, from: deviceModel.value, type: 'USER' })
 	 *   loading.value = false
-	 *   const token = res.code == 200 && res.data != null ? res.data.getString('access_token', '') : ''
+	 *   const token = isBusinessSuccessCode(res.code) && res.data != null ? res.data.getString('access_token', '') : ''
 	 *   if (token != '') { saveAccountPassword(); completeLogin(token) }
 	 * }
 	 */

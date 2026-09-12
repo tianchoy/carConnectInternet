@@ -50,6 +50,7 @@
 </template>
 
 <script setup lang="uts">
+import { isBusinessSuccessCode } from '../../../api/response.uts'
 import { showAppToast } from '../../../utils/toast.uts'
 	import { clearPushSessionState } from '../../../services/push.uts'
 	import { unbindPushDeviceOnLogout } from '../../../services/push-binding.uts'
@@ -98,7 +99,7 @@ import { showAppToast } from '../../../utils/toast.uts'
 	const logoutBtn = async () => {
 		await unbindPushDeviceOnLogout()
 		const res = await logout()
-		if(res.code == 200){
+		if(isBusinessSuccessCode(res.code)){
 			uni.removeStorageSync('token')
 			clearPushSessionState()
 			uni.reLaunch({

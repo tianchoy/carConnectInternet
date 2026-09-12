@@ -49,6 +49,7 @@
 </template>
 
 <script setup lang="uts">
+import { isBusinessSuccessCode } from '../../../api/response.uts'
 import { showAppToast } from '../../../utils/toast.uts'
 	import { getUserDeviceList } from '../../../api/request.uts'
 
@@ -91,7 +92,7 @@ import { showAppToast } from '../../../utils/toast.uts'
 				pageSize: pageSize.value
 			}
 			const res = await getUserDeviceList(data)
-			if (res.code != 200) {
+			if (!isBusinessSuccessCode(res.code)) {
 				showAppToast({
 					title: res.msg || '加载失败',
 					icon: 'none'

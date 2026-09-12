@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_request = require("../../api/request.js");
+const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -131,7 +132,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             tenantId: null,
             phonenumber: form.value.mobile
           }));
-          if (response.code != 200) {
+          if (!api_response.isBusinessSuccessCode(response.code)) {
             utils_toast.showAppToast({ title: response.msg || "验证码发送失败", icon: "none" });
             return Promise.resolve(null);
           }
@@ -176,7 +177,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             newPassword: form.value.password,
             confirmPassword: form.value.confirmPassword
           }));
-          if (response.code != 200) {
+          if (!api_response.isBusinessSuccessCode(response.code)) {
             utils_toast.showAppToast({ title: response.msg || "密码重置失败，请稍后重试", icon: "none" });
             return Promise.resolve(null);
           }

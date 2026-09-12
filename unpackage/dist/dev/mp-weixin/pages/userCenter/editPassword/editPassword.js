@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 const api_request = require("../../../api/request.js");
+const api_response = require("../../../api/response.js");
 const services_push = require("../../../services/push.js");
 const utils_toast = require("../../../utils/toast.js");
 if (!Array) {
@@ -127,7 +128,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             newPassword: form.value.newPassword,
             confirmPassword: form.value.confirmPassword
           }));
-          if (response.code != 200) {
+          if (!api_response.isBusinessSuccessCode(response.code)) {
             utils_toast.showAppToast({ title: response.msg || "密码修改失败，请稍后重试", icon: "none" });
             return Promise.resolve(null);
           }

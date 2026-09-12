@@ -49,6 +49,7 @@
 </template>
 
 <script setup lang="uts">
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
@@ -133,7 +134,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 		try {
 			const res = await getTrackPos(data)
 			const trackData = res.data
-			if (res.code != 200 || trackData == null) {
+			if (!isBusinessSuccessCode(res.code) || trackData == null) {
 				showAppToast({ title: res.msg || '数据加载失败', icon: 'none' })
 				carStopDetail.value = []
 				return

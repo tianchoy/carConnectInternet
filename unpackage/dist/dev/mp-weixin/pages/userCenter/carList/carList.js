@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const api_response = require("../../../api/response.js");
 const utils_toast = require("../../../utils/toast.js");
 const api_request = require("../../../api/request.js");
 if (!Array) {
@@ -34,7 +35,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadCarListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/userCenter/carList/carList.uvue:60", currPage.value, totalPage.value);
+        common_vendor.index.__f__("log", "at pages/userCenter/carList/carList.uvue:61", currPage.value, totalPage.value);
         if (loading.value || !hasMore.value)
           return Promise.resolve(null);
         loading.value = true;
@@ -44,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pageSize: pageSize.value
           });
           const res = yield api_request.getUserDeviceList(data);
-          if (res.code != 200) {
+          if (!api_response.isBusinessSuccessCode(res.code)) {
             utils_toast.showAppToast({
               title: res.msg || "加载失败",
               icon: "none"
@@ -71,7 +72,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/userCenter/carList/carList.uvue:106", "加载车辆列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/userCenter/carList/carList.uvue:107", "加载车辆列表失败:", error);
           utils_toast.showAppToast({
             title: "加载失败，请重试",
             icon: "none"

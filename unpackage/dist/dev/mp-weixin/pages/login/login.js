@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const api_request = require("../../api/request.js");
+const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const utils_modal = require("../../utils/modal.js");
 const utils_legal = require("../../utils/legal.js");
@@ -159,7 +160,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             iv: e.detail.iv
           }));
           const loginData = res.data;
-          if (res.code != 200 || loginData == null) {
+          if (!api_response.isBusinessSuccessCode(res.code) || loginData == null) {
             utils_toast.showAppToast({ title: res.msg || "登录失败", icon: "none" });
             return Promise.resolve(null);
           }
@@ -170,7 +171,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           completeLogin(token);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:492", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:493", "微信登录失败:", error);
           utils_toast.showAppToast({ title: "微信登录失败", icon: "none" });
         } finally {
           common_vendor.index.hideLoading();
@@ -190,7 +191,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         enterpriseForm.value.password = account.getString("password", "");
         rememberPassword.value = enterpriseForm.value.username != "" || enterpriseForm.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/login/login.uvue:513", "加载保存的企业账号失败:", error);
+        common_vendor.index.__f__("warn", "at pages/login/login.uvue:514", "加载保存的企业账号失败:", error);
       }
     };
     const toggleEnterpriseLogin = () => {
@@ -231,7 +232,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             password: enterpriseForm.value.password
           }));
           const token = response.data != null ? response.data.getString("access_token", response.data.getString("token", "")) : "";
-          if (response.code == 200 && token != "") {
+          if (api_response.isBusinessSuccessCode(response.code) && token != "") {
             saveEnterpriseAccount();
             completeLogin(token);
             return Promise.resolve(null);

@@ -190,6 +190,7 @@
 </template>
 
 <script setup lang="uts">
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { computed, ref } from 'vue'
 import { getAppAvailableCommands, getAppCommandDetail, getAppCommandHistory, retryAppCommand, sendAppCommand } from '../../api/request.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
@@ -460,7 +461,7 @@ async function loadAvailableCommands(): Promise<void> {
 	try {
 		isCommandLoading.value = true
 		const response = await getAppAvailableCommands(deviceId.value)
-		if (response.code == 200) {
+		if (isBusinessSuccessCode(response.code)) {
 			availableCommands.value = response.data
 			const stillSelected = selectedCommandId.value != '' ? response.data.find((command: UTSJSONObject): boolean => getCommandKey(command, 0) == selectedCommandId.value) : null
 			if (stillSelected == null) resetSelection()
@@ -510,7 +511,7 @@ async function loadHistoryPage(reset: boolean): Promise<void> {
 		query.set('pageNum', requestedPage)
 		query.set('pageSize', historyPageSize)
 		const response = await getAppCommandHistory(query)
-		if (response.code != 200) {
+		if (!isBusinessSuccessCode(response.code)) {
 			showAppToast({ title: response.msg != '' ? response.msg : '加载指令记录失败', icon: 'none' })
 			return
 		}
@@ -556,7 +557,7 @@ async function sendSelectedCommand(): Promise<void> {
 	try {
 		isSending.value = true
 		const response = await sendAppCommand(requestData)
-		if (response.code == 200) {
+		if (isBusinessSuccessCode(response.code)) {
 			const requestIdText = response.data != '' ? '追踪编号：' + response.data : '请在指令记录中查看下发结果'
 			showAppToast({ title: '指令已提交，' + requestIdText, icon: 'success', duration: 3500 })
 			await reloadHistory()
@@ -638,7 +639,7 @@ async function showCommandDetail(record: UTSJSONObject): Promise<void> {
 	isDetailLoading.value = true
 	try {
 		const response = await getAppCommandDetail(commandId)
-		if (response.code == 200 && response.data != null) {
+		if (isBusinessSuccessCode(response.code) && response.data != null) {
 			detailRecord.value = response.data
 		} else {
 			showAppToast({ title: response.msg != '' ? response.msg : '加载指令详情失败', icon: 'none' })
@@ -663,7 +664,7 @@ async function retryCommand(commandId: string): Promise<void> {
 	try {
 		isRetrying.value = true
 		const response = await retryAppCommand(commandId)
-		if (response.code == 200) {
+		if (isBusinessSuccessCode(response.code)) {
 			showAppToast({ title: response.msg != '' ? response.msg : '已重新提交指令', icon: 'success' })
 			detailVisible.value = false
 			await reloadHistory()

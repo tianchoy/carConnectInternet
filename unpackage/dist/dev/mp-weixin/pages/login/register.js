@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_request = require("../../api/request.js");
+const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const utils_modal = require("../../utils/modal.js");
 const api_http = require("../../api/http.js");
@@ -137,7 +138,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             tenantId: null,
             phonenumber: form.value.mobile
           }));
-          if (response.code != 200) {
+          if (!api_response.isBusinessSuccessCode(response.code)) {
             utils_toast.showAppToast({ title: response.msg || "验证码发送失败", icon: "none" });
             return Promise.resolve(null);
           }
@@ -200,7 +201,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             smsCode: form.value.smsCode
           }));
           const token = response.data != null ? response.data.getString("access_token", "") : "";
-          if (response.code == 200 && token != "") {
+          if (api_response.isBusinessSuccessCode(response.code) && token != "") {
             completeLogin(token);
             return Promise.resolve(null);
           }

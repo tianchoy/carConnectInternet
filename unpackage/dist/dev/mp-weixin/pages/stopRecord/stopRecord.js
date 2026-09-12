@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const utils_openLocation = require("../../utils/openLocation.js");
+const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 const utils_formateTime = require("../../utils/formateTime.js");
@@ -85,7 +86,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const res = yield api_request.getTrackPos(data);
           const trackData = res.data;
-          if (res.code != 200 || trackData == null) {
+          if (!api_response.isBusinessSuccessCode(res.code) || trackData == null) {
             utils_toast.showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
             carStopDetail.value = [];
             return Promise.resolve(null);
@@ -100,7 +101,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           carStopDetail.value = stopsWithAddress;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:151", "获取停车数据失败:", error);
+          common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:152", "获取停车数据失败:", error);
           utils_toast.showAppToast({ title: "数据加载失败", icon: "none" });
         } finally {
           common_vendor.index.hideLoading();

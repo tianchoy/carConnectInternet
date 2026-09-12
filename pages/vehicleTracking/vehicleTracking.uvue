@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="uts">
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, onUnmounted } from 'vue'
 	import { getDevicePos } from '../../api/request.uts'
@@ -176,7 +177,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 			const res = await getDevicePos(data)
 			const positions = res.data
-			if (res?.code != 200 || positions == null || positions.length == 0) {
+			if (res == null || !isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
 				showAppToast({
 					title: '获取位置失败',
 					icon: 'none'
@@ -456,7 +457,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		try {
 			const res = await getDevicePos({ deptId: deptId.value, deviceids: imei.value })
 			const positions = res.data
-			if (!isTracking.value || sessionId != trackingSessionId || res?.code != 200 || positions == null) return
+			if (!isTracking.value || sessionId != trackingSessionId || res == null || !isBusinessSuccessCode(res.code) || positions == null) return
 			const item = positions.find((value : UTSJSONObject) => value.getString('imei', '') == imei.value)
 			if (item == null) return
 			const rawLat = item.getNumber('latitude', 0), rawLng = item.getNumber('longitude', 0)

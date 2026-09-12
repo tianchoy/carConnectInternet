@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const api_response = require("../../../api/response.js");
 const api_request = require("../../../api/request.js");
 const utils_toast = require("../../../utils/toast.js");
 if (!Array) {
@@ -160,7 +161,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "保存中...", mask: true }));
         try {
           const res = yield api_request.editDeviceInfo(payload);
-          if (res.code == 200) {
+          if (api_response.isBusinessSuccessCode(res.code)) {
             carInfo.value = payload;
             editInfo.value.plateNo = plateNo;
             isEditing.value = false;
@@ -170,7 +171,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "保存失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:190", "保存车辆信息失败:", error);
+          common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:191", "保存车辆信息失败:", error);
           utils_toast.showAppToast({ title: "保存失败，请重试", icon: "none" });
         } finally {
           common_vendor.index.hideLoading();
@@ -185,14 +186,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         loadingDetail.value = true;
         try {
           const res = yield api_request.getDeviceDetail(deviceId.value);
-          if (res.code == 200 && res.data != null) {
+          if (api_response.isBusinessSuccessCode(res.code) && res.data != null) {
             carInfo.value = res.data;
             detailLoaded.value = true;
           } else {
             utils_toast.showAppToast({ title: res.msg || "获取车辆详情失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:210", "获取车辆详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:211", "获取车辆详情失败:", error);
           utils_toast.showAppToast({ title: "获取车辆详情失败", icon: "none" });
         } finally {
           loadingDetail.value = false;

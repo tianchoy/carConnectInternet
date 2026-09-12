@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+const api_response = require("../api/response.js");
 const api_request = require("../api/request.js");
-require("../api/http.js");
 const services_push = require("./push.js");
 let initialized = false;
 function pushBindingDebug(message) {
@@ -34,7 +34,7 @@ function unbindPushDeviceOnLogout() {
     try {
       pushBindingDebug("退出登录时解绑推送设备");
       const response = yield api_request.unbindPushDevice(registrationId);
-      if (response.code == 200) {
+      if (api_response.isBusinessSuccessCode(response.code)) {
         pushBindingDebug("推送设备解绑成功");
         return Promise.resolve(null);
       }

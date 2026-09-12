@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
 const services_push = require("../services/push.js");
+const api_response = require("./response.js");
 const utils_toast = require("../utils/toast.js");
 class RequestOptions extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -131,7 +132,7 @@ function handleTokenExpired() {
   if (isHandlingTokenExpired)
     return null;
   isHandlingTokenExpired = true;
-  common_vendor.index.__f__("log", "at api/http.uts:53", "检测到token过期，执行跳转登录页逻辑");
+  common_vendor.index.__f__("log", "at api/http.uts:54", "检测到token过期，执行跳转登录页逻辑");
   common_vendor.index.removeStorageSync("token");
   services_push.clearPushSessionState();
   utils_toast.showAppToast({
@@ -140,14 +141,14 @@ function handleTokenExpired() {
     duration: 2e3
   });
   setTimeout(() => {
-    common_vendor.index.__f__("log", "at api/http.uts:68", "正在跳转到登录页...");
+    common_vendor.index.__f__("log", "at api/http.uts:69", "正在跳转到登录页...");
     common_vendor.index.redirectTo({
       url: "/pages/login/login",
       success: () => {
-        common_vendor.index.__f__("log", "at api/http.uts:72", "跳转登录页成功");
+        common_vendor.index.__f__("log", "at api/http.uts:73", "跳转登录页成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at api/http.uts:75", "跳转登录页失败:", err);
+        common_vendor.index.__f__("log", "at api/http.uts:76", "跳转登录页失败:", err);
         common_vendor.index.reLaunch({
           url: "/pages/login/login"
         });
@@ -165,24 +166,38 @@ function requestInterceptor(config) {
   config.header["clientId"] = CLIENT_ID;
   return config;
 }
+function isBusinessTokenExpired(data = null) {
+  if (data == null)
+    return false;
+  try {
+    const responseObject = api_response.asJSONObject(data);
+    return api_response.getResponseCode(responseObject) == 401;
+  } catch (error) {
+    return false;
+  }
+}
 function responseInterceptor(response, config) {
-  return response.data;
+  const data = response.data;
+  if (isBusinessTokenExpired(data)) {
+    handleTokenExpired();
+  }
+  return data;
 }
 function logHttpError(error) {
   const detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (error.data != null ? error.data.toString() : "");
-  common_vendor.index.__f__("error", "at api/http.uts:127", "[HttpRequest] " + detail);
+  common_vendor.index.__f__("error", "at api/http.uts:142", "[HttpRequest] " + detail);
 }
 function errorHandler(error, config) {
   if (config.showLoading != false) {
     common_vendor.index.hideLoading();
   }
   logHttpError(error);
-  if (config.showError == false)
-    return null;
   if (error.statusCode == 401) {
     handleTokenExpired();
     return null;
   }
+  if (config.showError == false)
+    return null;
   if (error.statusCode != 0) {
     switch (error.statusCode) {
       case 403:
@@ -241,7 +256,7 @@ function request(options) {
       header: processedConfig.header,
       success: (res) => {
         const statusCode = res.statusCode;
-        if (statusCode == 200) {
+        if (statusCode >= 200 && statusCode < 300) {
           const data = responseInterceptor(res);
           resolve(data);
         } else {

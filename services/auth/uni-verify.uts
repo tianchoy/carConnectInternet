@@ -3,6 +3,7 @@
  * 保留完整实现，后续需要恢复时删除本注释首尾即可。
  */
 /*
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { uniVerifyLogin } from '../../api/request.uts'
 
 export type UniVerifyPreLoginResult = {
@@ -148,7 +149,7 @@ export function loginByUniVerify(clientVersion: string, deviceId: string): Promi
 						uniVerifyLogin(requestData).then((response) => {
 							const loginData = response.data
 							const token = loginData != null ? loginData.getString('access_token', '') : ''
-							if (response.code == 200 && token != '') {
+							if (isBusinessSuccessCode(response.code) && token != '') {
 								resolve(createResult(true, false, '', token))
 							} else {
 								resolve(createResult(false, false, response.msg || '本机号码登录失败，请稍后重试', ''))

@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const api_response = require("../../../api/response.js");
 const utils_toast = require("../../../utils/toast.js");
 const services_push = require("../../../services/push.js");
 const services_pushBinding = require("../../../services/push-binding.js");
@@ -64,9 +65,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             type: type != null ? type : 0,
             createTime: createTime != null ? createTime : ""
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:84", "用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:85", "用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:86", "解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:87", "解析用户信息失败:", e);
         }
       }
     });
@@ -79,7 +80,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         yield services_pushBinding.unbindPushDeviceOnLogout();
         const res = yield api_request.logout();
-        if (res.code == 200) {
+        if (api_response.isBusinessSuccessCode(res.code)) {
           common_vendor.index.removeStorageSync("token");
           services_push.clearPushSessionState();
           common_vendor.index.reLaunch({

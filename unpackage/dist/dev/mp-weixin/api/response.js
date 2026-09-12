@@ -1,5 +1,9 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+const BUSINESS_SUCCESS_CODE = 200;
+function isBusinessSuccessCode(code) {
+  return code == BUSINESS_SUCCESS_CODE;
+}
 function asJSONObject(value = null) {
   if (value == null) {
     return new common_vendor.UTSJSONObject();
@@ -26,4 +30,5 @@ exports.getResponseCode = getResponseCode;
 exports.getResponseDataArray = getResponseDataArray;
 exports.getResponseDataObject = getResponseDataObject;
 exports.getResponseMessage = getResponseMessage;
+exports.isBusinessSuccessCode = isBusinessSuccessCode;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/response.js.map

@@ -51,6 +51,7 @@
 </template>
 
 <script setup lang="uts">
+	import { isBusinessSuccessCode } from '../../../api/response.uts'
 	import { computed, ref } from 'vue'
 	import { editDeviceInfo, getDeviceDetail } from '../../../api/request.uts'
 	import carIcons from '../../../components/car-icons/car-icons.uvue'
@@ -177,7 +178,7 @@
 		uni.showLoading({ title: '保存中...', mask: true })
 		try {
 			const res = await editDeviceInfo(payload)
-			if (res.code == 200) {
+			if (isBusinessSuccessCode(res.code)) {
 				carInfo.value = payload
 				editInfo.value.plateNo = plateNo
 				isEditing.value = false
@@ -200,7 +201,7 @@
 		loadingDetail.value = true
 		try {
 			const res = await getDeviceDetail(deviceId.value)
-			if (res.code == 200 && res.data != null) {
+			if (isBusinessSuccessCode(res.code) && res.data != null) {
 				carInfo.value = res.data
 				detailLoaded.value = true
 			} else {
