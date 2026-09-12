@@ -2,6 +2,7 @@ import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvu
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue'
 import _easycom_indexListMode from '@/components/indexListMode/indexListMode.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, computed, watchEffect } from 'vue'
 	import { getUserDeviceList,delDevice} from '../../api/request.uts'
@@ -131,7 +132,7 @@ const mapScale = ref(4)
 			if (from) {
 				const params: UTSJSONObject = { pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
-				const list = (res.code == 200 && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
+				const list = (isBusinessSuccessCode(res.code) && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
 				if (list == null || !Array.isArray(list)) {
 					console.warn('获取设备列表返回异常:', res)
 					originalDeviceList.value = []
@@ -153,7 +154,7 @@ const mapScale = ref(4)
 		// 解绑设备
 	const unbindDevice = async (deviceId : string) => {
 		const res = await delDevice(deviceId)
-		if (res.code == 200) {
+		if (isBusinessSuccessCode(res.code)) {
 			showAppToast({
 				title: '解绑成功',
 				icon: 'success'

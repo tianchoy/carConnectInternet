@@ -389,6 +389,43 @@ fun onPushRegistrationIdReady(listener: PushRegistrationIdReadyListener): Unit {
 fun onPushSessionAuthenticated(listener: PushSessionAuthenticatedListener): Unit {
     pushSessionAuthenticatedListeners.push(listener)
 }
+val BUSINESS_SUCCESS_CODE: Number = 200
+fun isBusinessSuccessCode(code: Number): Boolean {
+    return code == BUSINESS_SUCCESS_CODE
+}
+fun asJSONObject(value: Any): UTSJSONObject {
+    if (value == null) {
+        return UTSJSONObject()
+    }
+    return value as UTSJSONObject
+}
+fun getResponseCode(response: UTSJSONObject): Number {
+    return response.getNumber("code", -1)
+}
+fun getResponseMessage(response: UTSJSONObject): String {
+    val msg = response.getString("msg", "")
+    return if (msg != "") {
+        msg
+    } else {
+        response.getString("message", "")
+    }
+}
+fun getResponseDataObject(response: UTSJSONObject): UTSJSONObject {
+    val data = response.getJSON("data")
+    return if (data != null) {
+        data
+    } else {
+        UTSJSONObject()
+    }
+}
+fun getResponseDataArray(response: UTSJSONObject): UTSArray<UTSJSONObject> {
+    val data = response.getArray<UTSJSONObject>("data")
+    return if (data != null) {
+        data
+    } else {
+        _uA()
+    }
+}
 fun showAppToast(options: ShowToastOptions): Unit {
     uni_showToast(options)
 }
@@ -450,8 +487,24 @@ fun requestInterceptor(config: RequestOptions__1): RequestOptions__1 {
     config.header!!.set("clientId", CLIENT_ID)
     return config
 }
+fun isBusinessTokenExpired(data: Any): Boolean {
+    if (data == null) {
+        return false
+    }
+    try {
+        val responseObject = asJSONObject(data)
+        return getResponseCode(responseObject) == 401
+    }
+     catch (error: Throwable) {
+        return false
+    }
+}
 fun responseInterceptor(response: RequestSuccess<Any>, config: RequestOptions__1): Any {
-    return response.data!!
+    val data = response.data!!
+    if (isBusinessTokenExpired(data)) {
+        handleTokenExpired()
+    }
+    return data
 }
 fun logHttpError(error: HttpError): Unit {
     val detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (if (error.data != null) {
@@ -468,11 +521,11 @@ fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
         uni_hideLoading(null)
     }
     logHttpError(error)
-    if (config.showError == false) {
-        return
-    }
     if (error.statusCode == 401) {
         handleTokenExpired()
+        return
+    }
+    if (config.showError == false) {
         return
     }
     if (error.statusCode != 0) {
@@ -523,7 +576,7 @@ fun request(options: RequestOptions__1): UTSPromise<Any> {
     return UTSPromise<Any>(fun(resolve, reject){
         uni_request<Any>(RequestOptions(url = processedConfig.url!!, method = processedConfig.method, data = processedConfig.data, header = processedConfig.header, success = fun(res: RequestSuccess<Any>){
             val statusCode = res.statusCode
-            if (statusCode == 200) {
+            if (statusCode >= 200 && statusCode < 300) {
                 val data = responseInterceptor(res, processedConfig)
                 resolve(data)
             } else {
@@ -563,39 +616,6 @@ fun put(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOpti
 }
 fun remove(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
     return request(RequestOptions__1(url = url, method = "DELETE", data = data, header = options.header, showLoading = options.showLoading, showError = options.showError))
-}
-fun asJSONObject(value: Any): UTSJSONObject {
-    if (value == null) {
-        return UTSJSONObject()
-    }
-    return value as UTSJSONObject
-}
-fun getResponseCode(response: UTSJSONObject): Number {
-    return response.getNumber("code", -1)
-}
-fun getResponseMessage(response: UTSJSONObject): String {
-    val msg = response.getString("msg", "")
-    return if (msg != "") {
-        msg
-    } else {
-        response.getString("message", "")
-    }
-}
-fun getResponseDataObject(response: UTSJSONObject): UTSJSONObject {
-    val data = response.getJSON("data")
-    return if (data != null) {
-        data
-    } else {
-        UTSJSONObject()
-    }
-}
-fun getResponseDataArray(response: UTSJSONObject): UTSArray<UTSJSONObject> {
-    val data = response.getArray<UTSJSONObject>("data")
-    return if (data != null) {
-        data
-    } else {
-        _uA()
-    }
 }
 val devicePos = "/gps/lastPosition?deptId="
 val trackPos = "/gps/trackPos?"
@@ -1383,14 +1403,9 @@ fun bindRegistrationId(registrationId: String): Unit {
     val data = PushDeviceBindRequest(registrationId = registrationId, platform = platform, deviceName = getDeviceName(), appVersion = getAppVersion())
     pushBindingDebug("开始绑定推送设备，platform=" + platform)
     bindPushDevice(data).then(fun(response){
-        if (response.code == 200) {
+        if (isBusinessSuccessCode(response.code)) {
             boundSessionKey = sessionKey
             pushBindingDebug("推送设备绑定成功，platform=" + platform)
-            return
-        }
-        if (response.code == 500) {
-            pushBindingWarn("推送设备绑定返回 500，登录状态已失效，跳转登录页。msg=" + response.msg)
-            handleTokenExpired()
             return
         }
         pushBindingWarn("推送设备绑定失败，稍后将重试。code=" + response.code + ", msg=" + response.msg)
@@ -1419,7 +1434,7 @@ fun unbindPushDeviceOnLogout(): UTSPromise<Unit> {
             try {
                 pushBindingDebug("退出登录时解绑推送设备")
                 val response = await(unbindPushDevice(registrationId))
-                if (response.code == 200) {
+                if (isBusinessSuccessCode(response.code)) {
                     pushBindingDebug("推送设备解绑成功")
                     return@w
                 }

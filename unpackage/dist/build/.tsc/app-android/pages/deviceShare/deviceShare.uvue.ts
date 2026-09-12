@@ -1,6 +1,7 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { ref, computed } from 'vue'
 import { showAppToast } from '../../utils/toast.uts'
 import { showAppModal } from '../../utils/modal.uts'
@@ -109,7 +110,7 @@ const loadSent = async (reset: boolean): Promise<void> => {
 	sentLoading.value = true
 	try {
 		const res = await getDeviceSharees(deviceId.value, { pageNum: sentPage.value, pageSize: requestPageSize } as UTSJSONObject)
-		if (res.code != 200) {
+		if (!isBusinessSuccessCode(res.code)) {
 			showAppToast({ title: res.msg || '获取分享列表失败', icon: 'none' })
 			return
 		}
@@ -162,7 +163,7 @@ const submitShare = async (): Promise<void> => {
 			targetPhone: phone,
 			expireTime: expireTime
 		})
-		if (res.code == 200) {
+		if (isBusinessSuccessCode(res.code)) {
 			showAppToast({ title: '分享成功', icon: 'success' })
 			targetPhone.value = ''
 			expireDate.value = ''
@@ -182,7 +183,7 @@ const revokeShare = async (shareId: string): Promise<void> => {
 	if (shareId == '') return
 	try {
 		const res = await revokeDeviceShare(shareId)
-		if (res.code == 200) {
+		if (isBusinessSuccessCode(res.code)) {
 			showAppToast({ title: '撤销成功', icon: 'success' })
 			await loadSent(true)
 		} else showAppToast({ title: res.msg || '撤销失败', icon: 'none' })
@@ -205,7 +206,7 @@ const showSharees = async (item: UTSJSONObject): Promise<void> => {
 	shareesLoading.value = true
 	try {
 		const res = await getDeviceSharees(item.getString('deviceId', ''), { pageNum: 1, pageSize: requestPageSize } as UTSJSONObject)
-		if (res.code == 200) sharees.value = res.data.list
+		if (isBusinessSuccessCode(res.code)) sharees.value = res.data.list
 		else showAppToast({ title: res.msg || '获取被分享者失败', icon: 'none' })
 	} catch (error) {
 		console.error('获取被分享者失败:', error)
@@ -221,7 +222,7 @@ const loadMore = (): void => {
 const initializeDeviceShare = async (): Promise<void> => {
 	try {
 		const res = await getDeviceShareEnabled()
-		if (res.code == 200) {
+		if (isBusinessSuccessCode(res.code)) {
 			enabled.value = res.data.getBoolean('enabled', false)
 		} else {
 			showAppToast({ title: res.msg || '获取分享开关失败', icon: 'none' })

@@ -4,7 +4,8 @@ import _easycom_i_checkbox from '@/uni_modules/i-ui-x/components/i-checkbox/i-ch
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
-import { ref, computed, onUnmounted } from 'vue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
+	import { ref, computed, onUnmounted } from 'vue'
 	import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { userAgreement, privacyPolicy } from '../../utils/legal.uts'
@@ -132,7 +133,7 @@ const _cache = __ins.renderCache;
 				password: personalForm.value.password
 			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
-			if (response.code == 200 && token != '') {
+			if (isBusinessSuccessCode(response.code) && token != '') {
 				completeLogin(token)
 				return
 			}
@@ -194,7 +195,7 @@ const _cache = __ins.renderCache;
 		try {
 			smsSending.value = true
 			const response = await sendSmsLoginCode({ phonenumber: smsMobile.value })
-			if (response.code != 200) {
+			if (!isBusinessSuccessCode(response.code)) {
 				showAppToast({ title: response.msg || '验证码发送失败', icon: 'none' })
 				return
 			}
@@ -218,7 +219,7 @@ const _cache = __ins.renderCache;
 				smsCode: smsCode.value
 			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
-			if (response.code == 200 && token != '') {
+			if (isBusinessSuccessCode(response.code) && token != '') {
 				smsCode.value = ''
 				completeLogin(token)
 				return
@@ -383,7 +384,7 @@ const _cache = __ins.renderCache;
 				password: enterpriseForm.value.password
 			})
 			const token = response.data != null ? response.data.getString('access_token', response.data.getString('token', '')) : ''
-			if (response.code == 200 && token != '') {
+			if (isBusinessSuccessCode(response.code) && token != '') {
 				saveEnterpriseAccount()
 				completeLogin(token)
 				return
@@ -450,7 +451,7 @@ const _cache = __ins.renderCache;
 	 *   loading.value = true
 	 *   const res = await login({ username: form.value.username, password: form.value.password, from: deviceModel.value, type: 'USER' })
 	 *   loading.value = false
-	 *   const token = res.code == 200 && res.data != null ? res.data.getString('access_token', '') : ''
+	 *   const token = isBusinessSuccessCode(res.code) && res.data != null ? res.data.getString('access_token', '') : ''
 	 *   if (token != '') { saveAccountPassword(); completeLogin(token) }
 	 * }
 	 */

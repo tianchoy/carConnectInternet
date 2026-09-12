@@ -46,7 +46,7 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                         try {
                             val data: UTSJSONObject = _uO("page" to currPage.value, "pageSize" to pageSize.value)
                             val res = await(getUserDeviceList(data))
-                            if (res.code != 200) {
+                            if (!isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {

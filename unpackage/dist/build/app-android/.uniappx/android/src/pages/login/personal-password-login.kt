@@ -75,7 +75,7 @@ open class GenPagesLoginPersonalPasswordLogin : BasePage {
                             } else {
                                 ""
                             }
-                            if (response.code == 200 && token != "") {
+                            if (isBusinessSuccessCode(response.code) && token != "") {
                                 completeLogin(token)
                                 return@w1
                             }

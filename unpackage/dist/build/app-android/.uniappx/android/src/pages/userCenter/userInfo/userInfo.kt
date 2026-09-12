@@ -68,7 +68,7 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
                 return wrapUTSPromise(suspend {
                         await(unbindPushDeviceOnLogout())
                         val res = await(logout())
-                        if (res.code == 200) {
+                        if (isBusinessSuccessCode(res.code)) {
                             uni_removeStorageSync("token")
                             clearPushSessionState()
                             uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))

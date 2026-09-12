@@ -5,6 +5,7 @@ import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_i_form from '@/uni_modules/i-ui-x/components/i-form/i-form.uvue'
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import {
@@ -219,7 +220,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 			uni.hideLoading()
 			loading.value = false
 
-			if (res.code == 200) {
+			if (isBusinessSuccessCode(res.code)) {
 				showAppToast({
 					title: '添加成功',
 					icon: 'success'

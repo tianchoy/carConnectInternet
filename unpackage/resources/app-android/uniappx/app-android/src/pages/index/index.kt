@@ -399,7 +399,7 @@ open class GenPagesIndexIndex : BasePage {
                         try {
                             val res = await(getDeviceDetail(deviceId))
                             val detail = res.data
-                            if (res.code != 200 || detail == null) {
+                            if (!isBusinessSuccessCode(res.code) || detail == null) {
                                 console.error("加载设备详情失败:", res.msg)
                                 return@w1
                             }
@@ -477,7 +477,7 @@ open class GenPagesIndexIndex : BasePage {
                             if (requestId != trackRequestId) {
                                 return@w1
                             }
-                            if (res.code != 200) {
+                            if (!isBusinessSuccessCode(res.code)) {
                                 console.error("加载轨迹失败:", res.msg)
                                 clearTripData()
                                 return@w1
@@ -515,7 +515,7 @@ open class GenPagesIndexIndex : BasePage {
                         try {
                             val res = await(getDevicePos(data))
                             val positions = res.data
-                            if (res.code != 200 || positions == null || positions.length == 0) {
+                            if (!isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
                                 console.warn("获取设备位置失败:", data.getString("deviceId", ""), res.code)
                                 positionState.value = "empty"
                                 return@w1 false
@@ -664,7 +664,7 @@ open class GenPagesIndexIndex : BasePage {
                         getUserLocation()
                         try {
                             val res = await(getUserDeviceList(_uO("pageSize" to 1000)))
-                            if (res.code != 200) {
+                            if (!isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {
@@ -859,7 +859,7 @@ open class GenPagesIndexIndex : BasePage {
                         try {
                             val res = await(getMessageUnreadCount())
                             console.log("加载未读消息数量:", res)
-                            if (checkToken() && res.code == 200 && res.data >= 0) {
+                            if (checkToken() && isBusinessSuccessCode(res.code) && res.data >= 0) {
                                 unreadMessageCount.value = res.data
                             }
                         }
@@ -974,7 +974,7 @@ open class GenPagesIndexIndex : BasePage {
                 return wrapUTSPromise(suspend {
                         val result = await(delDevice(currentCarDeviceId.value))
                         console.log("解绑设备结果:", result)
-                        if (result.code == 200) {
+                        if (isBusinessSuccessCode(result.code)) {
                             showAppToast(ShowToastOptions(title = "解绑成功", icon = "none"))
                             clearSavedSelectedDevice()
                             clearSavedSelectedDeviceIndex()
@@ -1003,7 +1003,7 @@ open class GenPagesIndexIndex : BasePage {
                 return wrapUTSPromise(suspend {
                         await(unbindPushDeviceOnLogout())
                         val res = await(logout())
-                        if (res.code == 200) {
+                        if (isBusinessSuccessCode(res.code)) {
                             clearSavedSelectedDevice()
                             clearSavedSelectedDeviceIndex()
                             uni_removeStorageSync("token")

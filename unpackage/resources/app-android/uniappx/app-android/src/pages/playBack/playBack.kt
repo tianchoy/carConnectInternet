@@ -503,7 +503,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            if (res.code != 200) {
+                            if (!isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {

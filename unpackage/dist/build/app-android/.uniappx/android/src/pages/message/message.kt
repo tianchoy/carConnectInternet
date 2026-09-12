@@ -93,7 +93,7 @@ open class GenPagesMessageMessage : BasePage {
                         try {
                             val res = await(getUserMsgList(_uO("page" to 1, "pageSize" to 10)))
                             val pageData = res.data
-                            if (res.code != 200 || pageData == null) {
+                            if (!isBusinessSuccessCode(res.code) || pageData == null) {
                                 return@w1 _uA()
                             }
                             val latestList: UTSArray<UTSJSONObject> = pageData.list
@@ -204,7 +204,7 @@ open class GenPagesMessageMessage : BasePage {
                                 loadStatus.value = "loading"
                             }
                             val res = await(getUserMsgList(_uO("page" to currPage.value, "pageSize" to pageSize.value)))
-                            if (res.code != 200) {
+                            if (!isBusinessSuccessCode(res.code)) {
                                 loadStatus.value = "loadmore"
                                 return@w1 false
                             }
@@ -315,7 +315,7 @@ open class GenPagesMessageMessage : BasePage {
                             try {
                                 val messageId = item.getString("messageId", "")
                                 val res = await(setMsgState(messageId))
-                                if (res.code == 200) {
+                                if (isBusinessSuccessCode(res.code)) {
                                     val index = msgList.value.findIndex(fun(message: UTSJSONObject): Boolean {
                                         return message.getString("messageId", "") == messageId
                                     }

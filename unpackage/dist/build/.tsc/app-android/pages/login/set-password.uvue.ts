@@ -2,7 +2,8 @@ import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvu
 import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
+	import { ref, onMounted, onUnmounted } from 'vue'
 	import { registerPersonalUser } from '../../api/request.uts'
 	import { resetTokenExpiredState } from '../../api/http.uts'
 	import { schedulePostLoginInitialization } from '../../services/app-startup.uts'
@@ -105,7 +106,7 @@ const _cache = __ins.renderCache;
 				smsCode: context.smsCode
 			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
-			if (response.code == 200 && token != '') {
+			if (isBusinessSuccessCode(response.code) && token != '') {
 				completeLogin(token)
 				return
 			}

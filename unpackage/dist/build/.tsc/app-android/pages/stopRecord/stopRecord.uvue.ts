@@ -4,6 +4,7 @@ import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/com
 import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
 import _easycom_i_empty from '@/uni_modules/i-ui-x/components/i-empty/i-empty.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
@@ -96,7 +97,7 @@ const carStatus = ref('在线')
 		try {
 			const res = await getTrackPos(data)
 			const trackData = res.data
-			if (res.code != 200 || trackData == null) {
+			if (!isBusinessSuccessCode(res.code) || trackData == null) {
 				showAppToast({ title: res.msg || '数据加载失败', icon: 'none' })
 				carStopDetail.value = []
 				return

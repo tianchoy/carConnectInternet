@@ -1,7 +1,8 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
-import { ref, computed, nextTick, onActivated, onDeactivated } from 'vue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
+	import { ref, computed, nextTick, onActivated, onDeactivated } from 'vue'
 	import { getUserMsgList, setMsgState } from '../../api/request.uts'
 	import { consumePendingMessageId, consumePushStaleFlag } from '../../services/push.uts'
 	import { parseLocalDateTime } from '../../utils/formateTime.uts'
@@ -83,7 +84,7 @@ const _cache = __ins.renderCache;
 		try {
 			const res = await getUserMsgList({ page: 1, pageSize: 10 })
 			const pageData = res.data
-			if (res.code != 200 || pageData == null) return []
+			if (!isBusinessSuccessCode(res.code) || pageData == null) return []
 			const latestList : Array<UTSJSONObject> = pageData.list
 
 			const existingIds = new Set<string>()
@@ -184,7 +185,7 @@ const _cache = __ins.renderCache;
 				page: currPage.value,
 				pageSize: pageSize.value
 			})
-			if (res.code != 200) {
+			if (!isBusinessSuccessCode(res.code)) {
 				loadStatus.value = 'loadmore'
 				return false
 			}
@@ -277,7 +278,7 @@ const _cache = __ins.renderCache;
 			try {
 				const messageId = item.getString('messageId', '')
 				const res = await setMsgState(messageId)
-				if (res.code == 200) {
+				if (isBusinessSuccessCode(res.code)) {
 					const index = msgList.value.findIndex((message : UTSJSONObject) : boolean => message.getString('messageId', '') == messageId)
 					if (index != -1) {
 						msgList.value[index].set('status', 0)

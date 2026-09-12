@@ -158,7 +158,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                         sentLoading.value = true
                         try {
                             val res = await(getDeviceSharees(deviceId.value, _uO("pageNum" to sentPage.value, "pageSize" to requestPageSize)))
-                            if (res.code != 200) {
+                            if (!isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {
@@ -229,7 +229,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                         submitting.value = true
                         try {
                             val res = await(createDeviceShare(DeviceShareCreateRequest(deviceId = deviceId.value, targetPhone = phone, expireTime = expireTime)))
-                            if (res.code == 200) {
+                            if (isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = "分享成功", icon = "success"))
                                 targetPhone.value = ""
                                 expireDate.value = ""
@@ -259,7 +259,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                         }
                         try {
                             val res = await(revokeDeviceShare(shareId))
-                            if (res.code == 200) {
+                            if (isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = "撤销成功", icon = "success"))
                                 await(loadSent(true))
                             } else {
@@ -292,7 +292,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                         shareesLoading.value = true
                         try {
                             val res = await(getDeviceSharees(item.getString("deviceId", ""), _uO("pageNum" to 1, "pageSize" to requestPageSize)))
-                            if (res.code == 200) {
+                            if (isBusinessSuccessCode(res.code)) {
                                 sharees.value = res.data.list
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
@@ -321,7 +321,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                 return wrapUTSPromise(suspend {
                         try {
                             val res = await(getDeviceShareEnabled())
-                            if (res.code == 200) {
+                            if (isBusinessSuccessCode(res.code)) {
                                 enabled.value = res.data.getBoolean("enabled", false)
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {

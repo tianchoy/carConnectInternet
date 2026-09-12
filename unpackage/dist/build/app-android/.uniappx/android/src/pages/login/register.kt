@@ -112,7 +112,7 @@ open class GenPagesLoginRegister : BasePage {
                         try {
                             smsSending.value = true
                             val response = await(sendSmsRegisterCode(SendSmsCodeRequest(phonenumber = form.value.mobile)))
-                            if (response.code != 200) {
+                            if (!isBusinessSuccessCode(response.code)) {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
                                 } else {
@@ -181,7 +181,7 @@ open class GenPagesLoginRegister : BasePage {
                             } else {
                                 ""
                             }
-                            if (response.code == 200 && token != "") {
+                            if (isBusinessSuccessCode(response.code) && token != "") {
                                 completeLogin(token)
                                 return@w1
                             }

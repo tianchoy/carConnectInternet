@@ -88,7 +88,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                             val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
                             val positions = res.data
-                            if (res?.code != 200 || positions == null || positions.length == 0) {
+                            if (res == null || !isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
                                 showAppToast(ShowToastOptions(title = "获取位置失败", icon = "none"))
                                 return@w1
                             }
@@ -435,7 +435,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                         try {
                             val res = await(getDevicePos(_uO("deptId" to deptId.value, "deviceids" to imei.value)))
                             val positions = res.data
-                            if (!isTracking.value || sessionId != trackingSessionId || res?.code != 200 || positions == null) {
+                            if (!isTracking.value || sessionId != trackingSessionId || res == null || !isBusinessSuccessCode(res.code) || positions == null) {
                                 return@w1
                             }
                             val item = positions.find(fun(value: UTSJSONObject): Boolean {

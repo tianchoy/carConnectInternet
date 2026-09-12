@@ -109,7 +109,7 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                         try {
                             submitting.value = true
                             val response = await(updatePassword(ChangePasswordRequest(oldPassword = form.value.oldPassword, newPassword = form.value.newPassword, confirmPassword = form.value.confirmPassword)))
-                            if (response.code != 200) {
+                            if (!isBusinessSuccessCode(response.code)) {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
                                 } else {

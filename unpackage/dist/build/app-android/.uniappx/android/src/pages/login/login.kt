@@ -109,7 +109,7 @@ open class GenPagesLoginLogin : BasePage {
                             } else {
                                 ""
                             }
-                            if (response.code == 200 && token != "") {
+                            if (isBusinessSuccessCode(response.code) && token != "") {
                                 completeLogin(token)
                                 return@w1
                             }
@@ -179,7 +179,7 @@ open class GenPagesLoginLogin : BasePage {
                         try {
                             smsSending.value = true
                             val response = await(sendSmsLoginCode(SendSmsCodeRequest(phonenumber = smsMobile.value)))
-                            if (response.code != 200) {
+                            if (!isBusinessSuccessCode(response.code)) {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
                                 } else {
@@ -215,7 +215,7 @@ open class GenPagesLoginLogin : BasePage {
                             } else {
                                 ""
                             }
-                            if (response.code == 200 && token != "") {
+                            if (isBusinessSuccessCode(response.code) && token != "") {
                                 smsCode.value = ""
                                 completeLogin(token)
                                 return@w1

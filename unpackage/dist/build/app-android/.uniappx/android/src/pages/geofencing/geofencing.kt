@@ -100,7 +100,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
                             val positions = res.data
-                            if (res.code != 200 || positions == null) {
+                            if (!isBusinessSuccessCode(res.code) || positions == null) {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {
@@ -412,7 +412,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return wrapUTSPromise(suspend {
                         try {
                             val res = await(getGeofenceList())
-                            if (res.code == 200 && res.data != null) {
+                            if (isBusinessSuccessCode(res.code) && res.data != null) {
                                 fenceList.value = res.data
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
@@ -597,7 +597,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return wrapUTSPromise(suspend {
                         try {
                             val result = await(deleteGeofence(id))
-                            if (result.code == 200) {
+                            if (isBusinessSuccessCode(result.code)) {
                                 showAppToast(ShowToastOptions(title = "删除成功"))
                                 selectedFence.value = null
                                 points.value = _uA()
@@ -681,7 +681,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 result = await(addGeofence(fenceData))
                             }
                             uni_hideLoading(null)
-                            if (result.code == 200) {
+                            if (isBusinessSuccessCode(result.code)) {
                                 showAppToast(ShowToastOptions(title = if (isTruthy(editingFence.value)) {
                                     "更新成功"
                                 } else {
@@ -742,7 +742,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         page.loadingMore = true
                         try {
                             val res = await(getBoundDevices(_uO("pageNum" to page.pageNum, "pageSize" to page.pageSize, "geoId" to fenceId)))
-                            if (res.code == 200) {
+                            if (isBusinessSuccessCode(res.code)) {
                                 val pageData = res.data
                                 val dataList: UTSArray<UTSJSONObject> = if (pageData != null) {
                                     pageData.list
@@ -781,7 +781,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         page.loadingMore = true
                         try {
                             val res = await(getUnboundDevices(_uO("pageNum" to page.pageNum, "pageSize" to page.pageSize, "geoId" to fenceId)))
-                            if (res.code == 200) {
+                            if (isBusinessSuccessCode(res.code)) {
                                 val pageData = res.data
                                 val dataList: UTSArray<UTSJSONObject> = if (pageData != null) {
                                     pageData.list
@@ -869,7 +869,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             } else {
                                 result = await(unbindDevices(params))
                             }
-                            if (result.code == 200) {
+                            if (isBusinessSuccessCode(result.code)) {
                                 showAppToast(ShowToastOptions(title = if (bound) {
                                     "绑定成功"
                                 } else {

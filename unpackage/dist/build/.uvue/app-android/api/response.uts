@@ -1,3 +1,8 @@
+export const BUSINESS_SUCCESS_CODE = 200;
+// `code` is the backend business response code; it is not the HTTP status code.
+export function isBusinessSuccessCode(code: number): boolean {
+    return code == BUSINESS_SUCCESS_CODE;
+}
 export class BackendResponse<T = any> {
     code: number = -1;
     msg: string = '';

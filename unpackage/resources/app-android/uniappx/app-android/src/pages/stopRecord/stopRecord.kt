@@ -84,7 +84,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
                         try {
                             val res = await(getTrackPos(data))
                             val trackData = res.data
-                            if (res.code != 200 || trackData == null) {
+                            if (!isBusinessSuccessCode(res.code) || trackData == null) {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {

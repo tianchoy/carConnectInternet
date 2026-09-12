@@ -6,6 +6,7 @@ import _easycom_i_slider from '@/uni_modules/i-ui-x/components/i-slider/i-slider
 import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.uvue'
 import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, watch } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
@@ -693,7 +694,7 @@ const center = reactive({
 			const res = await getTrackPos(data)
 			if (requestId != replaySessionId) return
 
-			if (res.code != 200) {
+			if (!isBusinessSuccessCode(res.code)) {
 				showAppToast({ title: res.msg || '轨迹加载失败', icon: 'none' })
 				showCurrentPosition()
 				return

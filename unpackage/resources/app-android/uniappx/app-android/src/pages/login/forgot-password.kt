@@ -114,7 +114,7 @@ open class GenPagesLoginForgotPassword : BasePage {
                         try {
                             smsSending.value = true
                             val response = await(sendSmsForgotPasswordCode(SendSmsCodeRequest(phonenumber = form.value.mobile)))
-                            if (response.code != 200) {
+                            if (!isBusinessSuccessCode(response.code)) {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
                                 } else {
@@ -163,7 +163,7 @@ open class GenPagesLoginForgotPassword : BasePage {
                         try {
                             resetSubmitting.value = true
                             val response = await(resetForgotPassword(ForgotPasswordResetRequest(phonenumber = form.value.mobile, smsCode = form.value.smsCode, newPassword = form.value.password, confirmPassword = form.value.confirmPassword)))
-                            if (response.code != 200) {
+                            if (!isBusinessSuccessCode(response.code)) {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
                                 } else {

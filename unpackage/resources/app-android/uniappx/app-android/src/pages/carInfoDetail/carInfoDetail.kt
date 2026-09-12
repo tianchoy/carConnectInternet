@@ -162,7 +162,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                     try {
                                         val res = await(getDevicePos(data))
                                         val positions = res.data
-                                        if (res.code != 200 || positions == null || positions.length == 0) {
+                                        if (!isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
                                             throw UTSError(if (res.msg != "") {
                                                 res.msg
                                             } else {
@@ -345,7 +345,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                 "1111"
                             ), "predictCmdId" to predictCmdId, "type" to type)))
                             uni_hideLoading(null)
-                            if (res.code == 200) {
+                            if (isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = if (operationType == 1) {
                                     "恢复油电成功"
                                 } else {
@@ -463,7 +463,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 return wrapUTSPromise(suspend {
                         if (deviceId.value != null) {
                             val res = await(getDeviceDetail(deviceId.value!!))
-                            if (res.code == 200 && res.data != null) {
+                            if (isBusinessSuccessCode(res.code) && res.data != null) {
                                 currentCarInfo.value = res.data
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {

@@ -13,6 +13,7 @@ import _imports_5 from '../../static/pay.png'
 import _imports_6 from '../../static/online.png'
 import _imports_7 from '../../static/del.png'
 import _imports_8 from '../../static/logout.png'
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
@@ -458,7 +459,7 @@ const loadDeviceDetail = async (deviceId: string) => {
     try {
         const res = await getDeviceDetail(deviceId)
         const detail = res.data
-        if (res.code != 200 || detail == null) {
+        if (!isBusinessSuccessCode(res.code) || detail == null) {
             console.error('加载设备详情失败:', res.msg)
             return
         }
@@ -566,7 +567,7 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
         const res = await getTrackPos(data)
         if (requestId != trackRequestId) return
 
-        if (res.code != 200) {
+        if (!isBusinessSuccessCode(res.code)) {
             console.error('加载轨迹失败:', res.msg)
             clearTripData()
             return
@@ -603,7 +604,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
     try {
         const res = await getDevicePos(data)
         const positions = res.data
-        if (res.code != 200 || positions == null || positions.length == 0) {
+        if (!isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
             console.warn('获取设备位置失败:', data.getString('deviceId', ''), res.code)
             positionState.value = 'empty'
             return false
@@ -759,7 +760,7 @@ const loadDeviceList = async () => {
         const res = await getUserDeviceList({
             pageSize: 1000
         })
-        if (res.code != 200) {
+        if (!isBusinessSuccessCode(res.code)) {
             showAppToast({
                 title: res.msg || '加载车辆列表失败',
                 icon: 'none'
@@ -969,7 +970,7 @@ async function loadUnreadMessageCount(): Promise<void> {
     try {
         const res = await getMessageUnreadCount()
         console.log('加载未读消息数量:', res)
-        if (checkToken() && res.code == 200 && res.data >= 0) {
+        if (checkToken() && isBusinessSuccessCode(res.code) && res.data >= 0) {
             unreadMessageCount.value = res.data
         }
     } catch (error) {
@@ -1128,7 +1129,7 @@ const gotoLogin = () => {
 async function unbindCurrentDevice() : Promise<void> {
     const result = await delDevice(currentCarDeviceId.value)
     console.log('解绑设备结果:', result)
-    if (result.code == 200) {
+    if (isBusinessSuccessCode(result.code)) {
         showAppToast({
             title: '解绑成功',
             icon: 'none'
@@ -1163,7 +1164,7 @@ const unbindDevice = () : void => {
 async function performLogout(): Promise<void> {
     await unbindPushDeviceOnLogout()
     const res = await logoutRequest()
-    if(res.code == 200){
+    if(isBusinessSuccessCode(res.code)){
         clearSavedSelectedDevice()
         clearSavedSelectedDeviceIndex()
         uni.removeStorageSync('token')

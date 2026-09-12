@@ -3,7 +3,8 @@ import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uv
 import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
-import { computed, ref } from 'vue'
+import { isBusinessSuccessCode } from '../../../api/response.uts'
+	import { computed, ref } from 'vue'
 	import { editDeviceInfo, getDeviceDetail } from '../../../api/request.uts'
 	import carIcons from '../../../components/car-icons/car-icons.uvue'
 	import { showAppToast } from '../../../utils/toast.uts'
@@ -137,7 +138,7 @@ const _cache = __ins.renderCache;
 		uni.showLoading({ title: '保存中...', mask: true })
 		try {
 			const res = await editDeviceInfo(payload)
-			if (res.code == 200) {
+			if (isBusinessSuccessCode(res.code)) {
 				carInfo.value = payload
 				editInfo.value.plateNo = plateNo
 				isEditing.value = false
@@ -160,7 +161,7 @@ const _cache = __ins.renderCache;
 		loadingDetail.value = true
 		try {
 			const res = await getDeviceDetail(deviceId.value)
-			if (res.code == 200 && res.data != null) {
+			if (isBusinessSuccessCode(res.code) && res.data != null) {
 				carInfo.value = res.data
 				detailLoaded.value = true
 			} else {

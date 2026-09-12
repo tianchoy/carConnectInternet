@@ -4,7 +4,8 @@ import _easycom_i_checkbox from '@/uni_modules/i-ui-x/components/i-checkbox/i-ch
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
-import { ref, computed, onUnmounted } from 'vue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
+	import { ref, computed, onUnmounted } from 'vue'
 	import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { sendSmsRegisterCode, registerPersonalUser } from '../../api/request.uts'
@@ -116,7 +117,7 @@ const _cache = __ins.renderCache;
 		try {
 			smsSending.value = true
 			const response = await sendSmsRegisterCode({ phonenumber: form.value.mobile })
-			if (response.code != 200) {
+			if (!isBusinessSuccessCode(response.code)) {
 				showAppToast({ title: response.msg || '验证码发送失败', icon: 'none' })
 				return
 			}
@@ -173,7 +174,7 @@ const _cache = __ins.renderCache;
 				smsCode: form.value.smsCode
 			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
-			if (response.code == 200 && token != '') {
+			if (isBusinessSuccessCode(response.code) && token != '') {
 				completeLogin(token)
 				return
 			}

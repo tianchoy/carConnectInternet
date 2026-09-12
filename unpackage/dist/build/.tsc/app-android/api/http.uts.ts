@@ -1,4 +1,5 @@
 import { clearPushSessionState } from '../services/push.uts'
+import { asJSONObject, getResponseCode } from './response.uts'
 import { showAppToast } from '../utils/toast.uts'
 
 import AndroidLog from 'android.util.Log'
@@ -115,8 +116,22 @@ function requestInterceptor(config: RequestOptions): RequestOptions {
 }
 
 // 响应拦截器
+function isBusinessTokenExpired(data: any): boolean {
+    if (data == null) return false
+    try {
+        const responseObject = asJSONObject(data)
+        return getResponseCode(responseObject) == 401
+    } catch (error) {
+        return false
+    }
+}
+
 function responseInterceptor(response: RequestSuccess<any>, config: RequestOptions): any {
-    return response.data!
+    const data = response.data!
+    if (isBusinessTokenExpired(data)) {
+        handleTokenExpired()
+    }
+    return data
 }
 
 function logHttpError(error: HttpError): void {
@@ -135,11 +150,11 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
     }
 
     logHttpError(error)
-    if (config.showError == false) return
     if (error.statusCode == 401) {
         handleTokenExpired()
         return
     }
+    if (config.showError == false) return
 
     // 处理错误状态码
     if (error.statusCode != 0) {
@@ -207,7 +222,7 @@ function request(options: RequestOptions): Promise<any> {
             header: processedConfig.header,
             success: (res: RequestSuccess<any>) => {
                 const statusCode = res.statusCode
-                if (statusCode == 200) {
+                if (statusCode >= 200 && statusCode < 300) {
                     const data = responseInterceptor(res, processedConfig)
                     resolve(data)
                 } else {
@@ -328,13 +343,18 @@ export function upload(url: string, filePath: string, name: string = 'file', for
                     uni.hideLoading()
                 }
 
-                if (res.statusCode == 200) {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    let data: any = res.data
                     try {
-                        const data = JSON.parse(res.data)
-                        resolve(data)
+                        data = JSON.parse(res.data)
                     } catch (e) {
-                        resolve(res.data)
+                        resolve(data)
+                        return
                     }
+                    if (isBusinessTokenExpired(data)) {
+                        handleTokenExpired()
+                    }
+                    resolve(data)
                 } else {
                     const error: HttpError = {
                         statusCode: res.statusCode,

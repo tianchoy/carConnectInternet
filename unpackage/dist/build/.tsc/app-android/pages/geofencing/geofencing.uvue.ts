@@ -8,6 +8,7 @@ import _easycom_i_radio from '@/uni_modules/i-ui-x/components/i-radio/i-radio.uv
 import _easycom_i_switch from '@/uni_modules/i-ui-x/components/i-switch/i-switch.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
@@ -164,7 +165,7 @@ const imei = ref<string | null>(null)
 			const data = { deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
 			const positions = res.data
-			if (res.code != 200 || positions == null) {
+			if (!isBusinessSuccessCode(res.code) || positions == null) {
 				showAppToast({ title: res.msg || '获取车辆位置失败', icon: 'none' })
 				return
 			}
@@ -494,7 +495,7 @@ const imei = ref<string | null>(null)
 	const loadGeofenceList = async () => {
 		try {
 			const res = await getGeofenceList()
-			if (res.code == 200 && res.data != null) {
+			if (isBusinessSuccessCode(res.code) && res.data != null) {
 				fenceList.value = res.data;
 			} else {
 				showAppToast({ title: res.msg || '获取围栏列表失败', icon: 'none' })
@@ -676,7 +677,7 @@ const imei = ref<string | null>(null)
 	async function deleteFenceById(id : string) : Promise<void> {
 		try {
 			const result = await deleteGeofence(id)
-			if (result.code == 200) {
+			if (isBusinessSuccessCode(result.code)) {
 				showAppToast({ title: '删除成功' })
 				selectedFence.value = null
 				points.value = []
@@ -778,7 +779,7 @@ const imei = ref<string | null>(null)
 
 			uni.hideLoading()
 
-			if (result.code == 200) {
+			if (isBusinessSuccessCode(result.code)) {
 				showAppToast({ title: editingFence.value ? '更新成功' : '保存成功' })
 				editDialogPopup.value?.$callMethod('close')
 
@@ -838,7 +839,7 @@ const imei = ref<string | null>(null)
 				geoId: fenceId
 			})
 
-			if (res.code == 200) {
+			if (isBusinessSuccessCode(res.code)) {
 				const pageData = res.data
 				const dataList : Array<UTSJSONObject> = pageData != null ? pageData.list : []
 				if (page.pageNum == 1) {
@@ -871,7 +872,7 @@ const imei = ref<string | null>(null)
 				geoId: fenceId
 			})
 
-			if (res.code == 200) {
+			if (isBusinessSuccessCode(res.code)) {
 				const pageData = res.data
 				const dataList : Array<UTSJSONObject> = pageData != null ? pageData.list : []
 				if (page.pageNum == 1) {
@@ -954,7 +955,7 @@ const imei = ref<string | null>(null)
 				result = await unbindDevices(params)
 			}
 
-			if (result.code == 200) {
+			if (isBusinessSuccessCode(result.code)) {
 				showAppToast({ title: bound ? '绑定成功' : '解绑成功' })
 				// 刷新当前标签页数据，重置分页
 				initPagination(activeTab.value)

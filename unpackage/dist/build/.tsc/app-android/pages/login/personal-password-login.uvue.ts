@@ -6,7 +6,8 @@ import _easycom_i_form from '@/uni_modules/i-ui-x/components/i-form/i-form.uvue'
 import _easycom_i_checkbox from '@/uni_modules/i-ui-x/components/i-checkbox/i-checkbox.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
-import { ref, computed } from 'vue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
+	import { ref, computed } from 'vue'
 	import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { personalPasswordLogin } from '../../api/request.uts'
@@ -86,7 +87,7 @@ const _cache = __ins.renderCache;
 				password: form.value.password
 			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
-			if (response.code == 200 && token != '') {
+			if (isBusinessSuccessCode(response.code) && token != '') {
 				completeLogin(token)
 				return
 			}

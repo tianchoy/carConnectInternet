@@ -1,5 +1,6 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { isBusinessSuccessCode } from '../../../api/response.uts'
 import { showAppToast } from '../../../utils/toast.uts'
 	import { getUserDeviceList } from '../../../api/request.uts'
 
@@ -50,7 +51,7 @@ const deviceList = ref<Array<UTSJSONObject>>([])
 				pageSize: pageSize.value
 			}
 			const res = await getUserDeviceList(data)
-			if (res.code != 200) {
+			if (!isBusinessSuccessCode(res.code)) {
 				showAppToast({
 					title: res.msg || '加载失败',
 					icon: 'none'

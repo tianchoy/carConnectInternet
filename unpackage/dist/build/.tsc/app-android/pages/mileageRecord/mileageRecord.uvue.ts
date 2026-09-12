@@ -5,6 +5,7 @@ import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popu
 import _easycom_i_empty from '@/uni_modules/i-ui-x/components/i-empty/i-empty.uvue'
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
@@ -164,7 +165,7 @@ const carStatus = ref('在线')
 				withTrip: true,
 			};
 			const res = await getTrackPos(data);
-			if (res.code != 200) {
+			if (!isBusinessSuccessCode(res.code)) {
 				showAppToast({ title: res.msg || '数据加载失败', icon: 'none' });
 				return;
 			}

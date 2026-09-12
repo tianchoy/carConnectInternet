@@ -135,7 +135,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             if (from) {
                                 val params: UTSJSONObject = _uO("pageSize" to 1000)
                                 val res = await(getUserDeviceList(params))
-                                val list = if (res.code == 200 && res.data != null) {
+                                val list = if (isBusinessSuccessCode(res.code) && res.data != null) {
                                     res.data.list
                                 } else {
                                     null
@@ -166,7 +166,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
             val unbindDevice = fun(deviceId: String): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         val res = await(delDevice(deviceId))
-                        if (res.code == 200) {
+                        if (isBusinessSuccessCode(res.code)) {
                             showAppToast(ShowToastOptions(title = "解绑成功", icon = "success"))
                             uni_setStorageSync("needRefreshHome", true)
                         } else {

@@ -38,7 +38,7 @@ open class GenPagesUserCenterUserCenter : BasePage {
                         val params: UTSJSONObject = _uO()
                         try {
                             val res = await(getUserInfo())
-                            if (res.code == 200 && res.data != null) {
+                            if (isBusinessSuccessCode(res.code) && res.data != null) {
                                 userInfo.value = _uO("avatar" to res.data.getString("avatar", "/static/avatar.png"), "nickname" to res.data.getString("nickname", ""))
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
@@ -49,7 +49,7 @@ open class GenPagesUserCenterUserCenter : BasePage {
                                 , icon = "none"))
                             }
                             val resCars = await(getUserDeviceList(params))
-                            if (resCars.code == 200 && resCars.data != null) {
+                            if (isBusinessSuccessCode(resCars.code) && resCars.data != null) {
                                 carsnumber.value = resCars.data.totalCount
                             } else {
                                 showAppToast(ShowToastOptions(title = if (resCars.msg != "") {

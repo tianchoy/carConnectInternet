@@ -2,6 +2,7 @@ import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvu
 import _easycom_sub_navBar from '@/components/sub-navBar/sub-navBar.uvue';
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue';
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
+import { isBusinessSuccessCode } from '../../api/response.uts';
 import { showAppToast } from '../../utils/toast.uts';
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { getDevicePos } from '../../api/request.uts';
@@ -129,7 +130,7 @@ const __sfc__ = defineComponent({
                 } as UTSJSONObject;
                 const res = await getDevicePos(data);
                 const positions = res.data;
-                if (res?.code != 200 || positions == null || positions.length == 0) {
+                if (res == null || !isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
                     showAppToast({
                         title: '获取位置失败',
                         icon: 'none'
@@ -414,7 +415,7 @@ const __sfc__ = defineComponent({
             try {
                 const res = await getDevicePos({ deptId: deptId.value, deviceids: imei.value });
                 const positions = res.data;
-                if (!isTracking.value || sessionId != trackingSessionId || res?.code != 200 || positions == null)
+                if (!isTracking.value || sessionId != trackingSessionId || res == null || !isBusinessSuccessCode(res.code) || positions == null)
                     return;
                 const item = positions.find((value: UTSJSONObject): boolean => value.getString('imei', '') == imei.value);
                 if (item == null)

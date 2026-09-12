@@ -3,6 +3,7 @@ import { AppModalOptions } from "../../utils/modal";
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue';
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue';
+import { isBusinessSuccessCode } from '../../api/response.uts';
 import { ref, computed } from 'vue';
 import { showAppToast } from '../../utils/toast.uts';
 import { showAppModal } from '../../utils/modal.uts';
@@ -116,7 +117,7 @@ const __sfc__ = defineComponent({
             sentLoading.value = true;
             try {
                 const res = await getDeviceSharees(deviceId.value, { pageNum: sentPage.value, pageSize: requestPageSize } as UTSJSONObject);
-                if (res.code != 200) {
+                if (!isBusinessSuccessCode(res.code)) {
                     showAppToast({ title: res.msg != "" ? res.msg : '获取分享列表失败', icon: 'none' } as ShowToastOptions);
                     return;
                 }
@@ -171,7 +172,7 @@ const __sfc__ = defineComponent({
                     targetPhone: phone,
                     expireTime: expireTime
                 } as DeviceShareCreateRequest);
-                if (res.code == 200) {
+                if (isBusinessSuccessCode(res.code)) {
                     showAppToast({ title: '分享成功', icon: 'success' } as ShowToastOptions);
                     targetPhone.value = '';
                     expireDate.value = '';
@@ -194,7 +195,7 @@ const __sfc__ = defineComponent({
                 return;
             try {
                 const res = await revokeDeviceShare(shareId);
-                if (res.code == 200) {
+                if (isBusinessSuccessCode(res.code)) {
                     showAppToast({ title: '撤销成功', icon: 'success' } as ShowToastOptions);
                     await loadSent(true);
                 }
@@ -221,7 +222,7 @@ const __sfc__ = defineComponent({
             shareesLoading.value = true;
             try {
                 const res = await getDeviceSharees(item.getString('deviceId', ''), { pageNum: 1, pageSize: requestPageSize } as UTSJSONObject);
-                if (res.code == 200)
+                if (isBusinessSuccessCode(res.code))
                     sharees.value = res.data.list;
                 else
                     showAppToast({ title: res.msg != "" ? res.msg : '获取被分享者失败', icon: 'none' } as ShowToastOptions);
@@ -241,7 +242,7 @@ const __sfc__ = defineComponent({
         const initializeDeviceShare = async (): Promise<void> => {
             try {
                 const res = await getDeviceShareEnabled();
-                if (res.code == 200) {
+                if (isBusinessSuccessCode(res.code)) {
                     enabled.value = res.data.getBoolean('enabled', false);
                 }
                 else {

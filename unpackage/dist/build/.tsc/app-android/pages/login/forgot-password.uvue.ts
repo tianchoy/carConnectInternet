@@ -2,7 +2,8 @@ import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvu
 import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
-import { ref, computed, onUnmounted } from 'vue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
+	import { ref, computed, onUnmounted } from 'vue'
 	import { resetForgotPassword, sendSmsForgotPasswordCode } from '../../api/request.uts'
 	import { showAppToast } from '../../utils/toast.uts'
 
@@ -111,7 +112,7 @@ const _cache = __ins.renderCache;
 		try {
 			smsSending.value = true
 			const response = await sendSmsForgotPasswordCode({ phonenumber: form.value.mobile })
-			if (response.code != 200) {
+			if (!isBusinessSuccessCode(response.code)) {
 				showAppToast({ title: response.msg || '验证码发送失败', icon: 'none' })
 				return
 			}
@@ -152,7 +153,7 @@ const _cache = __ins.renderCache;
 				newPassword: form.value.password,
 				confirmPassword: form.value.confirmPassword
 			})
-			if (response.code != 200) {
+			if (!isBusinessSuccessCode(response.code)) {
 				showAppToast({ title: response.msg || '密码重置失败，请稍后重试', icon: 'none' })
 				return
 			}

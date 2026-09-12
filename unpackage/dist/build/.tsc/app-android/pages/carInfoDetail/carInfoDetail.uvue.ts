@@ -5,6 +5,7 @@ import _easycom_i_grid from '@/uni_modules/i-ui-x/components/i-grid/i-grid.uvue'
 import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand ,getGeocoderAddress} from '../../api/request.uts'
@@ -239,7 +240,7 @@ const deptId = ref<string | null>('')
 
 				// 检查返回结果是否有效
 				const positions = res.data
-				if (res.code != 200 || positions == null || positions.length == 0) {
+				if (!isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
 					throw new Error(res.msg || '返回数据为空');
 				}
 
@@ -575,7 +576,7 @@ const deptId = ref<string | null>('')
 			uni.hideLoading()
 
 			// 根据响应处理结果
-			if (res.code == 200) {
+			if (isBusinessSuccessCode(res.code)) {
 				showAppToast({
 					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
 					icon: 'success'
@@ -730,7 +731,7 @@ const deptId = ref<string | null>('')
 	const loadDeviceDetail = async () => {
 		if (deviceId.value !== null) {
 			const res = await getDeviceDetail(deviceId.value)
-			if (res.code == 200 && res.data != null) {
+			if (isBusinessSuccessCode(res.code) && res.data != null) {
 				currentCarInfo.value = res.data
 			} else {
 				showAppToast({ title: res.msg || '获取设备详情失败', icon: 'none' })

@@ -1,6 +1,7 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue';
 import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue';
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
+import { isBusinessSuccessCode } from '../../../api/response.uts';
 import { showAppToast } from '../../../utils/toast.uts';
 import { clearPushSessionState } from '../../../services/push.uts';
 import { unbindPushDeviceOnLogout } from '../../../services/push-binding.uts';
@@ -53,7 +54,7 @@ const __sfc__ = defineComponent({
         const logoutBtn = async (): Promise<void> => {
             await unbindPushDeviceOnLogout();
             const res = await logout();
-            if (res.code == 200) {
+            if (isBusinessSuccessCode(res.code)) {
                 uni.removeStorageSync('token');
                 clearPushSessionState();
                 uni.reLaunch({

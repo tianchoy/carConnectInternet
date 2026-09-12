@@ -135,7 +135,7 @@ open class GenPagesAddCarAddCar : BasePage {
                             console.log("✅ 添加设备返回:", res)
                             uni_hideLoading(null)
                             loading.value = false
-                            if (res.code == 200) {
+                            if (isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = "添加成功", icon = "success"))
                                 uni_setStorageSync("needRefreshHome", true)
                                 refreshDeviceList()

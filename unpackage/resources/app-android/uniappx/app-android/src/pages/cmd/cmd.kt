@@ -438,7 +438,7 @@ open class GenPagesCmdCmd : BasePage {
                         try {
                             isCommandLoading.value = true
                             val response = await(getAppAvailableCommands(deviceId.value))
-                            if (response.code == 200) {
+                            if (isBusinessSuccessCode(response.code)) {
                                 availableCommands.value = response.data
                                 val stillSelected = if (selectedCommandId.value != "") {
                                     response.data.find(fun(command: UTSJSONObject): Boolean {
@@ -526,7 +526,7 @@ open class GenPagesCmdCmd : BasePage {
                             query.set("pageNum", requestedPage)
                             query.set("pageSize", historyPageSize)
                             val response = await(getAppCommandHistory(query))
-                            if (response.code != 200) {
+                            if (!isBusinessSuccessCode(response.code)) {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
                                 } else {
@@ -590,7 +590,7 @@ open class GenPagesCmdCmd : BasePage {
                         try {
                             isSending.value = true
                             val response = await(sendAppCommand(requestData))
-                            if (response.code == 200) {
+                            if (isBusinessSuccessCode(response.code)) {
                                 val requestIdText = if (response.data != "") {
                                     "追踪编号：" + response.data
                                 } else {
@@ -714,7 +714,7 @@ open class GenPagesCmdCmd : BasePage {
                         isDetailLoading.value = true
                         try {
                             val response = await(getAppCommandDetail(commandId))
-                            if (response.code == 200 && response.data != null) {
+                            if (isBusinessSuccessCode(response.code) && response.data != null) {
                                 detailRecord.value = response.data
                             } else {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
@@ -759,7 +759,7 @@ open class GenPagesCmdCmd : BasePage {
                         try {
                             isRetrying.value = true
                             val response = await(retryAppCommand(commandId))
-                            if (response.code == 200) {
+                            if (isBusinessSuccessCode(response.code)) {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {
                                     response.msg
                                 } else {

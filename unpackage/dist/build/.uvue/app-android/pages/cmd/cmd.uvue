@@ -6,6 +6,7 @@ import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button
 import _easycom_i_action_sheet from '@/uni_modules/i-ui-x/components/i-action-sheet/i-action-sheet.uvue';
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue';
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
+import { isBusinessSuccessCode } from '../../api/response.uts';
 import { computed, ref } from 'vue';
 import { getAppAvailableCommands, getAppCommandDetail, getAppCommandHistory, retryAppCommand, sendAppCommand } from '../../api/request.uts';
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts';
@@ -273,7 +274,7 @@ const __sfc__ = defineComponent({
             try {
                 isCommandLoading.value = true;
                 const response = await getAppAvailableCommands(deviceId.value);
-                if (response.code == 200) {
+                if (isBusinessSuccessCode(response.code)) {
                     availableCommands.value = response.data;
                     const stillSelected = selectedCommandId.value != '' ? response.data.find((command: UTSJSONObject): boolean => getCommandKey(command, 0) == selectedCommandId.value) : null;
                     if (stillSelected == null)
@@ -327,7 +328,7 @@ const __sfc__ = defineComponent({
                 query.set('pageNum', requestedPage);
                 query.set('pageSize', historyPageSize);
                 const response = await getAppCommandHistory(query);
-                if (response.code != 200) {
+                if (!isBusinessSuccessCode(response.code)) {
                     showAppToast({ title: response.msg != '' ? response.msg : '加载指令记录失败', icon: 'none' } as ShowToastOptions);
                     return;
                 }
@@ -377,7 +378,7 @@ const __sfc__ = defineComponent({
             try {
                 isSending.value = true;
                 const response = await sendAppCommand(requestData);
-                if (response.code == 200) {
+                if (isBusinessSuccessCode(response.code)) {
                     const requestIdText = response.data != '' ? '追踪编号：' + response.data : '请在指令记录中查看下发结果';
                     showAppToast({ title: '指令已提交，' + requestIdText, icon: 'success', duration: 3500 } as ShowToastOptions);
                     await reloadHistory();
@@ -454,7 +455,7 @@ const __sfc__ = defineComponent({
             isDetailLoading.value = true;
             try {
                 const response = await getAppCommandDetail(commandId);
-                if (response.code == 200 && response.data != null) {
+                if (isBusinessSuccessCode(response.code) && response.data != null) {
                     detailRecord.value = response.data;
                 }
                 else {
@@ -481,7 +482,7 @@ const __sfc__ = defineComponent({
             try {
                 isRetrying.value = true;
                 const response = await retryAppCommand(commandId);
-                if (response.code == 200) {
+                if (isBusinessSuccessCode(response.code)) {
                     showAppToast({ title: response.msg != '' ? response.msg : '已重新提交指令', icon: 'success' } as ShowToastOptions);
                     detailVisible.value = false;
                     await reloadHistory();
