@@ -944,9 +944,9 @@ const imei = ref<string | null>(null)
 		loading.value = true
 		try {
 			const params = {
-				geofenceId: currentFenceId.value,
+				geofenceId: currentFenceId.value ?? '',
 				imeis: [deviceImei]
-			}
+			} as UTSJSONObject
 			console.log('toggleDeviceBindingparams', params)
 			let result : any
 			if (bound) {
@@ -1191,14 +1191,27 @@ const imei = ref<string | null>(null)
 			clearDrawing()
 		}
 	}
+	const normalizeRouteValue = (value: any | null): string => {
+		if (value == null) return ''
+		const text = value.toString().trim()
+		if (text == '' || text == 'null' || text == 'undefined') return ''
+		try {
+			const decoded = decodeURIComponent(text)
+			return decoded == null ? text : decoded.trim()
+		} catch (error) {
+			return text
+		}
+	}
 	onLoad((option) => {
 		console.log('加载参数', option)
 		connectionStatus.value = option.connectionStatus
 		imei.value = option.imei
-		currentCar.value = option.plateNo || option.deviceName
+		const routeDeviceName = normalizeRouteValue(option.deviceName ?? '')
+		const routePlateNo = normalizeRouteValue(option.plateNo ?? '')
+		currentCar.value = routePlateNo != '' ? routePlateNo : (routeDeviceName != '' ? routeDeviceName : (imei.value ?? '未命名设备'))
 		deptId.value = option.deptId
-		carType.value = option.carType
-		deviceName.value = option.deviceName
+		carType.value = normalizeRouteValue(option.carType ?? '')
+		deviceName.value = routeDeviceName != '' ? routeDeviceName : currentCar.value
 
 		loadInitialPosition()
 		loadGeofenceList() // 页面加载时获取围栏列表

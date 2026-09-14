@@ -923,16 +923,29 @@ import { showAppToast } from '../../utils/toast.uts'
 		applyPlaybackSpeed(event.detail.value)
 	}
 
+	const normalizeRouteValue = (value: any | null): string => {
+		if (value == null) return ''
+		const text = value.toString().trim()
+		if (text == '' || text == 'null' || text == 'undefined') return ''
+		try {
+			const decoded = decodeURIComponent(text)
+			return decoded == null ? text : decoded.trim()
+		} catch (error) {
+			return text
+		}
+	}
+
 	onLoad((option) => {
 		imei.value = option.imei ?? null
 		carStatus.value = option.connectionStatus ?? ''
-		plateNo.value = option.plateNo ?? ''
-		carType.value = option.carType ?? ''
+		const displayCarName = normalizeRouteValue(option.plateNo ?? '')
+		plateNo.value = displayCarName != '' ? displayCarName : (imei.value ?? '未命名设备')
+		carType.value = normalizeRouteValue(option.carType ?? '')
 		lat.value = option.lat ?? null
 		lng.value = option.lng ?? null
 		startTime.value = option.startTime ?? ''
 		endTime.value = option.endTime ?? ''
-		console.log('lat:', lat.value, 'lng:', lng.value, 'startTime:', startTime.value, 'endTime:', endTime.value)
+		console.log('plateNo:', plateNo.value)
 		const routeStartTime = resolveRouteDateTime(startTime.value)
 		const routeEndTime = resolveRouteDateTime(endTime.value)
 		if (routeStartTime != null && routeEndTime != null) {

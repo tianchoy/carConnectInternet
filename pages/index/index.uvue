@@ -1192,7 +1192,7 @@ const toRecordDetail = () => {
     uni.navigateTo({
         url: '/pages/playBack/playBack?imei=' + encodeURIComponent(currentCarImei.value) +
             '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) +
-            '&plateNo=' + encodeURIComponent(currentCarPlateNo.value) +
+            '&plateNo=' + encodeURIComponent(currentCarName.value) +
             '&carType=' + encodeURIComponent(currentCarCarType.value) +
             '&lat=' + encodeURIComponent(hasValidPosition ? latitude.toString() : '') +
             '&lng=' + encodeURIComponent(hasValidPosition ? longitude.toString() : '') +
@@ -1217,7 +1217,7 @@ const toDeviceDetail = (e: any) => {
     if (!isLogin()) return
     if (!isCarSelected()) return
     uni.navigateTo({
-        url: `/pages/carInfoDetail/carInfoDetail?imei=${currentCarImei.value}&deptId=${currentCarDeptId.value}&deviceId=${currentCarDeviceId.value}`,
+        url: `/pages/carInfoDetail/carInfoDetail?imei=${encodeURIComponent(currentCarImei.value)}&deptId=${encodeURIComponent(currentCarDeptId.value)}&deviceId=${encodeURIComponent(currentCarDeviceId.value)}`,
     })
 }
 
@@ -1263,7 +1263,7 @@ const toFence = () => {
     if (!isLogin()) return
     if (!isCarSelected()) return
     uni.navigateTo({
-        url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value  + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
+        url: '/pages/geofencing/geofencing?imei=' + encodeURIComponent(currentCarImei.value) + '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) + '&plateNo=' + encodeURIComponent(currentCarName.value) + '&carType=' + encodeURIComponent(currentCarCarType.value) + '&deptId=' + encodeURIComponent(currentCarDeptId.value) + '&deviceName=' + encodeURIComponent(currentCarName.value)
     })
 }
 

@@ -282,14 +282,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       return normalized;
     }
+    const normalizeRouteValue = (value = null) => {
+      if (value == null)
+        return "";
+      const text = value.toString().trim();
+      if (text == "" || text == "null" || text == "undefined")
+        return "";
+      try {
+        const decoded = decodeURIComponent(text);
+        return decoded == null ? text : decoded.trim();
+      } catch (error) {
+        return text;
+      }
+    };
     common_vendor.onLoad((option) => {
       var _a, _b, _c, _d, _f;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:294", "option", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:305", "option", option);
       connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
       imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
-      currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
+      const displayCarName = normalizeRouteValue((_c = option.plateNo) !== null && _c !== void 0 ? _c : "");
+      currentCar.value = displayCarName != "" ? displayCarName : imei.value != "" ? imei.value : "未命名设备";
       deptId.value = (_d = option.deptId) !== null && _d !== void 0 ? _d : "";
-      carType.value = (_f = option.carType) !== null && _f !== void 0 ? _f : "";
+      carType.value = normalizeRouteValue((_f = option.carType) !== null && _f !== void 0 ? _f : "");
       loadInitialPosition();
     });
     const calculateDistance = (lat1, lng1, lat2, lng2) => {
@@ -513,7 +527,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pendingJumpTime = "";
           acceptLivePosition(item, position, positionTime, sessionId);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:487", "获取跟踪位置失败:", error);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:499", "获取跟踪位置失败:", error);
         } finally {
           if (sessionId == trackingSessionId)
             isTrackRequestPending = false;

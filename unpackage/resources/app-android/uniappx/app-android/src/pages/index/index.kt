@@ -876,8 +876,22 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isCarSelected()) {
                     return
                 }
+                val position = devicePosInfo.value
+                val latitude = position?.getNumber("latitude", 0) ?: 0
+                val longitude = position?.getNumber("longitude", 0) ?: 0
+                val hasValidPosition = !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0)
                 val timeRange = getTodayZeroTime()
-                uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude + "&startTime=" + formatTimes(timeRange.todayZero) + "&endTime=" + formatTimes(timeRange.nowTime), fail = fun(err){
+                uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + encodeURIComponent(currentCarImei.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&lat=" + encodeURIComponent(if (hasValidPosition) {
+                    latitude.toString(10)
+                } else {
+                    ""
+                }
+                ) + "&lng=" + encodeURIComponent(if (hasValidPosition) {
+                    longitude.toString(10)
+                } else {
+                    ""
+                }
+                ) + "&startTime=" + encodeURIComponent(formatTimes(timeRange.todayZero)) + "&endTime=" + encodeURIComponent(formatTimes(timeRange.nowTime)), fail = fun(err){
                     if (err.errMsg.indexOf("locked") < 0) {
                         console.error("跳转轨迹详情失败:", err)
                     }
@@ -897,7 +911,7 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isCarSelected()) {
                     return
                 }
-                uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?imei=" + currentCarImei.value + "&deptId=" + currentCarDeptId.value + "&deviceId=" + currentCarDeviceId.value))
+                uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?imei=" + encodeURIComponent(currentCarImei.value) + "&deptId=" + encodeURIComponent(currentCarDeptId.value) + "&deviceId=" + encodeURIComponent(currentCarDeviceId.value)))
             }
             val toAdd = fun(){
                 if (!isLogin()) {
@@ -941,7 +955,7 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isCarSelected()) {
                     return
                 }
-                uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value))
+                uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?imei=" + encodeURIComponent(currentCarImei.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&deptId=" + encodeURIComponent(currentCarDeptId.value) + "&deviceName=" + encodeURIComponent(currentCarName.value)))
             }
             val contactCustomerService = fun(){
                 showAppToast(ShowToastOptions(title = "请在微信小程序中联系客服", icon = "none"))

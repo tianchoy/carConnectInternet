@@ -914,9 +914,22 @@ const __sfc__ = defineComponent({
                 return;
             if (!isCarSelected())
                 return;
+            const position = devicePosInfo.value;
+            const latitude = position?.getNumber('latitude', 0) ?? 0;
+            const longitude = position?.getNumber('longitude', 0) ?? 0;
+            const hasValidPosition = !isNaN(latitude) && !isNaN(longitude) &&
+                latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 &&
+                !(latitude == 0 && longitude == 0);
             const timeRange = getTodayZeroTime();
             uni.navigateTo({
-                url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude + '&startTime=' + formatTimes(timeRange.todayZero) + '&endTime=' + formatTimes(timeRange.nowTime),
+                url: '/pages/playBack/playBack?imei=' + encodeURIComponent(currentCarImei.value) +
+                    '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) +
+                    '&plateNo=' + encodeURIComponent(currentCarName.value) +
+                    '&carType=' + encodeURIComponent(currentCarCarType.value) +
+                    '&lat=' + encodeURIComponent(hasValidPosition ? latitude.toString(10) : '') +
+                    '&lng=' + encodeURIComponent(hasValidPosition ? longitude.toString(10) : '') +
+                    '&startTime=' + encodeURIComponent(formatTimes(timeRange.todayZero)) +
+                    '&endTime=' + encodeURIComponent(formatTimes(timeRange.nowTime)),
                 fail: (err) => {
                     if (err.errMsg.indexOf('locked') < 0)
                         console.error('跳转轨迹详情失败:', err);
@@ -938,7 +951,7 @@ const __sfc__ = defineComponent({
             if (!isCarSelected())
                 return;
             uni.navigateTo({
-                url: `/pages/carInfoDetail/carInfoDetail?imei=${currentCarImei.value}&deptId=${currentCarDeptId.value}&deviceId=${currentCarDeviceId.value}`,
+                url: `/pages/carInfoDetail/carInfoDetail?imei=${encodeURIComponent(currentCarImei.value)}&deptId=${encodeURIComponent(currentCarDeptId.value)}&deviceId=${encodeURIComponent(currentCarDeviceId.value)}`,
             });
         };
         // 跳转添加车辆
@@ -987,7 +1000,7 @@ const __sfc__ = defineComponent({
             if (!isCarSelected())
                 return;
             uni.navigateTo({
-                url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
+                url: '/pages/geofencing/geofencing?imei=' + encodeURIComponent(currentCarImei.value) + '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) + '&plateNo=' + encodeURIComponent(currentCarName.value) + '&carType=' + encodeURIComponent(currentCarCarType.value) + '&deptId=' + encodeURIComponent(currentCarDeptId.value) + '&deviceName=' + encodeURIComponent(currentCarName.value)
             });
         };
         // 联系客服

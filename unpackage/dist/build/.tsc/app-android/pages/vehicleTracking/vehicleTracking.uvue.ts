@@ -266,14 +266,26 @@ const imei = ref<string>('')
 		}
 		return normalized
 	}
+	const normalizeRouteValue = (value: any | null): string => {
+		if (value == null) return ''
+		const text = value.toString().trim()
+		if (text == '' || text == 'null' || text == 'undefined') return ''
+		try {
+			const decoded = decodeURIComponent(text)
+			return decoded == null ? text : decoded.trim()
+		} catch (error) {
+			return text
+		}
+	}
 
 	onLoad((option) => {
 		console.log('option', option)
 		connectionStatus.value = option.connectionStatus ?? ''
 		imei.value = option.imei ?? ''
-		currentCar.value = option.plateNo ?? '未知车辆'
+		const displayCarName = normalizeRouteValue(option.plateNo ?? '')
+		currentCar.value = displayCarName != '' ? displayCarName : (imei.value != '' ? imei.value : '未命名设备')
 		deptId.value = option.deptId ?? ''
-		carType.value = option.carType ?? ''
+		carType.value = normalizeRouteValue(option.carType ?? '')
 		loadInitialPosition()
 	})
 

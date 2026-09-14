@@ -181,13 +181,42 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 return normalized
             }
             val normalizeRotation = ::gen_normalizeRotation_fn
+            val normalizeRouteValue = fun(value: Any?): String {
+                if (value == null) {
+                    return ""
+                }
+                val text = value.toString().trim()
+                if (text == "" || text == "null" || text == "undefined") {
+                    return ""
+                }
+                try {
+                    val decoded = decodeURIComponent(text)
+                    return if (decoded == null) {
+                        text
+                    } else {
+                        decoded.trim()
+                    }
+                }
+                 catch (error: Throwable) {
+                    return text
+                }
+            }
             onLoad(fun(option){
                 console.log("option", option)
                 connectionStatus.value = option["connectionStatus"] ?: ""
                 imei.value = option["imei"] ?: ""
-                currentCar.value = option["plateNo"] ?: "未知车辆"
+                val displayCarName = normalizeRouteValue(option["plateNo"] ?: "")
+                currentCar.value = if (displayCarName != "") {
+                    displayCarName
+                } else {
+                    if (imei.value != "") {
+                        imei.value
+                    } else {
+                        "未命名设备"
+                    }
+                }
                 deptId.value = option["deptId"] ?: ""
-                carType.value = option["carType"] ?: ""
+                carType.value = normalizeRouteValue(option["carType"] ?: "")
                 loadInitialPosition()
             }
             )

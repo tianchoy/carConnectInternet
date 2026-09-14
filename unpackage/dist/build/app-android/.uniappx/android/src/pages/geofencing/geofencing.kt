@@ -859,7 +859,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         console.log("toggleDeviceBinding", deviceImei, bound)
                         loading.value = true
                         try {
-                            val params: UTSJSONObject = _uO("geofenceId" to currentFenceId.value, "imeis" to _uA(
+                            val params: UTSJSONObject = _uO("geofenceId" to (currentFenceId.value ?: ""), "imeis" to _uA(
                                 deviceImei
                             ))
                             console.log("toggleDeviceBindingparams", params)
@@ -1064,18 +1064,48 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 }
             }
             val closeEditDialog = ::gen_closeEditDialog_fn
+            val normalizeRouteValue = fun(value: Any?): String {
+                if (value == null) {
+                    return ""
+                }
+                val text = value.toString().trim()
+                if (text == "" || text == "null" || text == "undefined") {
+                    return ""
+                }
+                try {
+                    val decoded = decodeURIComponent(text)
+                    return if (decoded == null) {
+                        text
+                    } else {
+                        decoded.trim()
+                    }
+                }
+                 catch (error: Throwable) {
+                    return text
+                }
+            }
             onLoad(fun(option){
                 console.log("加载参数", option)
                 connectionStatus.value = option["connectionStatus"]
                 imei.value = option["imei"]
-                currentCar.value = if (isTruthy(option["plateNo"])) {
-                    option["plateNo"]
+                val routeDeviceName = normalizeRouteValue(option["deviceName"] ?: "")
+                val routePlateNo = normalizeRouteValue(option["plateNo"] ?: "")
+                currentCar.value = if (routePlateNo != "") {
+                    routePlateNo
                 } else {
-                    option["deviceName"]
+                    if (routeDeviceName != "") {
+                        routeDeviceName
+                    } else {
+                        (imei.value ?: "未命名设备")
+                    }
                 }
                 deptId.value = option["deptId"]
-                carType.value = option["carType"]
-                deviceName.value = option["deviceName"]
+                carType.value = normalizeRouteValue(option["carType"] ?: "")
+                deviceName.value = if (routeDeviceName != "") {
+                    routeDeviceName
+                } else {
+                    currentCar.value
+                }
                 loadInitialPosition()
                 loadGeofenceList()
             }

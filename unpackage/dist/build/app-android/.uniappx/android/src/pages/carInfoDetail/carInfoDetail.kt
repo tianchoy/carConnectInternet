@@ -122,6 +122,17 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                     "bar-off"
                 }
             }
+            val getDisplayCarName = fun(): String {
+                val deviceName = currentCarInfo.value.getString("deviceName", "")
+                if (deviceName != "") {
+                    return deviceName
+                }
+                val plateNo = currentCarInfo.value.getString("plateNo", "")
+                if (plateNo != "") {
+                    return plateNo
+                }
+                return imei.value ?: "未命名设备"
+            }
             val createMarker = fun(id: Number, lat: Number, lng: Number, type: String, title: String?): Marker {
                 val connectionStatus = datainfo.value["connectionStatus"] as String?
                 val carType = currentCarInfo.value["carType"] as String?
@@ -213,7 +224,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                                 center.latitude = convertedLat
                                                 center.longitude = convertedLng
                                                 await(delay(50))
-                                                val deviceMarker = createMarker(1, convertedLat, convertedLng, "device", currentCarInfo.value.getString("deviceName", "当前位置"))
+                                                val deviceMarker = createMarker(1, convertedLat, convertedLng, "device", currentCarInfo.value.getString("deviceName", getDisplayCarName()))
                                                 markers.value = _uA()
                                                 await(delay(50))
                                                 markers.value = _uA(
@@ -396,7 +407,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
             fun gen_navTo_fn(): Unit {
                 var locationName = address.value
                 if (locationName == "") {
-                    locationName = currentCarInfo.value.getString("deviceName", "当前位置")
+                    locationName = currentCarInfo.value.getString("deviceName", getDisplayCarName())
                 }
                 openLocation(OpenLocationParams(latitude = center.latitude, longitude = center.longitude, name = locationName))
             }
@@ -404,17 +415,19 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
             val handleGridClick = fun(event: Any){
                 val name = event as UTSJSONObject
                 val itemTo = name["text"]
+                val routeDeviceName = getDisplayCarName()
+                val routeCarType = currentCarInfo.value.getString("carType", "")
                 if (itemTo == "轨迹回放") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + imei.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + currentCarInfo.value["deviceName"] + "&carType=" + currentCarInfo.value["carType"] + "&lat=" + datainfo.value["latitude"] + "&lng=" + datainfo.value["longitude"]))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + imei.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType) + "&lat=" + datainfo.value["latitude"] + "&lng=" + datainfo.value["longitude"]))
                 }
                 if (itemTo == "车辆跟踪") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&deptId=" + deptId.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + currentCarInfo.value["deviceName"] + "&carType=" + currentCarInfo.value["carType"]))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&deptId=" + deptId.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType)))
                 }
                 if (itemTo == "里程记录") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/mileageRecord/mileageRecord?imei=" + imei.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + currentCarInfo.value["deviceName"] + "&carType=" + currentCarInfo.value["carType"]))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/mileageRecord/mileageRecord?imei=" + imei.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType)))
                 }
                 if (itemTo == "停车记录") {
                     stopAutoRefresh()
@@ -442,7 +455,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 }
                 if (itemTo == "电子围栏") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + currentCarInfo.value["deviceName"] + "&carType=" + currentCarInfo.value["carType"] + "&deptId=" + deptId.value + "&deviceName=" + currentCarInfo.value["deviceName"]))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType) + "&deptId=" + deptId.value + "&deviceName=" + encodeURIComponent(routeDeviceName)))
                 }
                 if (itemTo == "一键寻车") {
                     navTo()
@@ -455,7 +468,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                     stopAutoRefresh()
                     val shareImei = imei.value ?: ""
                     val shareDeviceId = deviceId.value ?: ""
-                    val shareDeviceName = currentCarInfo.value.getString("deviceName", "")
+                    val shareDeviceName = getDisplayCarName()
                     uni_navigateTo(NavigateToOptions(url = "/pages/deviceShare/deviceShare?imei=" + encodeURIComponent(shareImei) + "&deviceId=" + encodeURIComponent(shareDeviceId) + "&deviceName=" + encodeURIComponent(shareDeviceName)))
                 }
             }
@@ -539,7 +552,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                 _cC("v-if", true)
                             }
                             ,
-                            _cV(_component_sub_navBar, _uM("class" to "sub-nav-overlay", "currentTime" to unref(currentTime), "showTime" to true, "showPickerTime" to false, "onUpdate:currentTime" to onCurrentTimeChange, "currentCar" to unref(currentCarInfo)["deviceName"], "times" to unref(times), "carStatus" to unref(datainfo)["connectionStatus"], "showPicker" to false, "showCar" to true), null, 8, _uA(
+                            _cV(_component_sub_navBar, _uM("class" to "sub-nav-overlay", "currentTime" to unref(currentTime), "showTime" to true, "showPickerTime" to false, "onUpdate:currentTime" to onCurrentTimeChange, "currentCar" to getDisplayCarName(), "times" to unref(times), "carStatus" to unref(datainfo)["connectionStatus"], "showPicker" to false, "showCar" to true), null, 8, _uA(
                                 "currentTime",
                                 "currentCar",
                                 "times",

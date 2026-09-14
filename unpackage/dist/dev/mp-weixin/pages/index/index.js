@@ -990,7 +990,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const hasValidPosition = !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0);
       const timeRange = utils_gettime.getTodayZeroTime();
       common_vendor.index.navigateTo({
-        url: "/pages/playBack/playBack?imei=" + encodeURIComponent(currentCarImei.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarPlateNo.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&lat=" + encodeURIComponent(hasValidPosition ? latitude.toString() : "") + "&lng=" + encodeURIComponent(hasValidPosition ? longitude.toString() : "") + "&startTime=" + encodeURIComponent(utils_formateTime.formatTimes(timeRange.todayZero)) + "&endTime=" + encodeURIComponent(utils_formateTime.formatTimes(timeRange.nowTime)),
+        url: "/pages/playBack/playBack?imei=" + encodeURIComponent(currentCarImei.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&lat=" + encodeURIComponent(hasValidPosition ? latitude.toString() : "") + "&lng=" + encodeURIComponent(hasValidPosition ? longitude.toString() : "") + "&startTime=" + encodeURIComponent(utils_formateTime.formatTimes(timeRange.todayZero)) + "&endTime=" + encodeURIComponent(utils_formateTime.formatTimes(timeRange.nowTime)),
         fail: (err) => {
           if (err.errMsg.indexOf("locked") < 0)
             common_vendor.index.__f__("error", "at pages/index/index.uvue:1202", "跳转轨迹详情失败:", err);
@@ -1010,7 +1010,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!isCarSelected())
         return null;
       common_vendor.index.navigateTo({
-        url: `/pages/carInfoDetail/carInfoDetail?imei=${currentCarImei.value}&deptId=${currentCarDeptId.value}&deviceId=${currentCarDeviceId.value}`
+        url: `/pages/carInfoDetail/carInfoDetail?imei=${encodeURIComponent(currentCarImei.value)}&deptId=${encodeURIComponent(currentCarDeptId.value)}&deviceId=${encodeURIComponent(currentCarDeviceId.value)}`
       });
     };
     const toAdd = () => {
@@ -1055,7 +1055,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!isCarSelected())
         return null;
       common_vendor.index.navigateTo({
-        url: "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value
+        url: "/pages/geofencing/geofencing?imei=" + encodeURIComponent(currentCarImei.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&deptId=" + encodeURIComponent(currentCarDeptId.value) + "&deviceName=" + encodeURIComponent(currentCarName.value)
       });
     };
     const contactCustomerService = () => {

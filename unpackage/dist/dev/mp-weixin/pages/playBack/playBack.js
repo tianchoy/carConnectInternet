@@ -766,17 +766,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function setPlaybackSpeedFromValue(value) {
       applyPlaybackSpeed(value);
     }
+    const normalizeRouteValue = (value = null) => {
+      if (value == null)
+        return "";
+      const text = value.toString().trim();
+      if (text == "" || text == "null" || text == "undefined")
+        return "";
+      try {
+        const decoded = decodeURIComponent(text);
+        return decoded == null ? text : decoded.trim();
+      } catch (error) {
+        return text;
+      }
+    };
     common_vendor.onLoad((option) => {
-      var _a, _b, _c, _d, _f, _g, _h, _j;
+      var _a, _b, _c, _d, _f, _g, _h, _j, _k;
       imei.value = (_a = option.imei) !== null && _a !== void 0 ? _a : null;
       carStatus.value = (_b = option.connectionStatus) !== null && _b !== void 0 ? _b : "";
-      plateNo.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "";
-      carType.value = (_d = option.carType) !== null && _d !== void 0 ? _d : "";
-      lat.value = (_f = option.lat) !== null && _f !== void 0 ? _f : null;
-      lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
-      startTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
-      endTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:935", "lat:", lat.value, "lng:", lng.value, "startTime:", startTime.value, "endTime:", endTime.value);
+      const displayCarName = normalizeRouteValue((_c = option.plateNo) !== null && _c !== void 0 ? _c : "");
+      plateNo.value = displayCarName != "" ? displayCarName : (_d = imei.value) !== null && _d !== void 0 ? _d : "未命名设备";
+      carType.value = normalizeRouteValue((_f = option.carType) !== null && _f !== void 0 ? _f : "");
+      lat.value = (_g = option.lat) !== null && _g !== void 0 ? _g : null;
+      lng.value = (_h = option.lng) !== null && _h !== void 0 ? _h : null;
+      startTime.value = (_j = option.startTime) !== null && _j !== void 0 ? _j : "";
+      endTime.value = (_k = option.endTime) !== null && _k !== void 0 ? _k : "";
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:948", "plateNo:", plateNo.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {

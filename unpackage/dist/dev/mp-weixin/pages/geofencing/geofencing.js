@@ -968,11 +968,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const toggleDeviceBinding = (deviceImei, bound) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a;
         common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1094", "toggleDeviceBinding", deviceImei, bound);
         loading.value = true;
         try {
           const params = new common_vendor.UTSJSONObject({
-            geofenceId: currentFenceId.value,
+            geofenceId: (_a = currentFenceId.value) !== null && _a !== void 0 ? _a : "",
             imeis: [deviceImei]
           });
           common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1101", "toggleDeviceBindingparams", params);
@@ -1140,14 +1141,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         clearDrawing();
       }
     }
+    const normalizeRouteValue = (value = null) => {
+      if (value == null)
+        return "";
+      const text = value.toString().trim();
+      if (text == "" || text == "null" || text == "undefined")
+        return "";
+      try {
+        const decoded = decodeURIComponent(text);
+        return decoded == null ? text : decoded.trim();
+      } catch (error) {
+        return text;
+      }
+    };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1346", "加载参数", option);
+      var _a, _b, _c, _d;
+      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1357", "加载参数", option);
       connectionStatus.value = option.connectionStatus;
       imei.value = option.imei;
-      currentCar.value = option.plateNo || option.deviceName;
+      const routeDeviceName = normalizeRouteValue((_a = option.deviceName) !== null && _a !== void 0 ? _a : "");
+      const routePlateNo = normalizeRouteValue((_b = option.plateNo) !== null && _b !== void 0 ? _b : "");
+      currentCar.value = routePlateNo != "" ? routePlateNo : routeDeviceName != "" ? routeDeviceName : (_c = imei.value) !== null && _c !== void 0 ? _c : "未命名设备";
       deptId.value = option.deptId;
-      carType.value = option.carType;
-      deviceName.value = option.deviceName;
+      carType.value = normalizeRouteValue((_d = option.carType) !== null && _d !== void 0 ? _d : "");
+      deviceName.value = routeDeviceName != "" ? routeDeviceName : currentCar.value;
       loadInitialPosition();
       loadGeofenceList();
     });

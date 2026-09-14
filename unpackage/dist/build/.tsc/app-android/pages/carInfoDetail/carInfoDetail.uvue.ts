@@ -197,6 +197,14 @@ const deptId = ref<string | null>('')
 		return barIndex < level ? 'bar-active' : 'bar-off';
 	}
 
+	const getDisplayCarName = (): string => {
+		const deviceName = currentCarInfo.value.getString('deviceName', '')
+		if (deviceName != '') return deviceName
+		const plateNo = currentCarInfo.value.getString('plateNo', '')
+		if (plateNo != '') return plateNo
+		return imei.value ?? '未命名设备'
+	}
+
 	//封装markers
 	const createMarker = (id : number, lat : number, lng : number, type : string, title ?: string): Marker => {
 		const connectionStatus = datainfo.value['connectionStatus'] as string | null;
@@ -301,7 +309,7 @@ const deptId = ref<string | null>('')
 							convertedLat,
 							convertedLng,
 							'device',
-							currentCarInfo.value.getString('deviceName', '当前位置')
+							currentCarInfo.value.getString('deviceName', getDisplayCarName())
 						);
 
 						// 使用强制响应式更新
@@ -638,7 +646,7 @@ const deptId = ref<string | null>('')
 	function navTo(): void {
 		let locationName = address.value
 		if (locationName == '') {
-			locationName = currentCarInfo.value.getString('deviceName', '当前位置')
+			locationName = currentCarInfo.value.getString('deviceName', getDisplayCarName())
 		}
 		openLocation({
 			latitude: center.latitude,
@@ -650,22 +658,24 @@ const deptId = ref<string | null>('')
 	const handleGridClick = (event: any) => {
 		const name = event as UTSJSONObject
 		const itemTo = name.text
+		const routeDeviceName = getDisplayCarName()
+		const routeCarType = currentCarInfo.value.getString('carType', '')
 		if (itemTo == '轨迹回放') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude
+				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType) + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude
 			})
 		}
 		if (itemTo == '车辆跟踪') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType
+				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType)
 			})
 		}
 		if (itemTo == '里程记录') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType
+				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType)
 			})
 		}
 		if (itemTo == '停车记录') {
@@ -703,7 +713,7 @@ const deptId = ref<string | null>('')
 		if (itemTo == '电子围栏') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType + '&deptId=' + deptId.value + '&deviceName=' + currentCarInfo.value.deviceName
+				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType) + '&deptId=' + deptId.value + '&deviceName=' + encodeURIComponent(routeDeviceName)
 			})
 		}
 		if (itemTo == '一键寻车') {
@@ -719,7 +729,7 @@ const deptId = ref<string | null>('')
 			stopAutoRefresh() // 停止刷新
 			const shareImei = imei.value ?? ''
 			const shareDeviceId = deviceId.value ?? ''
-			const shareDeviceName = currentCarInfo.value.getString('deviceName', '')
+			const shareDeviceName = getDisplayCarName()
 			uni.navigateTo({
 				url: '/pages/deviceShare/deviceShare?imei=' + encodeURIComponent(shareImei) + '&deviceId=' + encodeURIComponent(shareDeviceId) + '&deviceName=' + encodeURIComponent(shareDeviceName)
 			})
@@ -832,7 +842,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           showTime: true,
           showPickerTime: false,
           "onUpdate:currentTime": onCurrentTimeChange,
-          currentCar: unref(currentCarInfo).deviceName,
+          currentCar: getDisplayCarName(),
           times: unref(times),
           carStatus: unref(datainfo).connectionStatus,
           showPicker: false,

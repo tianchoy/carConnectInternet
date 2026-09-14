@@ -689,16 +689,41 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 applyPlaybackSpeed(event.detail.value)
             }
             val setPlaybackSpeed = ::gen_setPlaybackSpeed_fn
+            val normalizeRouteValue = fun(value: Any?): String {
+                if (value == null) {
+                    return ""
+                }
+                val text = value.toString().trim()
+                if (text == "" || text == "null" || text == "undefined") {
+                    return ""
+                }
+                try {
+                    val decoded = decodeURIComponent(text)
+                    return if (decoded == null) {
+                        text
+                    } else {
+                        decoded.trim()
+                    }
+                }
+                 catch (error: Throwable) {
+                    return text
+                }
+            }
             onLoad(fun(option){
                 imei.value = option["imei"] ?: null
                 carStatus.value = option["connectionStatus"] ?: ""
-                plateNo.value = option["plateNo"] ?: ""
-                carType.value = option["carType"] ?: ""
+                val displayCarName = normalizeRouteValue(option["plateNo"] ?: "")
+                plateNo.value = if (displayCarName != "") {
+                    displayCarName
+                } else {
+                    (imei.value ?: "未命名设备")
+                }
+                carType.value = normalizeRouteValue(option["carType"] ?: "")
                 lat.value = option["lat"] ?: null
                 lng.value = option["lng"] ?: null
                 startTime.value = option["startTime"] ?: ""
                 endTime.value = option["endTime"] ?: ""
-                console.log("startTime:", startTime.value, "endTime:", endTime.value)
+                console.log("plateNo:", plateNo.value)
                 val routeStartTime = resolveRouteDateTime(startTime.value)
                 val routeEndTime = resolveRouteDateTime(endTime.value)
                 if (routeStartTime != null && routeEndTime != null) {
