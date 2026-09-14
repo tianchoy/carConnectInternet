@@ -932,7 +932,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		lng.value = option.lng ?? null
 		startTime.value = option.startTime ?? ''
 		endTime.value = option.endTime ?? ''
-		console.log('startTime:', startTime.value, 'endTime:', endTime.value)
+		console.log('lat:', lat.value, 'lng:', lng.value, 'startTime:', startTime.value, 'endTime:', endTime.value)
 		const routeStartTime = resolveRouteDateTime(startTime.value)
 		const routeEndTime = resolveRouteDateTime(endTime.value)
 		if (routeStartTime != null && routeEndTime != null) {

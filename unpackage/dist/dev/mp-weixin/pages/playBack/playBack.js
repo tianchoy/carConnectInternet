@@ -776,7 +776,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
       startTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
       endTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:935", "startTime:", startTime.value, "endTime:", endTime.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:935", "lat:", lat.value, "lng:", lng.value, "startTime:", startTime.value, "endTime:", endTime.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {

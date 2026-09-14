@@ -1182,9 +1182,22 @@ async function loadUnreadMessageCount(): Promise<void> {
 const toRecordDetail = () => {
     if (!isLogin()) return
     if (!isCarSelected()) return
+    const position = devicePosInfo.value
+    const latitude = position?.getNumber('latitude', 0) ?? 0
+    const longitude = position?.getNumber('longitude', 0) ?? 0
+    const hasValidPosition = !isNaN(latitude) && !isNaN(longitude) &&
+        latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 &&
+        !(latitude == 0 && longitude == 0)
     const timeRange = getTodayZeroTime()
     uni.navigateTo({
-        url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude + '&startTime=' + formatTimes(timeRange.todayZero) + '&endTime=' + formatTimes(timeRange.nowTime),
+        url: '/pages/playBack/playBack?imei=' + encodeURIComponent(currentCarImei.value) +
+            '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) +
+            '&plateNo=' + encodeURIComponent(currentCarPlateNo.value) +
+            '&carType=' + encodeURIComponent(currentCarCarType.value) +
+            '&lat=' + encodeURIComponent(hasValidPosition ? latitude.toString() : '') +
+            '&lng=' + encodeURIComponent(hasValidPosition ? longitude.toString() : '') +
+            '&startTime=' + encodeURIComponent(formatTimes(timeRange.todayZero)) +
+            '&endTime=' + encodeURIComponent(formatTimes(timeRange.nowTime)),
         fail: (err) => {
             if (err.errMsg.indexOf('locked') < 0) console.error('跳转轨迹详情失败:', err)
         }

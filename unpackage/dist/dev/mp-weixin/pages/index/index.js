@@ -979,16 +979,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     }
     const toRecordDetail = () => {
+      var _a, _b;
       if (!isLogin())
         return null;
       if (!isCarSelected())
         return null;
+      const position = devicePosInfo.value;
+      const latitude = (_a = position === null || position === void 0 ? null : position.getNumber("latitude", 0)) !== null && _a !== void 0 ? _a : 0;
+      const longitude = (_b = position === null || position === void 0 ? null : position.getNumber("longitude", 0)) !== null && _b !== void 0 ? _b : 0;
+      const hasValidPosition = !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0);
       const timeRange = utils_gettime.getTodayZeroTime();
       common_vendor.index.navigateTo({
-        url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude + "&startTime=" + utils_formateTime.formatTimes(timeRange.todayZero) + "&endTime=" + utils_formateTime.formatTimes(timeRange.nowTime),
+        url: "/pages/playBack/playBack?imei=" + encodeURIComponent(currentCarImei.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarPlateNo.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&lat=" + encodeURIComponent(hasValidPosition ? latitude.toString() : "") + "&lng=" + encodeURIComponent(hasValidPosition ? longitude.toString() : "") + "&startTime=" + encodeURIComponent(utils_formateTime.formatTimes(timeRange.todayZero)) + "&endTime=" + encodeURIComponent(utils_formateTime.formatTimes(timeRange.nowTime)),
         fail: (err) => {
           if (err.errMsg.indexOf("locked") < 0)
-            common_vendor.index.__f__("error", "at pages/index/index.uvue:1189", "跳转轨迹详情失败:", err);
+            common_vendor.index.__f__("error", "at pages/index/index.uvue:1202", "跳转轨迹详情失败:", err);
         }
       });
     };
@@ -1015,7 +1020,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/addCar/addCar",
         fail: (err) => {
           if (err.errMsg.indexOf("locked") < 0)
-            common_vendor.index.__f__("error", "at pages/index/index.uvue:1217", "跳转添加设备失败:", err);
+            common_vendor.index.__f__("error", "at pages/index/index.uvue:1230", "跳转添加设备失败:", err);
         }
       });
     };
@@ -1058,7 +1063,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
         corpId: "ww686122ec6a4db85a",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1264", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1277", res);
         }
       }));
     };
@@ -1077,10 +1082,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1294", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1307", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1297", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1310", "打开小程序失败", res);
           needRefresh.value = false;
           utils_toast.showAppToast({
             title: "打开支付页面失败",
@@ -1100,7 +1105,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function unbindCurrentDevice() {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const result = yield api_request.delDevice(currentCarDeviceId.value);
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:1331", "解绑设备结果:", result);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:1344", "解绑设备结果:", result);
         if (api_response.isBusinessSuccessCode(result.code)) {
           utils_toast.showAppToast({
             title: "解绑成功",
