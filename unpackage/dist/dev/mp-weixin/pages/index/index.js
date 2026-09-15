@@ -1063,7 +1063,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
         corpId: "ww686122ec6a4db85a",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1277", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1277", "联系客服成功", res);
+        },
+        fail(res = null) {
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1280", "联系客服失败", res);
+        },
+        complete(res = null) {
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1283", "联系客服完成", res);
         }
       }));
     };
@@ -1082,10 +1088,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1307", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1313", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1310", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1316", "打开小程序失败", res);
           needRefresh.value = false;
           utils_toast.showAppToast({
             title: "打开支付页面失败",
@@ -1105,7 +1111,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function unbindCurrentDevice() {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const result = yield api_request.delDevice(currentCarDeviceId.value);
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:1344", "解绑设备结果:", result);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:1350", "解绑设备结果:", result);
         if (api_response.isBusinessSuccessCode(result.code)) {
           utils_toast.showAppToast({
             title: "解绑成功",

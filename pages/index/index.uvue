@@ -1274,7 +1274,13 @@ const contactCustomerService = () => {
         extInfo: {url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a'},
         corpId: 'ww686122ec6a4db85a',
         success(res) {
-            console.log(res)
+            console.log('联系客服成功', res)
+        },
+        fail(res) {
+            console.log('联系客服失败', res)
+        },
+        complete(res) {
+            console.log('联系客服完成', res)
         }
     })
 }
