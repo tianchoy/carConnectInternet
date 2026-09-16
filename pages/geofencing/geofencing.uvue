@@ -136,13 +136,13 @@
 					@scrolltolower="handleLoadMore"
 					:lower-threshold="150"
 				>
-					<view v-for="device in deviceList" :key="getDeviceImei(device)" class="device-item">
+					<view v-for="device in deviceList" :key="getDeviceNo(device)" class="device-item">
 						<view class="device-info">
 							<text class="name">{{ getDeviceDisplayName(device) }}</text>
-							<text class="status" v-if="getDeviceImei(device)">{{ isDeviceOnline(device) ? '在线' : '离线' }}</text>
+							<text class="status" v-if="getDeviceNo(device)">{{ isDeviceOnline(device) ? '在线' : '离线' }}</text>
 						</view>
-						<i-switch :model-value="isDeviceBound(getDeviceImei(device))"
-							@change="handleDeviceBindingChange(getDeviceImei(device), $event as boolean)" :disabled="loading || loadingMore"
+						<i-switch :model-value="isDeviceBound(getDeviceNo(device))"
+							@change="handleDeviceBindingChange(getDeviceNo(device), $event as boolean)" :disabled="loading || loadingMore"
 							size="20">
 						</i-switch>
 					</view>
@@ -175,7 +175,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 
-	const imei = ref<string | null>(null)
+	const deviceNo = ref<string | null>(null)
 	const connectionStatus = ref<string | null>(null)
 	const deptId = ref<string | null>(null)
 	const carType = ref<string | null>(null)
@@ -305,7 +305,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 		try {
 			isMapReady.value = false
-			const data = { deptId: deptId.value, deviceids: imei.value }
+			const data = { deptId: deptId.value, deviceids: deviceNo.value }
 			const res = await getDevicePos(data)
 			const positions = res.data
 			if (!isBusinessSuccessCode(res.code) || positions == null) {
@@ -314,7 +314,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			}
 
 			positions.forEach(item => {
-				if (item.getString('imei', '') == imei.value) {
+				if (item.getString('deviceNo', '') == deviceNo.value) {
 					const deviceData = item
 					const latitude = deviceData.getNumber('latitude', 0)
 					const longitude = deviceData.getNumber('longitude', 0)
@@ -1090,13 +1090,13 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 	// 切换设备绑定状态
-	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) : Promise<void> => {
-		console.log('toggleDeviceBinding', deviceImei, bound)
+	const toggleDeviceBinding = async (deviceNo : string, bound : boolean) : Promise<void> => {
+		console.log('toggleDeviceBinding', deviceNo, bound)
 		loading.value = true
 		try {
 			const params = {
 				geofenceId: currentFenceId.value ?? '',
-				imeis: [deviceImei]
+				deviceNos: [deviceNo]
 			} as UTSJSONObject
 			console.log('toggleDeviceBindingparams', params)
 			let result : any
@@ -1130,8 +1130,8 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 	// 检查设备是否已绑定
-	const isDeviceBound = (deviceImei : string) : boolean => {
-		return boundDevices.value.some((device : UTSJSONObject) : boolean => device.getString('imei', '') === deviceImei)
+	const isDeviceBound = (deviceNo : string) : boolean => {
+		return boundDevices.value.some((device : UTSJSONObject) : boolean => device.getString('deviceNo', '') === deviceNo)
 	}
 
 	/* 电子围栏绘制功能 */
@@ -1157,12 +1157,12 @@ import { showAppToast } from '../../utils/toast.uts'
 		updateMapDisplay()
 	}
 
-	function handleDeviceBindingChange(deviceImei : string, bound : boolean) : void {
-		void toggleDeviceBinding(deviceImei, bound)
+	function handleDeviceBindingChange(deviceNo : string, bound : boolean) : void {
+		void toggleDeviceBinding(deviceNo, bound)
 	}
 
-	function getDeviceImei(device : UTSJSONObject) : string {
-		return device.getString('imei', '')
+	function getDeviceNo(device : UTSJSONObject) : string {
+		return device.getString('deviceNo', '')
 	}
 
 	function isDeviceOnline(device : UTSJSONObject) : boolean {
@@ -1171,7 +1171,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	function getDeviceDisplayName(device : UTSJSONObject) : string {
 		const deviceName = device.getString('deviceName', '')
-		return deviceName ? deviceName : device.getString('plateNo', '') ? device.getString('plateNo', '') : device.getString('imei', '')
+		return deviceName ? deviceName : device.getString('plateNo', '') ? device.getString('plateNo', '') : device.getString('deviceNo', '')
 	}
 
 	function getSelectedFenceName() : string {
@@ -1356,10 +1356,10 @@ import { showAppToast } from '../../utils/toast.uts'
 	onLoad((option) => {
 		console.log('加载参数', option)
 		connectionStatus.value = option.connectionStatus
-		imei.value = option.imei
+		deviceNo.value = option.deviceNo
 		const routeDeviceName = normalizeRouteValue(option.deviceName ?? '')
 		const routePlateNo = normalizeRouteValue(option.plateNo ?? '')
-		currentCar.value = routePlateNo != '' ? routePlateNo : (routeDeviceName != '' ? routeDeviceName : (imei.value ?? '未命名设备'))
+		currentCar.value = routePlateNo != '' ? routePlateNo : (routeDeviceName != '' ? routeDeviceName : (deviceNo.value ?? '未命名设备'))
 		deptId.value = option.deptId
 		carType.value = normalizeRouteValue(option.carType ?? '')
 		deviceName.value = routeDeviceName != '' ? routeDeviceName : currentCar.value

@@ -50,14 +50,14 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	const deviceListItems = computed((): Array<DeviceItem> => {
 		return originalDeviceList.value.map((item: UTSJSONObject): DeviceItem => {
-			const imei = item.getString('imei', '')
+			const deviceNo = item.getString('deviceNo', '')
 			const rawDeviceName = item.getString('deviceName', '')
 			return {
 				plateNo: item.getString('plateNo', ''),
-				imei: imei,
+				deviceNo: deviceNo,
 				status: item.getNumber('status', 0),
 				companyId: item.getString('companyId', ''),
-				deviceName: rawDeviceName != '' ? rawDeviceName : imei,
+				deviceName: rawDeviceName != '' ? rawDeviceName : deviceNo,
 				deviceId: item.getString('deviceId', ''),
 				iccid: item.getString('iccid', ''),
 				simMerchant: item.getString('simMerchant', ''),
@@ -209,11 +209,11 @@ import { showAppToast } from '../../utils/toast.uts'
 			console.warn('未找到对应的设备信息', markerId)
 			return
 		}
-		const imeiValue = (selectedDevice['imei'] as string | null) ?? ''
+		const deviceNoValue = (selectedDevice['deviceNo'] as string | null) ?? ''
 		const companyId = (selectedDevice['companyId'] as string | number | null) ?? ''
 		const deviceId = (selectedDevice['deviceId'] as string | number | null) ?? ''
 		uni.navigateTo({
-			url: '/pages/carInfoDetail/carInfoDetail?imei=' + imeiValue + '&deptId=' + companyId.toString() + '&deviceId=' + deviceId.toString()
+			url: '/pages/carInfoDetail/carInfoDetail?deviceNo=' + deviceNoValue + '&deptId=' + companyId.toString() + '&deviceId=' + deviceId.toString()
 		})
 	}
 

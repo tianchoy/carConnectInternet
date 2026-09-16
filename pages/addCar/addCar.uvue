@@ -16,8 +16,8 @@
 					</i-input>
 				</i-form-item>
 
-				<i-form-item label="设备ID" name="imei" required  labelDirection="horizontal">
-					<i-input border="none" v-model="carInfo.imei" placeholder="请输入设备ID(必填)">
+				<i-form-item label="设备编号" name="deviceNo" required  labelDirection="horizontal">
+					<i-input border="none" v-model="carInfo.deviceNo" placeholder="请输入设备编号(必填)">
 						<template v-slot:suffix>
 							<i-icon name="/static/sancode.png" fontSize="24" @click="scanCode"></i-icon>
 						</template>
@@ -61,7 +61,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	type CarFormData = {
 		deviceName: string
-		imei: string
+		deviceNo: string
 		deviceType: string
 		deviceTypeValue: string
 		plateNo: string
@@ -88,7 +88,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	const carInfo = ref<CarFormData>({
 		deviceName: '',
-		imei: '',
+		deviceNo: '',
 		deviceType: '',
 		deviceTypeValue: '',
 		plateNo: '',
@@ -99,7 +99,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	// ===== 表单验证规则 =====
 	const rules = [
-		{ name: 'imei', required: true, message: '请输入设备ID' } as UTSJSONObject,
+		{ name: 'deviceNo', required: true, message: '请输入设备编号' } as UTSJSONObject,
 		{ name: 'deviceType', required: true, message: '请选择设备图标' } as UTSJSONObject
 	] as Array<UTSJSONObject>
 
@@ -168,15 +168,15 @@ import { showAppToast } from '../../utils/toast.uts'
 	const handleScanResult = (data: ScanResultData) => {
 		console.log('接收到扫码结果:', data.result)
 		if (data.result.length == 15) {
-			carInfo.value.imei = '0' + data.result.slice(4, 15)
+			carInfo.value.deviceNo = '0' + data.result.slice(4, 15)
 			return
 		}
 		if (data.result.length == 11) {
-			carInfo.value.imei = '0' + data.result
+			carInfo.value.deviceNo = '0' + data.result
 			return
 		}
 		showAppToast({
-			title: '扫码结果长度不是标准设备ID，请确认后提交',
+			title: '扫码结果长度不是标准设备编号，请确认后提交',
 			icon: 'none'
 		})
 	}
@@ -207,9 +207,9 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	// ===== 表单验证 =====
 	const validateForm = (): boolean => {
-		if (carInfo.value.imei.length == 0) {
+		if (carInfo.value.deviceNo.length == 0) {
 			showAppToast({
-				title: '请输入设备ID',
+				title: '请输入设备编号',
 				icon: 'none'
 			})
 			return false
@@ -241,7 +241,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 			const submitData = {
 				deviceName: carInfo.value.deviceName,
-				imei: carInfo.value.imei,
+				deviceNo: carInfo.value.deviceNo,
 				carType: carInfo.value.deviceType,
 				plateNo: carInfo.value.plateNo
 			}

@@ -9,7 +9,7 @@
 				<text class="title">{{item.getString('deviceName', '')}}</text>
 				<view class="device-info">
 					<text>{{item.getString('plateNo', '')}}</text>
-					<text class="tel">{{item.getString('imei', '')}}</text>
+					<text class="tel">{{item.getString('deviceNo', '')}}</text>
 				</view>
 			</view>
 

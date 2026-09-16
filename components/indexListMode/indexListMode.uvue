@@ -1,10 +1,10 @@
 <template>
 	<view class="list-container">
 		<scroll-view class="content" scroll-y v-if="props.lists.length != 0">
-			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.imei,item.deviceId)">
+			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.deviceNo,item.deviceId)">
 				<view class="title">
 					<view class="car-number">
-						{{item.deviceName || item.imei}}
+						{{item.deviceName || item.deviceNo}}
 						<i-tag class="car-status-spacing" size="mini" shape="circle" :text="item.connectionStatus == 'online' ? '在线' : '离线'" :type="item.connectionStatus== 'online' ? 'success' : 'error'"></i-tag>
 					</view>
 					<view class="device-tools">
@@ -15,7 +15,7 @@
 					</view>
 				</view>
 				<view>
-					<text class="imei">ID: {{item.imei}}</text>
+					<text class="imei">ID: {{item.deviceNo}}</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -103,9 +103,9 @@ import { showAppToast } from '../../utils/toast.uts'
 		// 隐藏确认弹窗
 		modal.value = false
 	}
-	const todetail = (companyId:string,imei:string,deviceId:string) => {
+	const todetail = (companyId:string,deviceNo:string,deviceId:string) => {
 		uni.navigateTo({
-			url: '/pages/carInfoDetail/carInfoDetail?deptId='+companyId+ '&imei=' + imei + '&deviceId=' + deviceId
+			url: '/pages/carInfoDetail/carInfoDetail?deptId='+companyId+ '&deviceNo=' + deviceNo + '&deviceId=' + deviceId
 		})
 	}
 </script>

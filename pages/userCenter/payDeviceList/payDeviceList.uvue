@@ -13,9 +13,9 @@
 					<view class="label">ICCID:</view>
 					<view class="value">{{item.iccid}}</view>
 				</view>
-				<view class="device-info" v-if="item.imei && item.imei != ''">
+				<view class="device-info" v-if="item.deviceNo && item.deviceNo != ''">
 					<view class="label">ID:</view>
-					<view class="value">{{item.imei}}</view>
+					<view class="value">{{item.deviceNo}}</view>
 				</view>
 				<!-- <view class="device-info" v-if="item.customerTime">
 					<view class="label">平台到期时间:</view>
