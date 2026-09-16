@@ -1299,6 +1299,13 @@ const needRefresh = ref(false)
 const toPay = (iccid : string,simMerchant : string) => {
     if (!isLogin()) return
     if (!isCarSelected()) return
+    if (!iccid || iccid.trim().length === 0) {
+        showAppToast({
+            title: '未配置充值号，请联系客服。',
+            icon: 'none'
+        })
+        return
+    }
     if(simMerchant.toLowerCase() == 'zddx'){
         iccid = iccid.substring(0,iccid.length-1)
     }

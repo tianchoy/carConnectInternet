@@ -1079,6 +1079,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       if (!isCarSelected())
         return null;
+      if (!iccid || iccid.trim().length === 0) {
+        utils_toast.showAppToast({
+          title: "未配置充值号，请联系客服。",
+          icon: "none"
+        });
+        return null;
+      }
       if (simMerchant.toLowerCase() == "zddx") {
         iccid = iccid.substring(0, iccid.length - 1);
       }
@@ -1088,10 +1095,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1313", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1320", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1316", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1323", "打开小程序失败", res);
           needRefresh.value = false;
           utils_toast.showAppToast({
             title: "打开支付页面失败",
@@ -1111,7 +1118,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function unbindCurrentDevice() {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const result = yield api_request.delDevice(currentCarDeviceId.value);
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:1350", "解绑设备结果:", result);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:1357", "解绑设备结果:", result);
         if (api_response.isBusinessSuccessCode(result.code)) {
           utils_toast.showAppToast({
             title: "解绑成功",
