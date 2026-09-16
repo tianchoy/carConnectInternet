@@ -112,7 +112,7 @@
 import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
-	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand ,getGeocoderAddress} from '../../api/request.uts'
+	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand, restoreOilPower, getGeocoderAddress } from '../../api/request.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -668,13 +668,16 @@ import { openLocation } from '../../utils/openLocation.uts'
 			})
 
 			// 调用接口
-			const res = await sendCommand({
+			const commandData = {
 				imei: imei.value,
 				password: userType.value == '1' ? psw.value : '', // 根据用户类型决定是否传密码
 				params: ['1111'],
 				predictCmdId: predictCmdId,
 				type: type
-			})
+			} as UTSJSONObject
+			const res = operationType == 1
+				? await restoreOilPower(commandData)
+				: await sendCommand(commandData)
 
 			// 隐藏加载中
 			uni.hideLoading()
