@@ -63,7 +63,7 @@ open class GenPagesIndexIndex : BasePage {
             val deviceList = ref(_uA<Device>())
             val showPicker = ref(false)
             val pickerValues = ref(_uA<PickerValue>())
-            val currentCarImei = ref("")
+            val currentCarDeviceNo = ref("")
             val currentCarDeptId = ref("")
             val currentCarDeviceId = ref("")
             val currentCarIccId = ref("")
@@ -115,8 +115,8 @@ open class GenPagesIndexIndex : BasePage {
                             if (device.name != "") {
                                 device.name
                             } else {
-                                if (device.imei != "") {
-                                    device.imei
+                                if (device.deviceNo != "") {
+                                    device.deviceNo
                                 } else {
                                     "未命名设备"
                                 }
@@ -127,8 +127,8 @@ open class GenPagesIndexIndex : BasePage {
                         } else {
                             "离线"
                         }
-                        return PickerColumnItem(id = device.imei, label = "" + displayName + " (" + statusText + ")", value = if (device.imei != "") {
-                            device.imei
+                        return PickerColumnItem(id = device.deviceNo, label = "" + displayName + " (" + statusText + ")", value = if (device.deviceNo != "") {
+                            device.deviceNo
                         } else {
                             device.deviceId
                         }
@@ -166,7 +166,7 @@ open class GenPagesIndexIndex : BasePage {
                         if (device.name != "") {
                             device.name
                         } else {
-                            device.imei
+                            device.deviceNo
                         }
                     }
                     , "deviceName" to if (device.deviceName != "") {
@@ -175,11 +175,11 @@ open class GenPagesIndexIndex : BasePage {
                         if (device.name != "") {
                             device.name
                         } else {
-                            device.imei
+                            device.deviceNo
                         }
                     }
-                    , "imei" to if (device.imei != "") {
-                        device.imei
+                    , "deviceNo" to if (device.deviceNo != "") {
+                        device.deviceNo
                     } else {
                         device.value
                     }
@@ -208,17 +208,17 @@ open class GenPagesIndexIndex : BasePage {
                 if (data == null) {
                     return null
                 }
-                val imei = data.getString("imei", "")
+                val deviceNo = data.getString("deviceNo", "")
                 val deviceId = data.getString("deviceId", "")
-                if (imei == "" && deviceId == "") {
+                if (deviceNo == "" && deviceId == "") {
                     return null
                 }
-                val identity = if (imei != "") {
-                    imei
+                val identity = if (deviceNo != "") {
+                    deviceNo
                 } else {
                     deviceId
                 }
-                val device = SavedDevice(name = data.getString("name", identity), deviceName = data.getString("deviceName", data.getString("name", identity)), imei = imei, deptId = data.getString("deptId", ""), deviceId = deviceId, iccid = data.getString("iccid", ""), simMerchant = data.getString("simMerchant", ""), connectionStatus = data.getString("connectionStatus", ""), carType = data.getString("carType", ""), plateNo = data.getString("plateNo", ""), latitude = data.getNumber("latitude", 0), longitude = data.getNumber("longitude", 0))
+                val device = SavedDevice(name = data.getString("name", identity), deviceName = data.getString("deviceName", data.getString("name", identity)), deviceNo = deviceNo, deptId = data.getString("deptId", ""), deviceId = deviceId, iccid = data.getString("iccid", ""), simMerchant = data.getString("simMerchant", ""), connectionStatus = data.getString("connectionStatus", ""), carType = data.getString("carType", ""), plateNo = data.getString("plateNo", ""), latitude = data.getNumber("latitude", 0), longitude = data.getNumber("longitude", 0))
                 return device
             }
             val getSavedSelectedDevice = fun(): SavedDevice? {
@@ -276,14 +276,14 @@ open class GenPagesIndexIndex : BasePage {
                     console.error("清除保存设备索引失败:", error)
                 }
             }
-            val findDeviceIndex = fun(imei: String, deviceId: String): Number {
-                if (imei != "") {
-                    val imeiIndex = deviceList.value.findIndex(fun(device): Boolean {
-                        return device.imei == imei || device.value == imei
+            val findDeviceIndex = fun(deviceNo: String, deviceId: String): Number {
+                if (deviceNo != "") {
+                    val deviceNoIndex = deviceList.value.findIndex(fun(device): Boolean {
+                        return device.deviceNo == deviceNo || device.value == deviceNo
                     }
                     )
-                    if (imeiIndex != -1) {
-                        return imeiIndex
+                    if (deviceNoIndex != -1) {
+                        return deviceNoIndex
                     }
                 }
                 if (deviceId != "") {
@@ -299,10 +299,10 @@ open class GenPagesIndexIndex : BasePage {
                     showAppToast(ShowToastOptions(title = "暂无车辆数据", icon = "none"))
                     return
                 }
-                val currentIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value)
+                val currentIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value)
                 val savedDevice = getSavedSelectedDevice()
                 val savedDeviceIndex = if (savedDevice != null) {
-                    findDeviceIndex(savedDevice.imei, savedDevice.deviceId)
+                    findDeviceIndex(savedDevice.deviceNo, savedDevice.deviceId)
                 } else {
                     -1
                 }
@@ -322,8 +322,8 @@ open class GenPagesIndexIndex : BasePage {
                     return
                 }
                 pickerValues.value = _uA(
-                    if (selectedDevice.imei != "") {
-                        selectedDevice.imei
+                    if (selectedDevice.deviceNo != "") {
+                        selectedDevice.deviceNo
                     } else {
                         selectedDevice.deviceId
                     }
@@ -431,7 +431,7 @@ open class GenPagesIndexIndex : BasePage {
                 averageSpeed.value = 0
             }
             val clearCurrentCar = fun(): Unit {
-                currentCarImei.value = ""
+                currentCarDeviceNo.value = ""
                 currentCarDeptId.value = ""
                 currentCarDeviceId.value = ""
                 currentCarIccId.value = ""
@@ -465,9 +465,9 @@ open class GenPagesIndexIndex : BasePage {
                     clearTripData()
                 }
             }
-            val createTrackRequestData = fun(imei: String): UTSJSONObject {
+            val createTrackRequestData = fun(deviceNo: String): UTSJSONObject {
                 val timeRange = getTodayZeroTime()
-                return _uO("imei" to imei, "startTime" to formatTimes(timeRange.todayZero), "endTime" to formatTimes(timeRange.nowTime), "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
+                return _uO("deviceNo" to deviceNo, "startTime" to formatTimes(timeRange.todayZero), "endTime" to formatTimes(timeRange.nowTime), "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
             }
             val loadTrackPos = fun(data: UTSJSONObject): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
@@ -559,14 +559,14 @@ open class GenPagesIndexIndex : BasePage {
                         console.log("开始加载设备数据:", device)
                         try {
                             await(loadDeviceDetail(device.deviceId))
-                            await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.imei != "") {
-                                device.imei
+                            await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.deviceNo != "") {
+                                device.deviceNo
                             } else {
                                 device.value
                             }
                             )))
-                            await(loadTrackPos(createTrackRequestData(if (device.imei != "") {
-                                device.imei
+                            await(loadTrackPos(createTrackRequestData(if (device.deviceNo != "") {
+                                device.deviceNo
                             } else {
                                 device.value
                             }
@@ -592,7 +592,7 @@ open class GenPagesIndexIndex : BasePage {
                 var selectedIndex: Number = -1
                 if (selectedValue != "") {
                     selectedIndex = deviceList.value.findIndex(fun(device): Boolean {
-                        return device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue
+                        return device.deviceNo == selectedValue || device.value == selectedValue || device.deviceId == selectedValue
                     }
                     )
                 }
@@ -603,7 +603,7 @@ open class GenPagesIndexIndex : BasePage {
                     }
                 }
                 if (selectedIndex < 0) {
-                    selectedIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value)
+                    selectedIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value)
                 }
                 if (selectedIndex < 0 && deviceList.value.length > 0) {
                     selectedIndex = 0
@@ -617,8 +617,8 @@ open class GenPagesIndexIndex : BasePage {
                     showAppToast(ShowToastOptions(title = "选择设备失败", icon = "none"))
                     return
                 }
-                if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-                    console.log("选择的设备111:", selectedDevice.imei, selectedDevice.deviceId, currentCarImei.value, currentCarDeviceId.value)
+                if (selectedDevice.deviceNo == currentCarDeviceNo.value && selectedDevice.deviceId == currentCarDeviceId.value) {
+                    console.log("选择的设备111:", selectedDevice.deviceNo, selectedDevice.deviceId, currentCarDeviceNo.value, currentCarDeviceId.value)
                     console.log("选择的设备与当前设备相同，不重复加载")
                     return
                 }
@@ -632,8 +632,8 @@ open class GenPagesIndexIndex : BasePage {
                     }
                 }
                 currentCarName.value = deviceName
-                currentCarImei.value = if (selectedDevice.imei != "") {
-                    selectedDevice.imei
+                currentCarDeviceNo.value = if (selectedDevice.deviceNo != "") {
+                    selectedDevice.deviceNo
                 } else {
                     selectedDevice.value
                 }
@@ -648,8 +648,8 @@ open class GenPagesIndexIndex : BasePage {
                 center.longitude = selectedDevice.longitude
                 saveSelectedDeviceIndex(selectedIndex)
                 pickerValues.value = _uA(
-                    if (selectedDevice.imei != "") {
-                        selectedDevice.imei
+                    if (selectedDevice.deviceNo != "") {
+                        selectedDevice.deviceNo
                     } else {
                         selectedDevice.deviceId
                     }
@@ -693,13 +693,13 @@ open class GenPagesIndexIndex : BasePage {
                                 markers.value = _uA()
                                 userDeviceList.value = list
                                 deviceList.value = list.map(fun(item: UTSJSONObject): Device {
-                                    val imei = item.getString("imei", "")
+                                    val deviceNo = item.getString("deviceNo", "")
                                     val rawDeviceName = item.getString("deviceName", "")
                                     val deviceName = if (rawDeviceName != "") {
                                         rawDeviceName
                                     } else {
-                                        if (imei != "") {
-                                            imei
+                                        if (deviceNo != "") {
+                                            deviceNo
                                         } else {
                                             "未命名设备"
                                         }
@@ -710,14 +710,14 @@ open class GenPagesIndexIndex : BasePage {
                                     } else {
                                         item.getString("companyId", "")
                                     }
-                                    return Device(name = deviceName, deviceName = deviceName, value = imei, imei = imei, deptId = deptId, deviceId = item.getString("deviceId", ""), iccid = item.getString("iccid", ""), simMerchant = item.getString("simMerchant", ""), connectionStatus = item.getString("connectionStatus", ""), carType = item.getString("carType", ""), plateNo = item.getString("plateNo", ""), latitude = item.getNumber("latitude", 0), longitude = item.getNumber("longitude", 0))
+                                    return Device(name = deviceName, deviceName = deviceName, value = deviceNo, deviceNo = deviceNo, deptId = deptId, deviceId = item.getString("deviceId", ""), iccid = item.getString("iccid", ""), simMerchant = item.getString("simMerchant", ""), connectionStatus = item.getString("connectionStatus", ""), carType = item.getString("carType", ""), plateNo = item.getString("plateNo", ""), latitude = item.getNumber("latitude", 0), longitude = item.getNumber("longitude", 0))
                                 })
                                 val savedDevice = getSavedSelectedDevice()
                                 val savedIndex = getSavedSelectedDeviceIndex()
                                 var selectedDevice: Device? = null
                                 var selectedIdx: Number = -1
                                 if (savedDevice != null) {
-                                    selectedIdx = findDeviceIndex(savedDevice.imei, savedDevice.deviceId)
+                                    selectedIdx = findDeviceIndex(savedDevice.deviceNo, savedDevice.deviceId)
                                     if (selectedIdx != -1) {
                                         selectedDevice = deviceList.value[selectedIdx]
                                         saveSelectedDeviceIndex(selectedIdx)
@@ -749,8 +749,8 @@ open class GenPagesIndexIndex : BasePage {
                                         }
                                     }
                                     currentCarName.value = deviceName
-                                    currentCarImei.value = if (device.imei != "") {
-                                        device.imei
+                                    currentCarDeviceNo.value = if (device.deviceNo != "") {
+                                        device.deviceNo
                                     } else {
                                         device.value
                                     }
@@ -764,21 +764,21 @@ open class GenPagesIndexIndex : BasePage {
                                     center.latitude = device.latitude
                                     center.longitude = device.longitude
                                     pickerValues.value = _uA(
-                                        if (device.imei != "") {
-                                            device.imei
+                                        if (device.deviceNo != "") {
+                                            device.deviceNo
                                         } else {
                                             device.deviceId
                                         }
                                     )
                                     await(loadDeviceDetail(device.deviceId))
-                                    await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.imei != "") {
-                                        device.imei
+                                    await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.deviceNo != "") {
+                                        device.deviceNo
                                     } else {
                                         device.value
                                     }
                                     )))
-                                    await(loadTrackPos(createTrackRequestData(if (device.imei != "") {
-                                        device.imei
+                                    await(loadTrackPos(createTrackRequestData(if (device.deviceNo != "") {
+                                        device.deviceNo
                                     } else {
                                         device.value
                                     }
@@ -818,7 +818,7 @@ open class GenPagesIndexIndex : BasePage {
                         }
                         uni_showLoading(ShowLoadingOptions(title = "刷新位置中...", mask = true))
                         try {
-                            await(loadDevicePos(_uO("deviceId" to currentCarDeviceId.value, "deviceids" to currentCarImei.value)))
+                            await(loadDevicePos(_uO("deviceId" to currentCarDeviceId.value, "deviceids" to currentCarDeviceNo.value)))
                         }
                          catch (error: Throwable) {
                             console.error("刷新位置失败", error)
@@ -881,7 +881,7 @@ open class GenPagesIndexIndex : BasePage {
                 val longitude = position?.getNumber("longitude", 0) ?: 0
                 val hasValidPosition = !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0)
                 val timeRange = getTodayZeroTime()
-                uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + encodeURIComponent(currentCarImei.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&lat=" + encodeURIComponent(if (hasValidPosition) {
+                uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?deviceNo=" + encodeURIComponent(currentCarDeviceNo.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&lat=" + encodeURIComponent(if (hasValidPosition) {
                     latitude.toString(10)
                 } else {
                     ""
@@ -911,7 +911,7 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isCarSelected()) {
                     return
                 }
-                uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?imei=" + encodeURIComponent(currentCarImei.value) + "&deptId=" + encodeURIComponent(currentCarDeptId.value) + "&deviceId=" + encodeURIComponent(currentCarDeviceId.value)))
+                uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?deviceNo=" + encodeURIComponent(currentCarDeviceNo.value) + "&deptId=" + encodeURIComponent(currentCarDeptId.value) + "&deviceId=" + encodeURIComponent(currentCarDeviceId.value)))
             }
             val toAdd = fun(){
                 if (!isLogin()) {
@@ -955,7 +955,7 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isCarSelected()) {
                     return
                 }
-                uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?imei=" + encodeURIComponent(currentCarImei.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&deptId=" + encodeURIComponent(currentCarDeptId.value) + "&deviceName=" + encodeURIComponent(currentCarName.value)))
+                uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?deviceNo=" + encodeURIComponent(currentCarDeviceNo.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&deptId=" + encodeURIComponent(currentCarDeptId.value) + "&deviceName=" + encodeURIComponent(currentCarName.value)))
             }
             val contactCustomerService = fun(){
                 showAppToast(ShowToastOptions(title = "请在微信小程序中联系客服", icon = "none"))
@@ -967,6 +967,10 @@ open class GenPagesIndexIndex : BasePage {
                     return
                 }
                 if (!isCarSelected()) {
+                    return
+                }
+                if (!(iccid != "") || iccid.trim().length === 0) {
+                    showAppToast(ShowToastOptions(title = "未配置充值号，请联系客服。", icon = "none"))
                     return
                 }
                 if (simMerchant.toLowerCase() == "zddx") {

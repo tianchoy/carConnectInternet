@@ -946,6 +946,11 @@ const sendCommand = (data) => {
     return basicResponse(raw);
   });
 };
+const restoreOilPower = (data) => {
+  return api_http.put(sendcmd, data).then((raw = null) => {
+    return basicResponse(raw);
+  });
+};
 const getDevicePos = (data) => {
   return api_http.get(devicePos, data).then((raw = null) => {
     const response = api_response.asJSONObject(raw);
@@ -1229,6 +1234,7 @@ exports.logout = logout;
 exports.personalPasswordLogin = personalPasswordLogin;
 exports.registerPersonalUser = registerPersonalUser;
 exports.resetForgotPassword = resetForgotPassword;
+exports.restoreOilPower = restoreOilPower;
 exports.retryAppCommand = retryAppCommand;
 exports.revokeDeviceShare = revokeDeviceShare;
 exports.sendAppCommand = sendAppCommand;

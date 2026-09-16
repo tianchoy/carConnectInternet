@@ -19,7 +19,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-const imei = ref('')
+const deviceNo = ref('')
 const deviceId = ref('')
 const activeTab = ref('send')
 const tabItems: Array<UTSJSONObject> = [
@@ -149,7 +149,7 @@ function getStatusClass(record: UTSJSONObject | null): string {
 }
 
 const displayDeviceIdentity = computed<string>(() : string => {
-	return imei.value != '' ? imei.value : (deviceId.value != '' ? '设备 ' + deviceId.value : '未识别设备')
+	return deviceNo.value != '' ? deviceNo.value : (deviceId.value != '' ? '设备 ' + deviceId.value : '未识别设备')
 })
 
 const isHistoryInitialLoading = computed<boolean>(() : boolean => {
@@ -523,7 +523,7 @@ function changeTab(value: string): void {
 }
 
 onLoad((options) => {
-	imei.value = options.imei ?? ''
+	deviceNo.value = options.deviceNo ?? ''
 	deviceId.value = options.deviceId ?? ''
 	if (deviceId.value != '') void loadAvailableCommands()
 })

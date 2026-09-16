@@ -22,7 +22,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesGeofencingGeofencing
             val _cache = __ins.renderCache
-            val imei = ref<String?>(null)
+            val deviceNo = ref<String?>(null)
             val connectionStatus = ref<String?>(null)
             val deptId = ref<String?>(null)
             val carType = ref<String?>(null)
@@ -97,7 +97,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         uni_showLoading(ShowLoadingOptions(title = "获取车辆位置中..."))
                         try {
                             isMapReady.value = false
-                            val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to imei.value)
+                            val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to deviceNo.value)
                             val res = await(getDevicePos(data))
                             val positions = res.data
                             if (!isBusinessSuccessCode(res.code) || positions == null) {
@@ -110,7 +110,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 return@w1
                             }
                             positions.forEach(fun(item){
-                                if (item.getString("imei", "") == imei.value) {
+                                if (item.getString("deviceNo", "") == deviceNo.value) {
                                     val deviceData = item
                                     val latitude = deviceData.getNumber("latitude", 0)
                                     val longitude = deviceData.getNumber("longitude", 0)
@@ -854,13 +854,13 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     loadUnboundDevices(currentFenceId.value)
                 }
             }
-            val toggleDeviceBinding = fun(deviceImei: String, bound: Boolean): UTSPromise<Unit> {
+            val toggleDeviceBinding = fun(deviceNo: String, bound: Boolean): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log("toggleDeviceBinding", deviceImei, bound)
+                        console.log("toggleDeviceBinding", deviceNo, bound)
                         loading.value = true
                         try {
-                            val params: UTSJSONObject = _uO("geofenceId" to (currentFenceId.value ?: ""), "imeis" to _uA(
-                                deviceImei
+                            val params: UTSJSONObject = _uO("geofenceId" to (currentFenceId.value ?: ""), "deviceNos" to _uA(
+                                deviceNo
                             ))
                             console.log("toggleDeviceBindingparams", params)
                             var result: Any
@@ -901,9 +901,9 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         }
                 })
             }
-            val isDeviceBound = fun(deviceImei: String): Boolean {
+            val isDeviceBound = fun(deviceNo: String): Boolean {
                 return boundDevices.value.some(fun(device: UTSJSONObject): Boolean {
-                    return device.getString("imei", "") === deviceImei
+                    return device.getString("deviceNo", "") === deviceNo
                 }
                 )
             }
@@ -924,14 +924,14 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 selectedFence.value = null
                 updateMapDisplay()
             }
-            fun gen_handleDeviceBindingChange_fn(deviceImei: String, bound: Boolean): Unit {
-                toggleDeviceBinding(deviceImei, bound)
+            fun gen_handleDeviceBindingChange_fn(deviceNo: String, bound: Boolean): Unit {
+                toggleDeviceBinding(deviceNo, bound)
             }
             val handleDeviceBindingChange = ::gen_handleDeviceBindingChange_fn
-            fun gen_getDeviceImei_fn(device: UTSJSONObject): String {
-                return device.getString("imei", "")
+            fun gen_getDeviceNo_fn(device: UTSJSONObject): String {
+                return device.getString("deviceNo", "")
             }
-            val getDeviceImei = ::gen_getDeviceImei_fn
+            val getDeviceNo = ::gen_getDeviceNo_fn
             fun gen_isDeviceOnline_fn(device: UTSJSONObject): Boolean {
                 return device.getString("connectionStatus", "") === "online"
             }
@@ -944,7 +944,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     if (device.getString("plateNo", "") != "") {
                         device.getString("plateNo", "")
                     } else {
-                        device.getString("imei", "")
+                        device.getString("deviceNo", "")
                     }
                 }
             }
@@ -1087,7 +1087,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             onLoad(fun(option){
                 console.log("加载参数", option)
                 connectionStatus.value = option["connectionStatus"]
-                imei.value = option["imei"]
+                deviceNo.value = option["deviceNo"]
                 val routeDeviceName = normalizeRouteValue(option["deviceName"] ?: "")
                 val routePlateNo = normalizeRouteValue(option["plateNo"] ?: "")
                 currentCar.value = if (routePlateNo != "") {
@@ -1096,7 +1096,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     if (routeDeviceName != "") {
                         routeDeviceName
                     } else {
-                        (imei.value ?: "未命名设备")
+                        (deviceNo.value ?: "未命名设备")
                     }
                 }
                 deptId.value = option["deptId"]
@@ -1459,10 +1459,10 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                     )),
                                     _cE("scroll-view", _uM("class" to "device-list", "scroll-y" to "true", "show-scrollbar" to false, "scroll-top" to scrollTop.value, "onScrolltolower" to handleLoadMore, "lower-threshold" to 150), _uA(
                                         _cE(Fragment, null, RenderHelpers.renderList(deviceList.value, fun(device, __key, __index, _cached): Any {
-                                            return _cE("view", _uM("key" to getDeviceImei(device), "class" to "device-item"), _uA(
+                                            return _cE("view", _uM("key" to getDeviceNo(device), "class" to "device-item"), _uA(
                                                 _cE("view", _uM("class" to "device-info"), _uA(
                                                     _cE("text", _uM("class" to "name"), _tD(getDeviceDisplayName(device)), 1),
-                                                    if (isTrue(getDeviceImei(device))) {
+                                                    if (isTrue(getDeviceNo(device))) {
                                                         _cE("text", _uM("key" to 0, "class" to "status"), _tD(if (isDeviceOnline(device)) {
                                                             "在线"
                                                         } else {
@@ -1472,8 +1472,8 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                                         _cC("v-if", true)
                                                     }
                                                 )),
-                                                _cV(_component_i_switch, _uM("model-value" to isDeviceBound(getDeviceImei(device)), "onChange" to fun(`$event`: Any){
-                                                    handleDeviceBindingChange(getDeviceImei(device), `$event` as Boolean)
+                                                _cV(_component_i_switch, _uM("model-value" to isDeviceBound(getDeviceNo(device)), "onChange" to fun(`$event`: Any){
+                                                    handleDeviceBindingChange(getDeviceNo(device), `$event` as Boolean)
                                                 }
                                                 , "disabled" to (loading.value || loadingMore.value), "size" to "20"), null, 8, _uA(
                                                     "model-value",

@@ -32,7 +32,7 @@ const carStatus = ref('在线')
 
 	const startTime = ref('')
 	const endTime = ref('')
-	const imei = ref<string | null>('')
+	const deviceNo = ref<string | null>('')
 	const carStopDetail = ref<Array<StopRecord>>([])
 	const getStopNumber = (item: UTSJSONObject, key: string): number => item.getNumber(key, 0)
 	const getStopText = (item: UTSJSONObject, key: string): string => item.getString(key, '')
@@ -51,7 +51,7 @@ const carStatus = ref('在线')
 	})
 
 	onLoad((option) => {
-		imei.value = option.imei
+		deviceNo.value = option.deviceNo
 	})
 
 	const initDateTime = () => {
@@ -86,7 +86,7 @@ const carStatus = ref('在线')
 			title: '加载中...'
 		})
 		const data = {
-			imei: imei.value,
+			deviceNo: deviceNo.value,
 			startTime: startTime.value,
 			endTime: endTime.value,
 			minParkTime: 10,

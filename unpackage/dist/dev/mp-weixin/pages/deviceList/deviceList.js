@@ -38,14 +38,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const originalDeviceList = common_vendor.ref([]);
     const deviceListItems = common_vendor.computed(() => {
       return originalDeviceList.value.map((item) => {
-        const imei = item.getString("imei", "");
+        const deviceNo = item.getString("deviceNo", "");
         const rawDeviceName = item.getString("deviceName", "");
         return new utils_device.DeviceItem({
           plateNo: item.getString("plateNo", ""),
-          imei,
+          deviceNo,
           status: item.getNumber("status", 0),
           companyId: item.getString("companyId", ""),
-          deviceName: rawDeviceName != "" ? rawDeviceName : imei,
+          deviceName: rawDeviceName != "" ? rawDeviceName : deviceNo,
           deviceId: item.getString("deviceId", ""),
           iccid: item.getString("iccid", ""),
           simMerchant: item.getString("simMerchant", ""),
@@ -187,11 +187,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:209", "未找到对应的设备信息", markerId);
         return null;
       }
-      const imeiValue = (_a = selectedDevice["imei"]) !== null && _a !== void 0 ? _a : "";
+      const deviceNoValue = (_a = selectedDevice["deviceNo"]) !== null && _a !== void 0 ? _a : "";
       const companyId = (_b = selectedDevice["companyId"]) !== null && _b !== void 0 ? _b : "";
       const deviceId = (_c = selectedDevice["deviceId"]) !== null && _c !== void 0 ? _c : "";
       common_vendor.index.navigateTo({
-        url: "/pages/carInfoDetail/carInfoDetail?imei=" + imeiValue + "&deptId=" + companyId.toString() + "&deviceId=" + deviceId.toString()
+        url: "/pages/carInfoDetail/carInfoDetail?deviceNo=" + deviceNoValue + "&deptId=" + companyId.toString() + "&deviceId=" + deviceId.toString()
       });
     };
     common_vendor.onLoad((options) => {

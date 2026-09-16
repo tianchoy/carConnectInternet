@@ -139,7 +139,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cE("text", _uM({ class: "title" }), _tD(item.getString('deviceName', '')), 1 /* TEXT */),
             _cE("view", _uM({ class: "device-info" }), [
               _cE("text", null, _tD(item.getString('plateNo', '')), 1 /* TEXT */),
-              _cE("text", _uM({ class: "tel" }), _tD(item.getString('imei', '')), 1 /* TEXT */)
+              _cE("text", _uM({ class: "tel" }), _tD(item.getString('deviceNo', '')), 1 /* TEXT */)
             ])
           ], 8 /* PROPS */, ["onClick"])
         }), 128 /* KEYED_FRAGMENT */),

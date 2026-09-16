@@ -28,7 +28,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
             val pickerTitle = ref("选择开始时间")
             val startTime = ref("")
             val endTime = ref("")
-            val imei = ref<String?>("")
+            val deviceNo = ref<String?>("")
             val carStopDetail = ref(_uA<StopRecord>())
             val sortedCarStopDetail = computed(fun(): UTSArray<StopRecord> {
                 val sorted = carStopDetail.value.slice()
@@ -52,7 +52,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
             }
             )
             onLoad(fun(option){
-                imei.value = option["imei"]
+                deviceNo.value = option["deviceNo"]
             }
             )
             val initDateTime = fun(){
@@ -80,7 +80,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
             val loadStopData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("deviceNo" to deviceNo.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             val trackData = res.data

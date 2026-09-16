@@ -19,7 +19,7 @@ const enabled = ref(false)
 const loadingEnabled = ref(true)
 const deviceId = ref('')
 const deviceName = ref('')
-const imei = ref('')
+const deviceNo = ref('')
 const targetPhone = ref('')
 const expireDate = ref('')
 const submitting = ref(false)
@@ -46,7 +46,7 @@ const normalizeRouteValue = (value: any): string => {
 
 const displayDeviceName = computed((): string => {
 	if (deviceName.value != '' && deviceName.value != 'null' && deviceName.value != 'undefined') return deviceName.value
-	if (imei.value != '' && imei.value != 'null' && imei.value != 'undefined') return imei.value
+	if (deviceNo.value != '' && deviceNo.value != 'null' && deviceNo.value != 'undefined') return deviceNo.value
 	return '--'
 })
 
@@ -134,7 +134,7 @@ const clearExpireDate = (): void => { expireDate.value = '' }
 const submitShare = async (): Promise<void> => {
 	if (submitting.value) return
 	if (deviceId.value == '') {
-		showAppToast({ title: '设备ID不能为空', icon: 'none' })
+		showAppToast({ title: '设备编号不能为空', icon: 'none' })
 		return
 	}
 	const phone = targetPhone.value.trim()
@@ -235,8 +235,8 @@ const initializeDeviceShare = async (): Promise<void> => {
 onLoad((options) => {
 	deviceId.value = normalizeRouteValue(options.deviceId ?? '')
 	deviceName.value = normalizeRouteValue(options.deviceName ?? '')
-	imei.value = normalizeRouteValue(options.imei ?? '')
-	console.log('imei:', imei.value, deviceName.value)
+	deviceNo.value = normalizeRouteValue(options.deviceNo ?? '')
+	console.log('deviceNo:', deviceNo.value, deviceName.value)
 	void initializeDeviceShare()
 })
 

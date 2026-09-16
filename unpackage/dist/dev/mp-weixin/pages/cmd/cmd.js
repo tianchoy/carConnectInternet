@@ -28,7 +28,7 @@ const historyPageSize = 10;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "cmd",
   setup(__props) {
-    const imei = common_vendor.ref("");
+    const deviceNo = common_vendor.ref("");
     const deviceId = common_vendor.ref("");
     const activeTab = common_vendor.ref("send");
     const tabItems = [
@@ -174,7 +174,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return "status-pending";
     }
     const displayDeviceIdentity = common_vendor.computed(() => {
-      return imei.value != "" ? imei.value : deviceId.value != "" ? "设备 " + deviceId.value : "未识别设备";
+      return deviceNo.value != "" ? deviceNo.value : deviceId.value != "" ? "设备 " + deviceId.value : "未识别设备";
     });
     const isHistoryInitialLoading = common_vendor.computed(() => {
       return isHistoryLoading.value && !hasLoadedHistory.value && historyRecords.value.length == 0;
@@ -565,7 +565,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     common_vendor.onLoad((options) => {
       var _a, _b;
-      imei.value = (_a = options.imei) !== null && _a !== void 0 ? _a : "";
+      deviceNo.value = (_a = options.deviceNo) !== null && _a !== void 0 ? _a : "";
       deviceId.value = (_b = options.deviceId) !== null && _b !== void 0 ? _b : "";
       if (deviceId.value != "")
         void loadAvailableCommands();

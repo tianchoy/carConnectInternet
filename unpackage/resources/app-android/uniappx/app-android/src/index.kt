@@ -984,6 +984,12 @@ val sendCommand = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
     }
     )
 }
+val restoreOilPower = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return put(sendcmd, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
 val getDevicePos = fun(data: UTSJSONObject): UTSPromise<DevicePositionResponse> {
     return get(devicePos, data).then(fun(raw: Any): DevicePositionResponse {
         val response = asJSONObject(raw)
@@ -5038,7 +5044,7 @@ open class Device (
     @JsonNotNull
     open var value: String,
     @JsonNotNull
-    open var imei: String,
+    open var deviceNo: String,
     @JsonNotNull
     open var deptId: String,
     @JsonNotNull
@@ -5067,7 +5073,7 @@ class DeviceReactiveObject : Device, IUTSReactive<Device> {
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: Device, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(name = __v_raw.name, deviceName = __v_raw.deviceName, value = __v_raw.value, imei = __v_raw.imei, deptId = __v_raw.deptId, deviceId = __v_raw.deviceId, iccid = __v_raw.iccid, simMerchant = __v_raw.simMerchant, connectionStatus = __v_raw.connectionStatus, carType = __v_raw.carType, plateNo = __v_raw.plateNo, latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
+    constructor(__v_raw: Device, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(name = __v_raw.name, deviceName = __v_raw.deviceName, value = __v_raw.value, deviceNo = __v_raw.deviceNo, deptId = __v_raw.deptId, deviceId = __v_raw.deviceId, iccid = __v_raw.iccid, simMerchant = __v_raw.simMerchant, connectionStatus = __v_raw.connectionStatus, carType = __v_raw.carType, plateNo = __v_raw.plateNo, latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
@@ -5112,17 +5118,17 @@ class DeviceReactiveObject : Device, IUTSReactive<Device> {
             __v_raw.value = value
             _tRS(__v_raw, "value", oldValue, value)
         }
-    override var imei: String
+    override var deviceNo: String
         get() {
-            return _tRG(__v_raw, "imei", __v_raw.imei, __v_isReadonly, __v_isShallow)
+            return _tRG(__v_raw, "deviceNo", __v_raw.deviceNo, __v_isReadonly, __v_isShallow)
         }
         set(value) {
-            if (!__v_canSet("imei")) {
+            if (!__v_canSet("deviceNo")) {
                 return
             }
-            val oldValue = __v_raw.imei
-            __v_raw.imei = value
-            _tRS(__v_raw, "imei", oldValue, value)
+            val oldValue = __v_raw.deviceNo
+            __v_raw.deviceNo = value
+            _tRS(__v_raw, "deviceNo", oldValue, value)
         }
     override var deptId: String
         get() {
@@ -5415,7 +5421,7 @@ open class SavedDevice (
     @JsonNotNull
     open var deviceName: String,
     @JsonNotNull
-    open var imei: String,
+    open var deviceNo: String,
     @JsonNotNull
     open var deptId: String,
     @JsonNotNull
@@ -6135,7 +6141,7 @@ open class CarFormData (
     @JsonNotNull
     open var deviceName: String,
     @JsonNotNull
-    open var imei: String,
+    open var deviceNo: String,
     @JsonNotNull
     open var deviceType: String,
     @JsonNotNull
@@ -6154,7 +6160,7 @@ class CarFormDataReactiveObject : CarFormData, IUTSReactive<CarFormData> {
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: CarFormData, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(deviceName = __v_raw.deviceName, imei = __v_raw.imei, deviceType = __v_raw.deviceType, deviceTypeValue = __v_raw.deviceTypeValue, plateNo = __v_raw.plateNo, carType = __v_raw.carType) {
+    constructor(__v_raw: CarFormData, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(deviceName = __v_raw.deviceName, deviceNo = __v_raw.deviceNo, deviceType = __v_raw.deviceType, deviceTypeValue = __v_raw.deviceTypeValue, plateNo = __v_raw.plateNo, carType = __v_raw.carType) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
@@ -6175,17 +6181,17 @@ class CarFormDataReactiveObject : CarFormData, IUTSReactive<CarFormData> {
             __v_raw.deviceName = value
             _tRS(__v_raw, "deviceName", oldValue, value)
         }
-    override var imei: String
+    override var deviceNo: String
         get() {
-            return _tRG(__v_raw, "imei", __v_raw.imei, __v_isReadonly, __v_isShallow)
+            return _tRG(__v_raw, "deviceNo", __v_raw.deviceNo, __v_isReadonly, __v_isShallow)
         }
         set(value) {
-            if (!__v_canSet("imei")) {
+            if (!__v_canSet("deviceNo")) {
                 return
             }
-            val oldValue = __v_raw.imei
-            __v_raw.imei = value
-            _tRS(__v_raw, "imei", oldValue, value)
+            val oldValue = __v_raw.deviceNo
+            __v_raw.deviceNo = value
+            _tRS(__v_raw, "deviceNo", oldValue, value)
         }
     override var deviceType: String
         get() {
@@ -9552,7 +9558,7 @@ open class DeviceItem (
     @JsonNotNull
     open var plateNo: String,
     @JsonNotNull
-    open var imei: String,
+    open var deviceNo: String,
     @JsonNotNull
     open var status: Number,
     @JsonNotNull
@@ -9577,7 +9583,7 @@ class DeviceItemReactiveObject : DeviceItem, IUTSReactive<DeviceItem> {
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: DeviceItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(plateNo = __v_raw.plateNo, imei = __v_raw.imei, status = __v_raw.status, companyId = __v_raw.companyId, deviceName = __v_raw.deviceName, deviceId = __v_raw.deviceId, iccid = __v_raw.iccid, simMerchant = __v_raw.simMerchant, connectionStatus = __v_raw.connectionStatus) {
+    constructor(__v_raw: DeviceItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(plateNo = __v_raw.plateNo, deviceNo = __v_raw.deviceNo, status = __v_raw.status, companyId = __v_raw.companyId, deviceName = __v_raw.deviceName, deviceId = __v_raw.deviceId, iccid = __v_raw.iccid, simMerchant = __v_raw.simMerchant, connectionStatus = __v_raw.connectionStatus) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
@@ -9598,17 +9604,17 @@ class DeviceItemReactiveObject : DeviceItem, IUTSReactive<DeviceItem> {
             __v_raw.plateNo = value
             _tRS(__v_raw, "plateNo", oldValue, value)
         }
-    override var imei: String
+    override var deviceNo: String
         get() {
-            return _tRG(__v_raw, "imei", __v_raw.imei, __v_isReadonly, __v_isShallow)
+            return _tRG(__v_raw, "deviceNo", __v_raw.deviceNo, __v_isReadonly, __v_isShallow)
         }
         set(value) {
-            if (!__v_canSet("imei")) {
+            if (!__v_canSet("deviceNo")) {
                 return
             }
-            val oldValue = __v_raw.imei
-            __v_raw.imei = value
-            _tRS(__v_raw, "imei", oldValue, value)
+            val oldValue = __v_raw.deviceNo
+            __v_raw.deviceNo = value
+            _tRS(__v_raw, "deviceNo", oldValue, value)
         }
     override var status: Number
         get() {

@@ -163,13 +163,13 @@ const __sfc__ = defineComponent({
                                         _cE("view", _uM({ class: "value" }), _tD(item["iccid"]), 1 /* TEXT */)
                                     ])
                                     : _cC("v-if", true),
-                                isTrue(isTruthy(item["imei"]) ? item["imei"] != '' : item["imei"])
+                                isTrue(isTruthy(item["deviceNo"]) ? item["deviceNo"] != '' : item["deviceNo"])
                                     ? _cE("view", _uM({
                                         key: 1,
                                         class: "device-info"
                                     }), [
                                         _cE("view", _uM({ class: "label" }), "ID:"),
-                                        _cE("view", _uM({ class: "value" }), _tD(item["imei"]), 1 /* TEXT */)
+                                        _cE("view", _uM({ class: "value" }), _tD(item["deviceNo"]), 1 /* TEXT */)
                                     ])
                                     : _cC("v-if", true),
                                 _cE("view", _uM({ class: "device-info" }), [

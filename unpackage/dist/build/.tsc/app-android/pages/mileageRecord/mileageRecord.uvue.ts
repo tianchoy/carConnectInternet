@@ -37,7 +37,7 @@ const carStatus = ref('在线')
 
 	const startTime = ref('')
 	const endTime = ref('')
-	const imei = ref<string | null>('')
+	const deviceNo = ref<string | null>('')
 
 	// 计算属性：按日期分组的行程数据
 	const groupedTrips = computed<Array<GroupType>>(() : Array<GroupType> => {
@@ -153,10 +153,10 @@ const carStatus = ref('在线')
 		uni.showLoading({
 			title: '加载中...',
 		})
-		if (!imei.value) return;
+		if (!deviceNo.value) return;
 		try {
 			const data = {
-				imei: imei.value,
+				deviceNo: deviceNo.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
 				minParkTime: 120,
@@ -194,7 +194,7 @@ const carStatus = ref('在线')
 	})
 
 	onLoad((option) => {
-		imei.value = option.imei ?? null
+		deviceNo.value = option.deviceNo ?? null
 		carStatus.value = option.connectionStatus ?? '在线'
 		plateNo.value = option.plateNo ?? ''
 		carType.value = option.carType ?? ''
@@ -202,7 +202,7 @@ const carStatus = ref('在线')
 
 	const gotoTripDetail = (startTime : string, endTime : string) => {
 		uni.navigateTo({
-			url: '/pages/playBack/playBack?startTime=' + startTime + '&endTime=' + endTime + '&imei=' + imei.value + '&connectionStatus=' + carStatus.value + '&plateNo=' + plateNo.value + '&carType=' + carType.value
+			url: '/pages/playBack/playBack?startTime=' + startTime + '&endTime=' + endTime + '&deviceNo=' + deviceNo.value + '&connectionStatus=' + carStatus.value + '&plateNo=' + plateNo.value + '&carType=' + carType.value
 		})
 	}
 

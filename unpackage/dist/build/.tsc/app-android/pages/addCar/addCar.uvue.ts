@@ -19,7 +19,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	type CarFormData = {
 		deviceName: string
-		imei: string
+		deviceNo: string
 		deviceType: string
 		deviceTypeValue: string
 		plateNo: string
@@ -54,7 +54,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 
 	const carInfo = ref<CarFormData>({
 		deviceName: '',
-		imei: '',
+		deviceNo: '',
 		deviceType: '',
 		deviceTypeValue: '',
 		plateNo: '',
@@ -65,7 +65,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 
 	// ===== 表单验证规则 =====
 	const rules = [
-		{ name: 'imei', required: true, message: '请输入设备ID' } as UTSJSONObject,
+		{ name: 'deviceNo', required: true, message: '请输入设备编号' } as UTSJSONObject,
 		{ name: 'deviceType', required: true, message: '请选择设备图标' } as UTSJSONObject
 	] as Array<UTSJSONObject>
 
@@ -134,15 +134,15 @@ const isRequestingCameraPermission = ref<boolean>(false)
 	const handleScanResult = (data: ScanResultData) => {
 		console.log('接收到扫码结果:', data.result)
 		if (data.result.length == 15) {
-			carInfo.value.imei = '0' + data.result.slice(4, 15)
+			carInfo.value.deviceNo = '0' + data.result.slice(4, 15)
 			return
 		}
 		if (data.result.length == 11) {
-			carInfo.value.imei = '0' + data.result
+			carInfo.value.deviceNo = '0' + data.result
 			return
 		}
 		showAppToast({
-			title: '扫码结果长度不是标准设备ID，请确认后提交',
+			title: '扫码结果长度不是标准设备编号，请确认后提交',
 			icon: 'none'
 		})
 	}
@@ -173,9 +173,9 @@ const isRequestingCameraPermission = ref<boolean>(false)
 
 	// ===== 表单验证 =====
 	const validateForm = (): boolean => {
-		if (carInfo.value.imei.length == 0) {
+		if (carInfo.value.deviceNo.length == 0) {
 			showAppToast({
-				title: '请输入设备ID',
+				title: '请输入设备编号',
 				icon: 'none'
 			})
 			return false
@@ -207,7 +207,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 
 			const submitData = {
 				deviceName: carInfo.value.deviceName,
-				imei: carInfo.value.imei,
+				deviceNo: carInfo.value.deviceNo,
 				carType: carInfo.value.deviceType,
 				plateNo: carInfo.value.plateNo
 			}
@@ -342,17 +342,17 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               _: 1 /* STABLE */
             })),
             _cV(_component_i_form_item, _uM({
-              label: "设备ID",
-              name: "imei",
+              label: "设备编号",
+              name: "deviceNo",
               required: "",
               labelDirection: "horizontal"
             }), _uM({
               default: withSlotCtx((): any[] => [
                 _cV(_component_i_input, _uM({
                   border: "none",
-                  modelValue: carInfo.value.imei,
-                  "onUpdate:modelValue": $event => {(carInfo.value.imei) = $event},
-                  placeholder: "请输入设备ID(必填)"
+                  modelValue: carInfo.value.deviceNo,
+                  "onUpdate:modelValue": $event => {(carInfo.value.deviceNo) = $event},
+                  placeholder: "请输入设备编号(必填)"
                 }), _uM({
                   suffix: withSlotCtx((): any[] => [
                     _cV(_component_i_icon, _uM({

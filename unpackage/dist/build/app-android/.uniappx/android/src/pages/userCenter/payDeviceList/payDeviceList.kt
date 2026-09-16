@@ -140,15 +140,15 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                                         _cC("v-if", true)
                                     }
                                     ,
-                                    if (isTrue(if (isTruthy(item["imei"])) {
-                                        item["imei"] != ""
+                                    if (isTrue(if (isTruthy(item["deviceNo"])) {
+                                        item["deviceNo"] != ""
                                     } else {
-                                        item["imei"]
+                                        item["deviceNo"]
                                     }
                                     )) {
                                         _cE("view", _uM("key" to 1, "class" to "device-info"), _uA(
                                             _cE("view", _uM("class" to "label"), "ID:"),
-                                            _cE("view", _uM("class" to "value"), _tD(item["imei"]), 1)
+                                            _cE("view", _uM("class" to "value"), _tD(item["deviceNo"]), 1)
                                         ))
                                     } else {
                                         _cC("v-if", true)

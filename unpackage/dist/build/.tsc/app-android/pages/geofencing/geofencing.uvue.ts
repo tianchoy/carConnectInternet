@@ -63,7 +63,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-const imei = ref<string | null>(null)
+const deviceNo = ref<string | null>(null)
 	const connectionStatus = ref<string | null>(null)
 	const deptId = ref<string | null>(null)
 	const carType = ref<string | null>(null)
@@ -162,7 +162,7 @@ const imei = ref<string | null>(null)
 
 		try {
 			isMapReady.value = false
-			const data = { deptId: deptId.value, deviceids: imei.value }
+			const data = { deptId: deptId.value, deviceids: deviceNo.value }
 			const res = await getDevicePos(data)
 			const positions = res.data
 			if (!isBusinessSuccessCode(res.code) || positions == null) {
@@ -171,7 +171,7 @@ const imei = ref<string | null>(null)
 			}
 
 			positions.forEach(item => {
-				if (item.getString('imei', '') == imei.value) {
+				if (item.getString('deviceNo', '') == deviceNo.value) {
 					const deviceData = item
 					const latitude = deviceData.getNumber('latitude', 0)
 					const longitude = deviceData.getNumber('longitude', 0)
@@ -939,13 +939,13 @@ const imei = ref<string | null>(null)
 	}
 
 	// 切换设备绑定状态
-	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) : Promise<void> => {
-		console.log('toggleDeviceBinding', deviceImei, bound)
+	const toggleDeviceBinding = async (deviceNo : string, bound : boolean) : Promise<void> => {
+		console.log('toggleDeviceBinding', deviceNo, bound)
 		loading.value = true
 		try {
 			const params = {
 				geofenceId: currentFenceId.value ?? '',
-				imeis: [deviceImei]
+				deviceNos: [deviceNo]
 			} as UTSJSONObject
 			console.log('toggleDeviceBindingparams', params)
 			let result : any
@@ -979,8 +979,8 @@ const imei = ref<string | null>(null)
 	}
 
 	// 检查设备是否已绑定
-	const isDeviceBound = (deviceImei : string) : boolean => {
-		return boundDevices.value.some((device : UTSJSONObject) : boolean => device.getString('imei', '') === deviceImei)
+	const isDeviceBound = (deviceNo : string) : boolean => {
+		return boundDevices.value.some((device : UTSJSONObject) : boolean => device.getString('deviceNo', '') === deviceNo)
 	}
 
 	/* 电子围栏绘制功能 */
@@ -1006,12 +1006,12 @@ const imei = ref<string | null>(null)
 		updateMapDisplay()
 	}
 
-	function handleDeviceBindingChange(deviceImei : string, bound : boolean) : void {
-		void toggleDeviceBinding(deviceImei, bound)
+	function handleDeviceBindingChange(deviceNo : string, bound : boolean) : void {
+		void toggleDeviceBinding(deviceNo, bound)
 	}
 
-	function getDeviceImei(device : UTSJSONObject) : string {
-		return device.getString('imei', '')
+	function getDeviceNo(device : UTSJSONObject) : string {
+		return device.getString('deviceNo', '')
 	}
 
 	function isDeviceOnline(device : UTSJSONObject) : boolean {
@@ -1020,7 +1020,7 @@ const imei = ref<string | null>(null)
 
 	function getDeviceDisplayName(device : UTSJSONObject) : string {
 		const deviceName = device.getString('deviceName', '')
-		return deviceName ? deviceName : device.getString('plateNo', '') ? device.getString('plateNo', '') : device.getString('imei', '')
+		return deviceName ? deviceName : device.getString('plateNo', '') ? device.getString('plateNo', '') : device.getString('deviceNo', '')
 	}
 
 	function getSelectedFenceName() : string {
@@ -1205,10 +1205,10 @@ const imei = ref<string | null>(null)
 	onLoad((option) => {
 		console.log('加载参数', option)
 		connectionStatus.value = option.connectionStatus
-		imei.value = option.imei
+		deviceNo.value = option.deviceNo
 		const routeDeviceName = normalizeRouteValue(option.deviceName ?? '')
 		const routePlateNo = normalizeRouteValue(option.plateNo ?? '')
-		currentCar.value = routePlateNo != '' ? routePlateNo : (routeDeviceName != '' ? routeDeviceName : (imei.value ?? '未命名设备'))
+		currentCar.value = routePlateNo != '' ? routePlateNo : (routeDeviceName != '' ? routeDeviceName : (deviceNo.value ?? '未命名设备'))
 		deptId.value = option.deptId
 		carType.value = normalizeRouteValue(option.carType ?? '')
 		deviceName.value = routeDeviceName != '' ? routeDeviceName : currentCar.value
@@ -1591,12 +1591,12 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
             }), [
               _cE(Fragment, null, RenderHelpers.renderList(deviceList.value, (device, __key, __index, _cached): any => {
                 return _cE("view", _uM({
-                  key: getDeviceImei(device),
+                  key: getDeviceNo(device),
                   class: "device-item"
                 }), [
                   _cE("view", _uM({ class: "device-info" }), [
                     _cE("text", _uM({ class: "name" }), _tD(getDeviceDisplayName(device)), 1 /* TEXT */),
-                    isTrue(getDeviceImei(device))
+                    isTrue(getDeviceNo(device))
                       ? _cE("text", _uM({
                           key: 0,
                           class: "status"
@@ -1604,8 +1604,8 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                       : _cC("v-if", true)
                   ]),
                   _cV(_component_i_switch, _uM({
-                    "model-value": isDeviceBound(getDeviceImei(device)),
-                    onChange: ($event: any) => {handleDeviceBindingChange(getDeviceImei(device), $event as boolean)},
+                    "model-value": isDeviceBound(getDeviceNo(device)),
+                    onChange: ($event: any) => {handleDeviceBindingChange(getDeviceNo(device), $event as boolean)},
                     disabled: loading.value || loadingMore.value,
                     size: "20"
                   }), null, 8 /* PROPS */, ["model-value", "onChange", "disabled"])

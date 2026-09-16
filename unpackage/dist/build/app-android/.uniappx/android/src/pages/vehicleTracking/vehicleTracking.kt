@@ -22,7 +22,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesVehicleTrackingVehicleTracking
             val _cache = __ins.renderCache
-            val imei = ref<String>("")
+            val deviceNo = ref<String>("")
             val connectionStatus = ref<String>("")
             val deviceId = ref<String>("")
             val deptId = ref<String>("")
@@ -85,7 +85,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 return wrapUTSPromise(suspend w1@{
                         isMapReady.value = false
                         try {
-                            val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to imei.value)
+                            val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to deviceNo.value)
                             val res = await(getDevicePos(data))
                             val positions = res.data
                             if (res == null || !isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
@@ -94,8 +94,8 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                             }
                             var foundDevice = false
                             positions.forEach(fun(item: UTSJSONObject){
-                                val itemImei = item.getString("imei", "")
-                                if (itemImei == imei.value) {
+                                val itemDeviceNo = item.getString("deviceNo", "")
+                                if (itemDeviceNo == deviceNo.value) {
                                     foundDevice = true
                                     val latitude = item.getNumber("latitude", 0)
                                     val longitude = item.getNumber("longitude", 0)
@@ -204,13 +204,13 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             onLoad(fun(option){
                 console.log("option", option)
                 connectionStatus.value = option["connectionStatus"] ?: ""
-                imei.value = option["imei"] ?: ""
+                deviceNo.value = option["deviceNo"] ?: ""
                 val displayCarName = normalizeRouteValue(option["plateNo"] ?: "")
                 currentCar.value = if (displayCarName != "") {
                     displayCarName
                 } else {
-                    if (imei.value != "") {
-                        imei.value
+                    if (deviceNo.value != "") {
+                        deviceNo.value
                     } else {
                         "未命名设备"
                     }
@@ -462,13 +462,13 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                         }
                         isTrackRequestPending = true
                         try {
-                            val res = await(getDevicePos(_uO("deptId" to deptId.value, "deviceids" to imei.value)))
+                            val res = await(getDevicePos(_uO("deptId" to deptId.value, "deviceids" to deviceNo.value)))
                             val positions = res.data
                             if (!isTracking.value || sessionId != trackingSessionId || res == null || !isBusinessSuccessCode(res.code) || positions == null) {
                                 return@w1
                             }
                             val item = positions.find(fun(value: UTSJSONObject): Boolean {
-                                return value.getString("imei", "") == imei.value
+                                return value.getString("deviceNo", "") == deviceNo.value
                             }
                             )
                             if (item == null) {

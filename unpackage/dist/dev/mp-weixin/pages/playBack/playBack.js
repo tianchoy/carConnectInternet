@@ -145,7 +145,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }));
     const mapScale = common_vendor.ref(12);
     const isMapReady = common_vendor.ref(false);
-    const imei = common_vendor.ref("");
+    const deviceNo = common_vendor.ref("");
     const carStatus = common_vendor.ref("");
     const plateNo = common_vendor.ref("");
     const carType = common_vendor.ref("");
@@ -594,7 +594,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         clearTrackDisplay();
         common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "加载中..." }));
         const data = new common_vendor.UTSJSONObject({
-          imei: imei.value,
+          deviceNo: deviceNo.value,
           startTime: startTime.value.replace(/\//g, "-"),
           endTime: endTime.value.replace(/\//g, "-"),
           minParkTime: 2,
@@ -781,10 +781,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onLoad((option) => {
       var _a, _b, _c, _d, _f, _g, _h, _j, _k;
-      imei.value = (_a = option.imei) !== null && _a !== void 0 ? _a : null;
+      deviceNo.value = (_a = option.deviceNo) !== null && _a !== void 0 ? _a : null;
       carStatus.value = (_b = option.connectionStatus) !== null && _b !== void 0 ? _b : "";
       const displayCarName = normalizeRouteValue((_c = option.plateNo) !== null && _c !== void 0 ? _c : "");
-      plateNo.value = displayCarName != "" ? displayCarName : (_d = imei.value) !== null && _d !== void 0 ? _d : "未命名设备";
+      plateNo.value = displayCarName != "" ? displayCarName : (_d = deviceNo.value) !== null && _d !== void 0 ? _d : "未命名设备";
       carType.value = normalizeRouteValue((_f = option.carType) !== null && _f !== void 0 ? _f : "");
       lat.value = (_g = option.lat) !== null && _g !== void 0 ? _g : null;
       lng.value = (_h = option.lng) !== null && _h !== void 0 ? _h : null;

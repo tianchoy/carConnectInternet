@@ -35,7 +35,7 @@ type Device = {
     name: string,
     deviceName: string,
     value: string,
-    imei: string,
+    deviceNo: string,
     deptId: string,
     deviceId: string,
     iccid: string,
@@ -73,7 +73,7 @@ type DeviceDetailState = {
 type SavedDevice = {
     name: string
     deviceName: string
-    imei: string
+    deviceNo: string
     deptId: string
     deviceId: string
     iccid: string
@@ -123,7 +123,7 @@ const deviceList = ref<Array<Device>>([])
 // picker 相关变量
 const showPicker = ref(false)
 const pickerValues = ref<PickerValue[]>([])
-const currentCarImei = ref('')
+const currentCarDeviceNo = ref('')
 const currentCarDeptId = ref('')
 const currentCarDeviceId = ref('')
 const currentCarIccId = ref('')
@@ -179,12 +179,12 @@ const batteryPercent = computed<number>(() : number => {
 // 处理车辆列表显示 - 返回 picker 选项
 const pickerColumns = computed<PickerColumn[]>(() => {
     return [deviceList.value.map((device): PickerColumnItem => {
-        const displayName = device.deviceName || device.name || device.imei || '未命名设备'
+        const displayName = device.deviceName || device.name || device.deviceNo || '未命名设备'
         const statusText = device.connectionStatus == 'online' ? '在线' : '离线'
         return {
-            id: device.imei,
+            id: device.deviceNo,
             label: `${displayName} (${statusText})`,
-            value: device.imei || device.deviceId,
+            value: device.deviceNo || device.deviceId,
             disabled: false,
             children: null
         }
@@ -215,9 +215,9 @@ const delay = (ms: number): Promise<void> => {
 const saveSelectedDevice = (device: Device) => {
     try {
         const deviceInfo = {
-            name: device.deviceName || device.name || device.imei,
-            deviceName: device.deviceName || device.name || device.imei,
-            imei: device.imei || device.value,
+            name: device.deviceName || device.name || device.deviceNo,
+            deviceName: device.deviceName || device.name || device.deviceNo,
+            deviceNo: device.deviceNo || device.value,
             deptId: device.deptId,
             deviceId: device.deviceId,
             iccid: device.iccid,
@@ -248,14 +248,14 @@ const decodeSavedDevice = (raw: any): SavedDevice | null => {
         data = raw as UTSJSONObject
     }
     if (data == null) return null
-    const imei = data.getString('imei', '')
+    const deviceNo = data.getString('deviceNo', '')
     const deviceId = data.getString('deviceId', '')
-    if (imei == '' && deviceId == '') return null
-    const identity = imei != '' ? imei : deviceId
+    if (deviceNo == '' && deviceId == '') return null
+    const identity = deviceNo != '' ? deviceNo : deviceId
     const device: SavedDevice = {
         name: data.getString('name', identity),
         deviceName: data.getString('deviceName', data.getString('name', identity)),
-        imei: imei,
+        deviceNo: deviceNo,
         deptId: data.getString('deptId', ''),
         deviceId: deviceId,
         iccid: data.getString('iccid', ''),
@@ -327,7 +327,7 @@ const clearSavedSelectedDeviceIndex = () => {
 const setCurrentCarFromSavedDevice = (savedDevice: any) => {
     const deviceName = savedDevice.deviceName || savedDevice.name || '未命名设备'
     currentCarName.value = deviceName
-    currentCarImei.value = savedDevice.imei || savedDevice.value
+    currentCarDeviceNo.value = savedDevice.deviceNo || savedDevice.value
     currentCarDeptId.value = savedDevice.deptId
     currentCarDeviceId.value = savedDevice.deviceId
     currentCarIccId.value = savedDevice.iccid
@@ -339,13 +339,13 @@ const setCurrentCarFromSavedDevice = (savedDevice: any) => {
     center.longitude = savedDevice.longitude
 }
 
-// 查找设备在当前列表中的索引，IMEI 优先，缺失时使用设备 ID
-const findDeviceIndex = (imei: string, deviceId: string): number => {
-    if (imei != '') {
-        const imeiIndex = deviceList.value.findIndex(device =>
-            device.imei == imei || device.value == imei
+// 查找设备在当前列表中的索引，设备编号优先，缺失时使用设备 ID
+const findDeviceIndex = (deviceNo: string, deviceId: string): number => {
+    if (deviceNo != '') {
+        const deviceNoIndex = deviceList.value.findIndex(device =>
+            device.deviceNo == deviceNo || device.value == deviceNo
         )
-        if (imeiIndex != -1) return imeiIndex
+        if (deviceNoIndex != -1) return deviceNoIndex
     }
     if (deviceId != '') {
         return deviceList.value.findIndex(device => device.deviceId == deviceId)
@@ -363,10 +363,10 @@ const handlePicker = () => {
         return
     }
 
-    const currentIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value)
+    const currentIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value)
     const savedDevice = getSavedSelectedDevice()
     const savedDeviceIndex = savedDevice != null
-        ? findDeviceIndex(savedDevice.imei, savedDevice.deviceId)
+        ? findDeviceIndex(savedDevice.deviceNo, savedDevice.deviceId)
         : -1
     const savedIndex = getSavedSelectedDeviceIndex()
 
@@ -380,7 +380,7 @@ const handlePicker = () => {
     const selectedDevice = deviceList.value[selectedIndex]
     if (selectedDevice == null) return
 
-    pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId]
+    pickerValues.value = [selectedDevice.deviceNo || selectedDevice.deviceId]
     showPicker.value = true
 }
 
@@ -500,7 +500,7 @@ const clearTripData = () : void => {
 }
 
 const clearCurrentCar = (): void => {
-    currentCarImei.value = ''
+    currentCarDeviceNo.value = ''
     currentCarDeptId.value = ''
     currentCarDeviceId.value = ''
     currentCarIccId.value = ''
@@ -548,10 +548,10 @@ const processTripData = (data : UTSJSONObject) : void => {
     }
 }
 
-const createTrackRequestData = (imei: string) : UTSJSONObject => {
+const createTrackRequestData = (deviceNo: string) : UTSJSONObject => {
     const timeRange = getTodayZeroTime()
     return {
-        imei: imei,
+        deviceNo: deviceNo,
         startTime: formatTimes(timeRange.todayZero),
         endTime: formatTimes(timeRange.nowTime),
         minParkTime: 120,
@@ -668,9 +668,9 @@ const loadDeviceData = async (device: Device) => {
         await loadDeviceDetail(device.deviceId);
         await loadDevicePos({
             deviceId: device.deviceId,
-            deviceids: device.imei || device.value
+            deviceids: device.deviceNo || device.value
         })
-        await loadTrackPos(createTrackRequestData(device.imei || device.value))
+        await loadTrackPos(createTrackRequestData(device.deviceNo || device.value))
         showAppToast({
             title: '切换成功',
             icon: 'none'
@@ -694,7 +694,7 @@ const handlePickerConfirm = (e: PickerConfirmEvent) => {
     let selectedIndex = -1
     if (selectedValue != '') {
         selectedIndex = deviceList.value.findIndex(device =>
-            device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue
+            device.deviceNo == selectedValue || device.value == selectedValue || device.deviceId == selectedValue
         )
     }
 
@@ -706,7 +706,7 @@ const handlePickerConfirm = (e: PickerConfirmEvent) => {
     }
 
     if (selectedIndex < 0) {
-        selectedIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value)
+        selectedIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value)
     }
     if (selectedIndex < 0 && deviceList.value.length > 0) {
         selectedIndex = 0
@@ -721,15 +721,15 @@ const handlePickerConfirm = (e: PickerConfirmEvent) => {
         return
     }
 
-    if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-        console.log('选择的设备111:',selectedDevice.imei ,selectedDevice.deviceId,currentCarImei.value,currentCarDeviceId.value)
+    if (selectedDevice.deviceNo == currentCarDeviceNo.value && selectedDevice.deviceId == currentCarDeviceId.value) {
+        console.log('选择的设备111:',selectedDevice.deviceNo ,selectedDevice.deviceId,currentCarDeviceNo.value,currentCarDeviceId.value)
         console.log('选择的设备与当前设备相同，不重复加载')
         return
     }
 
     const deviceName = selectedDevice.deviceName || selectedDevice.name || '未命名设备'
     currentCarName.value = deviceName
-    currentCarImei.value = selectedDevice.imei || selectedDevice.value
+    currentCarDeviceNo.value = selectedDevice.deviceNo || selectedDevice.value
     currentCarDeptId.value = selectedDevice.deptId
     currentCarDeviceId.value = selectedDevice.deviceId
     currentCarIccId.value = selectedDevice.iccid
@@ -741,7 +741,7 @@ const handlePickerConfirm = (e: PickerConfirmEvent) => {
     center.longitude = selectedDevice.longitude
 
     saveSelectedDeviceIndex(selectedIndex)
-    pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId]
+    pickerValues.value = [selectedDevice.deviceNo || selectedDevice.deviceId]
     saveSelectedDevice(selectedDevice)
 
     uni.showLoading({
@@ -790,16 +790,16 @@ const loadDeviceList = async () => {
             markers.value = []
             userDeviceList.value = list
             deviceList.value = list.map((item: UTSJSONObject): Device => {
-                const imei = item.getString('imei', '')
+                const deviceNo = item.getString('deviceNo', '')
                 const rawDeviceName = item.getString('deviceName', '')
-                const deviceName = rawDeviceName != '' ? rawDeviceName : (imei != '' ? imei : '未命名设备')
+                const deviceName = rawDeviceName != '' ? rawDeviceName : (deviceNo != '' ? deviceNo : '未命名设备')
                 const apiDeptId = item.getString('deptId', '')
                 const deptId = apiDeptId != '' ? apiDeptId : item.getString('companyId', '')
                 return {
                     name: deviceName,
                     deviceName: deviceName,
-                    value: imei,
-                    imei: imei,
+                    value: deviceNo,
+                    deviceNo: deviceNo,
                     deptId: deptId,
                     deviceId: item.getString('deviceId', ''),
                     iccid: item.getString('iccid', ''),
@@ -821,7 +821,7 @@ const loadDeviceList = async () => {
 
             // 优先按保存的设备身份恢复，避免列表排序变化后选中错误车辆
             if (savedDevice != null) {
-                selectedIdx = findDeviceIndex(savedDevice.imei, savedDevice.deviceId)
+                selectedIdx = findDeviceIndex(savedDevice.deviceNo, savedDevice.deviceId)
                 if (selectedIdx != -1) {
                     selectedDevice = deviceList.value[selectedIdx]
                     saveSelectedDeviceIndex(selectedIdx)
@@ -852,7 +852,7 @@ const loadDeviceList = async () => {
                 // 设置当前车辆信息
                 const deviceName = device.deviceName != '' ? device.deviceName : (device.name != '' ? device.name : '未命名设备')
                 currentCarName.value = deviceName
-                currentCarImei.value = device.imei != '' ? device.imei : device.value
+                currentCarDeviceNo.value = device.deviceNo != '' ? device.deviceNo : device.value
                 currentCarDeptId.value = device.deptId
                 currentCarDeviceId.value = device.deviceId
                 currentCarIccId.value = device.iccid
@@ -863,14 +863,14 @@ const loadDeviceList = async () => {
                 center.latitude = device.latitude
                 center.longitude = device.longitude
 
-                pickerValues.value = [device.imei != '' ? device.imei : device.deviceId]
+                pickerValues.value = [device.deviceNo != '' ? device.deviceNo : device.deviceId]
 
                 await loadDeviceDetail(device.deviceId);
                 await loadDevicePos({
                     deviceId: device.deviceId,
-                    deviceids: device.imei != '' ? device.imei : device.value
+                    deviceids: device.deviceNo != '' ? device.deviceNo : device.value
                 })
-                await loadTrackPos(createTrackRequestData(device.imei != '' ? device.imei : device.value))
+                await loadTrackPos(createTrackRequestData(device.deviceNo != '' ? device.deviceNo : device.value))
             }
         } else {
             userDeviceList.value = []
@@ -922,7 +922,7 @@ const refreshLocation = async () => {
     try {
         await loadDevicePos({
             deviceId: currentCarDeviceId.value,
-            deviceids: currentCarImei.value
+            deviceids: currentCarDeviceNo.value
         } as UTSJSONObject)
     } catch (error) {
         console.error('刷新位置失败', error)
@@ -990,7 +990,7 @@ const toRecordDetail = () => {
         !(latitude == 0 && longitude == 0)
     const timeRange = getTodayZeroTime()
     uni.navigateTo({
-        url: '/pages/playBack/playBack?imei=' + encodeURIComponent(currentCarImei.value) +
+        url: '/pages/playBack/playBack?deviceNo=' + encodeURIComponent(currentCarDeviceNo.value) +
             '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) +
             '&plateNo=' + encodeURIComponent(currentCarName.value) +
             '&carType=' + encodeURIComponent(currentCarCarType.value) +
@@ -1017,7 +1017,7 @@ const toDeviceDetail = (e: any) => {
     if (!isLogin()) return
     if (!isCarSelected()) return
     uni.navigateTo({
-        url: `/pages/carInfoDetail/carInfoDetail?imei=${encodeURIComponent(currentCarImei.value)}&deptId=${encodeURIComponent(currentCarDeptId.value)}&deviceId=${encodeURIComponent(currentCarDeviceId.value)}`,
+        url: `/pages/carInfoDetail/carInfoDetail?deviceNo=${encodeURIComponent(currentCarDeviceNo.value)}&deptId=${encodeURIComponent(currentCarDeptId.value)}&deviceId=${encodeURIComponent(currentCarDeviceId.value)}`,
     })
 }
 
@@ -1063,11 +1063,17 @@ const toFence = () => {
     if (!isLogin()) return
     if (!isCarSelected()) return
     uni.navigateTo({
-        url: '/pages/geofencing/geofencing?imei=' + encodeURIComponent(currentCarImei.value) + '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) + '&plateNo=' + encodeURIComponent(currentCarName.value) + '&carType=' + encodeURIComponent(currentCarCarType.value) + '&deptId=' + encodeURIComponent(currentCarDeptId.value) + '&deviceName=' + encodeURIComponent(currentCarName.value)
+        url: '/pages/geofencing/geofencing?deviceNo=' + encodeURIComponent(currentCarDeviceNo.value) + '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) + '&plateNo=' + encodeURIComponent(currentCarName.value) + '&carType=' + encodeURIComponent(currentCarCarType.value) + '&deptId=' + encodeURIComponent(currentCarDeptId.value) + '&deviceName=' + encodeURIComponent(currentCarName.value)
     })
 }
 
 // 联系客服
+
+
+
+
+
+
 
 
 
@@ -1093,6 +1099,13 @@ const needRefresh = ref(false)
 const toPay = (iccid : string,simMerchant : string) => {
     if (!isLogin()) return
     if (!isCarSelected()) return
+    if (!iccid || iccid.trim().length === 0) {
+        showAppToast({
+            title: '未配置充值号，请联系客服。',
+            icon: 'none'
+        })
+        return
+    }
     if(simMerchant.toLowerCase() == 'zddx'){
         iccid = iccid.substring(0,iccid.length-1)
     }

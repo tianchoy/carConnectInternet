@@ -204,13 +204,13 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
                   _cE("view", _uM({ class: "value" }), _tD(item.iccid), 1 /* TEXT */)
                 ])
               : _cC("v-if", true),
-            isTrue(item.imei && item.imei != '')
+            isTrue(item.deviceNo && item.deviceNo != '')
               ? _cE("view", _uM({
                   key: 1,
                   class: "device-info"
                 }), [
                   _cE("view", _uM({ class: "label" }), "ID:"),
-                  _cE("view", _uM({ class: "value" }), _tD(item.imei), 1 /* TEXT */)
+                  _cE("view", _uM({ class: "value" }), _tD(item.deviceNo), 1 /* TEXT */)
                 ])
               : _cC("v-if", true),
             _cE("view", _uM({ class: "device-info" }), [

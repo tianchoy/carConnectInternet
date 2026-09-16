@@ -34,12 +34,12 @@ open class GenPagesDeviceListDeviceList : BasePage {
             val originalDeviceList = ref(_uA<UTSJSONObject>())
             val deviceListItems = computed(fun(): UTSArray<DeviceItem> {
                 return originalDeviceList.value.map(fun(item: UTSJSONObject): DeviceItem {
-                    val imei = item.getString("imei", "")
+                    val deviceNo = item.getString("deviceNo", "")
                     val rawDeviceName = item.getString("deviceName", "")
-                    return DeviceItem(plateNo = item.getString("plateNo", ""), imei = imei, status = item.getNumber("status", 0), companyId = item.getString("companyId", ""), deviceName = if (rawDeviceName != "") {
+                    return DeviceItem(plateNo = item.getString("plateNo", ""), deviceNo = deviceNo, status = item.getNumber("status", 0), companyId = item.getString("companyId", ""), deviceName = if (rawDeviceName != "") {
                         rawDeviceName
                     } else {
-                        imei
+                        deviceNo
                     }
                     , deviceId = item.getString("deviceId", ""), iccid = item.getString("iccid", ""), simMerchant = item.getString("simMerchant", ""), connectionStatus = item.getString("connectionStatus", ""))
                 }
@@ -198,10 +198,10 @@ open class GenPagesDeviceListDeviceList : BasePage {
                     console.warn("未找到对应的设备信息", markerId)
                     return
                 }
-                val imeiValue = (selectedDevice["imei"] as String?) ?: ""
+                val deviceNoValue = (selectedDevice["deviceNo"] as String?) ?: ""
                 val companyId = (selectedDevice["companyId"] as Any?) ?: ""
                 val deviceId = (selectedDevice["deviceId"] as Any?) ?: ""
-                uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?imei=" + imeiValue + "&deptId=" + companyId.toString() + "&deviceId=" + deviceId.toString()))
+                uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?deviceNo=" + deviceNoValue + "&deptId=" + companyId.toString() + "&deviceId=" + deviceId.toString()))
             }
             onLoad(fun(options){
                 loadUserDeviceList(_uA(), true)

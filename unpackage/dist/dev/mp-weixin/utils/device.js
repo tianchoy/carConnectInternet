@@ -7,7 +7,7 @@ class DeviceItem extends common_vendor.UTS.UTSType {
       get fields() {
         return {
           plateNo: { type: String, optional: false },
-          imei: { type: String, optional: false },
+          deviceNo: { type: String, optional: false },
           status: { type: Number, optional: false },
           companyId: { type: String, optional: false },
           deviceName: { type: String, optional: false },
@@ -24,7 +24,7 @@ class DeviceItem extends common_vendor.UTS.UTSType {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.plateNo = this.__props__.plateNo;
-    this.imei = this.__props__.imei;
+    this.deviceNo = this.__props__.deviceNo;
     this.status = this.__props__.status;
     this.companyId = this.__props__.companyId;
     this.deviceName = this.__props__.deviceName;

@@ -82,7 +82,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const pickerTitle = common_vendor.ref("选择开始时间");
     const startTime = common_vendor.ref("");
     const endTime = common_vendor.ref("");
-    const imei = common_vendor.ref("");
+    const deviceNo = common_vendor.ref("");
     const groupedTrips = common_vendor.computed(() => {
       const dateGroups = [];
       tripData.value.forEach((trip) => {
@@ -185,11 +185,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
           title: "加载中..."
         }));
-        if (!imei.value)
+        if (!deviceNo.value)
           return Promise.resolve(null);
         try {
           const data = new common_vendor.UTSJSONObject({
-            imei: imei.value,
+            deviceNo: deviceNo.value,
             startTime: startTime.value,
             endTime: endTime.value,
             minParkTime: 120,
@@ -224,14 +224,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     common_vendor.onLoad((option) => {
       var _a, _b, _c, _d;
-      imei.value = (_a = option.imei) !== null && _a !== void 0 ? _a : null;
+      deviceNo.value = (_a = option.deviceNo) !== null && _a !== void 0 ? _a : null;
       carStatus.value = (_b = option.connectionStatus) !== null && _b !== void 0 ? _b : "在线";
       plateNo.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "";
       carType.value = (_d = option.carType) !== null && _d !== void 0 ? _d : "";
     });
     const gotoTripDetail = (startTime2, endTime2) => {
       common_vendor.index.navigateTo({
-        url: "/pages/playBack/playBack?startTime=" + startTime2 + "&endTime=" + endTime2 + "&imei=" + imei.value + "&connectionStatus=" + carStatus.value + "&plateNo=" + plateNo.value + "&carType=" + carType.value
+        url: "/pages/playBack/playBack?startTime=" + startTime2 + "&endTime=" + endTime2 + "&deviceNo=" + deviceNo.value + "&connectionStatus=" + carStatus.value + "&plateNo=" + plateNo.value + "&carType=" + carType.value
       });
     };
     const formatDisplayTime = (timeString) => {

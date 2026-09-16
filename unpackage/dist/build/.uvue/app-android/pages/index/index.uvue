@@ -33,7 +33,7 @@ type Device = {
     name: string;
     deviceName: string;
     value: string;
-    imei: string;
+    deviceNo: string;
     deptId: string;
     deviceId: string;
     iccid: string;
@@ -66,7 +66,7 @@ type DeviceDetailState = {
 type SavedDevice = {
     name: string;
     deviceName: string;
-    imei: string;
+    deviceNo: string;
     deptId: string;
     deviceId: string;
     iccid: string;
@@ -116,7 +116,7 @@ const __sfc__ = defineComponent({
         // picker 相关变量
         const showPicker = ref(false);
         const pickerValues = ref<PickerValue[]>([]);
-        const currentCarImei = ref('');
+        const currentCarDeviceNo = ref('');
         const currentCarDeptId = ref('');
         const currentCarDeviceId = ref('');
         const currentCarIccId = ref('');
@@ -166,12 +166,12 @@ const __sfc__ = defineComponent({
         // 处理车辆列表显示 - 返回 picker 选项
         const pickerColumns = computed<PickerColumn[]>((): PickerColumn[] => {
             return [deviceList.value.map((device): PickerColumnItem => {
-                    const displayName = device.deviceName != "" ? device.deviceName : device.name != "" ? device.name : device.imei != "" ? device.imei : '未命名设备';
+                    const displayName = device.deviceName != "" ? device.deviceName : device.name != "" ? device.name : device.deviceNo != "" ? device.deviceNo : '未命名设备';
                     const statusText = device.connectionStatus == 'online' ? '在线' : '离线';
                     return {
-                        id: device.imei,
+                        id: device.deviceNo,
                         label: `${displayName} (${statusText})`,
-                        value: device.imei != "" ? device.imei : device.deviceId,
+                        value: device.deviceNo != "" ? device.deviceNo : device.deviceId,
                         disabled: false,
                         children: null
                     } as PickerColumnItem;
@@ -198,9 +198,9 @@ const __sfc__ = defineComponent({
         const saveSelectedDevice = (device: Device) => {
             try {
                 const deviceInfo = {
-                    name: device.deviceName != "" ? device.deviceName : device.name != "" ? device.name : device.imei,
-                    deviceName: device.deviceName != "" ? device.deviceName : device.name != "" ? device.name : device.imei,
-                    imei: device.imei != "" ? device.imei : device.value,
+                    name: device.deviceName != "" ? device.deviceName : device.name != "" ? device.name : device.deviceNo,
+                    deviceName: device.deviceName != "" ? device.deviceName : device.name != "" ? device.name : device.deviceNo,
+                    deviceNo: device.deviceNo != "" ? device.deviceNo : device.value,
                     deptId: device.deptId,
                     deviceId: device.deviceId,
                     iccid: device.iccid,
@@ -235,15 +235,15 @@ const __sfc__ = defineComponent({
             }
             if (data == null)
                 return null;
-            const imei = data.getString('imei', '');
+            const deviceNo = data.getString('deviceNo', '');
             const deviceId = data.getString('deviceId', '');
-            if (imei == '' && deviceId == '')
+            if (deviceNo == '' && deviceId == '')
                 return null;
-            const identity = imei != '' ? imei : deviceId;
+            const identity = deviceNo != '' ? deviceNo : deviceId;
             const device: SavedDevice = {
                 name: data.getString('name', identity),
                 deviceName: data.getString('deviceName', data.getString('name', identity)),
-                imei: imei,
+                deviceNo: deviceNo,
                 deptId: data.getString('deptId', ''),
                 deviceId: deviceId,
                 iccid: data.getString('iccid', ''),
@@ -315,7 +315,7 @@ const __sfc__ = defineComponent({
         const setCurrentCarFromSavedDevice = (savedDevice: any) => {
             const deviceName = isTruthy(savedDevice.deviceName) ? savedDevice.deviceName : isTruthy(savedDevice.name) ? savedDevice.name : '未命名设备';
             currentCarName.value = deviceName;
-            currentCarImei.value = isTruthy(savedDevice.imei) ? savedDevice.imei : savedDevice.value;
+            currentCarDeviceNo.value = isTruthy(savedDevice.deviceNo) ? savedDevice.deviceNo : savedDevice.value;
             currentCarDeptId.value = savedDevice.deptId;
             currentCarDeviceId.value = savedDevice.deviceId;
             currentCarIccId.value = savedDevice.iccid;
@@ -326,12 +326,12 @@ const __sfc__ = defineComponent({
             center.latitude = savedDevice.latitude;
             center.longitude = savedDevice.longitude;
         };
-        // 查找设备在当前列表中的索引，IMEI 优先，缺失时使用设备 ID
-        const findDeviceIndex = (imei: string, deviceId: string): number => {
-            if (imei != '') {
-                const imeiIndex = deviceList.value.findIndex((device): boolean => device.imei == imei || device.value == imei);
-                if (imeiIndex != -1)
-                    return imeiIndex;
+        // 查找设备在当前列表中的索引，设备编号优先，缺失时使用设备 ID
+        const findDeviceIndex = (deviceNo: string, deviceId: string): number => {
+            if (deviceNo != '') {
+                const deviceNoIndex = deviceList.value.findIndex((device): boolean => device.deviceNo == deviceNo || device.value == deviceNo);
+                if (deviceNoIndex != -1)
+                    return deviceNoIndex;
             }
             if (deviceId != '') {
                 return deviceList.value.findIndex((device): boolean => device.deviceId == deviceId);
@@ -347,10 +347,10 @@ const __sfc__ = defineComponent({
                 } as ShowToastOptions);
                 return;
             }
-            const currentIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value);
+            const currentIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value);
             const savedDevice = getSavedSelectedDevice();
             const savedDeviceIndex = savedDevice != null
-                ? findDeviceIndex(savedDevice.imei, savedDevice.deviceId)
+                ? findDeviceIndex(savedDevice.deviceNo, savedDevice.deviceId)
                 : -1;
             const savedIndex = getSavedSelectedDeviceIndex();
             let selectedIndex = currentIndex;
@@ -364,7 +364,7 @@ const __sfc__ = defineComponent({
             const selectedDevice = deviceList.value[selectedIndex];
             if (selectedDevice == null)
                 return;
-            pickerValues.value = [selectedDevice.imei != "" ? selectedDevice.imei : selectedDevice.deviceId];
+            pickerValues.value = [selectedDevice.deviceNo != "" ? selectedDevice.deviceNo : selectedDevice.deviceId];
             showPicker.value = true;
         };
         // 创建标记点
@@ -469,7 +469,7 @@ const __sfc__ = defineComponent({
             averageSpeed.value = 0;
         };
         const clearCurrentCar = (): void => {
-            currentCarImei.value = '';
+            currentCarDeviceNo.value = '';
             currentCarDeptId.value = '';
             currentCarDeviceId.value = '';
             currentCarIccId.value = '';
@@ -513,10 +513,10 @@ const __sfc__ = defineComponent({
                 clearTripData();
             }
         };
-        const createTrackRequestData = (imei: string): UTSJSONObject => {
+        const createTrackRequestData = (deviceNo: string): UTSJSONObject => {
             const timeRange = getTodayZeroTime();
             return {
-                imei: imei,
+                deviceNo: deviceNo,
                 startTime: formatTimes(timeRange.todayZero),
                 endTime: formatTimes(timeRange.nowTime),
                 minParkTime: 120,
@@ -620,9 +620,9 @@ const __sfc__ = defineComponent({
                 await loadDeviceDetail(device.deviceId);
                 await loadDevicePos({
                     deviceId: device.deviceId,
-                    deviceids: device.imei != "" ? device.imei : device.value
+                    deviceids: device.deviceNo != "" ? device.deviceNo : device.value
                 });
-                await loadTrackPos(createTrackRequestData(device.imei != "" ? device.imei : device.value));
+                await loadTrackPos(createTrackRequestData(device.deviceNo != "" ? device.deviceNo : device.value));
                 showAppToast({
                     title: '切换成功',
                     icon: 'none'
@@ -645,7 +645,7 @@ const __sfc__ = defineComponent({
             const selectedValue = e.values.length > 0 ? e.values[0].toString() : '';
             let selectedIndex = -1;
             if (selectedValue != '') {
-                selectedIndex = deviceList.value.findIndex((device): boolean => device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue);
+                selectedIndex = deviceList.value.findIndex((device): boolean => device.deviceNo == selectedValue || device.value == selectedValue || device.deviceId == selectedValue);
             }
             if (selectedIndex < 0 && e.indexs.length > 0) {
                 const eventIndex = e.indexs[0];
@@ -654,7 +654,7 @@ const __sfc__ = defineComponent({
                 }
             }
             if (selectedIndex < 0) {
-                selectedIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value);
+                selectedIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value);
             }
             if (selectedIndex < 0 && deviceList.value.length > 0) {
                 selectedIndex = 0;
@@ -667,14 +667,14 @@ const __sfc__ = defineComponent({
                 } as ShowToastOptions);
                 return;
             }
-            if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-                console.log('选择的设备111:', selectedDevice.imei, selectedDevice.deviceId, currentCarImei.value, currentCarDeviceId.value);
+            if (selectedDevice.deviceNo == currentCarDeviceNo.value && selectedDevice.deviceId == currentCarDeviceId.value) {
+                console.log('选择的设备111:', selectedDevice.deviceNo, selectedDevice.deviceId, currentCarDeviceNo.value, currentCarDeviceId.value);
                 console.log('选择的设备与当前设备相同，不重复加载');
                 return;
             }
             const deviceName = selectedDevice.deviceName != "" ? selectedDevice.deviceName : selectedDevice.name != "" ? selectedDevice.name : '未命名设备';
             currentCarName.value = deviceName;
-            currentCarImei.value = selectedDevice.imei != "" ? selectedDevice.imei : selectedDevice.value;
+            currentCarDeviceNo.value = selectedDevice.deviceNo != "" ? selectedDevice.deviceNo : selectedDevice.value;
             currentCarDeptId.value = selectedDevice.deptId;
             currentCarDeviceId.value = selectedDevice.deviceId;
             currentCarIccId.value = selectedDevice.iccid;
@@ -685,7 +685,7 @@ const __sfc__ = defineComponent({
             center.latitude = selectedDevice.latitude;
             center.longitude = selectedDevice.longitude;
             saveSelectedDeviceIndex(selectedIndex);
-            pickerValues.value = [selectedDevice.imei != "" ? selectedDevice.imei : selectedDevice.deviceId];
+            pickerValues.value = [selectedDevice.deviceNo != "" ? selectedDevice.deviceNo : selectedDevice.deviceId];
             saveSelectedDevice(selectedDevice);
             uni.showLoading({
                 title: '加载车辆数据...',
@@ -731,16 +731,16 @@ const __sfc__ = defineComponent({
                     markers.value = [];
                     userDeviceList.value = list;
                     deviceList.value = list.map((item: UTSJSONObject): Device => {
-                        const imei = item.getString('imei', '');
+                        const deviceNo = item.getString('deviceNo', '');
                         const rawDeviceName = item.getString('deviceName', '');
-                        const deviceName = rawDeviceName != '' ? rawDeviceName : (imei != '' ? imei : '未命名设备');
+                        const deviceName = rawDeviceName != '' ? rawDeviceName : (deviceNo != '' ? deviceNo : '未命名设备');
                         const apiDeptId = item.getString('deptId', '');
                         const deptId = apiDeptId != '' ? apiDeptId : item.getString('companyId', '');
                         return {
                             name: deviceName,
                             deviceName: deviceName,
-                            value: imei,
-                            imei: imei,
+                            value: deviceNo,
+                            deviceNo: deviceNo,
                             deptId: deptId,
                             deviceId: item.getString('deviceId', ''),
                             iccid: item.getString('iccid', ''),
@@ -759,7 +759,7 @@ const __sfc__ = defineComponent({
                     let selectedIdx: number = -1;
                     // 优先按保存的设备身份恢复，避免列表排序变化后选中错误车辆
                     if (savedDevice != null) {
-                        selectedIdx = findDeviceIndex(savedDevice.imei, savedDevice.deviceId);
+                        selectedIdx = findDeviceIndex(savedDevice.deviceNo, savedDevice.deviceId);
                         if (selectedIdx != -1) {
                             selectedDevice = deviceList.value[selectedIdx];
                             saveSelectedDeviceIndex(selectedIdx);
@@ -788,7 +788,7 @@ const __sfc__ = defineComponent({
                         // 设置当前车辆信息
                         const deviceName = device.deviceName != '' ? device.deviceName : (device.name != '' ? device.name : '未命名设备');
                         currentCarName.value = deviceName;
-                        currentCarImei.value = device.imei != '' ? device.imei : device.value;
+                        currentCarDeviceNo.value = device.deviceNo != '' ? device.deviceNo : device.value;
                         currentCarDeptId.value = device.deptId;
                         currentCarDeviceId.value = device.deviceId;
                         currentCarIccId.value = device.iccid;
@@ -798,13 +798,13 @@ const __sfc__ = defineComponent({
                         currentCarPlateNo.value = device.plateNo;
                         center.latitude = device.latitude;
                         center.longitude = device.longitude;
-                        pickerValues.value = [device.imei != '' ? device.imei : device.deviceId];
+                        pickerValues.value = [device.deviceNo != '' ? device.deviceNo : device.deviceId];
                         await loadDeviceDetail(device.deviceId);
                         await loadDevicePos({
                             deviceId: device.deviceId,
-                            deviceids: device.imei != '' ? device.imei : device.value
+                            deviceids: device.deviceNo != '' ? device.deviceNo : device.value
                         });
-                        await loadTrackPos(createTrackRequestData(device.imei != '' ? device.imei : device.value));
+                        await loadTrackPos(createTrackRequestData(device.deviceNo != '' ? device.deviceNo : device.value));
                     }
                 }
                 else {
@@ -854,7 +854,7 @@ const __sfc__ = defineComponent({
             try {
                 await loadDevicePos({
                     deviceId: currentCarDeviceId.value,
-                    deviceids: currentCarImei.value
+                    deviceids: currentCarDeviceNo.value
                 } as UTSJSONObject);
             }
             catch (error: any) {
@@ -922,7 +922,7 @@ const __sfc__ = defineComponent({
                 !(latitude == 0 && longitude == 0);
             const timeRange = getTodayZeroTime();
             uni.navigateTo({
-                url: '/pages/playBack/playBack?imei=' + encodeURIComponent(currentCarImei.value) +
+                url: '/pages/playBack/playBack?deviceNo=' + encodeURIComponent(currentCarDeviceNo.value) +
                     '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) +
                     '&plateNo=' + encodeURIComponent(currentCarName.value) +
                     '&carType=' + encodeURIComponent(currentCarCarType.value) +
@@ -951,7 +951,7 @@ const __sfc__ = defineComponent({
             if (!isCarSelected())
                 return;
             uni.navigateTo({
-                url: `/pages/carInfoDetail/carInfoDetail?imei=${encodeURIComponent(currentCarImei.value)}&deptId=${encodeURIComponent(currentCarDeptId.value)}&deviceId=${encodeURIComponent(currentCarDeviceId.value)}`,
+                url: `/pages/carInfoDetail/carInfoDetail?deviceNo=${encodeURIComponent(currentCarDeviceNo.value)}&deptId=${encodeURIComponent(currentCarDeptId.value)}&deviceId=${encodeURIComponent(currentCarDeviceId.value)}`,
             });
         };
         // 跳转添加车辆
@@ -1000,7 +1000,7 @@ const __sfc__ = defineComponent({
             if (!isCarSelected())
                 return;
             uni.navigateTo({
-                url: '/pages/geofencing/geofencing?imei=' + encodeURIComponent(currentCarImei.value) + '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) + '&plateNo=' + encodeURIComponent(currentCarName.value) + '&carType=' + encodeURIComponent(currentCarCarType.value) + '&deptId=' + encodeURIComponent(currentCarDeptId.value) + '&deviceName=' + encodeURIComponent(currentCarName.value)
+                url: '/pages/geofencing/geofencing?deviceNo=' + encodeURIComponent(currentCarDeviceNo.value) + '&connectionStatus=' + encodeURIComponent(currentCarConnectionStatus.value) + '&plateNo=' + encodeURIComponent(currentCarName.value) + '&carType=' + encodeURIComponent(currentCarCarType.value) + '&deptId=' + encodeURIComponent(currentCarDeptId.value) + '&deviceName=' + encodeURIComponent(currentCarName.value)
             });
         };
         // 联系客服
@@ -1017,6 +1017,13 @@ const __sfc__ = defineComponent({
                 return;
             if (!isCarSelected())
                 return;
+            if (!(iccid != "") || iccid.trim().length === 0) {
+                showAppToast({
+                    title: '未配置充值号，请联系客服。',
+                    icon: 'none'
+                } as ShowToastOptions);
+                return;
+            }
             if (simMerchant.toLowerCase() == 'zddx') {
                 iccid = iccid.substring(0, iccid.length - 1);
             }

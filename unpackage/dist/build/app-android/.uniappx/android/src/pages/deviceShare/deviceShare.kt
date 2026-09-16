@@ -24,7 +24,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
             val loadingEnabled = ref(true)
             val deviceId = ref("")
             val deviceName = ref("")
-            val imei = ref("")
+            val deviceNo = ref("")
             val targetPhone = ref("")
             val expireDate = ref("")
             val submitting = ref(false)
@@ -60,8 +60,8 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                 if (deviceName.value != "" && deviceName.value != "null" && deviceName.value != "undefined") {
                     return deviceName.value
                 }
-                if (imei.value != "" && imei.value != "null" && imei.value != "undefined") {
-                    return imei.value
+                if (deviceNo.value != "" && deviceNo.value != "null" && deviceNo.value != "undefined") {
+                    return deviceNo.value
                 }
                 return "--"
             }
@@ -204,7 +204,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                             return@w1
                         }
                         if (deviceId.value == "") {
-                            showAppToast(ShowToastOptions(title = "设备ID不能为空", icon = "none"))
+                            showAppToast(ShowToastOptions(title = "设备编号不能为空", icon = "none"))
                             return@w1
                         }
                         val phone = targetPhone.value.trim()
@@ -347,8 +347,8 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
             onLoad(fun(options){
                 deviceId.value = normalizeRouteValue(options["deviceId"] ?: "")
                 deviceName.value = normalizeRouteValue(options["deviceName"] ?: "")
-                imei.value = normalizeRouteValue(options["imei"] ?: "")
-                console.log("imei:", imei.value, deviceName.value)
+                deviceNo.value = normalizeRouteValue(options["deviceNo"] ?: "")
+                console.log("deviceNo:", deviceNo.value, deviceName.value)
                 initializeDeviceShare()
             }
             )

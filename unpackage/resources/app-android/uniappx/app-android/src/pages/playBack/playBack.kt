@@ -27,7 +27,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val center = reactive(_uO("latitude" to 39.90469, "longitude" to 116.40717))
             val mapScale = ref(12)
             val isMapReady = ref(false)
-            val imei = ref<String?>("")
+            val deviceNo = ref<String?>("")
             val carStatus = ref<String?>("")
             val plateNo = ref<String?>("")
             val carType = ref<String?>("")
@@ -497,7 +497,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         val requestId = ++replaySessionId
                         clearTrackDisplay()
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("deviceNo" to deviceNo.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             if (requestId != replaySessionId) {
@@ -710,13 +710,13 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 }
             }
             onLoad(fun(option){
-                imei.value = option["imei"] ?: null
+                deviceNo.value = option["deviceNo"] ?: null
                 carStatus.value = option["connectionStatus"] ?: ""
                 val displayCarName = normalizeRouteValue(option["plateNo"] ?: "")
                 plateNo.value = if (displayCarName != "") {
                     displayCarName
                 } else {
-                    (imei.value ?: "未命名设备")
+                    (deviceNo.value ?: "未命名设备")
                 }
                 carType.value = normalizeRouteValue(option["carType"] ?: "")
                 lat.value = option["lat"] ?: null

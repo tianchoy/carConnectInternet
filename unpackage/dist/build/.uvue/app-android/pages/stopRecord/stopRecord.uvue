@@ -28,7 +28,7 @@ const __sfc__ = defineComponent({
         const pickerTitle = ref('选择开始时间');
         const startTime = ref('');
         const endTime = ref('');
-        const imei = ref<string | null>('');
+        const deviceNo = ref<string | null>('');
         const carStopDetail = ref<Array<StopRecord>>([]);
         const getStopNumber = (item: UTSJSONObject, key: string): number => item.getNumber(key, 0);
         const getStopText = (item: UTSJSONObject, key: string): string => item.getString(key, '');
@@ -47,7 +47,7 @@ const __sfc__ = defineComponent({
             return sorted;
         });
         onLoad((option) => {
-            imei.value = option["imei"];
+            deviceNo.value = option["deviceNo"];
         });
         const initDateTime = () => {
             const now = new Date();
@@ -71,7 +71,7 @@ const __sfc__ = defineComponent({
                 title: '加载中...'
             });
             const data = {
-                imei: imei.value,
+                deviceNo: deviceNo.value,
                 startTime: startTime.value,
                 endTime: endTime.value,
                 minParkTime: 10,

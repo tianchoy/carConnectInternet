@@ -66,7 +66,7 @@ const center = reactive({
 	})
 	const mapScale = ref(12)
 	const isMapReady = ref(false)
-	const imei = ref<string | null>('')
+	const deviceNo = ref<string | null>('')
 	const carStatus = ref<string | null>('')
 	const plateNo = ref<string | null>('')
 	const carType = ref<string | null>('')
@@ -681,7 +681,7 @@ const center = reactive({
 		clearTrackDisplay()
 		uni.showLoading({ title: '加载中...' })
 		const data = {
-			imei: imei.value,
+			deviceNo: deviceNo.value,
 			startTime: startTime.value.replace(/\//g, '-'),
 			endTime: endTime.value.replace(/\//g, '-'),
 			minParkTime: 2,
@@ -885,10 +885,10 @@ const center = reactive({
 	}
 
 	onLoad((option) => {
-		imei.value = option.imei ?? null
+		deviceNo.value = option.deviceNo ?? null
 		carStatus.value = option.connectionStatus ?? ''
 		const displayCarName = normalizeRouteValue(option.plateNo ?? '')
-		plateNo.value = displayCarName != '' ? displayCarName : (imei.value ?? '未命名设备')
+		plateNo.value = displayCarName != '' ? displayCarName : (deviceNo.value ?? '未命名设备')
 		carType.value = normalizeRouteValue(option.carType ?? '')
 		lat.value = option.lat ?? null
 		lng.value = option.lng ?? null

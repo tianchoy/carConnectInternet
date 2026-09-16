@@ -25,7 +25,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadingEnabled = common_vendor.ref(true);
     const deviceId = common_vendor.ref("");
     const deviceName = common_vendor.ref("");
-    const imei = common_vendor.ref("");
+    const deviceNo = common_vendor.ref("");
     const targetPhone = common_vendor.ref("");
     const expireDate = common_vendor.ref("");
     const submitting = common_vendor.ref(false);
@@ -53,8 +53,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const displayDeviceName = common_vendor.computed(() => {
       if (deviceName.value != "" && deviceName.value != "null" && deviceName.value != "undefined")
         return deviceName.value;
-      if (imei.value != "" && imei.value != "null" && imei.value != "undefined")
-        return imei.value;
+      if (deviceNo.value != "" && deviceNo.value != "null" && deviceNo.value != "undefined")
+        return deviceNo.value;
       return "--";
     });
     const canSubmit = common_vendor.computed(() => {
@@ -148,7 +148,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (submitting.value)
           return Promise.resolve(null);
         if (deviceId.value == "") {
-          utils_toast.showAppToast({ title: "设备ID不能为空", icon: "none" });
+          utils_toast.showAppToast({ title: "设备编号不能为空", icon: "none" });
           return Promise.resolve(null);
         }
         const phone = targetPhone.value.trim();
@@ -265,8 +265,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a, _b, _c;
       deviceId.value = normalizeRouteValue((_a = options.deviceId) !== null && _a !== void 0 ? _a : "");
       deviceName.value = normalizeRouteValue((_b = options.deviceName) !== null && _b !== void 0 ? _b : "");
-      imei.value = normalizeRouteValue((_c = options.imei) !== null && _c !== void 0 ? _c : "");
-      common_vendor.index.__f__("log", "at pages/deviceShare/deviceShare.uvue:310", "imei:", imei.value, deviceName.value);
+      deviceNo.value = normalizeRouteValue((_c = options.deviceNo) !== null && _c !== void 0 ? _c : "");
+      common_vendor.index.__f__("log", "at pages/deviceShare/deviceShare.uvue:310", "deviceNo:", deviceNo.value, deviceName.value);
       void initializeDeviceShare();
     });
     return (_ctx, _cache) => {

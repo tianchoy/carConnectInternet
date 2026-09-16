@@ -40,8 +40,8 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
             val cancel = fun(){
                 modal.value = false
             }
-            val todetail = fun(companyId: String, imei: String, deviceId: String){
-                uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&imei=" + imei + "&deviceId=" + deviceId))
+            val todetail = fun(companyId: String, deviceNo: String, deviceId: String){
+                uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&deviceNo=" + deviceNo + "&deviceId=" + deviceId))
             }
             return fun(): Any? {
                 val _component_i_tag = resolveEasyComponent("i-tag", GenUniModulesIUiXComponentsITagITagClass)
@@ -51,14 +51,14 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
                         _cE("scroll-view", _uM("key" to 0, "class" to "content", "scroll-y" to ""), _uA(
                             _cE(Fragment, null, RenderHelpers.renderList(props.lists, fun(item, index, __index, _cached): Any {
                                 return _cE("view", _uM("class" to "list-item", "key" to index, "onClick" to fun(){
-                                    todetail(item.companyId, item.imei, item.deviceId)
+                                    todetail(item.companyId, item.deviceNo, item.deviceId)
                                 }), _uA(
                                     _cE("view", _uM("class" to "title"), _uA(
                                         _cE("view", _uM("class" to "car-number"), _uA(
                                             _tD(if (item.deviceName != "") {
                                                 item.deviceName
                                             } else {
-                                                item.imei
+                                                item.deviceNo
                                             }) + " ",
                                             _cV(_component_i_tag, _uM("class" to "car-status-spacing", "size" to "mini", "shape" to "circle", "text" to if (item.connectionStatus == "online") {
                                                 "在线"
@@ -84,7 +84,7 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
                                         ))
                                     )),
                                     _cE("view", null, _uA(
-                                        _cE("text", _uM("class" to "imei"), "ID: " + _tD(item.imei), 1)
+                                        _cE("text", _uM("class" to "imei"), "ID: " + _tD(item.deviceNo), 1)
                                     ))
                                 ), 8, _uA(
                                     "onClick"

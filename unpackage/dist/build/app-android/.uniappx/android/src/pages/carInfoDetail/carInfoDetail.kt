@@ -25,7 +25,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
             val _ctx = __ins.proxy as GenPagesCarInfoDetailCarInfoDetail
             val _cache = __ins.renderCache
             val deptId = ref<String?>("")
-            val imei = ref<String?>("")
+            val deviceNo = ref<String?>("")
             val deviceId = ref<String?>("")
             val center = reactive<MapCenter__1>(MapCenter__1(latitude = 39.90469, longitude = 116.40717))
             val mapScale = ref(15)
@@ -131,7 +131,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 if (plateNo != "") {
                     return plateNo
                 }
-                return imei.value ?: "未命名设备"
+                return deviceNo.value ?: "未命名设备"
             }
             val createMarker = fun(id: Number, lat: Number, lng: Number, type: String, title: String?): Marker {
                 val connectionStatus = datainfo.value["connectionStatus"] as String?
@@ -183,8 +183,8 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                         }
                                         var foundDevice = false
                                         for(item in resolveUTSValueIterator(positions)){
-                                            val itemImei = item.getString("imei", "")
-                                            if (itemImei != null && itemImei == imei.value) {
+                                            val itemDeviceNo = item.getString("deviceNo", "")
+                                            if (itemDeviceNo != null && itemDeviceNo == deviceNo.value) {
                                                 foundDevice = true
                                                 datainfo.value = item
                                                 val attribute = item["attribute"] as UTSJSONObject?
@@ -244,7 +244,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                                 if (signalRssi.value != null) {
                                                     val signalExp = getSignalDetail(signalRssi.value).experience
                                                     if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                                                        console.warn("设备 " + imei.value!! + " 信号较弱: " + signalRssi.value!! + "dBm")
+                                                        console.warn("设备 " + deviceNo.value!! + " 信号较弱: " + signalRssi.value!! + "dBm")
                                                     }
                                                 }
                                             }
@@ -301,9 +301,9 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 if (intervalSeconds > 0) {
                     isRefreshing.value = true
                     val intervalMs = intervalSeconds * 1000
-                    loadData(_uO("deptId" to deptId.value, "deviceids" to imei.value), 3)
+                    loadData(_uO("deptId" to deptId.value, "deviceids" to deviceNo.value), 3)
                     refreshTimer.value = setInterval(fun(){
-                        loadData(_uO("deptId" to deptId.value, "deviceids" to imei.value), 3)
+                        loadData(_uO("deptId" to deptId.value, "deviceids" to deviceNo.value), 3)
                     }
                     , intervalMs) as Number
                 }
@@ -347,14 +347,19 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                         }
                         try {
                             uni_showLoading(ShowLoadingOptions(title = "执行中...", mask = true))
-                            val res = await(sendCommand(_uO("imei" to imei.value, "password" to if (userType.value == "1") {
+                            val commandData: UTSJSONObject = _uO("deviceNo" to deviceNo.value, "password" to if (userType.value == "1") {
                                 psw.value
                             } else {
                                 ""
                             }
                             , "params" to _uA(
                                 "1111"
-                            ), "predictCmdId" to predictCmdId, "type" to type)))
+                            ), "predictCmdId" to predictCmdId, "type" to type)
+                            val res = if (operationType == 1) {
+                                await(restoreOilPower(commandData))
+                            } else {
+                                await(sendCommand(commandData))
+                            }
                             uni_hideLoading(null)
                             if (isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = if (operationType == 1) {
@@ -419,19 +424,19 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 val routeCarType = currentCarInfo.value.getString("carType", "")
                 if (itemTo == "轨迹回放") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + imei.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType) + "&lat=" + datainfo.value["latitude"] + "&lng=" + datainfo.value["longitude"]))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?deviceNo=" + deviceNo.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType) + "&lat=" + datainfo.value["latitude"] + "&lng=" + datainfo.value["longitude"]))
                 }
                 if (itemTo == "车辆跟踪") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&deptId=" + deptId.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType)))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/vehicleTracking/vehicleTracking?deviceNo=" + deviceNo.value + "&deptId=" + deptId.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType)))
                 }
                 if (itemTo == "里程记录") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/mileageRecord/mileageRecord?imei=" + imei.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType)))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/mileageRecord/mileageRecord?deviceNo=" + deviceNo.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType)))
                 }
                 if (itemTo == "停车记录") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/stopRecord/stopRecord?imei=" + imei.value + "&deptId=" + deptId.value))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/stopRecord/stopRecord?deviceNo=" + deviceNo.value + "&deptId=" + deptId.value))
                 }
                 if (itemTo == "恢复油电") {
                     if (userType.value == "1") {
@@ -455,21 +460,21 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 }
                 if (itemTo == "电子围栏") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType) + "&deptId=" + deptId.value + "&deviceName=" + encodeURIComponent(routeDeviceName)))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/geofencing/geofencing?deviceNo=" + deviceNo.value + "&connectionStatus=" + datainfo.value["connectionStatus"] + "&plateNo=" + encodeURIComponent(routeDeviceName) + "&carType=" + encodeURIComponent(routeCarType) + "&deptId=" + deptId.value + "&deviceName=" + encodeURIComponent(routeDeviceName)))
                 }
                 if (itemTo == "一键寻车") {
                     navTo()
                 }
                 if (itemTo == "发送指令") {
                     stopAutoRefresh()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/cmd/cmd?imei=" + imei.value + "&deviceId=" + deviceId.value))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/cmd/cmd?deviceNo=" + deviceNo.value + "&deviceId=" + deviceId.value))
                 }
                 if (itemTo == "分享设备") {
                     stopAutoRefresh()
-                    val shareImei = imei.value ?: ""
+                    val shareDeviceNo = deviceNo.value ?: ""
                     val shareDeviceId = deviceId.value ?: ""
                     val shareDeviceName = getDisplayCarName()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/deviceShare/deviceShare?imei=" + encodeURIComponent(shareImei) + "&deviceId=" + encodeURIComponent(shareDeviceId) + "&deviceName=" + encodeURIComponent(shareDeviceName)))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/deviceShare/deviceShare?deviceNo=" + encodeURIComponent(shareDeviceNo) + "&deviceId=" + encodeURIComponent(shareDeviceId) + "&deviceName=" + encodeURIComponent(shareDeviceName)))
                 }
             }
             val loadDeviceDetail = fun(): UTSPromise<Unit> {
@@ -492,12 +497,12 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
             }
             onLoad(fun(option){
                 deptId.value = option["deptId"]
-                imei.value = option["imei"]
+                deviceNo.value = option["deviceNo"]
                 deviceId.value = option["deviceId"]
                 val storedUserType = uni_getStorageSync("userType") as String?
                 userType.value = storedUserType ?: ""
                 loadDeviceDetail().then(fun(){
-                    val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to imei.value)
+                    val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to deviceNo.value)
                     uni_showLoading(ShowLoadingOptions(title = "加载中..."))
                     loadData(data, 3).then(fun(success: Boolean){
                         uni_hideLoading(null)
@@ -563,7 +568,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                             _cE("view", _uM("class" to "imei-box"), _uA(
                                 _cE("view", _uM("class" to "imei-info", "onClick" to carDetail), _uA(
                                     _cE("view", _uM("class" to "imeis"), _uA(
-                                        _cE("text", _uM("class" to "imei-text"), "ID: " + _tD(unref(imei)), 1),
+                                        _cE("text", _uM("class" to "imei-text"), "ID: " + _tD(unref(deviceNo)), 1),
                                         _cE("text", _uM("class" to "pos-time"))
                                     )),
                                     _cV(_component_i_icon, _uM("name" to "/static/arrow-right.png", "fontSize" to "16"))

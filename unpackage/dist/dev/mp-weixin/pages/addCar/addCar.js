@@ -32,7 +32,7 @@ class CarFormData extends common_vendor.UTS.UTSType {
       get fields() {
         return {
           deviceName: { type: String, optional: false },
-          imei: { type: String, optional: false },
+          deviceNo: { type: String, optional: false },
           deviceType: { type: String, optional: false },
           deviceTypeValue: { type: String, optional: false },
           plateNo: { type: String, optional: false },
@@ -46,7 +46,7 @@ class CarFormData extends common_vendor.UTS.UTSType {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.deviceName = this.__props__.deviceName;
-    this.imei = this.__props__.imei;
+    this.deviceNo = this.__props__.deviceNo;
     this.deviceType = this.__props__.deviceType;
     this.deviceTypeValue = this.__props__.deviceTypeValue;
     this.plateNo = this.__props__.plateNo;
@@ -106,7 +106,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const formValid = common_vendor.ref(false);
     const carInfo = common_vendor.ref(new CarFormData({
       deviceName: "",
-      imei: "",
+      deviceNo: "",
       deviceType: "",
       deviceTypeValue: "",
       plateNo: "",
@@ -114,7 +114,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }));
     common_vendor.ref([]);
     const rules = [
-      new common_vendor.UTSJSONObject({ name: "imei", required: true, message: "请输入设备ID" }),
+      new common_vendor.UTSJSONObject({ name: "deviceNo", required: true, message: "请输入设备编号" }),
       new common_vendor.UTSJSONObject({ name: "deviceType", required: true, message: "请选择设备图标" })
     ];
     const handleModelValid = (value = null) => {
@@ -144,15 +144,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handleScanResult = (data) => {
       common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:169", "接收到扫码结果:", data.result);
       if (data.result.length == 15) {
-        carInfo.value.imei = "0" + data.result.slice(4, 15);
+        carInfo.value.deviceNo = "0" + data.result.slice(4, 15);
         return null;
       }
       if (data.result.length == 11) {
-        carInfo.value.imei = "0" + data.result;
+        carInfo.value.deviceNo = "0" + data.result;
         return null;
       }
       utils_toast.showAppToast({
-        title: "扫码结果长度不是标准设备ID，请确认后提交",
+        title: "扫码结果长度不是标准设备编号，请确认后提交",
         icon: "none"
       });
     };
@@ -174,9 +174,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.$emit("refreshDeviceList");
     };
     const validateForm = () => {
-      if (carInfo.value.imei.length == 0) {
+      if (carInfo.value.deviceNo.length == 0) {
         utils_toast.showAppToast({
-          title: "请输入设备ID",
+          title: "请输入设备编号",
           icon: "none"
         });
         return false;
@@ -204,7 +204,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }));
           const submitData = new common_vendor.UTSJSONObject({
             deviceName: carInfo.value.deviceName,
-            imei: carInfo.value.imei,
+            deviceNo: carInfo.value.deviceNo,
             carType: carInfo.value.deviceType,
             plateNo: carInfo.value.plateNo
           });
@@ -215,7 +215,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           loading.value = false;
           if (api_response.isBusinessSuccessCode(res.code)) {
             utils_toast.showAppToast({
-              title: "添加成功",
+              title: res.msg,
               icon: "success"
             });
             common_vendor.index.setStorageSync("needRefreshHome", true);
@@ -283,31 +283,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           labelDirection: "horizontal",
           class: "data-v-6409e324"
         }),
-        e: common_vendor.o(scanCode, "9d"),
+        e: common_vendor.o(scanCode, "18"),
         f: common_vendor.p({
           name: "/static/sancode.png",
           fontSize: "24",
           class: "data-v-6409e324"
         }),
         g: common_vendor.o(($event) => {
-          return carInfo.value.imei = $event;
-        }, "9d"),
+          return carInfo.value.deviceNo = $event;
+        }, "c7"),
         h: common_vendor.p({
           border: "none",
-          placeholder: "请输入设备ID(必填)",
-          modelValue: carInfo.value.imei,
+          placeholder: "请输入设备编号(必填)",
+          modelValue: carInfo.value.deviceNo,
           class: "data-v-6409e324"
         }),
         i: common_vendor.p({
-          label: "设备ID",
-          name: "imei",
+          label: "设备编号",
+          name: "deviceNo",
           required: true,
           labelDirection: "horizontal",
           class: "data-v-6409e324"
         }),
         j: common_vendor.t(carInfo.value.deviceTypeValue || "请选择设备图标(必选)"),
         k: !carInfo.value.deviceTypeValue ? 1 : "",
-        l: common_vendor.o(deviceTypeSelectFun, "ae"),
+        l: common_vendor.o(deviceTypeSelectFun, "ed"),
         m: common_vendor.p({
           label: "车标",
           name: "deviceType",
@@ -317,7 +317,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         n: common_vendor.o(($event) => {
           return carInfo.value.plateNo = $event;
-        }, "5e"),
+        }, "81"),
         o: common_vendor.p({
           border: "none",
           placeholder: "请输入车牌号",
@@ -330,8 +330,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           labelDirection: "horizontal",
           class: "data-v-6409e324"
         }),
-        q: common_vendor.o(updateCarIconSelectorVisible, "fd"),
-        r: common_vendor.o(selectIcon, "8d"),
+        q: common_vendor.o(updateCarIconSelectorVisible, "6e"),
+        r: common_vendor.o(selectIcon, "1f"),
         s: common_vendor.p({
           show: carIconSelectorVisible.value,
           class: "data-v-6409e324"
@@ -345,7 +345,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           watchValidStatus: true,
           class: "data-v-6409e324"
         }),
-        w: common_vendor.o(submit, "a8"),
+        w: common_vendor.o(submit, "91"),
         x: common_vendor.p({
           type: "primary",
           loading: loading.value,

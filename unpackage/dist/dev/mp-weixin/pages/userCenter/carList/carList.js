@@ -112,7 +112,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return {
             a: common_vendor.t(item.getString("deviceName", "")),
             b: common_vendor.t(item.getString("plateNo", "")),
-            c: common_vendor.t(item.getString("imei", "")),
+            c: common_vendor.t(item.getString("deviceNo", "")),
             d: index,
             e: common_vendor.o(($event) => {
               return carDetail(item.getString("deviceId", ""));

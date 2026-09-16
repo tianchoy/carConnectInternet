@@ -39,7 +39,7 @@ class Device extends common_vendor.UTS.UTSType {
           name: { type: String, optional: false },
           deviceName: { type: String, optional: false },
           value: { type: String, optional: false },
-          imei: { type: String, optional: false },
+          deviceNo: { type: String, optional: false },
           deptId: { type: String, optional: false },
           deviceId: { type: String, optional: false },
           iccid: { type: String, optional: false },
@@ -60,7 +60,7 @@ class Device extends common_vendor.UTS.UTSType {
     this.name = this.__props__.name;
     this.deviceName = this.__props__.deviceName;
     this.value = this.__props__.value;
-    this.imei = this.__props__.imei;
+    this.deviceNo = this.__props__.deviceNo;
     this.deptId = this.__props__.deptId;
     this.deviceId = this.__props__.deviceId;
     this.iccid = this.__props__.iccid;
@@ -170,7 +170,7 @@ class SavedDevice extends common_vendor.UTS.UTSType {
         return {
           name: { type: String, optional: false },
           deviceName: { type: String, optional: false },
-          imei: { type: String, optional: false },
+          deviceNo: { type: String, optional: false },
           deptId: { type: String, optional: false },
           deviceId: { type: String, optional: false },
           iccid: { type: String, optional: false },
@@ -190,7 +190,7 @@ class SavedDevice extends common_vendor.UTS.UTSType {
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.name = this.__props__.name;
     this.deviceName = this.__props__.deviceName;
-    this.imei = this.__props__.imei;
+    this.deviceNo = this.__props__.deviceNo;
     this.deptId = this.__props__.deptId;
     this.deviceId = this.__props__.deviceId;
     this.iccid = this.__props__.iccid;
@@ -238,7 +238,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const deviceList = common_vendor.ref([]);
     const showPicker = common_vendor.ref(false);
     const pickerValues = common_vendor.ref([]);
-    const currentCarImei = common_vendor.ref("");
+    const currentCarDeviceNo = common_vendor.ref("");
     const currentCarDeptId = common_vendor.ref("");
     const currentCarDeviceId = common_vendor.ref("");
     const currentCarIccId = common_vendor.ref("");
@@ -285,12 +285,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const pickerColumns = common_vendor.computed(() => {
       return [deviceList.value.map((device) => {
-        const displayName = device.deviceName || device.name || device.imei || "未命名设备";
+        const displayName = device.deviceName || device.name || device.deviceNo || "未命名设备";
         const statusText = device.connectionStatus == "online" ? "在线" : "离线";
         return {
-          id: device.imei,
+          id: device.deviceNo,
           label: `${displayName} (${statusText})`,
-          value: device.imei || device.deviceId,
+          value: device.deviceNo || device.deviceId,
           disabled: false,
           children: null
         };
@@ -313,9 +313,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const saveSelectedDevice = (device) => {
       try {
         const deviceInfo = new common_vendor.UTSJSONObject({
-          name: device.deviceName || device.name || device.imei,
-          deviceName: device.deviceName || device.name || device.imei,
-          imei: device.imei || device.value,
+          name: device.deviceName || device.name || device.deviceNo,
+          deviceName: device.deviceName || device.name || device.deviceNo,
+          deviceNo: device.deviceNo || device.value,
           deptId: device.deptId,
           deviceId: device.deviceId,
           iccid: device.iccid,
@@ -347,15 +347,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       if (data == null)
         return null;
-      const imei = data.getString("imei", "");
+      const deviceNo = data.getString("deviceNo", "");
       const deviceId = data.getString("deviceId", "");
-      if (imei == "" && deviceId == "")
+      if (deviceNo == "" && deviceId == "")
         return null;
-      const identity = imei != "" ? imei : deviceId;
+      const identity = deviceNo != "" ? deviceNo : deviceId;
       const device = new SavedDevice({
         name: data.getString("name", identity),
         deviceName: data.getString("deviceName", data.getString("name", identity)),
-        imei,
+        deviceNo,
         deptId: data.getString("deptId", ""),
         deviceId,
         iccid: data.getString("iccid", ""),
@@ -413,13 +413,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.__f__("error", "at pages/index/index.uvue:522", "清除保存设备索引失败:", error);
       }
     };
-    const findDeviceIndex = (imei, deviceId) => {
-      if (imei != "") {
-        const imeiIndex = deviceList.value.findIndex((device) => {
-          return device.imei == imei || device.value == imei;
+    const findDeviceIndex = (deviceNo, deviceId) => {
+      if (deviceNo != "") {
+        const deviceNoIndex = deviceList.value.findIndex((device) => {
+          return device.deviceNo == deviceNo || device.value == deviceNo;
         });
-        if (imeiIndex != -1)
-          return imeiIndex;
+        if (deviceNoIndex != -1)
+          return deviceNoIndex;
       }
       if (deviceId != "") {
         return deviceList.value.findIndex((device) => {
@@ -436,9 +436,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      const currentIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value);
+      const currentIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value);
       const savedDevice = getSavedSelectedDevice();
-      const savedDeviceIndex = savedDevice != null ? findDeviceIndex(savedDevice.imei, savedDevice.deviceId) : -1;
+      const savedDeviceIndex = savedDevice != null ? findDeviceIndex(savedDevice.deviceNo, savedDevice.deviceId) : -1;
       const savedIndex = getSavedSelectedDeviceIndex();
       let selectedIndex = currentIndex;
       if (selectedIndex == -1)
@@ -451,7 +451,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const selectedDevice = deviceList.value[selectedIndex];
       if (selectedDevice == null)
         return null;
-      pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId];
+      pickerValues.value = [selectedDevice.deviceNo || selectedDevice.deviceId];
       showPicker.value = true;
     };
     const createMarker = (id, lat, lng, type, title = null) => {
@@ -554,7 +554,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       averageSpeed.value = 0;
     };
     const clearCurrentCar = () => {
-      currentCarImei.value = "";
+      currentCarDeviceNo.value = "";
       currentCarDeptId.value = "";
       currentCarDeviceId.value = "";
       currentCarIccId.value = "";
@@ -596,10 +596,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         clearTripData();
       }
     };
-    const createTrackRequestData = (imei) => {
+    const createTrackRequestData = (deviceNo) => {
       const timeRange = utils_gettime.getTodayZeroTime();
       return new common_vendor.UTSJSONObject({
-        imei,
+        deviceNo,
         startTime: utils_formateTime.formatTimes(timeRange.todayZero),
         endTime: utils_formateTime.formatTimes(timeRange.nowTime),
         minParkTime: 120,
@@ -699,9 +699,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           yield loadDeviceDetail(device.deviceId);
           yield loadDevicePos(new common_vendor.UTSJSONObject({
             deviceId: device.deviceId,
-            deviceids: device.imei || device.value
+            deviceids: device.deviceNo || device.value
           }));
-          yield loadTrackPos(createTrackRequestData(device.imei || device.value));
+          yield loadTrackPos(createTrackRequestData(device.deviceNo || device.value));
           utils_toast.showAppToast({
             title: "切换成功",
             icon: "none"
@@ -723,7 +723,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       let selectedIndex = -1;
       if (selectedValue != "") {
         selectedIndex = deviceList.value.findIndex((device) => {
-          return device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue;
+          return device.deviceNo == selectedValue || device.value == selectedValue || device.deviceId == selectedValue;
         });
       }
       if (selectedIndex < 0 && e.indexs.length > 0) {
@@ -733,7 +733,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       }
       if (selectedIndex < 0) {
-        selectedIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value);
+        selectedIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value);
       }
       if (selectedIndex < 0 && deviceList.value.length > 0) {
         selectedIndex = 0;
@@ -746,14 +746,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:925", "选择的设备111:", selectedDevice.imei, selectedDevice.deviceId, currentCarImei.value, currentCarDeviceId.value);
+      if (selectedDevice.deviceNo == currentCarDeviceNo.value && selectedDevice.deviceId == currentCarDeviceId.value) {
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:925", "选择的设备111:", selectedDevice.deviceNo, selectedDevice.deviceId, currentCarDeviceNo.value, currentCarDeviceId.value);
         common_vendor.index.__f__("log", "at pages/index/index.uvue:926", "选择的设备与当前设备相同，不重复加载");
         return null;
       }
       const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
       currentCarName.value = deviceName;
-      currentCarImei.value = selectedDevice.imei || selectedDevice.value;
+      currentCarDeviceNo.value = selectedDevice.deviceNo || selectedDevice.value;
       currentCarDeptId.value = selectedDevice.deptId;
       currentCarDeviceId.value = selectedDevice.deviceId;
       currentCarIccId.value = selectedDevice.iccid;
@@ -764,7 +764,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       center.latitude = selectedDevice.latitude;
       center.longitude = selectedDevice.longitude;
       saveSelectedDeviceIndex(selectedIndex);
-      pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId];
+      pickerValues.value = [selectedDevice.deviceNo || selectedDevice.deviceId];
       saveSelectedDevice(selectedDevice);
       common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
         title: "加载车辆数据...",
@@ -810,16 +810,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             markers.value = [];
             userDeviceList.value = list;
             deviceList.value = list.map((item) => {
-              const imei = item.getString("imei", "");
+              const deviceNo = item.getString("deviceNo", "");
               const rawDeviceName = item.getString("deviceName", "");
-              const deviceName = rawDeviceName != "" ? rawDeviceName : imei != "" ? imei : "未命名设备";
+              const deviceName = rawDeviceName != "" ? rawDeviceName : deviceNo != "" ? deviceNo : "未命名设备";
               const apiDeptId = item.getString("deptId", "");
               const deptId = apiDeptId != "" ? apiDeptId : item.getString("companyId", "");
               return new Device({
                 name: deviceName,
                 deviceName,
-                value: imei,
-                imei,
+                value: deviceNo,
+                deviceNo,
                 deptId,
                 deviceId: item.getString("deviceId", ""),
                 iccid: item.getString("iccid", ""),
@@ -836,7 +836,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             let selectedDevice = null;
             let selectedIdx = -1;
             if (savedDevice != null) {
-              selectedIdx = findDeviceIndex(savedDevice.imei, savedDevice.deviceId);
+              selectedIdx = findDeviceIndex(savedDevice.deviceNo, savedDevice.deviceId);
               if (selectedIdx != -1) {
                 selectedDevice = deviceList.value[selectedIdx];
                 saveSelectedDeviceIndex(selectedIdx);
@@ -860,7 +860,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               const device = selectedDevice;
               const deviceName = device.deviceName != "" ? device.deviceName : device.name != "" ? device.name : "未命名设备";
               currentCarName.value = deviceName;
-              currentCarImei.value = device.imei != "" ? device.imei : device.value;
+              currentCarDeviceNo.value = device.deviceNo != "" ? device.deviceNo : device.value;
               currentCarDeptId.value = device.deptId;
               currentCarDeviceId.value = device.deviceId;
               currentCarIccId.value = device.iccid;
@@ -870,13 +870,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               currentCarPlateNo.value = device.plateNo;
               center.latitude = device.latitude;
               center.longitude = device.longitude;
-              pickerValues.value = [device.imei != "" ? device.imei : device.deviceId];
+              pickerValues.value = [device.deviceNo != "" ? device.deviceNo : device.deviceId];
               yield loadDeviceDetail(device.deviceId);
               yield loadDevicePos(new common_vendor.UTSJSONObject({
                 deviceId: device.deviceId,
-                deviceids: device.imei != "" ? device.imei : device.value
+                deviceids: device.deviceNo != "" ? device.deviceNo : device.value
               }));
-              yield loadTrackPos(createTrackRequestData(device.imei != "" ? device.imei : device.value));
+              yield loadTrackPos(createTrackRequestData(device.deviceNo != "" ? device.deviceNo : device.value));
             }
           } else {
             userDeviceList.value = [];
@@ -924,7 +924,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           yield loadDevicePos(new common_vendor.UTSJSONObject({
             deviceId: currentCarDeviceId.value,
-            deviceids: currentCarImei.value
+            deviceids: currentCarDeviceNo.value
           }));
         } catch (error) {
           common_vendor.index.__f__("error", "at pages/index/index.uvue:1128", "刷新位置失败", error);
@@ -990,7 +990,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const hasValidPosition = !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0);
       const timeRange = utils_gettime.getTodayZeroTime();
       common_vendor.index.navigateTo({
-        url: "/pages/playBack/playBack?imei=" + encodeURIComponent(currentCarImei.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&lat=" + encodeURIComponent(hasValidPosition ? latitude.toString() : "") + "&lng=" + encodeURIComponent(hasValidPosition ? longitude.toString() : "") + "&startTime=" + encodeURIComponent(utils_formateTime.formatTimes(timeRange.todayZero)) + "&endTime=" + encodeURIComponent(utils_formateTime.formatTimes(timeRange.nowTime)),
+        url: "/pages/playBack/playBack?deviceNo=" + encodeURIComponent(currentCarDeviceNo.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&lat=" + encodeURIComponent(hasValidPosition ? latitude.toString() : "") + "&lng=" + encodeURIComponent(hasValidPosition ? longitude.toString() : "") + "&startTime=" + encodeURIComponent(utils_formateTime.formatTimes(timeRange.todayZero)) + "&endTime=" + encodeURIComponent(utils_formateTime.formatTimes(timeRange.nowTime)),
         fail: (err) => {
           if (err.errMsg.indexOf("locked") < 0)
             common_vendor.index.__f__("error", "at pages/index/index.uvue:1202", "跳转轨迹详情失败:", err);
@@ -1010,7 +1010,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!isCarSelected())
         return null;
       common_vendor.index.navigateTo({
-        url: `/pages/carInfoDetail/carInfoDetail?imei=${encodeURIComponent(currentCarImei.value)}&deptId=${encodeURIComponent(currentCarDeptId.value)}&deviceId=${encodeURIComponent(currentCarDeviceId.value)}`
+        url: `/pages/carInfoDetail/carInfoDetail?deviceNo=${encodeURIComponent(currentCarDeviceNo.value)}&deptId=${encodeURIComponent(currentCarDeptId.value)}&deviceId=${encodeURIComponent(currentCarDeviceId.value)}`
       });
     };
     const toAdd = () => {
@@ -1055,7 +1055,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!isCarSelected())
         return null;
       common_vendor.index.navigateTo({
-        url: "/pages/geofencing/geofencing?imei=" + encodeURIComponent(currentCarImei.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&deptId=" + encodeURIComponent(currentCarDeptId.value) + "&deviceName=" + encodeURIComponent(currentCarName.value)
+        url: "/pages/geofencing/geofencing?deviceNo=" + encodeURIComponent(currentCarDeviceNo.value) + "&connectionStatus=" + encodeURIComponent(currentCarConnectionStatus.value) + "&plateNo=" + encodeURIComponent(currentCarName.value) + "&carType=" + encodeURIComponent(currentCarCarType.value) + "&deptId=" + encodeURIComponent(currentCarDeptId.value) + "&deviceName=" + encodeURIComponent(currentCarName.value)
       });
     };
     const contactCustomerService = () => {

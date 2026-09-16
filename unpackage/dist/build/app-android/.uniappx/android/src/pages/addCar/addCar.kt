@@ -34,9 +34,9 @@ open class GenPagesAddCarAddCar : BasePage {
             val carIconSelectorVisible = ref<Boolean>(false)
             val loading = ref<Boolean>(false)
             val formValid = ref<Boolean>(false)
-            val carInfo = ref<CarFormData>(CarFormData(deviceName = "", imei = "", deviceType = "", deviceTypeValue = "", plateNo = "", carType = ""))
+            val carInfo = ref<CarFormData>(CarFormData(deviceName = "", deviceNo = "", deviceType = "", deviceTypeValue = "", plateNo = "", carType = ""))
             val actions = ref(_uA<Any>())
-            val rules = _uA<UTSJSONObject>(_uO("name" to "imei", "required" to true, "message" to "请输入设备ID"), _uO("name" to "deviceType", "required" to true, "message" to "请选择设备图标"))
+            val rules = _uA<UTSJSONObject>(_uO("name" to "deviceNo", "required" to true, "message" to "请输入设备编号"), _uO("name" to "deviceType", "required" to true, "message" to "请选择设备图标"))
             val handleModelValid = fun(value: Any){
                 formValid.value = !!isTruthy(value)
             }
@@ -82,14 +82,14 @@ open class GenPagesAddCarAddCar : BasePage {
             val handleScanResult = fun(data: ScanResultData){
                 console.log("接收到扫码结果:", data.result)
                 if (data.result.length == 15) {
-                    carInfo.value.imei = "0" + data.result.slice(4, 15)
+                    carInfo.value.deviceNo = "0" + data.result.slice(4, 15)
                     return
                 }
                 if (data.result.length == 11) {
-                    carInfo.value.imei = "0" + data.result
+                    carInfo.value.deviceNo = "0" + data.result
                     return
                 }
-                showAppToast(ShowToastOptions(title = "扫码结果长度不是标准设备ID，请确认后提交", icon = "none"))
+                showAppToast(ShowToastOptions(title = "扫码结果长度不是标准设备编号，请确认后提交", icon = "none"))
             }
             val updateCarIconSelectorVisible = fun(visible: Boolean){
                 carIconSelectorVisible.value = visible
@@ -109,8 +109,8 @@ open class GenPagesAddCarAddCar : BasePage {
                 uni__emit("refreshDeviceList", null)
             }
             val validateForm = fun(): Boolean {
-                if (carInfo.value.imei.length == 0) {
-                    showAppToast(ShowToastOptions(title = "请输入设备ID", icon = "none"))
+                if (carInfo.value.deviceNo.length == 0) {
+                    showAppToast(ShowToastOptions(title = "请输入设备编号", icon = "none"))
                     return false
                 }
                 if (carInfo.value.deviceType.length == 0) {
@@ -129,7 +129,7 @@ open class GenPagesAddCarAddCar : BasePage {
                             console.log("✅ 表单验证通过")
                             loading.value = true
                             uni_showLoading(ShowLoadingOptions(title = "添加中...", mask = true))
-                            val submitData: UTSJSONObject = _uO("deviceName" to carInfo.value.deviceName, "imei" to carInfo.value.imei, "carType" to carInfo.value.deviceType, "plateNo" to carInfo.value.plateNo)
+                            val submitData: UTSJSONObject = _uO("deviceName" to carInfo.value.deviceName, "deviceNo" to carInfo.value.deviceNo, "carType" to carInfo.value.deviceType, "plateNo" to carInfo.value.plateNo)
                             console.log("📤 提交数据:", submitData)
                             val res = await(addDevice(submitData))
                             console.log("✅ 添加设备返回:", res)
@@ -204,12 +204,12 @@ open class GenPagesAddCarAddCar : BasePage {
                                         )
                                     }
                                     ), "_" to 1)),
-                                    _cV(_component_i_form_item, _uM("label" to "设备ID", "name" to "imei", "required" to "", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                    _cV(_component_i_form_item, _uM("label" to "设备编号", "name" to "deviceNo", "required" to "", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                         return _uA(
-                                            _cV(_component_i_input, _uM("border" to "none", "modelValue" to carInfo.value.imei, "onUpdate:modelValue" to fun(`$event`: String){
-                                                carInfo.value.imei = `$event`
+                                            _cV(_component_i_input, _uM("border" to "none", "modelValue" to carInfo.value.deviceNo, "onUpdate:modelValue" to fun(`$event`: String){
+                                                carInfo.value.deviceNo = `$event`
                                             }
-                                            , "placeholder" to "请输入设备ID(必填)"), _uM("suffix" to withSlotCtx(fun(): UTSArray<Any> {
+                                            , "placeholder" to "请输入设备编号(必填)"), _uM("suffix" to withSlotCtx(fun(): UTSArray<Any> {
                                                 return _uA(
                                                     _cV(_component_i_icon, _uM("name" to "/static/sancode.png", "fontSize" to "24", "onClick" to scanCode))
                                                 )

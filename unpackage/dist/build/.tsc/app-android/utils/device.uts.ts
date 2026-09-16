@@ -1,6 +1,6 @@
 export type DeviceItem = {
 	plateNo: string
-	imei: string
+	deviceNo: string
 	status: number
 	companyId: string
 	deviceName: string

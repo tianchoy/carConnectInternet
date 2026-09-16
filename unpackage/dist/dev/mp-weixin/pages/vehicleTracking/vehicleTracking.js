@@ -110,7 +110,7 @@ const MARKER_UPDATE_INTERVAL = 30;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "vehicleTracking",
   setup(__props) {
-    const imei = common_vendor.ref("");
+    const deviceNo = common_vendor.ref("");
     const connectionStatus = common_vendor.ref("");
     common_vendor.ref("");
     const deptId = common_vendor.ref("");
@@ -185,7 +185,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const data = new common_vendor.UTSJSONObject({
             deptId: deptId.value,
-            deviceids: imei.value
+            deviceids: deviceNo.value
           });
           const res = yield api_request.getDevicePos(data);
           const positions = res.data;
@@ -198,8 +198,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           let foundDevice = false;
           positions.forEach((item) => {
-            const itemImei = item.getString("imei", "");
-            if (itemImei == imei.value) {
+            const itemDeviceNo = item.getString("deviceNo", "");
+            if (itemDeviceNo == deviceNo.value) {
               foundDevice = true;
               const latitude = item.getNumber("latitude", 0);
               const longitude = item.getNumber("longitude", 0);
@@ -299,9 +299,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a, _b, _c, _d, _f;
       common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:305", "option", option);
       connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
-      imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
+      deviceNo.value = (_b = option.deviceNo) !== null && _b !== void 0 ? _b : "";
       const displayCarName = normalizeRouteValue((_c = option.plateNo) !== null && _c !== void 0 ? _c : "");
-      currentCar.value = displayCarName != "" ? displayCarName : imei.value != "" ? imei.value : "未命名设备";
+      currentCar.value = displayCarName != "" ? displayCarName : deviceNo.value != "" ? deviceNo.value : "未命名设备";
       deptId.value = (_d = option.deptId) !== null && _d !== void 0 ? _d : "";
       carType.value = normalizeRouteValue((_f = option.carType) !== null && _f !== void 0 ? _f : "");
       loadInitialPosition();
@@ -484,12 +484,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         isTrackRequestPending = true;
         try {
-          const res = yield api_request.getDevicePos(new common_vendor.UTSJSONObject({ deptId: deptId.value, deviceids: imei.value }));
+          const res = yield api_request.getDevicePos(new common_vendor.UTSJSONObject({ deptId: deptId.value, deviceids: deviceNo.value }));
           const positions = res.data;
           if (!isTracking.value || sessionId != trackingSessionId || res == null || !api_response.isBusinessSuccessCode(res.code) || positions == null)
             return Promise.resolve(null);
           const item = common_vendor.UTS.arrayFind(positions, (value) => {
-            return value.getString("imei", "") == imei.value;
+            return value.getString("deviceNo", "") == deviceNo.value;
           });
           if (item == null)
             return Promise.resolve(null);

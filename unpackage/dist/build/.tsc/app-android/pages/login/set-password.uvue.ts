@@ -3,7 +3,7 @@ import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uv
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { isBusinessSuccessCode } from '../../api/response.uts'
-	import { ref, onMounted, onUnmounted } from 'vue'
+	import { ref, computed, onMounted, onUnmounted } from 'vue'
 	import { registerPersonalUser } from '../../api/request.uts'
 	import { resetTokenExpiredState } from '../../api/http.uts'
 	import { schedulePostLoginInitialization } from '../../services/app-startup.uts'
@@ -30,6 +30,21 @@ const _cache = __ins.renderCache;
 	})
 	const submitting = ref(false)
 	let registerContext: SmsRegisterContext | null = null
+
+	const isPasswordSetupReady = computed<boolean>(() => {
+		const password = form.value.password
+		let categoryCount = 0
+		if (/[0-9]/.test(password)) categoryCount += 1
+		if (/[A-Za-z]/.test(password)) categoryCount += 1
+		if (/[^A-Za-z0-9]/.test(password)) categoryCount += 1
+
+		return password.length >= 8
+			&& password.length <= 16
+			&& categoryCount >= 2
+			&& form.value.confirmPassword != ''
+			&& password == form.value.confirmPassword
+			&& !submitting.value
+	})
 
 	const returnToLogin = (): void => {
 		clearSmsRegisterContext()
@@ -186,11 +201,12 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           color: "#3485df",
           customStyle: "height:104rpx;",
           loading: submitting.value,
+          disabled: !isPasswordSetupReady.value,
           onClick: submitRegister
         }), _uM({
           default: withSlotCtx((): any[] => [" 完成设置 "]),
           _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["loading"])
+        }), 8 /* PROPS */, ["loading", "disabled"])
       ])
     ]),
     _cV(_component_app_toast)

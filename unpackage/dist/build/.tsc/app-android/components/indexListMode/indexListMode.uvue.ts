@@ -85,9 +85,9 @@ __ins.emit(event, ...do_not_transform_spread)
 		// 隐藏确认弹窗
 		modal.value = false
 	}
-	const todetail = (companyId:string,imei:string,deviceId:string) => {
+	const todetail = (companyId:string,deviceNo:string,deviceId:string) => {
 		uni.navigateTo({
-			url: '/pages/carInfoDetail/carInfoDetail?deptId='+companyId+ '&imei=' + imei + '&deviceId=' + deviceId
+			url: '/pages/carInfoDetail/carInfoDetail?deptId='+companyId+ '&deviceNo=' + deviceNo + '&deviceId=' + deviceId
 		})
 	}
 
@@ -107,11 +107,11 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
             return _cE("view", _uM({
               class: "list-item",
               key: index,
-              onClick: () => {todetail(item.companyId,item.imei,item.deviceId)}
+              onClick: () => {todetail(item.companyId,item.deviceNo,item.deviceId)}
             }), [
               _cE("view", _uM({ class: "title" }), [
                 _cE("view", _uM({ class: "car-number" }), [
-                  _tD(item.deviceName || item.imei) + " ",
+                  _tD(item.deviceName || item.deviceNo) + " ",
                   _cV(_component_i_tag, _uM({
                     class: "car-status-spacing",
                     size: "mini",
@@ -130,7 +130,7 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
                 ])
               ]),
               _cE("view", null, [
-                _cE("text", _uM({ class: "imei" }), "ID: " + _tD(item.imei), 1 /* TEXT */)
+                _cE("text", _uM({ class: "imei" }), "ID: " + _tD(item.deviceNo), 1 /* TEXT */)
               ])
             ], 8 /* PROPS */, ["onClick"])
           }), 128 /* KEYED_FRAGMENT */)

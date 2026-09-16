@@ -344,6 +344,7 @@ export const getCustomList = (): Promise<JsonDataResponse> => get(customList).th
 export const getCustomDeviceList = (deptId: string): Promise<JsonDataResponse> => get(customDeviceList, { deptId } as UTSJSONObject).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw); });
 export const getUserGroupList = (): Promise<JsonDataResponse> => get(groupList).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw); });
 export const sendCommand = (data: UTSJSONObject): Promise<BasicResponse> => post(sendcmd, data).then((raw: any): BasicResponse => { return basicResponse(raw); });
+export const restoreOilPower = (data: UTSJSONObject): Promise<BasicResponse> => put(sendcmd, data).then((raw: any): BasicResponse => { return basicResponse(raw); });
 export const getDevicePos = (data: UTSJSONObject): Promise<DevicePositionResponse> => get(devicePos, data).then((raw: any): DevicePositionResponse => {
     const response = asJSONObject(raw);
     return {

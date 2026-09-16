@@ -35,7 +35,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const pickerTitle = common_vendor.ref("选择开始时间");
     const startTime = common_vendor.ref("");
     const endTime = common_vendor.ref("");
-    const imei = common_vendor.ref("");
+    const deviceNo = common_vendor.ref("");
     const carStopDetail = common_vendor.ref([]);
     const sortedCarStopDetail = common_vendor.computed(() => {
       const sorted = carStopDetail.value.slice();
@@ -51,7 +51,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return sorted;
     });
     common_vendor.onLoad((option) => {
-      imei.value = option.imei;
+      deviceNo.value = option.deviceNo;
     });
     const initDateTime = () => {
       const now = /* @__PURE__ */ new Date();
@@ -75,7 +75,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "加载中..."
         }));
         const data = new common_vendor.UTSJSONObject({
-          imei: imei.value,
+          deviceNo: deviceNo.value,
           startTime: startTime.value,
           endTime: endTime.value,
           minParkTime: 10,

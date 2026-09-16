@@ -46,7 +46,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-const imei = ref<string>('')
+const deviceNo = ref<string>('')
 	const connectionStatus = ref<string>('')
 	const deviceId = ref<string>('')
 	const deptId = ref<string>('')
@@ -149,7 +149,7 @@ const imei = ref<string>('')
 		try {
 			const data = {
 				deptId: deptId.value,
-				deviceids: imei.value
+				deviceids: deviceNo.value
 			}
 
 			const res = await getDevicePos(data)
@@ -163,8 +163,8 @@ const imei = ref<string>('')
 			}
 			let foundDevice = false
 			positions.forEach((item : UTSJSONObject) => {
-					const itemImei = item.getString('imei', '')
-					if (itemImei == imei.value) {
+					const itemDeviceNo = item.getString('deviceNo', '')
+					if (itemDeviceNo == deviceNo.value) {
 						foundDevice = true
 
 						const latitude = item.getNumber('latitude', 0)
@@ -281,9 +281,9 @@ const imei = ref<string>('')
 	onLoad((option) => {
 		console.log('option', option)
 		connectionStatus.value = option.connectionStatus ?? ''
-		imei.value = option.imei ?? ''
+		deviceNo.value = option.deviceNo ?? ''
 		const displayCarName = normalizeRouteValue(option.plateNo ?? '')
-		currentCar.value = displayCarName != '' ? displayCarName : (imei.value != '' ? imei.value : '未命名设备')
+		currentCar.value = displayCarName != '' ? displayCarName : (deviceNo.value != '' ? deviceNo.value : '未命名设备')
 		deptId.value = option.deptId ?? ''
 		carType.value = normalizeRouteValue(option.carType ?? '')
 		loadInitialPosition()
@@ -444,10 +444,10 @@ const imei = ref<string>('')
 		if (!isTracking.value || sessionId != trackingSessionId || isTrackRequestPending) return
 		isTrackRequestPending = true
 		try {
-			const res = await getDevicePos({ deptId: deptId.value, deviceids: imei.value })
+			const res = await getDevicePos({ deptId: deptId.value, deviceids: deviceNo.value })
 			const positions = res.data
 			if (!isTracking.value || sessionId != trackingSessionId || res == null || !isBusinessSuccessCode(res.code) || positions == null) return
-			const item = positions.find((value : UTSJSONObject) => value.getString('imei', '') == imei.value)
+			const item = positions.find((value : UTSJSONObject) => value.getString('deviceNo', '') == deviceNo.value)
 			if (item == null) return
 			const rawLat = item.getNumber('latitude', 0), rawLng = item.getNumber('longitude', 0)
 			if (rawLat == 0 || rawLng == 0 || !isFinite(rawLat) || !isFinite(rawLng)) return

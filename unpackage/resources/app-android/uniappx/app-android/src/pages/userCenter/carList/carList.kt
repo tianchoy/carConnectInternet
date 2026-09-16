@@ -111,7 +111,7 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                                     _cE("text", _uM("class" to "title"), _tD(item.getString("deviceName", "")), 1),
                                     _cE("view", _uM("class" to "device-info"), _uA(
                                         _cE("text", null, _tD(item.getString("plateNo", "")), 1),
-                                        _cE("text", _uM("class" to "tel"), _tD(item.getString("imei", "")), 1)
+                                        _cE("text", _uM("class" to "tel"), _tD(item.getString("deviceNo", "")), 1)
                                     ))
                                 ), 8, _uA(
                                     "onClick"

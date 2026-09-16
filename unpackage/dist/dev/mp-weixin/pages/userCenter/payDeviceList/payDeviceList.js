@@ -145,9 +145,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, item.iccid ? {
             c: common_vendor.t(item.iccid)
           } : {}, {
-            d: item.imei && item.imei != ""
-          }, item.imei && item.imei != "" ? {
-            e: common_vendor.t(item.imei)
+            d: item.deviceNo && item.deviceNo != ""
+          }, item.deviceNo && item.deviceNo != "" ? {
+            e: common_vendor.t(item.deviceNo)
           } : {}, {
             f: common_vendor.o(($event) => {
               return payDevice(item);

@@ -8,7 +8,7 @@ import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
-	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand ,getGeocoderAddress} from '../../api/request.uts'
+	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand, restoreOilPower, getGeocoderAddress } from '../../api/request.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -34,7 +34,7 @@ const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
 const deptId = ref<string | null>('')
-	const imei = ref<string | null>('')
+	const deviceNo = ref<string | null>('')
 	const deviceId = ref<string | null>('')
 	// 地图状态
 	const center = reactive<MapCenter>({
@@ -202,7 +202,7 @@ const deptId = ref<string | null>('')
 		if (deviceName != '') return deviceName
 		const plateNo = currentCarInfo.value.getString('plateNo', '')
 		if (plateNo != '') return plateNo
-		return imei.value ?? '未命名设备'
+		return deviceNo.value ?? '未命名设备'
 	}
 
 	//封装markers
@@ -256,8 +256,8 @@ const deptId = ref<string | null>('')
 
 				// 使用 for...of 替代 forEach，确保 await 生效
 				for (const item of positions) {
-					const itemImei = item.getString('imei', '');
-					if (itemImei != null && itemImei == imei.value) {
+					const itemDeviceNo = item.getString('deviceNo', '');
+					if (itemDeviceNo != null && itemDeviceNo == deviceNo.value) {
 						foundDevice = true;
 
 						// item 已是 UTSJSONObject，直接赋值以保留正确类型。
@@ -337,7 +337,7 @@ const deptId = ref<string | null>('')
 						if (signalRssi.value != null) {
 							const signalExp = getSignalDetail(signalRssi.value).experience;
 							if (signalExp === '差' || signalExp === '非常差' || signalExp === '无信号') {
-								console.warn(`设备 ${imei.value} 信号较弱: ${signalRssi.value}dBm`);
+								console.warn(`设备 ${deviceNo.value} 信号较弱: ${signalRssi.value}dBm`);
 							}
 						}
 					}
@@ -403,7 +403,7 @@ const deptId = ref<string | null>('')
 		try {
 			const success = await loadData({
 				deptId: deptId.value,
-				deviceids: imei.value
+				deviceids: deviceNo.value
 			} as UTSJSONObject, 3);
 
 			if (success) {
@@ -464,14 +464,14 @@ const deptId = ref<string | null>('')
 			// 立即加载一次数据
 			loadData({
 				deptId: deptId.value,
-				deviceids: imei.value
+				deviceids: deviceNo.value
 			} as UTSJSONObject, 3)
 
 			// 设置定时器
 			refreshTimer.value = setInterval(() => {
 				loadData({
 					deptId: deptId.value,
-					deviceids: imei.value
+					deviceids: deviceNo.value
 				} as UTSJSONObject, 3)
 			}, intervalMs) as number
 		}
@@ -572,13 +572,16 @@ const deptId = ref<string | null>('')
 			})
 
 			// 调用接口
-			const res = await sendCommand({
-				imei: imei.value,
+			const commandData = {
+				deviceNo: deviceNo.value,
 				password: userType.value == '1' ? psw.value : '', // 根据用户类型决定是否传密码
 				params: ['1111'],
 				predictCmdId: predictCmdId,
 				type: type
-			})
+			} as UTSJSONObject
+			const res = operationType == 1
+				? await restoreOilPower(commandData)
+				: await sendCommand(commandData)
 
 			// 隐藏加载中
 			uni.hideLoading()
@@ -663,25 +666,25 @@ const deptId = ref<string | null>('')
 		if (itemTo == '轨迹回放') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType) + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude
+				url: '/pages/playBack/playBack?deviceNo=' + deviceNo.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType) + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude
 			})
 		}
 		if (itemTo == '车辆跟踪') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType)
+				url: '/pages/vehicleTracking/vehicleTracking?deviceNo=' + deviceNo.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType)
 			})
 		}
 		if (itemTo == '里程记录') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType)
+				url: '/pages/mileageRecord/mileageRecord?deviceNo=' + deviceNo.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType)
 			})
 		}
 		if (itemTo == '停车记录') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/stopRecord/stopRecord?imei=' + imei.value + '&deptId=' + deptId.value
+				url: '/pages/stopRecord/stopRecord?deviceNo=' + deviceNo.value + '&deptId=' + deptId.value
 			})
 		}
 		if (itemTo == '恢复油电') {
@@ -713,7 +716,7 @@ const deptId = ref<string | null>('')
 		if (itemTo == '电子围栏') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType) + '&deptId=' + deptId.value + '&deviceName=' + encodeURIComponent(routeDeviceName)
+				url: '/pages/geofencing/geofencing?deviceNo=' + deviceNo.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType) + '&deptId=' + deptId.value + '&deviceName=' + encodeURIComponent(routeDeviceName)
 			})
 		}
 		if (itemTo == '一键寻车') {
@@ -722,16 +725,16 @@ const deptId = ref<string | null>('')
 		if (itemTo == '发送指令') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/cmd/cmd?imei=' + imei.value + '&deviceId=' + deviceId.value
+				url: '/pages/cmd/cmd?deviceNo=' + deviceNo.value + '&deviceId=' + deviceId.value
 			})
 		}
 		if (itemTo == '分享设备') {
 			stopAutoRefresh() // 停止刷新
-			const shareImei = imei.value ?? ''
+			const shareDeviceNo = deviceNo.value ?? ''
 			const shareDeviceId = deviceId.value ?? ''
 			const shareDeviceName = getDisplayCarName()
 			uni.navigateTo({
-				url: '/pages/deviceShare/deviceShare?imei=' + encodeURIComponent(shareImei) + '&deviceId=' + encodeURIComponent(shareDeviceId) + '&deviceName=' + encodeURIComponent(shareDeviceName)
+				url: '/pages/deviceShare/deviceShare?deviceNo=' + encodeURIComponent(shareDeviceNo) + '&deviceId=' + encodeURIComponent(shareDeviceId) + '&deviceName=' + encodeURIComponent(shareDeviceName)
 			})
 		}
 
@@ -753,7 +756,7 @@ const deptId = ref<string | null>('')
 
 	onLoad((option) => {
 		deptId.value = option.deptId;
-		imei.value = option.imei;
+		deviceNo.value = option.deviceNo;
 		deviceId.value = option.deviceId;
 		const storedUserType = uni.getStorageSync('userType') as string | null;
 		userType.value = storedUserType ?? '';
@@ -761,7 +764,7 @@ const deptId = ref<string | null>('')
 		loadDeviceDetail().then(() => {
 			const data: UTSJSONObject = {
 				deptId: deptId.value,
-				deviceids: imei.value
+				deviceids: deviceNo.value
 			};
 
 			uni.showLoading({ title: '加载中...' });
@@ -856,7 +859,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             onClick: carDetail
           }), [
             _cE("view", _uM({ class: "imeis" }), [
-              _cE("text", _uM({ class: "imei-text" }), "ID: " + _tD(unref(imei)), 1 /* TEXT */),
+              _cE("text", _uM({ class: "imei-text" }), "ID: " + _tD(unref(deviceNo)), 1 /* TEXT */),
               _cE("text", _uM({ class: "pos-time" }))
             ]),
             _cV(_component_i_icon, _uM({

@@ -25,6 +25,21 @@ open class GenPagesLoginSetPassword : BasePage {
             val form = ref<PasswordForm>(PasswordForm(password = "", confirmPassword = ""))
             val submitting = ref(false)
             var registerContext: SmsRegisterContext? = null
+            val isPasswordSetupReady = computed<Boolean>(fun(): Boolean {
+                val password = form.value.password
+                var categoryCount: Number = 0
+                if (UTSRegExp("[0-9]", "").test(password)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[A-Za-z]", "").test(password)) {
+                    categoryCount += 1
+                }
+                if (UTSRegExp("[^A-Za-z0-9]", "").test(password)) {
+                    categoryCount += 1
+                }
+                return password.length >= 8 && password.length <= 16 && categoryCount >= 2 && form.value.confirmPassword != "" && password == form.value.confirmPassword && !submitting.value
+            }
+            )
             val returnToLogin = fun(): Unit {
                 clearSmsRegisterContext()
                 uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
@@ -167,13 +182,14 @@ open class GenPagesLoginSetPassword : BasePage {
                                 "modelValue",
                                 "onUpdate:modelValue"
                             )),
-                            _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to submitting.value, "onClick" to submitRegister), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            _cV(_component_i_button, _uM("class" to "submit-button", "type" to "primary", "block" to "", "round" to "25rpx", "color" to "#3485df", "customStyle" to "height:104rpx;", "loading" to submitting.value, "disabled" to !isPasswordSetupReady.value, "onClick" to submitRegister), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
                                     " 完成设置 "
                                 )
                             }
                             ), "_" to 1), 8, _uA(
-                                "loading"
+                                "loading",
+                                "disabled"
                             ))
                         ))
                     )),

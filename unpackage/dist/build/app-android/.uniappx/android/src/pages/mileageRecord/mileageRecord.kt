@@ -34,7 +34,7 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             val pickerTitle = ref("选择开始时间")
             val startTime = ref("")
             val endTime = ref("")
-            val imei = ref<String?>("")
+            val deviceNo = ref<String?>("")
             val groupedTrips = computed<UTSArray<GroupType>>(fun(): UTSArray<GroupType> {
                 val dateGroups: UTSArray<DateTripGroup> = _uA()
                 tripData.value.forEach(fun(trip: UTSJSONObject): Unit {
@@ -176,11 +176,11 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             val loadMileageData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        if (!isTruthy(imei.value)) {
+                        if (!isTruthy(deviceNo.value)) {
                             return@w1
                         }
                         try {
-                            val data: UTSJSONObject = _uO("imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
+                            val data: UTSJSONObject = _uO("deviceNo" to deviceNo.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
                             val res = await(getTrackPos(data))
                             if (!isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
@@ -212,14 +212,14 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             }
             )
             onLoad(fun(option){
-                imei.value = option["imei"] ?: null
+                deviceNo.value = option["deviceNo"] ?: null
                 carStatus.value = option["connectionStatus"] ?: "在线"
                 plateNo.value = option["plateNo"] ?: ""
                 carType.value = option["carType"] ?: ""
             }
             )
             val gotoTripDetail = fun(startTime: String, endTime: String){
-                uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?startTime=" + startTime + "&endTime=" + endTime + "&imei=" + imei.value + "&connectionStatus=" + carStatus.value + "&plateNo=" + plateNo.value + "&carType=" + carType.value))
+                uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?startTime=" + startTime + "&endTime=" + endTime + "&deviceNo=" + deviceNo.value + "&connectionStatus=" + carStatus.value + "&plateNo=" + plateNo.value + "&carType=" + carType.value))
             }
             val formatDisplayTime = fun(timeString: String): String {
                 if (!(timeString != "")) {

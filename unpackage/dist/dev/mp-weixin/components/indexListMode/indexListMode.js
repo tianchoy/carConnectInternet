@@ -60,9 +60,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const cancel = () => {
       modal.value = false;
     };
-    const todetail = (companyId, imei, deviceId) => {
+    const todetail = (companyId, deviceNo, deviceId) => {
       common_vendor.index.navigateTo({
-        url: "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&imei=" + imei + "&deviceId=" + deviceId
+        url: "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&deviceNo=" + deviceNo + "&deviceId=" + deviceId
       });
     };
     return (_ctx, _cache) => {
@@ -72,7 +72,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, props.lists.length != 0 ? {
         b: common_vendor.f(props.lists, (item, index, i0) => {
           return {
-            a: common_vendor.t(item.deviceName || item.imei),
+            a: common_vendor.t(item.deviceName || item.deviceNo),
             b: "245c735a-0-" + i0,
             c: common_vendor.p({
               size: "mini",
@@ -89,10 +89,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               return unbindDevice(item.deviceId);
             }, index),
             g: "245c735a-2-" + i0,
-            h: common_vendor.t(item.imei),
+            h: common_vendor.t(item.deviceNo),
             i: index,
             j: common_vendor.o(($event) => {
-              return todetail(item.companyId, item.imei, item.deviceId);
+              return todetail(item.companyId, item.deviceNo, item.deviceId);
             }, index)
           };
         }),
@@ -106,8 +106,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "device-tool-spacing"
         })
       } : {}, {
-        e: common_vendor.o(confirm, "cf"),
-        f: common_vendor.o(cancel, "d2"),
+        e: common_vendor.o(confirm, "a5"),
+        f: common_vendor.o(cancel, "fb"),
         g: common_vendor.p({
           show: common_vendor.unref(modal),
           title: "提示",

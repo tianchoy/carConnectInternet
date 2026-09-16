@@ -209,7 +209,7 @@ class CoordinateBounds extends common_vendor.UTS.UTSType {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "geofencing",
   setup(__props) {
-    const imei = common_vendor.ref(null);
+    const deviceNo = common_vendor.ref(null);
     const connectionStatus = common_vendor.ref(null);
     const deptId = common_vendor.ref(null);
     const carType = common_vendor.ref(null);
@@ -290,7 +290,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }));
         try {
           isMapReady.value = false;
-          const data = new common_vendor.UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
+          const data = new common_vendor.UTSJSONObject({ deptId: deptId.value, deviceids: deviceNo.value });
           const res = yield api_request.getDevicePos(data);
           const positions = res.data;
           if (!api_response.isBusinessSuccessCode(res.code) || positions == null) {
@@ -298,7 +298,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             return Promise.resolve(null);
           }
           positions.forEach((item) => {
-            if (item.getString("imei", "") == imei.value) {
+            if (item.getString("deviceNo", "") == deviceNo.value) {
               const deviceData = item;
               const latitude = deviceData.getNumber("latitude", 0);
               const longitude = deviceData.getNumber("longitude", 0);
@@ -966,15 +966,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         loadUnboundDevices(currentFenceId.value);
       }
     };
-    const toggleDeviceBinding = (deviceImei, bound) => {
+    const toggleDeviceBinding = (deviceNo2, bound) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1094", "toggleDeviceBinding", deviceImei, bound);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1094", "toggleDeviceBinding", deviceNo2, bound);
         loading.value = true;
         try {
           const params = new common_vendor.UTSJSONObject({
             geofenceId: (_a = currentFenceId.value) !== null && _a !== void 0 ? _a : "",
-            imeis: [deviceImei]
+            deviceNos: [deviceNo2]
           });
           common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1101", "toggleDeviceBindingparams", params);
           let result = null;
@@ -1004,9 +1004,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    const isDeviceBound = (deviceImei) => {
+    const isDeviceBound = (deviceNo2) => {
       return boundDevices.value.some((device) => {
-        return device.getString("imei", "") === deviceImei;
+        return device.getString("deviceNo", "") === deviceNo2;
       });
     };
     const setDrawingMode = (mode) => {
@@ -1026,18 +1026,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       selectedFence.value = null;
       updateMapDisplay();
     };
-    function handleDeviceBindingChange(deviceImei, bound) {
-      void toggleDeviceBinding(deviceImei, bound);
+    function handleDeviceBindingChange(deviceNo2, bound) {
+      void toggleDeviceBinding(deviceNo2, bound);
     }
-    function getDeviceImei(device) {
-      return device.getString("imei", "");
+    function getDeviceNo(device) {
+      return device.getString("deviceNo", "");
     }
     function isDeviceOnline(device) {
       return device.getString("connectionStatus", "") === "online";
     }
     function getDeviceDisplayName(device) {
       const deviceName2 = device.getString("deviceName", "");
-      return deviceName2 ? deviceName2 : device.getString("plateNo", "") ? device.getString("plateNo", "") : device.getString("imei", "");
+      return deviceName2 ? deviceName2 : device.getString("plateNo", "") ? device.getString("plateNo", "") : device.getString("deviceNo", "");
     }
     function getSelectedFenceName() {
       const fence = selectedFence.value;
@@ -1158,10 +1158,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a, _b, _c, _d;
       common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1357", "加载参数", option);
       connectionStatus.value = option.connectionStatus;
-      imei.value = option.imei;
+      deviceNo.value = option.deviceNo;
       const routeDeviceName = normalizeRouteValue((_a = option.deviceName) !== null && _a !== void 0 ? _a : "");
       const routePlateNo = normalizeRouteValue((_b = option.plateNo) !== null && _b !== void 0 ? _b : "");
-      currentCar.value = routePlateNo != "" ? routePlateNo : routeDeviceName != "" ? routeDeviceName : (_c = imei.value) !== null && _c !== void 0 ? _c : "未命名设备";
+      currentCar.value = routePlateNo != "" ? routePlateNo : routeDeviceName != "" ? routeDeviceName : (_c = deviceNo.value) !== null && _c !== void 0 ? _c : "未命名设备";
       deptId.value = option.deptId;
       carType.value = normalizeRouteValue((_d = option.carType) !== null && _d !== void 0 ? _d : "");
       deviceName.value = routeDeviceName != "" ? routeDeviceName : currentCar.value;
@@ -1387,20 +1387,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         at: common_vendor.f(deviceList.value, (device, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(getDeviceDisplayName(device)),
-            b: getDeviceImei(device)
-          }, getDeviceImei(device) ? {
+            b: getDeviceNo(device)
+          }, getDeviceNo(device) ? {
             c: common_vendor.t(isDeviceOnline(device) ? "在线" : "离线")
           } : {}, {
             d: common_vendor.o(($event) => {
-              return handleDeviceBindingChange(getDeviceImei(device), $event);
-            }, getDeviceImei(device)),
+              return handleDeviceBindingChange(getDeviceNo(device), $event);
+            }, getDeviceNo(device)),
             e: "45be0509-24-" + i0 + ",45be0509-23",
             f: common_vendor.p({
-              ["model-value"]: isDeviceBound(getDeviceImei(device)),
+              ["model-value"]: isDeviceBound(getDeviceNo(device)),
               disabled: loading.value || loadingMore.value,
               size: "20"
             }),
-            g: getDeviceImei(device)
+            g: getDeviceNo(device)
           });
         }),
         av: deviceList.value.length == 0 && !loading.value

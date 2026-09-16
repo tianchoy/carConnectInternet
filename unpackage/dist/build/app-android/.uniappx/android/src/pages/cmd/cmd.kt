@@ -20,7 +20,7 @@ open class GenPagesCmdCmd : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesCmdCmd
             val _cache = __ins.renderCache
-            val imei = ref("")
+            val deviceNo = ref("")
             val deviceId = ref("")
             val activeTab = ref("send")
             val tabItems = _uA(
@@ -244,8 +244,8 @@ open class GenPagesCmdCmd : BasePage {
             }
             val getStatusClass = ::gen_getStatusClass_fn
             val displayDeviceIdentity = computed<String>(fun(): String {
-                return if (imei.value != "") {
-                    imei.value
+                return if (deviceNo.value != "") {
+                    deviceNo.value
                 } else {
                     if (deviceId.value != "") {
                         "设备 " + deviceId.value
@@ -810,7 +810,7 @@ open class GenPagesCmdCmd : BasePage {
             }
             val changeTab = ::gen_changeTab_fn
             onLoad(fun(options){
-                imei.value = options["imei"] ?: ""
+                deviceNo.value = options["deviceNo"] ?: ""
                 deviceId.value = options["deviceId"] ?: ""
                 if (deviceId.value != "") {
                     loadAvailableCommands()
