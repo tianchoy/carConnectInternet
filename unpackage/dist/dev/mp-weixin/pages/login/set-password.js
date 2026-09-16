@@ -50,6 +50,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }));
     const submitting = common_vendor.ref(false);
     let registerContext = null;
+    const isPasswordSetupReady = common_vendor.computed(() => {
+      const password = form.value.password;
+      let categoryCount = 0;
+      if (/[0-9]/.test(password))
+        categoryCount += 1;
+      if (/[A-Za-z]/.test(password))
+        categoryCount += 1;
+      if (/[^A-Za-z0-9]/.test(password))
+        categoryCount += 1;
+      return password.length >= 8 && password.length <= 16 && categoryCount >= 2 && form.value.confirmPassword != "" && password == form.value.confirmPassword && !submitting.value;
+    });
     const returnToLogin = () => {
       services_auth_smsRegisterContext.clearSmsRegisterContext();
       common_vendor.index.reLaunch({ url: "/pages/login/login" });
@@ -196,7 +207,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: form.value.confirmPassword,
           class: "password-input confirm-password-input data-v-6fabe61f"
         }),
-        f: common_vendor.o(submitRegister, "05"),
+        f: common_vendor.o(submitRegister, "44"),
         g: common_vendor.p({
           type: "primary",
           block: true,
@@ -204,6 +215,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           color: "#3485df",
           customStyle: "height:104rpx;",
           loading: submitting.value,
+          disabled: !isPasswordSetupReady.value,
           class: "submit-button data-v-6fabe61f"
         }),
         h: `${_ctx.u_s_b_h}px`,
