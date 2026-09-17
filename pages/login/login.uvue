@@ -468,15 +468,26 @@
 			showAppToast({ title: '获取手机号失败', icon: 'none' })
 			return
 		}
+		const phoneCode = e.detail.code != null ? e.detail.code.toString() : ''
+		if (phoneCode == '') {
+			showAppToast({ title: '获取手机号授权凭证失败，请重试', icon: 'none' })
+			return
+		}
 		try {
 			uni.showLoading({ title: '登录中...' })
 			const loginRes = await new Promise<UniApp.LoginRes>((resolve, reject) => {
 				uni.login({ provider: 'weixin', success: resolve, fail: reject })
 			})
+			const loginCode = loginRes.code != null ? loginRes.code : ''
+			if (loginCode == '') {
+				showAppToast({ title: '获取微信登录凭证失败，请重试', icon: 'none' })
+				return
+			}
 			const res = await PostWechatlogin({
-				code: loginRes.code,
-				encryptedData: e.detail.encryptedData,
-				iv: e.detail.iv
+				phoneCode,
+				loginCode,
+				encryptedData: e.detail.encryptedData != null ? e.detail.encryptedData.toString() : '',
+				iv: e.detail.iv != null ? e.detail.iv.toString() : ''
 			})
 			const loginData = res.data
 			if (!isBusinessSuccessCode(res.code) || loginData == null) {

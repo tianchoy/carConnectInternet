@@ -222,7 +222,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 
 			if (isBusinessSuccessCode(res.code)) {
 				showAppToast({
-					title: '添加成功',
+					title: res.msg,
 					icon: 'success'
 				})
 

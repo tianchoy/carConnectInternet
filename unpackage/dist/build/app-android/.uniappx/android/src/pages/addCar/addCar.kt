@@ -136,7 +136,7 @@ open class GenPagesAddCarAddCar : BasePage {
                             uni_hideLoading(null)
                             loading.value = false
                             if (isBusinessSuccessCode(res.code)) {
-                                showAppToast(ShowToastOptions(title = "添加成功", icon = "success"))
+                                showAppToast(ShowToastOptions(title = res.msg, icon = "success"))
                                 uni_setStorageSync("needRefreshHome", true)
                                 refreshDeviceList()
                                 setTimeout(fun(){

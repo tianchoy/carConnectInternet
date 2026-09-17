@@ -61,7 +61,7 @@ export type PushDeviceBindRequest = {
 }
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
 export type LegacyEnterpriseLoginRequest = { username: string, password: string, clientId?: string, tenantId?: string }
-export type WechatLoginRequest = { code: string, encryptedData: string, iv: string, clientId?: string, tenantId?: string }
+export type WechatLoginRequest = { phoneCode: string, loginCode: string, encryptedData: string, iv: string, clientId?: string, tenantId?: string }
 export type UniVerifyLoginRequest = UTSJSONObject
 export type SendSmsCodeRequest = { phonenumber: string, tenantId?: string }
 export type SmsLoginRequest = { phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
@@ -264,7 +264,8 @@ export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListRe
 
 export const PostWechatlogin = (data: WechatLoginRequest): Promise<JsonDataResponse> => {
     const requestData = new UTSJSONObject()
-    requestData.set('code', data.code)
+    requestData.set('phoneCode', data.phoneCode)
+    requestData.set('code', data.loginCode)
     requestData.set('encryptedData', data.encryptedData)
     requestData.set('iv', data.iv)
     requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)

@@ -147,17 +147,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           utils_toast.showAppToast({ title: "获取手机号失败", icon: "none" });
           return Promise.resolve(null);
         }
+        const phoneCode = e.detail.code != null ? e.detail.code.toString() : "";
+        if (phoneCode == "") {
+          utils_toast.showAppToast({ title: "获取手机号授权凭证失败，请重试", icon: "none" });
+          return Promise.resolve(null);
+        }
         try {
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "登录中..." }));
           const loginRes = yield new Promise((resolve, reject) => {
             common_vendor.index.login(new common_vendor.UTSJSONObject({ provider: "weixin", success: resolve, fail: reject }));
           });
+          const loginCode = loginRes.code != null ? loginRes.code : "";
+          if (loginCode == "") {
+            utils_toast.showAppToast({ title: "获取微信登录凭证失败，请重试", icon: "none" });
+            return Promise.resolve(null);
+          }
           const res = yield api_request.PostWechatlogin(new api_request.WechatLoginRequest({
             clientId: null,
             tenantId: null,
-            code: loginRes.code,
-            encryptedData: e.detail.encryptedData,
-            iv: e.detail.iv
+            phoneCode,
+            loginCode,
+            encryptedData: e.detail.encryptedData != null ? e.detail.encryptedData.toString() : "",
+            iv: e.detail.iv != null ? e.detail.iv.toString() : ""
           }));
           const loginData = res.data;
           if (!api_response.isBusinessSuccessCode(res.code) || loginData == null) {
@@ -171,7 +182,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           completeLogin(token);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:493", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:504", "微信登录失败:", error);
           utils_toast.showAppToast({ title: "微信登录失败", icon: "none" });
         } finally {
           common_vendor.index.hideLoading();
@@ -191,7 +202,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         enterpriseForm.value.password = account.getString("password", "");
         rememberPassword.value = enterpriseForm.value.username != "" || enterpriseForm.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/login/login.uvue:514", "加载保存的企业账号失败:", error);
+        common_vendor.index.__f__("warn", "at pages/login/login.uvue:525", "加载保存的企业账号失败:", error);
       }
     };
     const toggleEnterpriseLogin = () => {
