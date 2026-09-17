@@ -10,8 +10,8 @@
 					<text class="device-imei">{{ displayDeviceIdentity }}</text>
 				</view>
 				<view class="device-id-wrap">
-					<text class="device-id-label">设备 ID</text>
-					<text class="device-id-value">{{ deviceId != '' ? deviceId : '--' }}</text>
+					<text class="device-id-label">设备编号</text>
+					<text class="device-id-value">{{ displayDeviceIdentity }}</text>
 				</view>
 			</view>
 
@@ -32,9 +32,9 @@
 				@scroll="markHistoryScroll"
 				@scrolltolower="loadMoreHistory"
 			>
-				<view v-if="deviceId == ''" class="state-card">
+				<view v-if="deviceNo == '' && deviceId == ''" class="state-card">
 					<text class="state-title">无法加载指令</text>
-					<text class="state-text">未获取到设备 ID，请返回车辆详情后重新进入。</text>
+					<text class="state-text">未获取到设备编号，请返回车辆详情后重新进入。</text>
 				</view>
 
 				<view v-else-if="activeTab == 'send'" class="tab-content">
@@ -457,10 +457,10 @@ function resetSelection(): void {
 }
 
 async function loadAvailableCommands(): Promise<void> {
-	if (deviceId.value == '' || isCommandLoading.value) return
+	if ((deviceNo.value == '' && deviceId.value == '') || isCommandLoading.value) return
 	try {
 		isCommandLoading.value = true
-		const response = await getAppAvailableCommands(deviceId.value)
+		const response = await getAppAvailableCommands(deviceNo.value, deviceId.value)
 		if (isBusinessSuccessCode(response.code)) {
 			availableCommands.value = response.data
 			const stillSelected = selectedCommandId.value != '' ? response.data.find((command: UTSJSONObject): boolean => getCommandKey(command, 0) == selectedCommandId.value) : null
@@ -502,12 +502,13 @@ function buildCommandParams(): UTSJSONObject {
 }
 
 async function loadHistoryPage(reset: boolean): Promise<void> {
-	if (deviceId.value == '' || isHistoryLoading.value || (!reset && !hasMoreHistory.value)) return
+	if ((deviceNo.value == '' && deviceId.value == '') || isHistoryLoading.value || (!reset && !hasMoreHistory.value)) return
 	const requestedPage = reset ? 1 : historyPageNum.value
 	try {
 		isHistoryLoading.value = true
 		const query = new UTSJSONObject()
-		query.set('deviceId', deviceId.value)
+		if (deviceNo.value != '') query.set('deviceNo', deviceNo.value)
+		else query.set('deviceId', deviceId.value)
 		query.set('pageNum', requestedPage)
 		query.set('pageSize', historyPageSize)
 		const response = await getAppCommandHistory(query)
@@ -542,14 +543,15 @@ async function reloadHistory(): Promise<void> {
 
 async function sendSelectedCommand(): Promise<void> {
 	const command = selectedCommand.value
-	if (command == null || deviceId.value == '' || isSending.value) return
+	if (command == null || (deviceNo.value == '' && deviceId.value == '') || isSending.value) return
 	const cmdId = getString(command, 'cmdId')
 	if (cmdId == '') {
 		showAppToast({ title: '指令模板信息不完整', icon: 'none' })
 		return
 	}
 	const requestData = new UTSJSONObject()
-	requestData.set('deviceId', deviceId.value)
+	if (deviceNo.value != '') requestData.set('deviceNo', deviceNo.value)
+	else requestData.set('deviceId', deviceId.value)
 	requestData.set('cmdId', cmdId)
 	const cmdCode = getCommandCode(command)
 	if (cmdCode != '') requestData.set('cmdCode', cmdCode)
@@ -702,7 +704,7 @@ function changeTab(value: string): void {
 onLoad((options) => {
 	deviceNo.value = options.deviceNo ?? ''
 	deviceId.value = options.deviceId ?? ''
-	if (deviceId.value != '') void loadAvailableCommands()
+	if (deviceNo.value != '' || deviceId.value != '') void loadAvailableCommands()
 })
 </script>
 
