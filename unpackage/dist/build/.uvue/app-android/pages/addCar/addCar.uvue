@@ -187,7 +187,7 @@ const __sfc__ = defineComponent({
                 loading.value = false;
                 if (isBusinessSuccessCode(res.code)) {
                     showAppToast({
-                        title: '添加成功',
+                        title: res.msg,
                         icon: 'success'
                     } as ShowToastOptions);
                     uni.setStorageSync('needRefreshHome', true);

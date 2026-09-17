@@ -139,7 +139,8 @@ class WechatLoginRequest extends common_vendor.UTS.UTSType {
       kind: 2,
       get fields() {
         return {
-          code: { type: String, optional: false },
+          phoneCode: { type: String, optional: false },
+          loginCode: { type: String, optional: false },
           encryptedData: { type: String, optional: false },
           iv: { type: String, optional: false },
           clientId: { type: String, optional: true },
@@ -152,7 +153,8 @@ class WechatLoginRequest extends common_vendor.UTS.UTSType {
   constructor(options, metadata = WechatLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.code = this.__props__.code;
+    this.phoneCode = this.__props__.phoneCode;
+    this.loginCode = this.__props__.loginCode;
     this.encryptedData = this.__props__.encryptedData;
     this.iv = this.__props__.iv;
     this.clientId = this.__props__.clientId;
@@ -995,7 +997,8 @@ const getUserDeviceList = (data) => {
 };
 const PostWechatlogin = (data) => {
   const requestData = new common_vendor.UTSJSONObject();
-  requestData.set("code", data.code);
+  requestData.set("phoneCode", data.phoneCode);
+  requestData.set("code", data.loginCode);
   requestData.set("encryptedData", data.encryptedData);
   requestData.set("iv", data.iv);
   requestData.set("tenantId", data.tenantId != null ? data.tenantId : defaultTenantId);

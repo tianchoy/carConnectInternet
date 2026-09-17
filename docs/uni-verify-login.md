@@ -166,7 +166,7 @@ phonenumber=13800138000&tenantId=000000
 
 ## 验收清单
 
-1. 微信小程序仍将 `{ code, encryptedData, iv }` 提交到 `/authLogin`。
+1. 微信小程序个人一键登录将 `{ phoneCode, loginCode, encryptedData, iv, tenantId, clientId }` 提交到 `/authLogin`：`phoneCode` 为 `getPhoneNumber` 回调的 `e.detail.code`，供后端调用微信 `getuserphonenumber` 获取手机号；`loginCode` 为 `uni.login()` 返回的 code，供后端调用 `jscode2session` 获取 OpenID；`encryptedData` 和 `iv` 为同一手机号授权回调的原始加密数据，供后端需要兼容旧版解密流程时使用。两个 code 均短时有效且不可互换。
 2. 企业账号密码仍将原字段提交到 `/sys/login`。
 3. Android/iOS 默认进入一键登录视图；一键登录失败后页面不会自动显示短信表单。
 4. 用户主动选择“验证码登录”后，未同意协议、非法手机号或非 4 位验证码均不能发起对应请求。
