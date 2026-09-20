@@ -61,7 +61,7 @@ export type PushDeviceBindRequest = {
 }
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
 export type LegacyEnterpriseLoginRequest = { username: string, password: string, clientId?: string, tenantId?: string }
-export type WechatLoginRequest = { code: string, encryptedData: string, iv: string, clientId?: string, tenantId?: string }
+export type WechatLoginRequest = { phoneCode: string, loginCode: string, encryptedData: string, iv: string, clientId?: string, tenantId?: string }
 export type UniVerifyLoginRequest = UTSJSONObject
 export type SendSmsCodeRequest = { phonenumber: string, tenantId?: string }
 export type SmsLoginRequest = { phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
@@ -264,7 +264,8 @@ export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListRe
 
 export const PostWechatlogin = (data: WechatLoginRequest): Promise<JsonDataResponse> => {
     const requestData = new UTSJSONObject()
-    requestData.set('code', data.code)
+    requestData.set('phoneCode', data.phoneCode)
+    requestData.set('code', data.loginCode)
     requestData.set('encryptedData', data.encryptedData)
     requestData.set('iv', data.iv)
     requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
@@ -371,10 +372,15 @@ export const sendCmd = (data: UTSJSONObject): Promise<SendCmdResponse> => post(c
 })
 export const getCmdRecordById = (id: string): Promise<JsonDataResponse> => get(`${cmdRecordByIdUrl}${id}`).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 
-export const getAppAvailableCommands = (deviceId: string): Promise<CommandListResponse> => get(appCommandAvailableUrl, { deviceId } as UTSJSONObject).then((raw: any): CommandListResponse => {
-    const response = asJSONObject(raw)
-    return { code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) }
-})
+export const getAppAvailableCommands = (deviceNo: string, deviceId: string): Promise<CommandListResponse> => {
+    const params = new UTSJSONObject()
+    if (deviceNo != '') params.set('deviceNo', deviceNo)
+    else if (deviceId != '') params.set('deviceId', deviceId)
+    return get(appCommandAvailableUrl, params).then((raw: any): CommandListResponse => {
+        const response = asJSONObject(raw)
+        return { code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) }
+    })
+}
 export const sendAppCommand = (data: UTSJSONObject): Promise<SendCmdResponse> => post(appCommandSendUrl, data).then((raw: any): SendCmdResponse => {
     const response = asJSONObject(raw)
     return { code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString('data', '') }

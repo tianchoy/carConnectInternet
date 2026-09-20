@@ -46,7 +46,7 @@ import {
 
 
 
-const JPUSH_APP_KEY = 'a53c28d734057573f67e16f7'
+const JPUSH_APP_KEY = '0ee065e1a4024ce1801fa6d3'
 const JPUSH_CHANNEL = 'developer-default'
 
 function pushDebug(message: string): void {

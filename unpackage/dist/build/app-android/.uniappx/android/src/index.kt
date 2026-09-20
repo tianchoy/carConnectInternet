@@ -1246,8 +1246,14 @@ val unbindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
     }
     )
 }
-val getAppAvailableCommands = fun(deviceId: String): UTSPromise<CommandListResponse> {
-    return get(appCommandAvailableUrl, _uO("deviceId" to deviceId)).then(fun(raw: Any): CommandListResponse {
+val getAppAvailableCommands = fun(deviceNo: String, deviceId: String): UTSPromise<CommandListResponse> {
+    val params = UTSJSONObject()
+    if (deviceNo != "") {
+        params.set("deviceNo", deviceNo)
+    } else if (deviceId != "") {
+        params.set("deviceId", deviceId)
+    }
+    return get(appCommandAvailableUrl, params).then(fun(raw: Any): CommandListResponse {
         val response = asJSONObject(raw)
         return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
     }
@@ -2025,16 +2031,6 @@ val GenUniModulesIUiXComponentsIIconIIconClass = CreateVueComponent(GenUniModule
 }
 , fun(instance, renderer): GenUniModulesIUiXComponentsIIconIIcon {
     return GenUniModulesIUiXComponentsIIconIIcon(instance)
-}
-)
-val GenUniModulesIUiXComponentsILineProgressILineProgressClass = CreateVueComponent(GenUniModulesIUiXComponentsILineProgressILineProgress::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsILineProgressILineProgress.name, inheritAttrs = GenUniModulesIUiXComponentsILineProgressILineProgress.inheritAttrs, inject = GenUniModulesIUiXComponentsILineProgressILineProgress.inject, props = GenUniModulesIUiXComponentsILineProgressILineProgress.props, propsNeedCastKeys = GenUniModulesIUiXComponentsILineProgressILineProgress.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsILineProgressILineProgress.emits, components = GenUniModulesIUiXComponentsILineProgressILineProgress.components, styles = GenUniModulesIUiXComponentsILineProgressILineProgress.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesIUiXComponentsILineProgressILineProgress.setup(props as GenUniModulesIUiXComponentsILineProgressILineProgress)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsILineProgressILineProgress {
-    return GenUniModulesIUiXComponentsILineProgressILineProgress(instance)
 }
 )
 typealias PickerValue = Any

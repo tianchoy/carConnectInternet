@@ -10,8 +10,6 @@ require('uts.sdk.modules.DCloudUniMapTencent.LocationObject');
 
 const iIcon_uvue_vue_type_style_index_0_lang = {};
 
-const iLineProgress_uvue_vue_type_style_index_0_lang = {};
-
 const lPickerItem_uvue_vue_type_style_index_0_lang = {};
 
 const lPicker_uvue_vue_type_style_index_0_lang = {};

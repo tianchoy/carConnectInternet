@@ -198,6 +198,11 @@ sync_dir() {
   rsync "${RSYNC_OPTIONS[@]}" "$@" "${source}/" "${target}/"
 }
 
+# HBuilderX 生成的 Kotlin 代码必须保留 `uni.<APPID>` 包名（本项目为 uni.UNI662B0B4）。
+# DCloud 运行时按该包名反射查找 UniAppConfig，一旦改写就会抛出
+# `ClassNotFoundException: uni.UNI662B0B4.UniAppConfig` 并卡在启动页。
+# Android 包名只能通过 app/build.gradle 的 applicationId / namespace 修改。
+
 sync_generated_modules() {
   local module_source
   local module_name
@@ -312,13 +317,13 @@ sync_dir "${SOURCE_APP_ROOT}" "${TARGET_APP_ROOT}"
 print -- "[2/8] 同步离线 JPush/JCore Maven 仓库"
 sync_dir "${SOURCE_LOCAL_MAVEN_ROOT}" "${TARGET_LOCAL_MAVEN_ROOT}"
 
-print -- "[3/8] 同步生成的 index.kt、components 和 pages"
+print -- "[3/9] 同步生成的 index.kt、components 和 pages"
 rsync "${INDEX_RSYNC_OPTIONS[@]}" \
   "${SOURCE_GENERATED_ROOT}/index.kt" "${TARGET_JAVA_ROOT}/index.kt"
 sync_dir "${SOURCE_GENERATED_ROOT}/components" "${TARGET_JAVA_ROOT}/components"
 sync_dir "${SOURCE_GENERATED_ROOT}/pages" "${TARGET_JAVA_ROOT}/pages"
 
-print -- "[4/8] 同步生成的 uni_modules"
+print -- "[4/9] 同步生成的 uni_modules"
 sync_generated_modules
 
 print -- "[5/8] 同步 HBuilderX 导出的 Android 插件及 Kotlin 源码"

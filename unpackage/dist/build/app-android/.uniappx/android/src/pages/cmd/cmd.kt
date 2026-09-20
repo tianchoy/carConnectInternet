@@ -432,12 +432,12 @@ open class GenPagesCmdCmd : BasePage {
             val resetSelection = ::gen_resetSelection_fn
             fun gen_loadAvailableCommands_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        if (deviceId.value == "" || isCommandLoading.value) {
+                        if ((deviceNo.value == "" && deviceId.value == "") || isCommandLoading.value) {
                             return@w1
                         }
                         try {
                             isCommandLoading.value = true
-                            val response = await(getAppAvailableCommands(deviceId.value))
+                            val response = await(getAppAvailableCommands(deviceNo.value, deviceId.value))
                             if (isBusinessSuccessCode(response.code)) {
                                 availableCommands.value = response.data
                                 val stillSelected = if (selectedCommandId.value != "") {
@@ -511,7 +511,7 @@ open class GenPagesCmdCmd : BasePage {
             val buildCommandParams = ::gen_buildCommandParams_fn
             fun gen_loadHistoryPage_fn(reset: Boolean): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        if (deviceId.value == "" || isHistoryLoading.value || (!reset && !hasMoreHistory.value)) {
+                        if ((deviceNo.value == "" && deviceId.value == "") || isHistoryLoading.value || (!reset && !hasMoreHistory.value)) {
                             return@w1
                         }
                         val requestedPage = if (reset) {
@@ -522,7 +522,11 @@ open class GenPagesCmdCmd : BasePage {
                         try {
                             isHistoryLoading.value = true
                             val query = UTSJSONObject()
-                            query.set("deviceId", deviceId.value)
+                            if (deviceNo.value != "") {
+                                query.set("deviceNo", deviceNo.value)
+                            } else {
+                                query.set("deviceId", deviceId.value)
+                            }
                             query.set("pageNum", requestedPage)
                             query.set("pageSize", historyPageSize)
                             val response = await(getAppCommandHistory(query))
@@ -571,7 +575,7 @@ open class GenPagesCmdCmd : BasePage {
             fun gen_sendSelectedCommand_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         val command = selectedCommand.value
-                        if (command == null || deviceId.value == "" || isSending.value) {
+                        if (command == null || (deviceNo.value == "" && deviceId.value == "") || isSending.value) {
                             return@w1
                         }
                         val cmdId = getString(command, "cmdId")
@@ -580,7 +584,11 @@ open class GenPagesCmdCmd : BasePage {
                             return@w1
                         }
                         val requestData = UTSJSONObject()
-                        requestData.set("deviceId", deviceId.value)
+                        if (deviceNo.value != "") {
+                            requestData.set("deviceNo", deviceNo.value)
+                        } else {
+                            requestData.set("deviceId", deviceId.value)
+                        }
                         requestData.set("cmdId", cmdId)
                         val cmdCode = getCommandCode(command)
                         if (cmdCode != "") {
@@ -812,7 +820,7 @@ open class GenPagesCmdCmd : BasePage {
             onLoad(fun(options){
                 deviceNo.value = options["deviceNo"] ?: ""
                 deviceId.value = options["deviceId"] ?: ""
-                if (deviceId.value != "") {
+                if (deviceNo.value != "" || deviceId.value != "") {
                     loadAvailableCommands()
                 }
             }
@@ -835,23 +843,18 @@ open class GenPagesCmdCmd : BasePage {
                                     _cE("text", _uM("class" to "device-imei"), _tD(displayDeviceIdentity.value), 1)
                                 )),
                                 _cE("view", _uM("class" to "device-id-wrap"), _uA(
-                                    _cE("text", _uM("class" to "device-id-label"), "设备 ID"),
-                                    _cE("text", _uM("class" to "device-id-value"), _tD(if (deviceId.value != "") {
-                                        deviceId.value
-                                    } else {
-                                        "--"
-                                    }
-                                    ), 1)
+                                    _cE("text", _uM("class" to "device-id-label"), "设备编号"),
+                                    _cE("text", _uM("class" to "device-id-value"), _tD(displayDeviceIdentity.value), 1)
                                 ))
                             )),
                             _cV(_component_i_tabs, _uM("value" to activeTab.value, "list" to tabItems, "activeColor" to "#1677ff", "inactiveColor" to "#667085", "bgColor" to "#ffffff", "onUpdate:value" to changeTab), null, 8, _uA(
                                 "value"
                             )),
                             _cE("scroll-view", _uM("class" to "main-scroll", "scroll-y" to "true", "show-scrollbar" to false, "lower-threshold" to 80, "onScroll" to markHistoryScroll, "onScrolltolower" to loadMoreHistory), _uA(
-                                if (deviceId.value == "") {
+                                if (isTrue(deviceNo.value == "" && deviceId.value == "")) {
                                     _cE("view", _uM("key" to 0, "class" to "state-card"), _uA(
                                         _cE("text", _uM("class" to "state-title"), "无法加载指令"),
-                                        _cE("text", _uM("class" to "state-text"), "未获取到设备 ID，请返回车辆详情后重新进入。")
+                                        _cE("text", _uM("class" to "state-text"), "未获取到设备编号，请返回车辆详情后重新进入。")
                                     ))
                                 } else {
                                     if (activeTab.value == "send") {

@@ -280,10 +280,10 @@ function resetSelection(): void {
 }
 
 async function loadAvailableCommands(): Promise<void> {
-	if (deviceId.value == '' || isCommandLoading.value) return
+	if ((deviceNo.value == '' && deviceId.value == '') || isCommandLoading.value) return
 	try {
 		isCommandLoading.value = true
-		const response = await getAppAvailableCommands(deviceId.value)
+		const response = await getAppAvailableCommands(deviceNo.value, deviceId.value)
 		if (isBusinessSuccessCode(response.code)) {
 			availableCommands.value = response.data
 			const stillSelected = selectedCommandId.value != '' ? response.data.find((command: UTSJSONObject): boolean => getCommandKey(command, 0) == selectedCommandId.value) : null
@@ -325,12 +325,13 @@ function buildCommandParams(): UTSJSONObject {
 }
 
 async function loadHistoryPage(reset: boolean): Promise<void> {
-	if (deviceId.value == '' || isHistoryLoading.value || (!reset && !hasMoreHistory.value)) return
+	if ((deviceNo.value == '' && deviceId.value == '') || isHistoryLoading.value || (!reset && !hasMoreHistory.value)) return
 	const requestedPage = reset ? 1 : historyPageNum.value
 	try {
 		isHistoryLoading.value = true
 		const query = new UTSJSONObject()
-		query.set('deviceId', deviceId.value)
+		if (deviceNo.value != '') query.set('deviceNo', deviceNo.value)
+		else query.set('deviceId', deviceId.value)
 		query.set('pageNum', requestedPage)
 		query.set('pageSize', historyPageSize)
 		const response = await getAppCommandHistory(query)
@@ -365,14 +366,15 @@ async function reloadHistory(): Promise<void> {
 
 async function sendSelectedCommand(): Promise<void> {
 	const command = selectedCommand.value
-	if (command == null || deviceId.value == '' || isSending.value) return
+	if (command == null || (deviceNo.value == '' && deviceId.value == '') || isSending.value) return
 	const cmdId = getString(command, 'cmdId')
 	if (cmdId == '') {
 		showAppToast({ title: '指令模板信息不完整', icon: 'none' })
 		return
 	}
 	const requestData = new UTSJSONObject()
-	requestData.set('deviceId', deviceId.value)
+	if (deviceNo.value != '') requestData.set('deviceNo', deviceNo.value)
+	else requestData.set('deviceId', deviceId.value)
 	requestData.set('cmdId', cmdId)
 	const cmdCode = getCommandCode(command)
 	if (cmdCode != '') requestData.set('cmdCode', cmdCode)
@@ -525,7 +527,7 @@ function changeTab(value: string): void {
 onLoad((options) => {
 	deviceNo.value = options.deviceNo ?? ''
 	deviceId.value = options.deviceId ?? ''
-	if (deviceId.value != '') void loadAvailableCommands()
+	if (deviceNo.value != '' || deviceId.value != '') void loadAvailableCommands()
 })
 
 return (): any | null => {
@@ -554,8 +556,8 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cE("text", _uM({ class: "device-imei" }), _tD(displayDeviceIdentity.value), 1 /* TEXT */)
           ]),
           _cE("view", _uM({ class: "device-id-wrap" }), [
-            _cE("text", _uM({ class: "device-id-label" }), "设备 ID"),
-            _cE("text", _uM({ class: "device-id-value" }), _tD(deviceId.value != '' ? deviceId.value : '--'), 1 /* TEXT */)
+            _cE("text", _uM({ class: "device-id-label" }), "设备编号"),
+            _cE("text", _uM({ class: "device-id-value" }), _tD(displayDeviceIdentity.value), 1 /* TEXT */)
           ])
         ]),
         _cV(_component_i_tabs, _uM({
@@ -574,13 +576,13 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           onScroll: markHistoryScroll,
           onScrolltolower: loadMoreHistory
         }), [
-          deviceId.value == ''
+          isTrue(deviceNo.value == '' && deviceId.value == '')
             ? _cE("view", _uM({
                 key: 0,
                 class: "state-card"
               }), [
                 _cE("text", _uM({ class: "state-title" }), "无法加载指令"),
-                _cE("text", _uM({ class: "state-text" }), "未获取到设备 ID，请返回车辆详情后重新进入。")
+                _cE("text", _uM({ class: "state-text" }), "未获取到设备编号，请返回车辆详情后重新进入。")
               ])
             : activeTab.value == 'send'
               ? _cE("view", _uM({

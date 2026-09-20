@@ -1137,8 +1137,13 @@ const unbindDevices = (data) => {
     return basicResponse(raw);
   });
 };
-const getAppAvailableCommands = (deviceId) => {
-  return api_http.get(appCommandAvailableUrl, new common_vendor.UTSJSONObject({ deviceId })).then((raw = null) => {
+const getAppAvailableCommands = (deviceNo, deviceId) => {
+  const params = new common_vendor.UTSJSONObject();
+  if (deviceNo != "")
+    params.set("deviceNo", deviceNo);
+  else if (deviceId != "")
+    params.set("deviceId", deviceId);
+  return api_http.get(appCommandAvailableUrl, params).then((raw = null) => {
     const response = api_response.asJSONObject(raw);
     return new CommandListResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response), data: api_response.getResponseDataArray(response) });
   });

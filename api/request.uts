@@ -372,7 +372,7 @@ export const sendCmd = (data: UTSJSONObject): Promise<SendCmdResponse> => post(c
 })
 export const getCmdRecordById = (id: string): Promise<JsonDataResponse> => get(`${cmdRecordByIdUrl}${id}`).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 
-export const getAppAvailableCommands = (deviceNo: string, deviceId: string = ''): Promise<CommandListResponse> => {
+export const getAppAvailableCommands = (deviceNo: string, deviceId: string): Promise<CommandListResponse> => {
     const params = new UTSJSONObject()
     if (deviceNo != '') params.set('deviceNo', deviceNo)
     else if (deviceId != '') params.set('deviceId', deviceId)

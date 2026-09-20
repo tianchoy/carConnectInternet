@@ -269,11 +269,11 @@ const __sfc__ = defineComponent({
             paramConfigError.value = '';
         }
         async function loadAvailableCommands(): Promise<void> {
-            if (deviceId.value == '' || isCommandLoading.value)
+            if ((deviceNo.value == '' && deviceId.value == '') || isCommandLoading.value)
                 return;
             try {
                 isCommandLoading.value = true;
-                const response = await getAppAvailableCommands(deviceId.value);
+                const response = await getAppAvailableCommands(deviceNo.value, deviceId.value);
                 if (isBusinessSuccessCode(response.code)) {
                     availableCommands.value = response.data;
                     const stillSelected = selectedCommandId.value != '' ? response.data.find((command: UTSJSONObject): boolean => getCommandKey(command, 0) == selectedCommandId.value) : null;
@@ -318,13 +318,16 @@ const __sfc__ = defineComponent({
             return params;
         }
         async function loadHistoryPage(reset: boolean): Promise<void> {
-            if (deviceId.value == '' || isHistoryLoading.value || (!reset && !hasMoreHistory.value))
+            if ((deviceNo.value == '' && deviceId.value == '') || isHistoryLoading.value || (!reset && !hasMoreHistory.value))
                 return;
             const requestedPage = reset ? 1 : historyPageNum.value;
             try {
                 isHistoryLoading.value = true;
                 const query = new UTSJSONObject();
-                query.set('deviceId', deviceId.value);
+                if (deviceNo.value != '')
+                    query.set('deviceNo', deviceNo.value);
+                else
+                    query.set('deviceId', deviceId.value);
                 query.set('pageNum', requestedPage);
                 query.set('pageSize', historyPageSize);
                 const response = await getAppCommandHistory(query);
@@ -361,7 +364,7 @@ const __sfc__ = defineComponent({
         }
         async function sendSelectedCommand(): Promise<void> {
             const command = selectedCommand.value;
-            if (command == null || deviceId.value == '' || isSending.value)
+            if (command == null || (deviceNo.value == '' && deviceId.value == '') || isSending.value)
                 return;
             const cmdId = getString(command, 'cmdId');
             if (cmdId == '') {
@@ -369,7 +372,10 @@ const __sfc__ = defineComponent({
                 return;
             }
             const requestData = new UTSJSONObject();
-            requestData.set('deviceId', deviceId.value);
+            if (deviceNo.value != '')
+                requestData.set('deviceNo', deviceNo.value);
+            else
+                requestData.set('deviceId', deviceId.value);
             requestData.set('cmdId', cmdId);
             const cmdCode = getCommandCode(command);
             if (cmdCode != '')
@@ -524,7 +530,7 @@ const __sfc__ = defineComponent({
         onLoad((options) => {
             deviceNo.value = options["deviceNo"] ?? '';
             deviceId.value = options["deviceId"] ?? '';
-            if (deviceId.value != '')
+            if (deviceNo.value != '' || deviceId.value != '')
                 void loadAvailableCommands();
         });
         return (): any | null => {
@@ -551,8 +557,8 @@ const __sfc__ = defineComponent({
                                 _cE("text", _uM({ class: "device-imei" }), _tD(displayDeviceIdentity.value), 1 /* TEXT */)
                             ]),
                             _cE("view", _uM({ class: "device-id-wrap" }), [
-                                _cE("text", _uM({ class: "device-id-label" }), "设备 ID"),
-                                _cE("text", _uM({ class: "device-id-value" }), _tD(deviceId.value != '' ? deviceId.value : '--'), 1 /* TEXT */)
+                                _cE("text", _uM({ class: "device-id-label" }), "设备编号"),
+                                _cE("text", _uM({ class: "device-id-value" }), _tD(displayDeviceIdentity.value), 1 /* TEXT */)
                             ])
                         ]),
                         _cV(_component_i_tabs, _uM({
@@ -571,13 +577,13 @@ const __sfc__ = defineComponent({
                             onScroll: markHistoryScroll,
                             onScrolltolower: loadMoreHistory
                         }), [
-                            deviceId.value == ''
+                            isTrue(deviceNo.value == '' && deviceId.value == '')
                                 ? _cE("view", _uM({
                                     key: 0,
                                     class: "state-card"
                                 }), [
                                     _cE("text", _uM({ class: "state-title" }), "无法加载指令"),
-                                    _cE("text", _uM({ class: "state-text" }), "未获取到设备 ID，请返回车辆详情后重新进入。")
+                                    _cE("text", _uM({ class: "state-text" }), "未获取到设备编号，请返回车辆详情后重新进入。")
                                 ])
                                 : activeTab.value == 'send'
                                     ? _cE("view", _uM({

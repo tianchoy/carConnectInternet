@@ -23,7 +23,7 @@
 nativeResources/android/agconnect-services.json
 ```
 
-该文件由 [jg-jpush-u-huawei](../uni_modules/jg-jpush-u-huawei/readme.md) 在 Android 原生构建时使用。它必须与本应用包名 `uni.app.UNI662B0B4` 一致；不要在业务代码、`manifestPlaceholders.json` 或日志中复制其中的凭据字段。
+该文件由 [jg-jpush-u-huawei](../uni_modules/jg-jpush-u-huawei/readme.md) 在 Android 原生构建时使用。仓库中现有文件仍属于旧包名，**不能**通过替换 JSON 内的包名完成迁移；请在 AppGallery Connect 创建/更新 `com.zdiot.app` 后下载其专属 `agconnect-services.json` 并替换该文件。不要在业务代码、`manifestPlaceholders.json` 或日志中复制其中的凭据字段。
 
 JPush Android AppKey 和 channel 继续通过 [nativeResources/android/manifestPlaceholders.json](../nativeResources/android/manifestPlaceholders.json) 提供，Android 代码以空 AppKey 调用初始化，从而读取原生 Manifest 配置。
 
@@ -31,10 +31,10 @@ JPush Android AppKey 和 channel 继续通过 [nativeResources/android/manifestP
 
 发布或真机验证前，须同时完成：
 
-1. 在华为 AppGallery Connect 为 `uni.app.UNI662B0B4` 启用 **Push Kit**；
+1. 在华为 AppGallery Connect 为 `com.zdiot.app` 启用 **Push Kit**；
 2. 在 AG Connect 登记实际签名包使用的 SHA-256 证书指纹：Debug、Release，以及计划上架 AppGallery 时的重签名证书；修改后重新下载并替换 `agconnect-services.json`；
 3. 在极光控制台同一 JPush 应用的“华为厂商通道”填写华为 App ID、Client ID/Client Secret 等控制台要求的参数；
-4. 确认 JPush AppKey 归属于该极光应用，且极光、AG Connect、最终 APK/AAB 的包名均为 `uni.app.UNI662B0B4`。
+4. 确认 JPush AppKey 归属于该极光应用，且极光、AG Connect、最终 APK/AAB 的包名均为 `com.zdiot.app`。
 
 华为 Client Secret、服务账号私钥和 JPush Master Secret 仅能保存在相应的控制台或后端安全密钥库，**不得**放入客户端代码、原生资源、日志、推送 payload 或 Git 提交。
 
@@ -132,7 +132,7 @@ Content-Type: application/json
 ### Android 华为/HMS
 
 - [ ] 以完整原生 Android 构建生成新包，不能用热重载验证；
-- [ ] 最终包 application ID 为 `uni.app.UNI662B0B4`，实际签名 SHA-256 已登记在 AG Connect；
+- [ ] 最终包 application ID 为 `com.zdiot.app`，实际签名 SHA-256 已登记在 AG Connect；
 - [ ] 在真机华为/HMS 设备安装，Android 13+ 已授予通知权限；
 - [ ] 日志显示 JPush 初始化，并获得非空 JPush RegistrationID；
 - [ ] 在极光控制台按该 RegistrationID 发送测试，验证前台接收、后台系统通知、杀进程/冷启动和点击进入消息中心；

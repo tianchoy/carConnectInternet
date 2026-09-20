@@ -330,6 +330,17 @@ const _cache = __ins.renderCache;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 	}
 
 	const gotoIndex = (): void => {
