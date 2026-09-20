@@ -24,7 +24,7 @@
         "uni-barcode-scanning": {},
         "uni-map": {
           "tencent": {
-            "key": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
+            "key": "5VNBZ-M6QCL-VIDPL-E7765-7O6QZ-5QFNG"
           }
         },
         "uni-network": {},
@@ -39,9 +39,9 @@
         "uni-prompt": {},
         "uni-oauth": {},
         "uni-vibrate": {},
-        "uni-dialogPage": {},
         "uni-event": {},
         "uni-location": {},
+        "uni-dialogPage": {},
         "uni-openLocation": {},
         "uni-rpx2px": {},
         "uni-cloud-client": {},

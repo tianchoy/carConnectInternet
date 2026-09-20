@@ -64,7 +64,7 @@
 				"uni-camera": {},
 				"uni-map": {
 					"tencent": {
-						"key": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
+						"key": "5VNBZ-M6QCL-VIDPL-E7765-7O6QZ-5QFNG"
 					}
 				},
 				"uni-location": {
@@ -103,7 +103,7 @@
 						"appkey_android": "您的高德地图Android Key"
 					},
 					"qqmap": {
-						"appkey_android": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
+						"appkey_android": "5VNBZ-M6QCL-VIDPL-E7765-7O6QZ-5QFNG"
 					}
 				}
 			},
@@ -113,7 +113,7 @@
 						"appkey_ios": "您的高德地图iOS Key"
 					},
 					"qqmap": {
-						"appkey_ios": "您的腾讯地图iOS Key"
+						"appkey_ios": "5VNBZ-M6QCL-VIDPL-E7765-7O6QZ-5QFNG"
 					}
 				},
 				"UIBackgroundModes": [
@@ -161,7 +161,7 @@
 				"uni-barcode-scanning": {},
 				"uni-map": {
 					"tencent": {
-						"key": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
+						"key": "5VNBZ-M6QCL-VIDPL-E7765-7O6QZ-5QFNG"
 					}
 				}
 			},
