@@ -1088,7 +1088,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     const needRefresh = common_vendor.ref(false);
-    const toPay = (iccid, simMerchant) => {
+    const toPay = (iccid) => {
       if (!isLogin())
         return null;
       if (!isCarSelected())
@@ -1107,19 +1107,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      if (simMerchant.toLowerCase() == "zddx") {
-        iccid = iccid.substring(0, iccid.length - 1);
-      }
       needRefresh.value = true;
       common_vendor.index.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
         appId: platformAppId.value,
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1324", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1321", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1327", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1324", "打开小程序失败", res);
           needRefresh.value = false;
           utils_toast.showAppToast({
             title: "打开支付页面失败",
@@ -1139,7 +1136,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function unbindCurrentDevice() {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const result = yield api_request.delDevice(currentCarDeviceId.value);
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:1361", "解绑设备结果:", result);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:1358", "解绑设备结果:", result);
         if (api_response.isBusinessSuccessCode(result.code)) {
           utils_toast.showAppToast({
             title: "解绑成功",
@@ -1302,47 +1299,44 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         N: common_vendor.t(unreadMessageBadgeText.value)
       } : {}, {
         O: common_vendor.o(toMsgCenter, "87"),
-        P: platformAppId.value
-      }, platformAppId.value ? {
-        Q: common_assets._imports_6,
-        R: common_vendor.o(($event) => {
-          return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-        }, "b5")
-      } : {}, {
-        S: common_assets._imports_7,
-        T: common_vendor.o(contactCustomerService, "a9"),
-        U: common_assets._imports_8,
-        V: common_vendor.o(unbindDevice, "1b"),
-        W: common_assets._imports_9,
-        X: common_vendor.o(logout, "e0"),
-        Y: common_vendor.o(closePicker, "08"),
-        Z: common_vendor.o(handlePickerConfirm, "64"),
-        aa: common_vendor.o(($event) => {
+        P: common_assets._imports_6,
+        Q: common_vendor.o(($event) => {
+          return toPay(currentCarIccId.value);
+        }, "b1"),
+        R: common_assets._imports_7,
+        S: common_vendor.o(contactCustomerService, "1d"),
+        T: common_assets._imports_8,
+        U: common_vendor.o(unbindDevice, "56"),
+        V: common_assets._imports_9,
+        W: common_vendor.o(logout, "f6"),
+        X: common_vendor.o(closePicker, "92"),
+        Y: common_vendor.o(handlePickerConfirm, "db"),
+        Z: common_vendor.o(($event) => {
           return pickerValues.value = $event;
-        }, "65"),
-        ab: common_vendor.p({
+        }, "97"),
+        aa: common_vendor.p({
           ["cancel-btn"]: "取消",
           ["confirm-btn"]: "确认",
           columns: pickerColumns.value,
           modelValue: pickerValues.value,
           class: "data-v-00a60067"
         }),
-        ac: common_vendor.o(($event) => {
+        ab: common_vendor.o(($event) => {
           return showPicker.value = $event;
-        }, "cd"),
-        ad: common_vendor.p({
+        }, "d6"),
+        ac: common_vendor.p({
           position: "bottom",
           closeable: false,
           ["safe-area-inset-bottom"]: true,
           modelValue: showPicker.value,
           class: "data-v-00a60067"
         }),
-        ae: `${_ctx.u_s_b_h}px`,
-        af: `${_ctx.u_s_a_i_b}px`,
-        ag: common_vendor.p({
+        ad: `${_ctx.u_s_b_h}px`,
+        ae: `${_ctx.u_s_a_i_b}px`,
+        af: common_vendor.p({
           class: "data-v-00a60067"
         }),
-        ah: common_vendor.p({
+        ag: common_vendor.p({
           class: "data-v-00a60067"
         })
       });

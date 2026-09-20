@@ -160,7 +160,7 @@
                             </view>
                             <text class="item-title">警报消息</text>
                         </view>
-                        <view v-if="platformAppId" class="service-item" @tap="toPay(currentCarIccId,currentCarSimMerchant)">
+                        <view class="service-item" @tap="toPay(currentCarIccId)">
                             <image src="../../static/pay.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title">一键续费</text>
                         </view>
@@ -1293,7 +1293,7 @@ const contactCustomerService = () => {
 
 // 支付
 const needRefresh = ref(false)
-const toPay = (iccid : string,simMerchant : string) => {
+const toPay = (iccid : string) => {
     if (!isLogin()) return
     if (!isCarSelected()) return
     if (!iccid || iccid.trim().length === 0) {
@@ -1309,9 +1309,6 @@ const toPay = (iccid : string,simMerchant : string) => {
             icon: 'none'
         })
         return
-    }
-    if(simMerchant.toLowerCase() == 'zddx'){
-        iccid = iccid.substring(0,iccid.length-1)
     }
     needRefresh.value = true
 
