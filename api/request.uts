@@ -45,6 +45,7 @@ const appCommandRetryUrl = '/app/command/retry/'
 const pushBindUrl = '/app/push/bind'
 const pushUnbindUrl = '/app/push/unbind'
 const messageUnreadCountUrl = '/app/message/unreadCount'
+const homePlatformAppUrl = '/home/platform/app'
 const geocoderAddressUrl = '/geocoder/address'
 const deviceShareUrl = '/share/device'
 const deviceShareSentUrl = '/share/device/sent'
@@ -85,6 +86,7 @@ export type AppCommandDetailResponse = { code: number, msg: string, data: UTSJSO
 export type ChangePasswordRequest = { oldPassword: string, newPassword: string, confirmPassword: string }
 export type MessageResponse = { code: number, msg: string, data: UserDeviceListData }
 export type MessageUnreadCountResponse = { code: number, msg: string, data: number }
+export type HomePlatformAppResponse = { code: number, msg: string, data: string | null }
 export type GeocoderAddressResponse = { code: number, msg: string, data: UTSJSONObject }
 export type DeviceSharePageData = {
     list: Array<UTSJSONObject>
@@ -191,6 +193,16 @@ function messagePageResponse(raw: any): MessageResponse {
             totalPage: page.data.totalPage,
             totalCount: page.data.totalCount
         }
+    }
+}
+
+function homePlatformAppResponse(raw: any): HomePlatformAppResponse {
+    const response = asJSONObject(raw)
+    const appId = response.getString('data', '').trim()
+    return {
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: appId != '' ? appId : null
     }
 }
 
@@ -339,6 +351,9 @@ export const getMessageUnreadCount = (): Promise<MessageUnreadCountResponse> => 
         msg: getResponseMessage(response),
         data: response.getNumber('data', 0)
     }
+})
+export const getHomePlatformAppId = (): Promise<HomePlatformAppResponse> => getSilently(homePlatformAppUrl).then((raw: any): HomePlatformAppResponse => {
+    return homePlatformAppResponse(raw)
 })
 export const editDeviceInfo = (data: UTSJSONObject): Promise<BasicResponse> => put(updateDevice, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const getDeviceDetail = (deviceId: string): Promise<DeviceDetailResponse> => get(`${deviceDetail}${deviceId}`).then((raw: any): DeviceDetailResponse => {

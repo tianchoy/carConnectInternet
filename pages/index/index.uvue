@@ -160,7 +160,7 @@
                             </view>
                             <text class="item-title">警报消息</text>
                         </view>
-                        <view class="service-item" @tap="toPay(currentCarIccId,currentCarSimMerchant)">
+                        <view v-if="platformAppId" class="service-item" @tap="toPay(currentCarIccId,currentCarSimMerchant)">
                             <image src="../../static/pay.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title">一键续费</text>
                         </view>
@@ -210,7 +210,7 @@ import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { clearPushSessionState } from '../../services/push.uts'
 import { unbindPushDeviceOnLogout } from '../../services/push-binding.uts'
-import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount } from '../../api/request.uts'
+import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount, getHomePlatformAppId } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
@@ -288,6 +288,7 @@ const currentCarConnectionStatus = ref('')
 const currentCarCarType = ref('')
 const currentCarPlateNo = ref('')
 const unreadMessageCount = ref(0)
+const platformAppId = ref('')
 const unreadMessageBadgeText = computed<string>(() => unreadMessageCount.value > 99 ? '99+' : unreadMessageCount.value.toString())
 
 type DeviceStatus = {
@@ -1144,6 +1145,20 @@ function isCarSelected() : boolean {
     return true
 }
 
+async function loadHomePlatformAppId(): Promise<void> {
+    platformAppId.value = ''
+    try {
+        const res = await getHomePlatformAppId()
+        if (isBusinessSuccessCode(res.code) && res.data != null) {
+            platformAppId.value = res.data
+            return
+        }
+        console.warn('加载首页续费小程序配置失败:', res.msg)
+    } catch (error) {
+        console.error('加载首页续费小程序配置失败', error)
+    }
+}
+
 async function loadUnreadMessageCount(): Promise<void> {
     if (!checkToken()) {
         unreadMessageCount.value = 0
@@ -1288,6 +1303,13 @@ const toPay = (iccid : string,simMerchant : string) => {
         })
         return
     }
+    if (!platformAppId.value) {
+        showAppToast({
+            title: '续费服务暂不可用，请稍后重试',
+            icon: 'none'
+        })
+        return
+    }
     if(simMerchant.toLowerCase() == 'zddx'){
         iccid = iccid.substring(0,iccid.length-1)
     }
@@ -1295,7 +1317,7 @@ const toPay = (iccid : string,simMerchant : string) => {
 
     //#ifdef MP-WEIXIN
     uni.openEmbeddedMiniProgram({
-        appId: 'wx1d647f2cfdc089e6',
+        appId: platformAppId.value,
         path: '/pages/home/userSimRecharge?iccid=' + iccid,
         envVersion: 'release',
         success(res: any) {
@@ -1420,6 +1442,7 @@ const handleReload = () => {
 onLoad(() => {
     uni.hideTabBar()
     initDimensions()
+    void loadHomePlatformAppId()
 
     if (checkToken()) {
         loadDeviceList()

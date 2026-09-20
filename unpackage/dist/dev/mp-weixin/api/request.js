@@ -36,6 +36,7 @@ const appCommandDetailUrl = "/app/command/";
 const appCommandRetryUrl = "/app/command/retry/";
 const pushUnbindUrl = "/app/push/unbind";
 const messageUnreadCountUrl = "/app/message/unreadCount";
+const homePlatformAppUrl = "/home/platform/app";
 const geocoderAddressUrl = "/geocoder/address";
 const deviceShareUrl = "/share/device";
 const deviceShareEnabledUrl = "/share/device/enabled";
@@ -680,6 +681,29 @@ class MessageUnreadCountResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class HomePlatformAppResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: String, optional: true }
+        };
+      },
+      name: "HomePlatformAppResponse"
+    };
+  }
+  constructor(options, metadata = HomePlatformAppResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
 class GeocoderAddressResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -908,6 +932,15 @@ function messagePageResponse(raw = null) {
     })
   });
 }
+function homePlatformAppResponse(raw = null) {
+  const response = api_response.asJSONObject(raw);
+  const appId = response.getString("data", "").trim();
+  return new HomePlatformAppResponse({
+    code: api_response.getResponseCode(response),
+    msg: api_response.getResponseMessage(response),
+    data: appId != "" ? appId : null
+  });
+}
 function userInfoResponse(raw = null) {
   const response = jsonDataResponse(raw);
   return new UserInfoResponse({ code: response.code, msg: response.msg, data: response.data });
@@ -1086,6 +1119,11 @@ const getMessageUnreadCount = () => {
     });
   });
 };
+const getHomePlatformAppId = () => {
+  return api_http.getSilently(homePlatformAppUrl).then((raw = null) => {
+    return homePlatformAppResponse(raw);
+  });
+};
 const editDeviceInfo = (data) => {
   return api_http.put(updateDevice, data).then((raw = null) => {
     return basicResponse(raw);
@@ -1231,6 +1269,7 @@ exports.getDeviceShareEnabled = getDeviceShareEnabled;
 exports.getDeviceSharees = getDeviceSharees;
 exports.getGeocoderAddress = getGeocoderAddress;
 exports.getGeofenceList = getGeofenceList;
+exports.getHomePlatformAppId = getHomePlatformAppId;
 exports.getMessageUnreadCount = getMessageUnreadCount;
 exports.getTrackPos = getTrackPos;
 exports.getUnboundDevices = getUnboundDevices;
