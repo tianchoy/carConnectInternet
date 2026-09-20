@@ -304,7 +304,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             c: common_vendor.t(statusText(item.getString("status", ""))),
             d: common_vendor.n(statusClass(item.getString("status", ""))),
             e: common_vendor.t(getSharePerson(item, "targetNickName", "targetPhoneMasked")),
-            f: common_vendor.t(item.getString("role", "view")),
+            f: common_vendor.t(item.getString("roleName", "view")),
             g: common_vendor.t(formatTimestamp(item.getNumber("shareTime", 0))),
             h: common_vendor.t(formatExpireTime(item)),
             i: common_vendor.o(($event) => {
@@ -323,7 +323,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, sentHasMore.value ? {
         q: common_vendor.t(sentLoading.value ? "加载中..." : "加载更多"),
         r: sentLoading.value,
-        s: common_vendor.o(loadMore, "d3")
+        s: common_vendor.o(loadMore, "07")
       } : {}), {
         c: !enabled.value,
         t: common_vendor.o(loadMore, "88"),
@@ -331,7 +331,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, shareesVisible.value ? common_vendor.e({
         w: common_vendor.o(($event) => {
           return shareesVisible.value = false;
-        }, "cd"),
+        }, "54"),
         x: shareesLoading.value
       }, shareesLoading.value ? {} : sharees.value.length == 0 ? {} : {}, {
         y: sharees.value.length == 0,
@@ -345,10 +345,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         }),
         A: common_vendor.o(() => {
-        }, "bc"),
+        }, "d1"),
         B: common_vendor.o(($event) => {
           return shareesVisible.value = false;
-        }, "55")
+        }, "a6")
       }) : {}, {
         C: `${_ctx.u_s_b_h}px`,
         D: `${_ctx.u_s_a_i_b}px`,
