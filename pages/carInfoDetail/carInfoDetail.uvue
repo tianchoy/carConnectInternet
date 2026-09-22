@@ -71,10 +71,10 @@
 						<image class="power-icon" src="/static/v.png" />
 						<text class="satellite-text">{{carVoltage || 0}}V</text>
 					</view>
-					<view class="battery"
+					<view class="battery" v-if="batteryPercent"
 						:style="{ color: getBatteryColor(batteryPercent) }">
 						<image class="battery-icon" src="/static/pow.png" alt="" />
-						<text class="satellite-text">{{batteryPercent || 0}}%</text>
+						<text class="satellite-text">{{batteryPercent}}%</text>
 					</view>
 				</view>
 			</view>

@@ -290,6 +290,7 @@ const currentCarPlateNo = ref('')
 const unreadMessageCount = ref(0)
 const platformAppId = ref('')
 const unreadMessageBadgeText = computed<string>(() => unreadMessageCount.value > 99 ? '99+' : unreadMessageCount.value.toString())
+const payUrl = ref('')
 
 type DeviceStatus = {
     batteryPercent: number
@@ -1312,10 +1313,17 @@ const toPay = (iccid : string) => {
     }
     needRefresh.value = true
 
+    
+    if(platformAppId.value == 'wxf451813ad3364a12'){
+        payUrl.value = '/pages/recharge/recharge?rechargeNo=' + iccid
+    }else{
+        payUrl.value = '/pages/home/userSimRecharge?iccid=' + iccid
+    }
+
     //#ifdef MP-WEIXIN
     uni.openEmbeddedMiniProgram({
         appId: platformAppId.value,
-        path: '/pages/home/userSimRecharge?iccid=' + iccid,
+        path: payUrl.value,
         envVersion: 'release',
         success(res: any) {
             console.log('打开小程序成功', res)
@@ -1432,6 +1440,7 @@ onShow(async () => {
 // 刷新设备列表
 const handleReload = () => {
     if (!isLogin()) return
+    void loadHomePlatformAppId()
     loadDeviceList()
 }
 

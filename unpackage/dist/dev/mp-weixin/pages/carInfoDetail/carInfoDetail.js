@@ -747,13 +747,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         D: common_vendor.t(common_vendor.unref(signalSat)),
         E: common_assets._imports_1$1,
         F: common_vendor.t(common_vendor.unref(carVoltage) || 0),
-        G: common_assets._imports_2$1,
-        H: common_vendor.t(common_vendor.unref(batteryPercent) || 0),
-        I: getBatteryColor(common_vendor.unref(batteryPercent)),
-        J: common_vendor.o(($event) => {
+        G: common_vendor.unref(batteryPercent)
+      }, common_vendor.unref(batteryPercent) ? {
+        H: common_assets._imports_2$1,
+        I: common_vendor.t(common_vendor.unref(batteryPercent)),
+        J: getBatteryColor(common_vendor.unref(batteryPercent))
+      } : {}, {
+        K: common_vendor.o(($event) => {
           return handleGridClick($event);
-        }, "d6"),
-        K: common_vendor.p({
+        }, "1f"),
+        L: common_vendor.p({
           items: common_vendor.unref(baseList),
           col: 5,
           itemHeight: "88",
@@ -763,23 +766,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#606266",
           showBorder: true
         }),
-        L: common_vendor.o(filterNonLatin, "7f"),
-        M: common_vendor.o(($event) => {
+        M: common_vendor.o(filterNonLatin, "cb"),
+        N: common_vendor.o(($event) => {
           return common_vendor.isRef(psw) ? psw.value = $event : null;
-        }, "8f"),
-        N: common_vendor.p({
+        }, "99"),
+        O: common_vendor.p({
           placeholder: "请输入密码",
           clearable: true,
           password: true,
           modelValue: common_vendor.unref(psw)
         }),
-        O: common_vendor.o(confirm, "b8"),
-        P: common_vendor.p({
+        P: common_vendor.o(confirm, "16"),
+        Q: common_vendor.p({
           show: common_vendor.unref(popupRef),
           title: common_vendor.unref(modalTitle)
         }),
-        Q: `${_ctx.u_s_b_h}px`,
-        R: `${_ctx.u_s_a_i_b}px`
+        R: `${_ctx.u_s_b_h}px`,
+        S: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

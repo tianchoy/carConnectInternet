@@ -8207,9 +8207,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.5",
     appVersionCode: "105",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "5.25",
-    uniCompilerVersion: "5.25",
-    uniRuntimeVersion: "5.25",
+    uniCompileVersion: "5.26",
+    uniCompilerVersion: "5.26",
+    uniRuntimeVersion: "5.26",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -8239,8 +8239,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("5.25");
-      parameters.uniRuntimeVersionCode = parseFloat("5.25");
+      parameters.uniCompilerVersionCode = parseFloat("5.26");
+      parameters.uniRuntimeVersionCode = parseFloat("5.26");
     } catch (error) {
     }
   }
@@ -8376,9 +8376,9 @@ const getAppBaseInfo = {
       hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "5.25",
-      uniCompilerVersion: "5.25",
-      uniRuntimeVersion: "5.25"
+      uniCompileVersion: "5.26",
+      uniCompilerVersion: "5.26",
+      uniRuntimeVersion: "5.26"
     };
     try {
       if (typeof wx.getAccountInfoSync === "function") {
@@ -8388,8 +8388,8 @@ const getAppBaseInfo = {
     }
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("5.25");
-        parameters.uniRuntimeVersionCode = parseFloat("5.25");
+        parameters.uniCompilerVersionCode = parseFloat("5.26");
+        parameters.uniRuntimeVersionCode = parseFloat("5.26");
       } catch (error) {
       }
     }
@@ -9229,9 +9229,9 @@ function isConsoleWritable() {
 }
 const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.1.45,169.254.68.201,192.168.1.121";
+  const hosts = "127.0.0.1,192.168.1.45,169.254.109.18,192.168.1.121";
   const port = "8090";
-  const id = "mp-weixin_OQegAl";
+  const id = "mp-weixin_uyrCa6";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {
@@ -10988,7 +10988,13 @@ class S {
 function k(e2) {
   return e2 && "string" == typeof e2 ? JSON.parse(e2) : e2;
 }
-const A = true, C = "mp-weixin", T = k(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), b = C, P = k('{"address":["127.0.0.1","192.168.1.45","169.254.68.201","192.168.1.121"],"servePort":7001,"debugPort":9000,"initialLaunchType":"remote","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), x = k('[{"provider":"aliyun","spaceName":"zdiot-car","spaceId":"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff","clientSecret":"s9pFKgenncFnOUhRGOJpcw==","endpoint":"https://api.next.bspapp.com","failoverEndpoint":""}]') || [];
+const A = true, C = "mp-weixin", T = k(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), b = C, P = k('{"address":["127.0.0.1","192.168.1.45","169.254.109.18","192.168.1.121"],"servePort":7001,"debugPort":9000,"initialLaunchType":"remote","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), x = k(function() {
+  var d2 = [4148, 52771, 5152, 10879, 22520, 62277, 34202, 39080, 46584, 5918, 13959, 25613, 51403, 65075, 56107, 60891, 63481, 37154, 30728, 4346, 49893, 2307, 17271, 63416, 34605, 49706, 32187, 57902, 21959, 32481, 51308, 35021, 63714, 32576, 8185, 34418, 59723, 35509, 35131, 2787, 30353, 36544, 37926, 28029, 64739, 43727, 22784, 10102, 51577, 58242, 49043, 29706, 2149, 1039, 12546, 64825, 60557, 51541, 31420, 37828, 23186, 48303, 13935, 49217, 18881, 24551, 17331, 12943, 3424, 56136, 21733, 52999, 22651, 8954, 15820, 28196, 24079, 53539, 35938, 21305, 9725, 5529, 36472, 45823, 3453, 46755, 39788, 2215, 4377, 23275, 930, 54567, 21373, 24516, 10335, 17568, 51662, 22504, 60339, 17209, 59624, 55201, 21271, 20787, 65199, 44077, 19391, 8441, 40298, 22022, 2040, 45229, 42452, 33020, 39560, 59922, 47165, 29810, 26234, 42100, 55648, 36777, 13129, 34194, 60828, 33196, 8596, 53868, 45330, 27344, 53528, 41443, 14152, 57470, 5353, 45461, 39320, 31628, 13393, 55985, 31917, 26291, 17642, 33374, 9880, 37851, 56472, 52170, 1584, 1015, 34450, 9892, 40984, 12067, 1956, 56436, 35185, 43077, 38098, 36079, 17666, 7485, 30139, 20826, 46208, 8462, 48091, 32450, 48631, 29412, 61896, 21486, 31201, 59436, 24776, 38934, 11602, 11127, 20382, 31017, 47053, 45654, 7405, 31131, 40594, 13052, 46688, 34988, 629, 44111, 50563, 53548, 62165, 33063, 35442, 57811, 38440, 6342, 59765, 7485, 31190, 49719, 41326, 15296], m2 = [4207, 52824, 5122, 10767, 22410, 62250, 34284, 39105, 46492, 6011, 14069, 25647, 51441, 65041, 56138, 60855, 63376, 37211, 30845, 4244, 49863, 2351, 17237, 63435, 34653, 49739, 32216, 57931, 21897, 32384, 51201, 34984, 63680, 32634, 8155, 34312, 59695, 35548, 35156, 2711, 30396, 36515, 37959, 27919, 64705, 43747, 22818, 9989, 51465, 58339, 49136, 29807, 2092, 1131, 12576, 64771, 60591, 51512, 31436, 37865, 23201, 48284, 13917, 49265, 18855, 24449, 17365, 13038, 3405, 56187, 21712, 53055, 22604, 8919, 15864, 28182, 24172, 53525, 35919, 21249, 9676, 5631, 36427, 45778, 3406, 46791, 39689, 2207, 4477, 23182, 922, 54545, 21272, 24566, 10297, 17606, 51692, 22468, 60305, 17242, 59524, 55240, 21362, 20829, 65243, 44158, 19418, 8346, 40216, 22115, 1932, 45199, 42478, 32990, 39675, 59947, 47181, 29748, 26161, 42003, 55557, 36807, 13095, 34289, 60890, 33218, 8667, 53817, 45434, 27266, 53599, 41388, 14082, 57358, 5258, 45538, 39333, 31665, 13427, 55965, 31887, 26326, 17540, 33338, 9960, 37812, 56561, 52132, 1604, 981, 34472, 9862, 41072, 12119, 2e3, 56324, 35074, 43135, 38141, 36032, 17763, 7501, 30162, 20852, 46318, 8555, 48035, 32438, 48601, 29318, 61883, 21406, 31104, 59484, 24760, 38968, 11569, 11032, 20467, 30987, 47073, 45684, 7307, 31226, 40699, 12944, 46607, 35034, 528, 44093, 50630, 53570, 62129, 33111, 35357, 57786, 38470, 6322, 59735, 7431, 31220, 49685, 41235, 15261], s2 = "";
+  for (var i2 = 0; i2 < d2.length; i2++) {
+    s2 += String.fromCharCode(d2[i2] ^ m2[i2]);
+  }
+  return s2;
+}()) || [];
 let E = "";
 try {
   E = "__UNI__662B0B4";

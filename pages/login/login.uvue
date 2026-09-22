@@ -5,7 +5,7 @@
 
 		<view class="banner">
 			<image src="/static/car_location.png" class="banner-image" mode="aspectFill"></image>
-			<text class="title">中导物联</text>
+			<text class="title">中导车联</text>
 		</view>
 
 		<!-- #ifdef APP-ANDROID || APP-IOS -->

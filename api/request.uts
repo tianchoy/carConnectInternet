@@ -20,6 +20,7 @@ const defaultTenantId = '000000'
 const changePasswordUrl = '/user/profile/updatePassword'
 const userMsgList = '/usermessage/listForUser'
 const msgState = '/usermessage/detail/'
+const msgReadAllUrl = '/usermessage/readAll'
 const updateDevice = '/device/update'
 const deviceDetail = '/device/info/'
 const carType = '/carType/listAll'
@@ -344,6 +345,8 @@ export const getUserMsgList = (data?: UTSJSONObject): Promise<MessageResponse> =
     return messagePageResponse(raw)
 })
 export const setMsgState = (msgId: string): Promise<BasicResponse> => get(`${msgState}${msgId}`).then((raw: any): BasicResponse => { return basicResponse(raw) })
+// 一键已读：POST /usermessage/readAll，无请求体，服务端幂等（无未读时同样返回成功）
+export const readAllMessages = (): Promise<BasicResponse> => post(msgReadAllUrl, {} as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const getMessageUnreadCount = (): Promise<MessageUnreadCountResponse> => getSilently(messageUnreadCountUrl).then((raw: any): MessageUnreadCountResponse => {
     const response = asJSONObject(raw)
     return {

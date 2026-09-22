@@ -18,6 +18,7 @@ const defaultTenantId = "000000";
 const changePasswordUrl = "/user/profile/updatePassword";
 const userMsgList = "/usermessage/listForUser";
 const msgState = "/usermessage/detail/";
+const msgReadAllUrl = "/usermessage/readAll";
 const updateDevice = "/device/update";
 const deviceDetail = "/device/info/";
 const logoutUrl = "/auth/logout";
@@ -1109,6 +1110,11 @@ const setMsgState = (msgId) => {
     return basicResponse(raw);
   });
 };
+const readAllMessages = () => {
+  return api_http.post(msgReadAllUrl, new common_vendor.UTSJSONObject({})).then((raw = null) => {
+    return basicResponse(raw);
+  });
+};
 const getMessageUnreadCount = () => {
   return api_http.getSilently(messageUnreadCountUrl).then((raw = null) => {
     const response = api_response.asJSONObject(raw);
@@ -1279,6 +1285,7 @@ exports.getUserMsgList = getUserMsgList;
 exports.login = login;
 exports.logout = logout;
 exports.personalPasswordLogin = personalPasswordLogin;
+exports.readAllMessages = readAllMessages;
 exports.registerPersonalUser = registerPersonalUser;
 exports.resetForgotPassword = resetForgotPassword;
 exports.restoreOilPower = restoreOilPower;
