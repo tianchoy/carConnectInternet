@@ -322,7 +322,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
             msgList.value = [...msgList.value];
             common_vendor.index.showToast({
-              title: "已全部标为已读",
+              title: res.msg || "已全部标为已读",
               icon: "none"
             });
           } else {
@@ -442,21 +442,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getMessageContent = (item) => {
       return item.getString("content", "");
     };
+    const getMessageTitle = (item) => {
+      return item.getString("title", "");
+    };
     const isMessageUnread = (item) => {
       return item.getNumber("status", 0) == 1;
-    };
-    const getMessageTypeText = (type) => {
-      switch (type) {
-        case 1:
-          return "警告";
-        case 2:
-          return "事件";
-        default:
-          return "通知";
-      }
-    };
-    const getMessageTitle = (item) => {
-      return getMessageTypeText(item.getNumber("messageType", 0)) + " - " + getMessageCreateTime(item);
     };
     const formatTime = (timeString) => {
       if (!timeString)
@@ -531,10 +521,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         o: common_vendor.o(onRefresherRefresh, "2c"),
         p: common_vendor.o(onScrollToLower, "21"),
         q: common_vendor.o(onMessageScroll, "6b"),
-        r: common_vendor.o(ReadIt, "f4"),
+        r: common_vendor.o(ReadIt, "e5"),
         s: common_vendor.p({
           show: modal.value,
-          title: getMessageTypeText(modalContent.value.getNumber("messageType", 0)),
+          title: modalContent.value.getString("title", ""),
           content: modalContent.value.getString("content", "")
         }),
         t: `${_ctx.u_s_b_h}px`,

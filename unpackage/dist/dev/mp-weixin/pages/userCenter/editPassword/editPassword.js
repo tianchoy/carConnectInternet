@@ -132,7 +132,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: response.msg || "密码修改失败，请稍后重试", icon: "none" });
             return Promise.resolve(null);
           }
-          utils_toast.showAppToast({ title: "密码修改成功，请重新登录", icon: "success" });
+          utils_toast.showAppToast({ title: response.msg || "密码修改成功，请重新登录", icon: "success" });
           returnToLogin();
         } catch (error) {
           if (!sessionEnding.value) {

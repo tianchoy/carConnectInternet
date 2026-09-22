@@ -502,7 +502,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           common_vendor.index.hideLoading();
           if (api_response.isBusinessSuccessCode(res.code)) {
             utils_toast.showAppToast({
-              title: operationType == 1 ? "恢复油电成功" : "断开油电成功",
+              title: res.msg || (operationType == 1 ? "恢复油电成功" : "断开油电成功"),
               icon: "success"
             });
             psw.value = "";

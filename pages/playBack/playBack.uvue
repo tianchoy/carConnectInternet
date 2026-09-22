@@ -548,7 +548,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 	// 显示当前位置
-	function showCurrentPosition() {
+	function showCurrentPosition(message : string = '这段时间没有数据') {
 		isTrackPlayable.value = false
 		const originalLatText = lat.value ?? ''
 		const originalLngText = lng.value ?? ''
@@ -556,7 +556,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		const originalLng = parseFloat(originalLngText)
 		if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
 			showAppToast({
-				title: '这段时间没有数据',
+				title: message,
 				icon: 'none',
 				duration: 2000
 			})
@@ -564,7 +564,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 
 		showAppToast({
-			title: '这段时间没有数据',
+			title: message,
 			icon: 'none',
 			duration: 2000
 		})
@@ -746,8 +746,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			if (requestId != replaySessionId) return
 
 			if (!isBusinessSuccessCode(res.code)) {
-				showAppToast({ title: res.msg || '轨迹加载失败', icon: 'none' })
-				showCurrentPosition()
+				showCurrentPosition(res.msg || '轨迹加载失败')
 				return
 			}
 

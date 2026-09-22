@@ -187,6 +187,15 @@ function logHttpError(error) {
   const detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (error.data != null ? error.data.toString() : "");
   common_vendor.index.__f__("error", "at api/http.uts:142", "[HttpRequest] " + detail);
 }
+function getHttpResponseMessage(data = null) {
+  if (data == null)
+    return "";
+  try {
+    return api_response.getResponseMessage(api_response.asJSONObject(data));
+  } catch (error) {
+    return "";
+  }
+}
 function errorHandler(error, config) {
   if (config.showLoading != false) {
     common_vendor.index.hideLoading();
@@ -198,29 +207,30 @@ function errorHandler(error, config) {
   }
   if (config.showError == false)
     return null;
+  const responseMessage = getHttpResponseMessage(error.data);
   if (error.statusCode != 0) {
     switch (error.statusCode) {
       case 403:
         utils_toast.showAppToast({
-          title: "没有权限访问",
+          title: responseMessage != "" ? responseMessage : "没有权限访问",
           icon: "none"
         });
         break;
       case 404:
         utils_toast.showAppToast({
-          title: "请求资源不存在",
+          title: responseMessage != "" ? responseMessage : "请求资源不存在",
           icon: "none"
         });
         break;
       case 500:
         utils_toast.showAppToast({
-          title: "服务器错误",
+          title: responseMessage != "" ? responseMessage : "服务器错误",
           icon: "none"
         });
         break;
       default:
         utils_toast.showAppToast({
-          title: error.message != null ? error.message : `请求错误: ${error.statusCode}`,
+          title: responseMessage != "" ? responseMessage : error.message != "" ? error.message : `请求错误: ${error.statusCode}`,
           icon: "none"
         });
     }

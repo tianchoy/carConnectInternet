@@ -1096,7 +1096,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       if (!iccid || iccid.trim().length === 0) {
         utils_toast.showAppToast({
-          title: "未配置充值号，请联系客服。",
+          title: "未配置充值号,请联系客服",
           icon: "none"
         });
         return null;
@@ -1145,7 +1145,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.__f__("log", "at pages/index/index.uvue:1366", "解绑设备结果:", result);
         if (api_response.isBusinessSuccessCode(result.code)) {
           utils_toast.showAppToast({
-            title: "解绑成功",
+            title: result.msg || "解绑成功",
             icon: "none"
           });
           clearSavedSelectedDevice();

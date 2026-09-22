@@ -256,7 +256,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 			if (isBusinessSuccessCode(res.code)) {
 				showAppToast({
-					title: res.msg,
+					title: res.msg || '添加成功',
 					icon: 'success'
 				})
 

@@ -32,7 +32,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadPayDeviceListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (loading.value || !hasMore.value)
-          return Promise.resolve(null);
+          return false;
         loading.value = true;
         try {
           const data = new common_vendor.UTSJSONObject({
@@ -45,12 +45,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               title: res.msg || "加载失败",
               icon: "none"
             });
-            return Promise.resolve(null);
+            return false;
           }
           const pageData = res.data;
           if (pageData == null) {
             hasMore.value = false;
-            return Promise.resolve(null);
+            return true;
           }
           const list = pageData.list;
           const pageCount = pageData.totalPage;

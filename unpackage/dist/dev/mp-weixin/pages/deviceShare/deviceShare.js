@@ -176,7 +176,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             expireTime
           }));
           if (api_response.isBusinessSuccessCode(res.code)) {
-            utils_toast.showAppToast({ title: "分享成功", icon: "success" });
+            utils_toast.showAppToast({ title: res.msg || "分享成功", icon: "success" });
             targetPhone.value = "";
             expireDate.value = "";
             yield loadSent(true);
@@ -198,7 +198,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const res = yield api_request.revokeDeviceShare(shareId);
           if (api_response.isBusinessSuccessCode(res.code)) {
-            utils_toast.showAppToast({ title: "撤销成功", icon: "success" });
+            utils_toast.showAppToast({ title: res.msg || "撤销成功", icon: "success" });
             yield loadSent(true);
           } else
             utils_toast.showAppToast({ title: res.msg || "撤销失败", icon: "none" });

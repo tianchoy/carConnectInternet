@@ -105,14 +105,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const isDocState = () => {
       docState.value = !docState.value;
     };
-    const completeLogin = (token) => {
+    const completeLogin = (token, message = "登录成功") => {
       if (token == "") {
-        utils_toast.showAppToast({ title: "登录失败，请重试", icon: "none" });
+        utils_toast.showAppToast({ title: message || "登录失败，请重试", icon: "none" });
         return null;
       }
       common_vendor.index.setStorageSync("token", token);
       api_http.resetTokenExpiredState();
-      utils_toast.showAppToast({ title: "登录成功", icon: "success" });
+      utils_toast.showAppToast({ title: message || "登录成功", icon: "success" });
       setTimeout(() => {
         common_vendor.index.reLaunch({
           url: "/pages/index/index",
@@ -177,10 +177,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           const token = loginData.getString("token", "");
           if (token == "") {
-            utils_toast.showAppToast({ title: "登录失败: 未获取到token", icon: "none" });
+            utils_toast.showAppToast({ title: res.msg || "登录失败: 未获取到token", icon: "none" });
             return Promise.resolve(null);
           }
-          completeLogin(token);
+          completeLogin(token, res.msg);
         } catch (error) {
           common_vendor.index.__f__("error", "at pages/login/login.uvue:504", "微信登录失败:", error);
           utils_toast.showAppToast({ title: "微信登录失败", icon: "none" });
@@ -245,7 +245,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const token = response.data != null ? response.data.getString("access_token", response.data.getString("token", "")) : "";
           if (api_response.isBusinessSuccessCode(response.code) && token != "") {
             saveEnterpriseAccount();
-            completeLogin(token);
+            completeLogin(token, response.msg);
             return Promise.resolve(null);
           }
           utils_toast.showAppToast({ title: response.msg || "登录失败，请检查账号和密码", icon: "none" });

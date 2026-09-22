@@ -191,7 +191,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const positions = res.data;
           if (res == null || !api_response.isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
             utils_toast.showAppToast({
-              title: "获取位置失败",
+              title: res.msg || "获取位置失败",
               icon: "none"
             });
             return Promise.resolve(null);
@@ -243,7 +243,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           if (!foundDevice) {
             utils_toast.showAppToast({
-              title: "未找到车辆设备",
+              title: res.msg || "未找到车辆设备",
               icon: "none"
             });
           }

@@ -685,7 +685,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 			// 根据响应处理结果
 			if (isBusinessSuccessCode(res.code)) {
 				showAppToast({
-					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
+					title: res.msg || (operationType == 1 ? '恢复油电成功' : '断开油电成功'),
 					icon: 'success'
 				})
 

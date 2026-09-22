@@ -426,7 +426,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const response = yield api_request.sendAppCommand(requestData);
           if (api_response.isBusinessSuccessCode(response.code)) {
             const requestIdText = response.data != "" ? "追踪编号：" + response.data : "请在指令记录中查看下发结果";
-            utils_toast.showAppToast({ title: "指令已提交，" + requestIdText, icon: "success", duration: 3500 });
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令已提交，" + requestIdText, icon: "success", duration: 3500 });
             yield reloadHistory();
           } else {
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令下发失败", icon: "none", duration: 3e3 });

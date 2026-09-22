@@ -442,7 +442,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       pickerTitle.value = type == "start" ? "选择开始时间" : "选择结束时间";
       showDateTimePicker.value = true;
     }
-    function showCurrentPosition() {
+    function showCurrentPosition(message = "这段时间没有数据") {
       var _a, _b, _c, _d;
       isTrackPlayable.value = false;
       const originalLatText = (_a = lat.value) !== null && _a !== void 0 ? _a : "";
@@ -451,14 +451,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const originalLng = parseFloat(originalLngText);
       if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
         utils_toast.showAppToast({
-          title: "这段时间没有数据",
+          title: message,
           icon: "none",
           duration: 2e3
         });
         return null;
       }
       utils_toast.showAppToast({
-        title: "这段时间没有数据",
+        title: message,
         icon: "none",
         duration: 2e3
       });
@@ -607,8 +607,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (requestId != replaySessionId)
             return Promise.resolve(null);
           if (!api_response.isBusinessSuccessCode(res.code)) {
-            utils_toast.showAppToast({ title: res.msg || "轨迹加载失败", icon: "none" });
-            showCurrentPosition();
+            showCurrentPosition(res.msg || "轨迹加载失败");
             return Promise.resolve(null);
           }
           const trackData = res.data;
@@ -628,7 +627,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:770", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:769", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -790,7 +789,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_h = option.lng) !== null && _h !== void 0 ? _h : null;
       startTime.value = (_j = option.startTime) !== null && _j !== void 0 ? _j : "";
       endTime.value = (_k = option.endTime) !== null && _k !== void 0 ? _k : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:948", "plateNo:", plateNo.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:947", "plateNo:", plateNo.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {

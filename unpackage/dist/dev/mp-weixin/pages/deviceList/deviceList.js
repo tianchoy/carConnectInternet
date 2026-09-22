@@ -160,7 +160,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_request.delDevice(deviceId);
         if (api_response.isBusinessSuccessCode(res.code)) {
           utils_toast.showAppToast({
-            title: "解绑成功",
+            title: res.msg || "解绑成功",
             icon: "success"
           });
           common_vendor.index.setStorageSync("needRefreshHome", true);

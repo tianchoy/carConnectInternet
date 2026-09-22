@@ -137,7 +137,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             return Promise.resolve(null);
           }
           startSmsCooldown();
-          utils_toast.showAppToast({ title: "验证码已发送", icon: "success" });
+          utils_toast.showAppToast({ title: response.msg || "验证码已发送", icon: "success" });
         } catch (error) {
           utils_toast.showAppToast({ title: "验证码发送失败，请检查网络", icon: "none" });
         } finally {
@@ -182,6 +182,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             return Promise.resolve(null);
           }
           currentStep.value = 3;
+          utils_toast.showAppToast({ title: response.msg || "密码重置成功", icon: "success" });
         } catch (error) {
           utils_toast.showAppToast({ title: "密码重置失败，请检查网络后重试", icon: "none" });
         } finally {

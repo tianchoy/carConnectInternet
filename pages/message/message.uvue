@@ -58,7 +58,7 @@
 
 		<i-modal
 			:show="modal"
-			:title="getMessageTypeText(modalContent.getNumber('messageType', 0))"
+			:title="modalContent.getString('title', '')"
 			:content="modalContent.getString('content', '')"
 			@confirm="ReadIt">
 		</i-modal>
@@ -387,7 +387,7 @@
 				})
 				msgList.value = [...msgList.value]
 				uni.showToast({
-					title: '已全部标为已读',
+					title: res.msg || '已全部标为已读',
 					icon: 'none'
 				})
 			} else {
@@ -531,6 +531,10 @@
 		return item.getString('content', '')
 	}
 
+	const getMessageTitle = (item : UTSJSONObject) : string => {
+		return item.getString('title', '')
+	}
+
 	const isMessageUnread = (item : UTSJSONObject) : boolean => {
 		return item.getNumber('status', 0) == 1
 	}
@@ -543,9 +547,6 @@
 		}
 	}
 
-	const getMessageTitle = (item : UTSJSONObject) : string => {
-		return getMessageTypeText(item.getNumber('messageType', 0)) + ' - ' + getMessageCreateTime(item)
-	}
 
 	// 工具函数
 	const formatTime = (timeString: string) => {

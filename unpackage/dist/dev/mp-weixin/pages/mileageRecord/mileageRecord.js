@@ -185,8 +185,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
           title: "加载中..."
         }));
-        if (!deviceNo.value)
+        if (!deviceNo.value) {
+          common_vendor.index.hideLoading();
           return Promise.resolve(null);
+        }
         try {
           const data = new common_vendor.UTSJSONObject({
             deviceNo: deviceNo.value,
@@ -202,13 +204,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
             return Promise.resolve(null);
           }
-          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:227", "获取里程数据成功:", res);
+          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:230", "获取里程数据成功:", res);
           const trackData = res.data;
           if (trackData != null) {
             processTripData(trackData);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:233", "获取里程数据失败:", e);
+          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:236", "获取里程数据失败:", e);
           utils_toast.showAppToast({
             title: "数据加载失败",
             icon: "none"

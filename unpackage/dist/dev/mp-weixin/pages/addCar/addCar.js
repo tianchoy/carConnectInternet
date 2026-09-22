@@ -215,7 +215,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           loading.value = false;
           if (api_response.isBusinessSuccessCode(res.code)) {
             utils_toast.showAppToast({
-              title: res.msg,
+              title: res.msg || "添加成功",
               icon: "success"
             });
             common_vendor.index.setStorageSync("needRefreshHome", true);

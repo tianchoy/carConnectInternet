@@ -1299,7 +1299,7 @@ const toPay = (iccid : string) => {
     if (!isCarSelected()) return
     if (!iccid || iccid.trim().length === 0) {
         showAppToast({
-            title: '未配置充值号，请联系客服。',
+            title: '未配置充值号,请联系客服',
             icon: 'none'
         })
         return
@@ -1366,7 +1366,7 @@ async function unbindCurrentDevice() : Promise<void> {
     console.log('解绑设备结果:', result)
     if (isBusinessSuccessCode(result.code)) {
         showAppToast({
-            title: '解绑成功',
+            title: result.msg || '解绑成功',
             icon: 'none'
         })
         clearSavedSelectedDevice()

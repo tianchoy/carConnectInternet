@@ -735,7 +735,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const result = yield api_request.deleteGeofence(id);
           if (api_response.isBusinessSuccessCode(result.code)) {
-            utils_toast.showAppToast({ title: "删除成功" });
+            utils_toast.showAppToast({ title: result.msg || "删除成功", icon: "success" });
             selectedFence.value = null;
             points.value = [];
             circleCenter.value = null;
@@ -821,7 +821,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           common_vendor.index.hideLoading();
           if (api_response.isBusinessSuccessCode(result.code)) {
-            utils_toast.showAppToast({ title: editingFence.value ? "更新成功" : "保存成功" });
+            utils_toast.showAppToast({ title: result.msg || (editingFence.value ? "更新成功" : "保存成功") });
             (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.$callMethod("close");
             const tempFence = editingFence.value;
             editingFence.value = null;
@@ -984,7 +984,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             result = yield api_request.unbindDevices(params);
           }
           if (api_response.isBusinessSuccessCode(result.code)) {
-            utils_toast.showAppToast({ title: bound ? "绑定成功" : "解绑成功" });
+            utils_toast.showAppToast({ title: result.msg || (bound ? "绑定成功" : "解绑成功") });
             initPagination(activeTab.value);
             scrollTop.value = 0;
             if (activeTab.value === "bind") {

@@ -65,15 +65,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       services_auth_smsRegisterContext.clearSmsRegisterContext();
       common_vendor.index.reLaunch({ url: "/pages/login/login" });
     };
-    const completeLogin = (token) => {
+    const completeLogin = (token, message = "注册成功") => {
       if (token == "") {
-        utils_toast.showAppToast({ title: "注册失败，请重试", icon: "none" });
+        utils_toast.showAppToast({ title: message || "注册失败，请重试", icon: "none" });
         return null;
       }
       common_vendor.index.setStorageSync("token", token);
       api_http.resetTokenExpiredState();
       services_auth_smsRegisterContext.clearSmsRegisterContext();
-      utils_toast.showAppToast({ title: "注册成功", icon: "success" });
+      utils_toast.showAppToast({ title: message || "注册成功", icon: "success" });
       setTimeout(() => {
         common_vendor.index.reLaunch({
           url: "/pages/index/index",
@@ -142,7 +142,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }));
           const token = response.data != null ? response.data.getString("access_token", "") : "";
           if (api_response.isBusinessSuccessCode(response.code) && token != "") {
-            completeLogin(token);
+            completeLogin(token, response.msg);
             return Promise.resolve(null);
           }
           utils_toast.showAppToast({ title: response.msg || "注册失败，请稍后重试", icon: "none" });

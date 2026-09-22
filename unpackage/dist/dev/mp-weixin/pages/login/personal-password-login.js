@@ -85,10 +85,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       return true;
     };
-    const completeLogin = (token) => {
+    const completeLogin = (token, message = "登录成功") => {
       common_vendor.index.setStorageSync("token", token);
       api_http.resetTokenExpiredState();
-      utils_toast.showAppToast({ title: "登录成功", icon: "success" });
+      utils_toast.showAppToast({ title: message || "登录成功", icon: "success" });
       setTimeout(() => {
         common_vendor.index.reLaunch({
           url: "/pages/index/index",
@@ -112,7 +112,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }));
           const token = response.data != null ? response.data.getString("access_token", "") : "";
           if (api_response.isBusinessSuccessCode(response.code) && token != "") {
-            completeLogin(token);
+            completeLogin(token, response.msg);
             return Promise.resolve(null);
           }
           utils_toast.showAppToast({ title: response.msg || "登录失败，请检查账号和密码", icon: "none" });
