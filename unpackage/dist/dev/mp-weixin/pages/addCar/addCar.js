@@ -141,20 +141,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       openScanPage();
     };
+    const normalizeDeviceNo = (value) => {
+      const deviceNo = value.trim();
+      if (deviceNo == "" || !new RegExp("^[0-9]+$").test(deviceNo))
+        return "";
+      if (deviceNo.length == 15)
+        return "0" + deviceNo.slice(4, 15);
+      if (deviceNo.length == 11)
+        return "0" + deviceNo;
+      return deviceNo;
+    };
     const handleScanResult = (data) => {
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:169", "接收到扫码结果:", data.result);
-      if (data.result.length == 15) {
-        carInfo.value.deviceNo = "0" + data.result.slice(4, 15);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:178", "接收到扫码结果:", data.result);
+      const normalizedDeviceNo = normalizeDeviceNo(data.result);
+      if (normalizedDeviceNo == "") {
+        utils_toast.showAppToast({
+          title: "设备编号只能输入数字，请确认后提交",
+          icon: "none"
+        });
         return null;
       }
-      if (data.result.length == 11) {
-        carInfo.value.deviceNo = "0" + data.result;
-        return null;
-      }
-      utils_toast.showAppToast({
-        title: "扫码结果长度不是标准设备编号，请确认后提交",
-        icon: "none"
-      });
+      carInfo.value.deviceNo = normalizedDeviceNo;
     };
     const updateCarIconSelectorVisible = (visible) => {
       carIconSelectorVisible.value = visible;
@@ -162,7 +169,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const selectIcon = (item) => {
       const name = item.getString("name", "");
       const text = item.getString("text", "");
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:192", name);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:198", name);
       carInfo.value.deviceType = name;
       carInfo.value.deviceTypeValue = text;
       carIconSelectorVisible.value = false;
@@ -192,11 +199,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:229", "=== 开始提交设备 ===");
+        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:235", "=== 开始提交设备 ===");
         try {
           if (!validateForm())
             return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:234", "✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:240", "✅ 表单验证通过");
+          const normalizedDeviceNo = normalizeDeviceNo(carInfo.value.deviceNo);
+          if (normalizedDeviceNo == "") {
+            utils_toast.showAppToast({
+              title: "设备编号只能输入数字，请确认后提交",
+              icon: "none"
+            });
+            return Promise.resolve(null);
+          }
+          carInfo.value.deviceNo = normalizedDeviceNo;
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "添加中...",
@@ -204,13 +220,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }));
           const submitData = new common_vendor.UTSJSONObject({
             deviceName: carInfo.value.deviceName,
-            deviceNo: carInfo.value.deviceNo,
+            deviceNo: normalizedDeviceNo,
             carType: carInfo.value.deviceType,
             plateNo: carInfo.value.plateNo
           });
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:249", "📤 提交数据:", submitData);
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:265", "📤 提交数据:", submitData);
           const res = yield api_request.addDevice(submitData);
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:252", "✅ 添加设备返回:", res);
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:268", "✅ 添加设备返回:", res);
           common_vendor.index.hideLoading();
           loading.value = false;
           if (api_response.isBusinessSuccessCode(res.code)) {
@@ -231,7 +247,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:279", "❌ 添加设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:295", "❌ 添加设备失败:", error);
           common_vendor.index.hideLoading();
           loading.value = false;
           utils_toast.showAppToast({
@@ -246,9 +262,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onShow(() => {
       isNavigatingToScanner.value = false;
       const rawResult = common_vendor.index.getStorageSync("scanCodeResult");
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:297", "onShow:", rawResult);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:313", "onShow:", rawResult);
       const scanCodeResultListener = common_vendor.index.$on("scanCodeResult", handleScanResult);
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:299", "scanCodeResultListener:", scanCodeResultListener);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:315", "scanCodeResultListener:", scanCodeResultListener);
       const result = rawResult != null ? rawResult.toString() : "";
       if (result.length > 0) {
         common_vendor.index.removeStorageSync("scanCodeResult");
