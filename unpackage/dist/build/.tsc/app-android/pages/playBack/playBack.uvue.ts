@@ -497,7 +497,7 @@ const center = reactive({
 	}
 
 	// 显示当前位置
-	function showCurrentPosition() {
+	function showCurrentPosition(message : string = '这段时间没有数据') {
 		isTrackPlayable.value = false
 		const originalLatText = lat.value ?? ''
 		const originalLngText = lng.value ?? ''
@@ -505,7 +505,7 @@ const center = reactive({
 		const originalLng = parseFloat(originalLngText)
 		if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
 			showAppToast({
-				title: '这段时间没有数据',
+				title: message,
 				icon: 'none',
 				duration: 2000
 			})
@@ -513,7 +513,7 @@ const center = reactive({
 		}
 
 		showAppToast({
-			title: '这段时间没有数据',
+			title: message,
 			icon: 'none',
 			duration: 2000
 		})
@@ -695,8 +695,7 @@ const center = reactive({
 			if (requestId != replaySessionId) return
 
 			if (!isBusinessSuccessCode(res.code)) {
-				showAppToast({ title: res.msg || '轨迹加载失败', icon: 'none' })
-				showCurrentPosition()
+				showCurrentPosition(res.msg || '轨迹加载失败')
 				return
 			}
 

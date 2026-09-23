@@ -81,14 +81,14 @@ const __sfc__ = defineComponent({
                 return '';
             }
         };
-        const completeLogin = (token: string): void => {
+        const completeLogin = (token: string, message: string = '登录成功'): void => {
             if (token == '') {
-                showAppToast({ title: '登录失败，请重试', icon: 'none' } as ShowToastOptions);
+                showAppToast({ title: message != "" ? message : '登录失败，请重试', icon: 'none' } as ShowToastOptions);
                 return;
             }
             uni.setStorageSync('token', token);
             resetTokenExpiredState();
-            showAppToast({ title: '登录成功', icon: 'success' } as ShowToastOptions);
+            showAppToast({ title: message != "" ? message : '登录成功', icon: 'success' } as ShowToastOptions);
             setTimeout(() => {
                 uni.reLaunch({
                     url: '/pages/index/index',
@@ -126,7 +126,7 @@ const __sfc__ = defineComponent({
                 } as PersonalPasswordLoginRequest);
                 const token = response.data != null ? response.data.getString('access_token', '') : '';
                 if (isBusinessSuccessCode(response.code) && token != '') {
-                    completeLogin(token);
+                    completeLogin(token, response.msg);
                     return;
                 }
                 showAppToast({ title: response.msg != "" ? response.msg : '登录失败，请检查账号和密码', icon: 'none' } as ShowToastOptions);
@@ -189,7 +189,7 @@ const __sfc__ = defineComponent({
                     return;
                 }
                 startSmsCooldown();
-                showAppToast({ title: '验证码已发送', icon: 'success' } as ShowToastOptions);
+                showAppToast({ title: response.msg != "" ? response.msg : '验证码已发送', icon: 'success' } as ShowToastOptions);
             }
             catch (error: any) {
                 showAppToast({ title: '验证码发送失败，请检查网络', icon: 'none' } as ShowToastOptions);
@@ -213,7 +213,7 @@ const __sfc__ = defineComponent({
                 const token = response.data != null ? response.data.getString('access_token', '') : '';
                 if (isBusinessSuccessCode(response.code) && token != '') {
                     smsCode.value = '';
-                    completeLogin(token);
+                    completeLogin(token, response.msg);
                     return;
                 }
                 if (response.msg.indexOf('NEED_REGISTER:') == 0 || response.msg.indexOf('NEED_SET_PASSWORD:') == 0) {
@@ -335,7 +335,7 @@ const __sfc__ = defineComponent({
                 const token = response.data != null ? response.data.getString('access_token', response.data.getString('token', '')) : '';
                 if (isBusinessSuccessCode(response.code) && token != '') {
                     saveEnterpriseAccount();
-                    completeLogin(token);
+                    completeLogin(token, response.msg);
                     return;
                 }
                 showAppToast({ title: response.msg != "" ? response.msg : '登录失败，请检查账号和密码', icon: 'none' } as ShowToastOptions);
@@ -424,7 +424,7 @@ const __sfc__ = defineComponent({
                             class: "banner-image",
                             mode: "aspectFill"
                         })),
-                        _cE("text", _uM({ class: "title" }), "中导物联")
+                        _cE("text", _uM({ class: "title" }), "中导车联")
                     ]),
                     _cE("view", _uM({ class: "content" }), [
                         isTrue(!smsLoginMode.value)

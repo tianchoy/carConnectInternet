@@ -598,7 +598,11 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         try {
                             val result = await(deleteGeofence(id))
                             if (isBusinessSuccessCode(result.code)) {
-                                showAppToast(ShowToastOptions(title = "删除成功"))
+                                showAppToast(ShowToastOptions(title = if (result.msg != "") {
+                                    result.msg
+                                } else {
+                                    "删除成功"
+                                }, icon = "success"))
                                 selectedFence.value = null
                                 points.value = _uA()
                                 circleCenter.value = null
@@ -682,10 +686,14 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             }
                             uni_hideLoading(null)
                             if (isBusinessSuccessCode(result.code)) {
-                                showAppToast(ShowToastOptions(title = if (isTruthy(editingFence.value)) {
-                                    "更新成功"
+                                showAppToast(ShowToastOptions(title = if (isTruthy(result.msg)) {
+                                    result.msg
                                 } else {
-                                    "保存成功"
+                                    if (isTruthy(editingFence.value)) {
+                                        "更新成功"
+                                    } else {
+                                        "保存成功"
+                                    }
                                 }))
                                 editDialogPopup.value?.`$callMethod`("close")
                                 val tempFence = editingFence.value
@@ -870,10 +878,14 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 result = await(unbindDevices(params))
                             }
                             if (isBusinessSuccessCode(result.code)) {
-                                showAppToast(ShowToastOptions(title = if (bound) {
-                                    "绑定成功"
+                                showAppToast(ShowToastOptions(title = if (isTruthy(result.msg)) {
+                                    result.msg
                                 } else {
-                                    "解绑成功"
+                                    if (bound) {
+                                        "绑定成功"
+                                    } else {
+                                        "解绑成功"
+                                    }
                                 }))
                                 initPagination(activeTab.value)
                                 scrollTop.value = 0

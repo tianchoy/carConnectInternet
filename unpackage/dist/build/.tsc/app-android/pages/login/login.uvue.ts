@@ -88,14 +88,14 @@ const _cache = __ins.renderCache;
 		}
 	}
 
-	const completeLogin = (token: string): void => {
+	const completeLogin = (token: string, message: string = '登录成功'): void => {
 		if (token == '') {
-			showAppToast({ title: '登录失败，请重试', icon: 'none' })
+			showAppToast({ title: message || '登录失败，请重试', icon: 'none' })
 			return
 		}
 		uni.setStorageSync('token', token)
 		resetTokenExpiredState()
-		showAppToast({ title: '登录成功', icon: 'success' })
+		showAppToast({ title: message || '登录成功', icon: 'success' })
 		setTimeout(() => {
 			uni.reLaunch({
 				url: '/pages/index/index',
@@ -134,7 +134,7 @@ const _cache = __ins.renderCache;
 			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
 			if (isBusinessSuccessCode(response.code) && token != '') {
-				completeLogin(token)
+				completeLogin(token, response.msg)
 				return
 			}
 			showAppToast({ title: response.msg || '登录失败，请检查账号和密码', icon: 'none' })
@@ -200,7 +200,7 @@ const _cache = __ins.renderCache;
 				return
 			}
 			startSmsCooldown()
-			showAppToast({ title: '验证码已发送', icon: 'success' })
+			showAppToast({ title: response.msg || '验证码已发送', icon: 'success' })
 		} catch (error) {
 			showAppToast({ title: '验证码发送失败，请检查网络', icon: 'none' })
 		} finally {
@@ -221,7 +221,7 @@ const _cache = __ins.renderCache;
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
 			if (isBusinessSuccessCode(response.code) && token != '') {
 				smsCode.value = ''
-				completeLogin(token)
+				completeLogin(token, response.msg)
 				return
 			}
 			if (response.msg.indexOf('NEED_REGISTER:') == 0 || response.msg.indexOf('NEED_SET_PASSWORD:') == 0) {
@@ -397,7 +397,7 @@ const _cache = __ins.renderCache;
 			const token = response.data != null ? response.data.getString('access_token', response.data.getString('token', '')) : ''
 			if (isBusinessSuccessCode(response.code) && token != '') {
 				saveEnterpriseAccount()
-				completeLogin(token)
+				completeLogin(token, response.msg)
 				return
 			}
 			showAppToast({ title: response.msg || '登录失败，请检查账号和密码', icon: 'none' })
@@ -491,7 +491,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
           class: "banner-image",
           mode: "aspectFill"
         })),
-        _cE("text", _uM({ class: "title" }), "中导物联")
+        _cE("text", _uM({ class: "title" }), "中导车联")
       ]),
       _cE("view", _uM({ class: "content" }), [
         isTrue(!smsLoginMode.value)

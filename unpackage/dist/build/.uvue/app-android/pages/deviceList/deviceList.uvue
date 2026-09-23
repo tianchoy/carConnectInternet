@@ -144,7 +144,7 @@ const __sfc__ = defineComponent({
             const res = await delDevice(deviceId);
             if (isBusinessSuccessCode(res.code)) {
                 showAppToast({
-                    title: '解绑成功',
+                    title: res.msg != "" ? res.msg : '解绑成功',
                     icon: 'success'
                 } as ShowToastOptions);
                 uni.setStorageSync('needRefreshHome', true);

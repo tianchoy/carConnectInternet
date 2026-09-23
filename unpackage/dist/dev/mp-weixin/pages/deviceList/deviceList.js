@@ -20,6 +20,74 @@ const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
   (_easycom_custom_navBar + _easycom_i_tag + _easycom_indexListMode + _easycom_app_toast)();
 }
+class ClusterLabel extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          content: { type: String, optional: false },
+          fontSize: { type: Number, optional: false },
+          width: { type: Number, optional: false },
+          height: { type: Number, optional: false },
+          color: { type: String, optional: false },
+          bgColor: { type: String, optional: false },
+          borderRadius: { type: Number, optional: false },
+          textAlign: { type: String, optional: false },
+          anchorX: { type: Number, optional: false },
+          anchorY: { type: Number, optional: false }
+        };
+      },
+      name: "ClusterLabel"
+    };
+  }
+  constructor(options, metadata = ClusterLabel.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.content = this.__props__.content;
+    this.fontSize = this.__props__.fontSize;
+    this.width = this.__props__.width;
+    this.height = this.__props__.height;
+    this.color = this.__props__.color;
+    this.bgColor = this.__props__.bgColor;
+    this.borderRadius = this.__props__.borderRadius;
+    this.textAlign = this.__props__.textAlign;
+    this.anchorX = this.__props__.anchorX;
+    this.anchorY = this.__props__.anchorY;
+    delete this.__props__;
+  }
+}
+class ClusterMarker extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          clusterId: { type: Number, optional: false },
+          latitude: { type: Number, optional: false },
+          longitude: { type: Number, optional: false },
+          iconPath: { type: String, optional: false },
+          width: { type: Number, optional: false },
+          height: { type: Number, optional: false },
+          label: { type: ClusterLabel, optional: false }
+        };
+      },
+      name: "ClusterMarker"
+    };
+  }
+  constructor(options, metadata = ClusterMarker.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.clusterId = this.__props__.clusterId;
+    this.latitude = this.__props__.latitude;
+    this.longitude = this.__props__.longitude;
+    this.iconPath = this.__props__.iconPath;
+    this.width = this.__props__.width;
+    this.height = this.__props__.height;
+    this.label = this.__props__.label;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "deviceList",
   setup(__props) {
@@ -31,9 +99,91 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       latitude: 0,
       longitude: 0
     }));
+    let clusterContext = null;
+    let clusterReady = false;
+    const toPlainObject = (value = null) => {
+      const parsed = common_vendor.UTS.JSON.parse(common_vendor.UTS.JSON.stringify(value));
+      return parsed != null ? parsed : value;
+    };
+    const syncClusterMarkers = () => {
+      const context = clusterContext;
+      if (!clusterReady || context == null)
+        return null;
+      try {
+        context.addMarkers(toPlainObject(new common_vendor.UTSJSONObject({ markers: markers.value, clear: true })));
+      } catch (error) {
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:86", "车标同步到聚合器失败:", error);
+      }
+    };
+    const setupMarkerCluster = () => {
+      const context = clusterContext;
+      if (clusterReady || context == null)
+        return null;
+      try {
+        context.initMarkerCluster(toPlainObject(new common_vendor.UTSJSONObject({
+          enableDefaultStyle: false,
+          zoomOnClick: true,
+          gridSize: 60
+        })));
+        context.on("markerClusterCreate", (res = null) => {
+          const clusterList = res != null ? res["clusters"] : null;
+          if (clusterList == null)
+            return null;
+          const clusterMarkers = [];
+          clusterList.forEach((cluster = null) => {
+            const center = cluster["center"];
+            if (center == null)
+              return null;
+            const markerIds = cluster["markerIds"];
+            const count = markerIds != null ? markerIds.length : 0;
+            clusterMarkers.push(new ClusterMarker({
+              clusterId: cluster["clusterId"],
+              latitude: center["latitude"],
+              longitude: center["longitude"],
+              // 用透明图标占位，否则微信会给没有 iconPath 的标记渲染默认红色定位针
+              iconPath: "/static/transparent.png",
+              width: 1,
+              height: 1,
+              // 聚合簇用 label 显示数量
+              label: new ClusterLabel({
+                content: count.toString(),
+                fontSize: 14,
+                width: 40,
+                height: 40,
+                color: "#ffffff",
+                bgColor: "#1296db",
+                borderRadius: 20,
+                textAlign: "center",
+                anchorX: 0,
+                anchorY: -20
+              })
+            }));
+          });
+          context.addMarkers(toPlainObject(new common_vendor.UTSJSONObject({ markers: clusterMarkers })));
+        });
+        clusterReady = true;
+        syncClusterMarkers();
+      } catch (error) {
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:138", "点聚合初始化失败，回退为普通标记点:", error);
+      }
+    };
+    const EMPTY_MARKERS = [];
+    const mapMarkers = common_vendor.computed(() => {
+      let result = markers.value;
+      result = EMPTY_MARKERS;
+      return result;
+    });
     const pickerStateTitle = common_vendor.ref("全部状态");
     const showWhat = () => {
       showMap.value = !showMap.value;
+      if (showMap.value) {
+        clusterReady = false;
+        setTimeout(() => {
+          var _a, _b;
+          clusterContext = common_vendor.index.createMapContext("myMap", (_b = (_a = common_vendor.getCurrentInstance()) === null || _a === void 0 ? null : _a.proxy) !== null && _b !== void 0 ? _b : null);
+          setupMarkerCluster();
+        }, 100);
+      }
     };
     const originalDeviceList = common_vendor.ref([]);
     const deviceListItems = common_vendor.computed(() => {
@@ -105,6 +255,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           iconPath: utils_cars.getDeviceIcon(connectionStatus, carType),
           width: 30,
           height: 30,
+          // 声明参与微信小程序原生点聚合
+          joinCluster: true,
           callout: new common_vendor.UTSJSONObject({
             content: deviceName,
             display: "ALWAYS",
@@ -116,6 +268,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
       markers.value = nextMarkers;
+      setupMarkerCluster();
+      syncClusterMarkers();
       if (nextMarkers.length > 0 && userLocation.value.latitude == 0 && userLocation.value.longitude == 0) {
         const firstMarker = nextMarkers[0];
         userLocation.value.latitude = firstMarker.latitude;
@@ -136,7 +290,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             const res = yield api_request.getUserDeviceList(params);
             const list = api_response.isBusinessSuccessCode(res.code) && res.data != null ? res.data.list : null;
             if (list == null || !Array.isArray(list)) {
-              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:148", "获取设备列表返回异常:", res);
+              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:280", "获取设备列表返回异常:", res);
               originalDeviceList.value = [];
               markers.value = [];
               return Promise.resolve(null);
@@ -148,7 +302,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
           updateMarkers(originalDeviceList.value);
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:159", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:291", "获取设备列表失败:", err);
           originalDeviceList.value = [];
           markers.value = [];
           utils_toast.showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -184,7 +338,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return device["deviceId"] == markerId;
       });
       if (selectedDevice == null) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:209", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:330", "未找到对应的设备信息", markerId);
         return null;
       }
       const deviceNoValue = (_a = selectedDevice["deviceNo"]) !== null && _a !== void 0 ? _a : "";
@@ -194,6 +348,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/carInfoDetail/carInfoDetail?deviceNo=" + deviceNoValue + "&deptId=" + companyId.toString() + "&deviceId=" + deviceId.toString()
       });
     };
+    common_vendor.onReady(() => {
+      var _a, _b;
+      clusterContext = common_vendor.index.createMapContext("myMap", (_b = (_a = common_vendor.getCurrentInstance()) === null || _a === void 0 ? null : _a.proxy) !== null && _b !== void 0 ? _b : null);
+      setupMarkerCluster();
+    });
     common_vendor.onLoad((options) => {
       loadUserDeviceList([], true);
     });
@@ -208,42 +367,42 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: true,
           isIcon: true,
-          Icon: "/static/maps.png",
+          Icon: "/static/allDevice.png",
           iconColor: iconColor.value
         }),
         c: showMap.value
       }, showMap.value ? common_vendor.e({
         d: common_vendor.sei("myMap", "map"),
         e: mapScale.value,
-        f: common_vendor.o(handleTap, "c8"),
+        f: common_vendor.o(handleTap, "e9"),
         g: userLocation.value.latitude,
         h: userLocation.value.longitude,
-        i: markers.value,
+        i: mapMarkers.value,
         j: showMap.value
       }, showMap.value ? {
         k: common_vendor.o(($event) => {
           return changeState("全部");
-        }, "4c"),
+        }, "ed"),
         l: common_vendor.p({
           type: "primary",
           text: `全部 ${totalCount.value}`
         }),
         m: common_vendor.o(($event) => {
           return changeState("在线");
-        }, "c1"),
+        }, "bd"),
         n: common_vendor.p({
           type: "success",
           text: `在线 ${onlineCount.value}`
         }),
         o: common_vendor.o(($event) => {
           return changeState("离线");
-        }, "c7"),
+        }, "07"),
         p: common_vendor.p({
           type: "danger",
           text: `离线 ${offlineCount.value}`
         })
       } : {}) : {
-        q: common_vendor.o(unbindDevice, "1d"),
+        q: common_vendor.o(unbindDevice, "d2"),
         r: common_vendor.p({
           lists: deviceListItems.value
         })

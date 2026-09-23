@@ -604,7 +604,11 @@ open class GenPagesCmdCmd : BasePage {
                                 } else {
                                     "请在指令记录中查看下发结果"
                                 }
-                                showAppToast(ShowToastOptions(title = "指令已提交，" + requestIdText, icon = "success", duration = 3500))
+                                showAppToast(ShowToastOptions(title = if (response.msg != "") {
+                                    response.msg
+                                } else {
+                                    "指令已提交，" + requestIdText
+                                }, icon = "success", duration = 3500))
                                 await(reloadHistory())
                             } else {
                                 showAppToast(ShowToastOptions(title = if (response.msg != "") {

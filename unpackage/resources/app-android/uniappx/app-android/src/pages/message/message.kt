@@ -14,6 +14,7 @@ import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.createSelectorQuery as uni_createSelectorQuery
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
+import io.dcloud.uniapp.extapi.showToast as uni_showToast
 import io.dcloud.uniapp.extapi.vibrateLong as uni_vibrateLong
 open class GenPagesMessageMessage : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
@@ -41,6 +42,7 @@ open class GenPagesMessageMessage : BasePage {
             val Login = ref(false)
             val messageScrollViewportHeight = ref(0)
             val isNearMessageListBottom = ref(false)
+            val isReadingAll = ref(false)
             val isInitialLoading = computed<Boolean>(fun(): Boolean {
                 return isListLoading.value && !hasLoadedInitial.value && msgList.value.length == 0
             }
@@ -51,6 +53,13 @@ open class GenPagesMessageMessage : BasePage {
             )
             val showLoadMore = computed<Boolean>(fun(): Boolean {
                 return msgList.value.length > 0 && (isListLoading.value || loadStatus.value == "loadmore" || loadStatus.value == "nomore")
+            }
+            )
+            val hasUnreadMessage = computed<Boolean>(fun(): Boolean {
+                return msgList.value.some(fun(item: UTSJSONObject): Boolean {
+                    return item.getNumber("status", 0) == 1
+                }
+                )
             }
             )
             var checkTimer: Number = 0
@@ -333,6 +342,59 @@ open class GenPagesMessageMessage : BasePage {
                 })
             }
             val handleItemClick = ::gen_handleItemClick_fn
+            fun gen_handleReadAll_fn(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        console.log("一键已读触发")
+                        if (isReadingAll.value) {
+                            return@w1
+                        }
+                        if (isListLoading.value || isCheckingNewMessages.value) {
+                            uni_showToast(ShowToastOptions(title = "列表加载中，请稍候", icon = "none"))
+                            return@w1
+                        }
+                        if (!hasUnreadMessage.value) {
+                            uni_showToast(ShowToastOptions(title = "没有未读消息", icon = "none"))
+                            return@w1
+                        }
+                        isReadingAll.value = true
+                        try {
+                            val res = await(readAllMessages())
+                            console.log("一键已读结果:", res)
+                            if (isBusinessSuccessCode(res.code)) {
+                                msgList.value.forEach(fun(item: UTSJSONObject): Unit {
+                                    if (item.getNumber("status", 0) == 1) {
+                                        item.set("status", 0)
+                                    }
+                                })
+                                pendingNewMessages.value.forEach(fun(message: UTSJSONObject): Unit {
+                                    if (message.getNumber("status", 0) == 1) {
+                                        message.set("status", 0)
+                                    }
+                                })
+                                msgList.value = msgList.value.slice()
+                                uni_showToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "已全部标为已读"
+                                }, icon = "none"))
+                            } else {
+                                uni_showToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "操作失败"
+                                }
+                                , icon = "none"))
+                            }
+                        }
+                         catch (error: Throwable) {
+                            console.error("一键已读失败:", error)
+                        }
+                         finally {
+                            isReadingAll.value = false
+                        }
+                })
+            }
+            val handleReadAll = ::gen_handleReadAll_fn
             fun gen_openPendingPushMessage_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         if (isListLoading.value || isCheckingNewMessages.value) {
@@ -457,21 +519,11 @@ open class GenPagesMessageMessage : BasePage {
             val getMessageContent = fun(item: UTSJSONObject): String {
                 return item.getString("content", "")
             }
+            val getMessageTitle = fun(item: UTSJSONObject): String {
+                return item.getString("title", "")
+            }
             val isMessageUnread = fun(item: UTSJSONObject): Boolean {
                 return item.getNumber("status", 0) == 1
-            }
-            val getMessageTypeText = fun(type: Number): String {
-                when (type) {
-                    1 -> 
-                        return "警告"
-                    2 -> 
-                        return "事件"
-                    else -> 
-                        return "通知"
-                }
-            }
-            val getMessageTitle = fun(item: UTSJSONObject): String {
-                return getMessageTypeText(item.getNumber("messageType", 0)) + " - " + getMessageCreateTime(item)
             }
             val formatTime = fun(timeString: String): String {
                 if (!(timeString != "")) {
@@ -511,7 +563,15 @@ open class GenPagesMessageMessage : BasePage {
                 val _component_i_modal = resolveEasyComponent("i-modal", GenUniModulesIUiXComponentsIModalIModalClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 return _cE(Fragment, null, _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "消息中心", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false, "isShowStyle" to true)),
+                    _cV(_component_custom_navBar, _uM("title" to "消息中心", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to Login.value, "isIcon" to true, "Icon" to if (hasUnreadMessage.value) {
+                        "/static/read-all.png"
+                    } else {
+                        "/static/read-all-disabled.png"
+                    }
+                    , "isShowStyle" to true, "onCapsuleClick" to handleReadAll), null, 8, _uA(
+                        "showCapsule",
+                        "Icon"
+                    )),
                     _cE("view", _uM("class" to "container"), _uA(
                         if (isTrue(hasNewMessages.value)) {
                             _cE("view", _uM("key" to 0, "class" to "new-message-tip", "onClick" to loadNewMessages), _uA(
@@ -581,7 +641,7 @@ open class GenPagesMessageMessage : BasePage {
                             "scroll-top",
                             "refresher-triggered"
                         )),
-                        _cV(_component_i_modal, _uM("show" to modal.value, "title" to getMessageTypeText(modalContent.value.getNumber("messageType", 0)), "content" to modalContent.value.getString("content", ""), "onConfirm" to ReadIt), null, 8, _uA(
+                        _cV(_component_i_modal, _uM("show" to modal.value, "title" to modalContent.value.getString("title", ""), "content" to modalContent.value.getString("content", ""), "onConfirm" to ReadIt), null, 8, _uA(
                             "show",
                             "title",
                             "content"

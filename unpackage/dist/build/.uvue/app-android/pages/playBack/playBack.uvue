@@ -371,7 +371,7 @@ const __sfc__ = defineComponent({
             showDateTimePicker.value = true;
         }
         // 显示当前位置
-        function showCurrentPosition() {
+        function showCurrentPosition(message: string = '这段时间没有数据') {
             isTrackPlayable.value = false;
             const originalLatText = lat.value ?? '';
             const originalLngText = lng.value ?? '';
@@ -379,14 +379,14 @@ const __sfc__ = defineComponent({
             const originalLng = parseFloat(originalLngText);
             if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
                 showAppToast({
-                    title: '这段时间没有数据',
+                    title: message,
                     icon: 'none',
                     duration: 2000
                 } as ShowToastOptions);
                 return;
             }
             showAppToast({
-                title: '这段时间没有数据',
+                title: message,
                 icon: 'none',
                 duration: 2000
             } as ShowToastOptions);
@@ -542,8 +542,7 @@ const __sfc__ = defineComponent({
                 if (requestId != replaySessionId)
                     return;
                 if (!isBusinessSuccessCode(res.code)) {
-                    showAppToast({ title: res.msg != "" ? res.msg : '轨迹加载失败', icon: 'none' } as ShowToastOptions);
-                    showCurrentPosition();
+                    showCurrentPosition(res.msg != "" ? res.msg : '轨迹加载失败');
                     return;
                 }
                 const trackData = res.data;

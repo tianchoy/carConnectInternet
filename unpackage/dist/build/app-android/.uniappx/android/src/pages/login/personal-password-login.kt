@@ -50,10 +50,15 @@ open class GenPagesLoginPersonalPasswordLogin : BasePage {
                 }
                 return true
             }
-            val completeLogin = fun(token: String): Unit {
+            val completeLogin = fun(token: String, message: String = "登录成功"): Unit {
                 uni_setStorageSync("token", token)
                 resetTokenExpiredState()
-                showAppToast(ShowToastOptions(title = "登录成功", icon = "success"))
+                showAppToast(ShowToastOptions(title = if (message != "") {
+                    message
+                } else {
+                    "登录成功"
+                }
+                , icon = "success"))
                 setTimeout(fun(){
                     uni_reLaunch(ReLaunchOptions(url = "/pages/index/index", success = fun(_){
                         schedulePostLoginInitialization()
@@ -76,7 +81,7 @@ open class GenPagesLoginPersonalPasswordLogin : BasePage {
                                 ""
                             }
                             if (isBusinessSuccessCode(response.code) && token != "") {
-                                completeLogin(token)
+                                completeLogin(token, response.msg)
                                 return@w1
                             }
                             showAppToast(ShowToastOptions(title = if (response.msg != "") {

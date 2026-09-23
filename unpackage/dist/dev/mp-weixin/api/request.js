@@ -41,6 +41,8 @@ const homePlatformAppUrl = "/home/platform/app";
 const geocoderAddressUrl = "/geocoder/address";
 const deviceShareUrl = "/share/device";
 const deviceShareEnabledUrl = "/share/device/enabled";
+const notifyQuotaUrl = "/app/notify/quota";
+const notifyDeviceTicketUrl = "/app/notify/deviceTicket";
 class BasicResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -86,6 +88,88 @@ class PushDeviceBindRequest extends common_vendor.UTS.UTSType {
     this.appVersion = this.__props__.appVersion;
     delete this.__props__;
   }
+}
+class NotifyQuotaItem extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          bizCode: { type: String, optional: false },
+          templateId: { type: String, optional: false },
+          remaining: { type: Number, optional: false },
+          mode: { type: String, optional: false }
+        };
+      },
+      name: "NotifyQuotaItem"
+    };
+  }
+  constructor(options, metadata = NotifyQuotaItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.bizCode = this.__props__.bizCode;
+    this.templateId = this.__props__.templateId;
+    this.remaining = this.__props__.remaining;
+    this.mode = this.__props__.mode;
+    delete this.__props__;
+  }
+}
+class NotifyQuotaResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: "Unknown", optional: false }
+        };
+      },
+      name: "NotifyQuotaResponse"
+    };
+  }
+  constructor(options, metadata = NotifyQuotaResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
+class SubscribeReportRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          results: { type: "Unknown", optional: false }
+        };
+      },
+      name: "SubscribeReportRequest"
+    };
+  }
+  constructor(options, metadata = SubscribeReportRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.results = this.__props__.results;
+    delete this.__props__;
+  }
+}
+function notifyQuotaResponse(raw = null) {
+  const response = api_response.asJSONObject(raw);
+  const rows = api_response.getResponseDataArray(response);
+  const list = [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    list.push(new NotifyQuotaItem({
+      bizCode: row.getString("bizCode", ""),
+      templateId: row.getString("templateId", ""),
+      remaining: row.getNumber("remaining", -1),
+      mode: row.getString("mode", "")
+    }));
+  }
+  return new NotifyQuotaResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response), data: list });
 }
 class JsonDataResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -1029,6 +1113,16 @@ const getUserDeviceList = (data) => {
     return userDevicePageResponse(raw);
   });
 };
+const getNotifyQuota = () => {
+  return api_http.getSilently(notifyQuotaUrl).then((raw = null) => {
+    return notifyQuotaResponse(raw);
+  });
+};
+const getDeviceTicket = (deviceNo) => {
+  return api_http.get(`${notifyDeviceTicketUrl}?deviceNo=${encodeURIComponent(deviceNo)}`).then((raw = null) => {
+    return jsonDataResponse(raw);
+  });
+};
 const PostWechatlogin = (data) => {
   const requestData = new common_vendor.UTSJSONObject();
   requestData.set("phoneCode", data.phoneCode);
@@ -1253,6 +1347,7 @@ exports.ChangePasswordRequest = ChangePasswordRequest;
 exports.DeviceShareCreateRequest = DeviceShareCreateRequest;
 exports.ForgotPasswordResetRequest = ForgotPasswordResetRequest;
 exports.LegacyEnterpriseLoginRequest = LegacyEnterpriseLoginRequest;
+exports.NotifyQuotaItem = NotifyQuotaItem;
 exports.PersonalPasswordLoginRequest = PersonalPasswordLoginRequest;
 exports.PostWechatlogin = PostWechatlogin;
 exports.RegisterRequest = RegisterRequest;
@@ -1273,10 +1368,12 @@ exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
 exports.getDeviceShareEnabled = getDeviceShareEnabled;
 exports.getDeviceSharees = getDeviceSharees;
+exports.getDeviceTicket = getDeviceTicket;
 exports.getGeocoderAddress = getGeocoderAddress;
 exports.getGeofenceList = getGeofenceList;
 exports.getHomePlatformAppId = getHomePlatformAppId;
 exports.getMessageUnreadCount = getMessageUnreadCount;
+exports.getNotifyQuota = getNotifyQuota;
 exports.getTrackPos = getTrackPos;
 exports.getUnboundDevices = getUnboundDevices;
 exports.getUserDeviceList = getUserDeviceList;

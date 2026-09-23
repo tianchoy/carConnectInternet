@@ -62,14 +62,24 @@ open class GenPagesLoginLogin : BasePage {
             val isDocState = fun(): Unit {
                 docState.value = !docState.value
             }
-            val completeLogin = fun(token: String): Unit {
+            val completeLogin = fun(token: String, message: String = "登录成功"): Unit {
                 if (token == "") {
-                    showAppToast(ShowToastOptions(title = "登录失败，请重试", icon = "none"))
+                    showAppToast(ShowToastOptions(title = if (message != "") {
+                        message
+                    } else {
+                        "登录失败，请重试"
+                    }
+                    , icon = "none"))
                     return
                 }
                 uni_setStorageSync("token", token)
                 resetTokenExpiredState()
-                showAppToast(ShowToastOptions(title = "登录成功", icon = "success"))
+                showAppToast(ShowToastOptions(title = if (message != "") {
+                    message
+                } else {
+                    "登录成功"
+                }
+                , icon = "success"))
                 setTimeout(fun(){
                     uni_reLaunch(ReLaunchOptions(url = "/pages/index/index", success = fun(_){
                         schedulePostLoginInitialization()
@@ -110,7 +120,7 @@ open class GenPagesLoginLogin : BasePage {
                                 ""
                             }
                             if (isBusinessSuccessCode(response.code) && token != "") {
-                                completeLogin(token)
+                                completeLogin(token, response.msg)
                                 return@w1
                             }
                             showAppToast(ShowToastOptions(title = if (response.msg != "") {
@@ -189,7 +199,12 @@ open class GenPagesLoginLogin : BasePage {
                                 return@w1
                             }
                             startSmsCooldown()
-                            showAppToast(ShowToastOptions(title = "验证码已发送", icon = "success"))
+                            showAppToast(ShowToastOptions(title = if (response.msg != "") {
+                                response.msg
+                            } else {
+                                "验证码已发送"
+                            }
+                            , icon = "success"))
                         }
                          catch (error: Throwable) {
                             showAppToast(ShowToastOptions(title = "验证码发送失败，请检查网络", icon = "none"))
@@ -217,7 +232,7 @@ open class GenPagesLoginLogin : BasePage {
                             }
                             if (isBusinessSuccessCode(response.code) && token != "") {
                                 smsCode.value = ""
-                                completeLogin(token)
+                                completeLogin(token, response.msg)
                                 return@w1
                             }
                             if (response.msg.indexOf("NEED_REGISTER:") == 0 || response.msg.indexOf("NEED_SET_PASSWORD:") == 0) {
@@ -281,7 +296,7 @@ open class GenPagesLoginLogin : BasePage {
                         _cV(_component_custom_navBar, _uM("title" to "", "show-back" to false, "backgroundColor" to "#ffffff", "textColor" to "#333333", "showCapsule" to false)),
                         _cE("view", _uM("class" to "banner"), _uA(
                             _cE("image", _uM("src" to "/static/car_location.png", "class" to "banner-image", "mode" to "aspectFill")),
-                            _cE("text", _uM("class" to "title"), "中导物联")
+                            _cE("text", _uM("class" to "title"), "中导车联")
                         )),
                         _cE("view", _uM("class" to "content"), _uA(
                             if (isTrue(!smsLoginMode.value)) {

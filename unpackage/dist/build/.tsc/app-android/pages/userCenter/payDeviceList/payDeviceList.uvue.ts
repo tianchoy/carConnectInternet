@@ -41,8 +41,8 @@ const deviceList = ref<Array<UTSJSONObject>>([])
 	}
 
 	// 加载车辆列表数据
-	const loadPayDeviceListData = async () => {
-		if (loading.value || !hasMore.value) return
+	const loadPayDeviceListData = async (): Promise<boolean> => {
+		if (loading.value || !hasMore.value) return false
 
 		loading.value = true
 		try {
@@ -56,13 +56,13 @@ const deviceList = ref<Array<UTSJSONObject>>([])
 					title: res.msg || '加载失败',
 					icon: 'none'
 				})
-				return
+				return false
 			}
 
 			const pageData = res.data
 			if (pageData == null) {
 				hasMore.value = false
-				return
+				return true
 			}
 			const list : Array<UTSJSONObject> = pageData.list
 			const pageCount = pageData.totalPage

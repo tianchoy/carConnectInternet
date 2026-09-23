@@ -124,7 +124,12 @@ open class GenPagesLoginForgotPassword : BasePage {
                                 return@w1
                             }
                             startSmsCooldown()
-                            showAppToast(ShowToastOptions(title = "验证码已发送", icon = "success"))
+                            showAppToast(ShowToastOptions(title = if (response.msg != "") {
+                                response.msg
+                            } else {
+                                "验证码已发送"
+                            }
+                            , icon = "success"))
                         }
                          catch (error: Throwable) {
                             showAppToast(ShowToastOptions(title = "验证码发送失败，请检查网络", icon = "none"))
@@ -173,6 +178,12 @@ open class GenPagesLoginForgotPassword : BasePage {
                                 return@w1
                             }
                             currentStep.value = 3
+                            showAppToast(ShowToastOptions(title = if (response.msg != "") {
+                                response.msg
+                            } else {
+                                "密码重置成功"
+                            }
+                            , icon = "success"))
                         }
                          catch (error: Throwable) {
                             showAppToast(ShowToastOptions(title = "密码重置失败，请检查网络后重试", icon = "none"))

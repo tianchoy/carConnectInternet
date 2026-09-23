@@ -73,6 +73,7 @@ open class GenPagesIndexIndex : BasePage {
             val currentCarCarType = ref("")
             val currentCarPlateNo = ref("")
             val unreadMessageCount = ref(0)
+            val platformAppId = ref("")
             val unreadMessageBadgeText = computed<String>(fun(): String {
                 return if (unreadMessageCount.value > 99) {
                     "99+"
@@ -81,6 +82,7 @@ open class GenPagesIndexIndex : BasePage {
                 }
             }
             )
+            val payUrl = ref("")
             val deviceDetail = ref<DeviceDetailState>(DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = 0, voltage = 0, signalStrength = 0), connectionStatus = "offline", lastUpdateTime = ""))
             val markers = ref(_uA<Marker>())
             val lastUpdateTime = ref("--:--:--")
@@ -850,6 +852,23 @@ open class GenPagesIndexIndex : BasePage {
                 return true
             }
             val isCarSelected = ::gen_isCarSelected_fn
+            fun gen_loadHomePlatformAppId_fn(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        platformAppId.value = ""
+                        try {
+                            val res = await(getHomePlatformAppId())
+                            if (isBusinessSuccessCode(res.code) && res.data != null) {
+                                platformAppId.value = res.data!!
+                                return@w1
+                            }
+                            console.warn("加载首页续费小程序配置失败:", res.msg)
+                        }
+                         catch (error: Throwable) {
+                            console.error("加载首页续费小程序配置失败", error)
+                        }
+                })
+            }
+            val loadHomePlatformAppId = ::gen_loadHomePlatformAppId_fn
             fun gen_loadUnreadMessageCount_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         if (!checkToken()) {
@@ -961,8 +980,7 @@ open class GenPagesIndexIndex : BasePage {
                 showAppToast(ShowToastOptions(title = "请在微信小程序中联系客服", icon = "none"))
             }
             val needRefresh = ref(false)
-            val toPay = fun(reassignedIccid: String, simMerchant: String){
-                var iccid = reassignedIccid
+            val toPay = fun(iccid: String){
                 if (!isLogin()) {
                     return
                 }
@@ -970,13 +988,19 @@ open class GenPagesIndexIndex : BasePage {
                     return
                 }
                 if (!(iccid != "") || iccid.trim().length === 0) {
-                    showAppToast(ShowToastOptions(title = "未配置充值号，请联系客服。", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "未配置充值号,请联系客服", icon = "none"))
                     return
                 }
-                if (simMerchant.toLowerCase() == "zddx") {
-                    iccid = iccid.substring(0, iccid.length - 1)
+                if (!(platformAppId.value != "")) {
+                    showAppToast(ShowToastOptions(title = "续费服务暂不可用，请稍后重试", icon = "none"))
+                    return
                 }
                 needRefresh.value = true
+                if (platformAppId.value == "wxf451813ad3364a12") {
+                    payUrl.value = "/pages/recharge/recharge?rechargeNo=" + iccid
+                } else {
+                    payUrl.value = "/pages/home/userSimRecharge?iccid=" + iccid
+                }
                 console.log("iccid", iccid)
                 needRefresh.value = false
                 showAppToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none", duration = 2000, mask = true))
@@ -993,7 +1017,11 @@ open class GenPagesIndexIndex : BasePage {
                         val result = await(delDevice(currentCarDeviceId.value))
                         console.log("解绑设备结果:", result)
                         if (isBusinessSuccessCode(result.code)) {
-                            showAppToast(ShowToastOptions(title = "解绑成功", icon = "none"))
+                            showAppToast(ShowToastOptions(title = if (result.msg != "") {
+                                result.msg
+                            } else {
+                                "解绑成功"
+                            }, icon = "none"))
                             clearSavedSelectedDevice()
                             clearSavedSelectedDeviceIndex()
                             await(loadDeviceList())
@@ -1066,11 +1094,13 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isLogin()) {
                     return
                 }
+                loadHomePlatformAppId()
                 loadDeviceList()
             }
             onLoad(fun(_options){
                 uni_hideTabBar(null)
                 initDimensions()
+                loadHomePlatformAppId()
                 if (checkToken()) {
                     loadDeviceList()
                 }
@@ -1269,7 +1299,7 @@ open class GenPagesIndexIndex : BasePage {
                                             _cE("text", _uM("class" to "item-title"), "警报消息")
                                         )),
                                         _cE("view", _uM("class" to "service-item", "onClick" to fun(){
-                                            toPay(currentCarIccId.value, currentCarSimMerchant.value)
+                                            toPay(currentCarIccId.value)
                                         }
                                         ), _uA(
                                             _cE("image", _uM("src" to default__5, "mode" to "aspectFit", "class" to "icon-image")),

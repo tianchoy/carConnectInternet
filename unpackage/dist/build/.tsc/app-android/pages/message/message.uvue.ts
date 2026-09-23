@@ -3,7 +3,7 @@ import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uv
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { isBusinessSuccessCode } from '../../api/response.uts'
 	import { ref, computed, nextTick, onActivated, onDeactivated } from 'vue'
-	import { getUserMsgList, setMsgState } from '../../api/request.uts'
+	import { getUserMsgList, setMsgState, readAllMessages } from '../../api/request.uts'
 	import { consumePendingMessageId, consumePushStaleFlag } from '../../services/push.uts'
 	import { parseLocalDateTime } from '../../utils/formateTime.uts'
 
@@ -35,6 +35,7 @@ const _cache = __ins.renderCache;
 	const Login = ref(false)
 	const messageScrollViewportHeight = ref(0)
 	const isNearMessageListBottom = ref(false)
+	const isReadingAll = ref(false) // 是否正在执行一键已读
 
 	const isInitialLoading = computed<boolean>(() => {
 		return isListLoading.value && !hasLoadedInitial.value && msgList.value.length == 0
@@ -46,6 +47,11 @@ const _cache = __ins.renderCache;
 
 	const showLoadMore = computed<boolean>(() => {
 		return msgList.value.length > 0 && (isListLoading.value || loadStatus.value == 'loadmore' || loadStatus.value == 'nomore')
+	})
+
+	// 当前列表中是否存在未读（status == 1）消息，决定标题栏一键已读图标是否出现
+	const hasUnreadMessage = computed<boolean>(() => {
+		return msgList.value.some((item : UTSJSONObject) : boolean => item.getNumber('status', 0) == 1)
 	})
 
 	// 定时器相关
@@ -291,6 +297,55 @@ const _cache = __ins.renderCache;
 		}
 	}
 
+	// 一键已读：调用 POST /usermessage/readAll，成功后把本地未读状态同步为已读
+	async function handleReadAll() : Promise<void> {
+		console.log('一键已读触发')
+		if (isReadingAll.value) return
+		if (isListLoading.value || isCheckingNewMessages.value) {
+			uni.showToast({
+				title: '列表加载中，请稍候',
+				icon: 'none'
+			})
+			return
+		}
+		if (!hasUnreadMessage.value) {
+			uni.showToast({
+				title: '没有未读消息',
+				icon: 'none'
+			})
+			return
+		}
+		isReadingAll.value = true
+		try {
+			const res = await readAllMessages()
+			console.log('一键已读结果:', res)
+			if (isBusinessSuccessCode(res.code)) {
+				msgList.value.forEach((item : UTSJSONObject) : void => {
+					if (item.getNumber('status', 0) == 1) item.set('status', 0)
+				})
+				// 暂存的新消息同样已被服务端置为已读，保持一致
+				pendingNewMessages.value.forEach((message : UTSJSONObject) : void => {
+					if (message.getNumber('status', 0) == 1) message.set('status', 0)
+				})
+				msgList.value = [...msgList.value]
+				uni.showToast({
+					title: res.msg || '已全部标为已读',
+					icon: 'none'
+				})
+			} else {
+				uni.showToast({
+					title: res.msg != '' ? res.msg : '操作失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			// 网络与服务端异常已由 http 层统一提示
+			console.error('一键已读失败:', error)
+		} finally {
+			isReadingAll.value = false
+		}
+	}
+
 	async function openPendingPushMessage() : Promise<void> {
 		if (isListLoading.value || isCheckingNewMessages.value) {
 			setTimeout(() => {
@@ -418,6 +473,10 @@ const _cache = __ins.renderCache;
 		return item.getString('content', '')
 	}
 
+	const getMessageTitle = (item : UTSJSONObject) : string => {
+		return item.getString('title', '')
+	}
+
 	const isMessageUnread = (item : UTSJSONObject) : boolean => {
 		return item.getNumber('status', 0) == 1
 	}
@@ -430,9 +489,6 @@ const _cache = __ins.renderCache;
 		}
 	}
 
-	const getMessageTitle = (item : UTSJSONObject) : string => {
-		return getMessageTypeText(item.getNumber('messageType', 0)) + ' - ' + getMessageCreateTime(item)
-	}
 
 	// 工具函数
 	const formatTime = (timeString: string) => {
@@ -470,9 +526,12 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
       "show-back": true,
       backgroundColor: "#fff",
       textColor: "#333",
-      showCapsule: false,
-      isShowStyle: true
-    })),
+      showCapsule: Login.value,
+      isIcon: true,
+      Icon: hasUnreadMessage.value ? '/static/read-all.png' : '/static/read-all-disabled.png',
+      isShowStyle: true,
+      onCapsuleClick: handleReadAll
+    }), null, 8 /* PROPS */, ["showCapsule", "Icon"]),
     _cE("view", _uM({ class: "container" }), [
       isTrue(hasNewMessages.value)
         ? _cE("view", _uM({
@@ -560,7 +619,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
       ], 40 /* PROPS, NEED_HYDRATION */, ["scroll-top", "refresher-triggered"]),
       _cV(_component_i_modal, _uM({
         show: modal.value,
-        title: getMessageTypeText(modalContent.value.getNumber('messageType', 0)),
+        title: modalContent.value.getString('title', ''),
         content: modalContent.value.getString('content', ''),
         onConfirm: ReadIt
       }), null, 8 /* PROPS */, ["show", "title", "content"])

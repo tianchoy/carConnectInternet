@@ -160,7 +160,7 @@ const submitShare = async (): Promise<void> => {
 			expireTime: expireTime
 		})
 		if (isBusinessSuccessCode(res.code)) {
-			showAppToast({ title: '分享成功', icon: 'success' })
+			showAppToast({ title: res.msg || '分享成功', icon: 'success' })
 			targetPhone.value = ''
 			expireDate.value = ''
 			await loadSent(true)
@@ -180,7 +180,7 @@ const revokeShare = async (shareId: string): Promise<void> => {
 	try {
 		const res = await revokeDeviceShare(shareId)
 		if (isBusinessSuccessCode(res.code)) {
-			showAppToast({ title: '撤销成功', icon: 'success' })
+			showAppToast({ title: res.msg || '撤销成功', icon: 'success' })
 			await loadSent(true)
 		} else showAppToast({ title: res.msg || '撤销失败', icon: 'none' })
 	} catch (error) {
@@ -355,7 +355,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                       ]),
                       _cE("view", _uM({ class: "detail-line" }), [
                         _cE("text", null, "角色"),
-                        _cE("text", _uM({ class: "detail-value" }), _tD(item.getString('role', 'view')), 1 /* TEXT */)
+                        _cE("text", _uM({ class: "detail-value" }), _tD(item.getString('roleName', 'view')), 1 /* TEXT */)
                       ]),
                       _cE("view", _uM({ class: "detail-line" }), [
                         _cE("text", null, "分享时间"),

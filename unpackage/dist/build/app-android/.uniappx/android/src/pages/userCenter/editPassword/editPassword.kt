@@ -118,7 +118,12 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                                 , icon = "none"))
                                 return@w1
                             }
-                            showAppToast(ShowToastOptions(title = "密码修改成功，请重新登录", icon = "success"))
+                            showAppToast(ShowToastOptions(title = if (response.msg != "") {
+                                response.msg
+                            } else {
+                                "密码修改成功，请重新登录"
+                            }
+                            , icon = "success"))
                             returnToLogin()
                         }
                          catch (error: Throwable) {

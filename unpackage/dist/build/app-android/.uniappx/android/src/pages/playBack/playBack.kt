@@ -357,17 +357,17 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 showDateTimePicker.value = true
             }
             val showPicker = ::gen_showPicker_fn
-            fun gen_showCurrentPosition_fn() {
+            fun showCurrentPosition(message: String = "这段时间没有数据") {
                 isTrackPlayable.value = false
                 val originalLatText = lat.value ?: ""
                 val originalLngText = lng.value ?: ""
                 val originalLat = parseFloat(originalLatText)
                 val originalLng = parseFloat(originalLngText)
                 if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
-                    showAppToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
+                    showAppToast(ShowToastOptions(title = message, icon = "none", duration = 2000))
                     return
                 }
-                showAppToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
+                showAppToast(ShowToastOptions(title = message, icon = "none", duration = 2000))
                 val convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
                 center["latitude"] = convertedCoord.lat
                 center["longitude"] = convertedCoord.lng
@@ -381,7 +381,6 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 )
                 isMapReady.value = true
             }
-            val showCurrentPosition = ::gen_showCurrentPosition_fn
             fun gen_clearTrackDisplay_fn(): Unit {
                 isMapReady.value = false
                 trackPoints.value = _uA()
@@ -504,13 +503,12 @@ open class GenPagesPlayBackPlayBack : BasePage {
                                 return@w1
                             }
                             if (!isBusinessSuccessCode(res.code)) {
-                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                showCurrentPosition(if (res.msg != "") {
                                     res.msg
                                 } else {
                                     "轨迹加载失败"
                                 }
-                                , icon = "none"))
-                                showCurrentPosition()
+                                )
                                 return@w1
                             }
                             val trackData = res.data

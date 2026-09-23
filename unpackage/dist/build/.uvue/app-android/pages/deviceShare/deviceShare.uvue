@@ -170,7 +170,7 @@ const __sfc__ = defineComponent({
                     expireTime: expireTime
                 } as DeviceShareCreateRequest);
                 if (isBusinessSuccessCode(res.code)) {
-                    showAppToast({ title: '分享成功', icon: 'success' } as ShowToastOptions);
+                    showAppToast({ title: res.msg != "" ? res.msg : '分享成功', icon: 'success' } as ShowToastOptions);
                     targetPhone.value = '';
                     expireDate.value = '';
                     await loadSent(true);
@@ -193,7 +193,7 @@ const __sfc__ = defineComponent({
             try {
                 const res = await revokeDeviceShare(shareId);
                 if (isBusinessSuccessCode(res.code)) {
-                    showAppToast({ title: '撤销成功', icon: 'success' } as ShowToastOptions);
+                    showAppToast({ title: res.msg != "" ? res.msg : '撤销成功', icon: 'success' } as ShowToastOptions);
                     await loadSent(true);
                 }
                 else
@@ -376,7 +376,7 @@ const __sfc__ = defineComponent({
                                                 ]),
                                                 _cE("view", _uM({ class: "detail-line" }), [
                                                     _cE("text", null, "角色"),
-                                                    _cE("text", _uM({ class: "detail-value" }), _tD(item.getString('role', 'view')), 1 /* TEXT */)
+                                                    _cE("text", _uM({ class: "detail-value" }), _tD(item.getString('roleName', 'view')), 1 /* TEXT */)
                                                 ]),
                                                 _cE("view", _uM({ class: "detail-line" }), [
                                                     _cE("text", null, "分享时间"),

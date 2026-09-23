@@ -589,7 +589,7 @@ const deptId = ref<string | null>('')
 			// 根据响应处理结果
 			if (isBusinessSuccessCode(res.code)) {
 				showAppToast({
-					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
+					title: res.msg || (operationType == 1 ? '恢复油电成功' : '断开油电成功'),
 					icon: 'success'
 				})
 
@@ -943,17 +943,20 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               })),
               _cE("text", _uM({ class: "satellite-text" }), _tD(unref(carVoltage) || 0) + "V", 1 /* TEXT */)
             ]),
-            _cE("view", _uM({
-              class: "battery",
-              style: _nS(_uM({ color: getBatteryColor(unref(batteryPercent)) }))
-            }), [
-              _cE("image", _uM({
-                class: "battery-icon",
-                src: "/static/pow.png",
-                alt: ""
-              })),
-              _cE("text", _uM({ class: "satellite-text" }), _tD(unref(batteryPercent) || 0) + "%", 1 /* TEXT */)
-            ], 4 /* STYLE */)
+            isTrue(unref(batteryPercent))
+              ? _cE("view", _uM({
+                  key: 0,
+                  class: "battery",
+                  style: _nS(_uM({ color: getBatteryColor(unref(batteryPercent)) }))
+                }), [
+                  _cE("image", _uM({
+                    class: "battery-icon",
+                    src: "/static/pow.png",
+                    alt: ""
+                  })),
+                  _cE("text", _uM({ class: "satellite-text" }), _tD(unref(batteryPercent)) + "%", 1 /* TEXT */)
+                ], 4 /* STYLE */)
+              : _cC("v-if", true)
           ])
         ]),
         _cV(_component_i_grid, _uM({

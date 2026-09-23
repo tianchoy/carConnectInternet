@@ -177,6 +177,7 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                 return wrapUTSPromise(suspend w1@{
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
                         if (!isTruthy(deviceNo.value)) {
+                            uni_hideLoading(null)
                             return@w1
                         }
                         try {

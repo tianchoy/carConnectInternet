@@ -132,7 +132,7 @@ const __sfc__ = defineComponent({
                 const positions = res.data;
                 if (res == null || !isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
                     showAppToast({
-                        title: '获取位置失败',
+                        title: res.msg != "" ? res.msg : '获取位置失败',
                         icon: 'none'
                     } as ShowToastOptions);
                     return;
@@ -189,7 +189,7 @@ const __sfc__ = defineComponent({
                 });
                 if (!foundDevice) {
                     showAppToast({
-                        title: '未找到车辆设备',
+                        title: res.msg != "" ? res.msg : '未找到车辆设备',
                         icon: 'none'
                     } as ShowToastOptions);
                 }

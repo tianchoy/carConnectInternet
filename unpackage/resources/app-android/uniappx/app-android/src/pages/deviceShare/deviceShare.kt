@@ -230,7 +230,11 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                         try {
                             val res = await(createDeviceShare(DeviceShareCreateRequest(deviceId = deviceId.value, targetPhone = phone, expireTime = expireTime)))
                             if (isBusinessSuccessCode(res.code)) {
-                                showAppToast(ShowToastOptions(title = "分享成功", icon = "success"))
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "分享成功"
+                                }, icon = "success"))
                                 targetPhone.value = ""
                                 expireDate.value = ""
                                 await(loadSent(true))
@@ -260,7 +264,11 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                         try {
                             val res = await(revokeDeviceShare(shareId))
                             if (isBusinessSuccessCode(res.code)) {
-                                showAppToast(ShowToastOptions(title = "撤销成功", icon = "success"))
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "撤销成功"
+                                }, icon = "success"))
                                 await(loadSent(true))
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
@@ -447,7 +455,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                                                     )),
                                                     _cE("view", _uM("class" to "detail-line"), _uA(
                                                         _cE("text", null, "角色"),
-                                                        _cE("text", _uM("class" to "detail-value"), _tD(item.getString("role", "view")), 1)
+                                                        _cE("text", _uM("class" to "detail-value"), _tD(item.getString("roleName", "view")), 1)
                                                     )),
                                                     _cE("view", _uM("class" to "detail-line"), _uA(
                                                         _cE("text", null, "分享时间"),

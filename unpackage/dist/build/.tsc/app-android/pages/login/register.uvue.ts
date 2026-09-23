@@ -122,7 +122,7 @@ const _cache = __ins.renderCache;
 				return
 			}
 			startSmsCooldown()
-			showAppToast({ title: '验证码已发送', icon: 'success' })
+			showAppToast({ title: response.msg || '验证码已发送', icon: 'success' })
 		} catch (error) {
 			showAppToast({ title: '验证码发送失败，请检查网络', icon: 'none' })
 		} finally {
@@ -145,14 +145,14 @@ const _cache = __ins.renderCache;
 		return true
 	}
 
-	const completeLogin = (token: string): void => {
+	const completeLogin = (token: string, message: string = '注册成功'): void => {
 		if (token == '') {
-			showAppToast({ title: '注册失败，请重试', icon: 'none' })
+			showAppToast({ title: message || '注册失败，请重试', icon: 'none' })
 			return
 		}
 		uni.setStorageSync('token', token)
 		resetTokenExpiredState()
-		showAppToast({ title: '注册成功', icon: 'success' })
+		showAppToast({ title: message || '注册成功', icon: 'success' })
 		setTimeout(() => {
 			uni.reLaunch({
 				url: '/pages/index/index',
@@ -175,7 +175,7 @@ const _cache = __ins.renderCache;
 			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
 			if (isBusinessSuccessCode(response.code) && token != '') {
-				completeLogin(token)
+				completeLogin(token, response.msg)
 				return
 			}
 			showAppToast({ title: response.msg || '注册失败，请稍后重试', icon: 'none' })

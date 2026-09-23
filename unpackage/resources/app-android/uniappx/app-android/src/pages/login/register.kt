@@ -122,7 +122,12 @@ open class GenPagesLoginRegister : BasePage {
                                 return@w1
                             }
                             startSmsCooldown()
-                            showAppToast(ShowToastOptions(title = "验证码已发送", icon = "success"))
+                            showAppToast(ShowToastOptions(title = if (response.msg != "") {
+                                response.msg
+                            } else {
+                                "验证码已发送"
+                            }
+                            , icon = "success"))
                         }
                          catch (error: Throwable) {
                             showAppToast(ShowToastOptions(title = "验证码发送失败，请检查网络", icon = "none"))
@@ -152,14 +157,24 @@ open class GenPagesLoginRegister : BasePage {
                 }
                 return true
             }
-            val completeLogin = fun(token: String): Unit {
+            val completeLogin = fun(token: String, message: String = "注册成功"): Unit {
                 if (token == "") {
-                    showAppToast(ShowToastOptions(title = "注册失败，请重试", icon = "none"))
+                    showAppToast(ShowToastOptions(title = if (message != "") {
+                        message
+                    } else {
+                        "注册失败，请重试"
+                    }
+                    , icon = "none"))
                     return
                 }
                 uni_setStorageSync("token", token)
                 resetTokenExpiredState()
-                showAppToast(ShowToastOptions(title = "注册成功", icon = "success"))
+                showAppToast(ShowToastOptions(title = if (message != "") {
+                    message
+                } else {
+                    "注册成功"
+                }
+                , icon = "success"))
                 setTimeout(fun(){
                     uni_reLaunch(ReLaunchOptions(url = "/pages/index/index", success = fun(_){
                         schedulePostLoginInitialization()
@@ -182,7 +197,7 @@ open class GenPagesLoginRegister : BasePage {
                                 ""
                             }
                             if (isBusinessSuccessCode(response.code) && token != "") {
-                                completeLogin(token)
+                                completeLogin(token, response.msg)
                                 return@w1
                             }
                             showAppToast(ShowToastOptions(title = if (response.msg != "") {

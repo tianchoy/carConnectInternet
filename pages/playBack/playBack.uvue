@@ -414,13 +414,13 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 
 		const initialUnplayedPolyline = new Polyline(
-			toNativePoints(trackPoints.value), '#888787', 3, true, false, '', '#888787', 0, []
+			toNativePoints(trackPoints.value), '#444444', 3, true, false, '', '#444444', 0, []
 		)
-		initialUnplayedPolyline.color = '#888787'
+		initialUnplayedPolyline.color = '#444444'
 		initialUnplayedPolyline.width = 3
 		initialUnplayedPolyline.dottedLine = true
 		initialUnplayedPolyline.arrowLine = false
-		initialUnplayedPolyline.borderColor = '#888787'
+		initialUnplayedPolyline.borderColor = '#444444'
 		initialUnplayedPolyline.borderWidth = 0
 
 		const initialPlayedPolyline = new Polyline(
@@ -486,7 +486,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		if (unplayedPoints.length >= 2) {
 			lines.push({
 				points: toMpPoints(unplayedPoints),
-				color: '#999999',
+				color: '#444444',
 				width: 3,
 				dottedLine: true,
 				arrowLine: false,
@@ -498,7 +498,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			lines.push({
 				points: toMpPoints(playedPoints),
 				color: '#1890FF',
-				width: 6,
+				width: 5,
 				dottedLine: false,
 				arrowLine: true,
 				borderColor: '#FFFFFF',
@@ -724,6 +724,8 @@ import { showAppToast } from '../../utils/toast.uts'
 		center.latitude = firstPoint.latitude
 		center.longitude = firstPoint.longitude
 		renderPlaybackIndex()
+		// 未开始播放时车辆处于静止状态，速度显示 0；播放中由渲染帧更新为对应点的速度
+		currentSpeed.value = 0
 		isMapReady.value = true
 	}
 	const loadTrackPos = async () => {
@@ -803,6 +805,8 @@ import { showAppToast } from '../../utils/toast.uts'
 	function finishPlayback() : void {
 		pausePlayback()
 		activeSegmentTargetIndex.value = -1
+		// 播放结束后车辆为停止状态，速度显示 0
+		currentSpeed.value = 0
 		showAppToast({
 			title: '轨迹回放完成',
 			icon: 'none',
@@ -840,6 +844,9 @@ import { showAppToast } from '../../utils/toast.uts'
 			renderedPoint.rotation = (startPoint.rotation + rotationDifference * progress + 360) % 360
 			renderedPoint.deviceTime = targetPoint.deviceTime
 			renderedPoint.speed = targetPoint.speed
+			// 播放过程中同步展示当前对应点的速度与时间
+			currentSpeed.value = renderedPoint.speed
+			currentTime.value = renderedPoint.deviceTime
 			updateCarPosition()
 			updatePolyline()
 

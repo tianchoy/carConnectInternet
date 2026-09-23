@@ -390,7 +390,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (unplayedPoints.length >= 2) {
         lines.push(new MpPolylineData({
           points: toMpPoints(unplayedPoints),
-          color: "#999999",
+          color: "#444444",
           width: 3,
           dottedLine: true,
           arrowLine: false,
@@ -402,7 +402,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         lines.push(new MpPolylineData({
           points: toMpPoints(playedPoints),
           color: "#1890FF",
-          width: 6,
+          width: 5,
           dottedLine: false,
           arrowLine: true,
           borderColor: "#FFFFFF",
@@ -584,6 +584,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       center.latitude = firstPoint.latitude;
       center.longitude = firstPoint.longitude;
       renderPlaybackIndex();
+      currentSpeed.value = 0;
       isMapReady.value = true;
     }
     const loadTrackPos = () => {
@@ -627,7 +628,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:769", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:771", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -663,6 +664,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function finishPlayback() {
       pausePlayback();
       activeSegmentTargetIndex.value = -1;
+      currentSpeed.value = 0;
       utils_toast.showAppToast({
         title: "轨迹回放完成",
         icon: "none",
@@ -699,6 +701,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         renderedPoint.rotation = (startPoint.rotation + rotationDifference * progress + 360) % 360;
         renderedPoint.deviceTime = targetPoint.deviceTime;
         renderedPoint.speed = targetPoint.speed;
+        currentSpeed.value = renderedPoint.speed;
+        currentTime.value = renderedPoint.deviceTime;
         updateCarPosition();
         updatePolyline();
         if (progress >= 1) {
@@ -789,7 +793,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_h = option.lng) !== null && _h !== void 0 ? _h : null;
       startTime.value = (_j = option.startTime) !== null && _j !== void 0 ? _j : "";
       endTime.value = (_k = option.endTime) !== null && _k !== void 0 ? _k : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:947", "plateNo:", plateNo.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:954", "plateNo:", plateNo.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {

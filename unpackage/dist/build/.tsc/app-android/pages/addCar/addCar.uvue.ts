@@ -130,21 +130,27 @@ const isRequestingCameraPermission = ref<boolean>(false)
 
 	}
 
+	// ===== 设备编号处理 =====
+	const normalizeDeviceNo = (value: string): string => {
+		const deviceNo = value.trim()
+		if (deviceNo == '' || !new RegExp('^[0-9]+$').test(deviceNo)) return ''
+		if (deviceNo.length == 15) return '0' + deviceNo.slice(4, 15)
+		if (deviceNo.length == 11) return '0' + deviceNo
+		return deviceNo
+	}
+
 	// 扫码结果事件处理
 	const handleScanResult = (data: ScanResultData) => {
 		console.log('接收到扫码结果:', data.result)
-		if (data.result.length == 15) {
-			carInfo.value.deviceNo = '0' + data.result.slice(4, 15)
+		const normalizedDeviceNo = normalizeDeviceNo(data.result)
+		if (normalizedDeviceNo == '') {
+			showAppToast({
+				title: '设备编号只能输入数字，请确认后提交',
+				icon: 'none'
+			})
 			return
 		}
-		if (data.result.length == 11) {
-			carInfo.value.deviceNo = '0' + data.result
-			return
-		}
-		showAppToast({
-			title: '扫码结果长度不是标准设备编号，请确认后提交',
-			icon: 'none'
-		})
+		carInfo.value.deviceNo = normalizedDeviceNo
 	}
 
 	const updateCarIconSelectorVisible = (visible: boolean) => {
@@ -199,6 +205,16 @@ const isRequestingCameraPermission = ref<boolean>(false)
 			if (!validateForm()) return
 			console.log('✅ 表单验证通过')
 
+			const normalizedDeviceNo = normalizeDeviceNo(carInfo.value.deviceNo)
+			if (normalizedDeviceNo == '') {
+				showAppToast({
+					title: '设备编号只能输入数字，请确认后提交',
+					icon: 'none'
+				})
+				return
+			}
+			carInfo.value.deviceNo = normalizedDeviceNo
+
 			loading.value = true
 			uni.showLoading({
 				title: '添加中...',
@@ -207,7 +223,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 
 			const submitData = {
 				deviceName: carInfo.value.deviceName,
-				deviceNo: carInfo.value.deviceNo,
+				deviceNo: normalizedDeviceNo,
 				carType: carInfo.value.deviceType,
 				plateNo: carInfo.value.plateNo
 			}
@@ -222,7 +238,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 
 			if (isBusinessSuccessCode(res.code)) {
 				showAppToast({
-					title: res.msg,
+					title: res.msg || '添加成功',
 					icon: 'success'
 				})
 

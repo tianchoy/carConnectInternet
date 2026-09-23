@@ -167,7 +167,11 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 return wrapUTSPromise(suspend {
                         val res = await(delDevice(deviceId))
                         if (isBusinessSuccessCode(res.code)) {
-                            showAppToast(ShowToastOptions(title = "解绑成功", icon = "success"))
+                            showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                res.msg
+                            } else {
+                                "解绑成功"
+                            }, icon = "success"))
                             uni_setStorageSync("needRefreshHome", true)
                         } else {
                             showAppToast(ShowToastOptions(title = if (res.msg != "") {

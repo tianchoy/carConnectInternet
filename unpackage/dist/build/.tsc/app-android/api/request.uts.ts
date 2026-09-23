@@ -20,6 +20,7 @@ const defaultTenantId = '000000'
 const changePasswordUrl = '/user/profile/updatePassword'
 const userMsgList = '/usermessage/listForUser'
 const msgState = '/usermessage/detail/'
+const msgReadAllUrl = '/usermessage/readAll'
 const updateDevice = '/device/update'
 const deviceDetail = '/device/info/'
 const carType = '/carType/listAll'
@@ -45,6 +46,7 @@ const appCommandRetryUrl = '/app/command/retry/'
 const pushBindUrl = '/app/push/bind'
 const pushUnbindUrl = '/app/push/unbind'
 const messageUnreadCountUrl = '/app/message/unreadCount'
+const homePlatformAppUrl = '/home/platform/app'
 const geocoderAddressUrl = '/geocoder/address'
 const deviceShareUrl = '/share/device'
 const deviceShareSentUrl = '/share/device/sent'
@@ -85,6 +87,7 @@ export type AppCommandDetailResponse = { code: number, msg: string, data: UTSJSO
 export type ChangePasswordRequest = { oldPassword: string, newPassword: string, confirmPassword: string }
 export type MessageResponse = { code: number, msg: string, data: UserDeviceListData }
 export type MessageUnreadCountResponse = { code: number, msg: string, data: number }
+export type HomePlatformAppResponse = { code: number, msg: string, data: string | null }
 export type GeocoderAddressResponse = { code: number, msg: string, data: UTSJSONObject }
 export type DeviceSharePageData = {
     list: Array<UTSJSONObject>
@@ -191,6 +194,16 @@ function messagePageResponse(raw: any): MessageResponse {
             totalPage: page.data.totalPage,
             totalCount: page.data.totalCount
         }
+    }
+}
+
+function homePlatformAppResponse(raw: any): HomePlatformAppResponse {
+    const response = asJSONObject(raw)
+    const appId = response.getString('data', '').trim()
+    return {
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: appId != '' ? appId : null
     }
 }
 
@@ -332,6 +345,8 @@ export const getUserMsgList = (data?: UTSJSONObject): Promise<MessageResponse> =
     return messagePageResponse(raw)
 })
 export const setMsgState = (msgId: string): Promise<BasicResponse> => get(`${msgState}${msgId}`).then((raw: any): BasicResponse => { return basicResponse(raw) })
+// 一键已读：POST /usermessage/readAll，无请求体，服务端幂等（无未读时同样返回成功）
+export const readAllMessages = (): Promise<BasicResponse> => post(msgReadAllUrl, {} as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const getMessageUnreadCount = (): Promise<MessageUnreadCountResponse> => getSilently(messageUnreadCountUrl).then((raw: any): MessageUnreadCountResponse => {
     const response = asJSONObject(raw)
     return {
@@ -339,6 +354,9 @@ export const getMessageUnreadCount = (): Promise<MessageUnreadCountResponse> => 
         msg: getResponseMessage(response),
         data: response.getNumber('data', 0)
     }
+})
+export const getHomePlatformAppId = (): Promise<HomePlatformAppResponse> => getSilently(homePlatformAppUrl).then((raw: any): HomePlatformAppResponse => {
+    return homePlatformAppResponse(raw)
 })
 export const editDeviceInfo = (data: UTSJSONObject): Promise<BasicResponse> => put(updateDevice, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const getDeviceDetail = (deviceId: string): Promise<DeviceDetailResponse> => get(`${deviceDetail}${deviceId}`).then((raw: any): DeviceDetailResponse => {

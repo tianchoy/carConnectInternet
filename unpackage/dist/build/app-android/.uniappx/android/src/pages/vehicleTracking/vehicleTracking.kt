@@ -89,7 +89,12 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                             val res = await(getDevicePos(data))
                             val positions = res.data
                             if (res == null || !isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
-                                showAppToast(ShowToastOptions(title = "获取位置失败", icon = "none"))
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "获取位置失败"
+                                }
+                                , icon = "none"))
                                 return@w1
                             }
                             var foundDevice = false
@@ -138,7 +143,12 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                             }
                             )
                             if (!foundDevice) {
-                                showAppToast(ShowToastOptions(title = "未找到车辆设备", icon = "none"))
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "未找到车辆设备"
+                                }
+                                , icon = "none"))
                             }
                         }
                          catch (err: Throwable) {

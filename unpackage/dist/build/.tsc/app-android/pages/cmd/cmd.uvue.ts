@@ -384,7 +384,7 @@ async function sendSelectedCommand(): Promise<void> {
 		const response = await sendAppCommand(requestData)
 		if (isBusinessSuccessCode(response.code)) {
 			const requestIdText = response.data != '' ? '追踪编号：' + response.data : '请在指令记录中查看下发结果'
-			showAppToast({ title: '指令已提交，' + requestIdText, icon: 'success', duration: 3500 })
+			showAppToast({ title: response.msg != '' ? response.msg : '指令已提交，' + requestIdText, icon: 'success', duration: 3500 })
 			await reloadHistory()
 		} else {
 			showAppToast({ title: response.msg != '' ? response.msg : '指令下发失败', icon: 'none', duration: 3000 })

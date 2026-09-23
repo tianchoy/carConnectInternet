@@ -536,6 +536,17 @@ import { showAppToast } from '../../utils/toast.uts'
 		markers.value = newMarkers
 	}
 
+	// ===== 围栏颜色 =====
+	// map 是原生组件，颜色只支持 6 位（8 位）十六进制；rgba() 在部分安卓机上解析失败会渲染成黑色
+	const FENCE_STROKE_COLOR = '#FF0000'
+	const FENCE_FILL_ALPHA_HEX = '33' // 后两位为 alpha，33 约等于 20% 透明度
+	const FENCE_FILL_COLORS = ['#FF0000', '#2979FF', '#00BFA5', '#FF8C00', '#8E24AA', '#00ACC1']
+
+	// 按索引生成围栏填充色：#RRGGBB + 两位 alpha
+	const buildFenceFillColor = (colorIndex : number) : string => {
+		return FENCE_FILL_COLORS[colorIndex % FENCE_FILL_COLORS.length] + FENCE_FILL_ALPHA_HEX
+	}
+
 	const renderFencesOnMap = () => {
 		// 当围栏列表为空时，强制清空地图上所有围栏和标记
 		if (!fenceList.value || fenceList.value.length == 0) {
@@ -565,8 +576,8 @@ import { showAppToast } from '../../utils/toast.uts'
 						longitude: circleData.longitude,
 						radius: displayRadius,
 						strokeWidth: 2,
-						color: '#FF0000',
-						fillColor: `rgba(255,0,0,0.2)`
+						color: FENCE_STROKE_COLOR,
+						fillColor: buildFenceFillColor(0)
 					} as Circle)
 				}
 			} else {
@@ -576,8 +587,8 @@ import { showAppToast } from '../../utils/toast.uts'
 					fencePolygons.push({
 						points: fencePoints,
 						strokeWidth: 2,
-						strokeColor: '#FF0000',
-						fillColor: colorIndex++ == 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
+						strokeColor: FENCE_STROKE_COLOR,
+						fillColor: buildFenceFillColor(colorIndex++),
 						zIndex: 1
 					} as Polygon)
 				}
@@ -607,8 +618,8 @@ import { showAppToast } from '../../utils/toast.uts'
 				polygons.value = points.value.length >= 3 ? [{
 					points: points.value,
 					strokeWidth: 2,
-					strokeColor: '#FF0000',
-					fillColor: 'rgba(255,0,0,0.2)',
+					strokeColor: FENCE_STROKE_COLOR,
+					fillColor: buildFenceFillColor(0),
 					zIndex: 1
 				} as Polygon] : []
 				circles.value = []
@@ -620,8 +631,8 @@ import { showAppToast } from '../../utils/toast.uts'
 						longitude: drawingCenter.longitude,
 						radius: circleRadius.value,
 						strokeWidth: 2,
-						color: '#FF0000',
-						fillColor: 'rgba(255,0,0,0.2)'
+						color: FENCE_STROKE_COLOR,
+						fillColor: buildFenceFillColor(0)
 					} as Circle
 					circles.value = [drawingCircle]
 				} else {
@@ -1294,8 +1305,8 @@ import { showAppToast } from '../../utils/toast.uts'
 			polygons.value = points.value.length >= 3 ? [{
 				points: points.value,
 				strokeWidth: 2,
-				strokeColor: '#FF0000',
-				fillColor: 'rgba(255,0,0,0.2)',
+				strokeColor: FENCE_STROKE_COLOR,
+				fillColor: buildFenceFillColor(0),
 				zIndex: 1
 			} as Polygon] : []
 		} else {
@@ -1311,8 +1322,8 @@ import { showAppToast } from '../../utils/toast.uts'
 				longitude: circleCenter.value.longitude,
 				radius: circleRadius.value,
 				strokeWidth: 2,
-				color: '#FF0000',
-				fillColor: 'rgba(255,0,0,0.2)'
+				color: FENCE_STROKE_COLOR,
+				fillColor: buildFenceFillColor(0)
 			} as Circle]
 		} else {
 			circles.value = []

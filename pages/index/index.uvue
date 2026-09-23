@@ -17,16 +17,28 @@
                         <i-icon name="/static/right-bottom.png" fontSize="7"></i-icon>
                     </view>
                     <view class="nav-tools">
-                        <i-icon name="/static/reload.png" fontSize="18" @click="handleReload"></i-icon>
-                        <i-icon class="nav-tool-spacing" name="/static/maps.png" fontSize="18"  @click="toDeviceList"></i-icon>
+                        <i-icon name="/static/reload.png" fontSize="24" @click="handleReload"></i-icon>
+                        <i-icon class="nav-tool-spacing" name="/static/maps.png" fontSize="20"  @click="toDeviceList"></i-icon>
                         <view class="nav-tool-spacing nav-tool-add" @click="toAdd">
-                            <image src="/static/addNew.png" mode="aspectFit" class="nav-tool-add-image"></image>
+                            <i-icon name="/static/addNew.png" fontSize="24"></i-icon>
                         </view>
                     </view>
                 </view>
                 <view class="banner">
                     <image src="../../static/banner.png" mode="aspectFit" class="banner-image"></image>
                 </view>
+                <!--#ifdef MP-WEIXIN-->
+                <view class="subscribe-row" v-if="subscribeAvailable && checkToken() && hasDevice && false" @click="handleSubscribeTap">
+                    <image src="../../static/msg.png" mode="aspectFit" class="subscribe-icon"></image>
+                    <view class="subscribe-text">
+                        <text class="subscribe-title">车辆告警通知</text>
+                        <text class="subscribe-desc">{{ subscribeRowDesc }}</text>
+                    </view>
+                    <view class="subscribe-btn" :class="{ 'subscribed': deviceSubscribed }">
+                        <text class="subscribe-btn-text">{{ deviceSubscribed ? '已订阅' : '开启通知' }}</text>
+                    </view>
+                </view>
+                <!--#endif-->
                 <view class="car-state">
                     <view class="state-item">
                         <text class="state-label">设备状态</text>
@@ -207,9 +219,10 @@ import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
-import { ref, reactive, computed, nextTick } from 'vue';
+import { ref, reactive, computed, nextTick, watch } from 'vue';
 import { clearPushSessionState } from '../../services/push.uts'
 import { unbindPushDeviceOnLogout } from '../../services/push-binding.uts'
+import { isDeviceSubscribeSupported, authorizeDevice, checkTemplateSubscribed, fetchNotifyQuota, getCachedQuota } from '../../utils/notify.uts'
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount, getHomePlatformAppId } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
@@ -738,7 +751,7 @@ const createTrackRequestData = (deviceNo: string) : UTSJSONObject => {
         deviceNo: deviceNo,
         startTime: formatTimes(timeRange.todayZero),
         endTime: formatTimes(timeRange.nowTime),
-        minParkTime: 120,
+        minParkTime: 2,
         withStop: false,
         withPos: false,
         withTrip: true,
@@ -1426,9 +1439,93 @@ const logout = (): void => {
     })
 }
 
+// —— 车辆告警通知（硬件设备订阅，mode=device）——
+const deviceSubscribed = ref(false)
+const subscribeAvailable = ref(false)
+const subscribeRequesting = ref(false)
+const subscribeRowDesc = computed<string>(() => {
+    return deviceSubscribed.value
+        ? '车辆发生进/出围栏、超速等告警时将通过微信提醒'
+        : '开启后，告警将通过微信服务通知提醒'
+})
+
+// 拉取告警场景模板与通道（mode 必须为 device），并用微信设置页状态判断当前是否已订阅
+const refreshSubscribeState = async (): Promise<void> => {
+    if (!isDeviceSubscribeSupported() || !checkToken()) {
+        subscribeAvailable.value = false
+        deviceSubscribed.value = false
+        return
+    }
+    // 每次刷新时联网拉取一次（静默），模板 ID 以后端配置为准，前端不硬编码
+    await fetchNotifyQuota()
+    const item = getCachedQuota('alarm')
+    // 未配置模板的场景不会出现在 /quota 返回值中，此时隐藏引导 UI，不报错
+    if (item == null || item.mode != 'device' || item.templateId == '') {
+        subscribeAvailable.value = false
+        deviceSubscribed.value = false
+        return
+    }
+    subscribeAvailable.value = true
+    deviceSubscribed.value = await checkTemplateSubscribed(item.templateId)
+}
+
+// 用户主动点击订阅（device 通道：换票 → 授权；必须在 tap 手势链内）
+const handleSubscribeTap = async (): Promise<void> => {
+    if (!isLogin()) return
+    if (!isCarSelected()) return
+    if (subscribeRequesting.value) return
+    if (!isDeviceSubscribeSupported()) {
+        showAppToast({ title: '当前微信版本不支持设备订阅', icon: 'none' })
+        return
+    }
+    // 已订阅时不再重复弹授权，引导到设置页自行管理
+    if (deviceSubscribed.value) {
+        showAppModal({
+            title: '车辆告警通知',
+            content: '已开启车辆告警通知，如需关闭可在小程序设置中操作',
+            success: (res: AppModalSuccess): void => {
+                if (res.confirm) {
+                    // #ifdef MP-WEIXIN
+                    uni.openSetting({})
+                    // #endif
+                }
+            }
+        })
+        return
+    }
+    subscribeRequesting.value = true
+    try {
+        const outcome = await authorizeDevice(currentCarDeviceNo.value, 'alarm')
+        if (outcome.status == 'accept' || outcome.status == 'acceptWithAudio' || outcome.status == 'acceptWithAlert') {
+            deviceSubscribed.value = true
+            const title = outcome.status == 'acceptWithAlert' ? '订阅成功，已在微信中开启强提醒' : '订阅成功，车辆告警将通过微信通知'
+            showAppToast({ title: title, icon: 'none' })
+        } else if (outcome.status == 'reject') {
+            // 用户取消弹窗时不打扰
+            if (outcome.errMsg.indexOf('cancel') < 0) {
+                showAppToast({ title: '您拒绝了通知授权，可再次点击开启', icon: 'none' })
+            }
+        } else if (outcome.status == 'ban' || outcome.status == 'filter') {
+            showAppToast({ title: '通知模板暂不可用，请联系客服', icon: 'none' })
+        } else if (outcome.status == 'noTemplate') {
+            subscribeAvailable.value = false
+        } else if (outcome.status == 'fail') {
+            if (outcome.errMsg.indexOf('cancel') < 0) {
+                showAppToast({ title: outcome.errMsg != '' ? outcome.errMsg : '订阅失败，请稍后重试', icon: 'none' })
+            }
+        }
+    } finally {
+        subscribeRequesting.value = false
+    }
+}
+
+// 切换设备后刷新订阅状态
+watch(currentCarDeviceNo, () => { void refreshSubscribeState() })
+
 onShow(async () => {
     if (checkToken()) {
         await loadUnreadMessageCount()
+        void refreshSubscribeState()
         const needRefresh = uni.getStorageSync('needRefreshHome')
         if (needRefresh) {
             await loadDeviceList()
@@ -1534,12 +1631,9 @@ onLoad(() => {
                     display: flex;
                     width: 40rpx;
                     height: 40rpx;
+                    border-radius: 50%;
                     align-items: center;
                     justify-content: center;
-                }
-                .nav-tool-add-image {
-                    width: 36rpx;
-                    height: 36rpx;
                 }
                 .exit {
                     display: flex;
@@ -1562,6 +1656,62 @@ onLoad(() => {
                 width: 100%;
                 height: 300rpx;
             }
+
+        .subscribe-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 30rpx;
+            padding: 20rpx;
+            margin: 15rpx 0 12rpx 0;
+
+            .subscribe-icon {
+                width: 56rpx;
+                height: 56rpx;
+                flex-shrink: 0;
+            }
+
+            .subscribe-text {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                margin-left: 16rpx;
+
+                .subscribe-title {
+                    font-size: 28rpx;
+                    font-weight: bold;
+                    color: #333;
+                }
+
+                .subscribe-desc {
+                    margin-top: 6rpx;
+                    font-size: 22rpx;
+                    color: #999;
+                }
+            }
+
+            .subscribe-btn {
+                flex-shrink: 0;
+                margin-left: 16rpx;
+                padding: 12rpx 24rpx;
+                border-radius: 32rpx;
+                background-color: #07C160;
+
+                .subscribe-btn-text {
+                    font-size: 24rpx;
+                    color: #fff;
+                }
+
+                &.subscribed {
+                    background-color: #eee;
+
+                    .subscribe-btn-text {
+                        color: #999;
+                    }
+                }
+            }
+        }
 
         .car-state {
             display: flex;
@@ -1615,7 +1765,7 @@ onLoad(() => {
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
-                padding:20rpx 30rpx;
+                padding:20rpx;
                 border-bottom: 1rpx solid #f0f0f0;
 
                 .map-title {
@@ -1687,7 +1837,7 @@ onLoad(() => {
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
-                padding:20rpx 30rpx;
+                padding:20rpx;
                 border-bottom: 1rpx solid #f0f0f0;
 
                 .record-title {
@@ -1717,29 +1867,29 @@ onLoad(() => {
                 display: flex;
                 flex-direction: row;
                 justify-content: space-around;
-                padding: 30rpx 20rpx;
+                padding: 20rpx;
                 background-color: #edf7ff;
                 border-radius: 24rpx;
                 margin: 20rpx;
             }
             .ring-item {
                 position: relative;
-                width: 250rpx;
-                height: 250rpx;
+                width: 180rpx;
+                height: 180rpx;
                 display: flex;
                 align-items: center;
                 justify-content: center;
             }
             .ring-bg {
                 position: absolute;
-                width: 250rpx;
-                height: 250rpx;
+                width: 180rpx;
+                height: 180rpx;
                 z-index: 2;
             }
             .ring-quarter {
                 position: absolute;
-                width: 126rpx;
-                height: 126rpx;
+                width: 120rpx;
+                height: 120rpx;
                 overflow: hidden;
             }
             .ring-quarter--top-left {
@@ -1760,10 +1910,10 @@ onLoad(() => {
             }
             .ring-stroke {
                 position: absolute;
-                width: 250rpx;
-                height: 250rpx;
+                width: 180rpx;
+                height: 180rpx;
                 box-sizing: border-box;
-                border: 16rpx solid;
+                border: 10rpx solid;
                 border-radius: 999px;
             }
             .ring-quarter--top-left .ring-stroke {
@@ -1798,21 +1948,21 @@ onLoad(() => {
                 z-index: 10;
             }
             .num {
-                font-size: 45rpx;
+                font-size: 35rpx;
                 font-weight: bold;
                 color: #333;
                 text-align: center;
             }
             .unit {
                 font-size: 20rpx;
-                color: #666;
+                color: #999999;
                 text-align: right;
             }
             .label {
 
-                font-size: 25rpx;
-                color: #666;
-                margin-top: 12rpx;
+                font-size: 18rpx;
+                color: #999999;
+                margin-top: 5rpx;
                 text-align: center;
             }
         }
@@ -1826,7 +1976,7 @@ onLoad(() => {
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
-                padding: 24rpx;
+                padding: 20rpx;
                 background-color: #fff;
                 border-radius: 20rpx;
                 .item-label{
@@ -1879,9 +2029,8 @@ onLoad(() => {
                 font-size: 32rpx;
                 font-weight: bold;
                 color: #333;
-                padding:20rpx 30rpx;
+                padding:20rpx;
                 border-bottom: 1rpx solid #f0f0f0;
-                margin-bottom: 30rpx;
             }
             .service-content{
                 display: flex;

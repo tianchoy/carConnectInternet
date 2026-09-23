@@ -156,7 +156,7 @@ const deviceNo = ref<string>('')
 			const positions = res.data
 			if (res == null || !isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
 				showAppToast({
-					title: '获取位置失败',
+					title: res.msg || '获取位置失败',
 					icon: 'none'
 				})
 				return
@@ -220,7 +220,7 @@ const deviceNo = ref<string>('')
 
 				if (!foundDevice) {
 					showAppToast({
-						title: '未找到车辆设备',
+						title: res.msg || '未找到车辆设备',
 						icon: 'none'
 					})
 				}

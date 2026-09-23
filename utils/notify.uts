@@ -1,0 +1,289 @@
+import { isBusinessSuccessCode } from '../api/response.uts'
+import { getNotifyQuota, getDeviceTicket, reportSubscribeResults, type NotifyQuotaItem } from '../api/request.uts'
+
+/**
+ * 订阅消息前端封装（对接 /app/notify）
+ *
+ * 两条通道，由 /app/notify/quota 返回的 mode 决定，前端不硬编码：
+ * - device（alarm 告警）：GET /app/notify/deviceTicket 换票 → wx.requestSubscribeDeviceMessage → 长期有效，无需上报
+ * - once（order / expire / share）：wx.requestSubscribeMessage → POST /app/notify/subscribeReport 上报记账
+ *
+ * 后端文档：微信小程序订阅消息-前端对接API完整文档.md
+ */
+
+const QUOTA_STORAGE_KEY = 'wx_subscribe_quota'
+const DEFAULT_BIZ_CODE = 'alarm'
+
+export type DeviceAuthorizeStatus = 'accept' | 'acceptWithAudio' | 'acceptWithAlert' | 'reject' | 'ban' | 'filter' | 'fail' | 'unsupported' | 'noTemplate'
+
+export type DeviceAuthorizeOutcome = {
+    status: DeviceAuthorizeStatus
+    errMsg: string
+    templateId: string
+}
+
+/**
+ * 设备订阅能力探测：非微信小程序端或基础库 < 2.20.0 时不可用，调用方应隐藏入口
+ */
+export function isDeviceSubscribeSupported() : boolean {
+    // #ifdef MP-WEIXIN
+    try {
+        return wx.canIUse('requestSubscribeDeviceMessage')
+    } catch (error) {
+        console.warn('[notify] 能力探测失败:', error)
+        return false
+    }
+    // #endif
+    return false
+}
+
+/**
+ * 拉取各场景模板 ID 与通道，并写入本地缓存（后端要求缓存以减少请求）
+ */
+export async function fetchNotifyQuota() : Promise<Array<NotifyQuotaItem>> {
+    try {
+        const res = await getNotifyQuota()
+        if (!isBusinessSuccessCode(res.code)) {
+            console.warn('[notify] 拉取订阅额度失败:', res.msg)
+            return []
+        }
+        cacheQuota(res.data)
+        return res.data
+    } catch (error) {
+        console.warn('[notify] 拉取订阅额度异常:', error)
+        return []
+    }
+}
+
+function cacheQuota(list : Array<NotifyQuotaItem>) : void {
+    try {
+        uni.setStorageSync(QUOTA_STORAGE_KEY, JSON.stringify(list))
+    } catch (error) {
+        console.warn('[notify] 缓存订阅额度失败:', error)
+    }
+}
+
+/**
+ * 读取本地缓存的额度项；未拉取过时返回 null（调用方决定是否需要联网拉取）
+ */
+export function getCachedQuota(bizCode : string) : NotifyQuotaItem | null {
+    const list = readCachedQuota()
+    for (let i = 0; i < list.length; i++) {
+        if (list[i].bizCode == bizCode) return list[i]
+    }
+    return null
+}
+
+function readCachedQuota() : Array<NotifyQuotaItem> {
+    try {
+        const raw = uni.getStorageSync(QUOTA_STORAGE_KEY)
+        if (raw == null || raw.toString() == '') return []
+        const parsed = JSON.parse(raw.toString()) as Array<UTSJSONObject>
+        const list : Array<NotifyQuotaItem> = []
+        for (let i = 0; i < parsed.length; i++) {
+            const row = parsed[i]
+            list.push({
+                bizCode: row.getString('bizCode', ''),
+                templateId: row.getString('templateId', ''),
+                remaining: row.getNumber('remaining', -1),
+                mode: row.getString('mode', '')
+            })
+        }
+        return list
+    } catch (error) {
+        return []
+    }
+}
+
+/**
+ * 设备订阅授权（alarm 告警场景）
+ * ⚠️ 必须在用户 tap 手势回调链内调用；deviceNo 传设备原始编号；snTicket 现取现用（5 分钟有效，不缓存）
+ */
+export async function authorizeDevice(deviceNo : string, bizCode : string = DEFAULT_BIZ_CODE) : Promise<DeviceAuthorizeOutcome> {
+    if (!isDeviceSubscribeSupported()) {
+        return { status: 'unsupported', errMsg: '当前微信版本不支持设备订阅', templateId: '' }
+    }
+    if (deviceNo == '') {
+        return { status: 'fail', errMsg: '未选择设备', templateId: '' }
+    }
+
+    let item = getCachedQuota(bizCode)
+    if (item == null) {
+        await fetchNotifyQuota()
+        item = getCachedQuota(bizCode)
+    }
+    if (item == null) {
+        // 未配置模板的场景不会出现在 /quota 返回值中，按「隐藏引导 UI」处理，不算错误
+        return { status: 'noTemplate', errMsg: '', templateId: '' }
+    }
+    if (item.mode != 'device') {
+        return { status: 'noTemplate', errMsg: '当前场景未启用设备订阅', templateId: item.templateId }
+    }
+
+    try {
+        const ticketRes = await getDeviceTicket(deviceNo)
+        if (!isBusinessSuccessCode(ticketRes.code) || ticketRes.data == null) {
+            const msg = ticketRes.msg != '' ? ticketRes.msg : '获取设备票据失败，请稍后重试'
+            console.warn('[notify] 换票失败:', msg)
+            return { status: 'fail', errMsg: msg, templateId: item.templateId }
+        }
+        const sn = ticketRes.data.getString('sn', '')
+        const snTicket = ticketRes.data.getString('snTicket', '')
+        const modelId = ticketRes.data.getString('modelId', '')
+        const templateId = ticketRes.data.getString('templateId', '') != '' ? ticketRes.data.getString('templateId', '') : item.templateId
+        if (sn == '' || snTicket == '' || templateId == '') {
+            console.warn('[notify] 票据字段不完整:', ticketRes.data)
+            return { status: 'fail', errMsg: '设备票据不完整，请稍后重试', templateId: templateId }
+        }
+        // 订阅与下发必须同源同值，否则微信报 9800006
+        return await callDeviceSubscribe(sn, snTicket, modelId, templateId)
+    } catch (error) {
+        console.error('[notify] 设备订阅异常:', error)
+        return { status: 'fail', errMsg: '订阅请求异常，请稍后重试', templateId: item.templateId }
+    }
+}
+
+function callDeviceSubscribe(sn : string, snTicket : string, modelId : string, templateId : string) : Promise<DeviceAuthorizeOutcome> {
+    return new Promise((resolve) => {
+        // #ifdef MP-WEIXIN
+        wx.requestSubscribeDeviceMessage({
+            sn: sn,
+            snTicket: snTicket,
+            modelId: modelId,
+            tmplIds: [templateId],
+            success: (res : any) => {
+                // wx 原生回调对象是普通 JS 对象，不是 UTSJSONObject，只能用索引访问，不能调 getString/getJSON
+                const resObj = res as UTSJSONObject
+                const rawValue = res != null ? resObj[templateId] : null
+                const value = rawValue != null ? rawValue.toString() : ''
+                resolve({ status: parseDeviceStatus(value), errMsg: '', templateId: templateId })
+            },
+            fail: (err : any) => {
+                const errObj = err as UTSJSONObject
+                const rawErr = err != null ? errObj['errMsg'] : null
+                const rawCode = err != null ? errObj['errCode'] : null
+                const errMsg = rawErr != null ? rawErr.toString() : ''
+                console.warn('[notify] 设备订阅授权失败:', errMsg, 'errCode:', rawCode != null ? rawCode.toString() : '')
+                resolve({ status: 'fail', errMsg: normalizeDeviceError(errMsg), templateId: templateId })
+            }
+        })
+        // #endif
+        // #ifndef MP-WEIXIN
+        resolve({ status: 'unsupported', errMsg: '当前环境不支持设备订阅', templateId: templateId })
+        // #endif
+    })
+}
+
+// 微信原生错误信息对用户不可读，转成可判断的中文提示（含排障线索）
+function normalizeDeviceError(errMsg : string) : string {
+    if (errMsg.indexOf('invalid scope') >= 0) return '设备消息能力未开通，请联系客服'
+    if (errMsg.indexOf('cancel') >= 0) return errMsg
+    if (errMsg.indexOf('sn_ticket') >= 0 || errMsg.indexOf('1972072') >= 0) return '设备票据失效，请重试'
+    if (errMsg.indexOf('19720736') >= 0) return '设备型号与模板不匹配'
+    if (errMsg.indexOf('19720728') >= 0) return '模板 ID 不存在'
+    return errMsg
+}
+
+function parseDeviceStatus(value : string) : DeviceAuthorizeStatus {
+    if (value == 'accept' || value == 'acceptWithAudio' || value == 'acceptWithAlert') return value as DeviceAuthorizeStatus
+    if (value == 'reject') return 'reject'
+    if (value == 'ban') return 'ban'
+    if (value == 'filter') return 'filter'
+    return 'reject'
+}
+
+/**
+ * 查询某模板当前是否处于订阅状态（用户在设置页取消后会变为非 accept）
+ */
+export function checkTemplateSubscribed(templateId : string) : Promise<boolean> {
+    return new Promise((resolve) => {
+        if (templateId == '' || !isDeviceSubscribeSupported()) {
+            resolve(false)
+            return
+        }
+        // #ifdef MP-WEIXIN
+        wx.getSetting({
+            withSubscriptions: true,
+            success: (res : any) => {
+                // wx 原生回调对象是普通 JS 对象，只能用索引访问，不能调 getJSON/getString
+                try {
+                    const resObj = res as UTSJSONObject
+                    const settingRaw = res != null ? resObj['subscriptionsSetting'] : null
+                    if (settingRaw == null) { resolve(false); return }
+                    const setting = settingRaw as UTSJSONObject
+                    const mainSwitch = setting['mainSwitch']
+                    if (mainSwitch == false) { resolve(false); return }
+                    const itemsRaw = setting['itemSettings']
+                    if (itemsRaw == null) { resolve(false); return }
+                    const items = itemsRaw as UTSJSONObject
+                    const state = items[templateId]
+                    resolve(state != null && state.toString() == 'accept')
+                } catch (error) {
+                    console.warn('[notify] 解析订阅状态失败:', error)
+                    resolve(false)
+                }
+            },
+            fail: () => resolve(false)
+        })
+        // #endif
+        // #ifndef MP-WEIXIN
+        resolve(false)
+        // #endif
+    })
+}
+
+/**
+ * 一次性订阅授权（order / expire / share），成功后原样上报后端记账
+ * ⚠️ 必须在用户 tap 手势回调链内调用，单次最多 3 个模板
+ */
+export async function requestSubscribeOnce(bizCodes : Array<string>) : Promise<UTSJSONObject | null> {
+    if (bizCodes.length == 0) return null
+    let list = readCachedQuota()
+    if (list.length == 0) {
+        list = await fetchNotifyQuota()
+    }
+    const tmplIds : Array<string> = []
+    for (let i = 0; i < bizCodes.length && tmplIds.length < 3; i++) {
+        for (let j = 0; j < list.length; j++) {
+            if (list[j].bizCode == bizCodes[i] && list[j].mode == 'once' && list[j].templateId != '') {
+                tmplIds.push(list[j].templateId)
+                break
+            }
+        }
+    }
+    if (tmplIds.length == 0) return null
+    return await callOnceSubscribe(tmplIds)
+}
+
+function callOnceSubscribe(tmplIds : Array<string>) : Promise<UTSJSONObject | null> {
+    return new Promise((resolve) => {
+        // #ifdef MP-WEIXIN
+        uni.requestSubscribeMessage({
+            tmplIds: tmplIds,
+            success: (res : any) => {
+                const resObj = res as UTSJSONObject | null
+                if (resObj != null) reportOnceResult(resObj)
+                resolve(resObj)
+            },
+            fail: (err : any) => {
+                console.warn('[notify] 一次性订阅授权失败:', err)
+                resolve(null)
+            }
+        })
+        // #endif
+        // #ifndef MP-WEIXIN
+        resolve(null)
+        // #endif
+    })
+}
+
+async function reportOnceResult(result : UTSJSONObject) : Promise<void> {
+    try {
+        const res = await reportSubscribeResults(result)
+        if (!isBusinessSuccessCode(res.code)) {
+            console.warn('[notify] 订阅结果上报失败:', res.msg)
+        }
+    } catch (error) {
+        console.warn('[notify] 订阅结果上报异常:', error)
+    }
+}

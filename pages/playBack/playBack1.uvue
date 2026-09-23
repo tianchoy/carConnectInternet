@@ -512,13 +512,13 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 
 		const initialUnplayedPolyline = new Polyline(
-			toNativePoints(trackPoints.value), '#888787', 3, true, false, '', '#888787', 0, []
+			toNativePoints(trackPoints.value), '#333333', 3, true, false, '', '#333333', 0, []
 		)
-		initialUnplayedPolyline.color = '#888787'
+		initialUnplayedPolyline.color = '#333333'
 		initialUnplayedPolyline.width = 3
 		initialUnplayedPolyline.dottedLine = true
 		initialUnplayedPolyline.arrowLine = false
-		initialUnplayedPolyline.borderColor = '#888787'
+		initialUnplayedPolyline.borderColor = '#333333'
 		initialUnplayedPolyline.borderWidth = 0
 
 		const initialPlayedPolyline = new Polyline(
@@ -584,7 +584,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		if (unplayedPoints.length >= 2) {
 			lines.push({
 				points: toMpPoints(unplayedPoints),
-				color: '#999999',
+				color: '#333333',
 				width: 3,
 				dottedLine: true,
 				arrowLine: false,
@@ -876,6 +876,8 @@ import { showAppToast } from '../../utils/toast.uts'
 		center.longitude = firstPoint.longitude
 		playbackProgress.value = 0
 		renderPlaybackIndex()
+		// 未开始播放时车辆处于静止状态，速度显示 0；播放中由渲染帧更新为对应点的速度
+		currentSpeed.value = 0
 		isMapReady.value = true
 	}
 	const loadTrackPos = async () => {
@@ -956,6 +958,8 @@ import { showAppToast } from '../../utils/toast.uts'
 	function finishPlayback() : void {
 		pausePlayback()
 		activeSegmentTargetIndex.value = -1
+		// 播放结束后车辆为停止状态，速度显示 0
+		currentSpeed.value = 0
 		showAppToast({
 			title: '轨迹回放完成',
 			icon: 'none',

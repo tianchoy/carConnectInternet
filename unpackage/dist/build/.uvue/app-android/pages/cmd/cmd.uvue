@@ -386,7 +386,7 @@ const __sfc__ = defineComponent({
                 const response = await sendAppCommand(requestData);
                 if (isBusinessSuccessCode(response.code)) {
                     const requestIdText = response.data != '' ? '追踪编号：' + response.data : '请在指令记录中查看下发结果';
-                    showAppToast({ title: '指令已提交，' + requestIdText, icon: 'success', duration: 3500 } as ShowToastOptions);
+                    showAppToast({ title: response.msg != '' ? response.msg : '指令已提交，' + requestIdText, icon: 'success', duration: 3500 } as ShowToastOptions);
                     await reloadHistory();
                 }
                 else {

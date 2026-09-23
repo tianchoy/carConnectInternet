@@ -34,10 +34,10 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                 totalPage.value = 0
                 hasMore.value = true
             }
-            val loadPayDeviceListData = fun(): UTSPromise<Unit> {
+            val loadPayDeviceListData = fun(): UTSPromise<Boolean> {
                 return wrapUTSPromise(suspend w1@{
                         if (loading.value || !hasMore.value) {
-                            return@w1
+                            return@w1 false
                         }
                         loading.value = true
                         try {
@@ -50,12 +50,12 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                                     "加载失败"
                                 }
                                 , icon = "none"))
-                                return@w1
+                                return@w1 false
                             }
                             val pageData = res.data
                             if (pageData == null) {
                                 hasMore.value = false
-                                return@w1
+                                return@w1 true
                             }
                             val list: UTSArray<UTSJSONObject> = pageData.list
                             val pageCount = pageData.totalPage

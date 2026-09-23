@@ -139,8 +139,10 @@ const __sfc__ = defineComponent({
             uni.showLoading({
                 title: '加载中...',
             });
-            if (!isTruthy(deviceNo.value))
+            if (!isTruthy(deviceNo.value)) {
+                uni.hideLoading();
                 return;
+            }
             try {
                 const data = {
                     deviceNo: deviceNo.value,

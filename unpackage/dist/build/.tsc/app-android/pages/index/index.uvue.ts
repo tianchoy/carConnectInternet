@@ -19,7 +19,7 @@ import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { clearPushSessionState } from '../../services/push.uts'
 import { unbindPushDeviceOnLogout } from '../../services/push-binding.uts'
-import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount } from '../../api/request.uts'
+import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount, getHomePlatformAppId } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
@@ -132,7 +132,9 @@ const currentCarConnectionStatus = ref('')
 const currentCarCarType = ref('')
 const currentCarPlateNo = ref('')
 const unreadMessageCount = ref(0)
+const platformAppId = ref('')
 const unreadMessageBadgeText = computed<string>(() => unreadMessageCount.value > 99 ? '99+' : unreadMessageCount.value.toString())
+const payUrl = ref('')
 
 const deviceDetail = ref<DeviceDetailState>({
     deviceStatus: {
@@ -961,6 +963,20 @@ function isCarSelected() : boolean {
     return true
 }
 
+async function loadHomePlatformAppId(): Promise<void> {
+    platformAppId.value = ''
+    try {
+        const res = await getHomePlatformAppId()
+        if (isBusinessSuccessCode(res.code) && res.data != null) {
+            platformAppId.value = res.data
+            return
+        }
+        console.warn('加载首页续费小程序配置失败:', res.msg)
+    } catch (error) {
+        console.error('加载首页续费小程序配置失败', error)
+    }
+}
+
 async function loadUnreadMessageCount(): Promise<void> {
     if (!checkToken()) {
         unreadMessageCount.value = 0
@@ -1095,20 +1111,31 @@ const contactCustomerService = () => {
 
 // 支付
 const needRefresh = ref(false)
-const toPay = (iccid : string,simMerchant : string) => {
+const toPay = (iccid : string) => {
     if (!isLogin()) return
     if (!isCarSelected()) return
     if (!iccid || iccid.trim().length === 0) {
         showAppToast({
-            title: '未配置充值号，请联系客服。',
+            title: '未配置充值号,请联系客服',
             icon: 'none'
         })
         return
     }
-    if(simMerchant.toLowerCase() == 'zddx'){
-        iccid = iccid.substring(0,iccid.length-1)
+    if (!platformAppId.value) {
+        showAppToast({
+            title: '续费服务暂不可用，请稍后重试',
+            icon: 'none'
+        })
+        return
     }
     needRefresh.value = true
+
+    
+    if(platformAppId.value == 'wxf451813ad3364a12'){
+        payUrl.value = '/pages/recharge/recharge?rechargeNo=' + iccid
+    }else{
+        payUrl.value = '/pages/home/userSimRecharge?iccid=' + iccid
+    }
 
 
 
@@ -1156,7 +1183,7 @@ async function unbindCurrentDevice() : Promise<void> {
     console.log('解绑设备结果:', result)
     if (isBusinessSuccessCode(result.code)) {
         showAppToast({
-            title: '解绑成功',
+            title: result.msg || '解绑成功',
             icon: 'none'
         })
         clearSavedSelectedDevice()
@@ -1230,6 +1257,7 @@ onShow(async () => {
 // 刷新设备列表
 const handleReload = () => {
     if (!isLogin()) return
+    void loadHomePlatformAppId()
     loadDeviceList()
 }
 
@@ -1237,6 +1265,7 @@ const handleReload = () => {
 onLoad(() => {
     uni.hideTabBar()
     initDimensions()
+    void loadHomePlatformAppId()
 
     if (checkToken()) {
         loadDeviceList()
@@ -1509,7 +1538,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
               ]),
               _cE("view", _uM({
                 class: "service-item",
-                onClick: () => {toPay(currentCarIccId.value,currentCarSimMerchant.value)}
+                onClick: () => {toPay(currentCarIccId.value)}
               }), [
                 _cE("image", _uM({
                   src: _imports_5,

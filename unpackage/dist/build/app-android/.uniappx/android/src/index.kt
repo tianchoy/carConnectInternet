@@ -516,6 +516,17 @@ fun logHttpError(error: HttpError): Unit {
     AndroidLog.e("HttpRequest", detail)
     console.error("[HttpRequest] " + detail)
 }
+fun getHttpResponseMessage(data: Any): String {
+    if (data == null) {
+        return ""
+    }
+    try {
+        return getResponseMessage(asJSONObject(data))
+    }
+     catch (error: Throwable) {
+        return ""
+    }
+}
 fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
     if (config.showLoading != false) {
         uni_hideLoading(null)
@@ -528,19 +539,36 @@ fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
     if (config.showError == false) {
         return
     }
+    val responseMessage = getHttpResponseMessage(error.data)
     if (error.statusCode != 0) {
         when (error.statusCode) {
             403 -> 
-                showAppToast(ShowToastOptions(title = "没有权限访问", icon = "none"))
-            404 -> 
-                showAppToast(ShowToastOptions(title = "请求资源不存在", icon = "none"))
-            500 -> 
-                showAppToast(ShowToastOptions(title = "服务器错误", icon = "none"))
-            else -> 
-                showAppToast(ShowToastOptions(title = if (error.message != null) {
-                    error.message
+                showAppToast(ShowToastOptions(title = if (responseMessage != "") {
+                    responseMessage
                 } else {
-                    "请求错误: " + error.statusCode
+                    "没有权限访问"
+                }, icon = "none"))
+            404 -> 
+                showAppToast(ShowToastOptions(title = if (responseMessage != "") {
+                    responseMessage
+                } else {
+                    "请求资源不存在"
+                }, icon = "none"))
+            500 -> 
+                showAppToast(ShowToastOptions(title = if (responseMessage != "") {
+                    responseMessage
+                } else {
+                    "服务器错误"
+                }, icon = "none"))
+            else -> 
+                showAppToast(ShowToastOptions(title = if (responseMessage != "") {
+                    responseMessage
+                } else {
+                    if (error.message != "") {
+                        error.message
+                    } else {
+                        "请求错误: " + error.statusCode
+                    }
                 }, icon = "none"))
         }
     } else {
@@ -631,6 +659,7 @@ val defaultTenantId = "000000"
 val changePasswordUrl = "/user/profile/updatePassword"
 val userMsgList = "/usermessage/listForUser"
 val msgState = "/usermessage/detail/"
+val msgReadAllUrl = "/usermessage/readAll"
 val updateDevice = "/device/update"
 val deviceDetail = "/device/info/"
 val logoutUrl = "/auth/logout"
@@ -650,6 +679,7 @@ val appCommandRetryUrl = "/app/command/retry/"
 val pushBindUrl = "/app/push/bind"
 val pushUnbindUrl = "/app/push/unbind"
 val messageUnreadCountUrl = "/app/message/unreadCount"
+val homePlatformAppUrl = "/home/platform/app"
 val geocoderAddressUrl = "/geocoder/address"
 val deviceShareUrl = "/share/device"
 val deviceShareEnabledUrl = "/share/device/enabled"
@@ -856,6 +886,13 @@ open class MessageUnreadCountResponse (
     @JsonNotNull
     open var data: Number,
 ) : UTSObject()
+open class HomePlatformAppResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    open var data: String? = null,
+) : UTSObject()
 open class GeocoderAddressResponse (
     @JsonNotNull
     open var code: Number,
@@ -953,6 +990,16 @@ fun userDevicePageResponse(raw: Any): UserDeviceListResponse {
 fun messagePageResponse(raw: Any): MessageResponse {
     val page = devicePageResponse(raw)
     return MessageResponse(code = page.code, msg = page.msg, data = UserDeviceListData(list = page.data.list, totalPage = page.data.totalPage, totalCount = page.data.totalCount))
+}
+fun homePlatformAppResponse(raw: Any): HomePlatformAppResponse {
+    val response = asJSONObject(raw)
+    val appId = response.getString("data", "").trim()
+    return HomePlatformAppResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = if (appId != "") {
+        appId
+    } else {
+        null
+    }
+    )
 }
 fun userInfoResponse(raw: Any): UserInfoResponse {
     val response = jsonDataResponse(raw)
@@ -1178,10 +1225,22 @@ val setMsgState = fun(msgId: String): UTSPromise<BasicResponse> {
     }
     )
 }
+val readAllMessages = fun(): UTSPromise<BasicResponse> {
+    return post(msgReadAllUrl, _uO()).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
 val getMessageUnreadCount = fun(): UTSPromise<MessageUnreadCountResponse> {
     return getSilently(messageUnreadCountUrl).then(fun(raw: Any): MessageUnreadCountResponse {
         val response = asJSONObject(raw)
         return MessageUnreadCountResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = response.getNumber("data", 0))
+    }
+    )
+}
+val getHomePlatformAppId = fun(): UTSPromise<HomePlatformAppResponse> {
+    return getSilently(homePlatformAppUrl).then(fun(raw: Any): HomePlatformAppResponse {
+        return homePlatformAppResponse(raw)
     }
     )
 }
@@ -9742,7 +9801,7 @@ open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
     override var appid: String = "__UNI__662B0B4"
     override var versionName: String = "1.0.5"
     override var versionCode: String = "105"
-    override var uniCompilerVersion: String = "5.25"
+    override var uniCompilerVersion: String = "5.26"
     constructor() : super() {}
 }
 fun definePageRoutes() {
@@ -9794,9 +9853,432 @@ fun defineAppConfig() {
     __uniConfig.uniIdRouter = _uM()
     __uniConfig.ready = true
 }
+fun __decodeUniCloudSpaceList(): String {
+    val data = _uA(
+        25514,
+        44541,
+        12760,
+        2386,
+        51065,
+        32189,
+        49625,
+        43791,
+        48085,
+        18606,
+        28749,
+        58296,
+        38674,
+        35712,
+        50017,
+        16990,
+        39433,
+        36316,
+        64062,
+        32000,
+        21982,
+        65508,
+        55012,
+        58466,
+        53568,
+        44067,
+        27712,
+        56249,
+        2202,
+        49685,
+        4578,
+        50371,
+        41343,
+        18113,
+        57207,
+        11374,
+        19650,
+        51942,
+        13587,
+        5261,
+        45642,
+        34767,
+        37824,
+        20838,
+        12992,
+        8833,
+        35572,
+        9115,
+        43362,
+        15155,
+        31393,
+        17624,
+        41930,
+        61086,
+        45486,
+        13233,
+        18491,
+        38028,
+        58350,
+        30422,
+        15473,
+        56625,
+        23997,
+        642,
+        50487,
+        57996,
+        38680,
+        15635,
+        25318,
+        59942,
+        25654,
+        43610,
+        44994,
+        36808,
+        43275,
+        52499,
+        61555,
+        46200,
+        32816,
+        8244,
+        10808,
+        52808,
+        14662,
+        21538,
+        15847,
+        34363,
+        48197,
+        45032,
+        39683,
+        34279,
+        21148,
+        58926,
+        51241,
+        15072,
+        29446,
+        62735,
+        11058,
+        21691,
+        37999,
+        26950,
+        12088,
+        45787,
+        27371,
+        22002,
+        21649,
+        16047,
+        41244,
+        19627,
+        47519,
+        26502,
+        40993,
+        34175,
+        24186,
+        6627,
+        37060,
+        37701,
+        37765,
+        11890,
+        57541,
+        52805,
+        32394,
+        20982,
+        19921,
+        22134,
+        21852,
+        23379,
+        35941,
+        3531,
+        24821,
+        47225,
+        54814,
+        11140,
+        5043,
+        63145,
+        9090,
+        61926,
+        36775,
+        26146,
+        19070,
+        33078,
+        38180,
+        45524,
+        42716,
+        38692,
+        64158,
+        24525,
+        17137,
+        1600,
+        54530,
+        15396,
+        60709,
+        46131,
+        10278,
+        41017,
+        10089,
+        17154,
+        901,
+        47332,
+        36396,
+        61019,
+        42154,
+        22420,
+        24882,
+        35865,
+        36439,
+        22528,
+        60774,
+        46012,
+        47988,
+        35531,
+        15450,
+        45532,
+        55432,
+        36182,
+        26371,
+        30393,
+        24784,
+        53630,
+        28094,
+        52574,
+        21204,
+        13519,
+        10280,
+        48689,
+        36562,
+        62745,
+        58169,
+        19245,
+        34134,
+        37647,
+        41680,
+        29459,
+        27457,
+        19296,
+        20849,
+        18666,
+        47020,
+        45864,
+        51900,
+        47656,
+        63209,
+        45972,
+        5460,
+        11719
+    ) as UTSArray<Number>
+    val mask = _uA(
+        25585,
+        44422,
+        12794,
+        2338,
+        50955,
+        32210,
+        49583,
+        43878,
+        48049,
+        18635,
+        28735,
+        58266,
+        38696,
+        35746,
+        49920,
+        16946,
+        39520,
+        36261,
+        64075,
+        32110,
+        22012,
+        65480,
+        54982,
+        58385,
+        53552,
+        44098,
+        27683,
+        56284,
+        2260,
+        49780,
+        4495,
+        50342,
+        41309,
+        18171,
+        57173,
+        11284,
+        19622,
+        51855,
+        13692,
+        5369,
+        45671,
+        34732,
+        37793,
+        20756,
+        13026,
+        8877,
+        35542,
+        9192,
+        43282,
+        15186,
+        31426,
+        17597,
+        41859,
+        61178,
+        45452,
+        13195,
+        18457,
+        38113,
+        58270,
+        30459,
+        15426,
+        56578,
+        23951,
+        690,
+        50513,
+        58090,
+        38782,
+        15730,
+        25291,
+        59925,
+        25603,
+        43618,
+        45045,
+        36837,
+        43327,
+        52513,
+        61456,
+        46158,
+        32797,
+        8204,
+        10761,
+        52782,
+        14709,
+        21519,
+        15828,
+        34399,
+        48160,
+        45008,
+        39783,
+        34178,
+        21156,
+        58904,
+        51276,
+        15058,
+        29536,
+        62825,
+        11024,
+        21655,
+        37965,
+        26917,
+        12116,
+        45746,
+        27278,
+        21916,
+        21733,
+        16124,
+        41337,
+        19656,
+        47597,
+        26595,
+        41045,
+        34141,
+        24128,
+        6593,
+        37047,
+        37756,
+        37877,
+        11828,
+        57486,
+        52770,
+        32495,
+        20888,
+        19903,
+        22037,
+        21786,
+        23357,
+        35882,
+        3486,
+        24733,
+        47147,
+        54873,
+        11211,
+        5113,
+        63193,
+        9185,
+        61841,
+        36762,
+        26143,
+        19036,
+        33050,
+        38150,
+        45489,
+        42674,
+        38720,
+        64238,
+        24482,
+        17048,
+        1582,
+        54646,
+        15366,
+        60703,
+        46097,
+        10318,
+        41037,
+        10013,
+        17266,
+        1014,
+        47326,
+        36355,
+        61044,
+        42187,
+        22500,
+        24923,
+        35895,
+        36409,
+        22629,
+        60702,
+        46024,
+        47962,
+        35497,
+        15401,
+        45484,
+        55529,
+        36134,
+        26483,
+        30359,
+        24755,
+        53521,
+        28115,
+        52604,
+        21240,
+        13549,
+        10318,
+        48720,
+        36539,
+        62837,
+        58198,
+        19291,
+        34099,
+        37757,
+        41621,
+        29565,
+        27429,
+        19216,
+        20766,
+        18563,
+        47042,
+        45916,
+        51870,
+        47634,
+        63179,
+        46006,
+        5417,
+        11674
+    ) as UTSArray<Number>
+    var result = ""
+    run {
+        var i: Number = 0
+        while(i < data.length){
+            result += String.fromCharCode(data[i] xor mask[i])
+            i++
+        }
+    }
+    return result
+}
 open class UniCloudConfig : io.dcloud.unicloud.InternalUniCloudConfig {
     override var isDev: Boolean = false
-    override var spaceList: String = "[{\"provider\":\"aliyun\",\"spaceName\":\"zdiot-car\",\"spaceId\":\"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff\",\"clientSecret\":\"s9pFKgenncFnOUhRGOJpcw==\",\"endpoint\":\"https://api.next.bspapp.com\",\"failoverEndpoint\":\"\"}]"
+    override var spaceList: String = __decodeUniCloudSpaceList()
     override var debuggerInfo: String? = null
     override var secureNetworkEnable: Boolean = false
     override var secureNetworkConfig: String? = "[]"

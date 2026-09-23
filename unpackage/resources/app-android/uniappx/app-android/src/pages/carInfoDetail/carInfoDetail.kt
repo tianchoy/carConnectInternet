@@ -362,10 +362,14 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                             }
                             uni_hideLoading(null)
                             if (isBusinessSuccessCode(res.code)) {
-                                showAppToast(ShowToastOptions(title = if (operationType == 1) {
-                                    "恢复油电成功"
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
                                 } else {
-                                    "断开油电成功"
+                                    if (operationType == 1) {
+                                        "恢复油电成功"
+                                    } else {
+                                        "断开油电成功"
+                                    }
                                 }, icon = "success"))
                                 psw.value = ""
                             } else {
@@ -647,15 +651,14 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                         }
                                         ) + "V", 1)
                                     )),
-                                    _cE("view", _uM("class" to "battery", "style" to _nS(_uM("color" to getBatteryColor(unref(batteryPercent))))), _uA(
-                                        _cE("image", _uM("class" to "battery-icon", "src" to "/static/pow.png", "alt" to "")),
-                                        _cE("text", _uM("class" to "satellite-text"), _tD(if (isTruthy(unref(batteryPercent))) {
-                                            unref(batteryPercent)
-                                        } else {
-                                            0
-                                        }
-                                        ) + "%", 1)
-                                    ), 4)
+                                    if (isTrue(unref(batteryPercent))) {
+                                        _cE("view", _uM("key" to 0, "class" to "battery", "style" to _nS(_uM("color" to getBatteryColor(unref(batteryPercent))))), _uA(
+                                            _cE("image", _uM("class" to "battery-icon", "src" to "/static/pow.png", "alt" to "")),
+                                            _cE("text", _uM("class" to "satellite-text"), _tD(unref(batteryPercent)) + "%", 1)
+                                        ), 4)
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
                                 ))
                             )),
                             _cV(_component_i_grid, _uM("items" to unref(baseList), "col" to 5, "itemHeight" to "88", "round" to "8", "imageSize" to 30, "iconColor" to "#3c9cff", "textColor" to "#606266", "showBorder" to true, "onClick" to fun(`$event`: Any){

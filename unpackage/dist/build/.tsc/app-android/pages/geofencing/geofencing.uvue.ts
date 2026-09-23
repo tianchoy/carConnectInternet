@@ -678,7 +678,7 @@ const deviceNo = ref<string | null>(null)
 		try {
 			const result = await deleteGeofence(id)
 			if (isBusinessSuccessCode(result.code)) {
-				showAppToast({ title: '删除成功' })
+				showAppToast({ title: result.msg || '删除成功', icon: 'success' })
 				selectedFence.value = null
 				points.value = []
 				circleCenter.value = null
@@ -780,7 +780,7 @@ const deviceNo = ref<string | null>(null)
 			uni.hideLoading()
 
 			if (isBusinessSuccessCode(result.code)) {
-				showAppToast({ title: editingFence.value ? '更新成功' : '保存成功' })
+				showAppToast({ title: result.msg || (editingFence.value ? '更新成功' : '保存成功') })
 				editDialogPopup.value?.$callMethod('close')
 
 				// 重置状态
@@ -956,7 +956,7 @@ const deviceNo = ref<string | null>(null)
 			}
 
 			if (isBusinessSuccessCode(result.code)) {
-				showAppToast({ title: bound ? '绑定成功' : '解绑成功' })
+				showAppToast({ title: result.msg || (bound ? '绑定成功' : '解绑成功') })
 				// 刷新当前标签页数据，重置分页
 				initPagination(activeTab.value)
 				scrollTop.value = 0

@@ -649,7 +649,7 @@ const __sfc__ = defineComponent({
             try {
                 const result = await deleteGeofence(id);
                 if (isBusinessSuccessCode(result.code)) {
-                    showAppToast({ title: '删除成功' } as ShowToastOptions);
+                    showAppToast({ title: result.msg != "" ? result.msg : '删除成功', icon: 'success' } as ShowToastOptions);
                     selectedFence.value = null;
                     points.value = [];
                     circleCenter.value = null;
@@ -748,7 +748,7 @@ const __sfc__ = defineComponent({
                 }
                 uni.hideLoading();
                 if (isBusinessSuccessCode(result.code)) {
-                    showAppToast({ title: isTruthy(editingFence.value) ? '更新成功' : '保存成功' } as ShowToastOptions);
+                    showAppToast({ title: isTruthy(result.msg) ? result.msg : (isTruthy(editingFence.value) ? '更新成功' : '保存成功') } as ShowToastOptions);
                     editDialogPopup.value?.$callMethod('close');
                     // 重置状态
                     const tempFence = editingFence.value;
@@ -923,7 +923,7 @@ const __sfc__ = defineComponent({
                     result = await unbindDevices(params);
                 }
                 if (isBusinessSuccessCode(result.code)) {
-                    showAppToast({ title: bound ? '绑定成功' : '解绑成功' } as ShowToastOptions);
+                    showAppToast({ title: isTruthy(result.msg) ? result.msg : (bound ? '绑定成功' : '解绑成功') } as ShowToastOptions);
                     // 刷新当前标签页数据，重置分页
                     initPagination(activeTab.value);
                     scrollTop.value = 0;

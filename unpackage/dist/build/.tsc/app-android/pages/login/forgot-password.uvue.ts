@@ -117,7 +117,7 @@ const _cache = __ins.renderCache;
 				return
 			}
 			startSmsCooldown()
-			showAppToast({ title: '验证码已发送', icon: 'success' })
+			showAppToast({ title: response.msg || '验证码已发送', icon: 'success' })
 		} catch (error) {
 			showAppToast({ title: '验证码发送失败，请检查网络', icon: 'none' })
 		} finally {
@@ -158,6 +158,7 @@ const _cache = __ins.renderCache;
 				return
 			}
 			currentStep.value = 3
+			showAppToast({ title: response.msg || '密码重置成功', icon: 'success' })
 		} catch (error) {
 			showAppToast({ title: '密码重置失败，请检查网络后重试', icon: 'none' })
 		} finally {

@@ -156,7 +156,7 @@ const mapScale = ref(4)
 		const res = await delDevice(deviceId)
 		if (isBusinessSuccessCode(res.code)) {
 			showAppToast({
-				title: '解绑成功',
+				title: res.msg || '解绑成功',
 				icon: 'success'
 			})
 			uni.setStorageSync('needRefreshHome', true)

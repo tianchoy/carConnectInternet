@@ -100,7 +100,11 @@ open class GenPagesUserCenterCarDetailCarDetail : BasePage {
                                 editInfo.value.plateNo = plateNo
                                 isEditing.value = false
                                 carIconSelectorVisible.value = false
-                                showAppToast(ShowToastOptions(title = "保存成功", icon = "success"))
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
+                                    res.msg
+                                } else {
+                                    "保存成功"
+                                }, icon = "success"))
                             } else {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg

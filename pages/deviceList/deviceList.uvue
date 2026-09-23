@@ -1,11 +1,11 @@
 <template>
 	<view class="container">
 		<custom-navBar title="全部设备" :show-back="true" backgroundColor="#f1f1f1" textColor="#333" :showCapsule="true"
-			:isIcon="true" @capsuleClick="showWhat" Icon="/static/maps.png" :iconColor="iconColor">
+			:isIcon="true" @capsuleClick="showWhat" Icon="/static/allDevice.png" :iconColor="iconColor">
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
 			<map id="myMap" :scale="mapScale" style="width:100%;height:100%"
-				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :markers="markers" :enable-traffic="true" >
+				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :markers="mapMarkers" :enable-traffic="true" >
 			</map>
             <view class="right-bar" v-if="showMap">
 				<i-tag type="primary" @click="changeState('全部')" :text="`全部 ${totalCount}`"></i-tag>
@@ -23,7 +23,7 @@
 <script setup lang="uts">
 import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
-	import { ref, computed, watchEffect } from 'vue'
+	import { ref, computed, watchEffect, getCurrentInstance } from 'vue'
 	import { getUserDeviceList,delDevice} from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
@@ -38,11 +38,134 @@ import { showAppToast } from '../../utils/toast.uts'
 		longitude: 0
 	})
 
+	// ===== 车标点聚合 =====
+	// 仅微信小程序端提供原生点聚合（MapContext.initMarkerCluster）
+	// 注意：参与聚合的车标必须通过 MapContext.addMarkers 添加，组件的 markers 属性不会进入聚合器
+	// App 端 uni-app x 的 map 组件未暴露聚合能力，保持普通标记点渲染
+	// #ifdef MP-WEIXIN
+	type ClusterLabel = {
+		content : string
+		fontSize : number
+		width : number
+		height : number
+		color : string
+		bgColor : string
+		borderRadius : number
+		textAlign : string
+		anchorX : number
+		anchorY : number
+	}
+
+	type ClusterMarker = {
+		clusterId : number
+		latitude : number
+		longitude : number
+		iconPath : string
+		width : number
+		height : number
+		label : ClusterLabel
+	}
+
+	let clusterContext : any = null
+	let clusterReady = false
+
+	// 微信原生 API 内部使用结构化克隆传参；Vue 响应式对象与 UTSJSONObject 都是 Proxy，
+	// 直接传入会报 "An object could not be cloned"，这里统一深拷贝成纯 JS 对象
+	const toPlainObject = (value : any) : any => {
+		const parsed = JSON.parse(JSON.stringify(value))
+		return parsed != null ? parsed : value
+	}
+
+	// 把车标交给聚合器管理
+	const syncClusterMarkers = () => {
+		const context = clusterContext
+		if (!clusterReady || context == null) return
+		try {
+			context.addMarkers(toPlainObject({ markers: markers.value, clear: true }))
+		} catch (error) {
+			console.warn('车标同步到聚合器失败:', error)
+		}
+	}
+
+	const setupMarkerCluster = () => {
+		const context = clusterContext
+		if (clusterReady || context == null) return
+		try {
+			// 关闭默认样式，聚合簇样式由 markerClusterCreate 回调自定义
+			context.initMarkerCluster(toPlainObject({
+				enableDefaultStyle: false,
+				zoomOnClick: true,
+				gridSize: 60
+			}))
+			context.on('markerClusterCreate', (res : any) => {
+				const clusterList = res != null ? (res['clusters'] as Array<any> | null) : null
+				if (clusterList == null) return
+				const clusterMarkers : Array<ClusterMarker> = []
+				clusterList.forEach((cluster : any) => {
+					const center = cluster['center']
+					if (center == null) return
+					const markerIds = cluster['markerIds'] as Array<any> | null
+					const count = markerIds != null ? markerIds.length : 0
+					clusterMarkers.push({
+						clusterId: cluster['clusterId'] as number,
+						latitude: center['latitude'] as number,
+						longitude: center['longitude'] as number,
+						// 用透明图标占位，否则微信会给没有 iconPath 的标记渲染默认红色定位针
+						iconPath: '/static/transparent.png',
+						width: 1,
+						height: 1,
+						// 聚合簇用 label 显示数量
+						label: {
+							content: count.toString(),
+							fontSize: 14,
+							width: 40,
+							height: 40,
+							color: '#ffffff',
+							bgColor: '#1296db',
+							borderRadius: 20,
+							textAlign: 'center',
+							anchorX: 0,
+							anchorY: -20
+						}
+					} as ClusterMarker)
+				})
+				// 携带 clusterId 即更新对应聚合簇；此处不能用 clear，否则会把参与聚合的车标一起清掉
+				context.addMarkers(toPlainObject({ markers: clusterMarkers }))
+			})
+			clusterReady = true
+			syncClusterMarkers()
+		} catch (error) {
+			console.warn('点聚合初始化失败，回退为普通标记点:', error)
+		}
+	}
+	// #endif
+
+	// 小程序端车标由 MapContext.addMarkers 交给聚合器管理，组件的 markers 属性置空
+	// 用固定引用，避免数据更新时触发 markers 属性 setData 把聚合器里的车标清掉
+	const EMPTY_MARKERS : Array<Marker> = []
+	const mapMarkers = computed<Array<Marker>>(() => {
+		let result : Array<Marker> = markers.value
+		// #ifdef MP-WEIXIN
+		result = EMPTY_MARKERS
+		// #endif
+		return result
+	})
+
 	const pickerStateTitle = ref('全部状态')
 
 	// 切换显示模式
 	const showWhat = () => {
 		showMap.value = !showMap.value
+		// #ifdef MP-WEIXIN
+		if (showMap.value) {
+			// 地图按 v-if 重建后上下文会失效，需重新创建并重新初始化聚合
+			clusterReady = false
+			setTimeout(() => {
+				clusterContext = uni.createMapContext('myMap', getCurrentInstance()?.proxy ?? null)
+				setupMarkerCluster()
+			}, 100)
+		}
+		// #endif
 	}
 
 	// 原始设备列表
@@ -114,6 +237,10 @@ import { showAppToast } from '../../utils/toast.uts'
 				iconPath: getDeviceIcon(connectionStatus, carType),
 				width: 30,
 				height: 30,
+				// #ifdef MP-WEIXIN
+				// 声明参与微信小程序原生点聚合
+				joinCluster: true,
+				// #endif
 				callout: {
 					content: deviceName,
 					display: 'ALWAYS',
@@ -125,6 +252,11 @@ import { showAppToast } from '../../utils/toast.uts'
 			} as Marker)
 		}
 		markers.value = nextMarkers
+		// #ifdef MP-WEIXIN
+		// 数据可能早于 onReady 到达，这里兜底初始化聚合（内部幂等），并把车标同步给聚合器
+		setupMarkerCluster()
+		syncClusterMarkers()
+		// #endif
 		if (nextMarkers.length > 0 && userLocation.value.latitude == 0 && userLocation.value.longitude == 0) {
 			const firstMarker = nextMarkers[0]
 			userLocation.value.latitude = firstMarker.latitude
@@ -181,19 +313,8 @@ import { showAppToast } from '../../utils/toast.uts'
 		await loadUserDeviceList([],true)
 	}
 
-	// 订阅消息
-	const subMsg = () => {
-		console.log('订阅消息')
-		uni.requestSubscribeMessage({
-			tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
-			success: (res) => {
-				console.log('订阅成功:', res)
-			},
-			fail: (err) => {
-				console.log('订阅失败:', err)
-			}
-		})
-	}
+	// 设备告警订阅已由硬件设备长期订阅能力承接，入口在首页「车辆告警通知」行
+	// 实现见 utils/deviceSubscribe.uts（wx.requestSubscribeDeviceMessage，按设备 sn 授权）
 
 	// 切换筛选状态
 	const changeState= (type : string) => {
@@ -216,6 +337,13 @@ import { showAppToast } from '../../utils/toast.uts'
 			url: '/pages/carInfoDetail/carInfoDetail?deviceNo=' + deviceNoValue + '&deptId=' + companyId.toString() + '&deviceId=' + deviceId.toString()
 		})
 	}
+
+	onReady(() => {
+		// #ifdef MP-WEIXIN
+		clusterContext = uni.createMapContext('myMap', getCurrentInstance()?.proxy ?? null)
+		setupMarkerCluster()
+		// #endif
+	})
 
 	onLoad((options) => {
 		loadUserDeviceList([], true)

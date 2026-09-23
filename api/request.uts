@@ -53,6 +53,9 @@ const deviceShareSentUrl = '/share/device/sent'
 const deviceShareReceivedUrl = '/share/device/received'
 const deviceShareEnabledUrl = '/share/device/enabled'
 const deviceShareExitUrl = '/share/device/exit'
+const notifyQuotaUrl = '/app/notify/quota'
+const notifyDeviceTicketUrl = '/app/notify/deviceTicket'
+const notifySubscribeReportUrl = '/app/notify/subscribeReport'
 
 export type BasicResponse = { code: number, msg: string }
 export type PushDeviceBindRequest = {
@@ -60,6 +63,32 @@ export type PushDeviceBindRequest = {
     platform: string
     deviceName: string
     appVersion: string
+}
+// 订阅消息通道（后端文档 v1.0 /app/notify）：
+// mode=device → wx.requestSubscribeDeviceMessage（长期，无需上报）；mode=once → wx.requestSubscribeMessage（需上报记账）
+export type NotifyQuotaItem = {
+    bizCode: string
+    templateId: string
+    remaining: number
+    mode: string
+}
+export type NotifyQuotaResponse = { code: number, msg: string, data: Array<NotifyQuotaItem> }
+export type SubscribeReportRequest = { results: UTSJSONObject }
+
+function notifyQuotaResponse(raw: any): NotifyQuotaResponse {
+    const response = asJSONObject(raw)
+    const rows = getResponseDataArray(response)
+    const list: Array<NotifyQuotaItem> = []
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i]
+        list.push({
+            bizCode: row.getString('bizCode', ''),
+            templateId: row.getString('templateId', ''),
+            remaining: row.getNumber('remaining', -1),
+            mode: row.getString('mode', '')
+        })
+    }
+    return { code: getResponseCode(response), msg: getResponseMessage(response), data: list }
 }
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
 export type LegacyEnterpriseLoginRequest = { username: string, password: string, clientId?: string, tenantId?: string }
@@ -274,6 +303,17 @@ export const delDevice = (deviceId: string): Promise<BasicResponse> => post(dele
 export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListResponse> => post(userDeviceList, data).then((raw: any): UserDeviceListResponse => {
     return userDevicePageResponse(raw)
 })
+
+// 查询各场景模板 ID 与通道（mode=device / once），未配置模板的场景不会返回
+export const getNotifyQuota = (): Promise<NotifyQuotaResponse> => getSilently(notifyQuotaUrl).then((raw: any): NotifyQuotaResponse => {
+    return notifyQuotaResponse(raw)
+})
+
+// 设备订阅换票：snTicket 5 分钟有效，必须现取现用，不可缓存
+export const getDeviceTicket = (deviceNo: string): Promise<JsonDataResponse> => get(`${notifyDeviceTicketUrl}?deviceNo=${encodeURIComponent(deviceNo)}`).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+
+// 上报一次性订阅授权结果（仅 mode=once；设备订阅长期有效，无需上报）
+export const reportSubscribeResults = (results: UTSJSONObject): Promise<BasicResponse> => post(notifySubscribeReportUrl, { results: results } as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
 
 export const PostWechatlogin = (data: WechatLoginRequest): Promise<JsonDataResponse> => {
     const requestData = new UTSJSONObject()

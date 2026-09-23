@@ -542,7 +542,7 @@ const __sfc__ = defineComponent({
                 // 根据响应处理结果
                 if (isBusinessSuccessCode(res.code)) {
                     showAppToast({
-                        title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
+                        title: res.msg != "" ? res.msg : (operationType == 1 ? '恢复油电成功' : '断开油电成功'),
                         icon: 'success'
                     } as ShowToastOptions);
                     // 清空密码
@@ -877,17 +877,20 @@ const __sfc__ = defineComponent({
                                     })),
                                     _cE("text", _uM({ class: "satellite-text" }), _tD(isTruthy(unref(carVoltage)) ? unref(carVoltage) : 0) + "V", 1 /* TEXT */)
                                 ]),
-                                _cE("view", _uM({
-                                    class: "battery",
-                                    style: _nS(_uM({ color: getBatteryColor(unref(batteryPercent)) }))
-                                }), [
-                                    _cE("image", _uM({
-                                        class: "battery-icon",
-                                        src: "/static/pow.png",
-                                        alt: ""
-                                    })),
-                                    _cE("text", _uM({ class: "satellite-text" }), _tD(isTruthy(unref(batteryPercent)) ? unref(batteryPercent) : 0) + "%", 1 /* TEXT */)
-                                ], 4 /* STYLE */)
+                                isTrue(unref(batteryPercent))
+                                    ? _cE("view", _uM({
+                                        key: 0,
+                                        class: "battery",
+                                        style: _nS(_uM({ color: getBatteryColor(unref(batteryPercent)) }))
+                                    }), [
+                                        _cE("image", _uM({
+                                            class: "battery-icon",
+                                            src: "/static/pow.png",
+                                            alt: ""
+                                        })),
+                                        _cE("text", _uM({ class: "satellite-text" }), _tD(unref(batteryPercent)) + "%", 1 /* TEXT */)
+                                    ], 4 /* STYLE */)
+                                    : _cC("v-if", true)
                             ])
                         ]),
                         _cV(_component_i_grid, _uM({
