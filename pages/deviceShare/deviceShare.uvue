@@ -45,12 +45,12 @@
 							<view class="device-meta"><text class="device-title">{{displayDevice(item)}}</text><text class="plate">{{item.getString('plateNo', '')}}</text></view>
 							<text class="status" :class="statusClass(item.getString('status', ''))">{{statusText(item.getString('status', ''))}}</text>
 						</view>
-						<view class="detail-line"><text>分享给</text><text class="detail-value">{{getSharePerson(item, 'targetNickName', 'targetPhoneMasked')}}</text></view>
+						<view class="detail-line"><text>分享给</text><text class="detail-value">{{getSharePerson(item, 'targetNickName', '')}}</text></view>
+						<view class="detail-line"><text>手机号</text><text class="detail-value">{{item.getString('targetPhoneMasked', '')}}</text></view>
 						<view class="detail-line"><text>角色</text><text class="detail-value">{{item.getString('roleName', 'view')}}</text></view>
 						<view class="detail-line"><text>分享时间</text><text class="detail-value">{{formatTimestamp(item.getNumber('shareTime', 0))}}</text></view>
 						<view class="detail-line"><text>到期时间</text><text class="detail-value">{{formatExpireTime(item)}}</text></view>
 						<view class="card-actions">
-							<button class="plain-button" @click="showSharees(item)">查看被分享者</button>
 							<button v-if="item.getString('status', '') == 'active'" class="danger-button" @click="confirmRevoke(item)">撤销分享</button>
 						</view>
 					</view>
@@ -58,20 +58,6 @@
 				</view>
 			</view>
 		</scroll-view>
-
-		<view v-if="shareesVisible" class="modal-mask" @click="shareesVisible = false">
-			<view class="sharees-modal" @click.stop>
-				<view class="modal-header"><text class="section-title">被分享者</text><text class="modal-close" @click="shareesVisible = false">×</text></view>
-				<scroll-view class="sharees-list" scroll-y="true">
-					<view v-if="shareesLoading" class="state-card"><text>加载中...</text></view>
-					<view v-else-if="sharees.length == 0" class="state-card"><text>暂无被分享者</text></view>
-					<view v-for="item in sharees" :key="item.getString('shareId', '')" class="sharee-row">
-						<view><text class="device-title">{{getSharePerson(item, 'targetNickName', '')}}</text><text class="masked-phone">{{item.getString('targetPhoneMasked', '')}}</text></view>
-						<text class="status" :class="statusClass(item.getString('status', ''))">{{statusText(item.getString('status', ''))}}</text>
-					</view>
-				</scroll-view>
-			</view>
-		</view>
 	</view>
 	<app-toast></app-toast>
 	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
@@ -99,9 +85,6 @@ const sentTotalCount = ref(0)
 const sentPage = ref(1)
 const sentHasMore = ref(false)
 const sentLoading = ref(false)
-const sharees = ref<Array<UTSJSONObject>>([])
-const shareesVisible = ref(false)
-const shareesLoading = ref(false)
 
 const normalizeRouteValue = (value: any): string => {
 	if (value == null) return ''
@@ -267,21 +250,6 @@ const confirmRevoke = (item: UTSJSONObject): void => {
 		success: (result) => { if (result.confirm) void revokeShare(item.getString('shareId', '')) }
 	})
 }
-const showSharees = async (item: UTSJSONObject): Promise<void> => {
-	sharees.value = []
-	shareesVisible.value = true
-	shareesLoading.value = true
-	try {
-		const res = await getDeviceSharees(item.getString('deviceId', ''), { pageNum: 1, pageSize: requestPageSize } as UTSJSONObject)
-		if (isBusinessSuccessCode(res.code)) sharees.value = res.data.list
-		else showAppToast({ title: res.msg || '获取被分享者失败', icon: 'none' })
-	} catch (error) {
-		console.error('获取被分享者失败:', error)
-		showAppToast({ title: '获取被分享者失败，请重试', icon: 'none' })
-	} finally {
-		shareesLoading.value = false
-	}
-}
 const loadMore = (): void => {
 	if (sentHasMore.value) void loadSent(false)
 }
@@ -337,8 +305,7 @@ onLoad((options) => {
 .share-card-header { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start; margin-bottom: 18rpx; }
 .device-meta { flex: 1; }
 .device-title { color: #303133; font-size: 30rpx; font-weight: 600; }
-.plate, .masked-phone { color: #909399; font-size: 24rpx; margin-top: 8rpx; }
-.plate, .masked-phone { display: flex; }
+.plate { color: #909399; font-size: 24rpx; margin-top: 8rpx; display: flex; }
 .status { padding: 6rpx 14rpx; border-radius: 20rpx; font-size: 23rpx; }
 .status-active { color: #19a15f; background-color: #e8f8ef; }
 .status-inactive { color: #909399; background-color: #f0f1f3; }
@@ -351,10 +318,4 @@ onLoad((options) => {
 .state-card { padding: 70rpx 30rpx; text-align: center; color: #909399; font-size: 27rpx; background-color: #fff; border-radius: 16rpx; margin-bottom: 20rpx; }
 .state-title { color: #606266; font-size: 34rpx; font-weight: 600; margin-bottom: 16rpx; }
 .state-desc { color: #909399; }
-.modal-mask { position: fixed; left: 0; right: 0; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, .5); z-index: 1000; }
-.sharees-modal { width: 680rpx; max-height: 1200rpx; background-color: #fff; border-radius: 18rpx; overflow: hidden; }
-.modal-header { display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 28rpx; border-bottom: 1rpx solid #eee; }
-.modal-close { color: #909399; font-size: 46rpx; line-height: 36rpx; }
-.sharees-list { max-height: 700rpx; }
-.sharee-row { display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 24rpx 28rpx; border-bottom: 1rpx solid #f0f0f0; }
 </style>

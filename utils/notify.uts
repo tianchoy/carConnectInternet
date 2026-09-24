@@ -19,6 +19,7 @@ export type DeviceAuthorizeStatus = 'accept' | 'acceptWithAudio' | 'acceptWithAl
 export type DeviceAuthorizeOutcome = {
     status: DeviceAuthorizeStatus
     errMsg: string
+    errCode: number
     templateId: string
 }
 
@@ -101,10 +102,10 @@ function readCachedQuota() : Array<NotifyQuotaItem> {
  */
 export async function authorizeDevice(deviceNo : string, bizCode : string = DEFAULT_BIZ_CODE) : Promise<DeviceAuthorizeOutcome> {
     if (!isDeviceSubscribeSupported()) {
-        return { status: 'unsupported', errMsg: '当前微信版本不支持设备订阅', templateId: '' }
+        return { status: 'unsupported', errMsg: '当前微信版本不支持设备订阅', errCode: 0, templateId: '' }
     }
     if (deviceNo == '') {
-        return { status: 'fail', errMsg: '未选择设备', templateId: '' }
+        return { status: 'fail', errMsg: '未选择设备', errCode: 0, templateId: '' }
     }
 
     let item = getCachedQuota(bizCode)
@@ -114,10 +115,10 @@ export async function authorizeDevice(deviceNo : string, bizCode : string = DEFA
     }
     if (item == null) {
         // 未配置模板的场景不会出现在 /quota 返回值中，按「隐藏引导 UI」处理，不算错误
-        return { status: 'noTemplate', errMsg: '', templateId: '' }
+        return { status: 'noTemplate', errMsg: '', errCode: 0, templateId: '' }
     }
     if (item.mode != 'device') {
-        return { status: 'noTemplate', errMsg: '当前场景未启用设备订阅', templateId: item.templateId }
+        return { status: 'noTemplate', errMsg: '当前场景未启用设备订阅', errCode: 0, templateId: item.templateId }
     }
 
     try {
@@ -125,7 +126,7 @@ export async function authorizeDevice(deviceNo : string, bizCode : string = DEFA
         if (!isBusinessSuccessCode(ticketRes.code) || ticketRes.data == null) {
             const msg = ticketRes.msg != '' ? ticketRes.msg : '获取设备票据失败，请稍后重试'
             console.warn('[notify] 换票失败:', msg)
-            return { status: 'fail', errMsg: msg, templateId: item.templateId }
+            return { status: 'fail', errMsg: msg, errCode: 0, templateId: item.templateId }
         }
         const sn = ticketRes.data.getString('sn', '')
         const snTicket = ticketRes.data.getString('snTicket', '')
@@ -133,13 +134,13 @@ export async function authorizeDevice(deviceNo : string, bizCode : string = DEFA
         const templateId = ticketRes.data.getString('templateId', '') != '' ? ticketRes.data.getString('templateId', '') : item.templateId
         if (sn == '' || snTicket == '' || templateId == '') {
             console.warn('[notify] 票据字段不完整:', ticketRes.data)
-            return { status: 'fail', errMsg: '设备票据不完整，请稍后重试', templateId: templateId }
+            return { status: 'fail', errMsg: '设备票据不完整，请稍后重试', errCode: 0, templateId: templateId }
         }
         // 订阅与下发必须同源同值，否则微信报 9800006
         return await callDeviceSubscribe(sn, snTicket, modelId, templateId)
     } catch (error) {
         console.error('[notify] 设备订阅异常:', error)
-        return { status: 'fail', errMsg: '订阅请求异常，请稍后重试', templateId: item.templateId }
+        return { status: 'fail', errMsg: '订阅请求异常，请稍后重试', errCode: 0, templateId: item.templateId }
     }
 }
 
@@ -156,31 +157,39 @@ function callDeviceSubscribe(sn : string, snTicket : string, modelId : string, t
                 const resObj = res as UTSJSONObject
                 const rawValue = res != null ? resObj[templateId] : null
                 const value = rawValue != null ? rawValue.toString() : ''
-                resolve({ status: parseDeviceStatus(value), errMsg: '', templateId: templateId })
+                resolve({ status: parseDeviceStatus(value), errMsg: '', errCode: 0, templateId: templateId })
             },
             fail: (err : any) => {
                 const errObj = err as UTSJSONObject
                 const rawErr = err != null ? errObj['errMsg'] : null
                 const rawCode = err != null ? errObj['errCode'] : null
                 const errMsg = rawErr != null ? rawErr.toString() : ''
-                console.warn('[notify] 设备订阅授权失败:', errMsg, 'errCode:', rawCode != null ? rawCode.toString() : '')
-                resolve({ status: 'fail', errMsg: normalizeDeviceError(errMsg), templateId: templateId })
+                let errCode = 0
+                if (rawCode != null) {
+                    const parsed = parseInt(rawCode.toString())
+                    if (!isNaN(parsed)) errCode = parsed
+                }
+                console.warn('[notify] 设备订阅授权失败, errCode=' + errCode.toString() + ':', errMsg)
+                resolve({ status: 'fail', errMsg: normalizeDeviceError(errMsg, errCode), errCode: errCode, templateId: templateId })
             }
         })
         // #endif
         // #ifndef MP-WEIXIN
-        resolve({ status: 'unsupported', errMsg: '当前环境不支持设备订阅', templateId: templateId })
+        resolve({ status: 'unsupported', errMsg: '当前环境不支持设备订阅', errCode: 0, templateId: templateId })
         // #endif
     })
 }
 
-// 微信原生错误信息对用户不可读，转成可判断的中文提示（含排障线索）
-function normalizeDeviceError(errMsg : string) : string {
-    if (errMsg.indexOf('invalid scope') >= 0) return '设备消息能力未开通，请联系客服'
+// 微信原生错误信息对用户不可读，按 errCode 优先转成可判断的中文提示（含排障线索）
+// 错误码取值：wx.requestSubscribeDeviceMessage 官方错误码表
+function normalizeDeviceError(errMsg : string, errCode : number) : string {
+    if (errCode == 19720728) return '模板 ID 不存在，请核对后台模板配置'
+    if (errCode == 19720736) return '设备型号与模板不匹配'
+    if (errCode == 19720726 || errCode == 19720727) return '设备票据失效，请重试'
+    if (errCode == 10001 || errCode == 20001) return '模板 ID 未配置'
+    if (errCode == 20003) return '单次订阅模板数量超限'
+    if (errCode == -12001 || errMsg.indexOf('invalid scope') >= 0) return '设备消息能力未开通，请联系客服'
     if (errMsg.indexOf('cancel') >= 0) return errMsg
-    if (errMsg.indexOf('sn_ticket') >= 0 || errMsg.indexOf('1972072') >= 0) return '设备票据失效，请重试'
-    if (errMsg.indexOf('19720736') >= 0) return '设备型号与模板不匹配'
-    if (errMsg.indexOf('19720728') >= 0) return '模板 ID 不存在'
     return errMsg
 }
 

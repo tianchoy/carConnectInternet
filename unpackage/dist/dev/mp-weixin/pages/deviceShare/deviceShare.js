@@ -34,9 +34,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const sentPage = common_vendor.ref(1);
     const sentHasMore = common_vendor.ref(false);
     const sentLoading = common_vendor.ref(false);
-    const sharees = common_vendor.ref([]);
-    const shareesVisible = common_vendor.ref(false);
-    const shareesLoading = common_vendor.ref(false);
     const normalizeRouteValue = (value = null) => {
       if (value == null)
         return "";
@@ -136,7 +133,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (sentHasMore.value)
             sentPage.value = currentPage + 1;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:192", "获取发起分享列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:175", "获取发起分享列表失败:", error);
           utils_toast.showAppToast({ title: "获取分享列表失败，请重试", icon: "none" });
         } finally {
           sentLoading.value = false;
@@ -184,7 +181,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "分享失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:242", "发起设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:225", "发起设备分享失败:", error);
           utils_toast.showAppToast({ title: "分享失败，请重试", icon: "none" });
         } finally {
           submitting.value = false;
@@ -203,7 +200,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           } else
             utils_toast.showAppToast({ title: res.msg || "撤销失败", icon: "none" });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:258", "撤销设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:241", "撤销设备分享失败:", error);
           utils_toast.showAppToast({ title: "撤销失败，请重试", icon: "none" });
         }
       });
@@ -218,25 +215,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             void revokeShare(item.getString("shareId", ""));
         }
       }));
-    };
-    const showSharees = (item) => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        sharees.value = [];
-        shareesVisible.value = true;
-        shareesLoading.value = true;
-        try {
-          const res = yield api_request.getDeviceSharees(item.getString("deviceId", ""), new common_vendor.UTSJSONObject({ pageNum: 1, pageSize: requestPageSize }));
-          if (api_response.isBusinessSuccessCode(res.code))
-            sharees.value = res.data.list;
-          else
-            utils_toast.showAppToast({ title: res.msg || "获取被分享者失败", icon: "none" });
-        } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:279", "获取被分享者失败:", error);
-          utils_toast.showAppToast({ title: "获取被分享者失败，请重试", icon: "none" });
-        } finally {
-          shareesLoading.value = false;
-        }
-      });
     };
     const loadMore = () => {
       if (sentHasMore.value)
@@ -254,7 +232,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (enabled.value)
             yield loadSent(true);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:299", "初始化设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:267", "初始化设备分享失败:", error);
           utils_toast.showAppToast({ title: "加载分享功能失败，请重试", icon: "none" });
         } finally {
           loadingEnabled.value = false;
@@ -266,7 +244,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       deviceId.value = normalizeRouteValue((_a = options.deviceId) !== null && _a !== void 0 ? _a : "");
       deviceName.value = normalizeRouteValue((_b = options.deviceName) !== null && _b !== void 0 ? _b : "");
       deviceNo.value = normalizeRouteValue((_c = options.deviceNo) !== null && _c !== void 0 ? _c : "");
-      common_vendor.index.__f__("log", "at pages/deviceShare/deviceShare.uvue:310", "deviceNo:", deviceNo.value, deviceName.value);
+      common_vendor.index.__f__("log", "at pages/deviceShare/deviceShare.uvue:278", "deviceNo:", deviceNo.value, deviceName.value);
       void initializeDeviceShare();
     });
     return (_ctx, _cache) => {
@@ -303,13 +281,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             b: common_vendor.t(item.getString("plateNo", "")),
             c: common_vendor.t(statusText(item.getString("status", ""))),
             d: common_vendor.n(statusClass(item.getString("status", ""))),
-            e: common_vendor.t(getSharePerson(item, "targetNickName", "targetPhoneMasked")),
-            f: common_vendor.t(item.getString("roleName", "view")),
-            g: common_vendor.t(formatTimestamp(item.getNumber("shareTime", 0))),
-            h: common_vendor.t(formatExpireTime(item)),
-            i: common_vendor.o(($event) => {
-              return showSharees(item);
-            }, item.getString("shareId", "")),
+            e: common_vendor.t(getSharePerson(item, "targetNickName", "")),
+            f: common_vendor.t(item.getString("targetPhoneMasked", "")),
+            g: common_vendor.t(item.getString("roleName", "view")),
+            h: common_vendor.t(formatTimestamp(item.getNumber("shareTime", 0))),
+            i: common_vendor.t(formatExpireTime(item)),
             j: item.getString("status", "") == "active"
           }, item.getString("status", "") == "active" ? {
             k: common_vendor.o(($event) => {
@@ -323,39 +299,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, sentHasMore.value ? {
         q: common_vendor.t(sentLoading.value ? "加载中..." : "加载更多"),
         r: sentLoading.value,
-        s: common_vendor.o(loadMore, "07")
+        s: common_vendor.o(loadMore, "f6")
       } : {}), {
         c: !enabled.value,
         t: common_vendor.o(loadMore, "88"),
-        v: shareesVisible.value
-      }, shareesVisible.value ? common_vendor.e({
-        w: common_vendor.o(($event) => {
-          return shareesVisible.value = false;
-        }, "54"),
-        x: shareesLoading.value
-      }, shareesLoading.value ? {} : sharees.value.length == 0 ? {} : {}, {
-        y: sharees.value.length == 0,
-        z: common_vendor.f(sharees.value, (item, k0, i0) => {
-          return {
-            a: common_vendor.t(getSharePerson(item, "targetNickName", "")),
-            b: common_vendor.t(item.getString("targetPhoneMasked", "")),
-            c: common_vendor.t(statusText(item.getString("status", ""))),
-            d: common_vendor.n(statusClass(item.getString("status", ""))),
-            e: item.getString("shareId", "")
-          };
-        }),
-        A: common_vendor.o(() => {
-        }, "d1"),
-        B: common_vendor.o(($event) => {
-          return shareesVisible.value = false;
-        }, "a6")
-      }) : {}, {
-        C: `${_ctx.u_s_b_h}px`,
-        D: `${_ctx.u_s_a_i_b}px`,
-        E: common_vendor.p({
+        v: `${_ctx.u_s_b_h}px`,
+        w: `${_ctx.u_s_a_i_b}px`,
+        x: common_vendor.p({
           class: "data-v-19696bd2"
         }),
-        F: common_vendor.p({
+        y: common_vendor.p({
           class: "data-v-19696bd2"
         })
       });

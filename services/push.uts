@@ -322,7 +322,7 @@ class PushManager {
 			uni.setStorageSync(PUSH_MESSAGE_STALE_KEY, true)
 		}
 		if (event.kind == 'clicked') {
-			uni.switchTab({ url: '/pages/message/message' })
+			uni.reLaunch({ url: '/pages/message/message' })
 		}
 	}
 

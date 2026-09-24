@@ -28,7 +28,7 @@
                     <image src="../../static/banner.png" mode="aspectFit" class="banner-image"></image>
                 </view>
                 <!--#ifdef MP-WEIXIN-->
-                <view class="subscribe-row" v-if="subscribeAvailable && checkToken() && hasDevice && false" @click="handleSubscribeTap">
+                <view class="subscribe-row" v-if="subscribeAvailable && checkToken() && hasDevice" @click="handleSubscribeTap">
                     <image src="../../static/msg.png" mode="aspectFit" class="subscribe-icon"></image>
                     <view class="subscribe-text">
                         <text class="subscribe-title">车辆告警通知</text>
@@ -57,7 +57,7 @@
                     <view class="map-header">
                         <text class="map-title">车辆定位</text>
                         <view class="map-refresh-wrap" @click="refreshLocation">
-                            <text class="map-refresh">刷新位置</text>
+                            <text class="map-refresh">刷新定位</text>
                         </view>
                     </view>
                     <view class="map-container">
@@ -1246,7 +1246,7 @@ const toAdd = () => {
 // 跳转消息中心
 const toMsgCenter = () => {
     if (!isLogin()) return
-    uni.switchTab({
+    uni.navigateTo({
         url: '/pages/message/message',
     })
 }
@@ -1482,7 +1482,7 @@ const handleSubscribeTap = async (): Promise<void> => {
     if (deviceSubscribed.value) {
         showAppModal({
             title: '车辆告警通知',
-            content: '已开启车辆告警通知，如需关闭可在小程序设置中操作',
+            content: '已开启车辆告警通知，如需关闭，请点击确定后在订阅消息中手动关闭',
             success: (res: AppModalSuccess): void => {
                 if (res.confirm) {
                     // #ifdef MP-WEIXIN
@@ -1543,7 +1543,6 @@ const handleReload = () => {
 
 // 页面加载
 onLoad(() => {
-    uni.hideTabBar()
     initDimensions()
     void loadHomePlatformAppId()
 

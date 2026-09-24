@@ -1043,7 +1043,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const toMsgCenter = () => {
       if (!isLogin())
         return null;
-      common_vendor.index.switchTab({
+      common_vendor.index.navigateTo({
         url: "/pages/message/message"
       });
     };
@@ -1245,7 +1245,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (deviceSubscribed.value) {
           utils_modal.showAppModal(new common_vendor.UTSJSONObject({
             title: "车辆告警通知",
-            content: "已开启车辆告警通知，如需关闭可在小程序设置中操作",
+            content: "已开启车辆告警通知，如需关闭，请点击确定后在订阅消息中手动关闭",
             success: (res) => {
               if (res.confirm) {
                 common_vendor.index.openSetting(new common_vendor.UTSJSONObject({}));
@@ -1302,7 +1302,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       loadDeviceList();
     };
     common_vendor.onLoad(() => {
-      common_vendor.index.hideTabBar();
       initDimensions();
       void loadHomePlatformAppId();
       if (checkToken()) {
@@ -1345,19 +1344,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         l: common_vendor.o(toAdd, "29"),
         m: common_assets._imports_0,
-        n: subscribeAvailable.value && checkToken() && hasDevice.value && false
-      }, subscribeAvailable.value && checkToken() && hasDevice.value && false ? {
+        n: subscribeAvailable.value && checkToken() && hasDevice.value
+      }, subscribeAvailable.value && checkToken() && hasDevice.value ? {
         o: common_assets._imports_1,
         p: common_vendor.t(subscribeRowDesc.value),
         q: common_vendor.t(deviceSubscribed.value ? "已订阅" : "开启通知"),
         r: deviceSubscribed.value ? 1 : "",
-        s: common_vendor.o(handleSubscribeTap, "3d")
+        s: common_vendor.o(handleSubscribeTap, "41")
       } : {}, {
         t: common_vendor.t(hasDevice.value ? safeDeviceDetail.value.connectionStatus == "online" ? "在线" : "离线" : "--"),
         v: hasDevice.value && safeDeviceDetail.value.connectionStatus == "online" ? 1 : "",
         w: common_vendor.t(hasDevice.value ? devicePositionUpdateTime.value : "暂无位置"),
         x: statusBarHeight.value + 43 + "px",
-        y: common_vendor.o(refreshLocation, "a6"),
+        y: common_vendor.o(refreshLocation, "d3"),
         z: isMapReady.value
       }, isMapReady.value ? {
         A: common_vendor.sei("myMap", "map"),
@@ -1375,42 +1374,42 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           fontSize: "15",
           class: "data-v-00a60067"
         }),
-        K: common_vendor.o(toDeviceDetail, "83"),
+        K: common_vendor.o(toDeviceDetail, "d0"),
         L: common_assets._imports_3,
         M: common_vendor.p({
           name: "/static/arrow-right.png",
           fontSize: "15",
           class: "data-v-00a60067"
         }),
-        N: common_vendor.o(toFindCar, "78"),
+        N: common_vendor.o(toFindCar, "98"),
         O: common_assets._imports_4,
         P: common_vendor.p({
           name: "/static/arrow-right.png",
           fontSize: "15",
           class: "data-v-00a60067"
         }),
-        Q: common_vendor.o(toFence, "b4"),
+        Q: common_vendor.o(toFence, "a5"),
         R: common_assets._imports_1,
         S: unreadMessageCount.value > 0
       }, unreadMessageCount.value > 0 ? {
         T: common_vendor.t(unreadMessageBadgeText.value)
       } : {}, {
-        U: common_vendor.o(toMsgCenter, "c5"),
+        U: common_vendor.o(toMsgCenter, "c1"),
         V: common_assets._imports_5,
         W: common_vendor.o(($event) => {
           return toPay(currentCarIccId.value);
-        }, "0f"),
+        }, "a4"),
         X: common_assets._imports_6,
-        Y: common_vendor.o(contactCustomerService, "33"),
+        Y: common_vendor.o(contactCustomerService, "64"),
         Z: common_assets._imports_7,
-        aa: common_vendor.o(unbindDevice, "63"),
+        aa: common_vendor.o(unbindDevice, "93"),
         ab: common_assets._imports_8,
-        ac: common_vendor.o(logout, "ad"),
-        ad: common_vendor.o(closePicker, "da"),
-        ae: common_vendor.o(handlePickerConfirm, "25"),
+        ac: common_vendor.o(logout, "64"),
+        ad: common_vendor.o(closePicker, "b7"),
+        ae: common_vendor.o(handlePickerConfirm, "36"),
         af: common_vendor.o(($event) => {
           return pickerValues.value = $event;
-        }, "5f"),
+        }, "9b"),
         ag: common_vendor.p({
           ["cancel-btn"]: "取消",
           ["confirm-btn"]: "确认",
@@ -1420,7 +1419,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ah: common_vendor.o(($event) => {
           return showPicker.value = $event;
-        }, "6d"),
+        }, "d9"),
         ai: common_vendor.p({
           position: "bottom",
           closeable: false,

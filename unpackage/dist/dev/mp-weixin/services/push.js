@@ -193,7 +193,7 @@ class PushManager {
       common_vendor.index.setStorageSync(PUSH_MESSAGE_STALE_KEY, true);
     }
     if (event.kind == "clicked") {
-      common_vendor.index.switchTab({ url: "/pages/message/message" });
+      common_vendor.index.reLaunch({ url: "/pages/message/message" });
     }
   }
   clearRegistrationTimers() {

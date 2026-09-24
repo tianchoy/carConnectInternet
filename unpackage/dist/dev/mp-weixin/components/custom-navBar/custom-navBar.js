@@ -48,7 +48,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (pages.length > 1) {
         common_vendor.index.navigateBack();
       } else {
-        common_vendor.index.switchTab({ url: "/pages/index/index" });
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
       }
       emit("back");
     };
