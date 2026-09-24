@@ -1219,6 +1219,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           deviceSubscribed.value = false;
           return Promise.resolve(null);
         }
+        const enabled = yield utils_notify.fetchNotifyStatusEnabled();
+        if (!enabled) {
+          subscribeAvailable.value = false;
+          deviceSubscribed.value = false;
+          return Promise.resolve(null);
+        }
         yield utils_notify.fetchNotifyQuota();
         const item = utils_notify.getCachedQuota("alarm");
         if (item == null || item.mode != "device" || item.templateId == "") {
@@ -1279,9 +1285,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    common_vendor.watch(currentCarDeviceNo, () => {
-      void refreshSubscribeState();
-    });
     common_vendor.onShow(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (checkToken()) {

@@ -219,10 +219,10 @@ import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
-import { ref, reactive, computed, nextTick, watch } from 'vue';
+import { ref, reactive, computed, nextTick } from 'vue';
 import { clearPushSessionState } from '../../services/push.uts'
 import { unbindPushDeviceOnLogout } from '../../services/push-binding.uts'
-import { isDeviceSubscribeSupported, authorizeDevice, checkTemplateSubscribed, fetchNotifyQuota, getCachedQuota } from '../../utils/notify.uts'
+import { isDeviceSubscribeSupported, authorizeDevice, checkTemplateSubscribed, fetchNotifyQuota, fetchNotifyStatusEnabled, getCachedQuota } from '../../utils/notify.uts'
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount, getHomePlatformAppId } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
@@ -1449,14 +1449,21 @@ const subscribeRowDesc = computed<string>(() => {
         : '开启后，告警将通过微信服务通知提醒'
 })
 
-// 拉取告警场景模板与通道（mode 必须为 device），并用微信设置页状态判断当前是否已订阅
+// 拉取订阅展示开关（/app/notify/status）与告警模板，并用微信设置页状态判断当前是否已订阅
 const refreshSubscribeState = async (): Promise<void> => {
     if (!isDeviceSubscribeSupported() || !checkToken()) {
         subscribeAvailable.value = false
         deviceSubscribed.value = false
         return
     }
-    // 每次刷新时联网拉取一次（静默），模板 ID 以后端配置为准，前端不硬编码
+    // 后端开关控制订阅引导的展示与否
+    const enabled = await fetchNotifyStatusEnabled()
+    if (!enabled) {
+        subscribeAvailable.value = false
+        deviceSubscribed.value = false
+        return
+    }
+    // 模板 ID 以后端配置为准，前端不硬编码
     await fetchNotifyQuota()
     const item = getCachedQuota('alarm')
     // 未配置模板的场景不会出现在 /quota 返回值中，此时隐藏引导 UI，不报错
@@ -1518,9 +1525,6 @@ const handleSubscribeTap = async (): Promise<void> => {
         subscribeRequesting.value = false
     }
 }
-
-// 切换设备后刷新订阅状态
-watch(currentCarDeviceNo, () => { void refreshSubscribeState() })
 
 onShow(async () => {
     if (checkToken()) {

@@ -1,5 +1,5 @@
 import { isBusinessSuccessCode } from '../api/response.uts'
-import { getNotifyQuota, getDeviceTicket, reportSubscribeResults, type NotifyQuotaItem } from '../api/request.uts'
+import { getNotifyQuota, getDeviceTicket, getNotifyStatus, reportSubscribeResults, type NotifyQuotaItem } from '../api/request.uts'
 
 /**
  * 订阅消息前端封装（对接 /app/notify）
@@ -41,18 +41,55 @@ export function isDeviceSubscribeSupported() : boolean {
 /**
  * 拉取各场景模板 ID 与通道，并写入本地缓存（后端要求缓存以减少请求）
  */
+// 请求去重 + 节流：onShow、设备切换等多个入口可能连续触发拉取，避免重复请求 /quota
+let quotaInFlight : Promise<Array<NotifyQuotaItem>> | null = null
+let quotaFetchedAt : number = 0
+const QUOTA_FETCH_MIN_INTERVAL : number = 10 * 1000
+
 export async function fetchNotifyQuota() : Promise<Array<NotifyQuotaItem>> {
+    // 并发去重：同一时刻只发一个请求，后到者共享结果
+    const inFlight = quotaInFlight
+    if (inFlight != null) return inFlight
+    // 节流：短时间内直接复用本地缓存
+    if (Date.now() - quotaFetchedAt < QUOTA_FETCH_MIN_INTERVAL) {
+        const cached = readCachedQuota()
+        if (cached.length > 0) return cached
+    }
+    const task = doFetchQuota()
+    quotaInFlight = task
+    return task
+}
+
+async function doFetchQuota() : Promise<Array<NotifyQuotaItem>> {
     try {
         const res = await getNotifyQuota()
         if (!isBusinessSuccessCode(res.code)) {
             console.warn('[notify] 拉取订阅额度失败:', res.msg)
-            return []
+            return readCachedQuota()
         }
         cacheQuota(res.data)
+        quotaFetchedAt = Date.now()
         return res.data
     } catch (error) {
         console.warn('[notify] 拉取订阅额度异常:', error)
-        return []
+        return readCachedQuota()
+    } finally {
+        quotaInFlight = null
+    }
+}
+
+/**
+ * 查询订阅引导开关（GET /app/notify/status）
+ * 后端用 data.enabled 控制首页订阅行的展示与否；查询失败 / 字段缺失按「隐藏」处理（fail-closed）
+ */
+export async function fetchNotifyStatusEnabled() : Promise<boolean> {
+    try {
+        const res = await getNotifyStatus()
+        if (!isBusinessSuccessCode(res.code) || res.data == null) return false
+        return res.data.getBoolean('enabled', false)
+    } catch (error) {
+        console.warn('[notify] 查询订阅开关失败:', error)
+        return false
     }
 }
 

@@ -56,6 +56,7 @@ const deviceShareExitUrl = '/share/device/exit'
 const notifyQuotaUrl = '/app/notify/quota'
 const notifyDeviceTicketUrl = '/app/notify/deviceTicket'
 const notifySubscribeReportUrl = '/app/notify/subscribeReport'
+const notifyStatusUrl = '/app/notify/status'
 
 export type BasicResponse = { code: number, msg: string }
 export type PushDeviceBindRequest = {
@@ -273,7 +274,6 @@ export const getCustomDeviceList = (deptId: string): Promise<JsonDataResponse> =
 export const getUserGroupList = (): Promise<JsonDataResponse> => get(groupList).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 export const sendCommand = (data: UTSJSONObject): Promise<BasicResponse> => post(sendcmd, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const restoreOilPower = (data: UTSJSONObject): Promise<BasicResponse> => put(sendcmd, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
-
 export const getDevicePos = (data: UTSJSONObject): Promise<DevicePositionResponse> => get(devicePos, data).then((raw: any): DevicePositionResponse => {
     const response = asJSONObject(raw)
     return {
@@ -314,6 +314,9 @@ export const getDeviceTicket = (deviceNo: string): Promise<JsonDataResponse> => 
 
 // 上报一次性订阅授权结果（仅 mode=once；设备订阅长期有效，无需上报）
 export const reportSubscribeResults = (results: UTSJSONObject): Promise<BasicResponse> => post(notifySubscribeReportUrl, { results: results } as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
+
+// 查询订阅引导是否展示（后端开关），data.enabled 控制
+export const getNotifyStatus = (): Promise<JsonDataResponse> => getSilently(notifyStatusUrl).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 
 export const PostWechatlogin = (data: WechatLoginRequest): Promise<JsonDataResponse> => {
     const requestData = new UTSJSONObject()

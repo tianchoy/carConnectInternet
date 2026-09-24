@@ -43,6 +43,7 @@ const deviceShareUrl = "/share/device";
 const deviceShareEnabledUrl = "/share/device/enabled";
 const notifyQuotaUrl = "/app/notify/quota";
 const notifyDeviceTicketUrl = "/app/notify/deviceTicket";
+const notifyStatusUrl = "/app/notify/status";
 class BasicResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -1123,6 +1124,11 @@ const getDeviceTicket = (deviceNo) => {
     return jsonDataResponse(raw);
   });
 };
+const getNotifyStatus = () => {
+  return api_http.getSilently(notifyStatusUrl).then((raw = null) => {
+    return jsonDataResponse(raw);
+  });
+};
 const PostWechatlogin = (data) => {
   const requestData = new common_vendor.UTSJSONObject();
   requestData.set("phoneCode", data.phoneCode);
@@ -1374,6 +1380,7 @@ exports.getGeofenceList = getGeofenceList;
 exports.getHomePlatformAppId = getHomePlatformAppId;
 exports.getMessageUnreadCount = getMessageUnreadCount;
 exports.getNotifyQuota = getNotifyQuota;
+exports.getNotifyStatus = getNotifyStatus;
 exports.getTrackPos = getTrackPos;
 exports.getUnboundDevices = getUnboundDevices;
 exports.getUserDeviceList = getUserDeviceList;
