@@ -7,6 +7,10 @@
 				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="false" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 				</map>
 				<sub-navBar class="sub-nav-overlay" :showTime="false" :currentCar="plateNo" :showCar="true" :carStatus='carStatus'></sub-navBar>
+				<view v-if="isTrackPlayable" class="follow-toggle" :class="isFollowing ? 'follow-toggle-active' : ''" @click="toggleFollow">
+					<i-icon name="/static/current-location.png" fontSize="14"></i-icon>
+					<text class="follow-toggle-label">{{ isFollowing ? '跟随中' : '回到车标' }}</text>
+				</view>
 		</view>
 
 		<view class="tools-panel">
@@ -149,6 +153,8 @@ import { showAppToast } from '../../utils/toast.uts'
 	const MIN_SEGMENT_DURATION_MS = 500
 	const MAX_SEGMENT_DURATION_MS = 6000
 	const FALLBACK_SPEED_KMH = 20
+	// 车标与地图中心逐帧刷新；折线重绘是 O(n) 操作，按时间节流即可，肉眼无差别
+	const POLYLINE_RENDER_INTERVAL_MS = 80
 	const renderedPoint = reactive<TrackPoint>({
 		latitude: 0,
 		longitude: 0,
@@ -157,8 +163,11 @@ import { showAppToast } from '../../utils/toast.uts'
 		speed: 0
 	})
 	const activeSegmentTargetIndex = ref(-1)
+	// 是否让地图中心自动跟随车标。用户可手动解锁以自由查看地图。
+	const isFollowing = ref(true)
 	let playbackTimer : number | null = null
 	let replaySessionId = 0
+	let lastPolylineRenderAt = 0
 
 	function copyTrackPoint(point : TrackPoint) : TrackPoint {
 		return {
@@ -532,11 +541,22 @@ import { showAppToast } from '../../utils/toast.uts'
 			carMarker.value = updatedMarker
 			markers.value = [updatedMarker, ...markers.value.slice(1)]
 
-			if (currentIndex.value % 5 == 0 ||
-				currentIndex.value == trackPoints.value.length - 1) {
+			// 地图中心与车标逐帧同步，避免中心滞后导致车标跑出可视范围后再回弹
+			// （此前中心仅在 currentIndex % 5 == 0 时跳变，是"车标出屏→约 1 秒后弹回"的根因）。
+			// 仅在跟随模式下写入中心，用户解锁后可自由拖动/缩放查看轨迹。
+			if (isFollowing.value) {
 				center.latitude = renderedPoint.latitude
 				center.longitude = renderedPoint.longitude
 			}
+		}
+	}
+
+	// 切换地图跟随状态；重新跟随时立即定位到车标，无需等待下一帧
+	function toggleFollow() {
+		isFollowing.value = !isFollowing.value
+		if (isFollowing.value) {
+			center.latitude = renderedPoint.latitude
+			center.longitude = renderedPoint.longitude
 		}
 	}
 
@@ -714,6 +734,9 @@ import { showAppToast } from '../../utils/toast.uts'
 		isTrackPlayable.value = processedPoints.length > 1
 		currentIndex.value = 0
 		activeSegmentTargetIndex.value = -1
+		// 加载新轨迹时恢复跟随，确保默认体验是"车标始终可见"
+		isFollowing.value = true
+		lastPolylineRenderAt = 0
 		if (processedPoints.length == 0) return
 		resetRenderedPoint(processedPoints[0])
 		calculateTrackDistance()
@@ -751,6 +774,8 @@ import { showAppToast } from '../../utils/toast.uts'
 				showCurrentPosition(res.msg || '轨迹加载失败')
 				return
 			}
+
+			console.log('加载轨迹成功:', res)
 
 			const trackData = res.data
 			if (trackData == null) {
@@ -847,8 +872,14 @@ import { showAppToast } from '../../utils/toast.uts'
 			// 播放过程中同步展示当前对应点的速度与时间
 			currentSpeed.value = renderedPoint.speed
 			currentTime.value = renderedPoint.deviceTime
+			// 车标与地图中心必须逐帧更新，保证跟手流畅
 			updateCarPosition()
-			updatePolyline()
+			// 折线重绘开销随轨迹长度线性增长，按时间节流；每段结束时 renderPlaybackIndex 会补齐
+			const frameNow = Date.now()
+			if (frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS) {
+				lastPolylineRenderAt = frameNow
+				updatePolyline()
+			}
 
 			if (progress >= 1) {
 				currentIndex.value = targetIndex
@@ -878,6 +909,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 		activeSegmentTargetIndex.value = -1
 		isPlaying.value = true
+		lastPolylineRenderAt = 0
 		const sessionId = ++replaySessionId
 		animateNextSegment(sessionId)
 	}
@@ -998,6 +1030,36 @@ import { showAppToast } from '../../utils/toast.uts'
 				left: 0;
 				right: 0;
 				z-index: 100;
+			}
+
+			.follow-toggle {
+				position: absolute;
+				right: 24rpx;
+				bottom: 30rpx;
+				z-index: 101;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				height: 64rpx;
+				padding: 0 24rpx;
+				border-radius: 32rpx;
+				background-color: #ffffff;
+				box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.18);
+			}
+
+			.follow-toggle-active {
+				background-color: #1890FF;
+			}
+
+			.follow-toggle-label {
+				font-size: 24rpx;
+				line-height: 32rpx;
+				color: #333333;
+				margin-left: 8rpx;
+			}
+
+			.follow-toggle-active .follow-toggle-label {
+				color: #ffffff;
 			}
 		}
 

@@ -124,6 +124,7 @@ class RequestFailure extends common_vendor.UTS.UTSType {
 }
 const BASE_URL = "https://gpsapp.zdiot.cn";
 const CLIENT_ID = "428a8310cd442757ae699df5d894f051";
+const DEFAULT_TENANT_ID = "000000";
 let isHandlingTokenExpired = false;
 function resetTokenExpiredState() {
   isHandlingTokenExpired = false;
@@ -132,7 +133,7 @@ function handleTokenExpired() {
   if (isHandlingTokenExpired)
     return null;
   isHandlingTokenExpired = true;
-  common_vendor.index.__f__("log", "at api/http.uts:54", "检测到token过期，执行跳转登录页逻辑");
+  common_vendor.index.__f__("log", "at api/http.uts:56", "检测到token过期，执行跳转登录页逻辑");
   common_vendor.index.removeStorageSync("token");
   services_push.clearPushSessionState();
   utils_toast.showAppToast({
@@ -141,14 +142,14 @@ function handleTokenExpired() {
     duration: 2e3
   });
   setTimeout(() => {
-    common_vendor.index.__f__("log", "at api/http.uts:69", "正在跳转到登录页...");
+    common_vendor.index.__f__("log", "at api/http.uts:71", "正在跳转到登录页...");
     common_vendor.index.redirectTo({
       url: "/pages/login/login",
       success: () => {
-        common_vendor.index.__f__("log", "at api/http.uts:73", "跳转登录页成功");
+        common_vendor.index.__f__("log", "at api/http.uts:75", "跳转登录页成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at api/http.uts:76", "跳转登录页失败:", err);
+        common_vendor.index.__f__("log", "at api/http.uts:78", "跳转登录页失败:", err);
         common_vendor.index.reLaunch({
           url: "/pages/login/login"
         });
@@ -164,6 +165,7 @@ function requestInterceptor(config) {
   }
   config.header["Authorization"] = authorization;
   config.header["clientId"] = CLIENT_ID;
+  config.header["tenantId"] = DEFAULT_TENANT_ID;
   return config;
 }
 function isBusinessTokenExpired(data = null) {
@@ -185,7 +187,7 @@ function responseInterceptor(response, config) {
 }
 function logHttpError(error) {
   const detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (error.data != null ? error.data.toString() : "");
-  common_vendor.index.__f__("error", "at api/http.uts:142", "[HttpRequest] " + detail);
+  common_vendor.index.__f__("error", "at api/http.uts:146", "[HttpRequest] " + detail);
 }
 function getHttpResponseMessage(data = null) {
   if (data == null)
