@@ -16,6 +16,21 @@
 		<view v-else>
 			<indexListMode :lists="deviceListItems" @unbindDevice="unbindDevice" />
 		</view>
+
+		<!-- 重合设备选择：多台设备位置重合（放大到最大也无法分开）时，点击车标后从这里分别查看 -->
+		<view v-if="showOverlapPicker" class="overlap-mask" @click="closeOverlapPicker">
+			<view class="overlap-panel" @click.stop="keepOverlapPicker">
+				<view class="overlap-title">此处有 {{ overlapDevices.length }} 台设备</view>
+				<scroll-view class="overlap-list" scroll-y="true">
+					<view v-for="(device, index) in overlapDevices" :key="index" class="overlap-item"
+						@click="selectOverlapDevice(device)">
+						<text class="overlap-item-name">{{ deviceDisplayName(device) }}</text>
+						<text class="overlap-item-status"
+							:class="isDeviceOnline(device) ? 'status-online' : 'status-offline'">{{ isDeviceOnline(device) ? '在线' : '离线' }}</text>
+					</view>
+				</scroll-view>
+			</view>
+		</view>
 	</view>
 	<app-toast></app-toast>
 </template>
@@ -37,6 +52,20 @@ import { showAppToast } from '../../utils/toast.uts'
 		latitude: 0,
 		longitude: 0
 	})
+
+	// ===== 重合设备展开显示 =====
+	// 多台设备经纬度重合或仅差几米时，即使把缩放放到最大，车标也会完全叠在一起，
+	// 表现为"只能看到一台、另一台点不到"。处理办法是把间距过小的设备成组后按环形做微小偏移：
+	// 偏移量按参考缩放级别折算 —— 放大到该级别时刚好完全分开，缩小后偏移不足 1 像素、视觉无影响，
+	// 因此不会让正常点位的显示位置失真。
+	const OVERLAP_THRESHOLD_METERS = 12.0     // 间距小于该值（米）即视为重合，需要展开
+	const SPREAD_REFERENCE_ZOOM = 19.0        // 偏移量折算所依据的缩放级别
+	const SPREAD_RADIUS_PX = 26.0             // 环形展开半径（像素，@SPREAD_REFERENCE_ZOOM）
+	const DEGREE_PER_METER_LAT = 1.0 / 111320.0  // 1 米对应的纬度度数，用于分组前的快速粗筛
+
+	// 重合设备选择弹层
+	const showOverlapPicker = ref(false)
+	const overlapDevices = ref<Array<UTSJSONObject>>([])
 
 	// ===== 车标点聚合 =====
 	// 仅微信小程序端提供原生点聚合（MapContext.initMarkerCluster）
@@ -95,7 +124,9 @@ import { showAppToast } from '../../utils/toast.uts'
 			context.initMarkerCluster(toPlainObject({
 				enableDefaultStyle: false,
 				zoomOnClick: true,
-				gridSize: 60
+				// 网格边长 40px：重合设备被偏移展开后的间距在放大到 19 级时达到 52px，
+				// 足以跨出网格、单独显示；网格再大就会把它们重新并回一个聚合簇。
+				gridSize: 40
 			}))
 			context.on('markerClusterCreate', (res : any) => {
 				const clusterList = res != null ? (res['clusters'] as Array<any> | null) : null
@@ -190,7 +221,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	})
 
 	// 计算属性 筛选逻辑
-	const filteredDevices = computed(() => {
+	const filteredDevices = computed((): Array<UTSJSONObject> => {
 		if (!Array.isArray(originalDeviceList.value)) return []
 
 		let result = [...originalDeviceList.value]
@@ -214,15 +245,100 @@ import { showAppToast } from '../../utils/toast.uts'
 
 
 
+	// 坐标统一转成数字，非法值返回 NaN
+	const parseCoordinate = (value : string | number | null) : number => {
+		if (value == null) return NaN
+		return parseFloat(value.toString())
+	}
+
+	// 两点间球面距离（米）
+	const distanceMeters = (lat1 : number, lng1 : number, lat2 : number, lng2 : number) : number => {
+		const earthRadius = 6371000.0
+		const radLat1 = lat1 * Math.PI / 180.0
+		const radLat2 = lat2 * Math.PI / 180.0
+		const deltaLat = (lat2 - lat1) * Math.PI / 180.0
+		const deltaLng = (lng2 - lng1) * Math.PI / 180.0
+		const sinLat = Math.sin(deltaLat / 2.0)
+		const sinLng = Math.sin(deltaLng / 2.0)
+		const a = sinLat * sinLat + Math.cos(radLat1) * Math.cos(radLat2) * sinLng * sinLng
+		const clamped = a > 1.0 ? 1.0 : a
+		return 2.0 * earthRadius * Math.atan2(Math.sqrt(clamped), Math.sqrt(1.0 - clamped))
+	}
+
+	type OverlapAnalysis = {
+		groupOfIndex : Array<number>   // 每个设备所属的重合组编号，-1 表示不与他人重合
+		orderOfIndex : Array<number>   // 设备在组内的序号，决定展开角度
+		groups : Array<Array<number>>  // 每个重合组的成员在 devices 中的下标
+	}
+
+	// 把间距过近的设备聚成一组（链式聚合：A 近 B、B 近 C 时三者同组）
+	const analyzeOverlap = (devices : Array<UTSJSONObject>) : OverlapAnalysis => {
+		const count = devices.length
+		const lats : Array<number> = []
+		const lngs : Array<number> = []
+		const valid : Array<boolean> = []
+		const groupOfIndex : Array<number> = []
+		const orderOfIndex : Array<number> = []
+		const visited : Array<boolean> = []
+		for (let i = 0; i < count; i++) {
+			const lat = parseCoordinate(devices[i]['latitude'] as string | number | null)
+			const lng = parseCoordinate(devices[i]['longitude'] as string | number | null)
+			lats.push(lat)
+			lngs.push(lng)
+			valid.push(!isNaN(lat) && !isNaN(lng))
+			groupOfIndex.push(-1)
+			orderOfIndex.push(0)
+			visited.push(false)
+		}
+
+		const groups : Array<Array<number>> = []
+		const latLimit = OVERLAP_THRESHOLD_METERS * DEGREE_PER_METER_LAT
+
+		for (let i = 0; i < count; i++) {
+			if (visited[i] || !valid[i]) continue
+			visited[i] = true
+			const members : Array<number> = [i]
+			let head = 0
+			while (head < members.length) {
+				const current = members[head]
+				head++
+				for (let j = 0; j < count; j++) {
+					if (visited[j] || !valid[j]) continue
+					// 先用纬度差粗筛，避免对大量设备逐一做三角函数运算
+					if (Math.abs(lats[j] - lats[current]) > latLimit) continue
+					if (distanceMeters(lats[current], lngs[current], lats[j], lngs[j]) < OVERLAP_THRESHOLD_METERS) {
+						visited[j] = true
+						members.push(j)
+					}
+				}
+			}
+			if (members.length > 1) {
+				const groupId = groups.length
+				for (let k = 0; k < members.length; k++) {
+					groupOfIndex[members[k]] = groupId
+					orderOfIndex[members[k]] = k
+				}
+				groups.push(members)
+			}
+		}
+
+		return {
+			groupOfIndex: groupOfIndex,
+			orderOfIndex: orderOfIndex,
+			groups: groups
+		} as OverlapAnalysis
+	}
+
 	const updateMarkers = (devices: Array<UTSJSONObject>): void => {
+		const analysis = analyzeOverlap(devices)
+		// 展开偏移量：不同缩放级别下 1 像素对应的经纬度范围不同，
+		// 这里按参考缩放级别折算，保证放大到 SPREAD_REFERENCE_ZOOM 时组内设备恰好完全分开
+		const degreePerPixel = 360.0 / (256.0 * Math.pow(2.0, SPREAD_REFERENCE_ZOOM))
 		const nextMarkers: Array<Marker> = []
 		for (let index = 0; index < devices.length; index++) {
 			const device = devices[index]
-			const latitude = device['latitude'] as string | number | null
-			const longitude = device['longitude'] as string | number | null
-			if (latitude == null || longitude == null) continue
-			const lat = parseFloat(latitude.toString())
-			const lng = parseFloat(longitude.toString())
+			const lat = parseCoordinate(device['latitude'] as string | number | null)
+			const lng = parseCoordinate(device['longitude'] as string | number | null)
 			if (isNaN(lat) || isNaN(lng)) continue
 			const connectionStatus = (device['connectionStatus'] as string | null) ?? ''
 			const carType = (device['carType'] as string | null) ?? ''
@@ -230,15 +346,45 @@ import { showAppToast } from '../../utils/toast.uts'
 			const parsedId = idValue != null ? parseInt(idValue.toString()) : NaN
 			const markerId = isNaN(parsedId) ? index + 1 : parsedId
 			const deviceName = (device['deviceName'] as string | null) ?? (device['plateNo'] as string | null) ?? '设备'
+
+			// 重合组内的设备按环形做微小偏移，使其在最大缩放下可以分别看到与点击
+			let displayLat = lat
+			let displayLng = lng
+			const groupId = analysis.groupOfIndex[index]
+			if (groupId >= 0) {
+				const members = analysis.groups[groupId]
+				let sumLat = 0.0
+				let sumLng = 0.0
+				for (let k = 0; k < members.length; k++) {
+					sumLat += parseCoordinate(devices[members[k]]['latitude'] as string | number | null)
+					sumLng += parseCoordinate(devices[members[k]]['longitude'] as string | number | null)
+				}
+				const centerLat = sumLat / members.length
+				const centerLng = sumLng / members.length
+				// 组内成员越多，环半径越大，避免相邻车标仍然紧贴；但设上限，
+				// 避免大量设备重合时偏移过大、显示位置严重偏离真实位置（这种情况改用弹层列表选择）
+				const radiusRatio = Math.min(4.0, Math.max(1.0, members.length * 1.0 / 2.0))
+				const radiusPixel = SPREAD_RADIUS_PX * radiusRatio
+				const deltaLng = radiusPixel * degreePerPixel
+				const deltaLat = deltaLng * Math.cos(centerLat * Math.PI / 180.0)
+				// 从正右方起逆时针均分角度：两台设备时水平左右展开，气泡不会上下互相遮挡
+				const angle = 2.0 * Math.PI * analysis.orderOfIndex[index] / members.length
+				displayLat = centerLat + deltaLat * Math.cos(angle)
+				displayLng = centerLng + deltaLng * Math.sin(angle)
+			}
+
 			nextMarkers.push({
 				id: markerId,
-				latitude: lat,
-				longitude: lng,
+				latitude: displayLat,
+				longitude: displayLng,
 				iconPath: getDeviceIcon(connectionStatus, carType),
 				width: 30,
 				height: 30,
 				// #ifdef MP-WEIXIN
-				// 声明参与微信小程序原生点聚合
+				// 所有设备一律交给原生聚合器，保证聚合簇的数量统计与设备总数一致。
+				// 重合设备能否散开由"偏移间距 vs 聚合网格"决定：缩小视角时偏移不足 1 像素，
+				// 它们照常并入聚合簇；放大到 19 级以上时间距超过网格，才会各自单独显示。
+				// 注意：这里千万不能设成 false，否则这些设备会退出聚合，导致聚合数量少算。
 				joinCluster: true,
 				// #endif
 				callout: {
@@ -321,21 +467,82 @@ import { showAppToast } from '../../utils/toast.uts'
 		pickerStateTitle.value = type
 	}
 
+	// 设备展示名称：优先车牌号，其次设备名，最后回退到设备号
+	const deviceDisplayName = (device : UTSJSONObject) : string => {
+		const plateNo = (device['plateNo'] as string | null) ?? ''
+		if (plateNo != '') return plateNo
+		const deviceName = (device['deviceName'] as string | null) ?? ''
+		if (deviceName != '') return deviceName
+		const deviceNo = (device['deviceNo'] as string | null) ?? ''
+		return deviceNo != '' ? deviceNo : '设备'
+	}
+
+	const isDeviceOnline = (device : UTSJSONObject) : boolean => {
+		return (device['connectionStatus'] as string | null) == 'online'
+	}
+
+	// 跳转设备详情
+	const openDeviceDetail = (device : UTSJSONObject) => {
+		const deviceNoValue = (device['deviceNo'] as string | null) ?? ''
+		const companyId = (device['companyId'] as string | number | null) ?? ''
+		const deviceId = (device['deviceId'] as string | number | null) ?? ''
+		uni.navigateTo({
+			url: '/pages/carInfoDetail/carInfoDetail?deviceNo=' + deviceNoValue + '&deptId=' + companyId.toString() + '&deviceId=' + deviceId.toString()
+		})
+	}
+
+	// 点击弹层本体（而非遮罩）时不关闭弹层
+	const keepOverlapPicker = () => {
+	}
+
+	const closeOverlapPicker = () => {
+		showOverlapPicker.value = false
+		overlapDevices.value = []
+	}
+
+	const selectOverlapDevice = (device : UTSJSONObject) => {
+		closeOverlapPicker()
+		openDeviceDetail(device)
+	}
+
 	// 点击地图标记
 	const handleTap = (event: any) => {
 		const detail = event as UTSJSONObject
 		const markerId = detail != null ? detail['markerId'] : null
-		const selectedDevice = originalDeviceList.value.find((device: UTSJSONObject) => device['deviceId'] == markerId)
-		if (selectedDevice == null) {
+		if (markerId == null) return
+
+		// 地图渲染的是筛选后的集合，这里必须用同一集合分析，否则弹层会混入未在地图上显示的设备
+		const list = filteredDevices.value
+		let selectedIndex = -1
+		for (let i = 0; i < list.length; i++) {
+			const idValue = list[i]['deviceId'] as string | number | null
+			if (idValue != null && idValue.toString() == markerId.toString()) {
+				selectedIndex = i
+				break
+			}
+		}
+		if (selectedIndex < 0) {
 			console.warn('未找到对应的设备信息', markerId)
 			return
 		}
-		const deviceNoValue = (selectedDevice['deviceNo'] as string | null) ?? ''
-		const companyId = (selectedDevice['companyId'] as string | number | null) ?? ''
-		const deviceId = (selectedDevice['deviceId'] as string | number | null) ?? ''
-		uni.navigateTo({
-			url: '/pages/carInfoDetail/carInfoDetail?deviceNo=' + deviceNoValue + '&deptId=' + companyId.toString() + '&deviceId=' + deviceId.toString()
-		})
+
+		// 该位置若有多台重合设备，先让用户选择查看哪一台 —— 车标被遮挡时也能点开压在下面的那台
+		const analysis = analyzeOverlap(list)
+		const groupId = analysis.groupOfIndex[selectedIndex]
+		if (groupId >= 0) {
+			const members = analysis.groups[groupId]
+			if (members.length > 1) {
+				const candidates : Array<UTSJSONObject> = []
+				for (let k = 0; k < members.length; k++) {
+					candidates.push(list[members[k]])
+				}
+				overlapDevices.value = candidates
+				showOverlapPicker.value = true
+				return
+			}
+		}
+
+		openDeviceDetail(list[selectedIndex])
 	}
 
 	onReady(() => {
@@ -410,6 +617,71 @@ import { showAppToast } from '../../utils/toast.uts'
 			.offlineCar {
 				background-color: #d81e06;
 			}
+		}
+
+		// 重合设备选择弹层
+		.overlap-mask {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			z-index: 999;
+			background-color: rgba(0, 0, 0, 0.45);
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+		}
+
+		.overlap-panel {
+			width: 100%;
+			max-height: 60%;
+			padding: 24rpx 0 40rpx 0;
+			background-color: #ffffff;
+			border-top-left-radius: 24rpx;
+			border-top-right-radius: 24rpx;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.overlap-title {
+			padding: 12rpx 0 20rpx 0;
+			font-size: 30rpx;
+			font-weight: 600;
+			color: #333333;
+			text-align: center;
+		}
+
+		.overlap-list {
+			max-height: 700rpx;
+		}
+
+		.overlap-item {
+			padding: 28rpx 32rpx;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			border-top-width: 1rpx;
+			border-top-style: solid;
+			border-top-color: #f0f0f0;
+		}
+
+		.overlap-item-name {
+			font-size: 30rpx;
+			color: #333333;
+		}
+
+		.overlap-item-status {
+			font-size: 26rpx;
+		}
+
+		.status-online {
+			color: #0da117;
+		}
+
+		.status-offline {
+			color: #999999;
 		}
 	}
 </style>

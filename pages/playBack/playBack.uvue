@@ -2,15 +2,11 @@
 	<view class="container">
 		<custom-navBar title="轨迹回放" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
-		<view class="map-container">
+		<view class="map-container" id="track-map-container">
 			<map v-if="isMapReady" id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="false" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
-				</map>
-				<sub-navBar class="sub-nav-overlay" :showTime="false" :currentCar="plateNo" :showCar="true" :carStatus='carStatus'></sub-navBar>
-				<view v-if="isTrackPlayable" class="follow-toggle" :class="isFollowing ? 'follow-toggle-active' : ''" @click="toggleFollow">
-					<i-icon name="/static/current-location.png" fontSize="14"></i-icon>
-					<text class="follow-toggle-label">{{ isFollowing ? '跟随中' : '回到车标' }}</text>
-				</view>
+			</map>
+			<sub-navBar class="sub-nav-overlay" :showTime="false" :currentCar="plateNo" :showCar="true" :carStatus='carStatus'></sub-navBar>
 		</view>
 
 		<view class="tools-panel">
@@ -117,7 +113,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(12)
+	const mapScale = ref<number>(12)
 	const isMapReady = ref(false)
 	const deviceNo = ref<string | null>('')
 	const carStatus = ref<string | null>('')
@@ -163,8 +159,6 @@ import { showAppToast } from '../../utils/toast.uts'
 		speed: 0
 	})
 	const activeSegmentTargetIndex = ref(-1)
-	// 是否让地图中心自动跟随车标。用户可手动解锁以自由查看地图。
-	const isFollowing = ref(true)
 	let playbackTimer : number | null = null
 	let replaySessionId = 0
 	let lastPolylineRenderAt = 0
@@ -325,23 +319,111 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 	}
 
-	// 调整地图以适应轨迹
+	// ===== 视野控制 =====
+	// 需求：查询出轨迹时整条路线要完整落在可视区内；只有开始播放后，才把车标定位到地图中心。
+	// 因此这里按轨迹包围盒反算所需缩放级别（而不是拍几个固定档位），并在播放前保持全览视角。
+	const MIN_TRACK_FIT_SCALE = 5.0      // 全览轨迹时的最小缩放级别
+	const MAX_TRACK_FIT_SCALE = 17.0     // 全览轨迹时的最大缩放级别（避免短轨迹放得过近）
+	const TRACK_FIT_MARGIN = 0.85        // 轨迹占可视区的比例，留边距防止端点贴屏
+	const METERS_PER_DEGREE_LAT = 110540.0
+	const METERS_PER_DEGREE_LNG = 111320.0
+	const EARTH_RESOLUTION_BASE = 156543.03392  // zoom 为 0 时赤道上的地面分辨率（米/像素）
+
+	// 地图容器的实际显示尺寸（px），用于把轨迹跨度换算成所需缩放级别
+	let mapViewWidth = 0.0
+	let mapViewHeight = 0.0
+	let mapViewSizeMeasured = false
+
+	// 测量地图容器尺寸；测不到就保留估算值，保证后续计算始终可用
+	function measureMapViewportSize(callback : () => void) {
+		try {
+			const query = uni.createSelectorQuery()
+			query.select('#track-map-container').boundingClientRect((rect : any) => {
+				if (rect != null) {
+					const nodeInfo = rect as NodeInfo
+					const width = nodeInfo.width ?? 0
+					const height = nodeInfo.height ?? 0
+					if (width > 0 && height > 0) {
+						mapViewWidth = width
+						mapViewHeight = height
+						mapViewSizeMeasured = true
+					}
+				}
+				callback()
+			}).exec()
+		} catch (error) {
+			console.warn('测量地图容器尺寸失败:', error)
+			callback()
+		}
+	}
+
+	// 用系统信息估算可视区尺寸，避免测量完成前没有尺寸可用
+	function ensureMapViewportEstimate() {
+		if (mapViewWidth > 0 && mapViewHeight > 0) return
+		try {
+			const info = uni.getSystemInfoSync()
+			mapViewWidth = info.windowWidth
+			// 地图区位于顶部导航栏与底部控制面板之间，按约一半屏高估算
+			mapViewHeight = info.windowHeight * 0.5
+		} catch (error) {
+			mapViewWidth = 375.0
+			mapViewHeight = 300.0
+		}
+	}
+
+	// 调整地图以完整显示整条轨迹：中心取包围盒中心，缩放按包围盒跨度反算
 	function adjustMapToFitTrack() {
 		const nullableBounds = calculateTrackBounds()
 		if (nullableBounds == null) return
 		const bounds = nullableBounds
 
-		center.latitude = (bounds.minLat + bounds.maxLat) / 2
-		center.longitude = (bounds.minLng + bounds.maxLng) / 2
+		const midLat = (bounds.minLat + bounds.maxLat) / 2
+		const midLng = (bounds.minLng + bounds.maxLng) / 2
+		center.latitude = midLat
+		center.longitude = midLng
 
-		const latDiff = bounds.maxLat - bounds.minLat
-		const lngDiff = bounds.maxLng - bounds.minLng
-		const maxDiff = Math.max(latDiff, lngDiff)
+		ensureMapViewportEstimate()
+		const usableWidth = mapViewWidth * TRACK_FIT_MARGIN
+		const usableHeight = mapViewHeight * TRACK_FIT_MARGIN
+		if (usableWidth <= 0 || usableHeight <= 0) return
 
-		if (maxDiff > 0.1) mapScale.value = 10
-		else if (maxDiff > 0.05) mapScale.value = 12
-		else if (maxDiff > 0.02) mapScale.value = 15
-		else mapScale.value = 16
+		let cosLat = Math.cos(midLat * Math.PI / 180.0)
+		if (cosLat < 0.01) cosLat = 0.01
+
+		// 包围盒在南北、东西方向的实际跨度（米）
+		const spanLatMeters = (bounds.maxLat - bounds.minLat) * METERS_PER_DEGREE_LAT
+		const spanLngMeters = (bounds.maxLng - bounds.minLng) * METERS_PER_DEGREE_LNG * cosLat
+
+		// 需要的地面分辨率（米/像素）：取两个方向中更严格的一侧
+		const neededResolution = Math.max(spanLatMeters / usableHeight, spanLngMeters / usableWidth)
+
+		// Web Mercator：地面分辨率 = EARTH_RESOLUTION_BASE × cos(lat) / 2^zoom
+		let zoom = MAX_TRACK_FIT_SCALE
+		if (neededResolution > 0.0001) {
+			const baseResolution = EARTH_RESOLUTION_BASE * cosLat
+			zoom = Math.log(baseResolution / neededResolution) / Math.log(2.0)
+		}
+		// 向下取整，确保整条轨迹确实放得下
+		let finalZoom = Math.floor(zoom)
+		if (finalZoom > MAX_TRACK_FIT_SCALE) finalZoom = MAX_TRACK_FIT_SCALE
+		if (finalZoom < MIN_TRACK_FIT_SCALE) finalZoom = MIN_TRACK_FIT_SCALE
+		mapScale.value = finalZoom
+	}
+
+	// 适配视野：先用当前尺寸算一次，测到地图容器精确尺寸后再校正一次
+	function applyTrackViewportFit() {
+		adjustMapToFitTrack()
+		if (mapViewSizeMeasured) return
+		measureMapViewportSize(() => {
+			adjustMapToFitTrack()
+		})
+	}
+
+	// 播放阶段把车标置于地图中心（查询出轨迹时不做这件事，保持整条路线全览）
+	function focusMapOnVehicle() {
+		if (trackPoints.value.length == 0) return
+		center.latitude = renderedPoint.latitude
+		center.longitude = renderedPoint.longitude
 	}
 
 	// 计算轨迹总距离
@@ -541,22 +623,13 @@ import { showAppToast } from '../../utils/toast.uts'
 			carMarker.value = updatedMarker
 			markers.value = [updatedMarker, ...markers.value.slice(1)]
 
-			// 地图中心与车标逐帧同步，避免中心滞后导致车标跑出可视范围后再回弹
-			// （此前中心仅在 currentIndex % 5 == 0 时跳变，是"车标出屏→约 1 秒后弹回"的根因）。
-			// 仅在跟随模式下写入中心，用户解锁后可自由拖动/缩放查看轨迹。
-			if (isFollowing.value) {
+			// 仅在播放过程中把地图中心同步到车标：未播放时地图保持整条轨迹全览，
+			// 避免刚查询出轨迹、还没点播放就被拉到起点，导致看不出路线整体走向。
+			// 播放中逐帧同步是必须的，否则中心滞后会让车标跑出可视范围后再弹回。
+			if (isPlaying.value) {
 				center.latitude = renderedPoint.latitude
 				center.longitude = renderedPoint.longitude
 			}
-		}
-	}
-
-	// 切换地图跟随状态；重新跟随时立即定位到车标，无需等待下一帧
-	function toggleFollow() {
-		isFollowing.value = !isFollowing.value
-		if (isFollowing.value) {
-			center.latitude = renderedPoint.latitude
-			center.longitude = renderedPoint.longitude
 		}
 	}
 
@@ -734,18 +807,15 @@ import { showAppToast } from '../../utils/toast.uts'
 		isTrackPlayable.value = processedPoints.length > 1
 		currentIndex.value = 0
 		activeSegmentTargetIndex.value = -1
-		// 加载新轨迹时恢复跟随，确保默认体验是"车标始终可见"
-		isFollowing.value = true
 		lastPolylineRenderAt = 0
 		if (processedPoints.length == 0) return
 		resetRenderedPoint(processedPoints[0])
 		calculateTrackDistance()
 		initCarMarker()
 		initPolyline()
-		adjustMapToFitTrack()
-		const firstPoint = trackPoints.value[0]
-		center.latitude = firstPoint.latitude
-		center.longitude = firstPoint.longitude
+		// 查出轨迹后先完整展示整条路线；此处不再把中心改成轨迹起点，
+		// 播放时改由 focusMapOnVehicle() 与逐帧跟随把车标定位到地图中心。
+		applyTrackViewportFit()
 		renderPlaybackIndex()
 		// 未开始播放时车辆处于静止状态，速度显示 0；播放中由渲染帧更新为对应点的速度
 		currentSpeed.value = 0
@@ -810,6 +880,8 @@ import { showAppToast } from '../../utils/toast.uts'
 		currentIndex.value = 0
 		activeSegmentTargetIndex.value = -1
 		renderPlaybackIndex()
+		// 回到未播放状态，视野同步恢复为整条轨迹全览
+		applyTrackViewportFit()
 	}
 
 	function getShortestRotationDifference(from : number, to : number) : number {
@@ -909,6 +981,8 @@ import { showAppToast } from '../../utils/toast.uts'
 
 		activeSegmentTargetIndex.value = -1
 		isPlaying.value = true
+		// 开始播放：此刻才把车标定为地图中心（查询阶段保持整条轨迹全览）
+		focusMapOnVehicle()
 		lastPolylineRenderAt = 0
 		const sessionId = ++replaySessionId
 		animateNextSegment(sessionId)
@@ -996,6 +1070,14 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	})
 
+	onReady(() => {
+		// 页面渲染完成后用实测的地图容器尺寸再校正一次全览视野，
+		// 避免只依赖系统信息的估算值导致整条轨迹没有完全落在可视区内
+		measureMapViewportSize(() => {
+			if (trackPoints.value.length > 0 && !isPlaying.value) adjustMapToFitTrack()
+		})
+	})
+
 	onHide(() => {
 		pausePlayback()
 		++replaySessionId
@@ -1032,35 +1114,6 @@ import { showAppToast } from '../../utils/toast.uts'
 				z-index: 100;
 			}
 
-			.follow-toggle {
-				position: absolute;
-				right: 24rpx;
-				bottom: 30rpx;
-				z-index: 101;
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				height: 64rpx;
-				padding: 0 24rpx;
-				border-radius: 32rpx;
-				background-color: #ffffff;
-				box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.18);
-			}
-
-			.follow-toggle-active {
-				background-color: #1890FF;
-			}
-
-			.follow-toggle-label {
-				font-size: 24rpx;
-				line-height: 32rpx;
-				color: #333333;
-				margin-left: 8rpx;
-			}
-
-			.follow-toggle-active .follow-toggle-label {
-				color: #ffffff;
-			}
 		}
 
 		.tools-panel {

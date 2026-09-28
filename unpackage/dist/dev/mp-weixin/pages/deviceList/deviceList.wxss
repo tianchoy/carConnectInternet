@@ -78,3 +78,58 @@
 .container .right-bar .offlineCar[class] {
   background-color: #d81e06;
 }
+.container .overlap-mask[class] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.container .overlap-panel[class] {
+  width: 100%;
+  max-height: 60%;
+  padding: 24rpx 0 40rpx 0;
+  background-color: #ffffff;
+  border-top-left-radius: 24rpx;
+  border-top-right-radius: 24rpx;
+  display: flex;
+  flex-direction: column;
+}
+.container .overlap-title[class] {
+  padding: 12rpx 0 20rpx 0;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333333;
+  text-align: center;
+}
+.container .overlap-list[class] {
+  max-height: 700rpx;
+}
+.container .overlap-item[class] {
+  padding: 28rpx 32rpx;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-top-width: 1rpx;
+  border-top-style: solid;
+  border-top-color: #f0f0f0;
+}
+.container .overlap-item-name[class] {
+  font-size: 30rpx;
+  color: #333333;
+}
+.container .overlap-item-status[class] {
+  font-size: 26rpx;
+}
+.container .status-online[class] {
+  color: #0da117;
+}
+.container .status-offline[class] {
+  color: #999999;
+}

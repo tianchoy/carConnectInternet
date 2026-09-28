@@ -137,6 +137,12 @@ const MIN_SEGMENT_DURATION_MS = 500;
 const MAX_SEGMENT_DURATION_MS = 6e3;
 const FALLBACK_SPEED_KMH = 20;
 const POLYLINE_RENDER_INTERVAL_MS = 80;
+const MIN_TRACK_FIT_SCALE = 5;
+const MAX_TRACK_FIT_SCALE = 17;
+const TRACK_FIT_MARGIN = 0.85;
+const METERS_PER_DEGREE_LAT = 110540;
+const METERS_PER_DEGREE_LNG = 111320;
+const EARTH_RESOLUTION_BASE = 156543.03392;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "playBack",
   setup(__props) {
@@ -171,7 +177,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       speed: 0
     }));
     const activeSegmentTargetIndex = common_vendor.ref(-1);
-    const isFollowing = common_vendor.ref(true);
     let playbackTimer = null;
     let replaySessionId = 0;
     let lastPolylineRenderAt = 0;
@@ -245,7 +250,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:261", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:255", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -298,24 +303,88 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         maxLng
       };
     }
+    let mapViewWidth = 0;
+    let mapViewHeight = 0;
+    let mapViewSizeMeasured = false;
+    function measureMapViewportSize(callback) {
+      try {
+        const query = common_vendor.index.createSelectorQuery();
+        query.select("#track-map-container").boundingClientRect((rect = null) => {
+          var _a, _b;
+          if (rect != null) {
+            const nodeInfo = rect;
+            const width = (_a = nodeInfo.width) !== null && _a !== void 0 ? _a : 0;
+            const height = (_b = nodeInfo.height) !== null && _b !== void 0 ? _b : 0;
+            if (width > 0 && height > 0) {
+              mapViewWidth = width;
+              mapViewHeight = height;
+              mapViewSizeMeasured = true;
+            }
+          }
+          callback();
+        }).exec();
+      } catch (error) {
+        common_vendor.index.__f__("warn", "at pages/playBack/playBack.uvue:355", "测量地图容器尺寸失败:", error);
+        callback();
+      }
+    }
+    function ensureMapViewportEstimate() {
+      if (mapViewWidth > 0 && mapViewHeight > 0)
+        return null;
+      try {
+        const info = common_vendor.index.getSystemInfoSync();
+        mapViewWidth = info.windowWidth;
+        mapViewHeight = info.windowHeight * 0.5;
+      } catch (error) {
+        mapViewWidth = 375;
+        mapViewHeight = 300;
+      }
+    }
     function adjustMapToFitTrack() {
       const nullableBounds = calculateTrackBounds();
       if (nullableBounds == null)
         return null;
       const bounds = nullableBounds;
-      center.latitude = (bounds.minLat + bounds.maxLat) / 2;
-      center.longitude = (bounds.minLng + bounds.maxLng) / 2;
-      const latDiff = bounds.maxLat - bounds.minLat;
-      const lngDiff = bounds.maxLng - bounds.minLng;
-      const maxDiff = Math.max(latDiff, lngDiff);
-      if (maxDiff > 0.1)
-        mapScale.value = 10;
-      else if (maxDiff > 0.05)
-        mapScale.value = 12;
-      else if (maxDiff > 0.02)
-        mapScale.value = 15;
-      else
-        mapScale.value = 16;
+      const midLat = (bounds.minLat + bounds.maxLat) / 2;
+      const midLng = (bounds.minLng + bounds.maxLng) / 2;
+      center.latitude = midLat;
+      center.longitude = midLng;
+      ensureMapViewportEstimate();
+      const usableWidth = mapViewWidth * TRACK_FIT_MARGIN;
+      const usableHeight = mapViewHeight * TRACK_FIT_MARGIN;
+      if (usableWidth <= 0 || usableHeight <= 0)
+        return null;
+      let cosLat = Math.cos(midLat * Math.PI / 180);
+      if (cosLat < 0.01)
+        cosLat = 0.01;
+      const spanLatMeters = (bounds.maxLat - bounds.minLat) * METERS_PER_DEGREE_LAT;
+      const spanLngMeters = (bounds.maxLng - bounds.minLng) * METERS_PER_DEGREE_LNG * cosLat;
+      const neededResolution = Math.max(spanLatMeters / usableHeight, spanLngMeters / usableWidth);
+      let zoom = MAX_TRACK_FIT_SCALE;
+      if (neededResolution > 1e-4) {
+        const baseResolution = EARTH_RESOLUTION_BASE * cosLat;
+        zoom = Math.log(baseResolution / neededResolution) / Math.log(2);
+      }
+      let finalZoom = Math.floor(zoom);
+      if (finalZoom > MAX_TRACK_FIT_SCALE)
+        finalZoom = MAX_TRACK_FIT_SCALE;
+      if (finalZoom < MIN_TRACK_FIT_SCALE)
+        finalZoom = MIN_TRACK_FIT_SCALE;
+      mapScale.value = finalZoom;
+    }
+    function applyTrackViewportFit() {
+      adjustMapToFitTrack();
+      if (mapViewSizeMeasured)
+        return null;
+      measureMapViewportSize(() => {
+        adjustMapToFitTrack();
+      });
+    }
+    function focusMapOnVehicle() {
+      if (trackPoints.value.length == 0)
+        return null;
+      center.latitude = renderedPoint.latitude;
+      center.longitude = renderedPoint.longitude;
     }
     function calculateTrackDistance() {
       totalDistance.value = 0;
@@ -434,17 +503,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         };
         carMarker.value = updatedMarker;
         markers.value = [updatedMarker, ...markers.value.slice(1)];
-        if (isFollowing.value) {
+        if (isPlaying.value) {
           center.latitude = renderedPoint.latitude;
           center.longitude = renderedPoint.longitude;
         }
-      }
-    }
-    function toggleFollow() {
-      isFollowing.value = !isFollowing.value;
-      if (isFollowing.value) {
-        center.latitude = renderedPoint.latitude;
-        center.longitude = renderedPoint.longitude;
       }
     }
     function showPicker(type) {
@@ -583,7 +645,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isTrackPlayable.value = processedPoints.length > 1;
       currentIndex.value = 0;
       activeSegmentTargetIndex.value = -1;
-      isFollowing.value = true;
       lastPolylineRenderAt = 0;
       if (processedPoints.length == 0)
         return null;
@@ -591,10 +652,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       calculateTrackDistance();
       initCarMarker();
       initPolyline();
-      adjustMapToFitTrack();
-      const firstPoint = trackPoints.value[0];
-      center.latitude = firstPoint.latitude;
-      center.longitude = firstPoint.longitude;
+      applyTrackViewportFit();
       renderPlaybackIndex();
       currentSpeed.value = 0;
       isMapReady.value = true;
@@ -623,7 +681,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             showCurrentPosition(res.msg || "轨迹加载失败");
             return Promise.resolve(null);
           }
-          common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:778", "加载轨迹成功:", res);
+          common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:848", "加载轨迹成功:", res);
           const trackData = res.data;
           if (trackData == null) {
             showCurrentPosition();
@@ -641,7 +699,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:796", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:866", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -658,6 +716,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentIndex.value = 0;
       activeSegmentTargetIndex.value = -1;
       renderPlaybackIndex();
+      applyTrackViewportFit();
     }
     function getShortestRotationDifference(from, to) {
       let difference = to - from;
@@ -748,6 +807,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       activeSegmentTargetIndex.value = -1;
       isPlaying.value = true;
+      focusMapOnVehicle();
       lastPolylineRenderAt = 0;
       const sessionId = ++replaySessionId;
       animateNextSegment(sessionId);
@@ -811,7 +871,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_h = option.lng) !== null && _h !== void 0 ? _h : null;
       startTime.value = (_j = option.startTime) !== null && _j !== void 0 ? _j : "";
       endTime.value = (_k = option.endTime) !== null && _k !== void 0 ? _k : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:986", "plateNo:", plateNo.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1060", "plateNo:", plateNo.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {
@@ -821,6 +881,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         initDateTime();
         loadTrackPos();
       }
+    });
+    common_vendor.onReady(() => {
+      measureMapViewportSize(() => {
+        if (trackPoints.value.length > 0 && !isPlaying.value)
+          adjustMapToFitTrack();
+      });
     });
     common_vendor.onHide(() => {
       pausePlayback();
@@ -856,69 +922,60 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           carStatus: carStatus.value,
           class: "sub-nav-overlay"
         }),
-        j: isTrackPlayable.value
-      }, isTrackPlayable.value ? {
+        j: common_vendor.sei("track-map-container", "view"),
         k: common_vendor.p({
-          name: "/static/current-location.png",
-          fontSize: "14"
-        }),
-        l: common_vendor.t(isFollowing.value ? "跟随中" : "回到车标"),
-        m: common_vendor.n(isFollowing.value ? "follow-toggle-active" : ""),
-        n: common_vendor.o(toggleFollow, "3a")
-      } : {}, {
-        o: common_vendor.p({
           name: "/static/rili.png",
           fontSize: "15"
         }),
-        p: common_vendor.t(getPlaybackDate(startTime.value)),
-        q: common_vendor.t(getPlaybackClock(startTime.value)),
-        r: common_vendor.o(($event) => {
+        l: common_vendor.t(getPlaybackDate(startTime.value)),
+        m: common_vendor.t(getPlaybackClock(startTime.value)),
+        n: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "5c"),
+        }, "58"),
+        o: common_vendor.o(($event) => {
+          return showPicker("start");
+        }, "48"),
+        p: common_vendor.p({
+          name: "/static/xiangxia.png",
+          fontSize: "15",
+          class: "date-arrow"
+        }),
+        q: common_vendor.t(getPlaybackDate(endTime.value)),
+        r: common_vendor.t(getPlaybackClock(endTime.value)),
         s: common_vendor.o(($event) => {
-          return showPicker("start");
-        }, "09"),
-        t: common_vendor.p({
+          return showPicker("end");
+        }, "b6"),
+        t: common_vendor.o(($event) => {
+          return showPicker("end");
+        }, "da"),
+        v: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15",
           class: "date-arrow"
         }),
-        v: common_vendor.t(getPlaybackDate(endTime.value)),
-        w: common_vendor.t(getPlaybackClock(endTime.value)),
-        x: common_vendor.o(($event) => {
-          return showPicker("end");
-        }, "1d"),
-        y: common_vendor.o(($event) => {
-          return showPicker("end");
-        }, "5c"),
-        z: common_vendor.p({
-          name: "/static/xiangxia.png",
-          fontSize: "15",
-          class: "date-arrow"
-        }),
-        A: common_vendor.o(togglePlayback, "2c"),
-        B: common_vendor.p({
+        w: common_vendor.o(togglePlayback, "f4"),
+        x: common_vendor.p({
           type: "primary",
           size: "small",
           text: isPlaying.value ? "暂停" : "播放"
         }),
-        C: common_vendor.o(setPlaybackSpeedFromValue, "ed"),
-        D: common_vendor.o(($event) => {
+        y: common_vendor.o(setPlaybackSpeedFromValue, "6e"),
+        z: common_vendor.o(($event) => {
           return playbackSpeed.value = $event;
-        }, "26"),
-        E: common_vendor.p({
+        }, "96"),
+        A: common_vendor.p({
           min: 1,
           max: 30,
           step: 1,
           modelValue: playbackSpeed.value
         }),
-        F: common_vendor.t(playbackSpeed.value),
-        G: common_vendor.t(currentTime.value),
-        H: common_vendor.t(currentSpeed.value),
-        I: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        J: common_vendor.o(onConfirm, "62"),
-        K: common_vendor.o(onCancel, "de"),
-        L: common_vendor.p({
+        B: common_vendor.t(playbackSpeed.value),
+        C: common_vendor.t(currentTime.value),
+        D: common_vendor.t(currentSpeed.value),
+        E: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
+        F: common_vendor.o(onConfirm, "49"),
+        G: common_vendor.o(onCancel, "63"),
+        H: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           start: common_vendor.unref(pickerMinTime),
@@ -928,16 +985,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           mode: 63,
           format: "YYYY-MM-DD HH:mm:ss"
         }),
-        M: common_vendor.o(($event) => {
+        I: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }, "58"),
-        N: common_vendor.p({
+        }, "10"),
+        J: common_vendor.p({
           position: "bottom",
           closeable: false,
           modelValue: showDateTimePicker.value
         }),
-        O: `${_ctx.u_s_b_h}px`,
-        P: `${_ctx.u_s_a_i_b}px`
+        K: `${_ctx.u_s_b_h}px`,
+        L: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

@@ -20,6 +20,10 @@ const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
   (_easycom_custom_navBar + _easycom_i_tag + _easycom_indexListMode + _easycom_app_toast)();
 }
+const OVERLAP_THRESHOLD_METERS = 12;
+const SPREAD_REFERENCE_ZOOM = 19;
+const SPREAD_RADIUS_PX = 26;
+const DEGREE_PER_METER_LAT = 1 / 111320;
 class ClusterLabel extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -88,6 +92,29 @@ class ClusterMarker extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class OverlapAnalysis extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          groupOfIndex: { type: "Unknown", optional: false },
+          orderOfIndex: { type: "Unknown", optional: false },
+          groups: { type: "Unknown", optional: false }
+        };
+      },
+      name: "OverlapAnalysis"
+    };
+  }
+  constructor(options, metadata = OverlapAnalysis.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.groupOfIndex = this.__props__.groupOfIndex;
+    this.orderOfIndex = this.__props__.orderOfIndex;
+    this.groups = this.__props__.groups;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "deviceList",
   setup(__props) {
@@ -99,6 +126,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       latitude: 0,
       longitude: 0
     }));
+    const showOverlapPicker = common_vendor.ref(false);
+    const overlapDevices = common_vendor.ref([]);
     let clusterContext = null;
     let clusterReady = false;
     const toPlainObject = (value = null) => {
@@ -112,7 +141,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         context.addMarkers(toPlainObject(new common_vendor.UTSJSONObject({ markers: markers.value, clear: true })));
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:86", "车标同步到聚合器失败:", error);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:115", "车标同步到聚合器失败:", error);
       }
     };
     const setupMarkerCluster = () => {
@@ -123,7 +152,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         context.initMarkerCluster(toPlainObject(new common_vendor.UTSJSONObject({
           enableDefaultStyle: false,
           zoomOnClick: true,
-          gridSize: 60
+          // 网格边长 40px：重合设备被偏移展开后的间距在放大到 19 级时达到 52px，
+          // 足以跨出网格、单独显示；网格再大就会把它们重新并回一个聚合簇。
+          gridSize: 40
         })));
         context.on("markerClusterCreate", (res = null) => {
           const clusterList = res != null ? res["clusters"] : null;
@@ -164,7 +195,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         clusterReady = true;
         syncClusterMarkers();
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:138", "点聚合初始化失败，回退为普通标记点:", error);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:169", "点聚合初始化失败，回退为普通标记点:", error);
       }
     };
     const EMPTY_MARKERS = [];
@@ -229,17 +260,87 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const offlineCount = common_vendor.computed(() => {
       return totalCount.value - onlineCount.value;
     });
+    const parseCoordinate = (value = null) => {
+      if (value == null)
+        return NaN;
+      return parseFloat(value.toString());
+    };
+    const distanceMeters = (lat1, lng1, lat2, lng2) => {
+      const earthRadius = 6371e3;
+      const radLat1 = lat1 * Math.PI / 180;
+      const radLat2 = lat2 * Math.PI / 180;
+      const deltaLat = (lat2 - lat1) * Math.PI / 180;
+      const deltaLng = (lng2 - lng1) * Math.PI / 180;
+      const sinLat = Math.sin(deltaLat / 2);
+      const sinLng = Math.sin(deltaLng / 2);
+      const a = sinLat * sinLat + Math.cos(radLat1) * Math.cos(radLat2) * sinLng * sinLng;
+      const clamped = a > 1 ? 1 : a;
+      return 2 * earthRadius * Math.atan2(Math.sqrt(clamped), Math.sqrt(1 - clamped));
+    };
+    const analyzeOverlap = (devices) => {
+      const count = devices.length;
+      const lats = [];
+      const lngs = [];
+      const valid = [];
+      const groupOfIndex = [];
+      const orderOfIndex = [];
+      const visited = [];
+      for (let i = 0; i < count; i++) {
+        const lat = parseCoordinate(devices[i]["latitude"]);
+        const lng = parseCoordinate(devices[i]["longitude"]);
+        lats.push(lat);
+        lngs.push(lng);
+        valid.push(!isNaN(lat) && !isNaN(lng));
+        groupOfIndex.push(-1);
+        orderOfIndex.push(0);
+        visited.push(false);
+      }
+      const groups = [];
+      const latLimit = OVERLAP_THRESHOLD_METERS * DEGREE_PER_METER_LAT;
+      for (let i = 0; i < count; i++) {
+        if (visited[i] || !valid[i])
+          continue;
+        visited[i] = true;
+        const members = [i];
+        let head = 0;
+        while (head < members.length) {
+          const current = members[head];
+          head++;
+          for (let j = 0; j < count; j++) {
+            if (visited[j] || !valid[j])
+              continue;
+            if (Math.abs(lats[j] - lats[current]) > latLimit)
+              continue;
+            if (distanceMeters(lats[current], lngs[current], lats[j], lngs[j]) < OVERLAP_THRESHOLD_METERS) {
+              visited[j] = true;
+              members.push(j);
+            }
+          }
+        }
+        if (members.length > 1) {
+          const groupId = groups.length;
+          for (let k = 0; k < members.length; k++) {
+            groupOfIndex[members[k]] = groupId;
+            orderOfIndex[members[k]] = k;
+          }
+          groups.push(members);
+        }
+      }
+      return new OverlapAnalysis({
+        groupOfIndex,
+        orderOfIndex,
+        groups
+      });
+    };
     const updateMarkers = (devices) => {
       var _a, _b, _c, _d;
+      const analysis = analyzeOverlap(devices);
+      const degreePerPixel = 360 / (256 * Math.pow(2, SPREAD_REFERENCE_ZOOM));
       const nextMarkers = [];
       for (let index = 0; index < devices.length; index++) {
         const device = devices[index];
-        const latitude = device["latitude"];
-        const longitude = device["longitude"];
-        if (latitude == null || longitude == null)
-          continue;
-        const lat = parseFloat(latitude.toString());
-        const lng = parseFloat(longitude.toString());
+        const lat = parseCoordinate(device["latitude"]);
+        const lng = parseCoordinate(device["longitude"]);
         if (isNaN(lat) || isNaN(lng))
           continue;
         const connectionStatus = (_a = device["connectionStatus"]) !== null && _a !== void 0 ? _a : "";
@@ -248,14 +349,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const parsedId = idValue != null ? parseInt(idValue.toString()) : NaN;
         const markerId = isNaN(parsedId) ? index + 1 : parsedId;
         const deviceName = (_d = (_c = device["deviceName"]) !== null && _c !== void 0 ? _c : device["plateNo"]) !== null && _d !== void 0 ? _d : "设备";
+        let displayLat = lat;
+        let displayLng = lng;
+        const groupId = analysis.groupOfIndex[index];
+        if (groupId >= 0) {
+          const members = analysis.groups[groupId];
+          let sumLat = 0;
+          let sumLng = 0;
+          for (let k = 0; k < members.length; k++) {
+            sumLat += parseCoordinate(devices[members[k]]["latitude"]);
+            sumLng += parseCoordinate(devices[members[k]]["longitude"]);
+          }
+          const centerLat = sumLat / members.length;
+          const centerLng = sumLng / members.length;
+          const radiusRatio = Math.min(4, Math.max(1, members.length * 1 / 2));
+          const radiusPixel = SPREAD_RADIUS_PX * radiusRatio;
+          const deltaLng = radiusPixel * degreePerPixel;
+          const deltaLat = deltaLng * Math.cos(centerLat * Math.PI / 180);
+          const angle = 2 * Math.PI * analysis.orderOfIndex[index] / members.length;
+          displayLat = centerLat + deltaLat * Math.cos(angle);
+          displayLng = centerLng + deltaLng * Math.sin(angle);
+        }
         nextMarkers.push({
           id: markerId,
-          latitude: lat,
-          longitude: lng,
+          latitude: displayLat,
+          longitude: displayLng,
           iconPath: utils_cars.getDeviceIcon(connectionStatus, carType),
           width: 30,
           height: 30,
-          // 声明参与微信小程序原生点聚合
+          // 所有设备一律交给原生聚合器，保证聚合簇的数量统计与设备总数一致。
+          // 重合设备能否散开由"偏移间距 vs 聚合网格"决定：缩小视角时偏移不足 1 像素，
+          // 它们照常并入聚合簇；放大到 19 级以上时间距超过网格，才会各自单独显示。
+          // 注意：这里千万不能设成 false，否则这些设备会退出聚合，导致聚合数量少算。
           joinCluster: true,
           callout: new common_vendor.UTSJSONObject({
             content: deviceName,
@@ -290,7 +415,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             const res = yield api_request.getUserDeviceList(params);
             const list = api_response.isBusinessSuccessCode(res.code) && res.data != null ? res.data.list : null;
             if (list == null || !Array.isArray(list)) {
-              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:280", "获取设备列表返回异常:", res);
+              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:426", "获取设备列表返回异常:", res);
               originalDeviceList.value = [];
               markers.value = [];
               return Promise.resolve(null);
@@ -302,7 +427,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
           updateMarkers(originalDeviceList.value);
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:291", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:437", "获取设备列表失败:", err);
           originalDeviceList.value = [];
           markers.value = [];
           utils_toast.showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -330,23 +455,72 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const changeState = (type) => {
       pickerStateTitle.value = type;
     };
-    const handleTap = (event = null) => {
+    const deviceDisplayName = (device) => {
       var _a, _b, _c;
-      const detail = event;
-      const markerId = detail != null ? detail["markerId"] : null;
-      const selectedDevice = common_vendor.UTS.arrayFind(originalDeviceList.value, (device) => {
-        return device["deviceId"] == markerId;
-      });
-      if (selectedDevice == null) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:330", "未找到对应的设备信息", markerId);
-        return null;
-      }
-      const deviceNoValue = (_a = selectedDevice["deviceNo"]) !== null && _a !== void 0 ? _a : "";
-      const companyId = (_b = selectedDevice["companyId"]) !== null && _b !== void 0 ? _b : "";
-      const deviceId = (_c = selectedDevice["deviceId"]) !== null && _c !== void 0 ? _c : "";
+      const plateNo = (_a = device["plateNo"]) !== null && _a !== void 0 ? _a : "";
+      if (plateNo != "")
+        return plateNo;
+      const deviceName = (_b = device["deviceName"]) !== null && _b !== void 0 ? _b : "";
+      if (deviceName != "")
+        return deviceName;
+      const deviceNo = (_c = device["deviceNo"]) !== null && _c !== void 0 ? _c : "";
+      return deviceNo != "" ? deviceNo : "设备";
+    };
+    const isDeviceOnline = (device) => {
+      return device["connectionStatus"] == "online";
+    };
+    const openDeviceDetail = (device) => {
+      var _a, _b, _c;
+      const deviceNoValue = (_a = device["deviceNo"]) !== null && _a !== void 0 ? _a : "";
+      const companyId = (_b = device["companyId"]) !== null && _b !== void 0 ? _b : "";
+      const deviceId = (_c = device["deviceId"]) !== null && _c !== void 0 ? _c : "";
       common_vendor.index.navigateTo({
         url: "/pages/carInfoDetail/carInfoDetail?deviceNo=" + deviceNoValue + "&deptId=" + companyId.toString() + "&deviceId=" + deviceId.toString()
       });
+    };
+    const keepOverlapPicker = () => {
+    };
+    const closeOverlapPicker = () => {
+      showOverlapPicker.value = false;
+      overlapDevices.value = [];
+    };
+    const selectOverlapDevice = (device) => {
+      closeOverlapPicker();
+      openDeviceDetail(device);
+    };
+    const handleTap = (event = null) => {
+      const detail = event;
+      const markerId = detail != null ? detail["markerId"] : null;
+      if (markerId == null)
+        return null;
+      const list = filteredDevices.value;
+      let selectedIndex = -1;
+      for (let i = 0; i < list.length; i++) {
+        const idValue = list[i]["deviceId"];
+        if (idValue != null && idValue.toString() == markerId.toString()) {
+          selectedIndex = i;
+          break;
+        }
+      }
+      if (selectedIndex < 0) {
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:525", "未找到对应的设备信息", markerId);
+        return null;
+      }
+      const analysis = analyzeOverlap(list);
+      const groupId = analysis.groupOfIndex[selectedIndex];
+      if (groupId >= 0) {
+        const members = analysis.groups[groupId];
+        if (members.length > 1) {
+          const candidates = [];
+          for (let k = 0; k < members.length; k++) {
+            candidates.push(list[members[k]]);
+          }
+          overlapDevices.value = candidates;
+          showOverlapPicker.value = true;
+          return null;
+        }
+      }
+      openDeviceDetail(list[selectedIndex]);
     };
     common_vendor.onReady(() => {
       var _a, _b;
@@ -407,8 +581,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           lists: deviceListItems.value
         })
       }, {
-        s: `${_ctx.u_s_b_h}px`,
-        t: `${_ctx.u_s_a_i_b}px`
+        s: showOverlapPicker.value
+      }, showOverlapPicker.value ? {
+        t: common_vendor.t(overlapDevices.value.length),
+        v: common_vendor.f(overlapDevices.value, (device, index, i0) => {
+          return {
+            a: common_vendor.t(deviceDisplayName(device)),
+            b: common_vendor.t(isDeviceOnline(device) ? "在线" : "离线"),
+            c: common_vendor.n(isDeviceOnline(device) ? "status-online" : "status-offline"),
+            d: index,
+            e: common_vendor.o(($event) => {
+              return selectOverlapDevice(device);
+            }, index)
+          };
+        }),
+        w: common_vendor.o(keepOverlapPicker, "92"),
+        x: common_vendor.o(closeOverlapPicker, "06")
+      } : {}, {
+        y: `${_ctx.u_s_b_h}px`,
+        z: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };
