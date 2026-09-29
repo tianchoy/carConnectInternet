@@ -12,6 +12,8 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
+import io.dcloud.uniapp.extapi.createSelectorQuery as uni_createSelectorQuery
+import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
 open class GenPagesGeofencingGeofencing : BasePage {
@@ -28,7 +30,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             val carType = ref<String?>(null)
             val deviceName = ref<String?>(null)
             val center = reactive(_uO("latitude" to 39.90469, "longitude" to 116.40717))
-            val mapScale = ref(12)
+            val mapScale = ref<Number>(16)
             val isMapReady = ref(false)
             val isInitialPositionSettled = ref(false)
             val markers = ref(_uA<Marker>())
@@ -302,6 +304,19 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 markers.value = newMarkers
             }
             val updateMarkers = ::gen_updateMarkers_fn
+            val FENCE_STROKE_COLOR = "#FF0000"
+            val FENCE_FILL_ALPHA_HEX = "33"
+            val FENCE_FILL_COLORS = _uA(
+                "#FF0000",
+                "#2979FF",
+                "#00BFA5",
+                "#FF8C00",
+                "#8E24AA",
+                "#00ACC1"
+            )
+            val buildFenceFillColor = fun(colorIndex: Number): String {
+                return FENCE_FILL_COLORS[colorIndex % FENCE_FILL_COLORS.length] + FENCE_FILL_ALPHA_HEX
+            }
             val renderFencesOnMap = fun(){
                 if (!(fenceList.value != null) || fenceList.value.length == 0) {
                     polygons.value = _uA()
@@ -322,17 +337,12 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             } else {
                                 circleData.radius
                             }
-                            fenceCircles.push(Circle(latitude = circleData.latitude, longitude = circleData.longitude, radius = displayRadius, strokeWidth = 2, color = "#FF0000", fillColor = "rgba(255,0,0,0.2)"))
+                            fenceCircles.push(Circle(latitude = circleData.latitude, longitude = circleData.longitude, radius = displayRadius, strokeWidth = 2, color = FENCE_STROKE_COLOR, fillColor = buildFenceFillColor(0)))
                         }
                     } else {
                         val fencePoints = parsePolygon(fence.getString("area", ""))
                         if (fencePoints.length >= 3) {
-                            fencePolygons.push(Polygon(points = fencePoints, strokeWidth = 2, strokeColor = "#FF0000", fillColor = if (colorIndex++ == 0) {
-                                "rgba(255,0,0,0.2)"
-                            } else {
-                                "rgba(" + Math.floor(Math.random() * 200) + "," + Math.floor(Math.random() * 200) + "," + Math.floor(Math.random() * 200) + ",0.2)"
-                            }
-                            , zIndex = 1))
+                            fencePolygons.push(Polygon(points = fencePoints, strokeWidth = 2, strokeColor = FENCE_STROKE_COLOR, fillColor = buildFenceFillColor(colorIndex++), zIndex = 1))
                         }
                     }
                 }
@@ -385,7 +395,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     if (drawingMode.value === "polygon") {
                         polygons.value = if (points.value.length >= 3) {
                             _uA(
-                                Polygon(points = points.value, strokeWidth = 2, strokeColor = "#FF0000", fillColor = "rgba(255,0,0,0.2)", zIndex = 1)
+                                Polygon(points = points.value, strokeWidth = 2, strokeColor = FENCE_STROKE_COLOR, fillColor = buildFenceFillColor(0), zIndex = 1)
                             )
                         } else {
                             _uA()
@@ -394,7 +404,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     } else if (drawingMode.value === "circle") {
                         val drawingCenter = circleCenter.value
                         if (drawingCenter != null && circleRadius.value > 0) {
-                            val drawingCircle: Circle = Circle(latitude = drawingCenter.latitude, longitude = drawingCenter.longitude, radius = circleRadius.value, strokeWidth = 2, color = "#FF0000", fillColor = "rgba(255,0,0,0.2)")
+                            val drawingCircle: Circle = Circle(latitude = drawingCenter.latitude, longitude = drawingCenter.longitude, radius = circleRadius.value, strokeWidth = 2, color = FENCE_STROKE_COLOR, fillColor = buildFenceFillColor(0))
                             circles.value = _uA(
                                 drawingCircle
                             )
@@ -485,6 +495,147 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 }
                 )
                 return CoordinateBounds(minLat = minLat, maxLat = maxLat, minLng = minLng, maxLng = maxLng)
+            }
+            val FENCE_FIT_MARGIN: Number = 0.8
+            val FENCE_FIT_MIN_SCALE: Number = 5.0
+            val FENCE_FIT_MAX_SCALE: Number = 18.0
+            val FENCE_FIT_BOTTOM_RESERVE_RATIO: Number = 0.22
+            val FENCE_MAX_DISPLAY_RADIUS: Number = 100000
+            val METERS_PER_DEGREE_LAT: Number = 110540.0
+            val METERS_PER_DEGREE_LNG: Number = 111320.0
+            val EARTH_RESOLUTION_BASE: Number = 156543.03392
+            var fenceMapViewWidth: Number = 0.0
+            var fenceMapViewHeight: Number = 0.0
+            var fenceMapViewSizeMeasured = false
+            fun gen_measureFenceMapViewportSize_fn(callback: () -> Unit) {
+                try {
+                    val query = uni_createSelectorQuery()
+                    query.select("#fence-map-container").boundingClientRect(fun(rect: Any){
+                        if (rect != null) {
+                            val nodeInfo = rect as NodeInfo
+                            val width = nodeInfo.width ?: 0
+                            val height = nodeInfo.height ?: 0
+                            if (width > 0 && height > 0) {
+                                fenceMapViewWidth = width
+                                fenceMapViewHeight = height
+                                fenceMapViewSizeMeasured = true
+                            }
+                        }
+                        callback()
+                    }
+                    ).exec()
+                }
+                 catch (error: Throwable) {
+                    console.warn("测量地图容器尺寸失败:", error)
+                    callback()
+                }
+            }
+            val measureFenceMapViewportSize = ::gen_measureFenceMapViewportSize_fn
+            fun gen_ensureFenceMapViewportEstimate_fn() {
+                if (fenceMapViewWidth > 0 && fenceMapViewHeight > 0) {
+                    return
+                }
+                try {
+                    val info = uni_getSystemInfoSync()
+                    fenceMapViewWidth = info.windowWidth
+                    fenceMapViewHeight = info.windowHeight * 0.6
+                }
+                 catch (error: Throwable) {
+                    fenceMapViewWidth = 375.0
+                    fenceMapViewHeight = 420.0
+                }
+            }
+            val ensureFenceMapViewportEstimate = ::gen_ensureFenceMapViewportEstimate_fn
+            val calculateFenceBounds = fun(fence: UTSJSONObject): CoordinateBounds? {
+                val fenceType = getFenceType(fence)
+                val area = fence.getString("area", "")
+                if (fenceType === "circle") {
+                    val circleData = parseCircle(area)
+                    if (circleData != null) {
+                        val radius = if (circleData.radius > FENCE_MAX_DISPLAY_RADIUS) {
+                            FENCE_MAX_DISPLAY_RADIUS
+                        } else {
+                            circleData.radius
+                        }
+                        if (isFinite(radius) && radius > 0) {
+                            val deltaLat = radius / METERS_PER_DEGREE_LAT
+                            var circleCosLat = Math.cos(circleData.latitude * Math.PI / 180.0)
+                            if (circleCosLat < 0.01) {
+                                circleCosLat = 0.01
+                            }
+                            val deltaLng = radius / (METERS_PER_DEGREE_LNG * circleCosLat)
+                            return CoordinateBounds(minLat = circleData.latitude - deltaLat, maxLat = circleData.latitude + deltaLat, minLng = circleData.longitude - deltaLng, maxLng = circleData.longitude + deltaLng)
+                        }
+                    }
+                    return null
+                }
+                val fencePoints = parsePolygon(area)
+                if (fencePoints.length == 0) {
+                    return null
+                }
+                return calculateBounds(fencePoints)
+            }
+            val fitMapToFence = fun(fence: UTSJSONObject): Unit {
+                val nullableBounds = calculateFenceBounds(fence)
+                if (nullableBounds == null) {
+                    return
+                }
+                val bounds = nullableBounds
+                val midLat = (bounds.minLat + bounds.maxLat) / 2
+                val midLng = (bounds.minLng + bounds.maxLng) / 2
+                ensureFenceMapViewportEstimate()
+                if (fenceMapViewWidth <= 0 || fenceMapViewHeight <= 0) {
+                    return
+                }
+                var bottomReservePx = fenceMapViewHeight * FENCE_FIT_BOTTOM_RESERVE_RATIO
+                if (!isFinite(bottomReservePx) || bottomReservePx < 0) {
+                    bottomReservePx = 0.0
+                }
+                val usableWidth = fenceMapViewWidth * FENCE_FIT_MARGIN
+                val usableHeight = (fenceMapViewHeight - bottomReservePx) * FENCE_FIT_MARGIN
+                if (usableWidth <= 0 || usableHeight <= 0) {
+                    return
+                }
+                var cosLat = Math.cos(midLat * Math.PI / 180.0)
+                if (cosLat < 0.01) {
+                    cosLat = 0.01
+                }
+                val spanLatMeters = (bounds.maxLat - bounds.minLat) * METERS_PER_DEGREE_LAT
+                val spanLngMeters = (bounds.maxLng - bounds.minLng) * METERS_PER_DEGREE_LNG * cosLat
+                val neededResolution = Math.max(spanLatMeters / usableHeight, spanLngMeters / usableWidth)
+                var zoom = FENCE_FIT_MAX_SCALE
+                if (neededResolution > 0.0001) {
+                    val baseResolution = EARTH_RESOLUTION_BASE * cosLat
+                    zoom = Math.log(baseResolution / neededResolution) / Math.log(2.0)
+                }
+                var finalZoom = Math.floor(zoom)
+                if (finalZoom > FENCE_FIT_MAX_SCALE) {
+                    finalZoom = FENCE_FIT_MAX_SCALE
+                }
+                if (finalZoom < FENCE_FIT_MIN_SCALE) {
+                    finalZoom = FENCE_FIT_MIN_SCALE
+                }
+                mapScale.value = finalZoom
+                val resolutionAtZoom = EARTH_RESOLUTION_BASE * cosLat / Math.pow(2.0, finalZoom)
+                val latOffset = (bottomReservePx / 2.0) * resolutionAtZoom / METERS_PER_DEGREE_LAT
+                center["latitude"] = midLat - latOffset
+                center["longitude"] = midLng
+            }
+            val applyFenceViewportFit = fun(){
+                val fence = editingFence.value
+                if (fence != null) {
+                    fitMapToFence(fence)
+                }
+                if (fenceMapViewSizeMeasured) {
+                    return
+                }
+                measureFenceMapViewportSize(fun(){
+                    val currentFence = editingFence.value
+                    if (currentFence != null) {
+                        fitMapToFence(currentFence)
+                    }
+                }
+                )
             }
             val setMapCenterToFence = fun(fence: UTSJSONObject): Unit {
                 if (carMarker.value != null) {
@@ -591,6 +742,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     }
                 }
                 updateMapDisplay()
+                applyFenceViewportFit()
                 editDialogPopup.value?.`$callMethod`("open")
             }
             fun gen_deleteFenceById_fn(id: String): UTSPromise<Unit> {
@@ -1122,6 +1274,13 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 loadGeofenceList()
             }
             )
+            onReady(fun(){
+                measureFenceMapViewportSize(fun(){
+                    console.log("地图容器尺寸已测量:", fenceMapViewWidth, fenceMapViewHeight)
+                }
+                )
+            }
+            )
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_map = resolveComponent("map")
@@ -1137,7 +1296,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return _cE(Fragment, null, _uA(
                     _cE("view", _uM("class" to "container"), _uA(
                         _cV(_component_custom_navBar, _uM("title" to "地理围栏", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                        _cE("view", _uM("class" to "map-container"), _uA(
+                        _cE("view", _uM("class" to "map-container", "id" to "fence-map-container"), _uA(
                             if (isTrue(isMapReady.value)) {
                                 _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "polygons" to polygons.value, "markers" to markers.value, "circles" to circles.value, "onTap" to handleMapTap, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
                                     "latitude",

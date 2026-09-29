@@ -54,7 +54,7 @@ const __sfc__ = defineComponent({
             latitude: 39.90469,
             longitude: 116.40717
         });
-        const mapScale = ref(12);
+        const mapScale = ref<number>(12);
         const isMapReady = ref(false);
         const deviceNo = ref<string | null>('');
         const carStatus = ref<string | null>('');
@@ -81,6 +81,8 @@ const __sfc__ = defineComponent({
         const MIN_SEGMENT_DURATION_MS = 500;
         const MAX_SEGMENT_DURATION_MS = 6000;
         const FALLBACK_SPEED_KMH = 20;
+        // 车标与地图中心逐帧刷新；折线重绘是 O(n) 操作，按时间节流即可，肉眼无差别
+        const POLYLINE_RENDER_INTERVAL_MS = 80;
         const renderedPoint = reactive<TrackPoint>({
             latitude: 0,
             longitude: 0,
@@ -91,6 +93,7 @@ const __sfc__ = defineComponent({
         const activeSegmentTargetIndex = ref(-1);
         let playbackTimer: number | null = null;
         let replaySessionId = 0;
+        let lastPolylineRenderAt = 0;
         function copyTrackPoint(point: TrackPoint): TrackPoint {
             return {
                 latitude: point.latitude,
@@ -219,25 +222,109 @@ const __sfc__ = defineComponent({
                 maxLng: maxLng
             } as TrackBounds;
         }
-        // 调整地图以适应轨迹
+        // ===== 视野控制 =====
+        // 需求：查询出轨迹时整条路线要完整落在可视区内；只有开始播放后，才把车标定位到地图中心。
+        // 因此这里按轨迹包围盒反算所需缩放级别（而不是拍几个固定档位），并在播放前保持全览视角。
+        const MIN_TRACK_FIT_SCALE = 5.0; // 全览轨迹时的最小缩放级别
+        const MAX_TRACK_FIT_SCALE = 17.0; // 全览轨迹时的最大缩放级别（避免短轨迹放得过近）
+        const TRACK_FIT_MARGIN = 0.85; // 轨迹占可视区的比例，留边距防止端点贴屏
+        const METERS_PER_DEGREE_LAT = 110540.0;
+        const METERS_PER_DEGREE_LNG = 111320.0;
+        const EARTH_RESOLUTION_BASE = 156543.03392; // zoom 为 0 时赤道上的地面分辨率（米/像素）
+        // 地图容器的实际显示尺寸（px），用于把轨迹跨度换算成所需缩放级别
+        let mapViewWidth = 0.0;
+        let mapViewHeight = 0.0;
+        let mapViewSizeMeasured = false;
+        // 测量地图容器尺寸；测不到就保留估算值，保证后续计算始终可用
+        function measureMapViewportSize(callback: () => void) {
+            try {
+                const query = uni.createSelectorQuery();
+                query.select('#track-map-container').boundingClientRect((rect: any) => {
+                    if (rect != null) {
+                        const nodeInfo = rect as NodeInfo;
+                        const width = nodeInfo.width ?? 0;
+                        const height = nodeInfo.height ?? 0;
+                        if (width > 0 && height > 0) {
+                            mapViewWidth = width;
+                            mapViewHeight = height;
+                            mapViewSizeMeasured = true;
+                        }
+                    }
+                    callback();
+                }).exec();
+            }
+            catch (error: any) {
+                console.warn('测量地图容器尺寸失败:', error);
+                callback();
+            }
+        }
+        // 用系统信息估算可视区尺寸，避免测量完成前没有尺寸可用
+        function ensureMapViewportEstimate() {
+            if (mapViewWidth > 0 && mapViewHeight > 0)
+                return;
+            try {
+                const info = uni.getSystemInfoSync();
+                mapViewWidth = info.windowWidth;
+                // 地图区位于顶部导航栏与底部控制面板之间，按约一半屏高估算
+                mapViewHeight = info.windowHeight * 0.5;
+            }
+            catch (error: any) {
+                mapViewWidth = 375.0;
+                mapViewHeight = 300.0;
+            }
+        }
+        // 调整地图以完整显示整条轨迹：中心取包围盒中心，缩放按包围盒跨度反算
         function adjustMapToFitTrack() {
             const nullableBounds = calculateTrackBounds();
             if (nullableBounds == null)
                 return;
             const bounds = nullableBounds;
-            center["latitude"] = (bounds.minLat + bounds.maxLat) / 2;
-            center["longitude"] = (bounds.minLng + bounds.maxLng) / 2;
-            const latDiff = bounds.maxLat - bounds.minLat;
-            const lngDiff = bounds.maxLng - bounds.minLng;
-            const maxDiff = Math.max(latDiff, lngDiff);
-            if (maxDiff > 0.1)
-                mapScale.value = 10;
-            else if (maxDiff > 0.05)
-                mapScale.value = 12;
-            else if (maxDiff > 0.02)
-                mapScale.value = 15;
-            else
-                mapScale.value = 16;
+            const midLat = (bounds.minLat + bounds.maxLat) / 2;
+            const midLng = (bounds.minLng + bounds.maxLng) / 2;
+            center["latitude"] = midLat;
+            center["longitude"] = midLng;
+            ensureMapViewportEstimate();
+            const usableWidth = mapViewWidth * TRACK_FIT_MARGIN;
+            const usableHeight = mapViewHeight * TRACK_FIT_MARGIN;
+            if (usableWidth <= 0 || usableHeight <= 0)
+                return;
+            let cosLat = Math.cos(midLat * Math.PI / 180.0);
+            if (cosLat < 0.01)
+                cosLat = 0.01;
+            // 包围盒在南北、东西方向的实际跨度（米）
+            const spanLatMeters = (bounds.maxLat - bounds.minLat) * METERS_PER_DEGREE_LAT;
+            const spanLngMeters = (bounds.maxLng - bounds.minLng) * METERS_PER_DEGREE_LNG * cosLat;
+            // 需要的地面分辨率（米/像素）：取两个方向中更严格的一侧
+            const neededResolution = Math.max(spanLatMeters / usableHeight, spanLngMeters / usableWidth);
+            // Web Mercator：地面分辨率 = EARTH_RESOLUTION_BASE × cos(lat) / 2^zoom
+            let zoom = MAX_TRACK_FIT_SCALE;
+            if (neededResolution > 0.0001) {
+                const baseResolution = EARTH_RESOLUTION_BASE * cosLat;
+                zoom = Math.log(baseResolution / neededResolution) / Math.log(2.0);
+            }
+            // 向下取整，确保整条轨迹确实放得下
+            let finalZoom = Math.floor(zoom);
+            if (finalZoom > MAX_TRACK_FIT_SCALE)
+                finalZoom = MAX_TRACK_FIT_SCALE;
+            if (finalZoom < MIN_TRACK_FIT_SCALE)
+                finalZoom = MIN_TRACK_FIT_SCALE;
+            mapScale.value = finalZoom;
+        }
+        // 适配视野：先用当前尺寸算一次，测到地图容器精确尺寸后再校正一次
+        function applyTrackViewportFit() {
+            adjustMapToFitTrack();
+            if (mapViewSizeMeasured)
+                return;
+            measureMapViewportSize(() => {
+                adjustMapToFitTrack();
+            });
+        }
+        // 播放阶段把车标置于地图中心（查询出轨迹时不做这件事，保持整条路线全览）
+        function focusMapOnVehicle() {
+            if (trackPoints.value.length == 0)
+                return;
+            center["latitude"] = renderedPoint.latitude;
+            center["longitude"] = renderedPoint.longitude;
         }
         // 计算轨迹总距离
         function calculateTrackDistance() {
@@ -302,12 +389,12 @@ const __sfc__ = defineComponent({
                 polyline.value = [];
                 return;
             }
-            const initialUnplayedPolyline = new Polyline(toNativePoints(trackPoints.value), '#888787', 3, true, false, '', '#888787', 0, []);
-            initialUnplayedPolyline.color = '#888787';
+            const initialUnplayedPolyline = new Polyline(toNativePoints(trackPoints.value), '#444444', 3, true, false, '', '#444444', 0, []);
+            initialUnplayedPolyline.color = '#444444';
             initialUnplayedPolyline.width = 3;
             initialUnplayedPolyline.dottedLine = true;
             initialUnplayedPolyline.arrowLine = false;
-            initialUnplayedPolyline.borderColor = '#888787';
+            initialUnplayedPolyline.borderColor = '#444444';
             initialUnplayedPolyline.borderWidth = 0;
             const initialPlayedPolyline = new Polyline(toNativePoints(trackPoints.value.slice(0, 1)), '#3c5cff', 5, false, true, '', '#FFFFFF', 1, []);
             initialPlayedPolyline.color = '#3c5cff';
@@ -357,8 +444,10 @@ const __sfc__ = defineComponent({
                 };
                 carMarker.value = updatedMarker;
                 markers.value = [updatedMarker, ...markers.value.slice(1)];
-                if (currentIndex.value % 5 == 0 ||
-                    currentIndex.value == trackPoints.value.length - 1) {
+                // 仅在播放过程中把地图中心同步到车标：未播放时地图保持整条轨迹全览，
+                // 避免刚查询出轨迹、还没点播放就被拉到起点，导致看不出路线整体走向。
+                // 播放中逐帧同步是必须的，否则中心滞后会让车标跑出可视范围后再弹回。
+                if (isPlaying.value) {
                     center["latitude"] = renderedPoint.latitude;
                     center["longitude"] = renderedPoint.longitude;
                 }
@@ -510,17 +599,19 @@ const __sfc__ = defineComponent({
             isTrackPlayable.value = processedPoints.length > 1;
             currentIndex.value = 0;
             activeSegmentTargetIndex.value = -1;
+            lastPolylineRenderAt = 0;
             if (processedPoints.length == 0)
                 return;
             resetRenderedPoint(processedPoints[0]);
             calculateTrackDistance();
             initCarMarker();
             initPolyline();
-            adjustMapToFitTrack();
-            const firstPoint = trackPoints.value[0];
-            center["latitude"] = firstPoint.latitude;
-            center["longitude"] = firstPoint.longitude;
+            // 查出轨迹后先完整展示整条路线；此处不再把中心改成轨迹起点，
+            // 播放时改由 focusMapOnVehicle() 与逐帧跟随把车标定位到地图中心。
+            applyTrackViewportFit();
             renderPlaybackIndex();
+            // 未开始播放时车辆处于静止状态，速度显示 0；播放中由渲染帧更新为对应点的速度
+            currentSpeed.value = 0;
             isMapReady.value = true;
         }
         const loadTrackPos = async (): Promise<void> => {
@@ -545,6 +636,7 @@ const __sfc__ = defineComponent({
                     showCurrentPosition(res.msg != "" ? res.msg : '轨迹加载失败');
                     return;
                 }
+                console.log('加载轨迹成功:', res);
                 const trackData = res.data;
                 if (trackData == null) {
                     showCurrentPosition();
@@ -581,6 +673,8 @@ const __sfc__ = defineComponent({
             currentIndex.value = 0;
             activeSegmentTargetIndex.value = -1;
             renderPlaybackIndex();
+            // 回到未播放状态，视野同步恢复为整条轨迹全览
+            applyTrackViewportFit();
         }
         function getShortestRotationDifference(from: number, to: number): number {
             let difference = to - from;
@@ -600,6 +694,8 @@ const __sfc__ = defineComponent({
         function finishPlayback(): void {
             pausePlayback();
             activeSegmentTargetIndex.value = -1;
+            // 播放结束后车辆为停止状态，速度显示 0
+            currentSpeed.value = 0;
             showAppToast({
                 title: '轨迹回放完成',
                 icon: 'none',
@@ -636,8 +732,17 @@ const __sfc__ = defineComponent({
                 renderedPoint.rotation = (startPoint.rotation + rotationDifference * progress + 360) % 360;
                 renderedPoint.deviceTime = targetPoint.deviceTime;
                 renderedPoint.speed = targetPoint.speed;
+                // 播放过程中同步展示当前对应点的速度与时间
+                currentSpeed.value = renderedPoint.speed;
+                currentTime.value = renderedPoint.deviceTime;
+                // 车标与地图中心必须逐帧更新，保证跟手流畅
                 updateCarPosition();
-                updatePolyline();
+                // 折线重绘开销随轨迹长度线性增长，按时间节流；每段结束时 renderPlaybackIndex 会补齐
+                const frameNow = Date.now();
+                if (frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS) {
+                    lastPolylineRenderAt = frameNow;
+                    updatePolyline();
+                }
                 if (progress >= 1) {
                     currentIndex.value = targetIndex;
                     activeSegmentTargetIndex.value = -1;
@@ -662,6 +767,9 @@ const __sfc__ = defineComponent({
             }
             activeSegmentTargetIndex.value = -1;
             isPlaying.value = true;
+            // 开始播放：此刻才把车标定为地图中心（查询阶段保持整条轨迹全览）
+            focusMapOnVehicle();
+            lastPolylineRenderAt = 0;
             const sessionId = ++replaySessionId;
             animateNextSegment(sessionId);
         }
@@ -745,6 +853,14 @@ const __sfc__ = defineComponent({
                 loadTrackPos();
             }
         });
+        onReady(() => {
+            // 页面渲染完成后用实测的地图容器尺寸再校正一次全览视野，
+            // 避免只依赖系统信息的估算值导致整条轨迹没有完全落在可视区内
+            measureMapViewportSize(() => {
+                if (trackPoints.value.length > 0 && !isPlaying.value)
+                    adjustMapToFitTrack();
+            });
+        });
         onHide(() => {
             pausePlayback();
             ++replaySessionId;
@@ -772,7 +888,10 @@ const __sfc__ = defineComponent({
                         textColor: "#333",
                         showCapsule: false
                     })),
-                    _cE("view", _uM({ class: "map-container" }), [
+                    _cE("view", _uM({
+                        class: "map-container",
+                        id: "track-map-container"
+                    }), [
                         isTrue(isMapReady.value)
                             ? _cV(_component_map, _uM({
                                 key: 0,

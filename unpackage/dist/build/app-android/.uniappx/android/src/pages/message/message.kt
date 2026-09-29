@@ -342,20 +342,8 @@ open class GenPagesMessageMessage : BasePage {
                 })
             }
             val handleItemClick = ::gen_handleItemClick_fn
-            fun gen_handleReadAll_fn(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend w1@{
-                        console.log("一键已读触发")
-                        if (isReadingAll.value) {
-                            return@w1
-                        }
-                        if (isListLoading.value || isCheckingNewMessages.value) {
-                            uni_showToast(ShowToastOptions(title = "列表加载中，请稍候", icon = "none"))
-                            return@w1
-                        }
-                        if (!hasUnreadMessage.value) {
-                            uni_showToast(ShowToastOptions(title = "没有未读消息", icon = "none"))
-                            return@w1
-                        }
+            fun gen_executeReadAll_fn(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
                         isReadingAll.value = true
                         try {
                             val res = await(readAllMessages())
@@ -393,6 +381,27 @@ open class GenPagesMessageMessage : BasePage {
                             isReadingAll.value = false
                         }
                 })
+            }
+            val executeReadAll = ::gen_executeReadAll_fn
+            fun gen_handleReadAll_fn(): Unit {
+                console.log("一键已读触发")
+                if (isReadingAll.value) {
+                    return
+                }
+                if (isListLoading.value || isCheckingNewMessages.value) {
+                    uni_showToast(ShowToastOptions(title = "列表加载中，请稍候", icon = "none"))
+                    return
+                }
+                if (!hasUnreadMessage.value) {
+                    uni_showToast(ShowToastOptions(title = "没有未读消息", icon = "none"))
+                    return
+                }
+                showAppModal(AppModalOptions(title = "一键已读", content = "确定将全部消息标记为已读吗？", showCancel = true, confirmText = "确定", cancelText = "取消", success = fun(result: AppModalSuccess): Unit {
+                    if (result.confirm) {
+                        executeReadAll()
+                    }
+                }
+                ))
             }
             val handleReadAll = ::gen_handleReadAll_fn
             fun gen_openPendingPushMessage_fn(): UTSPromise<Unit> {
@@ -562,6 +571,7 @@ open class GenPagesMessageMessage : BasePage {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_i_modal = resolveEasyComponent("i-modal", GenUniModulesIUiXComponentsIModalIModalClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                val _component_app_modal = resolveEasyComponent("app-modal", GenComponentsAppModalAppModalClass)
                 return _cE(Fragment, null, _uA(
                     _cV(_component_custom_navBar, _uM("title" to "消息中心", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to Login.value, "isIcon" to true, "Icon" to if (hasUnreadMessage.value) {
                         "/static/read-all.png"
@@ -647,7 +657,8 @@ open class GenPagesMessageMessage : BasePage {
                             "content"
                         ))
                     )),
-                    _cV(_component_app_toast)
+                    _cV(_component_app_toast),
+                    _cV(_component_app_modal)
                 ), 64)
             }
         }

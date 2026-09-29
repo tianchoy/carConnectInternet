@@ -40,6 +40,8 @@ type RequestFailure = {
 // const BASE_URL = 'https://car.zdiot.cn:18443/api'
 const BASE_URL = 'https://gpsapp.zdiot.cn'
 const CLIENT_ID = '428a8310cd442757ae699df5d894f051'
+// 全局默认租户 ID：所有后端接口统一通过请求头 defaultTenantId 传递
+const DEFAULT_TENANT_ID = '000000'
 
 // 处理token过期的函数
 let isHandlingTokenExpired = false
@@ -97,11 +99,13 @@ function requestInterceptor(config: RequestOptions): RequestOptions {
 
 
 
+
     if (config.header == null) {
         config.header = new UTSJSONObject()
     }
     config.header!.set('Authorization', authorization)
     config.header!.set('clientId', CLIENT_ID)
+    config.header!.set('tenantId', DEFAULT_TENANT_ID)
 
 
     // 显示加载中

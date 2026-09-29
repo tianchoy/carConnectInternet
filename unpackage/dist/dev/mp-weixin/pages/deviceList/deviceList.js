@@ -128,6 +128,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }));
     const showOverlapPicker = common_vendor.ref(false);
     const overlapDevices = common_vendor.ref([]);
+    const overlapPanelMaxHeight = common_vendor.ref(600);
+    const updateOverlapPanelMaxHeight = () => {
+      const systemInfo = common_vendor.index.getSystemInfoSync();
+      const windowHeight = systemInfo.windowHeight != null ? systemInfo.windowHeight : 600;
+      overlapPanelMaxHeight.value = Math.floor(windowHeight * 0.6);
+    };
     let clusterContext = null;
     let clusterReady = false;
     const toPlainObject = (value = null) => {
@@ -141,7 +147,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         context.addMarkers(toPlainObject(new common_vendor.UTSJSONObject({ markers: markers.value, clear: true })));
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:115", "车标同步到聚合器失败:", error);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:124", "车标同步到聚合器失败:", error);
       }
     };
     const setupMarkerCluster = () => {
@@ -195,7 +201,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         clusterReady = true;
         syncClusterMarkers();
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:169", "点聚合初始化失败，回退为普通标记点:", error);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:178", "点聚合初始化失败，回退为普通标记点:", error);
       }
     };
     const EMPTY_MARKERS = [];
@@ -415,7 +421,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             const res = yield api_request.getUserDeviceList(params);
             const list = api_response.isBusinessSuccessCode(res.code) && res.data != null ? res.data.list : null;
             if (list == null || !Array.isArray(list)) {
-              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:426", "获取设备列表返回异常:", res);
+              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:435", "获取设备列表返回异常:", res);
               originalDeviceList.value = [];
               markers.value = [];
               return Promise.resolve(null);
@@ -427,7 +433,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
           updateMarkers(originalDeviceList.value);
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:437", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:446", "获取设备列表失败:", err);
           originalDeviceList.value = [];
           markers.value = [];
           utils_toast.showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -503,7 +509,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       }
       if (selectedIndex < 0) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:525", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:534", "未找到对应的设备信息", markerId);
         return null;
       }
       const analysis = analyzeOverlap(list);
@@ -516,6 +522,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             candidates.push(list[members[k]]);
           }
           overlapDevices.value = candidates;
+          updateOverlapPanelMaxHeight();
           showOverlapPicker.value = true;
           return null;
         }
@@ -595,11 +602,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, index)
           };
         }),
-        w: common_vendor.o(keepOverlapPicker, "92"),
-        x: common_vendor.o(closeOverlapPicker, "06")
+        w: overlapPanelMaxHeight.value + "px",
+        x: common_vendor.o(keepOverlapPicker, "cb"),
+        y: common_vendor.o(closeOverlapPicker, "06")
       } : {}, {
-        y: `${_ctx.u_s_b_h}px`,
-        z: `${_ctx.u_s_a_i_b}px`
+        z: `${_ctx.u_s_b_h}px`,
+        A: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

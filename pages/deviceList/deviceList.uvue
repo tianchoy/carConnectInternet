@@ -19,7 +19,7 @@
 
 		<!-- 重合设备选择：多台设备位置重合（放大到最大也无法分开）时，点击车标后从这里分别查看 -->
 		<view v-if="showOverlapPicker" class="overlap-mask" @click="closeOverlapPicker">
-			<view class="overlap-panel" @click.stop="keepOverlapPicker">
+			<view class="overlap-panel" :style="{ maxHeight: overlapPanelMaxHeight + 'px' }" @click.stop="keepOverlapPicker">
 				<view class="overlap-title">此处有 {{ overlapDevices.length }} 台设备</view>
 				<scroll-view class="overlap-list" scroll-y="true">
 					<view v-for="(device, index) in overlapDevices" :key="index" class="overlap-item"
@@ -66,6 +66,15 @@ import { showAppToast } from '../../utils/toast.uts'
 	// 重合设备选择弹层
 	const showOverlapPicker = ref(false)
 	const overlapDevices = ref<Array<UTSJSONObject>>([])
+	// 弹层最大高度（px）：uvue 的 max-height 不支持百分比，只能按屏幕高度换算成像素
+	const overlapPanelMaxHeight = ref(600)
+
+	const updateOverlapPanelMaxHeight = () => {
+		const systemInfo = uni.getSystemInfoSync()
+		const windowHeight = systemInfo.windowHeight != null ? systemInfo.windowHeight : 600
+		// 弹层最多占屏幕高度的 60%，保证上方遮罩仍可点击关闭
+		overlapPanelMaxHeight.value = Math.floor(windowHeight * 0.6)
+	}
 
 	// ===== 车标点聚合 =====
 	// 仅微信小程序端提供原生点聚合（MapContext.initMarkerCluster）
@@ -537,6 +546,7 @@ import { showAppToast } from '../../utils/toast.uts'
 					candidates.push(list[members[k]])
 				}
 				overlapDevices.value = candidates
+				updateOverlapPanelMaxHeight()
 				showOverlapPicker.value = true
 				return
 			}
@@ -635,7 +645,8 @@ import { showAppToast } from '../../utils/toast.uts'
 
 		.overlap-panel {
 			width: 100%;
-			max-height: 60%;
+			// 兜底值：实际高度由行内样式按屏幕高度的 60% 覆盖
+			max-height: 900rpx;
 			padding: 24rpx 0 40rpx 0;
 			background-color: #ffffff;
 			border-top-left-radius: 24rpx;

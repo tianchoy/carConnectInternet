@@ -55,6 +55,11 @@
   align-items: center;
 }
 .container .page-bg .top .device-car .current-car[class].data-v-00a60067 {
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  justify-content: flex-start;
+  margin-right: 60rpx;
   position: relative;
   display: flex;
   flex-direction: row;
@@ -512,4 +517,81 @@
   margin-top: 10rpx;
   font-size: 25rpx;
   color: #222;
+}
+.car-picker[class].data-v-00a60067 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 30rpx;
+}
+.car-picker .car-picker-title[class].data-v-00a60067 {
+  padding-bottom: 24rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333333;
+  text-align: center;
+}
+.car-picker .car-picker-list[class].data-v-00a60067 {
+  max-height: 900rpx;
+}
+.car-picker .car-picker-item[class].data-v-00a60067 {
+  padding: 30rpx 40rpx;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-top-width: 1rpx;
+  border-top-style: solid;
+  border-top-color: #F0EAEA;
+}
+.car-picker .car-picker-item-name[class].data-v-00a60067 {
+  flex: 1;
+  min-width: 0;
+  padding-right: 20rpx;
+  font-size: 32rpx;
+  color: #333333;
+}
+.car-picker .car-picker-item-name--active[class].data-v-00a60067 {
+  color: #3C6ECF;
+}
+.car-picker .car-picker-item-status[class].data-v-00a60067 {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.car-picker .car-picker-dot[class].data-v-00a60067 {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+}
+.car-picker .car-picker-dot--online[class].data-v-00a60067 {
+  background-color: #5BBF6A;
+}
+.car-picker .car-picker-dot--offline[class].data-v-00a60067 {
+  background-color: #9A9A9A;
+}
+.car-picker .car-picker-status-text[class].data-v-00a60067 {
+  margin-left: 10rpx;
+  font-size: 28rpx;
+}
+.car-picker .car-picker-status-text--online[class].data-v-00a60067 {
+  color: #5BBF6A;
+}
+.car-picker .car-picker-status-text--offline[class].data-v-00a60067 {
+  color: #9A9A9A;
+}
+.car-picker .car-picker-cancel[class].data-v-00a60067 {
+  padding: 32rpx 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-top-width: 1rpx;
+  border-top-style: solid;
+  border-top-color: #F0EAEA;
+}
+.car-picker .car-picker-cancel .car-picker-cancel-text[class].data-v-00a60067 {
+  font-size: 32rpx;
+  color: #333333;
 }

@@ -33,9 +33,6 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
             val sentPage = ref(1)
             val sentHasMore = ref(false)
             val sentLoading = ref(false)
-            val sharees = ref(_uA<UTSJSONObject>())
-            val shareesVisible = ref(false)
-            val shareesLoading = ref(false)
             val normalizeRouteValue = fun(value: Any): String {
                 if (value == null) {
                     return ""
@@ -293,33 +290,6 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                 }
                 ))
             }
-            val showSharees = fun(item: UTSJSONObject): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        sharees.value = _uA()
-                        shareesVisible.value = true
-                        shareesLoading.value = true
-                        try {
-                            val res = await(getDeviceSharees(item.getString("deviceId", ""), _uO("pageNum" to 1, "pageSize" to requestPageSize)))
-                            if (isBusinessSuccessCode(res.code)) {
-                                sharees.value = res.data.list
-                            } else {
-                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
-                                    res.msg
-                                } else {
-                                    "获取被分享者失败"
-                                }
-                                , icon = "none"))
-                            }
-                        }
-                         catch (error: Throwable) {
-                            console.error("获取被分享者失败:", error)
-                            showAppToast(ShowToastOptions(title = "获取被分享者失败，请重试", icon = "none"))
-                        }
-                         finally {
-                            shareesLoading.value = false
-                        }
-                })
-            }
             val loadMore = fun(): Unit {
                 if (sentHasMore.value) {
                     loadSent(false)
@@ -451,7 +421,11 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                                                     )),
                                                     _cE("view", _uM("class" to "detail-line"), _uA(
                                                         _cE("text", null, "分享给"),
-                                                        _cE("text", _uM("class" to "detail-value"), _tD(getSharePerson(item, "targetNickName", "targetPhoneMasked")), 1)
+                                                        _cE("text", _uM("class" to "detail-value"), _tD(getSharePerson(item, "targetNickName", "")), 1)
+                                                    )),
+                                                    _cE("view", _uM("class" to "detail-line"), _uA(
+                                                        _cE("text", null, "手机号"),
+                                                        _cE("text", _uM("class" to "detail-value"), _tD(item.getString("targetPhoneMasked", "")), 1)
                                                     )),
                                                     _cE("view", _uM("class" to "detail-line"), _uA(
                                                         _cE("text", null, "角色"),
@@ -466,12 +440,6 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                                                         _cE("text", _uM("class" to "detail-value"), _tD(formatExpireTime(item)), 1)
                                                     )),
                                                     _cE("view", _uM("class" to "card-actions"), _uA(
-                                                        _cE("button", _uM("class" to "plain-button", "onClick" to fun(){
-                                                            showSharees(item)
-                                                        }
-                                                        ), "查看被分享者", 8, _uA(
-                                                            "onClick"
-                                                        )),
                                                         if (item.getString("status", "") == "active") {
                                                             _cE("button", _uM("key" to 0, "class" to "danger-button", "onClick" to fun(){
                                                                 confirmRevoke(item)
@@ -500,58 +468,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
                                     ))
                                 }
                             }
-                        ), 32),
-                        if (isTrue(shareesVisible.value)) {
-                            _cE("view", _uM("key" to 0, "class" to "modal-mask", "onClick" to fun(){
-                                shareesVisible.value = false
-                            }), _uA(
-                                _cE("view", _uM("class" to "sharees-modal", "onClick" to withModifiers(fun(){}, _uA(
-                                    "stop"
-                                ))), _uA(
-                                    _cE("view", _uM("class" to "modal-header"), _uA(
-                                        _cE("text", _uM("class" to "section-title"), "被分享者"),
-                                        _cE("text", _uM("class" to "modal-close", "onClick" to fun(){
-                                            shareesVisible.value = false
-                                        }), "×", 8, _uA(
-                                            "onClick"
-                                        ))
-                                    )),
-                                    _cE("scroll-view", _uM("class" to "sharees-list", "scroll-y" to "true"), _uA(
-                                        if (isTrue(shareesLoading.value)) {
-                                            _cE("view", _uM("key" to 0, "class" to "state-card"), _uA(
-                                                _cE("text", null, "加载中...")
-                                            ))
-                                        } else {
-                                            if (sharees.value.length == 0) {
-                                                _cE("view", _uM("key" to 1, "class" to "state-card"), _uA(
-                                                    _cE("text", null, "暂无被分享者")
-                                                ))
-                                            } else {
-                                                _cC("v-if", true)
-                                            }
-                                        },
-                                        _cE(Fragment, null, RenderHelpers.renderList(sharees.value, fun(item, __key, __index, _cached): Any {
-                                            return _cE("view", _uM("key" to item.getString("shareId", ""), "class" to "sharee-row"), _uA(
-                                                _cE("view", null, _uA(
-                                                    _cE("text", _uM("class" to "device-title"), _tD(getSharePerson(item, "targetNickName", "")), 1),
-                                                    _cE("text", _uM("class" to "masked-phone"), _tD(item.getString("targetPhoneMasked", "")), 1)
-                                                )),
-                                                _cE("text", _uM("class" to _nC(_uA(
-                                                    "status",
-                                                    statusClass(item.getString("status", ""))
-                                                ))), _tD(statusText(item.getString("status", ""))), 3)
-                                            ))
-                                        }), 128)
-                                    ))
-                                ), 8, _uA(
-                                    "onClick"
-                                ))
-                            ), 8, _uA(
-                                "onClick"
-                            ))
-                        } else {
-                            _cC("v-if", true)
-                        }
+                        ), 32)
                     )),
                     _cV(_component_app_toast),
                     _cV(_component_app_modal)
@@ -565,7 +482,7 @@ open class GenPagesDeviceShareDeviceShare : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("page" to _pS(_uM("height" to "100%", "backgroundColor" to "#f5f7fa", "display" to "flex", "flexDirection" to "column")), "content" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "boxSizing" to "border-box")), "card" to _pS(_uM("backgroundColor" to "#ffffff", "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx", "marginBottom" to "20rpx")), "share-form" to _pS(_uM("paddingTop" to "28rpx", "paddingRight" to "28rpx", "paddingBottom" to "28rpx", "paddingLeft" to "28rpx")), "section-title" to _pS(_uM("color" to "#303133", "fontSize" to "32rpx", "fontWeight" to 600)), "form-row" to _pS(_uM("minHeight" to "82rpx", "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "form-label" to _pS(_uM("width" to "160rpx", "color" to "#606266", "fontSize" to "28rpx")), "form-value" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "color" to "#303133", "fontSize" to "28rpx", "textAlign" to "right")), "input-row" to _pS(_uM("alignItems" to "center")), "form-input" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "height" to "76rpx", "color" to "#303133", "fontSize" to "28rpx", "textAlign" to "right")), "expire-actions" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "flex-end")), "date-button" to _pS(_uM("color" to "#2979ff", "fontSize" to "26rpx", "marginLeft" to "18rpx")), "clear-date" to _pS(_uM("color" to "#999999", "fontSize" to "26rpx", "marginLeft" to "18rpx")), "form-tip" to _pS(_uM("color" to "#999999", "fontSize" to "24rpx", "paddingTop" to "20rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0)), "primary-button" to _pS(_uM("borderTopWidth" to 0, "borderRightWidth" to 0, "borderBottomWidth" to 0, "borderLeftWidth" to 0, "borderTopStyle" to "none", "borderRightStyle" to "none", "borderBottomStyle" to "none", "borderLeftStyle" to "none", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "fontSize" to "27rpx", "lineHeight" to "76rpx", "height" to "76rpx", "backgroundColor" to "#2979ff", "color" to "#ffffff", "width" to "100%")), "plain-button" to _pS(_uM("borderTopWidth" to 0, "borderRightWidth" to 0, "borderBottomWidth" to 0, "borderLeftWidth" to 0, "borderTopStyle" to "none", "borderRightStyle" to "none", "borderBottomStyle" to "none", "borderLeftStyle" to "none", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "fontSize" to "27rpx", "lineHeight" to "76rpx", "height" to "76rpx", "color" to "#2979ff", "backgroundColor" to "#eef5ff", "marginRight" to "16rpx", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "20rpx")), "danger-button" to _pS(_uM("borderTopWidth" to 0, "borderRightWidth" to 0, "borderBottomWidth" to 0, "borderLeftWidth" to 0, "borderTopStyle" to "none", "borderRightStyle" to "none", "borderBottomStyle" to "none", "borderLeftStyle" to "none", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "fontSize" to "27rpx", "lineHeight" to "76rpx", "height" to "76rpx", "color" to "#e45656", "backgroundColor" to "#fff0f0", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "20rpx")), "more-button" to _pS(_uM("borderTopWidth" to 0, "borderRightWidth" to 0, "borderBottomWidth" to 0, "borderLeftWidth" to 0, "borderTopStyle" to "none", "borderRightStyle" to "none", "borderBottomStyle" to "none", "borderLeftStyle" to "none", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "fontSize" to "27rpx", "lineHeight" to "76rpx", "height" to "76rpx", "width" to "100%", "color" to "#2979ff", "backgroundColor" to "#ffffff", "marginBottom" to "24rpx")), "button-disabled" to _pS(_uM("opacity" to 0.6)), "tabs" to _pS(_uM("height" to "84rpx", "display" to "flex", "flexDirection" to "row")), "tab" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "textAlign" to "center", "lineHeight" to "84rpx", "color" to "#909399", "fontSize" to "29rpx")), "tab-active" to _pS(_uM("color" to "#2979ff", "fontWeight" to 600)), "share-card" to _pS(_uM("paddingTop" to "26rpx", "paddingRight" to "26rpx", "paddingBottom" to "26rpx", "paddingLeft" to "26rpx")), "share-card-header" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "flex-start", "marginBottom" to "18rpx")), "device-meta" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "device-title" to _pS(_uM("color" to "#303133", "fontSize" to "30rpx", "fontWeight" to 600)), "plate" to _pS(_uM("color" to "#909399", "fontSize" to "24rpx", "marginTop" to "8rpx", "display" to "flex")), "masked-phone" to _pS(_uM("color" to "#909399", "fontSize" to "24rpx", "marginTop" to "8rpx", "display" to "flex")), "status" to _pS(_uM("paddingTop" to "6rpx", "paddingRight" to "14rpx", "paddingBottom" to "6rpx", "paddingLeft" to "14rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "fontSize" to "23rpx")), "status-active" to _pS(_uM("color" to "#19a15f", "backgroundColor" to "#e8f8ef")), "status-inactive" to _pS(_uM("color" to "#909399", "backgroundColor" to "#f0f1f3")), "detail-line" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0, "color" to "#909399", "fontSize" to "25rpx")), "detail-value" to _pS(_uM("color" to "#606266")), "card-actions" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-end", "marginTop" to "16rpx")), "state-card" to _pS(_uM("paddingTop" to "70rpx", "paddingRight" to "30rpx", "paddingBottom" to "70rpx", "paddingLeft" to "30rpx", "textAlign" to "center", "color" to "#909399", "fontSize" to "27rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx", "marginBottom" to "20rpx")), "state-title" to _pS(_uM("color" to "#606266", "fontSize" to "34rpx", "fontWeight" to 600, "marginBottom" to "16rpx")), "state-desc" to _pS(_uM("color" to "#909399")), "modal-mask" to _pS(_uM("position" to "fixed", "left" to 0, "right" to 0, "top" to 0, "bottom" to 0, "display" to "flex", "alignItems" to "center", "justifyContent" to "center", "backgroundColor" to "rgba(0,0,0,0.5)", "zIndex" to 1000)), "sharees-modal" to _pS(_uM("width" to "680rpx", "maxHeight" to "1200rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "18rpx", "borderTopRightRadius" to "18rpx", "borderBottomRightRadius" to "18rpx", "borderBottomLeftRadius" to "18rpx", "overflow" to "hidden")), "modal-header" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "28rpx", "paddingRight" to "28rpx", "paddingBottom" to "28rpx", "paddingLeft" to "28rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee")), "modal-close" to _pS(_uM("color" to "#909399", "fontSize" to "46rpx", "lineHeight" to "36rpx")), "sharees-list" to _pS(_uM("maxHeight" to "700rpx")), "sharee-row" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "24rpx", "paddingRight" to "28rpx", "paddingBottom" to "24rpx", "paddingLeft" to "28rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")))
+                return _uM("page" to _pS(_uM("height" to "100%", "backgroundColor" to "#f5f7fa", "display" to "flex", "flexDirection" to "column")), "content" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "boxSizing" to "border-box")), "card" to _pS(_uM("backgroundColor" to "#ffffff", "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx", "marginBottom" to "20rpx")), "share-form" to _pS(_uM("paddingTop" to "28rpx", "paddingRight" to "28rpx", "paddingBottom" to "28rpx", "paddingLeft" to "28rpx")), "section-title" to _pS(_uM("color" to "#303133", "fontSize" to "32rpx", "fontWeight" to 600)), "form-row" to _pS(_uM("minHeight" to "82rpx", "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "form-label" to _pS(_uM("width" to "160rpx", "color" to "#606266", "fontSize" to "28rpx")), "form-value" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "color" to "#303133", "fontSize" to "28rpx", "textAlign" to "right")), "input-row" to _pS(_uM("alignItems" to "center")), "form-input" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "height" to "76rpx", "color" to "#303133", "fontSize" to "28rpx", "textAlign" to "right")), "expire-actions" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "flex-end")), "date-button" to _pS(_uM("color" to "#2979ff", "fontSize" to "26rpx", "marginLeft" to "18rpx")), "clear-date" to _pS(_uM("color" to "#999999", "fontSize" to "26rpx", "marginLeft" to "18rpx")), "form-tip" to _pS(_uM("color" to "#999999", "fontSize" to "24rpx", "paddingTop" to "20rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0)), "primary-button" to _pS(_uM("borderTopWidth" to 0, "borderRightWidth" to 0, "borderBottomWidth" to 0, "borderLeftWidth" to 0, "borderTopStyle" to "none", "borderRightStyle" to "none", "borderBottomStyle" to "none", "borderLeftStyle" to "none", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "fontSize" to "27rpx", "lineHeight" to "76rpx", "height" to "76rpx", "backgroundColor" to "#2979ff", "color" to "#ffffff", "width" to "100%")), "plain-button" to _pS(_uM("borderTopWidth" to 0, "borderRightWidth" to 0, "borderBottomWidth" to 0, "borderLeftWidth" to 0, "borderTopStyle" to "none", "borderRightStyle" to "none", "borderBottomStyle" to "none", "borderLeftStyle" to "none", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "fontSize" to "27rpx", "lineHeight" to "76rpx", "height" to "76rpx", "color" to "#2979ff", "backgroundColor" to "#eef5ff", "marginRight" to "16rpx", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "20rpx")), "danger-button" to _pS(_uM("borderTopWidth" to 0, "borderRightWidth" to 0, "borderBottomWidth" to 0, "borderLeftWidth" to 0, "borderTopStyle" to "none", "borderRightStyle" to "none", "borderBottomStyle" to "none", "borderLeftStyle" to "none", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "fontSize" to "27rpx", "lineHeight" to "76rpx", "height" to "76rpx", "color" to "#e45656", "backgroundColor" to "#fff0f0", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "20rpx")), "more-button" to _pS(_uM("borderTopWidth" to 0, "borderRightWidth" to 0, "borderBottomWidth" to 0, "borderLeftWidth" to 0, "borderTopStyle" to "none", "borderRightStyle" to "none", "borderBottomStyle" to "none", "borderLeftStyle" to "none", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "fontSize" to "27rpx", "lineHeight" to "76rpx", "height" to "76rpx", "width" to "100%", "color" to "#2979ff", "backgroundColor" to "#ffffff", "marginBottom" to "24rpx")), "button-disabled" to _pS(_uM("opacity" to 0.6)), "tabs" to _pS(_uM("height" to "84rpx", "display" to "flex", "flexDirection" to "row")), "tab" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "textAlign" to "center", "lineHeight" to "84rpx", "color" to "#909399", "fontSize" to "29rpx")), "tab-active" to _pS(_uM("color" to "#2979ff", "fontWeight" to 600)), "share-card" to _pS(_uM("paddingTop" to "26rpx", "paddingRight" to "26rpx", "paddingBottom" to "26rpx", "paddingLeft" to "26rpx")), "share-card-header" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "flex-start", "marginBottom" to "18rpx")), "device-meta" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "device-title" to _pS(_uM("color" to "#303133", "fontSize" to "30rpx", "fontWeight" to 600)), "plate" to _pS(_uM("color" to "#909399", "fontSize" to "24rpx", "marginTop" to "8rpx", "display" to "flex")), "status" to _pS(_uM("paddingTop" to "6rpx", "paddingRight" to "14rpx", "paddingBottom" to "6rpx", "paddingLeft" to "14rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "fontSize" to "23rpx")), "status-active" to _pS(_uM("color" to "#19a15f", "backgroundColor" to "#e8f8ef")), "status-inactive" to _pS(_uM("color" to "#909399", "backgroundColor" to "#f0f1f3")), "detail-line" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0, "color" to "#909399", "fontSize" to "25rpx")), "detail-value" to _pS(_uM("color" to "#606266")), "card-actions" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-end", "marginTop" to "16rpx")), "state-card" to _pS(_uM("paddingTop" to "70rpx", "paddingRight" to "30rpx", "paddingBottom" to "70rpx", "paddingLeft" to "30rpx", "textAlign" to "center", "color" to "#909399", "fontSize" to "27rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx", "marginBottom" to "20rpx")), "state-title" to _pS(_uM("color" to "#606266", "fontSize" to "34rpx", "fontWeight" to 600, "marginBottom" to "16rpx")), "state-desc" to _pS(_uM("color" to "#909399")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

@@ -14,7 +14,7 @@ import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
-import io.dcloud.uniapp.extapi.switchTab as uni_switchTab
+import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 open class GenComponentsCustomNavBarCustomNavBar : VueComponent {
     constructor(__ins: ComponentInternalInstance) : super(__ins) {}
     open var title: String? by `$props`
@@ -56,7 +56,7 @@ open class GenComponentsCustomNavBarCustomNavBar : VueComponent {
                 if (pages.length > 1) {
                     uni_navigateBack(null)
                 } else {
-                    uni_switchTab(SwitchTabOptions(url = "/pages/index/index"))
+                    uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))
                 }
                 emit("back")
             }

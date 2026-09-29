@@ -37,7 +37,6 @@ import io.dcloud.uniapp.extapi.rpx2px as uni_rpx2px
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showModal as uni_showModal
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
-import io.dcloud.uniapp.extapi.switchTab as uni_switchTab
 val runBlock1 = run {
     __uniConfig.getAppStyles = fun(): Map<String, Map<String, Map<String, Any>>> {
         return GenApp.styles
@@ -308,7 +307,7 @@ open class PushManager {
             uni_setStorageSync(PUSH_MESSAGE_STALE_KEY, true)
         }
         if (event.kind == "clicked") {
-            uni_switchTab(SwitchTabOptions(url = "/pages/message/message"))
+            uni_reLaunch(ReLaunchOptions(url = "/pages/message/message"))
         }
     }
     private fun clearRegistrationTimers(): Unit {
@@ -446,6 +445,7 @@ open class HttpError (
 ) : UTSObject()
 val BASE_URL = "https://gpsapp.zdiot.cn"
 val CLIENT_ID = "428a8310cd442757ae699df5d894f051"
+val DEFAULT_TENANT_ID = "000000"
 var isHandlingTokenExpired = false
 fun resetTokenExpiredState(): Unit {
     isHandlingTokenExpired = false
@@ -485,6 +485,7 @@ fun requestInterceptor(config: RequestOptions__1): RequestOptions__1 {
     }
     config.header!!.set("Authorization", authorization)
     config.header!!.set("clientId", CLIENT_ID)
+    config.header!!.set("tenantId", DEFAULT_TENANT_ID)
     return config
 }
 fun isBusinessTokenExpired(data: Any): Boolean {
@@ -683,6 +684,8 @@ val homePlatformAppUrl = "/home/platform/app"
 val geocoderAddressUrl = "/geocoder/address"
 val deviceShareUrl = "/share/device"
 val deviceShareEnabledUrl = "/share/device/enabled"
+val notifyQuotaUrl = "/app/notify/quota"
+val notifyStatusUrl = "/app/notify/status"
 open class BasicResponse (
     @JsonNotNull
     open var code: Number,
@@ -699,6 +702,38 @@ open class PushDeviceBindRequest (
     @JsonNotNull
     open var appVersion: String,
 ) : UTSObject()
+open class NotifyQuotaItem (
+    @JsonNotNull
+    open var bizCode: String,
+    @JsonNotNull
+    open var templateId: String,
+    @JsonNotNull
+    open var remaining: Number,
+    @JsonNotNull
+    open var mode: String,
+) : UTSObject()
+open class NotifyQuotaResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSArray<NotifyQuotaItem>,
+) : UTSObject()
+fun notifyQuotaResponse(raw: Any): NotifyQuotaResponse {
+    val response = asJSONObject(raw)
+    val rows = getResponseDataArray(response)
+    val list: UTSArray<NotifyQuotaItem> = _uA()
+    run {
+        var i: Number = 0
+        while(i < rows.length){
+            val row = rows[i]
+            list.push(NotifyQuotaItem(bizCode = row.getString("bizCode", ""), templateId = row.getString("templateId", ""), remaining = row.getNumber("remaining", -1), mode = row.getString("mode", "")))
+            i++
+        }
+    }
+    return NotifyQuotaResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = list)
+}
 open class JsonDataResponse (
     @JsonNotNull
     open var code: Number,
@@ -1079,6 +1114,18 @@ val delDevice = fun(deviceId: String): UTSPromise<BasicResponse> {
 val getUserDeviceList = fun(data: UTSJSONObject): UTSPromise<UserDeviceListResponse> {
     return post(userDeviceList, data).then(fun(raw: Any): UserDeviceListResponse {
         return userDevicePageResponse(raw)
+    }
+    )
+}
+val getNotifyQuota = fun(): UTSPromise<NotifyQuotaResponse> {
+    return getSilently(notifyQuotaUrl).then(fun(raw: Any): NotifyQuotaResponse {
+        return notifyQuotaResponse(raw)
+    }
+    )
+}
+val getNotifyStatus = fun(): UTSPromise<JsonDataResponse> {
+    return getSilently(notifyStatusUrl).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
     }
     )
 }
@@ -2092,6 +2139,1865 @@ val GenUniModulesIUiXComponentsIIconIIconClass = CreateVueComponent(GenUniModule
     return GenUniModulesIUiXComponentsIIconIIcon(instance)
 }
 )
+fun raf(fn: UniAnimationFrameCallback): Number {
+    return raf(fn as Any)
+}
+fun raf(fn: UniAnimationFrameCallbackWithNoArgument): Number {
+    return raf(fn as Any)
+}
+fun raf(fn: Any): Number {
+    if (UTSAndroid.`typeof`(fn) == "UniAnimationFrameCallback") {
+        return requestAnimationFrame(fn as UniAnimationFrameCallback)
+    } else {
+        return requestAnimationFrame(fn as UniAnimationFrameCallbackWithNoArgument)
+    }
+}
+fun doubleRaf(fn: UniAnimationFrameCallback): Unit {
+    return doubleRaf(fn as Any)
+}
+fun doubleRaf(fn: UniAnimationFrameCallbackWithNoArgument): Unit {
+    return doubleRaf(fn as Any)
+}
+fun doubleRaf(fn: Any): Unit {
+    raf(fun(): Number {
+        return raf(fn)
+    }
+    )
+}
+typealias TransitionEmitStatus = String
+typealias TransitionStatus = String
+open class UseTransitionOptions (
+    open var element: Ref<UniElement?>? = null,
+    open var enterClass: String? = null,
+    open var enterActiveClass: String? = null,
+    open var enterToClass: String? = null,
+    open var leaveClass: String? = null,
+    open var leaveActiveClass: String? = null,
+    open var leaveToClass: String? = null,
+    open var appear: Boolean? = null,
+    open var defaultName: String? = null,
+    open var name: (() -> String)? = null,
+    open var visible: (() -> Boolean)? = null,
+    open var emits: ((name: TransitionEmitStatus) -> Unit)? = null,
+    open var onNextTick: ((name: TransitionEmitStatus) -> UTSPromise<Unit>)? = null,
+    open var duration: Number? = null,
+    open var removeClasses: Boolean? = null,
+) : UTSObject()
+typealias ClassNameMap = Map<String, String>
+open class UseTransitionReturn (
+    @JsonNotNull
+    open var state: Ref<Boolean>,
+    @JsonNotNull
+    open var display: Ref<Boolean>,
+    @JsonNotNull
+    open var inited: Ref<Boolean>,
+    @JsonNotNull
+    open var classes: Ref<String>,
+    @JsonNotNull
+    open var name: Ref<String>,
+    open var finished: () -> Unit,
+    open var toggle: (v: Boolean) -> Unit,
+) : UTSObject()
+fun useTransition(options: UseTransitionOptions): UseTransitionReturn {
+    val state = ref(false)
+    val display = ref(false)
+    val inited = ref(false)
+    val classes = ref("")
+    val name = ref(options.defaultName ?: "fade")
+    val enterClass = options.enterClass ?: ""
+    val enterActiveClass = options.enterActiveClass ?: ""
+    val enterToClass = options.enterToClass ?: ""
+    val leaveActiveClass = options.leaveActiveClass ?: ""
+    val leaveToClass = options.leaveToClass ?: ""
+    val leaveClass = options.leaveClass ?: ""
+    val appear = options.appear ?: false
+    val duration = options.duration ?: 300
+    var status: TransitionStatus = ""
+    var isTransitionEnd = false
+    var isTransitioning = false
+    var timeoutId: Number = -1
+    var finishTimeoutId: Number = -1
+    val emitEvent = fun(event: TransitionEmitStatus){
+        options.emits?.invoke(event)
+    }
+    val finished = fun(){
+        if (isTransitionEnd) {
+            return
+        }
+        isTransitionEnd = true
+        clearTimeout(finishTimeoutId)
+        if (options.removeClasses ?: false) {
+            classes.value = ""
+        }
+        emitEvent("after-" + status)
+        if (display.value && !state.value) {
+            display.value = false
+        }
+    }
+    val sleep = fun(): UTSPromise<Unit> {
+        return UTSPromise(fun(resolve, _reject){
+            nextTick(fun(){
+                raf(fun(){
+                    if (options.element?.value != null) {
+                        options.element?.value?.getBoundingClientRectAsync()?.then(fun(res){
+                            resolve(Unit)
+                        })
+                    } else {
+                        resolve(Unit)
+                    }
+                }
+                )
+            }
+            )
+        }
+        )
+    }
+    val getClassNames = fun(name: String): ClassNameMap {
+        return Map<String, String>(_uA(
+            _uA(
+                "enter",
+                "l-" + name + "-enter l-" + name + "-enter-active " + enterClass + " " + enterActiveClass
+            ),
+            _uA(
+                "enter-to",
+                "l-" + name + "-enter-to l-" + name + "-enter-active " + enterToClass + " " + enterActiveClass
+            ),
+            _uA(
+                "leave",
+                "l-" + name + "-leave l-" + name + "-leave-active " + leaveClass + " " + leaveActiveClass
+            ),
+            _uA(
+                "leave-to",
+                "l-" + name + "-leave-to l-" + name + "-leave-active " + leaveToClass + " " + leaveActiveClass
+            )
+        ))
+    }
+    val transitionQueue = ref(_uA<TransitionStatus>())
+    val performTransition = fun(newStatus: TransitionStatus, eventName: TransitionStatus): UTSPromise<Unit> {
+        return wrapUTSPromise(suspend w1@{
+                if (status == newStatus) {
+                    return@w1
+                }
+                transitionQueue.value.push(newStatus)
+                if (isTransitioning) {
+                    return@w1
+                }
+                isTransitioning = true
+                isTransitionEnd = true
+                while(transitionQueue.value.length > 0){
+                    val currentStatus = transitionQueue.value.shift()!!
+                    status = currentStatus
+                    emitEvent("before-" + eventName)
+                    await(sleep())
+                    await(sleep())
+                    await(sleep())
+                    await(sleep())
+                    await(sleep())
+                    if (status != currentStatus) {
+                        continue
+                    }
+                    val classNames = getClassNames(name.value)
+                    inited.value = true
+                    display.value = true
+                    classes.value = classNames.get(eventName)!!
+                    emitEvent(eventName)
+                    val executeAfterTick = options.onNextTick?.invoke(eventName)
+                    if (executeAfterTick != null) {
+                        await(executeAfterTick)
+                    }
+                    await(sleep())
+                    if (status != currentStatus) {
+                        continue
+                    }
+                    classes.value = classNames.get("" + eventName + "-to")!!
+                    if (status == "leave") {
+                        setTimeout(fun(){
+                            finished()
+                        }
+                        , duration)
+                    }
+                }
+                clearTimeout(timeoutId)
+                timeoutId = setTimeout(fun(){
+                    if (transitionQueue.value.length == 0 && status == newStatus) {
+                        isTransitionEnd = false
+                    }
+                }
+                , duration * 0.8)
+                isTransitioning = false
+        })
+    }
+    val enter = fun(){
+        performTransition("enter", "enter")
+    }
+    val leave = fun(){
+        performTransition("leave", "leave")
+    }
+    var init = false
+    var lastState: Boolean? = null
+    watchEffect(fun(){
+        if (options.visible == null) {
+            return
+        }
+        state.value = options.visible!!()
+        if (lastState == state.value) {
+            return
+        }
+        lastState = state.value
+        if (!appear && !init) {
+            init = true
+            return
+        }
+        if (state.value) {
+            enter()
+        } else {
+            leave()
+        }
+    }
+    )
+    watchEffect(fun(){
+        if (options.name == null) {
+            return
+        }
+        name.value = options.name!!()
+    }
+    )
+    val toggle = fun(v: Boolean){
+        state.value = v
+        if (v) {
+            enter()
+        } else {
+            leave()
+        }
+    }
+    return UseTransitionReturn(state = state, inited = inited, display = display, classes = classes, name = name, finished = finished, toggle = toggle)
+}
+interface OverlayProps {
+    var ariaLabel: String
+    var ariaRole: String
+    var lClass: String?
+    var bgColor: String?
+    var lStyle: Any?
+    var duration: Number
+    var preventScrollThrough: Boolean
+    var visible: Boolean
+    var zIndex: Number
+}
+val GenUniModulesLimeOverlayComponentsLOverlayLOverlayClass = CreateVueComponent(GenUniModulesLimeOverlayComponentsLOverlayLOverlay::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.inheritAttrs, inject = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.inject, props = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.props, propsNeedCastKeys = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.propsNeedCastKeys, emits = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.emits, components = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.components, styles = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesLimeOverlayComponentsLOverlayLOverlay.setup(props as GenUniModulesLimeOverlayComponentsLOverlayLOverlay)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesLimeOverlayComponentsLOverlayLOverlay {
+    return GenUniModulesLimeOverlayComponentsLOverlayLOverlay(instance)
+}
+)
+fun isNumber(value: Any?): Boolean {
+    return _uA(
+        "Byte",
+        "UByte",
+        "Short",
+        "UShort",
+        "Int",
+        "UInt",
+        "Long",
+        "ULong",
+        "Float",
+        "Double",
+        "number"
+    ).includes(UTSAndroid.`typeof`(value))
+}
+fun isString(str: Any?): Boolean {
+    return UTSAndroid.`typeof`(str) == "string"
+}
+fun isNumeric(value: Any?): Boolean {
+    if (value == null) {
+        return false
+    }
+    if (isNumber(value)) {
+        return true
+    } else if (isString(value)) {
+        val regex = UTSRegExp("^(-)?\\d+(\\.\\d+)?\$")
+        return regex.test(value as String)
+    }
+    return false
+}
+fun isDef(value: Any?): Boolean {
+    return value != null
+}
+fun addUnit(value: String): String? {
+    return addUnit(value as Any?)
+}
+fun addUnit(value: Number): String? {
+    return addUnit(value as Any?)
+}
+fun addUnit(reassignedValue: Any?): String? {
+    var value = reassignedValue
+    if (!isDef(value)) {
+        return null
+    }
+    value = "" + value
+    return if (isNumeric(value)) {
+        "" + value as String + "px"
+    } else {
+        value as String
+    }
+}
+fun convertRadius(radius: Any): UTSArray<String> {
+    if (UTSArray.isArray(radius)) {
+        val values = (radius as UTSArray<Any>).map(fun(item): String? {
+            return addUnit(item)
+        }
+        )
+        if (values.length == 1) {
+            return _uA(
+                values[0]!!,
+                values[0]!!,
+                values[0]!!,
+                values[0]!!
+            )
+        }
+        if (values.length == 2) {
+            return _uA(
+                values[0]!!,
+                values[1]!!,
+                values[0]!!,
+                values[1]!!
+            )
+        }
+        if (values.length == 3) {
+            return _uA(
+                values[0]!!,
+                values[1]!!,
+                values[2]!!,
+                values[1]!!
+            )
+        }
+        if (values.length == 4) {
+            return _uA(
+                values[0]!!,
+                values[1]!!,
+                values[2]!!,
+                values[3]!!
+            )
+        }
+        return _uA(
+            "0",
+            "0",
+            "0",
+            "0"
+        )
+    }
+    val value = addUnit(radius) ?: "0"
+    return _uA(
+        value,
+        value,
+        value,
+        value
+    )
+}
+interface PopupProps {
+    var closeable: Boolean
+    var closeOnClickOverlay: Boolean
+    var destroyOnClose: Boolean
+    var overlayStyle: Any?
+    var position: String
+    var preventScrollThrough: Boolean
+    var overlay: Boolean
+    var transitionName: String?
+    var visible: Boolean?
+    var zIndex: Number
+    var duration: Number
+    var bgColor: String?
+    var closeIcon: String
+    var iconColor: String?
+    var lStyle: Any?
+    var safeAreaInsetBottom: Boolean
+    var safeAreaInsetTop: Boolean
+    var radius: Any?
+}
+val GenUniModulesLimePopupComponentsLPopupLPopupClass = CreateVueComponent(GenUniModulesLimePopupComponentsLPopupLPopup::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesLimePopupComponentsLPopupLPopup.inheritAttrs, inject = GenUniModulesLimePopupComponentsLPopupLPopup.inject, props = GenUniModulesLimePopupComponentsLPopupLPopup.props, propsNeedCastKeys = GenUniModulesLimePopupComponentsLPopupLPopup.propsNeedCastKeys, emits = GenUniModulesLimePopupComponentsLPopupLPopup.emits, components = GenUniModulesLimePopupComponentsLPopupLPopup.components, styles = GenUniModulesLimePopupComponentsLPopupLPopup.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesLimePopupComponentsLPopupLPopup.setup(props as GenUniModulesLimePopupComponentsLPopupLPopup)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesLimePopupComponentsLPopupLPopup {
+    return GenUniModulesLimePopupComponentsLPopupLPopup(instance)
+}
+)
+val GenComponentsAppToastAppToastClass = CreateVueComponent(GenComponentsAppToastAppToast::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenComponentsAppToastAppToast.name, inheritAttrs = GenComponentsAppToastAppToast.inheritAttrs, inject = GenComponentsAppToastAppToast.inject, props = GenComponentsAppToastAppToast.props, propsNeedCastKeys = GenComponentsAppToastAppToast.propsNeedCastKeys, emits = GenComponentsAppToastAppToast.emits, components = GenComponentsAppToastAppToast.components, styles = GenComponentsAppToastAppToast.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenComponentsAppToastAppToast.setup(props as GenComponentsAppToastAppToast)
+    }
+    )
+}
+, fun(instance, renderer): GenComponentsAppToastAppToast {
+    return GenComponentsAppToastAppToast(instance)
+}
+)
+val GenComponentsAppModalAppModalClass = CreateVueComponent(GenComponentsAppModalAppModal::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenComponentsAppModalAppModal.name, inheritAttrs = GenComponentsAppModalAppModal.inheritAttrs, inject = GenComponentsAppModalAppModal.inject, props = GenComponentsAppModalAppModal.props, propsNeedCastKeys = GenComponentsAppModalAppModal.propsNeedCastKeys, emits = GenComponentsAppModalAppModal.emits, components = GenComponentsAppModalAppModal.components, styles = GenComponentsAppModalAppModal.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenComponentsAppModalAppModal.setup(props as GenComponentsAppModalAppModal)
+    }
+    )
+}
+, fun(instance, renderer): GenComponentsAppModalAppModal {
+    return GenComponentsAppModalAppModal(instance)
+}
+)
+val `default` = "/static/banner.png"
+val default__1 = "/static/pos.png"
+val default__2 = "/static/car.png"
+val default__3 = "/static/dzwl.png"
+val default__4 = "/static/msg.png"
+val default__5 = "/static/pay.png"
+val default__6 = "/static/online.png"
+val default__7 = "/static/del.png"
+val default__8 = "/static/logout.png"
+val QUOTA_STORAGE_KEY = "wx_subscribe_quota"
+fun isDeviceSubscribeSupported(): Boolean {
+    return false
+}
+var quotaInFlight: UTSPromise<UTSArray<NotifyQuotaItem>>? = null
+var quotaFetchedAt: Number = 0
+val QUOTA_FETCH_MIN_INTERVAL: Number = 10000
+fun fetchNotifyQuota(): UTSPromise<UTSArray<NotifyQuotaItem>> {
+    return wrapUTSPromise(suspend w@{
+            val inFlight = quotaInFlight
+            if (inFlight != null) {
+                return@w inFlight
+            }
+            if (Date.now() - quotaFetchedAt < QUOTA_FETCH_MIN_INTERVAL) {
+                val cached = readCachedQuota()
+                if (cached.length > 0) {
+                    return@w cached
+                }
+            }
+            val task = doFetchQuota()
+            quotaInFlight = task
+            return@w task
+    })
+}
+fun doFetchQuota(): UTSPromise<UTSArray<NotifyQuotaItem>> {
+    return wrapUTSPromise(suspend w@{
+            try {
+                val res = await(getNotifyQuota())
+                if (!isBusinessSuccessCode(res.code)) {
+                    console.warn("[notify] 拉取订阅额度失败:", res.msg)
+                    return@w readCachedQuota()
+                }
+                cacheQuota(res.data)
+                quotaFetchedAt = Date.now()
+                return@w res.data
+            }
+             catch (error: Throwable) {
+                console.warn("[notify] 拉取订阅额度异常:", error)
+                return@w readCachedQuota()
+            }
+             finally {
+                quotaInFlight = null
+            }
+    })
+}
+fun fetchNotifyStatusEnabled(): UTSPromise<Boolean> {
+    return wrapUTSPromise(suspend w@{
+            try {
+                val res = await(getNotifyStatus())
+                if (!isBusinessSuccessCode(res.code) || res.data == null) {
+                    return@w false
+                }
+                return@w res.data.getBoolean("enabled", false)
+            }
+             catch (error: Throwable) {
+                console.warn("[notify] 查询订阅开关失败:", error)
+                return@w false
+            }
+    })
+}
+fun cacheQuota(list: UTSArray<NotifyQuotaItem>): Unit {
+    try {
+        uni_setStorageSync(QUOTA_STORAGE_KEY, JSON.stringify(list))
+    }
+     catch (error: Throwable) {
+        console.warn("[notify] 缓存订阅额度失败:", error)
+    }
+}
+fun getCachedQuota(bizCode: String): NotifyQuotaItem? {
+    val list = readCachedQuota()
+    run {
+        var i: Number = 0
+        while(i < list.length){
+            if (list[i].bizCode == bizCode) {
+                return list[i]
+            }
+            i++
+        }
+    }
+    return null
+}
+fun readCachedQuota(): UTSArray<NotifyQuotaItem> {
+    try {
+        val raw = uni_getStorageSync(QUOTA_STORAGE_KEY)
+        if (raw == null || raw.toString() == "") {
+            return _uA()
+        }
+        val parsed = JSON.parse(raw.toString()) as UTSArray<UTSJSONObject>
+        val list: UTSArray<NotifyQuotaItem> = _uA()
+        run {
+            var i: Number = 0
+            while(i < parsed.length){
+                val row = parsed[i]
+                list.push(NotifyQuotaItem(bizCode = row.getString("bizCode", ""), templateId = row.getString("templateId", ""), remaining = row.getNumber("remaining", -1), mode = row.getString("mode", "")))
+                i++
+            }
+        }
+        return list
+    }
+     catch (error: Throwable) {
+        return _uA()
+    }
+}
+fun checkTemplateSubscribed(templateId: String): UTSPromise<Boolean> {
+    return UTSPromise(fun(resolve, _reject){
+        if (templateId == "" || !isDeviceSubscribeSupported()) {
+            resolve(false)
+            return
+        }
+        resolve(false)
+    }
+    )
+}
+open class TodayTimeRange (
+    @JsonNotNull
+    open var nowTime: Number,
+    @JsonNotNull
+    open var todayZero: Number,
+) : UTSObject()
+fun getTodayZeroTime(): TodayTimeRange {
+    val now = Date()
+    val nowTime = now.getTime()
+    val todayZero = Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime()
+    return TodayTimeRange(nowTime = nowTime, todayZero = todayZero)
+}
+fun pad(value: Number): String {
+    return value.toString(10).padStart(2, "0")
+}
+fun formatTimes(timestamp: Number): String {
+    val d = Date(timestamp)
+    return "" + d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds())
+}
+fun parseLocalDateTime(timestamp: String): Number? {
+    val match = timestamp.match(UTSRegExp("^(\\d{4})[-\\/](\\d{2})[-\\/](\\d{2})(?:\\s+(\\d{2}):(\\d{2})(?::(\\d{2}))?)?\$", ""))
+    if (match == null) {
+        return null
+    }
+    val year = parseInt(match[1] ?: "0")
+    val month = parseInt(match[2] ?: "0")
+    val day = parseInt(match[3] ?: "0")
+    val hour = if (match[4] == null) {
+        0
+    } else {
+        parseInt(match[4] ?: "0")
+    }
+    val minute = if (match[5] == null) {
+        0
+    } else {
+        parseInt(match[5] ?: "0")
+    }
+    val second = if (match[6] == null) {
+        0
+    } else {
+        parseInt(match[6] ?: "0")
+    }
+    val date = Date(year, month - 1, day, hour, minute, second)
+    if (date.getFullYear() != year || date.getMonth() != month - 1 || date.getDate() != day || date.getHours() != hour || date.getMinutes() != minute || date.getSeconds() != second) {
+        return null
+    }
+    return date.getTime()
+}
+fun normalizeLocalDateTime(timestamp: String): String {
+    val milliseconds = parseLocalDateTime(timestamp)
+    return if (milliseconds == null) {
+        timestamp
+    } else {
+        formatTimes(milliseconds)
+    }
+}
+fun formatLocalTime(timestamp: String): String {
+    val milliseconds = parseLocalDateTime(timestamp)
+    if (milliseconds == null) {
+        return ""
+    }
+    val date = Date(milliseconds)
+    return "" + pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds())
+}
+fun getDeviceIcon(connectionStatus: String, carType: String): String {
+    val basePath = if (connectionStatus == "online") {
+        "/static/cars/online/"
+    } else {
+        "/static/cars/offline/"
+    }
+    val validTypes = _uA(
+        "car",
+        "bus",
+        "bike",
+        "moto",
+        "diandong",
+        "huoche",
+        "sanlun",
+        "tuola",
+        "suv",
+        "baby",
+        "tank",
+        "zhuangjia",
+        "wajue",
+        "plan",
+        "walk",
+        "muma",
+        "hangmu",
+        "junjian",
+        "tuiche",
+        "train"
+    )
+    var iconPath = basePath + "default.png"
+    if (validTypes.includes(carType)) {
+        iconPath = basePath + carType + ".png"
+    }
+    return iconPath
+}
+open class Device (
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var deviceName: String,
+    @JsonNotNull
+    open var value: String,
+    @JsonNotNull
+    open var deviceNo: String,
+    @JsonNotNull
+    open var deptId: String,
+    @JsonNotNull
+    open var deviceId: String,
+    @JsonNotNull
+    open var iccid: String,
+    @JsonNotNull
+    open var simMerchant: String,
+    @JsonNotNull
+    open var connectionStatus: String,
+    @JsonNotNull
+    open var carType: String,
+    @JsonNotNull
+    open var plateNo: String,
+    @JsonNotNull
+    open var latitude: Number,
+    @JsonNotNull
+    open var longitude: Number,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class DeviceReactiveObject : Device, IUTSReactive<Device> {
+    override var __v_raw: Device
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: Device, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(name = __v_raw.name, deviceName = __v_raw.deviceName, value = __v_raw.value, deviceNo = __v_raw.deviceNo, deptId = __v_raw.deptId, deviceId = __v_raw.deviceId, iccid = __v_raw.iccid, simMerchant = __v_raw.simMerchant, connectionStatus = __v_raw.connectionStatus, carType = __v_raw.carType, plateNo = __v_raw.plateNo, latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): DeviceReactiveObject {
+        return DeviceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var name: String
+        get() {
+            return _tRG(__v_raw, "name", __v_raw.name, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("name")) {
+                return
+            }
+            val oldValue = __v_raw.name
+            __v_raw.name = value
+            _tRS(__v_raw, "name", oldValue, value)
+        }
+    override var deviceName: String
+        get() {
+            return _tRG(__v_raw, "deviceName", __v_raw.deviceName, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceName")) {
+                return
+            }
+            val oldValue = __v_raw.deviceName
+            __v_raw.deviceName = value
+            _tRS(__v_raw, "deviceName", oldValue, value)
+        }
+    override var value: String
+        get() {
+            return _tRG(__v_raw, "value", __v_raw.value, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("value")) {
+                return
+            }
+            val oldValue = __v_raw.value
+            __v_raw.value = value
+            _tRS(__v_raw, "value", oldValue, value)
+        }
+    override var deviceNo: String
+        get() {
+            return _tRG(__v_raw, "deviceNo", __v_raw.deviceNo, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceNo")) {
+                return
+            }
+            val oldValue = __v_raw.deviceNo
+            __v_raw.deviceNo = value
+            _tRS(__v_raw, "deviceNo", oldValue, value)
+        }
+    override var deptId: String
+        get() {
+            return _tRG(__v_raw, "deptId", __v_raw.deptId, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deptId")) {
+                return
+            }
+            val oldValue = __v_raw.deptId
+            __v_raw.deptId = value
+            _tRS(__v_raw, "deptId", oldValue, value)
+        }
+    override var deviceId: String
+        get() {
+            return _tRG(__v_raw, "deviceId", __v_raw.deviceId, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceId")) {
+                return
+            }
+            val oldValue = __v_raw.deviceId
+            __v_raw.deviceId = value
+            _tRS(__v_raw, "deviceId", oldValue, value)
+        }
+    override var iccid: String
+        get() {
+            return _tRG(__v_raw, "iccid", __v_raw.iccid, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("iccid")) {
+                return
+            }
+            val oldValue = __v_raw.iccid
+            __v_raw.iccid = value
+            _tRS(__v_raw, "iccid", oldValue, value)
+        }
+    override var simMerchant: String
+        get() {
+            return _tRG(__v_raw, "simMerchant", __v_raw.simMerchant, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("simMerchant")) {
+                return
+            }
+            val oldValue = __v_raw.simMerchant
+            __v_raw.simMerchant = value
+            _tRS(__v_raw, "simMerchant", oldValue, value)
+        }
+    override var connectionStatus: String
+        get() {
+            return _tRG(__v_raw, "connectionStatus", __v_raw.connectionStatus, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("connectionStatus")) {
+                return
+            }
+            val oldValue = __v_raw.connectionStatus
+            __v_raw.connectionStatus = value
+            _tRS(__v_raw, "connectionStatus", oldValue, value)
+        }
+    override var carType: String
+        get() {
+            return _tRG(__v_raw, "carType", __v_raw.carType, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("carType")) {
+                return
+            }
+            val oldValue = __v_raw.carType
+            __v_raw.carType = value
+            _tRS(__v_raw, "carType", oldValue, value)
+        }
+    override var plateNo: String
+        get() {
+            return _tRG(__v_raw, "plateNo", __v_raw.plateNo, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("plateNo")) {
+                return
+            }
+            val oldValue = __v_raw.plateNo
+            __v_raw.plateNo = value
+            _tRS(__v_raw, "plateNo", oldValue, value)
+        }
+    override var latitude: Number
+        get() {
+            return _tRG(__v_raw, "latitude", __v_raw.latitude, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("latitude")) {
+                return
+            }
+            val oldValue = __v_raw.latitude
+            __v_raw.latitude = value
+            _tRS(__v_raw, "latitude", oldValue, value)
+        }
+    override var longitude: Number
+        get() {
+            return _tRG(__v_raw, "longitude", __v_raw.longitude, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("longitude")) {
+                return
+            }
+            val oldValue = __v_raw.longitude
+            __v_raw.longitude = value
+            _tRS(__v_raw, "longitude", oldValue, value)
+        }
+}
+open class MapCenter (
+    @JsonNotNull
+    open var latitude: Number,
+    @JsonNotNull
+    open var longitude: Number,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class MapCenterReactiveObject : MapCenter, IUTSReactive<MapCenter> {
+    override var __v_raw: MapCenter
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: MapCenter, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): MapCenterReactiveObject {
+        return MapCenterReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var latitude: Number
+        get() {
+            return _tRG(__v_raw, "latitude", __v_raw.latitude, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("latitude")) {
+                return
+            }
+            val oldValue = __v_raw.latitude
+            __v_raw.latitude = value
+            _tRS(__v_raw, "latitude", oldValue, value)
+        }
+    override var longitude: Number
+        get() {
+            return _tRG(__v_raw, "longitude", __v_raw.longitude, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("longitude")) {
+                return
+            }
+            val oldValue = __v_raw.longitude
+            __v_raw.longitude = value
+            _tRS(__v_raw, "longitude", oldValue, value)
+        }
+}
+typealias PositionState = String
+open class DeviceStatus (
+    @JsonNotNull
+    open var batteryPercent: Number,
+    @JsonNotNull
+    open var voltage: Number,
+    @JsonNotNull
+    open var signalStrength: Number,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class DeviceStatusReactiveObject : DeviceStatus, IUTSReactive<DeviceStatus> {
+    override var __v_raw: DeviceStatus
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: DeviceStatus, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(batteryPercent = __v_raw.batteryPercent, voltage = __v_raw.voltage, signalStrength = __v_raw.signalStrength) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): DeviceStatusReactiveObject {
+        return DeviceStatusReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var batteryPercent: Number
+        get() {
+            return _tRG(__v_raw, "batteryPercent", __v_raw.batteryPercent, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("batteryPercent")) {
+                return
+            }
+            val oldValue = __v_raw.batteryPercent
+            __v_raw.batteryPercent = value
+            _tRS(__v_raw, "batteryPercent", oldValue, value)
+        }
+    override var voltage: Number
+        get() {
+            return _tRG(__v_raw, "voltage", __v_raw.voltage, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("voltage")) {
+                return
+            }
+            val oldValue = __v_raw.voltage
+            __v_raw.voltage = value
+            _tRS(__v_raw, "voltage", oldValue, value)
+        }
+    override var signalStrength: Number
+        get() {
+            return _tRG(__v_raw, "signalStrength", __v_raw.signalStrength, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("signalStrength")) {
+                return
+            }
+            val oldValue = __v_raw.signalStrength
+            __v_raw.signalStrength = value
+            _tRS(__v_raw, "signalStrength", oldValue, value)
+        }
+}
+open class DeviceDetailState (
+    @JsonNotNull
+    open var deviceStatus: DeviceStatus,
+    @JsonNotNull
+    open var connectionStatus: String,
+    @JsonNotNull
+    open var lastUpdateTime: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class DeviceDetailStateReactiveObject : DeviceDetailState, IUTSReactive<DeviceDetailState> {
+    override var __v_raw: DeviceDetailState
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: DeviceDetailState, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(deviceStatus = __v_raw.deviceStatus, connectionStatus = __v_raw.connectionStatus, lastUpdateTime = __v_raw.lastUpdateTime) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): DeviceDetailStateReactiveObject {
+        return DeviceDetailStateReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var deviceStatus: DeviceStatus
+        get() {
+            return _tRG(__v_raw, "deviceStatus", __v_raw.deviceStatus, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceStatus")) {
+                return
+            }
+            val oldValue = __v_raw.deviceStatus
+            __v_raw.deviceStatus = value
+            _tRS(__v_raw, "deviceStatus", oldValue, value)
+        }
+    override var connectionStatus: String
+        get() {
+            return _tRG(__v_raw, "connectionStatus", __v_raw.connectionStatus, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("connectionStatus")) {
+                return
+            }
+            val oldValue = __v_raw.connectionStatus
+            __v_raw.connectionStatus = value
+            _tRS(__v_raw, "connectionStatus", oldValue, value)
+        }
+    override var lastUpdateTime: String
+        get() {
+            return _tRG(__v_raw, "lastUpdateTime", __v_raw.lastUpdateTime, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("lastUpdateTime")) {
+                return
+            }
+            val oldValue = __v_raw.lastUpdateTime
+            __v_raw.lastUpdateTime = value
+            _tRS(__v_raw, "lastUpdateTime", oldValue, value)
+        }
+}
+open class SavedDevice (
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var deviceName: String,
+    @JsonNotNull
+    open var deviceNo: String,
+    @JsonNotNull
+    open var deptId: String,
+    @JsonNotNull
+    open var deviceId: String,
+    @JsonNotNull
+    open var iccid: String,
+    @JsonNotNull
+    open var simMerchant: String,
+    @JsonNotNull
+    open var connectionStatus: String,
+    @JsonNotNull
+    open var carType: String,
+    @JsonNotNull
+    open var plateNo: String,
+    @JsonNotNull
+    open var latitude: Number,
+    @JsonNotNull
+    open var longitude: Number,
+) : UTSObject()
+val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesIndexIndex.inheritAttrs, inject = GenPagesIndexIndex.inject, props = GenPagesIndexIndex.props, propsNeedCastKeys = GenPagesIndexIndex.propsNeedCastKeys, emits = GenPagesIndexIndex.emits, components = GenPagesIndexIndex.components, styles = GenPagesIndexIndex.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesIndexIndex.setup(props as GenPagesIndexIndex)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesIndexIndex {
+    return GenPagesIndexIndex(instance, renderer)
+}
+)
+val GenComponentsCustomNavBarCustomNavBarClass = CreateVueComponent(GenComponentsCustomNavBarCustomNavBar::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenComponentsCustomNavBarCustomNavBar.inheritAttrs, inject = GenComponentsCustomNavBarCustomNavBar.inject, props = GenComponentsCustomNavBarCustomNavBar.props, propsNeedCastKeys = GenComponentsCustomNavBarCustomNavBar.propsNeedCastKeys, emits = GenComponentsCustomNavBarCustomNavBar.emits, components = GenComponentsCustomNavBarCustomNavBar.components, styles = GenComponentsCustomNavBarCustomNavBar.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenComponentsCustomNavBarCustomNavBar.setup(props as GenComponentsCustomNavBarCustomNavBar)
+    }
+    )
+}
+, fun(instance, renderer): GenComponentsCustomNavBarCustomNavBar {
+    return GenComponentsCustomNavBarCustomNavBar(instance)
+}
+)
+val GenUniModulesIUiXComponentsIModalIModalClass = CreateVueComponent(GenUniModulesIUiXComponentsIModalIModal::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIModalIModal.name, inheritAttrs = GenUniModulesIUiXComponentsIModalIModal.inheritAttrs, inject = GenUniModulesIUiXComponentsIModalIModal.inject, props = GenUniModulesIUiXComponentsIModalIModal.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIModalIModal.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIModalIModal.emits, components = GenUniModulesIUiXComponentsIModalIModal.components, styles = GenUniModulesIUiXComponentsIModalIModal.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
+        return GenUniModulesIUiXComponentsIModalIModal.setup(props as GenUniModulesIUiXComponentsIModalIModal, ctx)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIModalIModal {
+    return GenUniModulesIUiXComponentsIModalIModal(instance)
+}
+)
+val GenPagesMessageMessageClass = CreateVueComponent(GenPagesMessageMessage::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesMessageMessage.inheritAttrs, inject = GenPagesMessageMessage.inject, props = GenPagesMessageMessage.props, propsNeedCastKeys = GenPagesMessageMessage.propsNeedCastKeys, emits = GenPagesMessageMessage.emits, components = GenPagesMessageMessage.components, styles = GenPagesMessageMessage.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesMessageMessage.setup(props as GenPagesMessageMessage)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesMessageMessage {
+    return GenPagesMessageMessage(instance, renderer)
+}
+)
+val GenUniModulesIUiXComponentsIBadgeIBadgeClass = CreateVueComponent(GenUniModulesIUiXComponentsIBadgeIBadge::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIBadgeIBadge.name, inheritAttrs = GenUniModulesIUiXComponentsIBadgeIBadge.inheritAttrs, inject = GenUniModulesIUiXComponentsIBadgeIBadge.inject, props = GenUniModulesIUiXComponentsIBadgeIBadge.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIBadgeIBadge.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIBadgeIBadge.emits, components = GenUniModulesIUiXComponentsIBadgeIBadge.components, styles = GenUniModulesIUiXComponentsIBadgeIBadge.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesIUiXComponentsIBadgeIBadge.setup(props as GenUniModulesIUiXComponentsIBadgeIBadge)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIBadgeIBadge {
+    return GenUniModulesIUiXComponentsIBadgeIBadge(instance)
+}
+)
+val GenPagesUserCenterUserCenterClass = CreateVueComponent(GenPagesUserCenterUserCenter::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesUserCenterUserCenter.inheritAttrs, inject = GenPagesUserCenterUserCenter.inject, props = GenPagesUserCenterUserCenter.props, propsNeedCastKeys = GenPagesUserCenterUserCenter.propsNeedCastKeys, emits = GenPagesUserCenterUserCenter.emits, components = GenPagesUserCenterUserCenter.components, styles = GenPagesUserCenterUserCenter.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesUserCenterUserCenter.setup(props as GenPagesUserCenterUserCenter)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesUserCenterUserCenter {
+    return GenPagesUserCenterUserCenter(instance, renderer)
+}
+)
+val GenUniModulesIUiXComponentsIInputIInputClass = CreateVueComponent(GenUniModulesIUiXComponentsIInputIInput::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIInputIInput.name, inheritAttrs = GenUniModulesIUiXComponentsIInputIInput.inheritAttrs, inject = GenUniModulesIUiXComponentsIInputIInput.inject, props = GenUniModulesIUiXComponentsIInputIInput.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIInputIInput.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIInputIInput.emits, components = GenUniModulesIUiXComponentsIInputIInput.components, styles = GenUniModulesIUiXComponentsIInputIInput.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
+        return GenUniModulesIUiXComponentsIInputIInput.setup(props as GenUniModulesIUiXComponentsIInputIInput, ctx)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIInputIInput {
+    return GenUniModulesIUiXComponentsIInputIInput(instance)
+}
+)
+val GenUniModulesIUiXComponentsICheckboxICheckboxClass = CreateVueComponent(GenUniModulesIUiXComponentsICheckboxICheckbox::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsICheckboxICheckbox.name, inheritAttrs = GenUniModulesIUiXComponentsICheckboxICheckbox.inheritAttrs, inject = GenUniModulesIUiXComponentsICheckboxICheckbox.inject, props = GenUniModulesIUiXComponentsICheckboxICheckbox.props, propsNeedCastKeys = GenUniModulesIUiXComponentsICheckboxICheckbox.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsICheckboxICheckbox.emits, components = GenUniModulesIUiXComponentsICheckboxICheckbox.components, styles = GenUniModulesIUiXComponentsICheckboxICheckbox.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesIUiXComponentsICheckboxICheckbox.setup(props as GenUniModulesIUiXComponentsICheckboxICheckbox)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsICheckboxICheckbox {
+    return GenUniModulesIUiXComponentsICheckboxICheckbox(instance)
+}
+)
+val GenUniModulesIUiXComponentsIButtonIButtonClass = CreateVueComponent(GenUniModulesIUiXComponentsIButtonIButton::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIButtonIButton.name, inheritAttrs = GenUniModulesIUiXComponentsIButtonIButton.inheritAttrs, inject = GenUniModulesIUiXComponentsIButtonIButton.inject, props = GenUniModulesIUiXComponentsIButtonIButton.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIButtonIButton.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIButtonIButton.emits, components = GenUniModulesIUiXComponentsIButtonIButton.components, styles = GenUniModulesIUiXComponentsIButtonIButton.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesIUiXComponentsIButtonIButton.setup(props as GenUniModulesIUiXComponentsIButtonIButton)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIButtonIButton {
+    return GenUniModulesIUiXComponentsIButtonIButton(instance)
+}
+)
+val userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。"
+val privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。"
+open class SmsRegisterContext (
+    @JsonNotNull
+    open var phonenumber: String,
+    @JsonNotNull
+    open var smsCode: String,
+) : UTSObject()
+var pendingContext: SmsRegisterContext? = null
+fun saveSmsRegisterContext(phonenumber: String, smsCode: String): Unit {
+    pendingContext = SmsRegisterContext(phonenumber = phonenumber, smsCode = smsCode)
+}
+fun getSmsRegisterContext(): SmsRegisterContext? {
+    return pendingContext
+}
+fun clearSmsRegisterContext(): Unit {
+    pendingContext = null
+}
+open class PersonalLoginForm (
+    @JsonNotNull
+    open var username: String,
+    @JsonNotNull
+    open var password: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return PersonalLoginFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class PersonalLoginFormReactiveObject : PersonalLoginForm, IUTSReactive<PersonalLoginForm> {
+    override var __v_raw: PersonalLoginForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: PersonalLoginForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PersonalLoginFormReactiveObject {
+        return PersonalLoginFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var username: String
+        get() {
+            return _tRG(__v_raw, "username", __v_raw.username, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("username")) {
+                return
+            }
+            val oldValue = __v_raw.username
+            __v_raw.username = value
+            _tRS(__v_raw, "username", oldValue, value)
+        }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+}
+open class EnterpriseLoginForm (
+    @JsonNotNull
+    open var username: String,
+    @JsonNotNull
+    open var password: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return EnterpriseLoginFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class EnterpriseLoginFormReactiveObject : EnterpriseLoginForm, IUTSReactive<EnterpriseLoginForm> {
+    override var __v_raw: EnterpriseLoginForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: EnterpriseLoginForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): EnterpriseLoginFormReactiveObject {
+        return EnterpriseLoginFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var username: String
+        get() {
+            return _tRG(__v_raw, "username", __v_raw.username, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("username")) {
+                return
+            }
+            val oldValue = __v_raw.username
+            __v_raw.username = value
+            _tRS(__v_raw, "username", oldValue, value)
+        }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+}
+val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginLogin.inheritAttrs, inject = GenPagesLoginLogin.inject, props = GenPagesLoginLogin.props, propsNeedCastKeys = GenPagesLoginLogin.propsNeedCastKeys, emits = GenPagesLoginLogin.emits, components = GenPagesLoginLogin.components, styles = GenPagesLoginLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginLogin.setup(props as GenPagesLoginLogin)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginLogin {
+    return GenPagesLoginLogin(instance, renderer)
+}
+)
+val GenUniModulesIUiXComponentsIFormItemIFormItemClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormItemIFormItem::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormItemIFormItem.name, inheritAttrs = GenUniModulesIUiXComponentsIFormItemIFormItem.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormItemIFormItem.inject, props = GenUniModulesIUiXComponentsIFormItemIFormItem.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormItemIFormItem.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormItemIFormItem.emits, components = GenUniModulesIUiXComponentsIFormItemIFormItem.components, styles = GenUniModulesIUiXComponentsIFormItemIFormItem.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesIUiXComponentsIFormItemIFormItem.setup(props as GenUniModulesIUiXComponentsIFormItemIFormItem)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIFormItemIFormItem {
+    return GenUniModulesIUiXComponentsIFormItemIFormItem(instance)
+}
+)
+val GenUniModulesIUiXComponentsIFormIFormClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormIForm::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormIForm.name, inheritAttrs = GenUniModulesIUiXComponentsIFormIForm.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormIForm.inject, props = GenUniModulesIUiXComponentsIFormIForm.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormIForm.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormIForm.emits, components = GenUniModulesIUiXComponentsIFormIForm.components, styles = GenUniModulesIUiXComponentsIFormIForm.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
+        return GenUniModulesIUiXComponentsIFormIForm.setup(props as GenUniModulesIUiXComponentsIFormIForm, ctx)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIFormIForm {
+    return GenUniModulesIUiXComponentsIFormIForm(instance)
+}
+)
+open class PersonalLoginForm__1 (
+    @JsonNotNull
+    open var username: String,
+    @JsonNotNull
+    open var password: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return PersonalLoginForm__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class PersonalLoginForm__1ReactiveObject : PersonalLoginForm__1, IUTSReactive<PersonalLoginForm__1> {
+    override var __v_raw: PersonalLoginForm__1
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: PersonalLoginForm__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PersonalLoginForm__1ReactiveObject {
+        return PersonalLoginForm__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var username: String
+        get() {
+            return _tRG(__v_raw, "username", __v_raw.username, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("username")) {
+                return
+            }
+            val oldValue = __v_raw.username
+            __v_raw.username = value
+            _tRS(__v_raw, "username", oldValue, value)
+        }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+}
+val GenPagesLoginPersonalPasswordLoginClass = CreateVueComponent(GenPagesLoginPersonalPasswordLogin::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginPersonalPasswordLogin.inheritAttrs, inject = GenPagesLoginPersonalPasswordLogin.inject, props = GenPagesLoginPersonalPasswordLogin.props, propsNeedCastKeys = GenPagesLoginPersonalPasswordLogin.propsNeedCastKeys, emits = GenPagesLoginPersonalPasswordLogin.emits, components = GenPagesLoginPersonalPasswordLogin.components, styles = GenPagesLoginPersonalPasswordLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginPersonalPasswordLogin.setup(props as GenPagesLoginPersonalPasswordLogin)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginPersonalPasswordLogin {
+    return GenPagesLoginPersonalPasswordLogin(instance, renderer)
+}
+)
+open class RegisterForm (
+    @JsonNotNull
+    open var password: String,
+    @JsonNotNull
+    open var mobile: String,
+    @JsonNotNull
+    open var smsCode: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return RegisterFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class RegisterFormReactiveObject : RegisterForm, IUTSReactive<RegisterForm> {
+    override var __v_raw: RegisterForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: RegisterForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(password = __v_raw.password, mobile = __v_raw.mobile, smsCode = __v_raw.smsCode) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): RegisterFormReactiveObject {
+        return RegisterFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+    override var mobile: String
+        get() {
+            return _tRG(__v_raw, "mobile", __v_raw.mobile, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("mobile")) {
+                return
+            }
+            val oldValue = __v_raw.mobile
+            __v_raw.mobile = value
+            _tRS(__v_raw, "mobile", oldValue, value)
+        }
+    override var smsCode: String
+        get() {
+            return _tRG(__v_raw, "smsCode", __v_raw.smsCode, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("smsCode")) {
+                return
+            }
+            val oldValue = __v_raw.smsCode
+            __v_raw.smsCode = value
+            _tRS(__v_raw, "smsCode", oldValue, value)
+        }
+}
+val GenPagesLoginRegisterClass = CreateVueComponent(GenPagesLoginRegister::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginRegister.inheritAttrs, inject = GenPagesLoginRegister.inject, props = GenPagesLoginRegister.props, propsNeedCastKeys = GenPagesLoginRegister.propsNeedCastKeys, emits = GenPagesLoginRegister.emits, components = GenPagesLoginRegister.components, styles = GenPagesLoginRegister.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginRegister.setup(props as GenPagesLoginRegister)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginRegister {
+    return GenPagesLoginRegister(instance, renderer)
+}
+)
+open class ForgotPasswordForm (
+    @JsonNotNull
+    open var mobile: String,
+    @JsonNotNull
+    open var smsCode: String,
+    @JsonNotNull
+    open var password: String,
+    @JsonNotNull
+    open var confirmPassword: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return ForgotPasswordFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class ForgotPasswordFormReactiveObject : ForgotPasswordForm, IUTSReactive<ForgotPasswordForm> {
+    override var __v_raw: ForgotPasswordForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: ForgotPasswordForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(mobile = __v_raw.mobile, smsCode = __v_raw.smsCode, password = __v_raw.password, confirmPassword = __v_raw.confirmPassword) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): ForgotPasswordFormReactiveObject {
+        return ForgotPasswordFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var mobile: String
+        get() {
+            return _tRG(__v_raw, "mobile", __v_raw.mobile, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("mobile")) {
+                return
+            }
+            val oldValue = __v_raw.mobile
+            __v_raw.mobile = value
+            _tRS(__v_raw, "mobile", oldValue, value)
+        }
+    override var smsCode: String
+        get() {
+            return _tRG(__v_raw, "smsCode", __v_raw.smsCode, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("smsCode")) {
+                return
+            }
+            val oldValue = __v_raw.smsCode
+            __v_raw.smsCode = value
+            _tRS(__v_raw, "smsCode", oldValue, value)
+        }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+    override var confirmPassword: String
+        get() {
+            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("confirmPassword")) {
+                return
+            }
+            val oldValue = __v_raw.confirmPassword
+            __v_raw.confirmPassword = value
+            _tRS(__v_raw, "confirmPassword", oldValue, value)
+        }
+}
+val GenPagesLoginForgotPasswordClass = CreateVueComponent(GenPagesLoginForgotPassword::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginForgotPassword.inheritAttrs, inject = GenPagesLoginForgotPassword.inject, props = GenPagesLoginForgotPassword.props, propsNeedCastKeys = GenPagesLoginForgotPassword.propsNeedCastKeys, emits = GenPagesLoginForgotPassword.emits, components = GenPagesLoginForgotPassword.components, styles = GenPagesLoginForgotPassword.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginForgotPassword.setup(props as GenPagesLoginForgotPassword)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginForgotPassword {
+    return GenPagesLoginForgotPassword(instance, renderer)
+}
+)
+open class PasswordForm (
+    @JsonNotNull
+    open var password: String,
+    @JsonNotNull
+    open var confirmPassword: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return PasswordFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class PasswordFormReactiveObject : PasswordForm, IUTSReactive<PasswordForm> {
+    override var __v_raw: PasswordForm
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: PasswordForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(password = __v_raw.password, confirmPassword = __v_raw.confirmPassword) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PasswordFormReactiveObject {
+        return PasswordFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var password: String
+        get() {
+            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("password")) {
+                return
+            }
+            val oldValue = __v_raw.password
+            __v_raw.password = value
+            _tRS(__v_raw, "password", oldValue, value)
+        }
+    override var confirmPassword: String
+        get() {
+            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("confirmPassword")) {
+                return
+            }
+            val oldValue = __v_raw.confirmPassword
+            __v_raw.confirmPassword = value
+            _tRS(__v_raw, "confirmPassword", oldValue, value)
+        }
+}
+val GenPagesLoginSetPasswordClass = CreateVueComponent(GenPagesLoginSetPassword::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginSetPassword.inheritAttrs, inject = GenPagesLoginSetPassword.inject, props = GenPagesLoginSetPassword.props, propsNeedCastKeys = GenPagesLoginSetPassword.propsNeedCastKeys, emits = GenPagesLoginSetPassword.emits, components = GenPagesLoginSetPassword.components, styles = GenPagesLoginSetPassword.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginSetPassword.setup(props as GenPagesLoginSetPassword)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginSetPassword {
+    return GenPagesLoginSetPassword(instance, renderer)
+}
+)
+open class PickerItem (
+    @JsonNotNull
+    open var label: String,
+    @JsonNotNull
+    open var value: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return PickerItemReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class PickerItemReactiveObject : PickerItem, IUTSReactive<PickerItem> {
+    override var __v_raw: PickerItem
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: PickerItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(label = __v_raw.label, value = __v_raw.value) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PickerItemReactiveObject {
+        return PickerItemReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var label: String
+        get() {
+            return _tRG(__v_raw, "label", __v_raw.label, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("label")) {
+                return
+            }
+            val oldValue = __v_raw.label
+            __v_raw.label = value
+            _tRS(__v_raw, "label", oldValue, value)
+        }
+    override var value: String
+        get() {
+            return _tRG(__v_raw, "value", __v_raw.value, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("value")) {
+                return
+            }
+            val oldValue = __v_raw.value
+            __v_raw.value = value
+            _tRS(__v_raw, "value", oldValue, value)
+        }
+}
+val GenComponentsSubNavBarSubNavBarClass = CreateVueComponent(GenComponentsSubNavBarSubNavBar::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenComponentsSubNavBarSubNavBar.inheritAttrs, inject = GenComponentsSubNavBarSubNavBar.inject, props = GenComponentsSubNavBarSubNavBar.props, propsNeedCastKeys = GenComponentsSubNavBarSubNavBar.propsNeedCastKeys, emits = GenComponentsSubNavBarSubNavBar.emits, components = GenComponentsSubNavBarSubNavBar.components, styles = GenComponentsSubNavBarSubNavBar.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenComponentsSubNavBarSubNavBar.setup(props as GenComponentsSubNavBarSubNavBar)
+    }
+    )
+}
+, fun(instance, renderer): GenComponentsSubNavBarSubNavBar {
+    return GenComponentsSubNavBarSubNavBar(instance)
+}
+)
+val GenUniModulesIUiXComponentsIGridIGridClass = CreateVueComponent(GenUniModulesIUiXComponentsIGridIGrid::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIGridIGrid.name, inheritAttrs = GenUniModulesIUiXComponentsIGridIGrid.inheritAttrs, inject = GenUniModulesIUiXComponentsIGridIGrid.inject, props = GenUniModulesIUiXComponentsIGridIGrid.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIGridIGrid.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIGridIGrid.emits, components = GenUniModulesIUiXComponentsIGridIGrid.components, styles = GenUniModulesIUiXComponentsIGridIGrid.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesIUiXComponentsIGridIGrid.setup(props as GenUniModulesIUiXComponentsIGridIGrid)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIGridIGrid {
+    return GenUniModulesIUiXComponentsIGridIGrid(instance)
+}
+)
+fun __uts_large_list_fill_fill_1(__arr: UTSArray<UTSJSONObject>): Unit {
+    __arr.push(_uO("image" to "/static/gjhf.png", "text" to "轨迹回放"))
+    __arr.push(_uO("image" to "/static/clgz.png", "text" to "车辆跟踪"))
+    __arr.push(_uO("image" to "/static/lcjl.png", "text" to "里程记录"))
+    __arr.push(_uO("image" to "/static/tcjl.png", "text" to "停车记录"))
+    __arr.push(_uO("image" to "/static/dzwl.png", "text" to "电子围栏"))
+    __arr.push(_uO("image" to "/static/navto.png", "text" to "一键寻车"))
+    __arr.push(_uO("image" to "/static/power.png", "text" to "恢复油电"))
+    __arr.push(_uO("image" to "/static/offpower.png", "text" to "断开油电"))
+    __arr.push(_uO("image" to "/static/share.png", "text" to "分享设备"))
+}
+fun __uts_large_list_build_0(): UTSArray<UTSJSONObject> {
+    val __arr = _uA<UTSJSONObject>()
+    __uts_large_list_fill_fill_1(__arr)
+    return __arr
+}
+open class MapCenter__1 (
+    @JsonNotNull
+    open var latitude: Number,
+    @JsonNotNull
+    open var longitude: Number,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return MapCenter__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class MapCenter__1ReactiveObject : MapCenter__1, IUTSReactive<MapCenter__1> {
+    override var __v_raw: MapCenter__1
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: MapCenter__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): MapCenter__1ReactiveObject {
+        return MapCenter__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var latitude: Number
+        get() {
+            return _tRG(__v_raw, "latitude", __v_raw.latitude, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("latitude")) {
+                return
+            }
+            val oldValue = __v_raw.latitude
+            __v_raw.latitude = value
+            _tRS(__v_raw, "latitude", oldValue, value)
+        }
+    override var longitude: Number
+        get() {
+            return _tRG(__v_raw, "longitude", __v_raw.longitude, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("longitude")) {
+                return
+            }
+            val oldValue = __v_raw.longitude
+            __v_raw.longitude = value
+            _tRS(__v_raw, "longitude", oldValue, value)
+        }
+}
+open class SignalDetail (
+    @JsonNotNull
+    open var experience: String,
+    @JsonNotNull
+    open var quality: String,
+    @JsonNotNull
+    open var color: String,
+    @JsonNotNull
+    open var level: Number,
+) : UTSObject()
+val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfoDetailCarInfoDetail::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesCarInfoDetailCarInfoDetail.inheritAttrs, inject = GenPagesCarInfoDetailCarInfoDetail.inject, props = GenPagesCarInfoDetailCarInfoDetail.props, propsNeedCastKeys = GenPagesCarInfoDetailCarInfoDetail.propsNeedCastKeys, emits = GenPagesCarInfoDetailCarInfoDetail.emits, components = GenPagesCarInfoDetailCarInfoDetail.components, styles = GenPagesCarInfoDetailCarInfoDetail.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesCarInfoDetailCarInfoDetail.setup(props as GenPagesCarInfoDetailCarInfoDetail)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesCarInfoDetailCarInfoDetail {
+    return GenPagesCarInfoDetailCarInfoDetail(instance, renderer)
+}
+)
+val GenUniModulesIUiXComponentsIPopupIPopupClass = CreateVueComponent(GenUniModulesIUiXComponentsIPopupIPopup::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIPopupIPopup.name, inheritAttrs = GenUniModulesIUiXComponentsIPopupIPopup.inheritAttrs, inject = GenUniModulesIUiXComponentsIPopupIPopup.inject, props = GenUniModulesIUiXComponentsIPopupIPopup.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIPopupIPopup.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIPopupIPopup.emits, components = GenUniModulesIUiXComponentsIPopupIPopup.components, styles = GenUniModulesIUiXComponentsIPopupIPopup.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
+        return GenUniModulesIUiXComponentsIPopupIPopup.setup(props as GenUniModulesIUiXComponentsIPopupIPopup, ctx)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsIPopupIPopup {
+    return GenUniModulesIUiXComponentsIPopupIPopup(instance)
+}
+)
+interface Props {
+    var show: Boolean
+    var title: String
+    var col: Number
+    var iconSize: Number
+    var safeAreaInsetBottom: Boolean
+}
+typealias CarIconItem = UTSJSONObject
+val GenComponentsCarIconsCarIconsClass = CreateVueComponent(GenComponentsCarIconsCarIcons::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenComponentsCarIconsCarIcons.inheritAttrs, inject = GenComponentsCarIconsCarIcons.inject, props = GenComponentsCarIconsCarIcons.props, propsNeedCastKeys = GenComponentsCarIconsCarIcons.propsNeedCastKeys, emits = GenComponentsCarIconsCarIcons.emits, components = GenComponentsCarIconsCarIcons.components, styles = GenComponentsCarIconsCarIcons.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenComponentsCarIconsCarIcons.setup(props as GenComponentsCarIconsCarIcons)
+    }
+    )
+}
+, fun(instance, renderer): GenComponentsCarIconsCarIcons {
+    return GenComponentsCarIconsCarIcons(instance)
+}
+)
+open class CarFormData (
+    @JsonNotNull
+    open var deviceName: String,
+    @JsonNotNull
+    open var deviceNo: String,
+    @JsonNotNull
+    open var deviceType: String,
+    @JsonNotNull
+    open var deviceTypeValue: String,
+    @JsonNotNull
+    open var plateNo: String,
+    @JsonNotNull
+    open var carType: String,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return CarFormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class CarFormDataReactiveObject : CarFormData, IUTSReactive<CarFormData> {
+    override var __v_raw: CarFormData
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: CarFormData, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(deviceName = __v_raw.deviceName, deviceNo = __v_raw.deviceNo, deviceType = __v_raw.deviceType, deviceTypeValue = __v_raw.deviceTypeValue, plateNo = __v_raw.plateNo, carType = __v_raw.carType) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): CarFormDataReactiveObject {
+        return CarFormDataReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var deviceName: String
+        get() {
+            return _tRG(__v_raw, "deviceName", __v_raw.deviceName, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceName")) {
+                return
+            }
+            val oldValue = __v_raw.deviceName
+            __v_raw.deviceName = value
+            _tRS(__v_raw, "deviceName", oldValue, value)
+        }
+    override var deviceNo: String
+        get() {
+            return _tRG(__v_raw, "deviceNo", __v_raw.deviceNo, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceNo")) {
+                return
+            }
+            val oldValue = __v_raw.deviceNo
+            __v_raw.deviceNo = value
+            _tRS(__v_raw, "deviceNo", oldValue, value)
+        }
+    override var deviceType: String
+        get() {
+            return _tRG(__v_raw, "deviceType", __v_raw.deviceType, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceType")) {
+                return
+            }
+            val oldValue = __v_raw.deviceType
+            __v_raw.deviceType = value
+            _tRS(__v_raw, "deviceType", oldValue, value)
+        }
+    override var deviceTypeValue: String
+        get() {
+            return _tRG(__v_raw, "deviceTypeValue", __v_raw.deviceTypeValue, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceTypeValue")) {
+                return
+            }
+            val oldValue = __v_raw.deviceTypeValue
+            __v_raw.deviceTypeValue = value
+            _tRS(__v_raw, "deviceTypeValue", oldValue, value)
+        }
+    override var plateNo: String
+        get() {
+            return _tRG(__v_raw, "plateNo", __v_raw.plateNo, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("plateNo")) {
+                return
+            }
+            val oldValue = __v_raw.plateNo
+            __v_raw.plateNo = value
+            _tRS(__v_raw, "plateNo", oldValue, value)
+        }
+    override var carType: String
+        get() {
+            return _tRG(__v_raw, "carType", __v_raw.carType, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("carType")) {
+                return
+            }
+            val oldValue = __v_raw.carType
+            __v_raw.carType = value
+            _tRS(__v_raw, "carType", oldValue, value)
+        }
+}
+open class ScanResultData (
+    @JsonNotNull
+    open var result: String,
+) : UTSObject()
+typealias CarIconItem__1 = UTSJSONObject
+val GenPagesAddCarAddCarClass = CreateVueComponent(GenPagesAddCarAddCar::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesAddCarAddCar.inheritAttrs, inject = GenPagesAddCarAddCar.inject, props = GenPagesAddCarAddCar.props, propsNeedCastKeys = GenPagesAddCarAddCar.propsNeedCastKeys, emits = GenPagesAddCarAddCar.emits, components = GenPagesAddCarAddCar.components, styles = GenPagesAddCarAddCar.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesAddCarAddCar.setup(props as GenPagesAddCarAddCar)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesAddCarAddCar {
+    return GenPagesAddCarAddCar(instance, renderer)
+}
+)
+val GenUniModulesIUiXComponentsISliderISliderClass = CreateVueComponent(GenUniModulesIUiXComponentsISliderISlider::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsISliderISlider.name, inheritAttrs = GenUniModulesIUiXComponentsISliderISlider.inheritAttrs, inject = GenUniModulesIUiXComponentsISliderISlider.inject, props = GenUniModulesIUiXComponentsISliderISlider.props, propsNeedCastKeys = GenUniModulesIUiXComponentsISliderISlider.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsISliderISlider.emits, components = GenUniModulesIUiXComponentsISliderISlider.components, styles = GenUniModulesIUiXComponentsISliderISlider.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesIUiXComponentsISliderISlider.setup(props as GenUniModulesIUiXComponentsISliderISlider)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesIUiXComponentsISliderISlider {
+    return GenUniModulesIUiXComponentsISliderISlider(instance)
+}
+)
 typealias PickerValue = Any
 open class PickerColumnItem (
     open var id: Any? = null,
@@ -2225,36 +4131,6 @@ interface PickerProps {
     var groupHeight: String?
     var radius: String?
     var resetIndex: Boolean
-}
-fun isString(str: Any?): Boolean {
-    return UTSAndroid.`typeof`(str) == "string"
-}
-fun isNumber(value: Any?): Boolean {
-    return _uA(
-        "Byte",
-        "UByte",
-        "Short",
-        "UShort",
-        "Int",
-        "UInt",
-        "Long",
-        "ULong",
-        "Float",
-        "Double",
-        "number"
-    ).includes(UTSAndroid.`typeof`(value))
-}
-fun isNumeric(value: Any?): Boolean {
-    if (value == null) {
-        return false
-    }
-    if (isNumber(value)) {
-        return true
-    } else if (isString(value)) {
-        val regex = UTSRegExp("^(-)?\\d+(\\.\\d+)?\$")
-        return regex.test(value as String)
-    }
-    return false
 }
 fun unitConvert(value: Any?, base: Number = 0): Number {
     if (value == null) {
@@ -4606,1722 +6482,6 @@ interface PickerItemProps {
     var column: Number
     var name: Any?
 }
-fun raf(fn: UniAnimationFrameCallback): Number {
-    return raf(fn as Any)
-}
-fun raf(fn: UniAnimationFrameCallbackWithNoArgument): Number {
-    return raf(fn as Any)
-}
-fun raf(fn: Any): Number {
-    if (UTSAndroid.`typeof`(fn) == "UniAnimationFrameCallback") {
-        return requestAnimationFrame(fn as UniAnimationFrameCallback)
-    } else {
-        return requestAnimationFrame(fn as UniAnimationFrameCallbackWithNoArgument)
-    }
-}
-fun doubleRaf(fn: UniAnimationFrameCallback): Unit {
-    return doubleRaf(fn as Any)
-}
-fun doubleRaf(fn: UniAnimationFrameCallbackWithNoArgument): Unit {
-    return doubleRaf(fn as Any)
-}
-fun doubleRaf(fn: Any): Unit {
-    raf(fun(): Number {
-        return raf(fn)
-    }
-    )
-}
-typealias TransitionEmitStatus = String
-typealias TransitionStatus = String
-open class UseTransitionOptions (
-    open var element: Ref<UniElement?>? = null,
-    open var enterClass: String? = null,
-    open var enterActiveClass: String? = null,
-    open var enterToClass: String? = null,
-    open var leaveClass: String? = null,
-    open var leaveActiveClass: String? = null,
-    open var leaveToClass: String? = null,
-    open var appear: Boolean? = null,
-    open var defaultName: String? = null,
-    open var name: (() -> String)? = null,
-    open var visible: (() -> Boolean)? = null,
-    open var emits: ((name: TransitionEmitStatus) -> Unit)? = null,
-    open var onNextTick: ((name: TransitionEmitStatus) -> UTSPromise<Unit>)? = null,
-    open var duration: Number? = null,
-    open var removeClasses: Boolean? = null,
-) : UTSObject()
-typealias ClassNameMap = Map<String, String>
-open class UseTransitionReturn (
-    @JsonNotNull
-    open var state: Ref<Boolean>,
-    @JsonNotNull
-    open var display: Ref<Boolean>,
-    @JsonNotNull
-    open var inited: Ref<Boolean>,
-    @JsonNotNull
-    open var classes: Ref<String>,
-    @JsonNotNull
-    open var name: Ref<String>,
-    open var finished: () -> Unit,
-    open var toggle: (v: Boolean) -> Unit,
-) : UTSObject()
-fun useTransition(options: UseTransitionOptions): UseTransitionReturn {
-    val state = ref(false)
-    val display = ref(false)
-    val inited = ref(false)
-    val classes = ref("")
-    val name = ref(options.defaultName ?: "fade")
-    val enterClass = options.enterClass ?: ""
-    val enterActiveClass = options.enterActiveClass ?: ""
-    val enterToClass = options.enterToClass ?: ""
-    val leaveActiveClass = options.leaveActiveClass ?: ""
-    val leaveToClass = options.leaveToClass ?: ""
-    val leaveClass = options.leaveClass ?: ""
-    val appear = options.appear ?: false
-    val duration = options.duration ?: 300
-    var status: TransitionStatus = ""
-    var isTransitionEnd = false
-    var isTransitioning = false
-    var timeoutId: Number = -1
-    var finishTimeoutId: Number = -1
-    val emitEvent = fun(event: TransitionEmitStatus){
-        options.emits?.invoke(event)
-    }
-    val finished = fun(){
-        if (isTransitionEnd) {
-            return
-        }
-        isTransitionEnd = true
-        clearTimeout(finishTimeoutId)
-        if (options.removeClasses ?: false) {
-            classes.value = ""
-        }
-        emitEvent("after-" + status)
-        if (display.value && !state.value) {
-            display.value = false
-        }
-    }
-    val sleep = fun(): UTSPromise<Unit> {
-        return UTSPromise(fun(resolve, _reject){
-            nextTick(fun(){
-                raf(fun(){
-                    if (options.element?.value != null) {
-                        options.element?.value?.getBoundingClientRectAsync()?.then(fun(res){
-                            resolve(Unit)
-                        })
-                    } else {
-                        resolve(Unit)
-                    }
-                }
-                )
-            }
-            )
-        }
-        )
-    }
-    val getClassNames = fun(name: String): ClassNameMap {
-        return Map<String, String>(_uA(
-            _uA(
-                "enter",
-                "l-" + name + "-enter l-" + name + "-enter-active " + enterClass + " " + enterActiveClass
-            ),
-            _uA(
-                "enter-to",
-                "l-" + name + "-enter-to l-" + name + "-enter-active " + enterToClass + " " + enterActiveClass
-            ),
-            _uA(
-                "leave",
-                "l-" + name + "-leave l-" + name + "-leave-active " + leaveClass + " " + leaveActiveClass
-            ),
-            _uA(
-                "leave-to",
-                "l-" + name + "-leave-to l-" + name + "-leave-active " + leaveToClass + " " + leaveActiveClass
-            )
-        ))
-    }
-    val transitionQueue = ref(_uA<TransitionStatus>())
-    val performTransition = fun(newStatus: TransitionStatus, eventName: TransitionStatus): UTSPromise<Unit> {
-        return wrapUTSPromise(suspend w1@{
-                if (status == newStatus) {
-                    return@w1
-                }
-                transitionQueue.value.push(newStatus)
-                if (isTransitioning) {
-                    return@w1
-                }
-                isTransitioning = true
-                isTransitionEnd = true
-                while(transitionQueue.value.length > 0){
-                    val currentStatus = transitionQueue.value.shift()!!
-                    status = currentStatus
-                    emitEvent("before-" + eventName)
-                    await(sleep())
-                    await(sleep())
-                    await(sleep())
-                    await(sleep())
-                    await(sleep())
-                    if (status != currentStatus) {
-                        continue
-                    }
-                    val classNames = getClassNames(name.value)
-                    inited.value = true
-                    display.value = true
-                    classes.value = classNames.get(eventName)!!
-                    emitEvent(eventName)
-                    val executeAfterTick = options.onNextTick?.invoke(eventName)
-                    if (executeAfterTick != null) {
-                        await(executeAfterTick)
-                    }
-                    await(sleep())
-                    if (status != currentStatus) {
-                        continue
-                    }
-                    classes.value = classNames.get("" + eventName + "-to")!!
-                    if (status == "leave") {
-                        setTimeout(fun(){
-                            finished()
-                        }
-                        , duration)
-                    }
-                }
-                clearTimeout(timeoutId)
-                timeoutId = setTimeout(fun(){
-                    if (transitionQueue.value.length == 0 && status == newStatus) {
-                        isTransitionEnd = false
-                    }
-                }
-                , duration * 0.8)
-                isTransitioning = false
-        })
-    }
-    val enter = fun(){
-        performTransition("enter", "enter")
-    }
-    val leave = fun(){
-        performTransition("leave", "leave")
-    }
-    var init = false
-    var lastState: Boolean? = null
-    watchEffect(fun(){
-        if (options.visible == null) {
-            return
-        }
-        state.value = options.visible!!()
-        if (lastState == state.value) {
-            return
-        }
-        lastState = state.value
-        if (!appear && !init) {
-            init = true
-            return
-        }
-        if (state.value) {
-            enter()
-        } else {
-            leave()
-        }
-    }
-    )
-    watchEffect(fun(){
-        if (options.name == null) {
-            return
-        }
-        name.value = options.name!!()
-    }
-    )
-    val toggle = fun(v: Boolean){
-        state.value = v
-        if (v) {
-            enter()
-        } else {
-            leave()
-        }
-    }
-    return UseTransitionReturn(state = state, inited = inited, display = display, classes = classes, name = name, finished = finished, toggle = toggle)
-}
-interface OverlayProps {
-    var ariaLabel: String
-    var ariaRole: String
-    var lClass: String?
-    var bgColor: String?
-    var lStyle: Any?
-    var duration: Number
-    var preventScrollThrough: Boolean
-    var visible: Boolean
-    var zIndex: Number
-}
-val GenUniModulesLimeOverlayComponentsLOverlayLOverlayClass = CreateVueComponent(GenUniModulesLimeOverlayComponentsLOverlayLOverlay::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.inheritAttrs, inject = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.inject, props = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.props, propsNeedCastKeys = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.propsNeedCastKeys, emits = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.emits, components = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.components, styles = GenUniModulesLimeOverlayComponentsLOverlayLOverlay.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesLimeOverlayComponentsLOverlayLOverlay.setup(props as GenUniModulesLimeOverlayComponentsLOverlayLOverlay)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesLimeOverlayComponentsLOverlayLOverlay {
-    return GenUniModulesLimeOverlayComponentsLOverlayLOverlay(instance)
-}
-)
-fun isDef(value: Any?): Boolean {
-    return value != null
-}
-fun addUnit(value: String): String? {
-    return addUnit(value as Any?)
-}
-fun addUnit(value: Number): String? {
-    return addUnit(value as Any?)
-}
-fun addUnit(reassignedValue: Any?): String? {
-    var value = reassignedValue
-    if (!isDef(value)) {
-        return null
-    }
-    value = "" + value
-    return if (isNumeric(value)) {
-        "" + value as String + "px"
-    } else {
-        value as String
-    }
-}
-fun convertRadius(radius: Any): UTSArray<String> {
-    if (UTSArray.isArray(radius)) {
-        val values = (radius as UTSArray<Any>).map(fun(item): String? {
-            return addUnit(item)
-        }
-        )
-        if (values.length == 1) {
-            return _uA(
-                values[0]!!,
-                values[0]!!,
-                values[0]!!,
-                values[0]!!
-            )
-        }
-        if (values.length == 2) {
-            return _uA(
-                values[0]!!,
-                values[1]!!,
-                values[0]!!,
-                values[1]!!
-            )
-        }
-        if (values.length == 3) {
-            return _uA(
-                values[0]!!,
-                values[1]!!,
-                values[2]!!,
-                values[1]!!
-            )
-        }
-        if (values.length == 4) {
-            return _uA(
-                values[0]!!,
-                values[1]!!,
-                values[2]!!,
-                values[3]!!
-            )
-        }
-        return _uA(
-            "0",
-            "0",
-            "0",
-            "0"
-        )
-    }
-    val value = addUnit(radius) ?: "0"
-    return _uA(
-        value,
-        value,
-        value,
-        value
-    )
-}
-interface PopupProps {
-    var closeable: Boolean
-    var closeOnClickOverlay: Boolean
-    var destroyOnClose: Boolean
-    var overlayStyle: Any?
-    var position: String
-    var preventScrollThrough: Boolean
-    var overlay: Boolean
-    var transitionName: String?
-    var visible: Boolean?
-    var zIndex: Number
-    var duration: Number
-    var bgColor: String?
-    var closeIcon: String
-    var iconColor: String?
-    var lStyle: Any?
-    var safeAreaInsetBottom: Boolean
-    var safeAreaInsetTop: Boolean
-    var radius: Any?
-}
-val GenUniModulesLimePopupComponentsLPopupLPopupClass = CreateVueComponent(GenUniModulesLimePopupComponentsLPopupLPopup::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesLimePopupComponentsLPopupLPopup.inheritAttrs, inject = GenUniModulesLimePopupComponentsLPopupLPopup.inject, props = GenUniModulesLimePopupComponentsLPopupLPopup.props, propsNeedCastKeys = GenUniModulesLimePopupComponentsLPopupLPopup.propsNeedCastKeys, emits = GenUniModulesLimePopupComponentsLPopupLPopup.emits, components = GenUniModulesLimePopupComponentsLPopupLPopup.components, styles = GenUniModulesLimePopupComponentsLPopupLPopup.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesLimePopupComponentsLPopupLPopup.setup(props as GenUniModulesLimePopupComponentsLPopupLPopup)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesLimePopupComponentsLPopupLPopup {
-    return GenUniModulesLimePopupComponentsLPopupLPopup(instance)
-}
-)
-val GenComponentsAppToastAppToastClass = CreateVueComponent(GenComponentsAppToastAppToast::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenComponentsAppToastAppToast.name, inheritAttrs = GenComponentsAppToastAppToast.inheritAttrs, inject = GenComponentsAppToastAppToast.inject, props = GenComponentsAppToastAppToast.props, propsNeedCastKeys = GenComponentsAppToastAppToast.propsNeedCastKeys, emits = GenComponentsAppToastAppToast.emits, components = GenComponentsAppToastAppToast.components, styles = GenComponentsAppToastAppToast.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenComponentsAppToastAppToast.setup(props as GenComponentsAppToastAppToast)
-    }
-    )
-}
-, fun(instance, renderer): GenComponentsAppToastAppToast {
-    return GenComponentsAppToastAppToast(instance)
-}
-)
-val GenComponentsAppModalAppModalClass = CreateVueComponent(GenComponentsAppModalAppModal::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenComponentsAppModalAppModal.name, inheritAttrs = GenComponentsAppModalAppModal.inheritAttrs, inject = GenComponentsAppModalAppModal.inject, props = GenComponentsAppModalAppModal.props, propsNeedCastKeys = GenComponentsAppModalAppModal.propsNeedCastKeys, emits = GenComponentsAppModalAppModal.emits, components = GenComponentsAppModalAppModal.components, styles = GenComponentsAppModalAppModal.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenComponentsAppModalAppModal.setup(props as GenComponentsAppModalAppModal)
-    }
-    )
-}
-, fun(instance, renderer): GenComponentsAppModalAppModal {
-    return GenComponentsAppModalAppModal(instance)
-}
-)
-val `default` = "/static/banner.png"
-val default__1 = "/static/pos.png"
-val default__2 = "/static/car.png"
-val default__3 = "/static/dzwl.png"
-val default__4 = "/static/msg.png"
-val default__5 = "/static/pay.png"
-val default__6 = "/static/online.png"
-val default__7 = "/static/del.png"
-val default__8 = "/static/logout.png"
-open class TodayTimeRange (
-    @JsonNotNull
-    open var nowTime: Number,
-    @JsonNotNull
-    open var todayZero: Number,
-) : UTSObject()
-fun getTodayZeroTime(): TodayTimeRange {
-    val now = Date()
-    val nowTime = now.getTime()
-    val todayZero = Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime()
-    return TodayTimeRange(nowTime = nowTime, todayZero = todayZero)
-}
-fun pad(value: Number): String {
-    return value.toString(10).padStart(2, "0")
-}
-fun formatTimes(timestamp: Number): String {
-    val d = Date(timestamp)
-    return "" + d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds())
-}
-fun parseLocalDateTime(timestamp: String): Number? {
-    val match = timestamp.match(UTSRegExp("^(\\d{4})[-\\/](\\d{2})[-\\/](\\d{2})(?:\\s+(\\d{2}):(\\d{2})(?::(\\d{2}))?)?\$", ""))
-    if (match == null) {
-        return null
-    }
-    val year = parseInt(match[1] ?: "0")
-    val month = parseInt(match[2] ?: "0")
-    val day = parseInt(match[3] ?: "0")
-    val hour = if (match[4] == null) {
-        0
-    } else {
-        parseInt(match[4] ?: "0")
-    }
-    val minute = if (match[5] == null) {
-        0
-    } else {
-        parseInt(match[5] ?: "0")
-    }
-    val second = if (match[6] == null) {
-        0
-    } else {
-        parseInt(match[6] ?: "0")
-    }
-    val date = Date(year, month - 1, day, hour, minute, second)
-    if (date.getFullYear() != year || date.getMonth() != month - 1 || date.getDate() != day || date.getHours() != hour || date.getMinutes() != minute || date.getSeconds() != second) {
-        return null
-    }
-    return date.getTime()
-}
-fun normalizeLocalDateTime(timestamp: String): String {
-    val milliseconds = parseLocalDateTime(timestamp)
-    return if (milliseconds == null) {
-        timestamp
-    } else {
-        formatTimes(milliseconds)
-    }
-}
-fun formatLocalTime(timestamp: String): String {
-    val milliseconds = parseLocalDateTime(timestamp)
-    if (milliseconds == null) {
-        return ""
-    }
-    val date = Date(milliseconds)
-    return "" + pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds())
-}
-fun getDeviceIcon(connectionStatus: String, carType: String): String {
-    val basePath = if (connectionStatus == "online") {
-        "/static/cars/online/"
-    } else {
-        "/static/cars/offline/"
-    }
-    val validTypes = _uA(
-        "car",
-        "bus",
-        "bike",
-        "moto",
-        "diandong",
-        "huoche",
-        "sanlun",
-        "tuola",
-        "suv",
-        "baby",
-        "tank",
-        "zhuangjia",
-        "wajue",
-        "plan",
-        "walk",
-        "muma",
-        "hangmu",
-        "junjian",
-        "tuiche",
-        "train"
-    )
-    var iconPath = basePath + "default.png"
-    if (validTypes.includes(carType)) {
-        iconPath = basePath + carType + ".png"
-    }
-    return iconPath
-}
-open class Device (
-    @JsonNotNull
-    open var name: String,
-    @JsonNotNull
-    open var deviceName: String,
-    @JsonNotNull
-    open var value: String,
-    @JsonNotNull
-    open var deviceNo: String,
-    @JsonNotNull
-    open var deptId: String,
-    @JsonNotNull
-    open var deviceId: String,
-    @JsonNotNull
-    open var iccid: String,
-    @JsonNotNull
-    open var simMerchant: String,
-    @JsonNotNull
-    open var connectionStatus: String,
-    @JsonNotNull
-    open var carType: String,
-    @JsonNotNull
-    open var plateNo: String,
-    @JsonNotNull
-    open var latitude: Number,
-    @JsonNotNull
-    open var longitude: Number,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class DeviceReactiveObject : Device, IUTSReactive<Device> {
-    override var __v_raw: Device
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: Device, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(name = __v_raw.name, deviceName = __v_raw.deviceName, value = __v_raw.value, deviceNo = __v_raw.deviceNo, deptId = __v_raw.deptId, deviceId = __v_raw.deviceId, iccid = __v_raw.iccid, simMerchant = __v_raw.simMerchant, connectionStatus = __v_raw.connectionStatus, carType = __v_raw.carType, plateNo = __v_raw.plateNo, latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): DeviceReactiveObject {
-        return DeviceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var name: String
-        get() {
-            return _tRG(__v_raw, "name", __v_raw.name, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("name")) {
-                return
-            }
-            val oldValue = __v_raw.name
-            __v_raw.name = value
-            _tRS(__v_raw, "name", oldValue, value)
-        }
-    override var deviceName: String
-        get() {
-            return _tRG(__v_raw, "deviceName", __v_raw.deviceName, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("deviceName")) {
-                return
-            }
-            val oldValue = __v_raw.deviceName
-            __v_raw.deviceName = value
-            _tRS(__v_raw, "deviceName", oldValue, value)
-        }
-    override var value: String
-        get() {
-            return _tRG(__v_raw, "value", __v_raw.value, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("value")) {
-                return
-            }
-            val oldValue = __v_raw.value
-            __v_raw.value = value
-            _tRS(__v_raw, "value", oldValue, value)
-        }
-    override var deviceNo: String
-        get() {
-            return _tRG(__v_raw, "deviceNo", __v_raw.deviceNo, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("deviceNo")) {
-                return
-            }
-            val oldValue = __v_raw.deviceNo
-            __v_raw.deviceNo = value
-            _tRS(__v_raw, "deviceNo", oldValue, value)
-        }
-    override var deptId: String
-        get() {
-            return _tRG(__v_raw, "deptId", __v_raw.deptId, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("deptId")) {
-                return
-            }
-            val oldValue = __v_raw.deptId
-            __v_raw.deptId = value
-            _tRS(__v_raw, "deptId", oldValue, value)
-        }
-    override var deviceId: String
-        get() {
-            return _tRG(__v_raw, "deviceId", __v_raw.deviceId, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("deviceId")) {
-                return
-            }
-            val oldValue = __v_raw.deviceId
-            __v_raw.deviceId = value
-            _tRS(__v_raw, "deviceId", oldValue, value)
-        }
-    override var iccid: String
-        get() {
-            return _tRG(__v_raw, "iccid", __v_raw.iccid, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("iccid")) {
-                return
-            }
-            val oldValue = __v_raw.iccid
-            __v_raw.iccid = value
-            _tRS(__v_raw, "iccid", oldValue, value)
-        }
-    override var simMerchant: String
-        get() {
-            return _tRG(__v_raw, "simMerchant", __v_raw.simMerchant, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("simMerchant")) {
-                return
-            }
-            val oldValue = __v_raw.simMerchant
-            __v_raw.simMerchant = value
-            _tRS(__v_raw, "simMerchant", oldValue, value)
-        }
-    override var connectionStatus: String
-        get() {
-            return _tRG(__v_raw, "connectionStatus", __v_raw.connectionStatus, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("connectionStatus")) {
-                return
-            }
-            val oldValue = __v_raw.connectionStatus
-            __v_raw.connectionStatus = value
-            _tRS(__v_raw, "connectionStatus", oldValue, value)
-        }
-    override var carType: String
-        get() {
-            return _tRG(__v_raw, "carType", __v_raw.carType, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("carType")) {
-                return
-            }
-            val oldValue = __v_raw.carType
-            __v_raw.carType = value
-            _tRS(__v_raw, "carType", oldValue, value)
-        }
-    override var plateNo: String
-        get() {
-            return _tRG(__v_raw, "plateNo", __v_raw.plateNo, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("plateNo")) {
-                return
-            }
-            val oldValue = __v_raw.plateNo
-            __v_raw.plateNo = value
-            _tRS(__v_raw, "plateNo", oldValue, value)
-        }
-    override var latitude: Number
-        get() {
-            return _tRG(__v_raw, "latitude", __v_raw.latitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("latitude")) {
-                return
-            }
-            val oldValue = __v_raw.latitude
-            __v_raw.latitude = value
-            _tRS(__v_raw, "latitude", oldValue, value)
-        }
-    override var longitude: Number
-        get() {
-            return _tRG(__v_raw, "longitude", __v_raw.longitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("longitude")) {
-                return
-            }
-            val oldValue = __v_raw.longitude
-            __v_raw.longitude = value
-            _tRS(__v_raw, "longitude", oldValue, value)
-        }
-}
-open class MapCenter (
-    @JsonNotNull
-    open var latitude: Number,
-    @JsonNotNull
-    open var longitude: Number,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class MapCenterReactiveObject : MapCenter, IUTSReactive<MapCenter> {
-    override var __v_raw: MapCenter
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: MapCenter, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): MapCenterReactiveObject {
-        return MapCenterReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var latitude: Number
-        get() {
-            return _tRG(__v_raw, "latitude", __v_raw.latitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("latitude")) {
-                return
-            }
-            val oldValue = __v_raw.latitude
-            __v_raw.latitude = value
-            _tRS(__v_raw, "latitude", oldValue, value)
-        }
-    override var longitude: Number
-        get() {
-            return _tRG(__v_raw, "longitude", __v_raw.longitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("longitude")) {
-                return
-            }
-            val oldValue = __v_raw.longitude
-            __v_raw.longitude = value
-            _tRS(__v_raw, "longitude", oldValue, value)
-        }
-}
-typealias PositionState = String
-open class DeviceStatus (
-    @JsonNotNull
-    open var batteryPercent: Number,
-    @JsonNotNull
-    open var voltage: Number,
-    @JsonNotNull
-    open var signalStrength: Number,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class DeviceStatusReactiveObject : DeviceStatus, IUTSReactive<DeviceStatus> {
-    override var __v_raw: DeviceStatus
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: DeviceStatus, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(batteryPercent = __v_raw.batteryPercent, voltage = __v_raw.voltage, signalStrength = __v_raw.signalStrength) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): DeviceStatusReactiveObject {
-        return DeviceStatusReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var batteryPercent: Number
-        get() {
-            return _tRG(__v_raw, "batteryPercent", __v_raw.batteryPercent, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("batteryPercent")) {
-                return
-            }
-            val oldValue = __v_raw.batteryPercent
-            __v_raw.batteryPercent = value
-            _tRS(__v_raw, "batteryPercent", oldValue, value)
-        }
-    override var voltage: Number
-        get() {
-            return _tRG(__v_raw, "voltage", __v_raw.voltage, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("voltage")) {
-                return
-            }
-            val oldValue = __v_raw.voltage
-            __v_raw.voltage = value
-            _tRS(__v_raw, "voltage", oldValue, value)
-        }
-    override var signalStrength: Number
-        get() {
-            return _tRG(__v_raw, "signalStrength", __v_raw.signalStrength, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("signalStrength")) {
-                return
-            }
-            val oldValue = __v_raw.signalStrength
-            __v_raw.signalStrength = value
-            _tRS(__v_raw, "signalStrength", oldValue, value)
-        }
-}
-open class DeviceDetailState (
-    @JsonNotNull
-    open var deviceStatus: DeviceStatus,
-    @JsonNotNull
-    open var connectionStatus: String,
-    @JsonNotNull
-    open var lastUpdateTime: String,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class DeviceDetailStateReactiveObject : DeviceDetailState, IUTSReactive<DeviceDetailState> {
-    override var __v_raw: DeviceDetailState
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: DeviceDetailState, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(deviceStatus = __v_raw.deviceStatus, connectionStatus = __v_raw.connectionStatus, lastUpdateTime = __v_raw.lastUpdateTime) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): DeviceDetailStateReactiveObject {
-        return DeviceDetailStateReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var deviceStatus: DeviceStatus
-        get() {
-            return _tRG(__v_raw, "deviceStatus", __v_raw.deviceStatus, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("deviceStatus")) {
-                return
-            }
-            val oldValue = __v_raw.deviceStatus
-            __v_raw.deviceStatus = value
-            _tRS(__v_raw, "deviceStatus", oldValue, value)
-        }
-    override var connectionStatus: String
-        get() {
-            return _tRG(__v_raw, "connectionStatus", __v_raw.connectionStatus, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("connectionStatus")) {
-                return
-            }
-            val oldValue = __v_raw.connectionStatus
-            __v_raw.connectionStatus = value
-            _tRS(__v_raw, "connectionStatus", oldValue, value)
-        }
-    override var lastUpdateTime: String
-        get() {
-            return _tRG(__v_raw, "lastUpdateTime", __v_raw.lastUpdateTime, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("lastUpdateTime")) {
-                return
-            }
-            val oldValue = __v_raw.lastUpdateTime
-            __v_raw.lastUpdateTime = value
-            _tRS(__v_raw, "lastUpdateTime", oldValue, value)
-        }
-}
-open class SavedDevice (
-    @JsonNotNull
-    open var name: String,
-    @JsonNotNull
-    open var deviceName: String,
-    @JsonNotNull
-    open var deviceNo: String,
-    @JsonNotNull
-    open var deptId: String,
-    @JsonNotNull
-    open var deviceId: String,
-    @JsonNotNull
-    open var iccid: String,
-    @JsonNotNull
-    open var simMerchant: String,
-    @JsonNotNull
-    open var connectionStatus: String,
-    @JsonNotNull
-    open var carType: String,
-    @JsonNotNull
-    open var plateNo: String,
-    @JsonNotNull
-    open var latitude: Number,
-    @JsonNotNull
-    open var longitude: Number,
-) : UTSObject()
-val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesIndexIndex.inheritAttrs, inject = GenPagesIndexIndex.inject, props = GenPagesIndexIndex.props, propsNeedCastKeys = GenPagesIndexIndex.propsNeedCastKeys, emits = GenPagesIndexIndex.emits, components = GenPagesIndexIndex.components, styles = GenPagesIndexIndex.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesIndexIndex.setup(props as GenPagesIndexIndex)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesIndexIndex {
-    return GenPagesIndexIndex(instance, renderer)
-}
-)
-val GenComponentsCustomNavBarCustomNavBarClass = CreateVueComponent(GenComponentsCustomNavBarCustomNavBar::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenComponentsCustomNavBarCustomNavBar.inheritAttrs, inject = GenComponentsCustomNavBarCustomNavBar.inject, props = GenComponentsCustomNavBarCustomNavBar.props, propsNeedCastKeys = GenComponentsCustomNavBarCustomNavBar.propsNeedCastKeys, emits = GenComponentsCustomNavBarCustomNavBar.emits, components = GenComponentsCustomNavBarCustomNavBar.components, styles = GenComponentsCustomNavBarCustomNavBar.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenComponentsCustomNavBarCustomNavBar.setup(props as GenComponentsCustomNavBarCustomNavBar)
-    }
-    )
-}
-, fun(instance, renderer): GenComponentsCustomNavBarCustomNavBar {
-    return GenComponentsCustomNavBarCustomNavBar(instance)
-}
-)
-val GenUniModulesIUiXComponentsIModalIModalClass = CreateVueComponent(GenUniModulesIUiXComponentsIModalIModal::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIModalIModal.name, inheritAttrs = GenUniModulesIUiXComponentsIModalIModal.inheritAttrs, inject = GenUniModulesIUiXComponentsIModalIModal.inject, props = GenUniModulesIUiXComponentsIModalIModal.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIModalIModal.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIModalIModal.emits, components = GenUniModulesIUiXComponentsIModalIModal.components, styles = GenUniModulesIUiXComponentsIModalIModal.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
-        return GenUniModulesIUiXComponentsIModalIModal.setup(props as GenUniModulesIUiXComponentsIModalIModal, ctx)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIModalIModal {
-    return GenUniModulesIUiXComponentsIModalIModal(instance)
-}
-)
-val GenPagesMessageMessageClass = CreateVueComponent(GenPagesMessageMessage::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesMessageMessage.inheritAttrs, inject = GenPagesMessageMessage.inject, props = GenPagesMessageMessage.props, propsNeedCastKeys = GenPagesMessageMessage.propsNeedCastKeys, emits = GenPagesMessageMessage.emits, components = GenPagesMessageMessage.components, styles = GenPagesMessageMessage.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesMessageMessage.setup(props as GenPagesMessageMessage)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesMessageMessage {
-    return GenPagesMessageMessage(instance, renderer)
-}
-)
-val GenUniModulesIUiXComponentsIBadgeIBadgeClass = CreateVueComponent(GenUniModulesIUiXComponentsIBadgeIBadge::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIBadgeIBadge.name, inheritAttrs = GenUniModulesIUiXComponentsIBadgeIBadge.inheritAttrs, inject = GenUniModulesIUiXComponentsIBadgeIBadge.inject, props = GenUniModulesIUiXComponentsIBadgeIBadge.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIBadgeIBadge.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIBadgeIBadge.emits, components = GenUniModulesIUiXComponentsIBadgeIBadge.components, styles = GenUniModulesIUiXComponentsIBadgeIBadge.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesIUiXComponentsIBadgeIBadge.setup(props as GenUniModulesIUiXComponentsIBadgeIBadge)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIBadgeIBadge {
-    return GenUniModulesIUiXComponentsIBadgeIBadge(instance)
-}
-)
-val GenPagesUserCenterUserCenterClass = CreateVueComponent(GenPagesUserCenterUserCenter::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesUserCenterUserCenter.inheritAttrs, inject = GenPagesUserCenterUserCenter.inject, props = GenPagesUserCenterUserCenter.props, propsNeedCastKeys = GenPagesUserCenterUserCenter.propsNeedCastKeys, emits = GenPagesUserCenterUserCenter.emits, components = GenPagesUserCenterUserCenter.components, styles = GenPagesUserCenterUserCenter.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesUserCenterUserCenter.setup(props as GenPagesUserCenterUserCenter)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesUserCenterUserCenter {
-    return GenPagesUserCenterUserCenter(instance, renderer)
-}
-)
-val GenUniModulesIUiXComponentsIInputIInputClass = CreateVueComponent(GenUniModulesIUiXComponentsIInputIInput::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIInputIInput.name, inheritAttrs = GenUniModulesIUiXComponentsIInputIInput.inheritAttrs, inject = GenUniModulesIUiXComponentsIInputIInput.inject, props = GenUniModulesIUiXComponentsIInputIInput.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIInputIInput.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIInputIInput.emits, components = GenUniModulesIUiXComponentsIInputIInput.components, styles = GenUniModulesIUiXComponentsIInputIInput.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
-        return GenUniModulesIUiXComponentsIInputIInput.setup(props as GenUniModulesIUiXComponentsIInputIInput, ctx)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIInputIInput {
-    return GenUniModulesIUiXComponentsIInputIInput(instance)
-}
-)
-val GenUniModulesIUiXComponentsICheckboxICheckboxClass = CreateVueComponent(GenUniModulesIUiXComponentsICheckboxICheckbox::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsICheckboxICheckbox.name, inheritAttrs = GenUniModulesIUiXComponentsICheckboxICheckbox.inheritAttrs, inject = GenUniModulesIUiXComponentsICheckboxICheckbox.inject, props = GenUniModulesIUiXComponentsICheckboxICheckbox.props, propsNeedCastKeys = GenUniModulesIUiXComponentsICheckboxICheckbox.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsICheckboxICheckbox.emits, components = GenUniModulesIUiXComponentsICheckboxICheckbox.components, styles = GenUniModulesIUiXComponentsICheckboxICheckbox.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesIUiXComponentsICheckboxICheckbox.setup(props as GenUniModulesIUiXComponentsICheckboxICheckbox)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsICheckboxICheckbox {
-    return GenUniModulesIUiXComponentsICheckboxICheckbox(instance)
-}
-)
-val GenUniModulesIUiXComponentsIButtonIButtonClass = CreateVueComponent(GenUniModulesIUiXComponentsIButtonIButton::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIButtonIButton.name, inheritAttrs = GenUniModulesIUiXComponentsIButtonIButton.inheritAttrs, inject = GenUniModulesIUiXComponentsIButtonIButton.inject, props = GenUniModulesIUiXComponentsIButtonIButton.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIButtonIButton.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIButtonIButton.emits, components = GenUniModulesIUiXComponentsIButtonIButton.components, styles = GenUniModulesIUiXComponentsIButtonIButton.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesIUiXComponentsIButtonIButton.setup(props as GenUniModulesIUiXComponentsIButtonIButton)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIButtonIButton {
-    return GenUniModulesIUiXComponentsIButtonIButton(instance)
-}
-)
-val userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。"
-val privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。"
-open class SmsRegisterContext (
-    @JsonNotNull
-    open var phonenumber: String,
-    @JsonNotNull
-    open var smsCode: String,
-) : UTSObject()
-var pendingContext: SmsRegisterContext? = null
-fun saveSmsRegisterContext(phonenumber: String, smsCode: String): Unit {
-    pendingContext = SmsRegisterContext(phonenumber = phonenumber, smsCode = smsCode)
-}
-fun getSmsRegisterContext(): SmsRegisterContext? {
-    return pendingContext
-}
-fun clearSmsRegisterContext(): Unit {
-    pendingContext = null
-}
-open class PersonalLoginForm (
-    @JsonNotNull
-    open var username: String,
-    @JsonNotNull
-    open var password: String,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return PersonalLoginFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class PersonalLoginFormReactiveObject : PersonalLoginForm, IUTSReactive<PersonalLoginForm> {
-    override var __v_raw: PersonalLoginForm
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: PersonalLoginForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PersonalLoginFormReactiveObject {
-        return PersonalLoginFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var username: String
-        get() {
-            return _tRG(__v_raw, "username", __v_raw.username, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("username")) {
-                return
-            }
-            val oldValue = __v_raw.username
-            __v_raw.username = value
-            _tRS(__v_raw, "username", oldValue, value)
-        }
-    override var password: String
-        get() {
-            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("password")) {
-                return
-            }
-            val oldValue = __v_raw.password
-            __v_raw.password = value
-            _tRS(__v_raw, "password", oldValue, value)
-        }
-}
-open class EnterpriseLoginForm (
-    @JsonNotNull
-    open var username: String,
-    @JsonNotNull
-    open var password: String,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return EnterpriseLoginFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class EnterpriseLoginFormReactiveObject : EnterpriseLoginForm, IUTSReactive<EnterpriseLoginForm> {
-    override var __v_raw: EnterpriseLoginForm
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: EnterpriseLoginForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): EnterpriseLoginFormReactiveObject {
-        return EnterpriseLoginFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var username: String
-        get() {
-            return _tRG(__v_raw, "username", __v_raw.username, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("username")) {
-                return
-            }
-            val oldValue = __v_raw.username
-            __v_raw.username = value
-            _tRS(__v_raw, "username", oldValue, value)
-        }
-    override var password: String
-        get() {
-            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("password")) {
-                return
-            }
-            val oldValue = __v_raw.password
-            __v_raw.password = value
-            _tRS(__v_raw, "password", oldValue, value)
-        }
-}
-val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginLogin.inheritAttrs, inject = GenPagesLoginLogin.inject, props = GenPagesLoginLogin.props, propsNeedCastKeys = GenPagesLoginLogin.propsNeedCastKeys, emits = GenPagesLoginLogin.emits, components = GenPagesLoginLogin.components, styles = GenPagesLoginLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesLoginLogin.setup(props as GenPagesLoginLogin)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesLoginLogin {
-    return GenPagesLoginLogin(instance, renderer)
-}
-)
-val GenUniModulesIUiXComponentsIFormItemIFormItemClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormItemIFormItem::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormItemIFormItem.name, inheritAttrs = GenUniModulesIUiXComponentsIFormItemIFormItem.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormItemIFormItem.inject, props = GenUniModulesIUiXComponentsIFormItemIFormItem.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormItemIFormItem.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormItemIFormItem.emits, components = GenUniModulesIUiXComponentsIFormItemIFormItem.components, styles = GenUniModulesIUiXComponentsIFormItemIFormItem.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesIUiXComponentsIFormItemIFormItem.setup(props as GenUniModulesIUiXComponentsIFormItemIFormItem)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIFormItemIFormItem {
-    return GenUniModulesIUiXComponentsIFormItemIFormItem(instance)
-}
-)
-val GenUniModulesIUiXComponentsIFormIFormClass = CreateVueComponent(GenUniModulesIUiXComponentsIFormIForm::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIFormIForm.name, inheritAttrs = GenUniModulesIUiXComponentsIFormIForm.inheritAttrs, inject = GenUniModulesIUiXComponentsIFormIForm.inject, props = GenUniModulesIUiXComponentsIFormIForm.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIFormIForm.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIFormIForm.emits, components = GenUniModulesIUiXComponentsIFormIForm.components, styles = GenUniModulesIUiXComponentsIFormIForm.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
-        return GenUniModulesIUiXComponentsIFormIForm.setup(props as GenUniModulesIUiXComponentsIFormIForm, ctx)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIFormIForm {
-    return GenUniModulesIUiXComponentsIFormIForm(instance)
-}
-)
-open class PersonalLoginForm__1 (
-    @JsonNotNull
-    open var username: String,
-    @JsonNotNull
-    open var password: String,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return PersonalLoginForm__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class PersonalLoginForm__1ReactiveObject : PersonalLoginForm__1, IUTSReactive<PersonalLoginForm__1> {
-    override var __v_raw: PersonalLoginForm__1
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: PersonalLoginForm__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(username = __v_raw.username, password = __v_raw.password) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PersonalLoginForm__1ReactiveObject {
-        return PersonalLoginForm__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var username: String
-        get() {
-            return _tRG(__v_raw, "username", __v_raw.username, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("username")) {
-                return
-            }
-            val oldValue = __v_raw.username
-            __v_raw.username = value
-            _tRS(__v_raw, "username", oldValue, value)
-        }
-    override var password: String
-        get() {
-            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("password")) {
-                return
-            }
-            val oldValue = __v_raw.password
-            __v_raw.password = value
-            _tRS(__v_raw, "password", oldValue, value)
-        }
-}
-val GenPagesLoginPersonalPasswordLoginClass = CreateVueComponent(GenPagesLoginPersonalPasswordLogin::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginPersonalPasswordLogin.inheritAttrs, inject = GenPagesLoginPersonalPasswordLogin.inject, props = GenPagesLoginPersonalPasswordLogin.props, propsNeedCastKeys = GenPagesLoginPersonalPasswordLogin.propsNeedCastKeys, emits = GenPagesLoginPersonalPasswordLogin.emits, components = GenPagesLoginPersonalPasswordLogin.components, styles = GenPagesLoginPersonalPasswordLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesLoginPersonalPasswordLogin.setup(props as GenPagesLoginPersonalPasswordLogin)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesLoginPersonalPasswordLogin {
-    return GenPagesLoginPersonalPasswordLogin(instance, renderer)
-}
-)
-open class RegisterForm (
-    @JsonNotNull
-    open var password: String,
-    @JsonNotNull
-    open var mobile: String,
-    @JsonNotNull
-    open var smsCode: String,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return RegisterFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class RegisterFormReactiveObject : RegisterForm, IUTSReactive<RegisterForm> {
-    override var __v_raw: RegisterForm
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: RegisterForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(password = __v_raw.password, mobile = __v_raw.mobile, smsCode = __v_raw.smsCode) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): RegisterFormReactiveObject {
-        return RegisterFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var password: String
-        get() {
-            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("password")) {
-                return
-            }
-            val oldValue = __v_raw.password
-            __v_raw.password = value
-            _tRS(__v_raw, "password", oldValue, value)
-        }
-    override var mobile: String
-        get() {
-            return _tRG(__v_raw, "mobile", __v_raw.mobile, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("mobile")) {
-                return
-            }
-            val oldValue = __v_raw.mobile
-            __v_raw.mobile = value
-            _tRS(__v_raw, "mobile", oldValue, value)
-        }
-    override var smsCode: String
-        get() {
-            return _tRG(__v_raw, "smsCode", __v_raw.smsCode, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("smsCode")) {
-                return
-            }
-            val oldValue = __v_raw.smsCode
-            __v_raw.smsCode = value
-            _tRS(__v_raw, "smsCode", oldValue, value)
-        }
-}
-val GenPagesLoginRegisterClass = CreateVueComponent(GenPagesLoginRegister::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginRegister.inheritAttrs, inject = GenPagesLoginRegister.inject, props = GenPagesLoginRegister.props, propsNeedCastKeys = GenPagesLoginRegister.propsNeedCastKeys, emits = GenPagesLoginRegister.emits, components = GenPagesLoginRegister.components, styles = GenPagesLoginRegister.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesLoginRegister.setup(props as GenPagesLoginRegister)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesLoginRegister {
-    return GenPagesLoginRegister(instance, renderer)
-}
-)
-open class ForgotPasswordForm (
-    @JsonNotNull
-    open var mobile: String,
-    @JsonNotNull
-    open var smsCode: String,
-    @JsonNotNull
-    open var password: String,
-    @JsonNotNull
-    open var confirmPassword: String,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return ForgotPasswordFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class ForgotPasswordFormReactiveObject : ForgotPasswordForm, IUTSReactive<ForgotPasswordForm> {
-    override var __v_raw: ForgotPasswordForm
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: ForgotPasswordForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(mobile = __v_raw.mobile, smsCode = __v_raw.smsCode, password = __v_raw.password, confirmPassword = __v_raw.confirmPassword) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): ForgotPasswordFormReactiveObject {
-        return ForgotPasswordFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var mobile: String
-        get() {
-            return _tRG(__v_raw, "mobile", __v_raw.mobile, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("mobile")) {
-                return
-            }
-            val oldValue = __v_raw.mobile
-            __v_raw.mobile = value
-            _tRS(__v_raw, "mobile", oldValue, value)
-        }
-    override var smsCode: String
-        get() {
-            return _tRG(__v_raw, "smsCode", __v_raw.smsCode, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("smsCode")) {
-                return
-            }
-            val oldValue = __v_raw.smsCode
-            __v_raw.smsCode = value
-            _tRS(__v_raw, "smsCode", oldValue, value)
-        }
-    override var password: String
-        get() {
-            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("password")) {
-                return
-            }
-            val oldValue = __v_raw.password
-            __v_raw.password = value
-            _tRS(__v_raw, "password", oldValue, value)
-        }
-    override var confirmPassword: String
-        get() {
-            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("confirmPassword")) {
-                return
-            }
-            val oldValue = __v_raw.confirmPassword
-            __v_raw.confirmPassword = value
-            _tRS(__v_raw, "confirmPassword", oldValue, value)
-        }
-}
-val GenPagesLoginForgotPasswordClass = CreateVueComponent(GenPagesLoginForgotPassword::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginForgotPassword.inheritAttrs, inject = GenPagesLoginForgotPassword.inject, props = GenPagesLoginForgotPassword.props, propsNeedCastKeys = GenPagesLoginForgotPassword.propsNeedCastKeys, emits = GenPagesLoginForgotPassword.emits, components = GenPagesLoginForgotPassword.components, styles = GenPagesLoginForgotPassword.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesLoginForgotPassword.setup(props as GenPagesLoginForgotPassword)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesLoginForgotPassword {
-    return GenPagesLoginForgotPassword(instance, renderer)
-}
-)
-open class PasswordForm (
-    @JsonNotNull
-    open var password: String,
-    @JsonNotNull
-    open var confirmPassword: String,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return PasswordFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class PasswordFormReactiveObject : PasswordForm, IUTSReactive<PasswordForm> {
-    override var __v_raw: PasswordForm
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: PasswordForm, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(password = __v_raw.password, confirmPassword = __v_raw.confirmPassword) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PasswordFormReactiveObject {
-        return PasswordFormReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var password: String
-        get() {
-            return _tRG(__v_raw, "password", __v_raw.password, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("password")) {
-                return
-            }
-            val oldValue = __v_raw.password
-            __v_raw.password = value
-            _tRS(__v_raw, "password", oldValue, value)
-        }
-    override var confirmPassword: String
-        get() {
-            return _tRG(__v_raw, "confirmPassword", __v_raw.confirmPassword, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("confirmPassword")) {
-                return
-            }
-            val oldValue = __v_raw.confirmPassword
-            __v_raw.confirmPassword = value
-            _tRS(__v_raw, "confirmPassword", oldValue, value)
-        }
-}
-val GenPagesLoginSetPasswordClass = CreateVueComponent(GenPagesLoginSetPassword::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginSetPassword.inheritAttrs, inject = GenPagesLoginSetPassword.inject, props = GenPagesLoginSetPassword.props, propsNeedCastKeys = GenPagesLoginSetPassword.propsNeedCastKeys, emits = GenPagesLoginSetPassword.emits, components = GenPagesLoginSetPassword.components, styles = GenPagesLoginSetPassword.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesLoginSetPassword.setup(props as GenPagesLoginSetPassword)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesLoginSetPassword {
-    return GenPagesLoginSetPassword(instance, renderer)
-}
-)
-open class PickerItem (
-    @JsonNotNull
-    open var label: String,
-    @JsonNotNull
-    open var value: String,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return PickerItemReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class PickerItemReactiveObject : PickerItem, IUTSReactive<PickerItem> {
-    override var __v_raw: PickerItem
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: PickerItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(label = __v_raw.label, value = __v_raw.value) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PickerItemReactiveObject {
-        return PickerItemReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var label: String
-        get() {
-            return _tRG(__v_raw, "label", __v_raw.label, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("label")) {
-                return
-            }
-            val oldValue = __v_raw.label
-            __v_raw.label = value
-            _tRS(__v_raw, "label", oldValue, value)
-        }
-    override var value: String
-        get() {
-            return _tRG(__v_raw, "value", __v_raw.value, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("value")) {
-                return
-            }
-            val oldValue = __v_raw.value
-            __v_raw.value = value
-            _tRS(__v_raw, "value", oldValue, value)
-        }
-}
-val GenComponentsSubNavBarSubNavBarClass = CreateVueComponent(GenComponentsSubNavBarSubNavBar::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenComponentsSubNavBarSubNavBar.inheritAttrs, inject = GenComponentsSubNavBarSubNavBar.inject, props = GenComponentsSubNavBarSubNavBar.props, propsNeedCastKeys = GenComponentsSubNavBarSubNavBar.propsNeedCastKeys, emits = GenComponentsSubNavBarSubNavBar.emits, components = GenComponentsSubNavBarSubNavBar.components, styles = GenComponentsSubNavBarSubNavBar.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenComponentsSubNavBarSubNavBar.setup(props as GenComponentsSubNavBarSubNavBar)
-    }
-    )
-}
-, fun(instance, renderer): GenComponentsSubNavBarSubNavBar {
-    return GenComponentsSubNavBarSubNavBar(instance)
-}
-)
-val GenUniModulesIUiXComponentsIGridIGridClass = CreateVueComponent(GenUniModulesIUiXComponentsIGridIGrid::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIGridIGrid.name, inheritAttrs = GenUniModulesIUiXComponentsIGridIGrid.inheritAttrs, inject = GenUniModulesIUiXComponentsIGridIGrid.inject, props = GenUniModulesIUiXComponentsIGridIGrid.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIGridIGrid.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIGridIGrid.emits, components = GenUniModulesIUiXComponentsIGridIGrid.components, styles = GenUniModulesIUiXComponentsIGridIGrid.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesIUiXComponentsIGridIGrid.setup(props as GenUniModulesIUiXComponentsIGridIGrid)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIGridIGrid {
-    return GenUniModulesIUiXComponentsIGridIGrid(instance)
-}
-)
-fun __uts_large_list_fill_fill_1(__arr: UTSArray<UTSJSONObject>): Unit {
-    __arr.push(_uO("image" to "/static/gjhf.png", "text" to "轨迹回放"))
-    __arr.push(_uO("image" to "/static/clgz.png", "text" to "车辆跟踪"))
-    __arr.push(_uO("image" to "/static/lcjl.png", "text" to "里程记录"))
-    __arr.push(_uO("image" to "/static/tcjl.png", "text" to "停车记录"))
-    __arr.push(_uO("image" to "/static/dzwl.png", "text" to "电子围栏"))
-    __arr.push(_uO("image" to "/static/navto.png", "text" to "一键寻车"))
-    __arr.push(_uO("image" to "/static/power.png", "text" to "恢复油电"))
-    __arr.push(_uO("image" to "/static/offpower.png", "text" to "断开油电"))
-    __arr.push(_uO("image" to "/static/share.png", "text" to "分享设备"))
-}
-fun __uts_large_list_build_0(): UTSArray<UTSJSONObject> {
-    val __arr = _uA<UTSJSONObject>()
-    __uts_large_list_fill_fill_1(__arr)
-    return __arr
-}
-open class MapCenter__1 (
-    @JsonNotNull
-    open var latitude: Number,
-    @JsonNotNull
-    open var longitude: Number,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return MapCenter__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class MapCenter__1ReactiveObject : MapCenter__1, IUTSReactive<MapCenter__1> {
-    override var __v_raw: MapCenter__1
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: MapCenter__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): MapCenter__1ReactiveObject {
-        return MapCenter__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var latitude: Number
-        get() {
-            return _tRG(__v_raw, "latitude", __v_raw.latitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("latitude")) {
-                return
-            }
-            val oldValue = __v_raw.latitude
-            __v_raw.latitude = value
-            _tRS(__v_raw, "latitude", oldValue, value)
-        }
-    override var longitude: Number
-        get() {
-            return _tRG(__v_raw, "longitude", __v_raw.longitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("longitude")) {
-                return
-            }
-            val oldValue = __v_raw.longitude
-            __v_raw.longitude = value
-            _tRS(__v_raw, "longitude", oldValue, value)
-        }
-}
-open class SignalDetail (
-    @JsonNotNull
-    open var experience: String,
-    @JsonNotNull
-    open var quality: String,
-    @JsonNotNull
-    open var color: String,
-    @JsonNotNull
-    open var level: Number,
-) : UTSObject()
-val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfoDetailCarInfoDetail::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesCarInfoDetailCarInfoDetail.inheritAttrs, inject = GenPagesCarInfoDetailCarInfoDetail.inject, props = GenPagesCarInfoDetailCarInfoDetail.props, propsNeedCastKeys = GenPagesCarInfoDetailCarInfoDetail.propsNeedCastKeys, emits = GenPagesCarInfoDetailCarInfoDetail.emits, components = GenPagesCarInfoDetailCarInfoDetail.components, styles = GenPagesCarInfoDetailCarInfoDetail.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesCarInfoDetailCarInfoDetail.setup(props as GenPagesCarInfoDetailCarInfoDetail)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesCarInfoDetailCarInfoDetail {
-    return GenPagesCarInfoDetailCarInfoDetail(instance, renderer)
-}
-)
-val GenUniModulesIUiXComponentsIPopupIPopupClass = CreateVueComponent(GenUniModulesIUiXComponentsIPopupIPopup::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIPopupIPopup.name, inheritAttrs = GenUniModulesIUiXComponentsIPopupIPopup.inheritAttrs, inject = GenUniModulesIUiXComponentsIPopupIPopup.inject, props = GenUniModulesIUiXComponentsIPopupIPopup.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIPopupIPopup.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIPopupIPopup.emits, components = GenUniModulesIUiXComponentsIPopupIPopup.components, styles = GenUniModulesIUiXComponentsIPopupIPopup.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
-        return GenUniModulesIUiXComponentsIPopupIPopup.setup(props as GenUniModulesIUiXComponentsIPopupIPopup, ctx)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsIPopupIPopup {
-    return GenUniModulesIUiXComponentsIPopupIPopup(instance)
-}
-)
-interface Props {
-    var show: Boolean
-    var title: String
-    var col: Number
-    var iconSize: Number
-    var safeAreaInsetBottom: Boolean
-}
-typealias CarIconItem = UTSJSONObject
-val GenComponentsCarIconsCarIconsClass = CreateVueComponent(GenComponentsCarIconsCarIcons::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenComponentsCarIconsCarIcons.inheritAttrs, inject = GenComponentsCarIconsCarIcons.inject, props = GenComponentsCarIconsCarIcons.props, propsNeedCastKeys = GenComponentsCarIconsCarIcons.propsNeedCastKeys, emits = GenComponentsCarIconsCarIcons.emits, components = GenComponentsCarIconsCarIcons.components, styles = GenComponentsCarIconsCarIcons.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenComponentsCarIconsCarIcons.setup(props as GenComponentsCarIconsCarIcons)
-    }
-    )
-}
-, fun(instance, renderer): GenComponentsCarIconsCarIcons {
-    return GenComponentsCarIconsCarIcons(instance)
-}
-)
-open class CarFormData (
-    @JsonNotNull
-    open var deviceName: String,
-    @JsonNotNull
-    open var deviceNo: String,
-    @JsonNotNull
-    open var deviceType: String,
-    @JsonNotNull
-    open var deviceTypeValue: String,
-    @JsonNotNull
-    open var plateNo: String,
-    @JsonNotNull
-    open var carType: String,
-) : UTSReactiveObject() {
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return CarFormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class CarFormDataReactiveObject : CarFormData, IUTSReactive<CarFormData> {
-    override var __v_raw: CarFormData
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: CarFormData, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(deviceName = __v_raw.deviceName, deviceNo = __v_raw.deviceNo, deviceType = __v_raw.deviceType, deviceTypeValue = __v_raw.deviceTypeValue, plateNo = __v_raw.plateNo, carType = __v_raw.carType) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): CarFormDataReactiveObject {
-        return CarFormDataReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var deviceName: String
-        get() {
-            return _tRG(__v_raw, "deviceName", __v_raw.deviceName, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("deviceName")) {
-                return
-            }
-            val oldValue = __v_raw.deviceName
-            __v_raw.deviceName = value
-            _tRS(__v_raw, "deviceName", oldValue, value)
-        }
-    override var deviceNo: String
-        get() {
-            return _tRG(__v_raw, "deviceNo", __v_raw.deviceNo, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("deviceNo")) {
-                return
-            }
-            val oldValue = __v_raw.deviceNo
-            __v_raw.deviceNo = value
-            _tRS(__v_raw, "deviceNo", oldValue, value)
-        }
-    override var deviceType: String
-        get() {
-            return _tRG(__v_raw, "deviceType", __v_raw.deviceType, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("deviceType")) {
-                return
-            }
-            val oldValue = __v_raw.deviceType
-            __v_raw.deviceType = value
-            _tRS(__v_raw, "deviceType", oldValue, value)
-        }
-    override var deviceTypeValue: String
-        get() {
-            return _tRG(__v_raw, "deviceTypeValue", __v_raw.deviceTypeValue, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("deviceTypeValue")) {
-                return
-            }
-            val oldValue = __v_raw.deviceTypeValue
-            __v_raw.deviceTypeValue = value
-            _tRS(__v_raw, "deviceTypeValue", oldValue, value)
-        }
-    override var plateNo: String
-        get() {
-            return _tRG(__v_raw, "plateNo", __v_raw.plateNo, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("plateNo")) {
-                return
-            }
-            val oldValue = __v_raw.plateNo
-            __v_raw.plateNo = value
-            _tRS(__v_raw, "plateNo", oldValue, value)
-        }
-    override var carType: String
-        get() {
-            return _tRG(__v_raw, "carType", __v_raw.carType, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("carType")) {
-                return
-            }
-            val oldValue = __v_raw.carType
-            __v_raw.carType = value
-            _tRS(__v_raw, "carType", oldValue, value)
-        }
-}
-open class ScanResultData (
-    @JsonNotNull
-    open var result: String,
-) : UTSObject()
-typealias CarIconItem__1 = UTSJSONObject
-val GenPagesAddCarAddCarClass = CreateVueComponent(GenPagesAddCarAddCar::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesAddCarAddCar.inheritAttrs, inject = GenPagesAddCarAddCar.inject, props = GenPagesAddCarAddCar.props, propsNeedCastKeys = GenPagesAddCarAddCar.propsNeedCastKeys, emits = GenPagesAddCarAddCar.emits, components = GenPagesAddCarAddCar.components, styles = GenPagesAddCarAddCar.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenPagesAddCarAddCar.setup(props as GenPagesAddCarAddCar)
-    }
-    )
-}
-, fun(instance, renderer): GenPagesAddCarAddCar {
-    return GenPagesAddCarAddCar(instance, renderer)
-}
-)
-val GenUniModulesIUiXComponentsISliderISliderClass = CreateVueComponent(GenUniModulesIUiXComponentsISliderISlider::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsISliderISlider.name, inheritAttrs = GenUniModulesIUiXComponentsISliderISlider.inheritAttrs, inject = GenUniModulesIUiXComponentsISliderISlider.inject, props = GenUniModulesIUiXComponentsISliderISlider.props, propsNeedCastKeys = GenUniModulesIUiXComponentsISliderISlider.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsISliderISlider.emits, components = GenUniModulesIUiXComponentsISliderISlider.components, styles = GenUniModulesIUiXComponentsISliderISlider.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesIUiXComponentsISliderISlider.setup(props as GenUniModulesIUiXComponentsISliderISlider)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesIUiXComponentsISliderISlider {
-    return GenUniModulesIUiXComponentsISliderISlider(instance)
-}
-)
 typealias TimeModeValues = String
 typealias DateValue = Any
 typealias DateTimePickerColumn = PickerColumn
@@ -9766,6 +9926,14 @@ val GenComponentsIndexListModeIndexListModeClass = CreateVueComponent(GenCompone
     return GenComponentsIndexListModeIndexListMode(instance)
 }
 )
+open class OverlapAnalysis (
+    @JsonNotNull
+    open var groupOfIndex: UTSArray<Number>,
+    @JsonNotNull
+    open var orderOfIndex: UTSArray<Number>,
+    @JsonNotNull
+    open var groups: UTSArray<UTSArray<Number>>,
+) : UTSObject()
 val GenPagesDeviceListDeviceListClass = CreateVueComponent(GenPagesDeviceListDeviceList::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesDeviceListDeviceList.inheritAttrs, inject = GenPagesDeviceListDeviceList.inject, props = GenPagesDeviceListDeviceList.props, propsNeedCastKeys = GenPagesDeviceListDeviceList.propsNeedCastKeys, emits = GenPagesDeviceListDeviceList.emits, components = GenPagesDeviceListDeviceList.components, styles = GenPagesDeviceListDeviceList.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesDeviceListDeviceList.setup(props as GenPagesDeviceListDeviceList)
@@ -9832,21 +10000,12 @@ fun definePageRoutes() {
     __uniRoutes.push(UniPageRoute(path = "pages/deviceList/deviceList", component = GenPagesDeviceListDeviceListClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "设备列表")))
     __uniRoutes.push(UniPageRoute(path = "pages/deviceShare/deviceShare", component = GenPagesDeviceShareDeviceShareClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "设备分享")))
 }
-val __uniTabBar: Map<String, Any?>? = _uM("color" to "#2c2c2c", "selectedColor" to "#d81e06", "borderStyle" to "black", "backgroundColor" to "#ffffff", "list" to _uA(
-    _uM("pagePath" to "pages/index/index", "iconPath" to "/static/tabBar/home.png", "selectedIconPath" to "/static/tabBar/home1.png", "text" to "首页"),
-    _uM("pagePath" to "pages/message/message", "iconPath" to "/static/tabBar/message.png", "selectedIconPath" to "/static/tabBar/message1.png", "text" to "消息"),
-    _uM("pagePath" to "pages/userCenter/userCenter", "iconPath" to "/static/tabBar/userCenter.png", "selectedIconPath" to "/static/tabBar/userCenter1.png", "text" to "我的")
-))
 val __uniLaunchPage: Map<String, Any?> = _uM("url" to "pages/index/index", "style" to _uM("navigationBarTitleText" to "车联网"))
 fun defineAppConfig() {
     __uniConfig.entryPagePath = "/pages/index/index"
     __uniConfig.globalStyle = _uM("navigationStyle" to "custom", "navigationBarTextStyle" to "black", "navigationBarTitleText" to "车联网", "navigationBarBackgroundColor" to "#F8F8F8", "backgroundColor" to "#F8F8F8")
     __uniConfig.getTabBarConfig = fun(): Map<String, Any>? {
-        return _uM("color" to "#2c2c2c", "selectedColor" to "#d81e06", "borderStyle" to "black", "backgroundColor" to "#ffffff", "list" to _uA(
-            _uM("pagePath" to "pages/index/index", "iconPath" to "/static/tabBar/home.png", "selectedIconPath" to "/static/tabBar/home1.png", "text" to "首页"),
-            _uM("pagePath" to "pages/message/message", "iconPath" to "/static/tabBar/message.png", "selectedIconPath" to "/static/tabBar/message1.png", "text" to "消息"),
-            _uM("pagePath" to "pages/userCenter/userCenter", "iconPath" to "/static/tabBar/userCenter.png", "selectedIconPath" to "/static/tabBar/userCenter1.png", "text" to "我的")
-        ))
+        return null
     }
     __uniConfig.tabBar = __uniConfig.getTabBarConfig()
     __uniConfig.conditionUrl = ""
@@ -9855,416 +10014,416 @@ fun defineAppConfig() {
 }
 fun __decodeUniCloudSpaceList(): String {
     val data = _uA(
-        25514,
-        44541,
-        12760,
-        2386,
-        51065,
-        32189,
-        49625,
-        43791,
-        48085,
-        18606,
-        28749,
-        58296,
-        38674,
-        35712,
-        50017,
-        16990,
-        39433,
-        36316,
-        64062,
-        32000,
-        21982,
-        65508,
-        55012,
-        58466,
-        53568,
-        44067,
-        27712,
-        56249,
-        2202,
-        49685,
-        4578,
-        50371,
-        41343,
-        18113,
-        57207,
-        11374,
-        19650,
-        51942,
-        13587,
-        5261,
-        45642,
-        34767,
-        37824,
-        20838,
-        12992,
-        8833,
-        35572,
-        9115,
-        43362,
-        15155,
-        31393,
-        17624,
-        41930,
-        61086,
-        45486,
-        13233,
-        18491,
-        38028,
-        58350,
-        30422,
-        15473,
-        56625,
-        23997,
-        642,
-        50487,
-        57996,
-        38680,
-        15635,
-        25318,
-        59942,
-        25654,
-        43610,
-        44994,
-        36808,
-        43275,
-        52499,
-        61555,
-        46200,
-        32816,
-        8244,
-        10808,
-        52808,
-        14662,
-        21538,
-        15847,
-        34363,
-        48197,
-        45032,
-        39683,
-        34279,
-        21148,
-        58926,
-        51241,
-        15072,
-        29446,
-        62735,
-        11058,
-        21691,
-        37999,
-        26950,
-        12088,
-        45787,
-        27371,
-        22002,
-        21649,
-        16047,
-        41244,
-        19627,
-        47519,
-        26502,
-        40993,
-        34175,
-        24186,
-        6627,
-        37060,
-        37701,
-        37765,
-        11890,
-        57541,
-        52805,
-        32394,
-        20982,
-        19921,
-        22134,
-        21852,
-        23379,
-        35941,
-        3531,
-        24821,
-        47225,
-        54814,
-        11140,
-        5043,
-        63145,
-        9090,
-        61926,
-        36775,
-        26146,
-        19070,
-        33078,
-        38180,
-        45524,
-        42716,
-        38692,
-        64158,
-        24525,
-        17137,
-        1600,
-        54530,
-        15396,
-        60709,
-        46131,
-        10278,
-        41017,
-        10089,
-        17154,
-        901,
-        47332,
-        36396,
-        61019,
-        42154,
-        22420,
-        24882,
-        35865,
-        36439,
-        22528,
-        60774,
-        46012,
-        47988,
-        35531,
-        15450,
-        45532,
-        55432,
-        36182,
-        26371,
-        30393,
-        24784,
-        53630,
-        28094,
-        52574,
-        21204,
-        13519,
-        10280,
-        48689,
-        36562,
-        62745,
-        58169,
-        19245,
-        34134,
-        37647,
-        41680,
-        29459,
-        27457,
-        19296,
-        20849,
-        18666,
-        47020,
-        45864,
-        51900,
-        47656,
-        63209,
-        45972,
-        5460,
-        11719
+        45458,
+        4556,
+        53251,
+        27798,
+        40798,
+        4559,
+        29633,
+        3393,
+        39722,
+        10197,
+        57300,
+        16911,
+        855,
+        11039,
+        41570,
+        53684,
+        51436,
+        54403,
+        27290,
+        158,
+        20685,
+        62116,
+        56608,
+        2485,
+        52557,
+        1424,
+        3332,
+        48594,
+        259,
+        63943,
+        41379,
+        46773,
+        6187,
+        39679,
+        9897,
+        9841,
+        24765,
+        16321,
+        2543,
+        38662,
+        34369,
+        33135,
+        29081,
+        19156,
+        54686,
+        37148,
+        13957,
+        43436,
+        64762,
+        36961,
+        26027,
+        7957,
+        37657,
+        34487,
+        49136,
+        55867,
+        726,
+        61396,
+        12209,
+        64649,
+        60351,
+        39549,
+        19528,
+        885,
+        29182,
+        56206,
+        44288,
+        1186,
+        25560,
+        42787,
+        1062,
+        38197,
+        42845,
+        12790,
+        35526,
+        52357,
+        11501,
+        55100,
+        41976,
+        16106,
+        31026,
+        40563,
+        39449,
+        54485,
+        13824,
+        64331,
+        37342,
+        23810,
+        31884,
+        47508,
+        58073,
+        22641,
+        54561,
+        11880,
+        27989,
+        19061,
+        56340,
+        14964,
+        14367,
+        4079,
+        23943,
+        13892,
+        24546,
+        27225,
+        21829,
+        1773,
+        3756,
+        37434,
+        64213,
+        59576,
+        22888,
+        38579,
+        15206,
+        23979,
+        705,
+        47976,
+        46597,
+        16044,
+        60589,
+        19663,
+        18755,
+        34666,
+        37624,
+        19335,
+        48778,
+        24205,
+        43537,
+        33905,
+        2813,
+        46776,
+        61911,
+        32204,
+        43030,
+        63045,
+        27929,
+        47248,
+        1040,
+        7598,
+        7472,
+        52106,
+        44127,
+        16252,
+        65218,
+        31824,
+        6172,
+        14064,
+        7989,
+        1308,
+        42799,
+        39222,
+        64157,
+        33576,
+        14936,
+        29605,
+        53709,
+        2067,
+        32708,
+        26828,
+        36615,
+        5163,
+        15957,
+        28755,
+        8925,
+        9811,
+        14213,
+        28443,
+        42164,
+        62376,
+        23716,
+        16315,
+        2182,
+        19185,
+        58039,
+        40775,
+        36048,
+        27401,
+        7566,
+        64371,
+        44150,
+        54119,
+        39790,
+        49903,
+        48639,
+        58022,
+        94,
+        13133,
+        20928,
+        38199,
+        11396,
+        43801,
+        33934,
+        12714,
+        54397,
+        52309,
+        46160,
+        34440,
+        38904,
+        38784,
+        38477,
+        33296,
+        15868,
+        62813,
+        28393,
+        36844
     ) as UTSArray<Number>
     val mask = _uA(
-        25585,
-        44422,
-        12794,
-        2338,
-        50955,
-        32210,
-        49583,
-        43878,
-        48049,
-        18635,
-        28735,
-        58266,
-        38696,
-        35746,
-        49920,
-        16946,
-        39520,
-        36261,
-        64075,
-        32110,
-        22012,
-        65480,
-        54982,
-        58385,
-        53552,
-        44098,
-        27683,
-        56284,
-        2260,
-        49780,
-        4495,
-        50342,
-        41309,
-        18171,
-        57173,
-        11284,
-        19622,
-        51855,
-        13692,
-        5369,
-        45671,
-        34732,
-        37793,
-        20756,
-        13026,
-        8877,
-        35542,
-        9192,
-        43282,
-        15186,
-        31426,
-        17597,
-        41859,
-        61178,
-        45452,
-        13195,
-        18457,
-        38113,
-        58270,
-        30459,
-        15426,
+        45513,
+        4535,
+        53281,
+        27878,
+        40748,
+        4512,
+        29623,
+        3368,
+        39758,
+        10160,
+        57254,
+        16941,
+        877,
+        11069,
+        41475,
+        53720,
+        51333,
+        54522,
+        27375,
+        240,
+        20719,
+        62088,
         56578,
-        23951,
+        2502,
+        52541,
+        1521,
+        3431,
+        48567,
+        333,
+        63910,
+        41422,
+        46800,
+        6153,
+        39621,
+        9867,
+        9739,
+        24793,
+        16296,
+        2432,
+        38770,
+        34412,
+        33036,
+        29176,
+        19110,
+        54716,
+        37168,
+        13991,
+        43487,
+        64650,
+        36864,
+        26056,
+        8048,
+        37712,
+        34515,
+        49106,
+        55809,
+        756,
+        61369,
+        12225,
+        64676,
+        60300,
+        39502,
+        19578,
+        837,
+        29080,
+        56296,
+        44390,
+        1219,
+        25589,
+        42768,
+        1043,
+        38157,
+        42858,
+        12763,
+        35570,
+        52407,
+        11406,
+        55050,
+        41941,
+        16082,
+        30979,
+        40469,
+        39466,
+        54520,
+        13875,
+        64303,
+        37307,
+        23866,
+        31976,
+        47601,
+        58081,
+        22599,
+        54596,
+        11866,
+        27955,
+        18963,
+        56374,
+        14936,
+        14397,
+        3980,
+        24043,
+        13869,
+        24455,
+        27191,
+        21809,
+        1726,
+        3785,
+        37465,
+        64167,
+        59613,
+        22812,
+        38545,
+        15196,
+        23945,
         690,
-        50513,
-        58090,
-        38782,
-        15730,
-        25291,
-        59925,
-        25603,
-        43618,
-        45045,
-        36837,
-        43327,
-        52513,
-        61456,
-        46158,
-        32797,
-        8204,
-        10761,
-        52782,
-        14709,
-        21519,
-        15828,
-        34399,
-        48160,
-        45008,
-        39783,
-        34178,
-        21156,
-        58904,
-        51276,
-        15058,
-        29536,
-        62825,
-        11024,
-        21655,
-        37965,
-        26917,
-        12116,
-        45746,
-        27278,
-        21916,
-        21733,
-        16124,
-        41337,
-        19656,
-        47597,
-        26595,
-        41045,
-        34141,
-        24128,
-        6593,
-        37047,
-        37756,
-        37877,
-        11828,
-        57486,
-        52770,
-        32495,
-        20888,
-        19903,
-        22037,
-        21786,
-        23357,
-        35882,
-        3486,
-        24733,
-        47147,
-        54873,
-        11211,
-        5113,
-        63193,
-        9185,
-        61841,
-        36762,
-        26143,
-        19036,
-        33050,
-        38150,
-        45489,
-        42674,
-        38720,
-        64238,
-        24482,
-        17048,
-        1582,
-        54646,
-        15366,
-        60703,
-        46097,
-        10318,
-        41037,
-        10013,
-        17266,
-        1014,
-        47326,
-        36355,
-        61044,
-        42187,
-        22500,
-        24923,
-        35895,
-        36409,
-        22629,
-        60702,
-        46024,
-        47962,
-        35497,
-        15401,
-        45484,
-        55529,
-        36134,
-        26483,
-        30359,
-        24755,
-        53521,
-        28115,
-        52604,
-        21240,
-        13549,
-        10318,
-        48720,
-        36539,
-        62837,
-        58198,
-        19291,
-        34099,
-        37757,
-        41621,
-        29565,
-        27429,
-        19216,
-        20766,
-        18563,
-        47042,
-        45916,
-        51870,
-        47634,
-        63179,
-        46006,
-        5417,
-        11674
+        47953,
+        46709,
+        16106,
+        60646,
+        19624,
+        18726,
+        34564,
+        37526,
+        19428,
+        48844,
+        24291,
+        43614,
+        33828,
+        2709,
+        46826,
+        61840,
+        32131,
+        43100,
+        63029,
+        28026,
+        47335,
+        1069,
+        7571,
+        7442,
+        52134,
+        44157,
+        16153,
+        65196,
+        31796,
+        6252,
+        13983,
+        8028,
+        1394,
+        42843,
+        39188,
+        64167,
+        33546,
+        14896,
+        29649,
+        53689,
+        2147,
+        32695,
+        26870,
+        36648,
+        5124,
+        15924,
+        28707,
+        8884,
+        9853,
+        14315,
+        28542,
+        42188,
+        62428,
+        23690,
+        16345,
+        2293,
+        19073,
+        58070,
+        40759,
+        36000,
+        27431,
+        7661,
+        64284,
+        44059,
+        54085,
+        39746,
+        49869,
+        48537,
+        58055,
+        55,
+        13089,
+        20911,
+        38209,
+        11489,
+        43883,
+        33995,
+        12740,
+        54297,
+        52261,
+        46143,
+        34529,
+        38806,
+        38900,
+        38511,
+        33322,
+        15838,
+        62847,
+        28308,
+        36785
     ) as UTSArray<Number>
     var result = ""
     run {

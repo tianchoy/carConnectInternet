@@ -1,5 +1,10 @@
 <template>
-    <scroll-view class="container" scroll-y="true" :show-scrollbar="false">
+    <!--
+      scroll-y 在弹框打开时置为 false：
+      仅把弹框移出滚动容器仍会被穿透，真机上滑动列表时页面会跟着滚，
+      这里直接在弹框打开期间锁死页面滚动（此时页面被遮罩盖住，本来也不该滚）。
+    -->
+    <scroll-view class="container" :scroll-y="showPicker ? 'false' : 'true'" :show-scrollbar="false">
         <view class="page-bg">
             <!--#ifdef MP-WEIXIN-->
             <view class="top" :style="{paddingTop: statusBarHeight + 43 + 'px'}">
@@ -8,12 +13,13 @@
             <view class="top" :style="{paddingTop: statusBarHeight+ 10 + 'px'}">
             <!--#endif-->
                 <view class="device-car">
-                    <view class="current-car">
+                    <!-- 整条（除右侧三个按钮外）都是选择设备的触发区域，下三角紧贴设备名 -->
+                    <view class="current-car" @click="handlePicker">
                         <view v-if="checkToken()">
-                            <text v-if="currentCarName" class="car-id" @click="handlePicker">{{currentCarName ?? '加载中…'}}</text>
+                            <text v-if="currentCarName" class="car-id">{{currentCarName ?? '加载中…'}}</text>
                             <text v-else class="car-id">暂无设备</text>
                         </view>
-                        <text v-else class="login" @click="gotoLogin">点击登录!</text>
+                        <text v-else class="login" @click.stop="gotoLogin">点击登录!</text>
                         <i-icon name="/static/right-bottom.png" fontSize="7"></i-icon>
                     </view>
                     <view class="nav-tools">
@@ -192,22 +198,49 @@
                 </view>
             </view>
         </view>
-        <l-popup
-            v-model="showPicker"
-            position="bottom"
-            :closeable="false"
-            :safe-area-inset-bottom="true"
-        >
-            <l-picker
-                v-model="pickerValues"
-                cancel-btn="取消"
-                confirm-btn="确认"
-                :columns="pickerColumns"
-                @cancel="closePicker"
-                @confirm="handlePickerConfirm"
-            ></l-picker>
-        </l-popup>
     </scroll-view>
+    <!--
+      选择车辆弹框：必须放在根 scroll-view 之外。
+      嵌在页面滚动容器里会形成 scroll-view 套 scroll-view，
+      外层可能抢走竖向手势或让背景页面跟着一起滚。
+      destroy-on-close：关闭即销毁，设备多时列表节点不会常驻内存。
+    -->
+    <l-popup
+        v-model="showPicker"
+        position="bottom"
+        :closeable="false"
+        :safe-area-inset-bottom="true"
+        :destroy-on-close="true"
+        :radius="16"
+        bg-color="#ffffff"
+    >
+        <!-- touchmove.stop：截断 touchmove 向上传播，第二道防穿透 -->
+        <view class="car-picker" @touchmove.stop>
+            <text class="car-picker-title">选择车辆</text>
+            <scroll-view
+                class="car-picker-list"
+                scroll-y="true"
+                :show-scrollbar="false"
+                :style="{ maxHeight: pickerListMaxHeight + 'px' }"
+            >
+                <view
+                    v-for="(device, index) in deviceList"
+                    :key="index"
+                    class="car-picker-item"
+                    @click="handleDeviceSelect(device)"
+                >
+                    <text :class="isCurrentDevice(device) ? 'car-picker-item-name car-picker-item-name--active' : 'car-picker-item-name'">{{ deviceDisplayName(device) }}</text>
+                    <view class="car-picker-item-status">
+                        <view :class="isDeviceOnline(device) ? 'car-picker-dot car-picker-dot--online' : 'car-picker-dot car-picker-dot--offline'"></view>
+                        <text :class="isDeviceOnline(device) ? 'car-picker-status-text car-picker-status-text--online' : 'car-picker-status-text car-picker-status-text--offline'">{{ isDeviceOnline(device) ? '在线' : '离线' }}</text>
+                    </view>
+                </view>
+            </scroll-view>
+            <view class="car-picker-cancel" @click="closePicker">
+                <text class="car-picker-cancel-text">取消</text>
+            </view>
+        </view>
+    </l-popup>
 	<app-toast></app-toast>
 	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
 	<app-modal></app-modal>
@@ -228,7 +261,6 @@ import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
 import { getDeviceIcon } from '../../utils/cars'
-import type { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerValue } from '@/uni_modules/lime-picker'
 // #ifdef APP-ANDROID
 import AndroidLog from 'android.util.Log'
 // #endif
@@ -288,9 +320,12 @@ const statusBarHeight = ref(20)
 const menuButtonInfo = ref(null)
 const navBarHeight = ref(44)
 const deviceList = ref<Array<Device>>([])
-// picker 相关变量
+// 选择车辆弹框相关变量
 const showPicker = ref(false)
-const pickerValues = ref<PickerValue[]>([])
+// 设备列表区域最大高度（px），超出后列表整体可上下滑动
+const pickerListMaxHeight = ref(600)
+// 是否正在切换设备：切换过程中忽略再次点击，避免连点重复请求
+const isSwitchingDevice = ref(false)
 const currentCarDeviceNo = ref('')
 const currentCarDeptId = ref('')
 const currentCarDeviceId = ref('')
@@ -358,20 +393,25 @@ const batteryPercent = computed<number>(() : number => {
 })
 
 
-// 处理车辆列表显示 - 返回 picker 选项
-const pickerColumns = computed<PickerColumn[]>(() => {
-    return [deviceList.value.map((device): PickerColumnItem => {
-        const displayName = device.deviceName || device.name || device.deviceNo || '未命名设备'
-        const statusText = device.connectionStatus == 'online' ? '在线' : '离线'
-        return {
-            id: device.deviceNo,
-            label: `${displayName} (${statusText})`,
-            value: device.deviceNo || device.deviceId,
-            disabled: false,
-            children: null
-        }
-    })]
-})
+// 设备显示名称
+const deviceDisplayName = (device: Device): string => {
+    if (device.deviceName != '') return device.deviceName
+    if (device.name != '') return device.name
+    if (device.deviceNo != '') return device.deviceNo
+    return '未命名设备'
+}
+
+// 设备是否在线
+const isDeviceOnline = (device: Device): boolean => {
+    return device.connectionStatus == 'online'
+}
+
+// 是否为当前已选中的设备（用于列表中高亮）
+const isCurrentDevice = (device: Device): boolean => {
+    if (currentCarDeviceId.value != '' && device.deviceId == currentCarDeviceId.value) return true
+    if (currentCarDeviceNo.value == '') return false
+    return device.deviceNo == currentCarDeviceNo.value || device.value == currentCarDeviceNo.value
+}
 
 // 关闭 picker
 const closePicker = () => {
@@ -382,6 +422,9 @@ const closePicker = () => {
 const initDimensions = () => {
     const systemInfo = uni.getSystemInfoSync();
     statusBarHeight.value = systemInfo.statusBarHeight != null ? systemInfo.statusBarHeight : 20;
+    // 设备列表最多占屏幕高度的 60%，保证弹框标题与「取消」按钮始终可见
+    const windowHeight = systemInfo.windowHeight != null ? systemInfo.windowHeight : 600
+    pickerListMaxHeight.value = Math.floor(windowHeight * 0.6)
 }
 
 // 延迟函数
@@ -550,8 +593,12 @@ const findDeviceIndex = (deviceNo: string, deviceId: string): number => {
     return -1
 }
 
-// 处理选择车辆 - 打开 picker
+// 处理选择车辆 - 打开设备列表弹框
 const handlePicker = () => {
+    if (!checkToken()) {
+        gotoLogin()
+        return
+    }
     if (deviceList.value.length == 0) {
         showAppToast({
             title: '暂无车辆数据',
@@ -559,25 +606,6 @@ const handlePicker = () => {
         })
         return
     }
-
-    const currentIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value)
-    const savedDevice = getSavedSelectedDevice()
-    const savedDeviceIndex = savedDevice != null
-        ? findDeviceIndex(savedDevice.deviceNo, savedDevice.deviceId)
-        : -1
-    const savedIndex = getSavedSelectedDeviceIndex()
-
-    let selectedIndex = currentIndex
-    if (selectedIndex == -1) selectedIndex = savedDeviceIndex
-    if (selectedIndex == -1 && savedIndex != null && savedIndex < deviceList.value.length) {
-        selectedIndex = savedIndex
-    }
-    if (selectedIndex == -1) selectedIndex = 0
-
-    const selectedDevice = deviceList.value[selectedIndex]
-    if (selectedDevice == null) return
-
-    pickerValues.value = [selectedDevice.deviceNo || selectedDevice.deviceId]
     showPicker.value = true
 }
 
@@ -706,7 +734,6 @@ const clearCurrentCar = (): void => {
     currentCarConnectionStatus.value = ''
     currentCarCarType.value = ''
     currentCarPlateNo.value = ''
-    pickerValues.value = []
     deviceDetail.value = {
         deviceStatus: {
             batteryPercent: 0,
@@ -883,70 +910,49 @@ const loadDeviceData = async (device: Device) => {
     }
 }
 
-// 处理选择车辆确认
-const handlePickerConfirm = (e: PickerConfirmEvent) => {
-    showPicker.value = false
+// 点击列表中的某一设备即为选中
+// 加固：切换进行中忽略再次点击，避免连点导致多次 showLoading / 重复请求
+const handleDeviceSelect = async (selectedDevice: Device) => {
+    if (isSwitchingDevice.value) return
+    isSwitchingDevice.value = true
 
-    const selectedValue = e.values.length > 0 ? e.values[0].toString() : ''
-    let selectedIndex = -1
-    if (selectedValue != '') {
-        selectedIndex = deviceList.value.findIndex(device =>
-            device.deviceNo == selectedValue || device.value == selectedValue || device.deviceId == selectedValue
-        )
-    }
+    closePicker()
 
-    if (selectedIndex < 0 && e.indexs.length > 0) {
-        const eventIndex = e.indexs[0]
-        if (eventIndex >= 0 && eventIndex < deviceList.value.length) {
-            selectedIndex = eventIndex
+    try {
+        if (selectedDevice.deviceNo == currentCarDeviceNo.value && selectedDevice.deviceId == currentCarDeviceId.value) {
+            console.log('选择的设备与当前设备相同，不重复加载')
+            return
         }
-    }
 
-    if (selectedIndex < 0) {
-        selectedIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value)
-    }
-    if (selectedIndex < 0 && deviceList.value.length > 0) {
-        selectedIndex = 0
-    }
+        const deviceName = selectedDevice.deviceName != '' ? selectedDevice.deviceName : (selectedDevice.name != '' ? selectedDevice.name : '未命名设备')
+        currentCarName.value = deviceName
+        currentCarDeviceNo.value = selectedDevice.deviceNo != '' ? selectedDevice.deviceNo : selectedDevice.value
+        currentCarDeptId.value = selectedDevice.deptId
+        currentCarDeviceId.value = selectedDevice.deviceId
+        currentCarIccId.value = selectedDevice.iccid
+        currentCarSimMerchant.value = selectedDevice.simMerchant
+        currentCarConnectionStatus.value = selectedDevice.connectionStatus
+        currentCarCarType.value = selectedDevice.carType
+        currentCarPlateNo.value = selectedDevice.plateNo
+        center.latitude = selectedDevice.latitude
+        center.longitude = selectedDevice.longitude
 
-    const selectedDevice = selectedIndex >= 0 ? deviceList.value[selectedIndex] : null
-    if (selectedDevice == null) {
-        showAppToast({
-            title: '选择设备失败',
-            icon: 'none'
+        const selectedIndex = deviceList.value.findIndex(device =>
+            device.deviceId == selectedDevice.deviceId
+                && device.deviceNo == selectedDevice.deviceNo
+        )
+        if (selectedIndex >= 0) saveSelectedDeviceIndex(selectedIndex)
+        saveSelectedDevice(selectedDevice)
+
+        uni.showLoading({
+            title: '加载车辆数据...',
+            mask: true
         })
-        return
+
+        await loadDeviceData(selectedDevice)
+    } finally {
+        isSwitchingDevice.value = false
     }
-
-    if (selectedDevice.deviceNo == currentCarDeviceNo.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-        console.log('选择的设备111:',selectedDevice.deviceNo ,selectedDevice.deviceId,currentCarDeviceNo.value,currentCarDeviceId.value)
-        console.log('选择的设备与当前设备相同，不重复加载')
-        return
-    }
-
-    const deviceName = selectedDevice.deviceName || selectedDevice.name || '未命名设备'
-    currentCarName.value = deviceName
-    currentCarDeviceNo.value = selectedDevice.deviceNo || selectedDevice.value
-    currentCarDeptId.value = selectedDevice.deptId
-    currentCarDeviceId.value = selectedDevice.deviceId
-    currentCarIccId.value = selectedDevice.iccid
-    currentCarSimMerchant.value = selectedDevice.simMerchant
-    currentCarConnectionStatus.value = selectedDevice.connectionStatus
-    currentCarCarType.value = selectedDevice.carType
-    currentCarPlateNo.value = selectedDevice.plateNo
-    center.latitude = selectedDevice.latitude
-    center.longitude = selectedDevice.longitude
-
-    saveSelectedDeviceIndex(selectedIndex)
-    pickerValues.value = [selectedDevice.deviceNo || selectedDevice.deviceId]
-    saveSelectedDevice(selectedDevice)
-
-    uni.showLoading({
-        title: '加载车辆数据...',
-        mask: true
-    })
-
-    loadDeviceData(selectedDevice)
 }
 
 // 加载车辆列表
@@ -1059,8 +1065,6 @@ const loadDeviceList = async () => {
                 currentCarPlateNo.value = device.plateNo
                 center.latitude = device.latitude
                 center.longitude = device.longitude
-
-                pickerValues.value = [device.deviceNo != '' ? device.deviceNo : device.deviceId]
 
                 await loadDeviceDetail(device.deviceId);
                 await loadDevicePos({
@@ -1596,6 +1600,13 @@ onLoad(() => {
             align-items: center;
 
             .current-car {
+                // 点击区域：左侧整块（设备名 + 下三角），纵向撑满整条
+                flex: 1;
+                min-width: 0;
+                align-self: stretch;
+                justify-content: flex-start;
+                // 与右侧三个按钮留出间距，避免误触刷新/地图/新增
+                margin-right: 60rpx;
                 position: relative;
                 display: flex;
                 flex-direction: row;
@@ -2086,6 +2097,106 @@ onLoad(() => {
             }
         }
     }
+    }
+
+}
+
+// 底部「选择车辆」弹框
+// l-popup 放在根 scroll-view 之外：嵌在页面滚动容器里会形成 scroll-view 套 scroll-view，
+// 外层可能抢走竖向手势或让背景页面跟着一起滚。
+// 白底 / 顶部圆角 / 底部安全区由 l-popup 的 bg-color、radius、safe-area-inset-bottom 提供，
+// 这里不要再给 .car-picker 设背景和圆角，否则会盖掉 l-popup 的圆角。
+.car-picker {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 30rpx;
+
+    .car-picker-title {
+        padding-bottom: 24rpx;
+        font-size: 34rpx;
+        font-weight: 600;
+        color: #333333;
+        text-align: center;
+    }
+
+    // 设备多时列表整体上下滑动（行内样式按屏幕高度覆盖这里的值）
+    .car-picker-list {
+        max-height: 900rpx;
+    }
+
+    .car-picker-item {
+        padding: 30rpx 40rpx;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        border-top-width: 1rpx;
+        border-top-style: solid;
+        border-top-color: #F0EAEA;
+    }
+
+    .car-picker-item-name {
+        flex: 1;
+        min-width: 0;
+        padding-right: 20rpx;
+        font-size: 32rpx;
+        color: #333333;
+    }
+
+    // 当前选中设备：名称高亮
+    .car-picker-item-name--active {
+        color: #3C6ECF;
+    }
+
+    .car-picker-item-status {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .car-picker-dot {
+        width: 14rpx;
+        height: 14rpx;
+        border-radius: 50%;
+    }
+
+    .car-picker-dot--online {
+        background-color: #5BBF6A;
+    }
+
+    .car-picker-dot--offline {
+        background-color: #9A9A9A;
+    }
+
+    .car-picker-status-text {
+        margin-left: 10rpx;
+        font-size: 28rpx;
+    }
+
+    .car-picker-status-text--online {
+        color: #5BBF6A;
+    }
+
+    .car-picker-status-text--offline {
+        color: #9A9A9A;
+    }
+
+    .car-picker-cancel {
+        padding: 32rpx 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        border-top-width: 1rpx;
+        border-top-style: solid;
+        border-top-color: #F0EAEA;
+
+        .car-picker-cancel-text {
+            font-size: 32rpx;
+            color: #333333;
+        }
     }
 }
 </style>

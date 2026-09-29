@@ -69,7 +69,8 @@ const __sfc__ = defineComponent({
             latitude: 39.90469,
             longitude: 116.40717
         });
-        const mapScale = ref(12);
+        // 显式声明为 number：编辑围栏时缩放级别由包围盒反算得出（可能为浮点），避免被推断成整型
+        const mapScale = ref<number>(16);
         const isMapReady = ref(false);
         const isInitialPositionSettled = ref(false);
         const markers = ref<Array<Marker>>([]); // 标记点
@@ -373,6 +374,15 @@ const __sfc__ = defineComponent({
             }
             markers.value = newMarkers;
         }
+        // ===== 围栏颜色 =====
+        // map 是原生组件，颜色只支持 6 位（8 位）十六进制；rgba() 在部分安卓机上解析失败会渲染成黑色
+        const FENCE_STROKE_COLOR = '#FF0000';
+        const FENCE_FILL_ALPHA_HEX = '33'; // 后两位为 alpha，33 约等于 20% 透明度
+        const FENCE_FILL_COLORS = ['#FF0000', '#2979FF', '#00BFA5', '#FF8C00', '#8E24AA', '#00ACC1'];
+        // 按索引生成围栏填充色：#RRGGBB + 两位 alpha
+        const buildFenceFillColor = (colorIndex: number): string => {
+            return FENCE_FILL_COLORS[colorIndex % FENCE_FILL_COLORS.length] + FENCE_FILL_ALPHA_HEX;
+        };
         const renderFencesOnMap = () => {
             // 当围栏列表为空时，强制清空地图上所有围栏和标记
             if (!(fenceList.value != null) || fenceList.value.length == 0) {
@@ -398,8 +408,8 @@ const __sfc__ = defineComponent({
                             longitude: circleData.longitude,
                             radius: displayRadius,
                             strokeWidth: 2,
-                            color: '#FF0000',
-                            fillColor: `rgba(255,0,0,0.2)`
+                            color: FENCE_STROKE_COLOR,
+                            fillColor: buildFenceFillColor(0)
                         } as Circle);
                     }
                 }
@@ -410,8 +420,8 @@ const __sfc__ = defineComponent({
                         fencePolygons.push({
                             points: fencePoints,
                             strokeWidth: 2,
-                            strokeColor: '#FF0000',
-                            fillColor: colorIndex++ == 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
+                            strokeColor: FENCE_STROKE_COLOR,
+                            fillColor: buildFenceFillColor(colorIndex++),
                             zIndex: 1
                         } as Polygon);
                     }
@@ -437,8 +447,8 @@ const __sfc__ = defineComponent({
                     polygons.value = points.value.length >= 3 ? [{
                             points: points.value,
                             strokeWidth: 2,
-                            strokeColor: '#FF0000',
-                            fillColor: 'rgba(255,0,0,0.2)',
+                            strokeColor: FENCE_STROKE_COLOR,
+                            fillColor: buildFenceFillColor(0),
                             zIndex: 1
                         } as Polygon] : [];
                     circles.value = [];
@@ -451,8 +461,8 @@ const __sfc__ = defineComponent({
                             longitude: drawingCenter.longitude,
                             radius: circleRadius.value,
                             strokeWidth: 2,
-                            color: '#FF0000',
-                            fillColor: 'rgba(255,0,0,0.2)'
+                            color: FENCE_STROKE_COLOR,
+                            fillColor: buildFenceFillColor(0)
                         } as Circle;
                         circles.value = [drawingCircle];
                     }
@@ -532,6 +542,153 @@ const __sfc__ = defineComponent({
                 maxLng = Math.max(maxLng, point.longitude);
             });
             return { minLat, maxLat, minLng, maxLng } as CoordinateBounds;
+        };
+        // ===== 编辑围栏时的视野适配 =====
+        // 需求：编辑某个围栏时自动调整缩放比，让整个围栏完整落在可视区内。
+        // 原先 editFence() 完全不改变视野（既不居中也不缩放），而已有的 setMapCenterToFence()
+        // 只按半径拍几个固定档位、且在有车辆标记时直接返回，导致编辑时围栏常常超出屏幕。
+        // 这里改为按围栏包围盒 + 地图容器实际像素尺寸反算缩放级别（与轨迹回放页同一套 Web Mercator 算法）。
+        const FENCE_FIT_MARGIN = 0.8; // 围栏占可用区域的比例，四周留白防止贴边
+        const FENCE_FIT_MIN_SCALE = 5.0; // 编辑围栏时的最小缩放级别
+        const FENCE_FIT_MAX_SCALE = 18.0; // 最大缩放级别（避免极小的围栏放得过近）
+        // 底部编辑弹窗会遮住地图下半部分，预留一部分高度让围栏整体浮在弹窗上方。
+        // 若真机上仍被遮挡可调大，若觉得围栏偏上可调小（0 表示不做预留）。
+        const FENCE_FIT_BOTTOM_RESERVE_RATIO = 0.22;
+        const FENCE_MAX_DISPLAY_RADIUS = 100000; // 与围栏渲染时的半径上限保持一致（米）
+        const METERS_PER_DEGREE_LAT = 110540.0;
+        const METERS_PER_DEGREE_LNG = 111320.0;
+        const EARTH_RESOLUTION_BASE = 156543.03392; // zoom 为 0 时赤道上的地面分辨率（米/像素）
+        // 地图容器的实际显示尺寸（px），用于把围栏跨度换算成所需缩放级别
+        let fenceMapViewWidth = 0.0;
+        let fenceMapViewHeight = 0.0;
+        let fenceMapViewSizeMeasured = false;
+        // 测量地图容器尺寸；测不到就保留估算值，保证后续计算始终可用
+        function measureFenceMapViewportSize(callback: () => void) {
+            try {
+                const query = uni.createSelectorQuery();
+                query.select('#fence-map-container').boundingClientRect((rect: any) => {
+                    if (rect != null) {
+                        const nodeInfo = rect as NodeInfo;
+                        const width = nodeInfo.width ?? 0;
+                        const height = nodeInfo.height ?? 0;
+                        if (width > 0 && height > 0) {
+                            fenceMapViewWidth = width;
+                            fenceMapViewHeight = height;
+                            fenceMapViewSizeMeasured = true;
+                        }
+                    }
+                    callback();
+                }).exec();
+            }
+            catch (error: any) {
+                console.warn('测量地图容器尺寸失败:', error);
+                callback();
+            }
+        }
+        // 用系统信息估算可视区尺寸，避免测量完成前没有尺寸可用
+        function ensureFenceMapViewportEstimate() {
+            if (fenceMapViewWidth > 0 && fenceMapViewHeight > 0)
+                return;
+            try {
+                const info = uni.getSystemInfoSync();
+                fenceMapViewWidth = info.windowWidth;
+                // 地图位于顶部导航栏与底部工具栏之间，按约六成屏高估算
+                fenceMapViewHeight = info.windowHeight * 0.6;
+            }
+            catch (error: any) {
+                fenceMapViewWidth = 375.0;
+                fenceMapViewHeight = 420.0;
+            }
+        }
+        // 计算围栏的经纬度包围盒：圆形按"圆心 ± 半径"换算成经纬度跨度
+        const calculateFenceBounds = (fence: UTSJSONObject): CoordinateBounds | null => {
+            const fenceType = getFenceType(fence);
+            const area = fence.getString('area', '');
+            if (fenceType === 'circle') {
+                const circleData = parseCircle(area);
+                if (circleData != null) {
+                    // 与地图实际渲染一致，超限半径按上限显示
+                    const radius = circleData.radius > FENCE_MAX_DISPLAY_RADIUS ? FENCE_MAX_DISPLAY_RADIUS : circleData.radius;
+                    if (isFinite(radius) && radius > 0) {
+                        const deltaLat = radius / METERS_PER_DEGREE_LAT;
+                        let circleCosLat = Math.cos(circleData.latitude * Math.PI / 180.0);
+                        if (circleCosLat < 0.01)
+                            circleCosLat = 0.01;
+                        const deltaLng = radius / (METERS_PER_DEGREE_LNG * circleCosLat);
+                        return {
+                            minLat: circleData.latitude - deltaLat,
+                            maxLat: circleData.latitude + deltaLat,
+                            minLng: circleData.longitude - deltaLng,
+                            maxLng: circleData.longitude + deltaLng
+                        } as CoordinateBounds;
+                    }
+                }
+                return null;
+            }
+            const fencePoints = parsePolygon(area);
+            if (fencePoints.length == 0)
+                return null;
+            return calculateBounds(fencePoints);
+        };
+        // 调整地图中心与缩放级别，让整个围栏完整落在可视区内
+        const fitMapToFence = (fence: UTSJSONObject): void => {
+            const nullableBounds = calculateFenceBounds(fence);
+            if (nullableBounds == null)
+                return;
+            const bounds = nullableBounds;
+            const midLat = (bounds.minLat + bounds.maxLat) / 2;
+            const midLng = (bounds.minLng + bounds.maxLng) / 2;
+            ensureFenceMapViewportEstimate();
+            if (fenceMapViewWidth <= 0 || fenceMapViewHeight <= 0)
+                return;
+            // 底部弹窗预留区域（px）
+            let bottomReservePx = fenceMapViewHeight * FENCE_FIT_BOTTOM_RESERVE_RATIO;
+            if (!isFinite(bottomReservePx) || bottomReservePx < 0)
+                bottomReservePx = 0.0;
+            const usableWidth = fenceMapViewWidth * FENCE_FIT_MARGIN;
+            const usableHeight = (fenceMapViewHeight - bottomReservePx) * FENCE_FIT_MARGIN;
+            if (usableWidth <= 0 || usableHeight <= 0)
+                return;
+            let cosLat = Math.cos(midLat * Math.PI / 180.0);
+            if (cosLat < 0.01)
+                cosLat = 0.01;
+            // 包围盒在南北、东西方向的实际跨度（米）
+            const spanLatMeters = (bounds.maxLat - bounds.minLat) * METERS_PER_DEGREE_LAT;
+            const spanLngMeters = (bounds.maxLng - bounds.minLng) * METERS_PER_DEGREE_LNG * cosLat;
+            // 需要的地面分辨率（米/像素）：取两个方向中更严格的一侧，保证南北、东西都装得下
+            const neededResolution = Math.max(spanLatMeters / usableHeight, spanLngMeters / usableWidth);
+            // Web Mercator：地面分辨率 = EARTH_RESOLUTION_BASE × cos(lat) / 2^zoom
+            let zoom = FENCE_FIT_MAX_SCALE;
+            if (neededResolution > 0.0001) {
+                const baseResolution = EARTH_RESOLUTION_BASE * cosLat;
+                zoom = Math.log(baseResolution / neededResolution) / Math.log(2.0);
+            }
+            // 向下取整，确保围栏确实放得下
+            let finalZoom = Math.floor(zoom);
+            if (finalZoom > FENCE_FIT_MAX_SCALE)
+                finalZoom = FENCE_FIT_MAX_SCALE;
+            if (finalZoom < FENCE_FIT_MIN_SCALE)
+                finalZoom = FENCE_FIT_MIN_SCALE;
+            mapScale.value = finalZoom;
+            // 地图中心始终是容器几何中心，而围栏要显示在"未被底部弹窗遮挡区域"的中央，
+            // 因此把地图中心向南偏移半个预留高度，使围栏视觉上落在可见区中央。
+            const resolutionAtZoom = EARTH_RESOLUTION_BASE * cosLat / Math.pow(2.0, finalZoom);
+            const latOffset = (bottomReservePx / 2.0) * resolutionAtZoom / METERS_PER_DEGREE_LAT;
+            center["latitude"] = midLat - latOffset;
+            center["longitude"] = midLng;
+        };
+        // 先用当前尺寸适配一次，测到地图容器精确尺寸后再校正一次
+        const applyFenceViewportFit = () => {
+            const fence = editingFence.value;
+            if (fence != null)
+                fitMapToFence(fence);
+            if (fenceMapViewSizeMeasured)
+                return;
+            measureFenceMapViewportSize(() => {
+                const currentFence = editingFence.value;
+                if (currentFence != null)
+                    fitMapToFence(currentFence);
+            });
         };
         // 调整地图中心到围栏中心位置
         const setMapCenterToFence = (fence: UTSJSONObject): void => {
@@ -642,6 +799,8 @@ const __sfc__ = defineComponent({
             }
             // 更新地图显示，让用户看到围栏
             updateMapDisplay();
+            // 调整地图中心与缩放比，让整个围栏完整落在可视区内（避开底部编辑弹窗的遮挡）
+            applyFenceViewportFit();
             // 打开编辑对话框
             editDialogPopup.value?.$callMethod('open');
         };
@@ -1087,8 +1246,8 @@ const __sfc__ = defineComponent({
                 polygons.value = points.value.length >= 3 ? [{
                         points: points.value,
                         strokeWidth: 2,
-                        strokeColor: '#FF0000',
-                        fillColor: 'rgba(255,0,0,0.2)',
+                        strokeColor: FENCE_STROKE_COLOR,
+                        fillColor: buildFenceFillColor(0),
                         zIndex: 1
                     } as Polygon] : [];
             }
@@ -1104,8 +1263,8 @@ const __sfc__ = defineComponent({
                         longitude: circleCenter.value!.longitude,
                         radius: circleRadius.value,
                         strokeWidth: 2,
-                        color: '#FF0000',
-                        fillColor: 'rgba(255,0,0,0.2)'
+                        color: FENCE_STROKE_COLOR,
+                        fillColor: buildFenceFillColor(0)
                     } as Circle];
             }
             else {
@@ -1159,6 +1318,13 @@ const __sfc__ = defineComponent({
             loadInitialPosition();
             loadGeofenceList(); // 页面加载时获取围栏列表
         });
+        onReady(() => {
+            // 页面渲染完成后预先量出地图容器的真实尺寸，
+            // 后续编辑围栏时可直接按实际可视区反算缩放，不必先用估算值兜一轮
+            measureFenceMapViewportSize(() => {
+                console.log('地图容器尺寸已测量:', fenceMapViewWidth, fenceMapViewHeight);
+            });
+        });
         return (): any | null => {
             const _component_custom_navBar = resolveEasyComponent("custom-navBar", _easycom_custom_navBar);
             const _component_map = resolveComponent("map");
@@ -1180,7 +1346,10 @@ const __sfc__ = defineComponent({
                         textColor: "#333",
                         showCapsule: false
                     })),
-                    _cE("view", _uM({ class: "map-container" }), [
+                    _cE("view", _uM({
+                        class: "map-container",
+                        id: "fence-map-container"
+                    }), [
                         isTrue(isMapReady.value)
                             ? _cV(_component_map, _uM({
                                 key: 0,

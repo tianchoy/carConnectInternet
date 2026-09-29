@@ -80,7 +80,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
             val loadStopData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("deviceNo" to deviceNo.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("deviceNo" to deviceNo.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 2, "withStop" to true, "withPos" to false, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             val trackData = res.data

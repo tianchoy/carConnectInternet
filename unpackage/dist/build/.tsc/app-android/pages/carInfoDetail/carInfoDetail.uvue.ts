@@ -60,6 +60,7 @@ const deptId = ref<string | null>('')
 	])
 	const refreshTimer = ref<number | null>(null)
 	const isRefreshing = ref(false)
+	const isLoadingDeviceData = ref(false)
 
 	const popupRef = ref(false);
 	const psw = ref('')
@@ -300,10 +301,8 @@ const deptId = ref<string | null>('')
 						center.latitude = convertedLat;
 						center.longitude = convertedLng;
 
-						// 在 UTS 环境中，使用 setTimeout 替代 $nextTick
-						await delay(50);
-
-						// 更新设备标记
+						// 更新设备标记：id 固定为 1，整体替换数组，原生按 id 做 in-place 更新，
+						// 避免「清空 → 延迟 → 重设」在同一 id 上反复删建导致的 callout 浮层泄漏（部分安卓机双气泡）
 						const deviceMarker = createMarker(
 							1,
 							convertedLat,
@@ -311,10 +310,6 @@ const deptId = ref<string | null>('')
 							'device',
 							currentCarInfo.value.getString('deviceName', getDisplayCarName())
 						);
-
-						// 使用强制响应式更新
-						markers.value = [];
-						await delay(50);
 						markers.value = [deviceMarker];
 						isMapReady.value = true;
 
@@ -393,6 +388,17 @@ const deptId = ref<string | null>('')
 		return tryLoad(1);
 	}
 
+	// 带互斥的数据加载：上一轮未结束时跳过本轮，避免并发加载叠加导致地图浮层竞态
+	const safeLoadData = async (data : UTSJSONObject, retryCount : number): Promise<boolean> => {
+		if (isLoadingDeviceData.value) return false
+		isLoadingDeviceData.value = true
+		try {
+			return await loadData(data, retryCount)
+		} finally {
+			isLoadingDeviceData.value = false
+		}
+	}
+
 	// 手动刷新方法
 	const manualRefresh = async () => {
 		uni.showLoading({
@@ -401,7 +407,7 @@ const deptId = ref<string | null>('')
 		});
 
 		try {
-			const success = await loadData({
+			const success = await safeLoadData({
 				deptId: deptId.value,
 				deviceids: deviceNo.value
 			} as UTSJSONObject, 3);
@@ -462,14 +468,14 @@ const deptId = ref<string | null>('')
 			const intervalMs = intervalSeconds * 1000
 
 			// 立即加载一次数据
-			loadData({
+			safeLoadData({
 				deptId: deptId.value,
 				deviceids: deviceNo.value
 			} as UTSJSONObject, 3)
 
 			// 设置定时器
 			refreshTimer.value = setInterval(() => {
-				loadData({
+				safeLoadData({
 					deptId: deptId.value,
 					deviceids: deviceNo.value
 				} as UTSJSONObject, 3)
@@ -768,7 +774,7 @@ const deptId = ref<string | null>('')
 			};
 
 			uni.showLoading({ title: '加载中...' });
-			loadData(data, 3).then((success: boolean) => {
+			safeLoadData(data, 3).then((success: boolean) => {
 				uni.hideLoading();
 				if (success && datainfo.value.connectionStatus == 'online') {
 					setupAutoRefresh(currentTime.value);

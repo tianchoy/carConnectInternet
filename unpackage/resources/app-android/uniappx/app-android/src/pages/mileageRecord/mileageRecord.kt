@@ -181,7 +181,7 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                             return@w1
                         }
                         try {
-                            val data: UTSJSONObject = _uO("deviceNo" to deviceNo.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
+                            val data: UTSJSONObject = _uO("deviceNo" to deviceNo.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 2, "withStop" to false, "withPos" to false, "withTrip" to true)
                             val res = await(getTrackPos(data))
                             if (!isBusinessSuccessCode(res.code)) {
                                 showAppToast(ShowToastOptions(title = if (res.msg != "") {

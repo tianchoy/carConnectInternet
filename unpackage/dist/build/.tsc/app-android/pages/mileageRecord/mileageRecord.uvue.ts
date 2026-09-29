@@ -162,7 +162,7 @@ const carStatus = ref('在线')
 				deviceNo: deviceNo.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
-				minParkTime: 120,
+				minParkTime: 2,
 				withStop: false,
 				withPos: false,
 				withTrip: true,

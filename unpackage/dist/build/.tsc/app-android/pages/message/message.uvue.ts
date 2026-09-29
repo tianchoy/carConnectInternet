@@ -1,8 +1,10 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import { isBusinessSuccessCode } from '../../api/response.uts'
 	import { ref, computed, nextTick, onActivated, onDeactivated } from 'vue'
+	import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 	import { getUserMsgList, setMsgState, readAllMessages } from '../../api/request.uts'
 	import { consumePendingMessageId, consumePushStaleFlag } from '../../services/push.uts'
 	import { parseLocalDateTime } from '../../utils/formateTime.uts'
@@ -297,24 +299,8 @@ const _cache = __ins.renderCache;
 		}
 	}
 
-	// 一键已读：调用 POST /usermessage/readAll，成功后把本地未读状态同步为已读
-	async function handleReadAll() : Promise<void> {
-		console.log('一键已读触发')
-		if (isReadingAll.value) return
-		if (isListLoading.value || isCheckingNewMessages.value) {
-			uni.showToast({
-				title: '列表加载中，请稍候',
-				icon: 'none'
-			})
-			return
-		}
-		if (!hasUnreadMessage.value) {
-			uni.showToast({
-				title: '没有未读消息',
-				icon: 'none'
-			})
-			return
-		}
+	// 执行一键已读请求：调用 POST /usermessage/readAll，成功后把本地未读状态同步为已读
+	async function executeReadAll() : Promise<void> {
 		isReadingAll.value = true
 		try {
 			const res = await readAllMessages()
@@ -344,6 +330,36 @@ const _cache = __ins.renderCache;
 		} finally {
 			isReadingAll.value = false
 		}
+	}
+
+	// 一键已读：先由用户确认，取消时不发起请求
+	function handleReadAll() : void {
+		console.log('一键已读触发')
+		if (isReadingAll.value) return
+		if (isListLoading.value || isCheckingNewMessages.value) {
+			uni.showToast({
+				title: '列表加载中，请稍候',
+				icon: 'none'
+			})
+			return
+		}
+		if (!hasUnreadMessage.value) {
+			uni.showToast({
+				title: '没有未读消息',
+				icon: 'none'
+			})
+			return
+		}
+		showAppModal({
+			title: '一键已读',
+			content: '确定将全部消息标记为已读吗？',
+			showCancel: true,
+			confirmText: '确定',
+			cancelText: '取消',
+			success: (result: AppModalSuccess): void => {
+				if (result.confirm) void executeReadAll()
+			}
+		})
 	}
 
 	async function openPendingPushMessage() : Promise<void> {
@@ -519,6 +535,7 @@ return (): any | null => {
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
 const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
+const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal)
 
   return _cE(Fragment, null, [
     _cV(_component_custom_navBar, _uM({
@@ -624,7 +641,8 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         onConfirm: ReadIt
       }), null, 8 /* PROPS */, ["show", "title", "content"])
     ]),
-    _cV(_component_app_toast)
+    _cV(_component_app_toast),
+    _cV(_component_app_modal)
   ], 64 /* STABLE_FRAGMENT */)
 }
 }

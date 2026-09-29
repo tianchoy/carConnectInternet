@@ -47,6 +47,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
             ))
             val refreshTimer = ref<Number?>(null)
             val isRefreshing = ref(false)
+            val isLoadingDeviceData = ref(false)
             val popupRef = ref(false)
             val psw = ref("")
             val currentOperation = ref(0)
@@ -223,10 +224,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                                 }
                                                 center.latitude = convertedLat
                                                 center.longitude = convertedLng
-                                                await(delay(50))
                                                 val deviceMarker = createMarker(1, convertedLat, convertedLng, "device", currentCarInfo.value.getString("deviceName", getDisplayCarName()))
-                                                markers.value = _uA()
-                                                await(delay(50))
                                                 markers.value = _uA(
                                                     deviceMarker
                                                 )
@@ -280,6 +278,20 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                         return@w1 tryLoad(1)
                 })
             }
+            val safeLoadData = fun(data: UTSJSONObject, retryCount: Number): UTSPromise<Boolean> {
+                return wrapUTSPromise(suspend w1@{
+                        if (isLoadingDeviceData.value) {
+                            return@w1 false
+                        }
+                        isLoadingDeviceData.value = true
+                        try {
+                            return@w1 await(loadData(data, retryCount))
+                        }
+                         finally {
+                            isLoadingDeviceData.value = false
+                        }
+                })
+            }
             val setupAutoRefresh = fun(intervalValue: String){
                 if (refreshTimer.value != null) {
                     val timer = refreshTimer.value!!
@@ -301,9 +313,9 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 if (intervalSeconds > 0) {
                     isRefreshing.value = true
                     val intervalMs = intervalSeconds * 1000
-                    loadData(_uO("deptId" to deptId.value, "deviceids" to deviceNo.value), 3)
+                    safeLoadData(_uO("deptId" to deptId.value, "deviceids" to deviceNo.value), 3)
                     refreshTimer.value = setInterval(fun(){
-                        loadData(_uO("deptId" to deptId.value, "deviceids" to deviceNo.value), 3)
+                        safeLoadData(_uO("deptId" to deptId.value, "deviceids" to deviceNo.value), 3)
                     }
                     , intervalMs) as Number
                 }
@@ -508,7 +520,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 loadDeviceDetail().then(fun(){
                     val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to deviceNo.value)
                     uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                    loadData(data, 3).then(fun(success: Boolean){
+                    safeLoadData(data, 3).then(fun(success: Boolean){
                         uni_hideLoading(null)
                         if (success && datainfo.value["connectionStatus"] == "online") {
                             setupAutoRefresh(currentTime.value)

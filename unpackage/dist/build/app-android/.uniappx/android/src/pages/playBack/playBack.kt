@@ -14,6 +14,8 @@ import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import uts.sdk.modules.DCloudUniMapTencent.Polyline
 import uts.sdk.modules.DCloudUniMapTencent.LocationObject as LocationObject__1
+import io.dcloud.uniapp.extapi.createSelectorQuery as uni_createSelectorQuery
+import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
 open class GenPagesPlayBackPlayBack : BasePage {
@@ -25,7 +27,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val _ctx = __ins.proxy as GenPagesPlayBackPlayBack
             val _cache = __ins.renderCache
             val center = reactive(_uO("latitude" to 39.90469, "longitude" to 116.40717))
-            val mapScale = ref(12)
+            val mapScale = ref<Number>(12)
             val isMapReady = ref(false)
             val deviceNo = ref<String?>("")
             val carStatus = ref<String?>("")
@@ -50,10 +52,12 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val MIN_SEGMENT_DURATION_MS: Number = 500
             val MAX_SEGMENT_DURATION_MS: Number = 6000
             val FALLBACK_SPEED_KMH: Number = 20
+            val POLYLINE_RENDER_INTERVAL_MS: Number = 80
             val renderedPoint = reactive<TrackPoint>(TrackPoint(latitude = 0, longitude = 0, rotation = 0, deviceTime = "", speed = 0))
             val activeSegmentTargetIndex = ref(-1)
             var playbackTimer: Number? = null
             var replaySessionId: Number = 0
+            var lastPolylineRenderAt: Number = 0
             fun gen_copyTrackPoint_fn(point: TrackPoint): TrackPoint {
                 return TrackPoint(latitude = point.latitude, longitude = point.longitude, rotation = point.rotation, deviceTime = point.deviceTime, speed = point.speed)
             }
@@ -213,28 +217,111 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 return TrackBounds(minLat = minLat, maxLat = maxLat, minLng = minLng, maxLng = maxLng)
             }
             val calculateTrackBounds = ::gen_calculateTrackBounds_fn
+            val MIN_TRACK_FIT_SCALE: Number = 5.0
+            val MAX_TRACK_FIT_SCALE: Number = 17.0
+            val TRACK_FIT_MARGIN: Number = 0.85
+            val METERS_PER_DEGREE_LAT: Number = 110540.0
+            val METERS_PER_DEGREE_LNG: Number = 111320.0
+            val EARTH_RESOLUTION_BASE: Number = 156543.03392
+            var mapViewWidth: Number = 0.0
+            var mapViewHeight: Number = 0.0
+            var mapViewSizeMeasured = false
+            fun gen_measureMapViewportSize_fn(callback: () -> Unit) {
+                try {
+                    val query = uni_createSelectorQuery()
+                    query.select("#track-map-container").boundingClientRect(fun(rect: Any){
+                        if (rect != null) {
+                            val nodeInfo = rect as NodeInfo
+                            val width = nodeInfo.width ?: 0
+                            val height = nodeInfo.height ?: 0
+                            if (width > 0 && height > 0) {
+                                mapViewWidth = width
+                                mapViewHeight = height
+                                mapViewSizeMeasured = true
+                            }
+                        }
+                        callback()
+                    }
+                    ).exec()
+                }
+                 catch (error: Throwable) {
+                    console.warn("测量地图容器尺寸失败:", error)
+                    callback()
+                }
+            }
+            val measureMapViewportSize = ::gen_measureMapViewportSize_fn
+            fun gen_ensureMapViewportEstimate_fn() {
+                if (mapViewWidth > 0 && mapViewHeight > 0) {
+                    return
+                }
+                try {
+                    val info = uni_getSystemInfoSync()
+                    mapViewWidth = info.windowWidth
+                    mapViewHeight = info.windowHeight * 0.5
+                }
+                 catch (error: Throwable) {
+                    mapViewWidth = 375.0
+                    mapViewHeight = 300.0
+                }
+            }
+            val ensureMapViewportEstimate = ::gen_ensureMapViewportEstimate_fn
             fun gen_adjustMapToFitTrack_fn() {
                 val nullableBounds = calculateTrackBounds()
                 if (nullableBounds == null) {
                     return
                 }
                 val bounds = nullableBounds
-                center["latitude"] = (bounds.minLat + bounds.maxLat) / 2
-                center["longitude"] = (bounds.minLng + bounds.maxLng) / 2
-                val latDiff = bounds.maxLat - bounds.minLat
-                val lngDiff = bounds.maxLng - bounds.minLng
-                val maxDiff = Math.max(latDiff, lngDiff)
-                if (maxDiff > 0.1) {
-                    mapScale.value = 10
-                } else if (maxDiff > 0.05) {
-                    mapScale.value = 12
-                } else if (maxDiff > 0.02) {
-                    mapScale.value = 15
-                } else {
-                    mapScale.value = 16
+                val midLat = (bounds.minLat + bounds.maxLat) / 2
+                val midLng = (bounds.minLng + bounds.maxLng) / 2
+                center["latitude"] = midLat
+                center["longitude"] = midLng
+                ensureMapViewportEstimate()
+                val usableWidth = mapViewWidth * TRACK_FIT_MARGIN
+                val usableHeight = mapViewHeight * TRACK_FIT_MARGIN
+                if (usableWidth <= 0 || usableHeight <= 0) {
+                    return
                 }
+                var cosLat = Math.cos(midLat * Math.PI / 180.0)
+                if (cosLat < 0.01) {
+                    cosLat = 0.01
+                }
+                val spanLatMeters = (bounds.maxLat - bounds.minLat) * METERS_PER_DEGREE_LAT
+                val spanLngMeters = (bounds.maxLng - bounds.minLng) * METERS_PER_DEGREE_LNG * cosLat
+                val neededResolution = Math.max(spanLatMeters / usableHeight, spanLngMeters / usableWidth)
+                var zoom = MAX_TRACK_FIT_SCALE
+                if (neededResolution > 0.0001) {
+                    val baseResolution = EARTH_RESOLUTION_BASE * cosLat
+                    zoom = Math.log(baseResolution / neededResolution) / Math.log(2.0)
+                }
+                var finalZoom = Math.floor(zoom)
+                if (finalZoom > MAX_TRACK_FIT_SCALE) {
+                    finalZoom = MAX_TRACK_FIT_SCALE
+                }
+                if (finalZoom < MIN_TRACK_FIT_SCALE) {
+                    finalZoom = MIN_TRACK_FIT_SCALE
+                }
+                mapScale.value = finalZoom
             }
             val adjustMapToFitTrack = ::gen_adjustMapToFitTrack_fn
+            fun gen_applyTrackViewportFit_fn() {
+                adjustMapToFitTrack()
+                if (mapViewSizeMeasured) {
+                    return
+                }
+                measureMapViewportSize(fun(){
+                    adjustMapToFitTrack()
+                }
+                )
+            }
+            val applyTrackViewportFit = ::gen_applyTrackViewportFit_fn
+            fun gen_focusMapOnVehicle_fn() {
+                if (trackPoints.value.length == 0) {
+                    return
+                }
+                center["latitude"] = renderedPoint.latitude
+                center["longitude"] = renderedPoint.longitude
+            }
+            val focusMapOnVehicle = ::gen_focusMapOnVehicle_fn
             fun gen_calculateTrackDistance_fn() {
                 totalDistance.value = 0
                 run {
@@ -282,12 +369,12 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     polyline.value = _uA()
                     return
                 }
-                val initialUnplayedPolyline = Polyline(toNativePoints(trackPoints.value), "#888787", 3, true, false, "", "#888787", 0, _uA())
-                initialUnplayedPolyline.color = "#888787"
+                val initialUnplayedPolyline = Polyline(toNativePoints(trackPoints.value), "#444444", 3, true, false, "", "#444444", 0, _uA())
+                initialUnplayedPolyline.color = "#444444"
                 initialUnplayedPolyline.width = 3
                 initialUnplayedPolyline.dottedLine = true
                 initialUnplayedPolyline.arrowLine = false
-                initialUnplayedPolyline.borderColor = "#888787"
+                initialUnplayedPolyline.borderColor = "#444444"
                 initialUnplayedPolyline.borderWidth = 0
                 val initialPlayedPolyline = Polyline(toNativePoints(trackPoints.value.slice(0, 1)), "#3c5cff", 5, false, true, "", "#FFFFFF", 1, _uA())
                 initialPlayedPolyline.color = "#3c5cff"
@@ -340,7 +427,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     markers.value = _uA(
                         updatedMarker
                     ).concat(markers.value.slice(1))
-                    if (currentIndex.value % 5 == 0 || currentIndex.value == trackPoints.value.length - 1) {
+                    if (isPlaying.value) {
                         center["latitude"] = renderedPoint.latitude
                         center["longitude"] = renderedPoint.longitude
                     }
@@ -475,6 +562,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 isTrackPlayable.value = processedPoints.length > 1
                 currentIndex.value = 0
                 activeSegmentTargetIndex.value = -1
+                lastPolylineRenderAt = 0
                 if (processedPoints.length == 0) {
                     return
                 }
@@ -482,11 +570,9 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 calculateTrackDistance()
                 initCarMarker()
                 initPolyline()
-                adjustMapToFitTrack()
-                val firstPoint = trackPoints.value[0]
-                center["latitude"] = firstPoint.latitude
-                center["longitude"] = firstPoint.longitude
+                applyTrackViewportFit()
                 renderPlaybackIndex()
+                currentSpeed.value = 0
                 isMapReady.value = true
             }
             val processTrackData = ::gen_processTrackData_fn
@@ -511,6 +597,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                                 )
                                 return@w1
                             }
+                            console.log("加载轨迹成功:", res)
                             val trackData = res.data
                             if (trackData == null) {
                                 showCurrentPosition()
@@ -548,6 +635,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 currentIndex.value = 0
                 activeSegmentTargetIndex.value = -1
                 renderPlaybackIndex()
+                applyTrackViewportFit()
             }
             val resetPlayback = ::gen_resetPlayback_fn
             fun gen_getShortestRotationDifference_fn(from: Number, to: Number): Number {
@@ -579,6 +667,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             fun gen_finishPlayback_fn(): Unit {
                 pausePlayback()
                 activeSegmentTargetIndex.value = -1
+                currentSpeed.value = 0
                 showAppToast(ShowToastOptions(title = "轨迹回放完成", icon = "none", duration = 1500))
             }
             val finishPlayback = ::gen_finishPlayback_fn
@@ -608,8 +697,14 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     renderedPoint.rotation = (startPoint.rotation + rotationDifference * progress + 360) % 360
                     renderedPoint.deviceTime = targetPoint.deviceTime
                     renderedPoint.speed = targetPoint.speed
+                    currentSpeed.value = renderedPoint.speed
+                    currentTime.value = renderedPoint.deviceTime
                     updateCarPosition()
-                    updatePolyline()
+                    val frameNow = Date.now()
+                    if (frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS) {
+                        lastPolylineRenderAt = frameNow
+                        updatePolyline()
+                    }
                     if (progress >= 1) {
                         currentIndex.value = targetIndex
                         activeSegmentTargetIndex.value = -1
@@ -638,6 +733,8 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 }
                 activeSegmentTargetIndex.value = -1
                 isPlaying.value = true
+                focusMapOnVehicle()
+                lastPolylineRenderAt = 0
                 val sessionId = ++replaySessionId
                 animateNextSegment(sessionId)
             }
@@ -733,6 +830,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 }
             }
             )
+            onReady(fun(){
+                measureMapViewportSize(fun(){
+                    if (trackPoints.value.length > 0 && !isPlaying.value) {
+                        adjustMapToFitTrack()
+                    }
+                }
+                )
+            }
+            )
             onHide(fun(){
                 pausePlayback()
                 ++replaySessionId
@@ -756,7 +862,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 return _cE(Fragment, null, _uA(
                     _cE("view", _uM("class" to "container"), _uA(
                         _cV(_component_custom_navBar, _uM("title" to "轨迹回放", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                        _cE("view", _uM("class" to "map-container"), _uA(
+                        _cE("view", _uM("class" to "map-container", "id" to "track-map-container"), _uA(
                             if (isTrue(isMapReady.value)) {
                                 _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
                                     "latitude",

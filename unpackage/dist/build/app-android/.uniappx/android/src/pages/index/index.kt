@@ -17,13 +17,11 @@ import io.dcloud.uniapp.extapi.getLocation as uni_getLocation
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
-import io.dcloud.uniapp.extapi.hideTabBar as uni_hideTabBar
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.switchTab as uni_switchTab
 open class GenPagesIndexIndex : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -62,7 +60,8 @@ open class GenPagesIndexIndex : BasePage {
             val navBarHeight = ref(44)
             val deviceList = ref(_uA<Device>())
             val showPicker = ref(false)
-            val pickerValues = ref(_uA<PickerValue>())
+            val pickerListMaxHeight = ref(600)
+            val isSwitchingDevice = ref(false)
             val currentCarDeviceNo = ref("")
             val currentCarDeptId = ref("")
             val currentCarDeviceId = ref("")
@@ -108,38 +107,30 @@ open class GenPagesIndexIndex : BasePage {
                 return Math.max(0, Math.min(100, Math.round(percent)))
             }
             )
-            val pickerColumns = computed<UTSArray<PickerColumn>>(fun(): UTSArray<PickerColumn> {
-                return _uA(
-                    deviceList.value.map(fun(device): PickerColumnItem {
-                        val displayName = if (device.deviceName != "") {
-                            device.deviceName
-                        } else {
-                            if (device.name != "") {
-                                device.name
-                            } else {
-                                if (device.deviceNo != "") {
-                                    device.deviceNo
-                                } else {
-                                    "未命名设备"
-                                }
-                            }
-                        }
-                        val statusText = if (device.connectionStatus == "online") {
-                            "在线"
-                        } else {
-                            "离线"
-                        }
-                        return PickerColumnItem(id = device.deviceNo, label = "" + displayName + " (" + statusText + ")", value = if (device.deviceNo != "") {
-                            device.deviceNo
-                        } else {
-                            device.deviceId
-                        }
-                        , disabled = false, children = null)
-                    }
-                    )
-                )
+            val deviceDisplayName = fun(device: Device): String {
+                if (device.deviceName != "") {
+                    return device.deviceName
+                }
+                if (device.name != "") {
+                    return device.name
+                }
+                if (device.deviceNo != "") {
+                    return device.deviceNo
+                }
+                return "未命名设备"
             }
-            )
+            val isDeviceOnline = fun(device: Device): Boolean {
+                return device.connectionStatus == "online"
+            }
+            val isCurrentDevice = fun(device: Device): Boolean {
+                if (currentCarDeviceId.value != "" && device.deviceId == currentCarDeviceId.value) {
+                    return true
+                }
+                if (currentCarDeviceNo.value == "") {
+                    return false
+                }
+                return device.deviceNo == currentCarDeviceNo.value || device.value == currentCarDeviceNo.value
+            }
             val closePicker = fun(){
                 showPicker.value = false
             }
@@ -150,6 +141,12 @@ open class GenPagesIndexIndex : BasePage {
                 } else {
                     20
                 }
+                val windowHeight = if (systemInfo.windowHeight != null) {
+                    systemInfo.windowHeight
+                } else {
+                    600
+                }
+                pickerListMaxHeight.value = Math.floor(windowHeight * 0.6)
             }
             val delay = fun(ms: Number): UTSPromise<Unit> {
                 return UTSPromise<Unit>(fun(resolve: (value: Unit) -> Unit, _reject){
@@ -297,39 +294,14 @@ open class GenPagesIndexIndex : BasePage {
                 return -1
             }
             val handlePicker = fun(){
+                if (!checkToken()) {
+                    gotoLogin()
+                    return
+                }
                 if (deviceList.value.length == 0) {
                     showAppToast(ShowToastOptions(title = "暂无车辆数据", icon = "none"))
                     return
                 }
-                val currentIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value)
-                val savedDevice = getSavedSelectedDevice()
-                val savedDeviceIndex = if (savedDevice != null) {
-                    findDeviceIndex(savedDevice.deviceNo, savedDevice.deviceId)
-                } else {
-                    -1
-                }
-                val savedIndex = getSavedSelectedDeviceIndex()
-                var selectedIndex = currentIndex
-                if (selectedIndex == -1) {
-                    selectedIndex = savedDeviceIndex
-                }
-                if (selectedIndex == -1 && savedIndex != null && savedIndex < deviceList.value.length) {
-                    selectedIndex = savedIndex
-                }
-                if (selectedIndex == -1) {
-                    selectedIndex = 0
-                }
-                val selectedDevice = deviceList.value[selectedIndex]
-                if (selectedDevice == null) {
-                    return
-                }
-                pickerValues.value = _uA(
-                    if (selectedDevice.deviceNo != "") {
-                        selectedDevice.deviceNo
-                    } else {
-                        selectedDevice.deviceId
-                    }
-                )
                 showPicker.value = true
             }
             val createMarker = fun(id: Number, lat: Number, lng: Number, type: String, title: String?): Marker {
@@ -442,7 +414,6 @@ open class GenPagesIndexIndex : BasePage {
                 currentCarConnectionStatus.value = ""
                 currentCarCarType.value = ""
                 currentCarPlateNo.value = ""
-                pickerValues.value = _uA()
                 deviceDetail.value = DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = 0, voltage = 0, signalStrength = 0), connectionStatus = "offline", lastUpdateTime = "")
                 lastUpdateTime.value = "--:--:--"
                 positionState.value = "empty"
@@ -469,7 +440,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val createTrackRequestData = fun(deviceNo: String): UTSJSONObject {
                 val timeRange = getTodayZeroTime()
-                return _uO("deviceNo" to deviceNo, "startTime" to formatTimes(timeRange.todayZero), "endTime" to formatTimes(timeRange.nowTime), "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
+                return _uO("deviceNo" to deviceNo, "startTime" to formatTimes(timeRange.todayZero), "endTime" to formatTimes(timeRange.nowTime), "minParkTime" to 2, "withStop" to false, "withPos" to false, "withTrip" to true)
             }
             val loadTrackPos = fun(data: UTSJSONObject): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
@@ -584,81 +555,57 @@ open class GenPagesIndexIndex : BasePage {
                         }
                 })
             }
-            val handlePickerConfirm = fun(e: PickerConfirmEvent){
-                showPicker.value = false
-                val selectedValue = if (e.values.length > 0) {
-                    e.values[0].toString()
-                } else {
-                    ""
-                }
-                var selectedIndex: Number = -1
-                if (selectedValue != "") {
-                    selectedIndex = deviceList.value.findIndex(fun(device): Boolean {
-                        return device.deviceNo == selectedValue || device.value == selectedValue || device.deviceId == selectedValue
-                    }
-                    )
-                }
-                if (selectedIndex < 0 && e.indexs.length > 0) {
-                    val eventIndex = e.indexs[0]
-                    if (eventIndex >= 0 && eventIndex < deviceList.value.length) {
-                        selectedIndex = eventIndex
-                    }
-                }
-                if (selectedIndex < 0) {
-                    selectedIndex = findDeviceIndex(currentCarDeviceNo.value, currentCarDeviceId.value)
-                }
-                if (selectedIndex < 0 && deviceList.value.length > 0) {
-                    selectedIndex = 0
-                }
-                val selectedDevice = if (selectedIndex >= 0) {
-                    deviceList.value[selectedIndex]
-                } else {
-                    null
-                }
-                if (selectedDevice == null) {
-                    showAppToast(ShowToastOptions(title = "选择设备失败", icon = "none"))
-                    return
-                }
-                if (selectedDevice.deviceNo == currentCarDeviceNo.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-                    console.log("选择的设备111:", selectedDevice.deviceNo, selectedDevice.deviceId, currentCarDeviceNo.value, currentCarDeviceId.value)
-                    console.log("选择的设备与当前设备相同，不重复加载")
-                    return
-                }
-                val deviceName = if (selectedDevice.deviceName != "") {
-                    selectedDevice.deviceName
-                } else {
-                    if (selectedDevice.name != "") {
-                        selectedDevice.name
-                    } else {
-                        "未命名设备"
-                    }
-                }
-                currentCarName.value = deviceName
-                currentCarDeviceNo.value = if (selectedDevice.deviceNo != "") {
-                    selectedDevice.deviceNo
-                } else {
-                    selectedDevice.value
-                }
-                currentCarDeptId.value = selectedDevice.deptId
-                currentCarDeviceId.value = selectedDevice.deviceId
-                currentCarIccId.value = selectedDevice.iccid
-                currentCarSimMerchant.value = selectedDevice.simMerchant
-                currentCarConnectionStatus.value = selectedDevice.connectionStatus
-                currentCarCarType.value = selectedDevice.carType
-                currentCarPlateNo.value = selectedDevice.plateNo
-                center.latitude = selectedDevice.latitude
-                center.longitude = selectedDevice.longitude
-                saveSelectedDeviceIndex(selectedIndex)
-                pickerValues.value = _uA(
-                    if (selectedDevice.deviceNo != "") {
-                        selectedDevice.deviceNo
-                    } else {
-                        selectedDevice.deviceId
-                    }
-                )
-                saveSelectedDevice(selectedDevice)
-                uni_showLoading(ShowLoadingOptions(title = "加载车辆数据...", mask = true))
-                loadDeviceData(selectedDevice)
+            val handleDeviceSelect = fun(selectedDevice: Device): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        if (isSwitchingDevice.value) {
+                            return@w1
+                        }
+                        isSwitchingDevice.value = true
+                        closePicker()
+                        try {
+                            if (selectedDevice.deviceNo == currentCarDeviceNo.value && selectedDevice.deviceId == currentCarDeviceId.value) {
+                                console.log("选择的设备与当前设备相同，不重复加载")
+                                return@w1
+                            }
+                            val deviceName = if (selectedDevice.deviceName != "") {
+                                selectedDevice.deviceName
+                            } else {
+                                if (selectedDevice.name != "") {
+                                    selectedDevice.name
+                                } else {
+                                    "未命名设备"
+                                }
+                            }
+                            currentCarName.value = deviceName
+                            currentCarDeviceNo.value = if (selectedDevice.deviceNo != "") {
+                                selectedDevice.deviceNo
+                            } else {
+                                selectedDevice.value
+                            }
+                            currentCarDeptId.value = selectedDevice.deptId
+                            currentCarDeviceId.value = selectedDevice.deviceId
+                            currentCarIccId.value = selectedDevice.iccid
+                            currentCarSimMerchant.value = selectedDevice.simMerchant
+                            currentCarConnectionStatus.value = selectedDevice.connectionStatus
+                            currentCarCarType.value = selectedDevice.carType
+                            currentCarPlateNo.value = selectedDevice.plateNo
+                            center.latitude = selectedDevice.latitude
+                            center.longitude = selectedDevice.longitude
+                            val selectedIndex = deviceList.value.findIndex(fun(device): Boolean {
+                                return device.deviceId == selectedDevice.deviceId && device.deviceNo == selectedDevice.deviceNo
+                            }
+                            )
+                            if (selectedIndex >= 0) {
+                                saveSelectedDeviceIndex(selectedIndex)
+                            }
+                            saveSelectedDevice(selectedDevice)
+                            uni_showLoading(ShowLoadingOptions(title = "加载车辆数据...", mask = true))
+                            await(loadDeviceData(selectedDevice))
+                        }
+                         finally {
+                            isSwitchingDevice.value = false
+                        }
+                })
             }
             val loadDeviceList = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
@@ -765,13 +712,6 @@ open class GenPagesIndexIndex : BasePage {
                                     currentCarPlateNo.value = device.plateNo
                                     center.latitude = device.latitude
                                     center.longitude = device.longitude
-                                    pickerValues.value = _uA(
-                                        if (device.deviceNo != "") {
-                                            device.deviceNo
-                                        } else {
-                                            device.deviceId
-                                        }
-                                    )
                                     await(loadDeviceDetail(device.deviceId))
                                     await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.deviceNo != "") {
                                         device.deviceNo
@@ -947,7 +887,7 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isLogin()) {
                     return
                 }
-                uni_switchTab(SwitchTabOptions(url = "/pages/message/message"))
+                uni_navigateTo(NavigateToOptions(url = "/pages/message/message"))
             }
             val toFindCar = fun(){
                 if (!isLogin()) {
@@ -1077,10 +1017,46 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 ))
             }
+            val deviceSubscribed = ref(false)
+            val subscribeAvailable = ref(false)
+            val subscribeRequesting = ref(false)
+            val subscribeRowDesc = computed<String>(fun(): String {
+                return if (deviceSubscribed.value) {
+                    "车辆发生进/出围栏、超速等告警时将通过微信提醒"
+                } else {
+                    "开启后，告警将通过微信服务通知提醒"
+                }
+            }
+            )
+            val refreshSubscribeState = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        if (!isDeviceSubscribeSupported() || !checkToken()) {
+                            subscribeAvailable.value = false
+                            deviceSubscribed.value = false
+                            return@w1
+                        }
+                        val enabled = await(fetchNotifyStatusEnabled())
+                        if (!enabled) {
+                            subscribeAvailable.value = false
+                            deviceSubscribed.value = false
+                            return@w1
+                        }
+                        await(fetchNotifyQuota())
+                        val item = getCachedQuota("alarm")
+                        if (item == null || item.mode != "device" || item.templateId == "") {
+                            subscribeAvailable.value = false
+                            deviceSubscribed.value = false
+                            return@w1
+                        }
+                        subscribeAvailable.value = true
+                        deviceSubscribed.value = await(checkTemplateSubscribed(item.templateId))
+                })
+            }
             onShow(fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         if (checkToken()) {
                             await(loadUnreadMessageCount())
+                            refreshSubscribeState()
                             val needRefresh = uni_getStorageSync("needRefreshHome")
                             if (isTruthy(needRefresh)) {
                                 await(loadDeviceList())
@@ -1098,7 +1074,6 @@ open class GenPagesIndexIndex : BasePage {
                 loadDeviceList()
             }
             onLoad(fun(_options){
-                uni_hideTabBar(null)
                 initDimensions()
                 loadHomePlatformAppId()
                 if (checkToken()) {
@@ -1109,35 +1084,41 @@ open class GenPagesIndexIndex : BasePage {
             return fun(): Any? {
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
                 val _component_map = resolveComponent("map")
-                val _component_l_picker = resolveEasyComponent("l-picker", GenUniModulesLimePickerComponentsLPickerLPickerClass)
                 val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 val _component_app_modal = resolveEasyComponent("app-modal", GenComponentsAppModalAppModalClass)
                 return _cE(Fragment, null, _uA(
-                    _cE("scroll-view", _uM("class" to "container", "scroll-y" to "true", "show-scrollbar" to false), _uA(
+                    _cE("scroll-view", _uM("class" to "container", "scroll-y" to if (showPicker.value) {
+                        "false"
+                    } else {
+                        "true"
+                    }
+                    , "show-scrollbar" to false), _uA(
                         _cE("view", _uM("class" to "page-bg"), _uA(
                             _cE("view", _uM("class" to "top", "style" to _nS(_uM("paddingTop" to (statusBarHeight.value + 10 + "px")))), _uA(
                                 _cE("view", _uM("class" to "device-car"), _uA(
-                                    _cE("view", _uM("class" to "current-car"), _uA(
+                                    _cE("view", _uM("class" to "current-car", "onClick" to handlePicker), _uA(
                                         if (isTrue(checkToken())) {
                                             _cE("view", _uM("key" to 0), _uA(
                                                 if (isTrue(currentCarName.value)) {
-                                                    _cE("text", _uM("key" to 0, "class" to "car-id", "onClick" to handlePicker), _tD(currentCarName.value ?: "加载中…"), 1)
+                                                    _cE("text", _uM("key" to 0, "class" to "car-id"), _tD(currentCarName.value ?: "加载中…"), 1)
                                                 } else {
                                                     _cE("text", _uM("key" to 1, "class" to "car-id"), "暂无设备")
                                                 }
                                             ))
                                         } else {
-                                            _cE("text", _uM("key" to 1, "class" to "login", "onClick" to gotoLogin), "点击登录!")
+                                            _cE("text", _uM("key" to 1, "class" to "login", "onClick" to withModifiers(gotoLogin, _uA(
+                                                "stop"
+                                            ))), "点击登录!")
                                         }
                                         ,
                                         _cV(_component_i_icon, _uM("name" to "/static/right-bottom.png", "fontSize" to "7"))
                                     )),
                                     _cE("view", _uM("class" to "nav-tools"), _uA(
-                                        _cV(_component_i_icon, _uM("name" to "/static/reload.png", "fontSize" to "18", "onClick" to handleReload)),
-                                        _cV(_component_i_icon, _uM("class" to "nav-tool-spacing", "name" to "/static/maps.png", "fontSize" to "18", "onClick" to toDeviceList)),
+                                        _cV(_component_i_icon, _uM("name" to "/static/reload.png", "fontSize" to "24", "onClick" to handleReload)),
+                                        _cV(_component_i_icon, _uM("class" to "nav-tool-spacing", "name" to "/static/maps.png", "fontSize" to "20", "onClick" to toDeviceList)),
                                         _cE("view", _uM("class" to "nav-tool-spacing nav-tool-add", "onClick" to toAdd), _uA(
-                                            _cE("image", _uM("src" to "/static/addNew.png", "mode" to "aspectFit", "class" to "nav-tool-add-image"))
+                                            _cV(_component_i_icon, _uM("name" to "/static/addNew.png", "fontSize" to "24"))
                                         ))
                                     ))
                                 )),
@@ -1177,7 +1158,7 @@ open class GenPagesIndexIndex : BasePage {
                                     _cE("view", _uM("class" to "map-header"), _uA(
                                         _cE("text", _uM("class" to "map-title"), "车辆定位"),
                                         _cE("view", _uM("class" to "map-refresh-wrap", "onClick" to refreshLocation), _uA(
-                                            _cE("text", _uM("class" to "map-refresh"), "刷新位置")
+                                            _cE("text", _uM("class" to "map-refresh"), "刷新定位")
                                         ))
                                     )),
                                     _cE("view", _uM("class" to "map-container"), _uA(
@@ -1322,26 +1303,67 @@ open class GenPagesIndexIndex : BasePage {
                                     ))
                                 ))
                             ))
-                        )),
-                        _cV(_component_l_popup, _uM("modelValue" to showPicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
-                            showPicker.value = `$event`
-                        }
-                        , "position" to "bottom", "closeable" to false, "safe-area-inset-bottom" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                _cV(_component_l_picker, _uM("modelValue" to pickerValues.value, "onUpdate:modelValue" to fun(`$event`: UTSArray<PickerValue>){
-                                    pickerValues.value = `$event`
-                                }
-                                , "cancel-btn" to "取消", "confirm-btn" to "确认", "columns" to pickerColumns.value, "onCancel" to closePicker, "onConfirm" to handlePickerConfirm), null, 8, _uA(
-                                    "modelValue",
-                                    "onUpdate:modelValue",
-                                    "columns"
-                                ))
-                            )
-                        }
-                        ), "_" to 1), 8, _uA(
-                            "modelValue",
-                            "onUpdate:modelValue"
                         ))
+                    ), 8, _uA(
+                        "scroll-y"
+                    )),
+                    _cV(_component_l_popup, _uM("modelValue" to showPicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
+                        showPicker.value = `$event`
+                    }
+                    , "position" to "bottom", "closeable" to false, "safe-area-inset-bottom" to true, "destroy-on-close" to true, "radius" to 16, "bg-color" to "#ffffff"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                        return _uA(
+                            _cE("view", _uM("class" to "car-picker", "onTouchmove" to withModifiers(fun(){}, _uA(
+                                "stop"
+                            ))), _uA(
+                                _cE("text", _uM("class" to "car-picker-title"), "选择车辆"),
+                                _cE("scroll-view", _uM("class" to "car-picker-list", "scroll-y" to "true", "show-scrollbar" to false, "style" to _nS(_uM("maxHeight" to (pickerListMaxHeight.value + "px")))), _uA(
+                                    _cE(Fragment, null, RenderHelpers.renderList(deviceList.value, fun(device, index, __index, _cached): Any {
+                                        return _cE("view", _uM("key" to index, "class" to "car-picker-item", "onClick" to fun(){
+                                            handleDeviceSelect(device)
+                                        }
+                                        ), _uA(
+                                            _cE("text", _uM("class" to _nC(if (isCurrentDevice(device)) {
+                                                "car-picker-item-name car-picker-item-name--active"
+                                            } else {
+                                                "car-picker-item-name"
+                                            }
+                                            )), _tD(deviceDisplayName(device)), 3),
+                                            _cE("view", _uM("class" to "car-picker-item-status"), _uA(
+                                                _cE("view", _uM("class" to _nC(if (isDeviceOnline(device)) {
+                                                    "car-picker-dot car-picker-dot--online"
+                                                } else {
+                                                    "car-picker-dot car-picker-dot--offline"
+                                                }
+                                                )), null, 2),
+                                                _cE("text", _uM("class" to _nC(if (isDeviceOnline(device)) {
+                                                    "car-picker-status-text car-picker-status-text--online"
+                                                } else {
+                                                    "car-picker-status-text car-picker-status-text--offline"
+                                                }
+                                                )), _tD(if (isDeviceOnline(device)) {
+                                                    "在线"
+                                                } else {
+                                                    "离线"
+                                                }
+                                                ), 3)
+                                            ))
+                                        ), 8, _uA(
+                                            "onClick"
+                                        ))
+                                    }
+                                    ), 128)
+                                ), 4),
+                                _cE("view", _uM("class" to "car-picker-cancel", "onClick" to closePicker), _uA(
+                                    _cE("text", _uM("class" to "car-picker-cancel-text"), "取消")
+                                ))
+                            ), 40, _uA(
+                                "onTouchmove"
+                            ))
+                        )
+                    }
+                    ), "_" to 1), 8, _uA(
+                        "modelValue",
+                        "onUpdate:modelValue"
                     )),
                     _cV(_component_app_toast),
                     _cV(_component_app_modal)
@@ -1355,7 +1377,7 @@ open class GenPagesIndexIndex : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#E6F9E6", "backgroundImage" to "linear-gradient(to right, #E6F9E6, #E0F0FF)")), "page-bg" to _uM(".container " to _uM("paddingTop" to 0, "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx")), "loading-container" to _uM(".container .page-bg " to _uM("position" to "fixed", "top" to "50%", "left" to "50%", "transform" to "translate(-50%, -50%)", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "zIndex" to 999)), "loading-text" to _uM(".container .page-bg .loading-container " to _uM("marginTop" to "20rpx", "fontSize" to "28rpx", "color" to "#666666")), "device-car" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "current-car" to _uM(".container .page-bg .top .device-car " to _uM("position" to "relative", "display" to "flex", "flexDirection" to "row", "alignItems" to "flex-end")), "car-id" to _uM(".container .page-bg .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "position" to "relative")), "login" to _uM(".container .page-bg .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "paddingRight" to "10rpx")), "nav-tools" to _uM(".container .page-bg .top .device-car " to _uM("display" to "flex", "flexShrink" to 0, "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "nav-tool-spacing" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("flexShrink" to 0, "marginLeft" to "20rpx")), "nav-tool-add" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("display" to "flex", "width" to "40rpx", "height" to "40rpx", "alignItems" to "center", "justifyContent" to "center")), "nav-tool-add-image" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("width" to "36rpx", "height" to "36rpx")), "exit" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "rgba(0,0,0,0.05)", "transitionProperty" to "all", "transitionDuration" to "0.2s", "transitionTimingFunction" to "ease", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%")), "exit-icon" to _uM(".container .page-bg .top .device-car .nav-tools .exit " to _uM("width" to "40rpx", "height" to "40rpx")), "banner-image" to _uM(".container .page-bg .top " to _uM("width" to "100%", "height" to "300rpx")), "car-state" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0, "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx")), "state-item" to _uM(".container .page-bg .top .car-state .state-item+" to _uM("marginLeft" to "20rpx"), ".container .page-bg .top .car-state " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx")), "state-label" to _uM(".container .page-bg .top .car-state .state-item " to _uM("fontSize" to "24rpx", "color" to "#999999")), "state-value" to _uM(".container .page-bg .top .car-state .state-item " to _uM("marginTop" to "12rpx", "fontSize" to "25rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .page-bg .top .car-state .state-item .online" to _uM("color" to "#07C160")), "map-box" to _uM(".container .page-bg .content " to _uM("width" to "100%", "height" to "400rpx", "marginTop" to "10rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0, "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden")), "map-header" to _uM(".container .page-bg .content .map-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "map-title" to _uM(".container .page-bg .content .map-box .map-header " to _uM("flexShrink" to 0, "fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "map-refresh-wrap" to _uM(".container .page-bg .content .map-box .map-header " to _uM("display" to "flex", "flexShrink" to 0, "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "map-refresh" to _uM(".container .page-bg .content .map-box .map-header .map-refresh-wrap " to _uM("fontSize" to "26rpx", "lineHeight" to "42rpx", "color" to "#07C160", "whiteSpace" to "nowrap")), "map-container" to _uM(".container .page-bg .content .map-box " to _uM("position" to "relative", "height" to "300rpx")), "map-status" to _uM(".container .page-bg .content .map-box .map-container " to _uM("position" to "absolute", "left" to "24rpx", "right" to "24rpx", "bottom" to "24rpx", "paddingTop" to "16rpx", "paddingRight" to "20rpx", "paddingBottom" to "16rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "12rpx", "borderTopRightRadius" to "12rpx", "borderBottomRightRadius" to "12rpx", "borderBottomLeftRadius" to "12rpx", "backgroundColor" to "rgba(0,0,0,0.68)", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "map-status-text" to _uM(".container .page-bg .content .map-box .map-container .map-status " to _uM("color" to "#ffffff", "fontSize" to "24rpx")), "map-status-retry" to _uM(".container .page-bg .content .map-box .map-container .map-status " to _uM("flexShrink" to 0, "marginLeft" to "20rpx", "color" to "#8de39b", "fontSize" to "24rpx")), "mile-record" to _uM(".container .page-bg .content " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden", "boxShadow" to "0 4rpx 20rpx rgba(0, 0, 0, 0.08)")), "record-header" to _uM(".container .page-bg .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "record-title" to _uM(".container .page-bg .content .mile-record .record-header " to _uM("flexShrink" to 0, "fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "record-desc-wrap" to _uM(".container .page-bg .content .mile-record .record-header " to _uM("display" to "flex", "flexShrink" to 0, "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "record-desc" to _uM(".container .page-bg .content .mile-record .record-header .record-desc-wrap " to _uM("fontSize" to "26rpx", "lineHeight" to "42rpx", "color" to "#07C160", "whiteSpace" to "nowrap")), "ring-container" to _uM(".container .page-bg .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-around", "paddingTop" to "30rpx", "paddingRight" to "20rpx", "paddingBottom" to "30rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#edf7ff", "borderTopLeftRadius" to "24rpx", "borderTopRightRadius" to "24rpx", "borderBottomRightRadius" to "24rpx", "borderBottomLeftRadius" to "24rpx", "marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx")), "ring-item" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "relative", "width" to "250rpx", "height" to "250rpx", "display" to "flex", "alignItems" to "center", "justifyContent" to "center")), "ring-bg" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "250rpx", "height" to "250rpx", "zIndex" to 2)), "ring-quarter" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "126rpx", "height" to "126rpx", "overflow" to "hidden")), "ring-quarter--top-left" to _uM(".container .page-bg .content .mile-record " to _uM("top" to 0, "left" to 0)), "ring-quarter--top-right" to _uM(".container .page-bg .content .mile-record " to _uM("top" to 0, "right" to 0)), "ring-quarter--bottom-right" to _uM(".container .page-bg .content .mile-record " to _uM("right" to 0, "bottom" to 0)), "ring-quarter--bottom-left" to _uM(".container .page-bg .content .mile-record " to _uM("bottom" to 0, "left" to 0)), "ring-stroke" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "250rpx", "height" to "250rpx", "boxSizing" to "border-box", "borderTopWidth" to "16rpx", "borderRightWidth" to "16rpx", "borderBottomWidth" to "16rpx", "borderLeftWidth" to "16rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to 999, "borderTopRightRadius" to 999, "borderBottomRightRadius" to 999, "borderBottomLeftRadius" to 999), ".container .page-bg .content .mile-record .ring-quarter--top-left " to _uM("top" to 0, "left" to 0), ".container .page-bg .content .mile-record .ring-quarter--top-right " to _uM("top" to 0, "right" to 0), ".container .page-bg .content .mile-record .ring-quarter--bottom-right " to _uM("right" to 0, "bottom" to 0), ".container .page-bg .content .mile-record .ring-quarter--bottom-left " to _uM("bottom" to 0, "left" to 0)), "ring-stroke--track" to _uM(".container .page-bg .content .mile-record " to _uM("borderTopColor" to "#dceaf3", "borderRightColor" to "#dceaf3", "borderBottomColor" to "#dceaf3", "borderLeftColor" to "#dceaf3", "borderTopWidth" to "5rpx", "borderRightWidth" to "5rpx", "borderBottomWidth" to "5rpx", "borderLeftWidth" to "5rpx")), "ring-stroke--active" to _uM(".container .page-bg .content .mile-record " to _uM("borderTopColor" to "#4cd964", "borderRightColor" to "#4cd964", "borderBottomColor" to "#4cd964", "borderLeftColor" to "#4cd964"), ".container .page-bg .content .mile-record .ring-bg.orange " to _uM("borderTopColor" to "#ff9500", "borderRightColor" to "#ff9500", "borderBottomColor" to "#ff9500", "borderLeftColor" to "#ff9500")), "ring-text" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "relative", "zIndex" to 10)), "num" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "45rpx", "fontWeight" to "bold", "color" to "#333333", "textAlign" to "center")), "unit" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "20rpx", "color" to "#666666", "textAlign" to "right")), "label" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "25rpx", "color" to "#666666", "marginTop" to "12rpx", "textAlign" to "center")), "device-list" to _uM(".container .page-bg .content " to _uM("display" to "flex", "flexDirection" to "column", "marginTop" to "40rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0)), "device-item" to _uM(".container .page-bg .content .device-list .device-item+" to _uM("marginTop" to "30rpx"), ".container .page-bg .content .device-list " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "item-label" to _uM(".container .page-bg .content .device-list .device-item " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center")), "icon" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("width" to "80rpx", "height" to "80rpx", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "paddingTop" to "18rpx", "paddingRight" to "18rpx", "paddingBottom" to "18rpx", "paddingLeft" to "18rpx"), ".container .page-bg .content .device-list .device-item .item-label .icon-device" to _uM("backgroundColor" to "#f0f9f0"), ".container .page-bg .content .device-list .device-item .item-label .icon-car" to _uM("backgroundColor" to "#f3f8fb"), ".container .page-bg .content .device-list .device-item .item-label .icon-fence" to _uM("backgroundColor" to "#f1f7f4")), "icon-image" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("width" to "45rpx", "height" to "45rpx"), ".container .page-bg .content .service .service-content .service-item " to _uM("width" to "60rpx", "height" to "60rpx")), "item-info" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("marginLeft" to "20rpx")), "item-title" to _uM(".container .page-bg .content .device-list .device-item .item-label .item-info " to _uM("fontSize" to "28rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .page-bg .content .service .service-content .service-item " to _uM("marginTop" to "10rpx", "fontSize" to "25rpx", "color" to "#222222")), "item-desc" to _uM(".container .page-bg .content .device-list .device-item .item-label .item-info " to _uM("color" to "#cccccc", "fontSize" to "24rpx", "marginTop" to "10rpx")), "service" to _uM(".container .page-bg .content " to _uM("display" to "flex", "flexDirection" to "column", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#ffffff", "marginBottom" to "30rpx")), "service-header" to _uM(".container .page-bg .content .service " to _uM("fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0", "marginBottom" to "30rpx")), "service-content" to _uM(".container .page-bg .content .service " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx")), "service-item" to _uM(".container .page-bg .content .service .service-content " to _uM("display" to "flex", "flexDirection" to "column", "alignItems" to "center")), "message-icon-wrap" to _uM(".container .page-bg .content .service .service-content .service-item " to _uM("position" to "relative", "display" to "flex", "alignItems" to "center", "justifyContent" to "center", "width" to "80rpx", "overflow" to "visible")), "message-unread-badge" to _uM(".container .page-bg .content .service .service-content .service-item " to _uM("position" to "absolute", "top" to 0, "right" to "-5rpx", "zIndex" to 10, "display" to "flex", "alignItems" to "center", "justifyContent" to "center", "minWidth" to "30rpx", "height" to "30rpx", "boxSizing" to "border-box", "paddingTop" to 0, "paddingRight" to "6rpx", "paddingBottom" to 0, "paddingLeft" to "6rpx", "borderTopLeftRadius" to "14rpx", "borderTopRightRadius" to "14rpx", "borderBottomRightRadius" to "14rpx", "borderBottomLeftRadius" to "14rpx", "backgroundColor" to "#ff4444", "color" to "#ffffff", "fontSize" to "18rpx", "lineHeight" to "28rpx", "textAlign" to "center", "whiteSpace" to "nowrap")), "@TRANSITION" to _uM("exit" to _uM("property" to "all", "duration" to "0.2s", "timingFunction" to "ease")))
+                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#E6F9E6", "backgroundImage" to "linear-gradient(to right, #E6F9E6, #E0F0FF)")), "page-bg" to _uM(".container " to _uM("paddingTop" to 0, "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx")), "loading-container" to _uM(".container .page-bg " to _uM("position" to "fixed", "top" to "50%", "left" to "50%", "transform" to "translate(-50%, -50%)", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "zIndex" to 999)), "loading-text" to _uM(".container .page-bg .loading-container " to _uM("marginTop" to "20rpx", "fontSize" to "28rpx", "color" to "#666666")), "device-car" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "current-car" to _uM(".container .page-bg .top .device-car " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "minWidth" to 0, "alignSelf" to "stretch", "justifyContent" to "flex-start", "marginRight" to "60rpx", "position" to "relative", "display" to "flex", "flexDirection" to "row", "alignItems" to "flex-end")), "car-id" to _uM(".container .page-bg .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "position" to "relative")), "login" to _uM(".container .page-bg .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "paddingRight" to "10rpx")), "nav-tools" to _uM(".container .page-bg .top .device-car " to _uM("display" to "flex", "flexShrink" to 0, "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "nav-tool-spacing" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("flexShrink" to 0, "marginLeft" to "20rpx")), "nav-tool-add" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("display" to "flex", "width" to "40rpx", "height" to "40rpx", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "alignItems" to "center", "justifyContent" to "center")), "exit" to _uM(".container .page-bg .top .device-car .nav-tools " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "rgba(0,0,0,0.05)", "transitionProperty" to "all", "transitionDuration" to "0.2s", "transitionTimingFunction" to "ease", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%")), "exit-icon" to _uM(".container .page-bg .top .device-car .nav-tools .exit " to _uM("width" to "40rpx", "height" to "40rpx")), "banner-image" to _uM(".container .page-bg .top " to _uM("width" to "100%", "height" to "300rpx")), "subscribe-row" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "marginTop" to "15rpx", "marginRight" to 0, "marginBottom" to "12rpx", "marginLeft" to 0)), "subscribe-icon" to _uM(".container .page-bg .top .subscribe-row " to _uM("width" to "56rpx", "height" to "56rpx", "flexShrink" to 0)), "subscribe-text" to _uM(".container .page-bg .top .subscribe-row " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "flexDirection" to "column", "marginLeft" to "16rpx")), "subscribe-title" to _uM(".container .page-bg .top .subscribe-row .subscribe-text " to _uM("fontSize" to "28rpx", "fontWeight" to "bold", "color" to "#333333")), "subscribe-desc" to _uM(".container .page-bg .top .subscribe-row .subscribe-text " to _uM("marginTop" to "6rpx", "fontSize" to "22rpx", "color" to "#999999")), "subscribe-btn" to _uM(".container .page-bg .top .subscribe-row " to _uM("flexShrink" to 0, "marginLeft" to "16rpx", "paddingTop" to "12rpx", "paddingRight" to "24rpx", "paddingBottom" to "12rpx", "paddingLeft" to "24rpx", "borderTopLeftRadius" to "32rpx", "borderTopRightRadius" to "32rpx", "borderBottomRightRadius" to "32rpx", "borderBottomLeftRadius" to "32rpx", "backgroundColor" to "#07C160"), ".container .page-bg .top .subscribe-row .subscribed" to _uM("backgroundColor" to "#eeeeee")), "subscribe-btn-text" to _uM(".container .page-bg .top .subscribe-row .subscribe-btn " to _uM("fontSize" to "24rpx", "color" to "#ffffff"), ".container .page-bg .top .subscribe-row .subscribe-btn.subscribed " to _uM("color" to "#999999")), "car-state" to _uM(".container .page-bg .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0, "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx")), "state-item" to _uM(".container .page-bg .top .car-state .state-item+" to _uM("marginLeft" to "20rpx"), ".container .page-bg .top .car-state " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx")), "state-label" to _uM(".container .page-bg .top .car-state .state-item " to _uM("fontSize" to "24rpx", "color" to "#999999")), "state-value" to _uM(".container .page-bg .top .car-state .state-item " to _uM("marginTop" to "12rpx", "fontSize" to "25rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .page-bg .top .car-state .state-item .online" to _uM("color" to "#07C160")), "map-box" to _uM(".container .page-bg .content " to _uM("width" to "100%", "height" to "400rpx", "marginTop" to "10rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0, "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden")), "map-header" to _uM(".container .page-bg .content .map-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "map-title" to _uM(".container .page-bg .content .map-box .map-header " to _uM("flexShrink" to 0, "fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "map-refresh-wrap" to _uM(".container .page-bg .content .map-box .map-header " to _uM("display" to "flex", "flexShrink" to 0, "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "map-refresh" to _uM(".container .page-bg .content .map-box .map-header .map-refresh-wrap " to _uM("fontSize" to "26rpx", "lineHeight" to "42rpx", "color" to "#07C160", "whiteSpace" to "nowrap")), "map-container" to _uM(".container .page-bg .content .map-box " to _uM("position" to "relative", "height" to "300rpx")), "map-status" to _uM(".container .page-bg .content .map-box .map-container " to _uM("position" to "absolute", "left" to "24rpx", "right" to "24rpx", "bottom" to "24rpx", "paddingTop" to "16rpx", "paddingRight" to "20rpx", "paddingBottom" to "16rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "12rpx", "borderTopRightRadius" to "12rpx", "borderBottomRightRadius" to "12rpx", "borderBottomLeftRadius" to "12rpx", "backgroundColor" to "rgba(0,0,0,0.68)", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "map-status-text" to _uM(".container .page-bg .content .map-box .map-container .map-status " to _uM("color" to "#ffffff", "fontSize" to "24rpx")), "map-status-retry" to _uM(".container .page-bg .content .map-box .map-container .map-status " to _uM("flexShrink" to 0, "marginLeft" to "20rpx", "color" to "#8de39b", "fontSize" to "24rpx")), "mile-record" to _uM(".container .page-bg .content " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden", "boxShadow" to "0 4rpx 20rpx rgba(0, 0, 0, 0.08)")), "record-header" to _uM(".container .page-bg .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "record-title" to _uM(".container .page-bg .content .mile-record .record-header " to _uM("flexShrink" to 0, "fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "record-desc-wrap" to _uM(".container .page-bg .content .mile-record .record-header " to _uM("display" to "flex", "flexShrink" to 0, "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "record-desc" to _uM(".container .page-bg .content .mile-record .record-header .record-desc-wrap " to _uM("fontSize" to "26rpx", "lineHeight" to "42rpx", "color" to "#07C160", "whiteSpace" to "nowrap")), "ring-container" to _uM(".container .page-bg .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-around", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#edf7ff", "borderTopLeftRadius" to "24rpx", "borderTopRightRadius" to "24rpx", "borderBottomRightRadius" to "24rpx", "borderBottomLeftRadius" to "24rpx", "marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx")), "ring-item" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "relative", "width" to "180rpx", "height" to "180rpx", "display" to "flex", "alignItems" to "center", "justifyContent" to "center")), "ring-bg" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "180rpx", "height" to "180rpx", "zIndex" to 2)), "ring-quarter" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "120rpx", "height" to "120rpx", "overflow" to "hidden")), "ring-quarter--top-left" to _uM(".container .page-bg .content .mile-record " to _uM("top" to 0, "left" to 0)), "ring-quarter--top-right" to _uM(".container .page-bg .content .mile-record " to _uM("top" to 0, "right" to 0)), "ring-quarter--bottom-right" to _uM(".container .page-bg .content .mile-record " to _uM("right" to 0, "bottom" to 0)), "ring-quarter--bottom-left" to _uM(".container .page-bg .content .mile-record " to _uM("bottom" to 0, "left" to 0)), "ring-stroke" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "absolute", "width" to "180rpx", "height" to "180rpx", "boxSizing" to "border-box", "borderTopWidth" to "10rpx", "borderRightWidth" to "10rpx", "borderBottomWidth" to "10rpx", "borderLeftWidth" to "10rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#000000", "borderRightColor" to "#000000", "borderBottomColor" to "#000000", "borderLeftColor" to "#000000", "borderTopLeftRadius" to 999, "borderTopRightRadius" to 999, "borderBottomRightRadius" to 999, "borderBottomLeftRadius" to 999), ".container .page-bg .content .mile-record .ring-quarter--top-left " to _uM("top" to 0, "left" to 0), ".container .page-bg .content .mile-record .ring-quarter--top-right " to _uM("top" to 0, "right" to 0), ".container .page-bg .content .mile-record .ring-quarter--bottom-right " to _uM("right" to 0, "bottom" to 0), ".container .page-bg .content .mile-record .ring-quarter--bottom-left " to _uM("bottom" to 0, "left" to 0)), "ring-stroke--track" to _uM(".container .page-bg .content .mile-record " to _uM("borderTopColor" to "#dceaf3", "borderRightColor" to "#dceaf3", "borderBottomColor" to "#dceaf3", "borderLeftColor" to "#dceaf3", "borderTopWidth" to "5rpx", "borderRightWidth" to "5rpx", "borderBottomWidth" to "5rpx", "borderLeftWidth" to "5rpx")), "ring-stroke--active" to _uM(".container .page-bg .content .mile-record " to _uM("borderTopColor" to "#4cd964", "borderRightColor" to "#4cd964", "borderBottomColor" to "#4cd964", "borderLeftColor" to "#4cd964"), ".container .page-bg .content .mile-record .ring-bg.orange " to _uM("borderTopColor" to "#ff9500", "borderRightColor" to "#ff9500", "borderBottomColor" to "#ff9500", "borderLeftColor" to "#ff9500")), "ring-text" to _uM(".container .page-bg .content .mile-record " to _uM("position" to "relative", "zIndex" to 10)), "num" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "35rpx", "fontWeight" to "bold", "color" to "#333333", "textAlign" to "center")), "unit" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "20rpx", "color" to "#999999", "textAlign" to "right")), "label" to _uM(".container .page-bg .content .mile-record " to _uM("fontSize" to "18rpx", "color" to "#999999", "marginTop" to "5rpx", "textAlign" to "center")), "device-list" to _uM(".container .page-bg .content " to _uM("display" to "flex", "flexDirection" to "column", "marginTop" to "40rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0)), "device-item" to _uM(".container .page-bg .content .device-list .device-item+" to _uM("marginTop" to "30rpx"), ".container .page-bg .content .device-list " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "item-label" to _uM(".container .page-bg .content .device-list .device-item " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center")), "icon" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("width" to "80rpx", "height" to "80rpx", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "paddingTop" to "18rpx", "paddingRight" to "18rpx", "paddingBottom" to "18rpx", "paddingLeft" to "18rpx"), ".container .page-bg .content .device-list .device-item .item-label .icon-device" to _uM("backgroundColor" to "#f0f9f0"), ".container .page-bg .content .device-list .device-item .item-label .icon-car" to _uM("backgroundColor" to "#f3f8fb"), ".container .page-bg .content .device-list .device-item .item-label .icon-fence" to _uM("backgroundColor" to "#f1f7f4")), "icon-image" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("width" to "45rpx", "height" to "45rpx"), ".container .page-bg .content .service .service-content .service-item " to _uM("width" to "60rpx", "height" to "60rpx")), "item-info" to _uM(".container .page-bg .content .device-list .device-item .item-label " to _uM("marginLeft" to "20rpx")), "item-title" to _uM(".container .page-bg .content .device-list .device-item .item-label .item-info " to _uM("fontSize" to "28rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .page-bg .content .service .service-content .service-item " to _uM("marginTop" to "10rpx", "fontSize" to "25rpx", "color" to "#222222")), "item-desc" to _uM(".container .page-bg .content .device-list .device-item .item-label .item-info " to _uM("color" to "#cccccc", "fontSize" to "24rpx", "marginTop" to "10rpx")), "service" to _uM(".container .page-bg .content " to _uM("display" to "flex", "flexDirection" to "column", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#ffffff", "marginBottom" to "30rpx")), "service-header" to _uM(".container .page-bg .content .service " to _uM("fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "service-content" to _uM(".container .page-bg .content .service " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx")), "service-item" to _uM(".container .page-bg .content .service .service-content " to _uM("display" to "flex", "flexDirection" to "column", "alignItems" to "center")), "message-icon-wrap" to _uM(".container .page-bg .content .service .service-content .service-item " to _uM("position" to "relative", "display" to "flex", "alignItems" to "center", "justifyContent" to "center", "width" to "80rpx", "overflow" to "visible")), "message-unread-badge" to _uM(".container .page-bg .content .service .service-content .service-item " to _uM("position" to "absolute", "top" to 0, "right" to "-5rpx", "zIndex" to 10, "display" to "flex", "alignItems" to "center", "justifyContent" to "center", "minWidth" to "30rpx", "height" to "30rpx", "boxSizing" to "border-box", "paddingTop" to 0, "paddingRight" to "6rpx", "paddingBottom" to 0, "paddingLeft" to "6rpx", "borderTopLeftRadius" to "14rpx", "borderTopRightRadius" to "14rpx", "borderBottomRightRadius" to "14rpx", "borderBottomLeftRadius" to "14rpx", "backgroundColor" to "#ff4444", "color" to "#ffffff", "fontSize" to "18rpx", "lineHeight" to "28rpx", "textAlign" to "center", "whiteSpace" to "nowrap")), "car-picker" to _pS(_uM("width" to "100%", "display" to "flex", "flexDirection" to "column", "paddingTop" to "30rpx")), "car-picker-title" to _uM(".car-picker " to _uM("paddingBottom" to "24rpx", "fontSize" to "34rpx", "fontWeight" to 600, "color" to "#333333", "textAlign" to "center")), "car-picker-list" to _uM(".car-picker " to _uM("maxHeight" to "900rpx")), "car-picker-item" to _uM(".car-picker " to _uM("paddingTop" to "30rpx", "paddingRight" to "40rpx", "paddingBottom" to "30rpx", "paddingLeft" to "40rpx", "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between", "borderTopWidth" to "1rpx", "borderTopStyle" to "solid", "borderTopColor" to "#F0EAEA")), "car-picker-item-name" to _uM(".car-picker " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "minWidth" to 0, "paddingRight" to "20rpx", "fontSize" to "32rpx", "color" to "#333333")), "car-picker-item-name--active" to _uM(".car-picker " to _uM("color" to "#3C6ECF")), "car-picker-item-status" to _uM(".car-picker " to _uM("flexShrink" to 0, "display" to "flex", "flexDirection" to "row", "alignItems" to "center")), "car-picker-dot" to _uM(".car-picker " to _uM("width" to "14rpx", "height" to "14rpx", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%")), "car-picker-dot--online" to _uM(".car-picker " to _uM("backgroundColor" to "#5BBF6A")), "car-picker-dot--offline" to _uM(".car-picker " to _uM("backgroundColor" to "#9A9A9A")), "car-picker-status-text" to _uM(".car-picker " to _uM("marginLeft" to "10rpx", "fontSize" to "28rpx")), "car-picker-status-text--online" to _uM(".car-picker " to _uM("color" to "#5BBF6A")), "car-picker-status-text--offline" to _uM(".car-picker " to _uM("color" to "#9A9A9A")), "car-picker-cancel" to _uM(".car-picker " to _uM("paddingTop" to "32rpx", "paddingRight" to 0, "paddingBottom" to "32rpx", "paddingLeft" to 0, "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "center", "borderTopWidth" to "1rpx", "borderTopStyle" to "solid", "borderTopColor" to "#F0EAEA")), "car-picker-cancel-text" to _uM(".car-picker .car-picker-cancel " to _uM("fontSize" to "32rpx", "color" to "#333333")), "@TRANSITION" to _uM("exit" to _uM("property" to "all", "duration" to "0.2s", "timingFunction" to "ease")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
