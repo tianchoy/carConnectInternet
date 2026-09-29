@@ -217,7 +217,7 @@ import { showAppToast } from '../../utils/toast.uts'
 				deviceNo: deviceNo.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
-				minParkTime: 120,
+				minParkTime: 2,
 				withStop: false,
 				withPos: false,
 				withTrip: true,
