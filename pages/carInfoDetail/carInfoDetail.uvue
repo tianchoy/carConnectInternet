@@ -116,6 +116,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
+	import { getUserCurrentLocation, isValidLatLng } from '../../utils/getUserLocation.uts'
 
 	const deptId = ref<string | null>('')
 	const deviceNo = ref<string | null>('')
@@ -326,6 +327,33 @@ import { openLocation } from '../../utils/openLocation.uts'
 		return marker
 	}
 
+	// 设备无有效位置时，回退到用户当前位置并展示「当前位置」标记
+	const showUserLocationFallback = async () => {
+		const userLoc = await getUserCurrentLocation()
+		if (userLoc == null) return
+		center.latitude = userLoc.latitude
+		center.longitude = userLoc.longitude
+		mapScale.value = 12
+		const userMarker = {
+			id: 10001,
+			latitude: userLoc.latitude,
+			longitude: userLoc.longitude,
+			width: 25,
+			height: 25,
+			iconPath: '/static/current-location.png',
+			callout: {
+				content: '当前位置',
+				color: datainfo.value != null && datainfo.value.connectionStatus == 'online' ? '#ffffff' : '#999999',
+				borderRadius: 10,
+				bgColor: datainfo.value != null && datainfo.value.connectionStatus == 'online' ? '#1296db' : '#CCCCCC',
+				padding: 5,
+				display: 'ALWAYS'
+			}
+		} as Marker
+		markers.value = [userMarker]
+		isMapReady.value = true
+	}
+
 	const delay = (ms: number): Promise<void> => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
@@ -346,7 +374,13 @@ import { openLocation } from '../../utils/openLocation.uts'
 				// 检查返回结果是否有效
 				const positions = res.data
 				if (!isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
-					throw new Error(res.msg || '返回数据为空');
+					showAppToast({
+						title: res.msg || '返回数据为空',
+						icon: 'none'
+					})
+					// 设备无位置数据，回退展示用户当前位置（与首页统一：在线/离线都回退）
+					await showUserLocationFallback()
+					return false
 				}
 
 				let foundDevice = false;
@@ -363,23 +397,15 @@ import { openLocation } from '../../utils/openLocation.uts'
 						signalRssi.value = attribute != null ? attribute['rssi'] as string | number | null : null;
 						signalSat.value = attribute != null ? attribute['sat'] as string | number | null : null;
 
-						const latitude = item.getNumber('latitude', 0);
-						const longitude = item.getNumber('longitude', 0);
-						if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
+						const lat = item.getNumber('latitude', 0)
+						const lng = item.getNumber('longitude', 0)
+						if (!isValidLatLng(lat, lng)) {
 							console.error('位置信息缺失', item);
 							showAppToast({
 								title: '位置信息缺失',
 								icon: 'none'
 							})
-							return false;
-						}
-
-						// 确保经纬度是数字类型
-						const lat = parseFloat(latitude.toString());
-						const lng = parseFloat(longitude.toString());
-
-						if (isNaN(lat) || isNaN(lng)) {
-							console.error('经纬度格式错误', latitude, longitude);
+							await showUserLocationFallback()
 							return false;
 						}
 
@@ -436,7 +462,13 @@ import { openLocation } from '../../utils/openLocation.uts'
 
 				// 如果没有找到对应设备
 				if (!foundDevice) {
-					throw new Error('未找到对应的设备数据');
+					showAppToast({
+						title: '未找到对应的设备数据',
+						icon: 'none'
+					})
+					// 设备无位置数据，回退展示用户当前位置（与首页统一：在线/离线都回退）
+					await showUserLocationFallback()
+					return false
 				}
 
 				return true; // 成功标志

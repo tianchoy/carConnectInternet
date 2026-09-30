@@ -6,6 +6,7 @@ const api_request = require("../../api/request.js");
 const utils_formateTime = require("../../utils/formateTime.js");
 const utils_cars = require("../../utils/cars.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
+const utils_getUserLocation = require("../../utils/getUserLocation.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
@@ -250,7 +251,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:255", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:256", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -324,7 +325,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           callback();
         }).exec();
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/playBack/playBack.uvue:355", "测量地图容器尺寸失败:", error);
+        common_vendor.index.__f__("warn", "at pages/playBack/playBack.uvue:356", "测量地图容器尺寸失败:", error);
         callback();
       }
     }
@@ -527,6 +528,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           icon: "none",
           duration: 2e3
         });
+        showUserLocationFallback();
         return null;
       }
       utils_toast.showAppToast({
@@ -563,6 +565,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       markers.value = [marker];
       isMapReady.value = true;
     }
+    const showUserLocationFallback = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const userLoc = yield utils_getUserLocation.getUserCurrentLocation();
+        if (userLoc == null)
+          return Promise.resolve(null);
+        center.latitude = userLoc.latitude;
+        center.longitude = userLoc.longitude;
+        mapScale.value = 12;
+        const userMarker = {
+          id: 10004,
+          latitude: userLoc.latitude,
+          longitude: userLoc.longitude,
+          width: 25,
+          height: 25,
+          iconPath: "/static/current-location.png",
+          callout: new common_vendor.UTSJSONObject({
+            content: "当前位置",
+            color: carStatus.value == "online" ? "#ffffff" : "#999999",
+            borderRadius: 10,
+            bgColor: carStatus.value == "online" ? "#1296db" : "#CCCCCC",
+            padding: 5,
+            display: "ALWAYS"
+          })
+        };
+        markers.value = [userMarker];
+        isMapReady.value = true;
+      });
+    };
     function clearTrackDisplay() {
       isMapReady.value = false;
       trackPoints.value = [];
@@ -681,7 +711,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             showCurrentPosition(res.msg || "轨迹加载失败");
             return Promise.resolve(null);
           }
-          common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:848", "加载轨迹成功:", res);
+          common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:878", "加载轨迹成功:", res);
           const trackData = res.data;
           if (trackData == null) {
             showCurrentPosition();
@@ -699,7 +729,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:866", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:896", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -871,7 +901,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_h = option.lng) !== null && _h !== void 0 ? _h : null;
       startTime.value = (_j = option.startTime) !== null && _j !== void 0 ? _j : "";
       endTime.value = (_k = option.endTime) !== null && _k !== void 0 ? _k : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1060", "plateNo:", plateNo.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1090", "plateNo:", plateNo.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {

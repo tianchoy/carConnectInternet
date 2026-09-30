@@ -616,7 +616,7 @@ const createMarker = (id: number, lat: number, lng: number, type: string, title?
         content: title || '爱车位置',
         color: isOnline ? '#ffffff' : '#999999',
         borderRadius: 6,
-        bgColor: isOnline ? '#07C160' : '#CCCCCC',
+        bgColor: type == 'user' ? (isOnline ? '#1296db' : '#CCCCCC') : (isOnline ? '#07C160' : '#CCCCCC'),
         padding: 4,
         fontSize: 12,
         display: 'ALWAYS'
@@ -654,6 +654,25 @@ async function centerOnUserLocation() {
         '当前位置'
     )
     markers.value = [nextMarker]
+    isMapReady.value = true
+}
+
+// 设备无有效位置时，回退到用户当前位置并展示「当前位置」标记
+const showUserLocationFallback = async () => {
+    if (!hasUserLocation.value) return
+    center.latitude = userLocation.latitude
+    center.longitude = userLocation.longitude
+    const nextMarker = createMarker(
+        userLocationMarkerId,
+        userLocation.latitude,
+        userLocation.longitude,
+        'user',
+        '当前位置'
+    )
+    markers.value = [nextMarker]
+    isMapReady.value = false
+    await nextTick()
+    await delay(50)
     isMapReady.value = true
 }
 
@@ -831,6 +850,8 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
         if (!isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
             console.warn('获取设备位置失败:', data.getString('deviceId', ''), res.code)
             positionState.value = 'empty'
+            // 设备无位置数据，回退展示用户当前位置
+            await showUserLocationFallback()
             return false
         }
 
@@ -850,6 +871,8 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
                 title: '定位数据异常',
                 icon: 'none'
             })
+            // 设备经纬度无效，回退展示用户当前位置
+            await showUserLocationFallback()
             return false
         }
 

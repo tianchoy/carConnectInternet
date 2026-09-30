@@ -92,6 +92,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
+	import { getUserCurrentLocation } from '../../utils/getUserLocation.uts'
 	// #ifdef APP-ANDROID
 	import Polyline from 'uts.sdk.modules.DCloudUniMapTencent.Polyline'
 	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
@@ -701,6 +702,8 @@ import { showAppToast } from '../../utils/toast.uts'
 				icon: 'none',
 				duration: 2000
 			})
+			// 设备无有效位置，回退展示用户当前位置
+			showUserLocationFallback()
 			return
 		}
 
@@ -746,7 +749,34 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 
-	function clearTrackDisplay() : void {
+	// 设备无有效位置（无轨迹 / 无车辆位置）时，回退到用户当前位置并展示「当前位置」标记
+const showUserLocationFallback = async () => {
+	const userLoc = await getUserCurrentLocation()
+	if (userLoc == null) return
+	center.latitude = userLoc.latitude
+	center.longitude = userLoc.longitude
+	mapScale.value = 12
+	const userMarker = {
+		id: 10004,
+		latitude: userLoc.latitude,
+		longitude: userLoc.longitude,
+		width: 25,
+		height: 25,
+		iconPath: '/static/current-location.png',
+		callout: {
+			content: '当前位置',
+			color: carStatus.value == 'online' ? '#ffffff' : '#999999',
+			borderRadius: 10,
+			bgColor: carStatus.value == 'online' ? '#1296db' : '#CCCCCC',
+			padding: 5,
+			display: 'ALWAYS'
+		}
+	} as Marker
+	markers.value = [userMarker]
+	isMapReady.value = true
+}
+
+function clearTrackDisplay() : void {
 		isMapReady.value = false
 		trackPoints.value = []
 		isTrackPlayable.value = false

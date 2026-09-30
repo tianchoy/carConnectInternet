@@ -5,6 +5,7 @@ const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 const utils_cars = require("../../utils/cars.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
+const utils_getUserLocation = require("../../utils/getUserLocation.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
@@ -179,6 +180,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         alpha: 1
       };
     }
+    const showUserLocationFallback = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const userLoc = yield utils_getUserLocation.getUserCurrentLocation();
+        if (userLoc == null)
+          return Promise.resolve(null);
+        center.latitude = userLoc.latitude;
+        center.longitude = userLoc.longitude;
+        currentPosition.latitude = userLoc.latitude;
+        currentPosition.longitude = userLoc.longitude;
+        targetPosition.latitude = userLoc.latitude;
+        targetPosition.longitude = userLoc.longitude;
+        mapScale.value = 12;
+        markers.value = [{
+          id: 10002,
+          latitude: userLoc.latitude,
+          longitude: userLoc.longitude,
+          width: 25,
+          height: 25,
+          iconPath: "/static/current-location.png",
+          callout: new common_vendor.UTSJSONObject({
+            content: "当前位置",
+            color: connectionStatus.value == "online" ? "#ffffff" : "#999999",
+            borderRadius: 10,
+            bgColor: connectionStatus.value == "online" ? "#1296db" : "#CCCCCC",
+            padding: 5,
+            display: "ALWAYS"
+          })
+        }];
+        markerInitialized.value = true;
+        isMapReady.value = true;
+      });
+    };
     function loadInitialPosition() {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         isMapReady.value = false;
@@ -194,6 +227,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               title: res.msg || "获取位置失败",
               icon: "none"
             });
+            showUserLocationFallback();
             return Promise.resolve(null);
           }
           let foundDevice = false;
@@ -208,6 +242,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   title: "位置信息缺失",
                   icon: "none"
                 });
+                showUserLocationFallback();
                 return null;
               }
               const direction = item.getNumber("direction", 0);
@@ -248,7 +283,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:252", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:287", "获取初始位置失败:", err);
           utils_toast.showAppToast({
             title: "网络请求失败",
             icon: "none"
@@ -265,7 +300,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const marker = createVehicleMarker(iconPath);
       markers.value = [marker];
       markerInitialized.value = true;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:273", "初始化标记点完成");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:308", "初始化标记点完成");
     }
     function calculateMapRotation(direction) {
       let rotation = direction;
@@ -297,7 +332,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onLoad((option) => {
       var _a, _b, _c, _d, _f;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:305", "option", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:340", "option", option);
       connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
       deviceNo.value = (_b = option.deviceNo) !== null && _b !== void 0 ? _b : "";
       const displayCarName = normalizeRouteValue((_c = option.plateNo) !== null && _c !== void 0 ? _c : "");
@@ -527,7 +562,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pendingJumpTime = "";
           acceptLivePosition(item, position, positionTime, sessionId);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:499", "获取跟踪位置失败:", error);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:534", "获取跟踪位置失败:", error);
         } finally {
           if (sessionId == trackingSessionId)
             isTrackRequestPending = false;
