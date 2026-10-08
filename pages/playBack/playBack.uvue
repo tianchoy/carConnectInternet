@@ -6,6 +6,17 @@
 			<map v-if="isMapReady" id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="false" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 			</map>
+			<!-- #ifdef MP-WEIXIN -->
+			<!--
+				播放期车标：普通 view 覆盖在 map 之上，固定钉在屏幕中心。
+				这是"车标零闪动"的根本原因——车标不再属于原生 markers 覆盖物图层，
+				播放期间完全不产生 markers 的 setData，也就完全避开了安卓端的图层销毁重建。
+				地图中心每帧精确跟到车标经纬度，中心即车标，因此视觉上二者完全同频。
+			-->
+			<view v-if="showCarOverlay" class="car-overlay">
+				<image class="car-overlay-icon" :src="carOverlayIcon" :style="'transform: rotate(' + carOverlayRotation + 'deg);'"></image>
+			</view>
+			<!-- #endif -->
 			<sub-navBar class="sub-nav-overlay" :showTime="false" :currentCar="plateNo" :showCar="true" :carStatus='carStatus'></sub-navBar>
 		</view>
 
@@ -146,12 +157,47 @@ import { showAppToast } from '../../utils/toast.uts'
 	const currentTime = ref('')
 	const currentIndex = ref(0)
 	const carMarker = ref<MapMarker | null>(null)
+	// #ifdef MP-WEIXIN
+	// 微信小程序里逻辑层与原生地图层是跨线程通信。关键认知：
+	// "地图中心"和"车标"是两笔开销完全不同的 setData，编译后它们各自是一个独立的顶层绑定
+	//（latitude/longitude 与 markers）：
+	//   - center：只有两个数字，极轻，逐帧下发不会引起闪动；
+	//   - markers：整个数组，微信端每收到一次赋值，安卓机就会销毁并重建整个 marker 覆盖物层。
+	// 车标闪动的根因就在第二项：只要播放期间还在下发 markers，就一定会闪，节流只能让它
+	// 闪得少一点，无法根治（长距离直线段车速高、每帧位移大，反而是每帧必发，闪得最明显）。
+	// 因此最终方案是把播放期车标整体移出原生图层，改用普通 view 覆盖（.car-overlay）：
+	// 覆盖层车标恒定钉在屏幕中心，只有地图在动，播放期间 markers 一次都不下发。
+	const PLAYBACK_FRAME_INTERVAL_MS = 50
+	// #endif
+	// #ifdef APP-ANDROID || APP-IOS
 	const PLAYBACK_FRAME_INTERVAL_MS = 30
+	// #endif
+	// #ifdef MP-WEIXIN
+	// 播放期车标改为普通 view 覆盖物（见模板中的 .car-overlay），彻底移出原生 markers 图层。
+	// 状态：是否显示覆盖层车标、覆盖层车标的图标与角度。
+	// 覆盖层车标恒定钉在地图容器正中，因此它自身永远不需要移动——需要移动的只有地图。
+	// 这样播放期间 markers 一次都不下发，安卓端不再有覆盖物层的销毁重建，闪动从根上消失。
+	const showCarOverlay = ref(false)
+	const carOverlayIcon = ref('/static/cars/online/default.png')
+	const carOverlayRotation = ref(0)
+	// #endif
 	const MIN_SEGMENT_DURATION_MS = 500
 	const MAX_SEGMENT_DURATION_MS = 6000
 	const FALLBACK_SPEED_KMH = 20
+	// #ifdef MP-WEIXIN
+	// 折线每次更新都要把整条轨迹的点跨线程传一遍、再由原生层整条重画，是小程序端最贵的
+	// 一次 setData，也是安卓端闪动的主要来源。它只需让"已走/未走"的分界大致跟上即可，
+	// 不需要和车标同频（车标已经压在分界前面，两者最多差一根线的宽度），因此间隔放大到
+	// 1000ms，把跨线程通信预算尽量留给车标。
+	const POLYLINE_RENDER_INTERVAL_MS = 1000
+	// #endif
+	// #ifdef APP-ANDROID || APP-IOS
 	// 车标与地图中心逐帧刷新；折线重绘是 O(n) 操作，按时间节流即可，肉眼无差别
 	const POLYLINE_RENDER_INTERVAL_MS = 80
+	// #endif
+	// 车标角度变化小于该度数时不下发新的 rotate：地图端每收到一个不同的 rotate 都要重建
+	// 车标视图，而 2° 以内的差异肉眼完全看不出来
+	const MARKER_ROTATION_UPDATE_THRESHOLD = 2
 	const renderedPoint = reactive<TrackPoint>({
 		latitude: 0,
 		longitude: 0,
@@ -163,6 +209,8 @@ import { showAppToast } from '../../utils/toast.uts'
 	let playbackTimer : number | null = null
 	let replaySessionId = 0
 	let lastPolylineRenderAt = 0
+	// 上一次真正下发给地图的车标角度（用于过滤无意义的 rotate 变化）
+	let lastCarMarkerRotation = 0
 
 	function copyTrackPoint(point : TrackPoint) : TrackPoint {
 		return {
@@ -180,6 +228,15 @@ import { showAppToast } from '../../utils/toast.uts'
 		renderedPoint.rotation = point.rotation
 		renderedPoint.deviceTime = point.deviceTime
 		renderedPoint.speed = point.speed
+	}
+
+	// 两个角度之间的最短差值（-180~180）。朝向是环形量，必须按最短路径比较：
+	// 从 359° 转到 1° 实际只转了 2°，直接相减会得到 -358°，导致每帧都误判为"大幅转向"。
+	function shortestAngleDiff(from : number, to : number) : number {
+		let difference = to - from
+		if (difference > 180) difference -= 360
+		else if (difference < -180) difference += 360
+		return difference
 	}
 
 	function formatPlaybackTime(timestamp : number) : string {
@@ -449,24 +506,37 @@ import { showAppToast } from '../../utils/toast.uts'
 		)
 	}
 
+	// 起点 / 终点标记。必须持有引用而不能是 initCarMarker 的局部变量：
+	// 微信小程序播放期间车标改由 .car-overlay 覆盖物承担（原生 markers 里只剩起终点），
+	// 暂停或播放结束时由 applyFullMarkers 重新组装完整数组。
+	let startMarker : MapMarker | null = null
+	let endMarker : MapMarker | null = null
+
 	// 初始化小车标记
 	function initCarMarker() {
 		if (trackPoints.value.length == 0) return
 
 		const firstPoint = trackPoints.value[0]
+		const deviceIcon = getDeviceIcon(carStatus.value ?? '', carType.value ?? '')
 		const marker : MapMarker = {
 			id: 999,
 			latitude: firstPoint.latitude,
 			longitude: firstPoint.longitude,
-			iconPath: getDeviceIcon(carStatus.value ?? '', carType.value ?? ''),
+			iconPath: deviceIcon,
 			width: 25,
 			height: 25,
 			rotate: firstPoint.rotation,
 			anchor: { x: 0.5, y: 0.5 }
 		}
 		carMarker.value = marker
+		lastCarMarkerRotation = firstPoint.rotation
+		// #ifdef MP-WEIXIN
+		// 覆盖层车标复用同一张车辆图标，起播时直接可用
+		carOverlayIcon.value = deviceIcon
+		carOverlayRotation.value = firstPoint.rotation
+		// #endif
 
-		const startMarker : MapMarker = {
+		const start : MapMarker = {
 			id: 1000,
 			latitude: firstPoint.latitude,
 			longitude: firstPoint.longitude,
@@ -477,7 +547,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			callout: { content: '起点', borderRadius: 5, padding: 5, display: 'BYCLICK' }
 		}
 		const lastPoint = trackPoints.value[trackPoints.value.length - 1]
-		const endMarker : MapMarker = {
+		const end : MapMarker = {
 			id: 1001,
 			latitude: lastPoint.latitude,
 			longitude: lastPoint.longitude,
@@ -487,7 +557,19 @@ import { showAppToast } from '../../utils/toast.uts'
 			anchor: { x: 0.5, y: 0.5 },
 			callout: { content: '终点', borderRadius: 5, padding: 5, display: 'BYCLICK' }
 		}
-		markers.value = [marker, startMarker, endMarker]
+		startMarker = start
+		endMarker = end
+		markers.value = [marker, start, end]
+	}
+
+	// 把车标与起终点标记组装成完整的 markers 数组（暂停、结束、换轨迹时调用）
+	function applyFullMarkers() {
+		const car = carMarker.value
+		if (car == null) return
+		const list : Array<MapMarker> = [car]
+		if (startMarker != null) list.push(startMarker)
+		if (endMarker != null) list.push(endMarker)
+		markers.value = list
 	}
 
 	// #ifdef APP-ANDROID
@@ -557,7 +639,85 @@ import { showAppToast } from '../../utils/toast.uts'
 			longitude: point.longitude
 		}))
 	}
+	// #endif
 
+	// #ifdef MP-WEIXIN
+	// 单次 setData 下发给地图的折线点数上限。长轨迹动辄上千个点，全量传输会把
+	// JS↔原生桥打满，安卓机上直接表现为覆盖物反复重建、车标闪动。
+	// 手机屏幕只有几百像素宽，抽稀到 400 点形状上完全看不出差别。
+	const MAX_POLYLINE_POINTS = 400
+
+	// 等距抽稀后转换为小程序折线点。关键在于"先抽稀、再转换"：若先转换再抽稀，
+	// 会为每个原始点都创建一个对象再把大部分丢掉，长轨迹下这是纯粹的 CPU 浪费，
+	// 而这段代码正跑在动画帧的关键路径上，会挤占车标下发的时机。
+	function toThinnedMpPoints(points : Array<TrackPoint>) : Array<MapPolylinePoint> {
+		const total = points.length
+		if (total <= MAX_POLYLINE_POINTS || MAX_POLYLINE_POINTS < 2) return toMpPoints(points)
+		const step = (total - 1) / (MAX_POLYLINE_POINTS - 1)
+		const thinned : Array<MapPolylinePoint> = []
+		let lastIndex = -1
+		for (let i = 0; i < MAX_POLYLINE_POINTS; i++) {
+			// 保证首尾两点（车标所在端）不被丢掉
+			const index = Math.round(step * i)
+			if (index == lastIndex) continue
+			lastIndex = index
+			const point = points[index]
+			thinned.push({ latitude: point.latitude, longitude: point.longitude })
+		}
+		return thinned
+	}
+
+	function updatePolyline() {
+		if (trackPoints.value.length < 2) {
+			polyline.value = []
+			return
+		}
+
+		const isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value
+		const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
+		if (isAnimatingSegment) {
+			playedPoints.push(copyTrackPoint(renderedPoint))
+		}
+		const unplayedStartIndex = isAnimatingSegment ? activeSegmentTargetIndex.value : currentIndex.value
+		const lines : Array<MpPolylineData> = []
+		const unplayedPoints = trackPoints.value.slice(unplayedStartIndex)
+		if (isAnimatingSegment) {
+			unplayedPoints.unshift(copyTrackPoint(renderedPoint))
+		}
+		// 与 Flutter 端（car_flutter/lib/views/vehicle/playback）保持一致：
+		// 未播放 = 灰色虚线，已播放 = 蓝色实线，两条线宽相同，蓝色画在灰色之上正好盖住已走过的部分。
+		// 绘制顺序即数组顺序，灰色在前、蓝色在后。
+		if (unplayedPoints.length >= 2) {
+			lines.push({
+				points: toThinnedMpPoints(unplayedPoints),
+				color: '#999999',
+				width: 3,
+				dottedLine: true,
+				arrowLine: false,
+				borderColor: '#FFFFFF',
+				borderWidth: 0
+			})
+		}
+		if (playedPoints.length >= 2) {
+			lines.push({
+				points: toThinnedMpPoints(playedPoints),
+				color: '#1890FF',
+				width: 3,
+				dottedLine: false,
+				arrowLine: false,
+				borderColor: '#FFFFFF',
+				borderWidth: 0
+			})
+		}
+		polyline.value = lines
+	}
+
+	function initPolyline() {
+		updatePolyline()
+	}
+	// #endif
+
+	// #ifdef APP-IOS
 	function updatePolyline() {
 		if (trackPoints.value.length < 2) {
 			polyline.value = []
@@ -605,10 +765,55 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 	// #endif
 
-	// 更新小车位置
-	function updateCarPosition() {
+	// #ifdef MP-WEIXIN
+	// 当前缩放级别下 1 个屏幕像素对应的地面距离（米）
+	function getMetersPerPixelOfScale(latitude : number) : number {
+		let cosLat = Math.cos(latitude * Math.PI / 180.0)
+		if (cosLat < 0.01) cosLat = 0.01
+		const resolution = EARTH_RESOLUTION_BASE * cosLat / Math.pow(2.0, mapScale.value)
+		return resolution > 0.0001 ? resolution : 1.0
+	}
+	// #endif
+
+	// 更新小车位置。force = true 时跳过节流强制下发一帧，用于"位置必须立即对齐"的场合：
+	// 起播、重置、以及每段动画结束（否则车标会停在最后一次推送处，播放结束时与终点差一小段）。
+	function updateCarPosition(force : boolean) {
 		const marker = carMarker.value
 		if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
+			// 地图中心每帧都跟随车标：center 编译后只是 latitude/longitude 两个数字的
+			// 独立顶层绑定，下发成本极轻，不会触发安卓端的覆盖物重建，因此可以放心逐帧更新。
+			// 只有播放中才跟随——未播放时地图保持整条轨迹全览。
+			// 这一段必须放在下面的 markers 死区判断之前：早先把两者绑在同一个门控上，
+			// 导致低缩放下每秒才下发一次，镜头和车标一起"顿"一下，观感就是"一顿一顿"。
+			if (isPlaying.value) {
+				center.latitude = renderedPoint.latitude
+				center.longitude = renderedPoint.longitude
+			}
+
+			// #ifdef MP-WEIXIN
+			// 播放期间：车标由 .car-overlay 这个普通 view 承担，它恒定钉在屏幕中心，
+			// 地图中心又已经精确跟到车标经上，因此覆盖层车标不需要再移动，只需要更新朝向。
+			// 这里是全文件最重要的分支：它让播放过程彻底不再触碰 markers，
+			// 从而彻底避开安卓端"每次 markers 赋值 → 销毁重建整个覆盖物层 → 车标闪一下"的开销。
+			if (isPlaying.value) {
+				const overlayDiff = shortestAngleDiff(renderedPoint.rotation, carOverlayRotation.value)
+				if (force || Math.abs(overlayDiff) >= MARKER_ROTATION_UPDATE_THRESHOLD) {
+					carOverlayRotation.value = renderedPoint.rotation
+				}
+				// 播放中不更新原生车标 marker，直接返回。
+				// 地图中心已在上面更新完毕，覆盖层车标角度也已刷新，二者已完全同频。
+				return
+			}
+			// #endif
+
+			// 角度变化小于阈值时沿用上一次下发的角度：地图端每收到一个不同的 rotate 都要
+			// 重建车标视图，小程序（尤其安卓）上会表现为车标闪动，而 2° 以内看不出来
+			const rotationDiff = shortestAngleDiff(renderedPoint.rotation, lastCarMarkerRotation)
+			const markerRotation = Math.abs(rotationDiff) >= MARKER_ROTATION_UPDATE_THRESHOLD
+				? renderedPoint.rotation
+				: lastCarMarkerRotation
+			lastCarMarkerRotation = markerRotation
+
 			const updatedMarker : MapMarker = {
 				id: marker.id,
 				latitude: renderedPoint.latitude,
@@ -616,21 +821,13 @@ import { showAppToast } from '../../utils/toast.uts'
 				iconPath: marker.iconPath,
 				width: marker.width,
 				height: marker.height,
-				rotate: renderedPoint.rotation,
+				rotate: markerRotation,
 				anchor: marker.anchor,
 				callout: marker.callout,
 				label: marker.label
 			}
 			carMarker.value = updatedMarker
 			markers.value = [updatedMarker, ...markers.value.slice(1)]
-
-			// 仅在播放过程中把地图中心同步到车标：未播放时地图保持整条轨迹全览，
-			// 避免刚查询出轨迹、还没点播放就被拉到起点，导致看不出路线整体走向。
-			// 播放中逐帧同步是必须的，否则中心滞后会让车标跑出可视范围后再弹回。
-			if (isPlaying.value) {
-				center.latitude = renderedPoint.latitude
-				center.longitude = renderedPoint.longitude
-			}
 		}
 	}
 
@@ -744,6 +941,8 @@ function clearTrackDisplay() : void {
 		totalDistance.value = 0
 		carMarker.value = null
 		markers.value = []
+		lastCarMarkerRotation = 0
+		lastPolylineRenderAt = 0
 		// #ifdef APP-ANDROID
 		unplayedPolyline = null
 		playedPolyline = null
@@ -752,9 +951,9 @@ function clearTrackDisplay() : void {
 		// #ifdef MP-WEIXIN || APP-IOS
 		polyline.value = []
 		// #endif
-	}
+		}
 
-	function clearPlaybackTimer() : void {
+		function clearPlaybackTimer() : void {
 		const timer = playbackTimer
 		if (timer != null) {
 			clearTimeout(timer)
@@ -765,6 +964,19 @@ function clearTrackDisplay() : void {
 	function pausePlayback() : void {
 		isPlaying.value = false
 		clearPlaybackTimer()
+		// #ifdef MP-WEIXIN
+		// 收尾：隐藏覆盖层车标，交还给原生 markers 车标。
+		// 两者切换发生在同一帧，地图中心本就停在车标经纬度上，因此视觉上是同一个位置无缝接力，
+		// 不会看到车标跳动或消失。
+		showCarOverlay.value = false
+		// #endif
+		// 暂停 / 播放结束时的收尾对齐：强制下发一帧车标。
+		// 覆盖层车标只是显示层的一层薄纱，真实位置由原生 markers 车标承载，
+		// 因此必须让它精确落在最后一个渲染点上，否则暂停后会看到车标与覆盖层错位一小段。
+		if (carMarker.value != null && trackPoints.value.length > 0) {
+			updateCarPosition(true)
+			applyFullMarkers()
+		}
 	}
 
 	function renderPlaybackIndex() : void {
@@ -772,8 +984,19 @@ function clearTrackDisplay() : void {
 		if (activeSegmentTargetIndex.value <= currentIndex.value) {
 			resetRenderedPoint(trackPoints.value[currentIndex.value])
 		}
-		updateCarPosition()
+		// 强制下发一帧：这里的位置是"跳变后的确定值"（段末、重置、载入完成），必须精确对齐。
+		// 微信端播放中该调用只更新覆盖层车标朝向、不碰 markers（见 updateCarPosition）；
+		// 非播放时则用它把原生车标 marker 落到准确位置。
+		updateCarPosition(true)
 		updatePolyline()
+		// 这里已经完整重画过一次折线，重置节流时间戳，避免紧接着的动画帧马上再重画一次
+		lastPolylineRenderAt = Date.now()
+		// 非播放状态下组装完整的 markers（车标 + 起点 + 终点）。
+		// 播放中必须跳过：此时原生 markers 里只有静止的起终点，
+		// 一旦在这里把车标补回，播放过程就会重新开始下发 markers，闪动立刻回来。
+		if (!isPlaying.value) {
+			applyFullMarkers()
+		}
 		const point = trackPoints.value[currentIndex.value]
 		currentSpeed.value = point.speed
 		currentTime.value = point.deviceTime
@@ -974,13 +1197,17 @@ function clearTrackDisplay() : void {
 			// 播放过程中同步展示当前对应点的速度与时间
 			currentSpeed.value = renderedPoint.speed
 			currentTime.value = renderedPoint.deviceTime
-			// 车标与地图中心必须逐帧更新，保证跟手流畅
-			updateCarPosition()
-			// 折线重绘开销随轨迹长度线性增长，按时间节流；每段结束时 renderPlaybackIndex 会补齐
+			// 动画帧内按节流下发
+			updateCarPosition(false)
+
+			// 折线重绘是O(n) 的计算（切片 + 坐标转换 + 抽稀），长轨迹下足以占用几十毫秒。
+			// 它与车标共用同一条跨线程通道，若在帧内同步执行，会推迟本帧车标的 setData，
+			// 表现为车标周期性地"顿"一下。所以先算好下一帧的调度时刻（纯整数运算，开销可忽略），
+			// 让车标与镜头先完成下发，再把折线重绘排到它后面的独立任务里执行。
 			const frameNow = Date.now()
-			if (frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS) {
+			const polylineDue = frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS
+			if (polylineDue) {
 				lastPolylineRenderAt = frameNow
-				updatePolyline()
 			}
 
 			if (progress >= 1) {
@@ -992,7 +1219,21 @@ function clearTrackDisplay() : void {
 				return
 			}
 			if (renderFrame != null) {
-				playbackTimer = setTimeout(() => { renderFrame?.() }, PLAYBACK_FRAME_INTERVAL_MS)
+				// 自校正调度：setTimeout 递归调用会逐帧累积漂移（安卓上尤甚），实际帧率
+				// 会明显低于设定值，表现为"一顿一顿"。这里始终以本段起点为基准计算下一帧的
+				// 目标时刻，若已落后于该时刻则立即补帧，从而把帧率稳定在设定值上。
+				const nextFrameAt = startedAt + (Math.floor((frameNow - startedAt) / PLAYBACK_FRAME_INTERVAL_MS) + 1) * PLAYBACK_FRAME_INTERVAL_MS
+				const delay = nextFrameAt - frameNow
+				playbackTimer = setTimeout(() => { renderFrame?.() }, delay > 0 ? delay : 0)
+			}
+			// 折线重绘放在下一帧的调度之后：此时车标与镜头的 setData 已经被收集并发出，
+			// 这段计算不会再抢在它们前面。若播放状态已变化则直接跳过，避免多余开销。
+			if (polylineDue) {
+				const polylineSessionId = sessionId
+				setTimeout(() => {
+					if (!isPlaying.value || polylineSessionId != replaySessionId) return
+					updatePolyline()
+				}, 0)
 			}
 		}
 
@@ -1011,6 +1252,15 @@ function clearTrackDisplay() : void {
 
 		activeSegmentTargetIndex.value = -1
 		isPlaying.value = true
+		// #ifdef MP-WEIXIN
+		// 起播这一刻完成车标交接：显示覆盖层车标，同时把原生 markers 里的车标剔除，
+		// 只留下静止的起点 / 终点标记。
+		// 从这一帧起，整段播放过程 markers 数组再也不会被赋值——
+		// 安卓端不再有覆盖物层的销毁重建，车标闪动被彻底消除。
+		showCarOverlay.value = true
+		carOverlayRotation.value = renderedPoint.rotation
+		markers.value = markers.value.slice(1)
+		// #endif
 		// 开始播放：此刻才把车标定为地图中心（查询阶段保持整条轨迹全览）
 		focusMapOnVehicle()
 		lastPolylineRenderAt = 0
@@ -1144,6 +1394,32 @@ function clearTrackDisplay() : void {
 				z-index: 100;
 			}
 
+			/* #ifdef MP-WEIXIN */
+			/*
+			 * 播放期车标覆盖层。
+			 * 关键：它只是地图正中一层 25x25 的图片，本身从不移动，
+			 * 因此更新它的成本只有一次 transform 旋转（甚至角度不变时连 setData 都没有），
+			 * 完全不触碰原生 marker 覆盖物层 —— 这就是车标不再闪动的原因。
+			 * 地图在它下方移动，观感上车标始终居中跟随。
+			 * pointer-events 置空，避免这层薄纱吃掉地图的点击手势。
+			 */
+			.car-overlay {
+				position: absolute;
+				left: 0;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				z-index: 90;
+				align-items: center;
+				justify-content: center;
+				pointer-events: none;
+			}
+
+			.car-overlay-icon {
+				width: 50rpx;
+				height: 50rpx;
+			}
+			/* #endif */
 		}
 
 		.tools-panel {

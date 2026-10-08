@@ -37,6 +37,14 @@
   flex: 1;
   width: 100%;
   position: relative;
+  /*
+   * 播放期车标覆盖层。
+   * 关键：它只是地图正中一层 25x25 的图片，本身从不移动，
+   * 因此更新它的成本只有一次 transform 旋转（甚至角度不变时连 setData 都没有），
+   * 完全不触碰原生 marker 覆盖物层 —— 这就是车标不再闪动的原因。
+   * 地图在它下方移动，观感上车标始终居中跟随。
+   * pointer-events 置空，避免这层薄纱吃掉地图的点击手势。
+   */
 }
 .container .map-container .sub-nav-overlay[class] {
   position: absolute;
@@ -44,6 +52,21 @@
   left: 0;
   right: 0;
   z-index: 100;
+}
+.container .map-container .car-overlay[class] {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 90;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.container .map-container .car-overlay-icon[class] {
+  width: 50rpx;
+  height: 50rpx;
 }
 .container .tools-panel[class] {
   width: 100%;
