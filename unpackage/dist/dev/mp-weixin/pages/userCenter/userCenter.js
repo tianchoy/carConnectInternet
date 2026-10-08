@@ -64,7 +64,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       windowHeight.value = systemInfo.windowHeight;
       moveX.value = windowWidth.value - buttonWidth - 20;
       moveY.value = windowHeight.value - buttonHeight - 20;
-      const token = common_vendor.index.getStorageSync("token");
+      const token = common_vendor.index.getStorageSync("token", true);
       if (token) {
         Login.value = true;
         loadData();
@@ -76,13 +76,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       version.value = appVersion;
     });
     const contactCustomerService = () => {
-      common_vendor.index.openCustomerServiceChat(new common_vendor.UTSJSONObject({
-        extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
+      common_vendor.index.openCustomerServiceChat({
+        extInfo: { url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" },
         corpId: "ww686122ec6a4db85a",
-        success(res = null) {
+        success(res) {
           common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:128", res);
         }
-      }));
+      });
     };
     const onMoveChange = (e) => {
       const detail = e.getJSON("detail");

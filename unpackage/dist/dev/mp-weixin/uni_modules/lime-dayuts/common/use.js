@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
-require("../utssdk/interface.js");
 const uni_modules_limeDayuts_common_locale_en_index = require("./locale/en/index.js");
 const uni_modules_limeDayuts_common_locale_zhCn_index = require("./locale/zh-cn/index.js");
 const localesMap = /* @__PURE__ */ new Map();

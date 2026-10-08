@@ -1,5 +1,4 @@
 "use strict";
-require("../utssdk/interface.js");
 const uni_modules_limeDayuts_common_constant = require("./constant.js");
 const uni_modules_limeDayuts_common_utils = require("./utils.js");
 const uni_modules_limeDayuts_common_use = require("./use.js");
@@ -27,7 +26,7 @@ function parseLocale(preset, object = null, isLocal = false) {
   if (!isLocal && l != null) {
     uni_modules_limeDayuts_common_use.dayutsIntl.locale = l;
   }
-  return l !== null && l !== void 0 ? l : uni_modules_limeDayuts_common_use.dayutsIntl.locale;
+  return l ?? uni_modules_limeDayuts_common_use.dayutsIntl.locale;
 }
 function tryParseNumberAtIndex(digits, index) {
   if (index >= 0 && index < digits.length) {
@@ -41,18 +40,25 @@ function tryParseNumberAtIndex(digits, index) {
   return null;
 }
 function createDateFromArray(d, offset = 0) {
-  var _a, _b, _c, _e, _f, _g, _h;
-  const year = (_a = tryParseNumberAtIndex(d, 1 - offset)) !== null && _a !== void 0 ? _a : (/* @__PURE__ */ new Date()).getFullYear();
-  const month = ((_b = tryParseNumberAtIndex(d, 2 - offset)) !== null && _b !== void 0 ? _b : 1) - 1;
-  const day = (_c = tryParseNumberAtIndex(d, 3 - offset)) !== null && _c !== void 0 ? _c : 1;
-  const hour = (_e = tryParseNumberAtIndex(d, 4 - offset)) !== null && _e !== void 0 ? _e : 0;
-  const minute = (_f = tryParseNumberAtIndex(d, 5 - offset)) !== null && _f !== void 0 ? _f : 0;
-  const second = (_g = tryParseNumberAtIndex(d, 6 - offset)) !== null && _g !== void 0 ? _g : 0;
-  const millisecond = ((_h = tryParseNumberAtIndex(d, 7 - offset)) !== null && _h !== void 0 ? _h : 0).toString().substring(0, 3);
-  return new Date(year, month, day, hour, minute, second, parseInt(millisecond));
+  const year = tryParseNumberAtIndex(d, 1 - offset) ?? (/* @__PURE__ */ new Date()).getFullYear();
+  const month = (tryParseNumberAtIndex(d, 2 - offset) ?? 1) - 1;
+  const day = tryParseNumberAtIndex(d, 3 - offset) ?? 1;
+  const hour = tryParseNumberAtIndex(d, 4 - offset) ?? 0;
+  const minute = tryParseNumberAtIndex(d, 5 - offset) ?? 0;
+  const second = tryParseNumberAtIndex(d, 6 - offset) ?? 0;
+  const millisecond = (tryParseNumberAtIndex(d, 7 - offset) ?? 0).toString().substring(0, 3);
+  return new Date(
+    year,
+    month,
+    day,
+    hour,
+    minute,
+    second,
+    parseInt(millisecond)
+  );
 }
 function parseDate(cfg) {
-  const date = cfg.date;
+  const { date } = cfg;
   if (date == null)
     return /* @__PURE__ */ new Date();
   if (date instanceof Date)
@@ -82,7 +88,6 @@ function wrapper(date, instance) {
 }
 class Dayuts {
   constructor(cfg) {
-    var _a;
     this.valid = true;
     this.$d = /* @__PURE__ */ new Date();
     this.$y = 0;
@@ -94,7 +99,7 @@ class Dayuts {
     this.$s = 0;
     this.$ms = 0;
     this.$u = false;
-    this.$L = (_a = parseLocale(cfg.locale)) !== null && _a !== void 0 ? _a : uni_modules_limeDayuts_common_use.dayutsIntl.locale;
+    this.$L = parseLocale(cfg.locale) ?? uni_modules_limeDayuts_common_use.dayutsIntl.locale;
     this.parse(cfg);
   }
   parse(cfg) {
@@ -107,7 +112,7 @@ class Dayuts {
     }
   }
   init() {
-    const $d = this.$d;
+    const { $d } = this;
     this.$y = $d.getFullYear();
     this.$M = $d.getMonth();
     this.$D = $d.getDate();
@@ -193,7 +198,6 @@ class Dayuts {
    * @returns {Dayuts} 返回一个新的Dayuts对象，表示调整后的日期。
    */
   startOf(units, startOf = true) {
-    var _a;
     const isStartOf = startOf;
     const unit = uni_modules_limeDayuts_common_utils.prettyUnit(units);
     const instanceFactory = (d, m) => {
@@ -222,14 +226,14 @@ class Dayuts {
       }
       return dayuts(date);
     };
-    const _b = this, $W = _b.$W, $M = _b.$M, $D = _b.$D;
+    const { $W, $M, $D } = this;
     const utcPad = `set${this.$u ? "UTC" : ""}`;
     if (unit == uni_modules_limeDayuts_common_constant.Y) {
       return isStartOf ? instanceFactory(1, 0) : instanceFactory(31, 11);
     } else if (unit == uni_modules_limeDayuts_common_constant.M) {
       return isStartOf ? instanceFactory(1, $M) : instanceFactory(0, $M + 1);
     } else if (unit == uni_modules_limeDayuts_common_constant.W) {
-      const weekStart = (_a = this.$locale().weekStart) !== null && _a !== void 0 ? _a : 0;
+      const weekStart = this.$locale().weekStart ?? 0;
       const gap = ($W < weekStart ? $W + 7 : $W) - weekStart;
       return instanceFactory(isStartOf ? $D - gap : $D + (6 - gap), $M);
     } else if (unit == uni_modules_limeDayuts_common_constant.D || unit == uni_modules_limeDayuts_common_constant.DATE) {
@@ -375,7 +379,6 @@ class Dayuts {
    * @returns {Dayuts} 更新的 Dayuts 实例。
    */
   add(number, units) {
-    var _a;
     const unit = uni_modules_limeDayuts_common_utils.prettyUnit(units);
     const instanceFactorySet = (n) => {
       const d = dayuts(this);
@@ -398,7 +401,7 @@ class Dayuts {
       [uni_modules_limeDayuts_common_constant.H, uni_modules_limeDayuts_common_constant.MILLISECONDS_A_HOUR],
       [uni_modules_limeDayuts_common_constant.S, uni_modules_limeDayuts_common_constant.MILLISECONDS_A_SECOND]
     ]);
-    const step = (_a = steps.get(unit)) !== null && _a !== void 0 ? _a : 1;
+    const step = steps.get(unit) ?? 1;
     const nextTimeStamp = this.$d.getTime() + number * step;
     return wrapper(nextTimeStamp, this);
   }
@@ -420,10 +423,10 @@ class Dayuts {
     const locale = this.$locale();
     if (!this.isValid())
       return uni_modules_limeDayuts_common_constant.INVALID_DATE_STRING;
-    const str = formatStr !== null && formatStr !== void 0 ? formatStr : uni_modules_limeDayuts_common_constant.FORMAT_DEFAULT;
+    const str = formatStr ?? uni_modules_limeDayuts_common_constant.FORMAT_DEFAULT;
     const zoneStr = uni_modules_limeDayuts_common_utils.padZoneStr(this);
-    const _a = this, $H = _a.$H, $m = _a.$m, $M = _a.$M;
-    const weekdays = locale.weekdays, months = locale.months, meridiem = locale.meridiem;
+    const { $H, $m, $M } = this;
+    const { weekdays, months, meridiem } = locale;
     function getShort(arr, index, full = [], length = 0) {
       if (arr != null && arr.length >= index) {
         return arr[index];
@@ -432,13 +435,11 @@ class Dayuts {
       }
       return "";
     }
-    const get$H = (num) => {
-      return uni_modules_limeDayuts_common_utils.padStart(($H % 12 == 0 ? 12 : $H % 12).toString(), num, "0");
-    };
-    const meridiemFunc = meridiem !== null && meridiem !== void 0 ? meridiem : (hour, _, isLowercase) => {
+    const get$H = (num) => uni_modules_limeDayuts_common_utils.padStart(($H % 12 == 0 ? 12 : $H % 12).toString(), num, "0");
+    const meridiemFunc = meridiem ?? ((hour, _, isLowercase) => {
       const m = hour < 12 ? "AM" : "PM";
       return isLowercase ? m.toLowerCase() : m;
-    };
+    });
     const matches = (match) => {
       if (match == "YY") {
         return this.$y.toString().slice(-2);
@@ -492,8 +493,7 @@ class Dayuts {
       return null;
     };
     return str.replace(uni_modules_limeDayuts_common_constant.REGEX_FORMAT, (match, $1, offset, string) => {
-      var _a2;
-      return (_a2 = $1 !== null && $1 !== void 0 ? $1 : matches(match)) !== null && _a2 !== void 0 ? _a2 : zoneStr.replace(":", "");
+      return $1 ?? matches(match) ?? zoneStr.replace(":", "");
     });
   }
   /**
@@ -508,9 +508,7 @@ class Dayuts {
     const that = dayuts(input);
     const zoneDelta = (that.utcOffset() - this.utcOffset()) * uni_modules_limeDayuts_common_constant.MILLISECONDS_A_MINUTE;
     const diff = this.valueOf() - that.valueOf();
-    const getMonth = () => {
-      return uni_modules_limeDayuts_common_utils.monthDiff(this, that);
-    };
+    const getMonth = () => uni_modules_limeDayuts_common_utils.monthDiff(this, that);
     let result;
     switch (unit) {
       case uni_modules_limeDayuts_common_constant.Y:
@@ -634,9 +632,9 @@ class Dayuts {
     return input == null ? dayOfYear : this.add(input - dayOfYear, "day");
   }
   fromToBase(input, withoutSuffix, instance, isFrom) {
-    var _a, _b;
-    const relObj = (_a = uni_modules_limeDayuts_common_use.localeState.locales.get("en")) === null || _a === void 0 ? void 0 : _a.relativeTime;
-    const loc = (_b = instance.$locale().relativeTime) !== null && _b !== void 0 ? _b : relObj;
+    var _a;
+    const relObj = (_a = uni_modules_limeDayuts_common_use.localeState.locales.get("en")) == null ? void 0 : _a.relativeTime;
+    const loc = instance.$locale().relativeTime ?? relObj;
     if (loc == null)
       return "";
     const T = [

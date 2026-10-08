@@ -11,7 +11,7 @@ function pushBindingWarn(message) {
   common_vendor.index.__f__("warn", "at services/push-binding.uts:25", "[PushBinding] " + message);
 }
 function getLoginToken() {
-  const value = common_vendor.index.getStorageSync("token");
+  const value = common_vendor.index.getStorageSync("token", true);
   return value == null ? "" : value.toString();
 }
 function bindRegistrationId(registrationId) {

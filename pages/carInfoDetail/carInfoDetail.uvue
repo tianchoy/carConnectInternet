@@ -30,9 +30,10 @@
 				<view class="pos-adress">
 					<view class="address-row">
 						<text class="address-label" style="margin-right:10rpx; font-size: 22rpx;">当前位置:</text>
-						<text v-if="address" class="address-text">{{address}}</text>
-						<text v-if="!address" style="color: #007AFF; margin-left: 20rpx;font-weight: bold; font-size: 22rpx;"
-							@click="refreshAdress">查看中文地址</text>
+						<text v-if="!showAddress" class="address-text">{{latLngText}}</text>
+						<text v-if="showAddress && address" class="address-text">{{address}}</text>
+						<text v-if="!showAddress" class="addr-action" @click="refreshAdress">查看中文地址</text>
+						<text v-if="showAddress" class="addr-action" @click="toggleToLatLng">查看经纬度</text>
 					</view>
 				</view>
 				<!-- 信号强度显示区域 -->
@@ -134,6 +135,14 @@ import { openLocation } from '../../utils/openLocation.uts'
 	const isMapReady = ref(false)
 	const datainfo = ref<UTSJSONObject>({})
 	const address = ref('')
+	// 当前位置展示开关：默认显示经纬度，点击「查看中文地址」后切换为中文地址
+	const showAddress = ref(false)
+	const latLngText = computed<string>(() => {
+		return center.latitude.toFixed(6) + ', ' + center.longitude.toFixed(6)
+	})
+	const toggleToLatLng = (): void => {
+		showAddress.value = false
+	}
 	const currentTime = ref('5s')
 	const onCurrentTimeChange = (value: string) => {
 		currentTime.value = value
@@ -774,9 +783,16 @@ import { openLocation } from '../../utils/openLocation.uts'
 				lng: center.longitude,
 				deviceId: deviceId.value
 			});
-			address.value = addr.data.getString('address', '');
+			const text = addr.data.getString('address', '')
+			if (text != '') {
+				address.value = text
+				showAddress.value = true
+			} else {
+				showAppToast({ title: '未获取到中文地址', icon: 'none' })
+			}
 		} catch (error) {
 			console.error('获取地址信息失败:', error);
+			showAppToast({ title: '获取地址失败，请重试', icon: 'none' })
 		}
 	}
 
@@ -1109,6 +1125,14 @@ import { openLocation } from '../../utils/openLocation.uts'
 							flex:1;
 							font-size: 22rpx;
 							line-height: 1.4;
+						}
+
+						.addr-action {
+							flex-shrink: 0;
+							margin-left: 20rpx;
+							color: #007AFF;
+							font-weight: bold;
+							font-size: 22rpx;
 						}
 
 

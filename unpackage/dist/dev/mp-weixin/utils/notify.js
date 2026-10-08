@@ -105,7 +105,7 @@ function getCachedQuota(bizCode) {
 }
 function readCachedQuota() {
   try {
-    const raw = common_vendor.index.getStorageSync(QUOTA_STORAGE_KEY);
+    const raw = common_vendor.index.getStorageSync(QUOTA_STORAGE_KEY, true);
     if (raw == null || raw.toString() == "")
       return [];
     const parsed = common_vendor.UTS.JSON.parse(raw.toString());
@@ -113,10 +113,10 @@ function readCachedQuota() {
     for (let i = 0; i < parsed.length; i++) {
       const row = parsed[i];
       list.push(new api_request.NotifyQuotaItem({
-        bizCode: row.getString("bizCode", ""),
-        templateId: row.getString("templateId", ""),
-        remaining: row.getNumber("remaining", -1),
-        mode: row.getString("mode", "")
+        bizCode: row.bizCode != null ? String(row.bizCode) : "",
+        templateId: row.templateId != null ? String(row.templateId) : "",
+        remaining: row.remaining != null ? Number(row.remaining) : -1,
+        mode: row.mode != null ? String(row.mode) : ""
       }));
     }
     return list;

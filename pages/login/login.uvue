@@ -517,9 +517,12 @@
 		try {
 			const rawAccount = uni.getStorageSync('savedEnterpriseAccount')
 			if (rawAccount == null || rawAccount == '') return
-			const account = typeof rawAccount == 'string' ? JSON.parse(rawAccount) as UTSJSONObject : rawAccount as UTSJSONObject
-			enterpriseForm.value.username = account.getString('username', '')
-			enterpriseForm.value.password = account.getString('password', '')
+			// 微信小程序 storage 返回普通对象，没有 UTSJSONObject 的 getString，直接按字段读取
+			const account = (typeof rawAccount == 'string' ? JSON.parse(rawAccount) : rawAccount) as any
+			const username = account.username
+			const password = account.password
+			enterpriseForm.value.username = username != null ? String(username) : ''
+			enterpriseForm.value.password = password != null ? String(password) : ''
 			rememberPassword.value = enterpriseForm.value.username != '' || enterpriseForm.value.password != ''
 		} catch (error) {
 			console.warn('加载保存的企业账号失败:', error)

@@ -116,15 +116,15 @@ function readCachedQuota() : Array<NotifyQuotaItem> {
     try {
         const raw = uni.getStorageSync(QUOTA_STORAGE_KEY)
         if (raw == null || raw.toString() == '') return []
-        const parsed = JSON.parse(raw.toString()) as Array<UTSJSONObject>
+        const parsed = JSON.parse(raw.toString()) as Array<any>
         const list : Array<NotifyQuotaItem> = []
         for (let i = 0; i < parsed.length; i++) {
-            const row = parsed[i]
+            const row = parsed[i] as any
             list.push({
-                bizCode: row.getString('bizCode', ''),
-                templateId: row.getString('templateId', ''),
-                remaining: row.getNumber('remaining', -1),
-                mode: row.getString('mode', '')
+                bizCode: row.bizCode != null ? String(row.bizCode) : '',
+                templateId: row.templateId != null ? String(row.templateId) : '',
+                remaining: row.remaining != null ? Number(row.remaining) : -1,
+                mode: row.mode != null ? String(row.mode) : ''
             })
         }
         return list

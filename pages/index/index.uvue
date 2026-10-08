@@ -475,36 +475,49 @@ type SavedDevice = {
     longitude: number
 }
 
+// storage 在微信小程序里返回的是普通 JS 对象（无 UTSJSONObject 的 getString/getNumber），
+// 原生 App 端可能是真正的 UTSJSONObject。这里统一兼容两种形态按字段读取，避免 data.getString is not a function
+const readStoredStr = (obj: any, key: string, def: string): string => {
+	if (obj != null && typeof obj.getString == 'function') return obj.getString(key, def)
+	const v = obj != null ? obj[key] : undefined
+	return v == null ? def : (typeof v == 'string' ? v : String(v))
+}
+const readStoredNum = (obj: any, key: string, def: number): number => {
+	if (obj != null && typeof obj.getNumber == 'function') return obj.getNumber(key, def)
+	const v = obj != null ? obj[key] : undefined
+	return v == null ? def : Number(v)
+}
+
 const decodeSavedDevice = (raw: any): SavedDevice | null => {
     if (raw == null || raw == '') return null
-    let data: UTSJSONObject | null = null
+    let data: any = null
     if (typeof raw == 'string') {
         try {
-            data = JSON.parse(raw) as UTSJSONObject
+            data = JSON.parse(raw)
         } catch (error) {
             return null
         }
     } else {
-        data = raw as UTSJSONObject
+        data = raw
     }
     if (data == null) return null
-    const deviceNo = data.getString('deviceNo', '')
-    const deviceId = data.getString('deviceId', '')
+    const deviceNo = readStoredStr(data, 'deviceNo', '')
+    const deviceId = readStoredStr(data, 'deviceId', '')
     if (deviceNo == '' && deviceId == '') return null
     const identity = deviceNo != '' ? deviceNo : deviceId
     const device: SavedDevice = {
-        name: data.getString('name', identity),
-        deviceName: data.getString('deviceName', data.getString('name', identity)),
+        name: readStoredStr(data, 'name', identity),
+        deviceName: readStoredStr(data, 'deviceName', readStoredStr(data, 'name', identity)),
         deviceNo: deviceNo,
-        deptId: data.getString('deptId', ''),
+        deptId: readStoredStr(data, 'deptId', ''),
         deviceId: deviceId,
-        iccid: data.getString('iccid', ''),
-        simMerchant: data.getString('simMerchant', ''),
-        connectionStatus: data.getString('connectionStatus', ''),
-        carType: data.getString('carType', ''),
-        plateNo: data.getString('plateNo', ''),
-        latitude: data.getNumber('latitude', 0),
-        longitude: data.getNumber('longitude', 0)
+        iccid: readStoredStr(data, 'iccid', ''),
+        simMerchant: readStoredStr(data, 'simMerchant', ''),
+        connectionStatus: readStoredStr(data, 'connectionStatus', ''),
+        carType: readStoredStr(data, 'carType', ''),
+        plateNo: readStoredStr(data, 'plateNo', ''),
+        latitude: readStoredNum(data, 'latitude', 0),
+        longitude: readStoredNum(data, 'longitude', 0)
     }
     return device
 }
@@ -842,13 +855,16 @@ const centerMapOnDevice = async (latitude: number, longitude: number): Promise<v
 }
 
 // 加载设备位置
-const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
+// 注意：调用方传入的是普通对象字面量（如 {deviceId, deviceids}），微信小程序下没有 UTSJSONObject 的 getString，
+// 这里统一用对象属性访问读取字段
+const loadDevicePos = async (data: any) : Promise<boolean> => {
     positionState.value = 'loading'
     try {
-        const res = await getDevicePos(data)
+        const res = await getDevicePos(data as UTSJSONObject)
         const positions = res.data
+        const logDeviceId = data != null ? (data.deviceId ?? '') : ''
         if (!isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
-            console.warn('获取设备位置失败:', data.getString('deviceId', ''), res.code)
+            console.warn('获取设备位置失败:', logDeviceId, res.code)
             positionState.value = 'empty'
             // 设备无位置数据，回退展示用户当前位置
             await showUserLocationFallback()
@@ -895,7 +911,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
             // 原生地图视图刷新异常不应覆盖已成功取得的车辆位置。
             console.error('刷新地图视图失败', mapError)
         }
-        console.log('标记点更新完成:', data.getString('deviceId', ''), convertedCoord.lat, convertedCoord.lng)
+        console.log('标记点更新完成:', logDeviceId, convertedCoord.lat, convertedCoord.lng)
         return true
     } catch (error) {
         console.error('加载设备位置失败', error)

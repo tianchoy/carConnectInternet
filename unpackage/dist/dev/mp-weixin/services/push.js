@@ -56,7 +56,7 @@ function stringValue(value = null) {
   return value.toString();
 }
 function storageString(key) {
-  const value = common_vendor.index.getStorageSync(key);
+  const value = common_vendor.index.getStorageSync(key, true);
   return value == null ? "" : stringValue(value);
 }
 function payloadValue(payload = null, key) {
@@ -64,7 +64,7 @@ function payloadValue(payload = null, key) {
     return "";
   if (typeof payload == "string") {
     try {
-      const parsedPayload = common_vendor.UTS.JSON.parse(payload, common_vendor.UTSJSONObject);
+      const parsedPayload = common_vendor.UTS.JSON.parse(payload);
       if (parsedPayload == null)
         return "";
       return payloadValue(parsedPayload, key);
@@ -74,7 +74,10 @@ function payloadValue(payload = null, key) {
   }
   try {
     const object = payload;
-    return object.getString(key, "");
+    if (typeof object.getString == "function")
+      return object.getString(key, "");
+    const v = object[key];
+    return v != null ? typeof v == "string" ? v : String(v) : "";
   } catch (error) {
     return "";
   }

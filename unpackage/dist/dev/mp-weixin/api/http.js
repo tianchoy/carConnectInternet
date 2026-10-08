@@ -158,7 +158,7 @@ function handleTokenExpired() {
   }, 500);
 }
 function requestInterceptor(config) {
-  const token = common_vendor.index.getStorageSync("token");
+  const token = common_vendor.index.getStorageSync("token", true);
   const authorization = "Bearer " + (token != null ? token.toString() : "");
   if (config.header == null) {
     config.header = new common_vendor.UTSJSONObject({});
@@ -289,7 +289,8 @@ function request(options) {
         });
         errorHandler(httpError, processedConfig);
         reject(httpError);
-      }
+      },
+      isUTS: true
     });
   });
 }

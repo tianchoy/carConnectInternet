@@ -90,7 +90,7 @@ function payloadValue(payload: any, key: string): string {
 	if (payload == null) return ''
 	if (typeof payload == 'string') {
 		try {
-			const parsedPayload = JSON.parse<UTSJSONObject>(payload)
+			const parsedPayload = JSON.parse(payload) as any
 			if (parsedPayload == null) return ''
 			return payloadValue(parsedPayload, key)
 		} catch (error) {
@@ -98,8 +98,11 @@ function payloadValue(payload: any, key: string): string {
 		}
 	}
 	try {
-		const object = payload as UTSJSONObject
-		return object.getString(key, '')
+		// 微信小程序下推送 payload / JSON.parse 结果为普通对象，没有 UTSJSONObject 的 getString，需兼容
+		const object = payload as any
+		if (typeof object.getString == 'function') return object.getString(key, '')
+		const v = object[key]
+		return v != null ? (typeof v == 'string' ? v : String(v)) : ''
 	} catch (error) {
 		return ''
 	}

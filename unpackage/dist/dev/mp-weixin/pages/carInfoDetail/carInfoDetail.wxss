@@ -179,6 +179,14 @@
   font-size: 22rpx;
   line-height: 1.4;
 }
+.container .tools-panel .imei-box .pos-date .address-row .addr-action[class],
+.container .tools-panel .imei-box .pos-adress .address-row .addr-action[class] {
+  flex-shrink: 0;
+  margin-left: 20rpx;
+  color: #007AFF;
+  font-weight: bold;
+  font-size: 22rpx;
+}
 .container .tools-panel .imei-box .pos-date .address-row .pos-icon[class],
 .container .tools-panel .imei-box .pos-adress .address-row .pos-icon[class] {
   width: 30rpx;

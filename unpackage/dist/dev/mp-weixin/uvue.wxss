@@ -26,6 +26,7 @@ checkbox,
 picker-view,
 radio,
 slider,
+video,
 
 cover-image,
 cover-view,
@@ -51,7 +52,6 @@ page-meta,
 picker,
 progress,
 radio-group,
-rich-text,
 scroll-view,
 sticky-header,
 sticky-section,
@@ -62,7 +62,6 @@ template,
 text,
 textarea,
 unicloud-db,
-video,
 view,
 web-view {
   position: relative;
@@ -79,6 +78,30 @@ web-view {
   min-width: 0px;
   border-width: medium;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ad-draw[hidden],
 ad-fullscreen-video[hidden],

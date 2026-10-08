@@ -82,7 +82,7 @@ const _sfc_main = common_vendor.defineComponent({
   onLaunch: function() {
     common_vendor.index.__f__("log", "at App.uvue:80", "App onLaunch");
     checkForUpdates();
-    if (common_vendor.index.getStorageSync("token") != null) {
+    if (common_vendor.index.getStorageSync("token", true) != null) {
       services_appStartup.schedulePostLoginInitialization();
     }
   },

@@ -194,15 +194,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadSavedEnterpriseAccount = () => {
       try {
-        const rawAccount = common_vendor.index.getStorageSync("savedEnterpriseAccount");
+        const rawAccount = common_vendor.index.getStorageSync("savedEnterpriseAccount", true);
         if (rawAccount == null || rawAccount == "")
           return null;
         const account = typeof rawAccount == "string" ? common_vendor.UTS.JSON.parse(rawAccount) : rawAccount;
-        enterpriseForm.value.username = account.getString("username", "");
-        enterpriseForm.value.password = account.getString("password", "");
+        const username = account.username;
+        const password = account.password;
+        enterpriseForm.value.username = username != null ? String(username) : "";
+        enterpriseForm.value.password = password != null ? String(password) : "";
         rememberPassword.value = enterpriseForm.value.username != "" || enterpriseForm.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/login/login.uvue:525", "加载保存的企业账号失败:", error);
+        common_vendor.index.__f__("warn", "at pages/login/login.uvue:528", "加载保存的企业账号失败:", error);
       }
     };
     const toggleEnterpriseLogin = () => {

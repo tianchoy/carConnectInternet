@@ -9,7 +9,7 @@ function startupLog(message) {
   common_vendor.index.__f__("log", "at services/app-startup.uts:16", "[AppStartup] " + message);
 }
 function hasLoginToken() {
-  const token = common_vendor.index.getStorageSync("token");
+  const token = common_vendor.index.getStorageSync("token", true);
   return token != null && token.toString() != "";
 }
 function initializePushServices() {

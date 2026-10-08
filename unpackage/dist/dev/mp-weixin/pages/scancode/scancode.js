@@ -42,13 +42,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const requestCameraPermission = () => {
-      common_vendor.index.getSetting(new common_vendor.UTSJSONObject({
-        success: (res = null) => {
+      common_vendor.index.getSetting({
+        success: (res) => {
           if (res.authSetting["scope.camera"]) {
             common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:84", "已有摄像头权限");
             return null;
           }
-          common_vendor.index.authorize(new common_vendor.UTSJSONObject({
+          common_vendor.index.authorize({
             scope: "scope.camera",
             success: () => {
               common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:91", "摄像头权限授权成功");
@@ -66,9 +66,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 }
               }));
             }
-          }));
+          });
         }
-      }));
+      });
     };
     common_vendor.onLoad(() => {
       requestCameraPermission();

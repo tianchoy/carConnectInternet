@@ -5,14 +5,14 @@ const utils_toast = require("../../utils/toast.js");
 require("../../utils/modal.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
-  const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
-  const _easycom_i_form_item_1 = common_vendor.resolveComponent("i-form-item");
-  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
-  const _easycom_i_form_1 = common_vendor.resolveComponent("i-form");
-  const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
-  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
-  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_form_item_1 + _easycom_i_icon_1 + _easycom_i_form_1 + _easycom_i_button_1 + _easycom_app_toast_1)();
+  const _easycom_custom_navBar2 = common_vendor.resolveComponent("custom-navBar");
+  const _easycom_i_input2 = common_vendor.resolveComponent("i-input");
+  const _easycom_i_form_item2 = common_vendor.resolveComponent("i-form-item");
+  const _easycom_i_icon2 = common_vendor.resolveComponent("i-icon");
+  const _easycom_i_form2 = common_vendor.resolveComponent("i-form");
+  const _easycom_i_button2 = common_vendor.resolveComponent("i-button");
+  const _easycom_app_toast2 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar2 + _easycom_i_input2 + _easycom_i_form_item2 + _easycom_i_icon2 + _easycom_i_form2 + _easycom_i_button2 + _easycom_app_toast2)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
@@ -25,77 +25,6 @@ if (!Math) {
   (_easycom_custom_navBar + _easycom_i_input + _easycom_i_form_item + _easycom_i_icon + common_vendor.unref(carIcons) + _easycom_i_form + _easycom_i_button + _easycom_app_toast)();
 }
 const carIcons = () => "../../components/car-icons/car-icons.js";
-class CarFormData extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          deviceName: { type: String, optional: false },
-          deviceNo: { type: String, optional: false },
-          deviceType: { type: String, optional: false },
-          deviceTypeValue: { type: String, optional: false },
-          plateNo: { type: String, optional: false },
-          carType: { type: String, optional: false }
-        };
-      },
-      name: "CarFormData"
-    };
-  }
-  constructor(options, metadata = CarFormData.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.deviceName = this.__props__.deviceName;
-    this.deviceNo = this.__props__.deviceNo;
-    this.deviceType = this.__props__.deviceType;
-    this.deviceTypeValue = this.__props__.deviceTypeValue;
-    this.plateNo = this.__props__.plateNo;
-    this.carType = this.__props__.carType;
-    delete this.__props__;
-  }
-}
-class ScanResultData extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          result: { type: String, optional: false }
-        };
-      },
-      name: "ScanResultData"
-    };
-  }
-  constructor(options, metadata = ScanResultData.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.result = this.__props__.result;
-    delete this.__props__;
-  }
-}
-class AddDeviceResponse extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          code: { type: Number, optional: false },
-          msg: { type: String, optional: false },
-          data: { type: CarFormData, optional: false }
-        };
-      },
-      name: "AddDeviceResponse"
-    };
-  }
-  constructor(options, metadata = AddDeviceResponse.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.code = this.__props__.code;
-    this.msg = this.__props__.msg;
-    this.data = this.__props__.data;
-    delete this.__props__;
-  }
-}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "addCar",
   setup(__props) {
@@ -104,25 +33,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const carIconSelectorVisible = common_vendor.ref(false);
     const loading = common_vendor.ref(false);
     const formValid = common_vendor.ref(false);
-    const carInfo = common_vendor.ref(new CarFormData({
+    const carInfo = common_vendor.ref({
       deviceName: "",
       deviceNo: "",
       deviceType: "",
       deviceTypeValue: "",
       plateNo: "",
       carType: ""
-    }));
+    });
     common_vendor.ref([]);
     const rules = [
-      new common_vendor.UTSJSONObject({ name: "deviceNo", required: true, message: "请输入设备编号" }),
-      new common_vendor.UTSJSONObject({ name: "deviceType", required: true, message: "请选择设备图标" })
+      { name: "deviceNo", required: true, message: "请输入设备编号" },
+      { name: "deviceType", required: true, message: "请选择设备图标" }
     ];
-    const handleModelValid = (value = null) => {
+    const handleModelValid = (value) => {
       formValid.value = !!value;
     };
     const openScanPage = () => {
       if (isNavigatingToScanner.value)
-        return null;
+        return;
       isNavigatingToScanner.value = true;
       common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:118", "打开扫码页");
       common_vendor.index.navigateTo({
@@ -138,7 +67,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const scanCode = () => {
       if (isRequestingCameraPermission.value || isNavigatingToScanner.value)
-        return null;
+        return;
       openScanPage();
     };
     const normalizeDeviceNo = (value) => {
@@ -159,7 +88,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "设备编号只能输入数字，请确认后提交",
           icon: "none"
         });
-        return null;
+        return;
       }
       carInfo.value.deviceNo = normalizedDeviceNo;
     };
@@ -197,65 +126,63 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       return true;
     };
-    const submit = () => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:235", "=== 开始提交设备 ===");
-        try {
-          if (!validateForm())
-            return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:240", "✅ 表单验证通过");
-          const normalizedDeviceNo = normalizeDeviceNo(carInfo.value.deviceNo);
-          if (normalizedDeviceNo == "") {
-            utils_toast.showAppToast({
-              title: "设备编号只能输入数字，请确认后提交",
-              icon: "none"
-            });
-            return Promise.resolve(null);
-          }
-          carInfo.value.deviceNo = normalizedDeviceNo;
-          loading.value = true;
-          common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
-            title: "添加中...",
-            mask: true
-          }));
-          const submitData = new common_vendor.UTSJSONObject({
-            deviceName: carInfo.value.deviceName,
-            deviceNo: normalizedDeviceNo,
-            carType: carInfo.value.deviceType,
-            plateNo: carInfo.value.plateNo
-          });
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:265", "📤 提交数据:", submitData);
-          const res = yield api_request.addDevice(submitData);
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:268", "✅ 添加设备返回:", res);
-          common_vendor.index.hideLoading();
-          loading.value = false;
-          if (api_response.isBusinessSuccessCode(res.code)) {
-            utils_toast.showAppToast({
-              title: res.msg || "添加成功",
-              icon: "success"
-            });
-            common_vendor.index.setStorageSync("needRefreshHome", true);
-            refreshDeviceList();
-            setTimeout(() => {
-              common_vendor.index.navigateBack();
-            }, 1500);
-          } else {
-            utils_toast.showAppToast({
-              title: res.msg || "添加失败",
-              icon: "none",
-              duration: 2e3
-            });
-          }
-        } catch (error) {
-          common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:295", "❌ 添加设备失败:", error);
-          common_vendor.index.hideLoading();
-          loading.value = false;
+    const submit = async () => {
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:235", "=== 开始提交设备 ===");
+      try {
+        if (!validateForm())
+          return;
+        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:240", "✅ 表单验证通过");
+        const normalizedDeviceNo = normalizeDeviceNo(carInfo.value.deviceNo);
+        if (normalizedDeviceNo == "") {
           utils_toast.showAppToast({
-            title: "添加设备失败",
+            title: "设备编号只能输入数字，请确认后提交",
             icon: "none"
           });
+          return;
         }
-      });
+        carInfo.value.deviceNo = normalizedDeviceNo;
+        loading.value = true;
+        common_vendor.index.showLoading({
+          title: "添加中...",
+          mask: true
+        });
+        const submitData = {
+          deviceName: carInfo.value.deviceName,
+          deviceNo: normalizedDeviceNo,
+          carType: carInfo.value.deviceType,
+          plateNo: carInfo.value.plateNo
+        };
+        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:265", "📤 提交数据:", submitData);
+        const res = await api_request.addDevice(submitData);
+        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:268", "✅ 添加设备返回:", res);
+        common_vendor.index.hideLoading();
+        loading.value = false;
+        if (api_response.isBusinessSuccessCode(res.code)) {
+          utils_toast.showAppToast({
+            title: res.msg || "添加成功",
+            icon: "success"
+          });
+          common_vendor.index.setStorageSync("needRefreshHome", true);
+          refreshDeviceList();
+          setTimeout(() => {
+            common_vendor.index.navigateBack();
+          }, 1500);
+        } else {
+          utils_toast.showAppToast({
+            title: res.msg || "添加失败",
+            icon: "none",
+            duration: 2e3
+          });
+        }
+      } catch (error) {
+        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:295", "❌ 添加设备失败:", error);
+        common_vendor.index.hideLoading();
+        loading.value = false;
+        utils_toast.showAppToast({
+          title: "添加设备失败",
+          icon: "none"
+        });
+      }
     };
     common_vendor.onLoad(() => {
     });
@@ -268,7 +195,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const result = rawResult != null ? rawResult.toString() : "";
       if (result.length > 0) {
         common_vendor.index.removeStorageSync("scanCodeResult");
-        handleScanResult(new ScanResultData({ result }));
+        handleScanResult({ result });
       }
     });
     common_vendor.onUnload(() => {
@@ -284,9 +211,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-6409e324"
         }),
-        b: common_vendor.o(($event) => {
-          return carInfo.value.deviceName = $event;
-        }, "64"),
+        b: common_vendor.o(($event) => carInfo.value.deviceName = $event, "25"),
         c: common_vendor.p({
           border: "none",
           placeholder: "请输入设备名称",
@@ -305,9 +230,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           fontSize: "24",
           class: "data-v-6409e324"
         }),
-        g: common_vendor.o(($event) => {
-          return carInfo.value.deviceNo = $event;
-        }, "c7"),
+        g: common_vendor.o(($event) => carInfo.value.deviceNo = $event, "83"),
         h: common_vendor.p({
           border: "none",
           placeholder: "请输入设备编号(必填)",
@@ -331,9 +254,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           labelDirection: "horizontal",
           class: "data-v-6409e324"
         }),
-        n: common_vendor.o(($event) => {
-          return carInfo.value.plateNo = $event;
-        }, "81"),
+        n: common_vendor.o(($event) => carInfo.value.plateNo = $event, "3f"),
         o: common_vendor.p({
           border: "none",
           placeholder: "请输入车牌号",

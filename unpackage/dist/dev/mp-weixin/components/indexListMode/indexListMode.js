@@ -32,7 +32,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:52", iccid);
       needRefresh.value = true;
-      common_vendor.index.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
+      common_vendor.index.openEmbeddedMiniProgram({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
@@ -47,7 +47,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             icon: "none"
           });
         }
-      }));
+      });
     };
     const unbindDevice = (deviceId) => {
       selectedDeviceId.value = deviceId;
