@@ -137,7 +137,12 @@ const PLAYBACK_FRAME_INTERVAL_MS = 50;
 const MIN_SEGMENT_DURATION_MS = 500;
 const MAX_SEGMENT_DURATION_MS = 6e3;
 const FALLBACK_SPEED_KMH = 20;
-const POLYLINE_RENDER_INTERVAL_MS = 1e3;
+const POLYLINE_SCREEN_DEADBAND_PX = 8;
+const POLYLINE_MAX_DEADBAND_PX = 10;
+const POLYLINE_MIN_PUSH_GAP_MS = 200;
+const POLYLINE_CLIP_MARGIN = 1.35;
+const POLYLINE_CLIP_EDGE_TOLERANCE = 1.3;
+const MAP_SCALE_SYNC_INTERVAL_MS = 300;
 const MARKER_ROTATION_UPDATE_THRESHOLD = 2;
 const MIN_TRACK_FIT_SCALE = 5;
 const MAX_TRACK_FIT_SCALE = 17;
@@ -185,17 +190,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const activeSegmentTargetIndex = common_vendor.ref(-1);
     let playbackTimer = null;
     let replaySessionId = 0;
-    let lastPolylineRenderAt = 0;
     let lastCarMarkerRotation = 0;
-    function copyTrackPoint(point) {
-      return new TrackPoint({
-        latitude: point.latitude,
-        longitude: point.longitude,
-        rotation: point.rotation,
-        deviceTime: point.deviceTime,
-        speed: point.speed
-      });
-    }
     function resetRenderedPoint(point) {
       renderedPoint.latitude = point.latitude;
       renderedPoint.longitude = point.longitude;
@@ -265,7 +260,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:313", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:355", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -339,7 +334,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           callback();
         }).exec();
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/playBack/playBack.uvue:413", "测量地图容器尺寸失败:", error);
+        common_vendor.index.__f__("warn", "at pages/playBack/playBack.uvue:455", "测量地图容器尺寸失败:", error);
         callback();
       }
     }
@@ -469,50 +464,212 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         list.push(endMarker);
       markers.value = list;
     }
-    function toMpPoints(points) {
-      return points.map((point) => {
-        return new MapPolylinePoint({
-          latitude: point.latitude,
-          longitude: point.longitude
-        });
-      });
-    }
-    function toThinnedMpPoints(points) {
-      const total = points.length;
-      if (total <= MAX_POLYLINE_POINTS || MAX_POLYLINE_POINTS < 2)
-        return toMpPoints(points);
-      const step = (total - 1) / (MAX_POLYLINE_POINTS - 1);
-      const thinned = [];
-      let lastIndex = -1;
-      for (let i = 0; i < MAX_POLYLINE_POINTS; i++) {
-        const index = Math.round(step * i);
-        if (index == lastIndex)
-          continue;
-        lastIndex = index;
-        const point = points[index];
-        thinned.push(new MapPolylinePoint({ latitude: point.latitude, longitude: point.longitude }));
+    let thinnedSourceIndex = [];
+    let rawPoints = [];
+    let thinnedCount = 0;
+    let polylineAnchorLat = 0;
+    let polylineAnchorLng = 0;
+    let polylineAnchorScale = 0;
+    let polylineAnchorValid = false;
+    let polylineForceNext = false;
+    let polylineDeadbandPx = POLYLINE_SCREEN_DEADBAND_PX;
+    let polylineLastPushAt = 0;
+    let trueMapScale = 0;
+    let mapContext = null;
+    let mapScaleSyncTimer = null;
+    function ensureMapContext() {
+      var _a, _b;
+      if (mapContext == null) {
+        mapContext = common_vendor.index.createMapContext("myMap", (_b = (_a = common_vendor.getCurrentInstance()) === null || _a === void 0 ? null : _a.proxy) !== null && _b !== void 0 ? _b : null);
       }
-      return thinned;
+      return mapContext;
+    }
+    function syncTrueMapScale() {
+      const ctx = ensureMapContext();
+      if (ctx == null)
+        return null;
+      ctx.getScale(new common_vendor.UTSJSONObject({
+        success: (result = null) => {
+          const scale = result != null ? result.scale : 0;
+          if (scale <= 0 || scale > 24)
+            return null;
+          if (Math.abs(scale - trueMapScale) < 0.01)
+            return null;
+          trueMapScale = scale;
+          invalidatePolylineAnchor();
+        },
+        fail: () => {
+        }
+      }));
+    }
+    function startMapScaleSync() {
+      stopMapScaleSync();
+      const tick = () => {
+        syncTrueMapScale();
+        mapScaleSyncTimer = setTimeout(tick, MAP_SCALE_SYNC_INTERVAL_MS);
+      };
+      tick();
+    }
+    function stopMapScaleSync() {
+      const timer = mapScaleSyncTimer;
+      if (timer != null) {
+        clearTimeout(timer);
+        mapScaleSyncTimer = null;
+      }
+    }
+    function getEffectiveMapScale() {
+      return trueMapScale > 0 ? trueMapScale : mapScale.value;
+    }
+    function markPolylineRendered() {
+      if (polylineAnchorValid && polylineAnchorScale == getEffectiveMapScale()) {
+        const elapsed = Date.now() - polylineLastPushAt;
+        const movedPx = getScreenDistancePx(polylineAnchorLat, polylineAnchorLng, renderedPoint.latitude, renderedPoint.longitude);
+        if (elapsed > 0 && movedPx > 0) {
+          let required = movedPx / elapsed * POLYLINE_MIN_PUSH_GAP_MS;
+          if (required > POLYLINE_MAX_DEADBAND_PX) {
+            required = POLYLINE_MAX_DEADBAND_PX;
+          }
+          if (required > polylineDeadbandPx) {
+            polylineDeadbandPx = required;
+          }
+        }
+      }
+      polylineAnchorLat = renderedPoint.latitude;
+      polylineAnchorLng = renderedPoint.longitude;
+      polylineAnchorScale = getEffectiveMapScale();
+      polylineAnchorValid = true;
+      polylineLastPushAt = Date.now();
+    }
+    function invalidatePolylineAnchor() {
+      polylineAnchorValid = false;
+      polylineForceNext = true;
+      polylineDeadbandPx = POLYLINE_SCREEN_DEADBAND_PX;
+    }
+    function getScreenDistancePx(lat1, lng1, lat2, lng2) {
+      const metersPerPixel = getMetersPerPixelOfScale(lat1);
+      if (metersPerPixel <= 0)
+        return 0;
+      const dLatMeters = (lat2 - lat1) * METERS_PER_DEGREE_LAT;
+      let cosLat = Math.cos(lat1 * Math.PI / 180);
+      if (cosLat < 0.01)
+        cosLat = 0.01;
+      const dLngMeters = (lng2 - lng1) * METERS_PER_DEGREE_LNG * cosLat;
+      const distMeters = Math.sqrt(dLatMeters * dLatMeters + dLngMeters * dLngMeters);
+      return distMeters / metersPerPixel;
+    }
+    function shouldPushPolyline() {
+      if (!isPlaying.value)
+        return true;
+      if (polylineForceNext)
+        return true;
+      if (!polylineAnchorValid)
+        return true;
+      if (polylineAnchorScale != getEffectiveMapScale())
+        return true;
+      const movedPx = getScreenDistancePx(polylineAnchorLat, polylineAnchorLng, renderedPoint.latitude, renderedPoint.longitude);
+      return movedPx >= polylineDeadbandPx;
+    }
+    function buildThinnedPoints() {
+      thinnedSourceIndex.length = 0;
+      rawPoints.length = 0;
+      const total = trackPoints.value.length;
+      if (total == 0)
+        return null;
+      if (total <= MAX_POLYLINE_POINTS || MAX_POLYLINE_POINTS < 2) {
+        for (let i = 0; i < total; i++) {
+          const point = trackPoints.value[i];
+          thinnedSourceIndex.push(i);
+          rawPoints.push(new MapPolylinePoint({ latitude: point.latitude, longitude: point.longitude }));
+        }
+      } else {
+        const step = (total - 1) / (MAX_POLYLINE_POINTS - 1);
+        let lastIndex = -1;
+        for (let i = 0; i < MAX_POLYLINE_POINTS; i++) {
+          const index = Math.round(step * i);
+          if (index == lastIndex)
+            continue;
+          lastIndex = index;
+          const point = trackPoints.value[index];
+          thinnedSourceIndex.push(index);
+          rawPoints.push(new MapPolylinePoint({ latitude: point.latitude, longitude: point.longitude }));
+        }
+      }
+      thinnedCount = rawPoints.length;
+    }
+    function distanceToCarMeters(point) {
+      const dLat = (point.latitude - renderedPoint.latitude) * METERS_PER_DEGREE_LAT;
+      let cosLat = Math.cos(renderedPoint.latitude * Math.PI / 180);
+      if (cosLat < 0.01)
+        cosLat = 0.01;
+      const dLng = (point.longitude - renderedPoint.longitude) * METERS_PER_DEGREE_LNG * cosLat;
+      return Math.sqrt(dLat * dLat + dLng * dLng);
+    }
+    function findGrayClipEnd(fromIndex, clipRadius) {
+      const limit = clipRadius * POLYLINE_CLIP_EDGE_TOLERANCE;
+      for (let i = fromIndex; i < thinnedCount; i++) {
+        if (distanceToCarMeters(rawPoints[i]) > limit) {
+          return i + 1;
+        }
+      }
+      return thinnedCount;
+    }
+    function findBlueClipStart(boundaryIndex, clipRadius) {
+      const limit = clipRadius * POLYLINE_CLIP_EDGE_TOLERANCE;
+      for (let i = boundaryIndex; i >= 0; i--) {
+        if (distanceToCarMeters(rawPoints[i]) > limit) {
+          return i;
+        }
+      }
+      return 0;
     }
     function updatePolyline() {
-      if (trackPoints.value.length < 2) {
-        polyline.value = [];
+      if (!shouldPushPolyline()) {
         return null;
       }
-      const isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value;
-      const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1);
-      if (isAnimatingSegment) {
-        playedPoints.push(copyTrackPoint(renderedPoint));
+      if (trackPoints.value.length < 2 || thinnedCount < 2) {
+        polyline.value = [];
+        polylineForceNext = false;
+        return null;
       }
-      const unplayedStartIndex = isAnimatingSegment ? activeSegmentTargetIndex.value : currentIndex.value;
+      let boundary = -1;
+      for (let i = 0; i < thinnedCount; i++) {
+        if (thinnedSourceIndex[i] <= currentIndex.value) {
+          boundary = i;
+        } else {
+          break;
+        }
+      }
       const lines = [];
-      const unplayedPoints = trackPoints.value.slice(unplayedStartIndex);
-      if (isAnimatingSegment) {
-        unplayedPoints.unshift(copyTrackPoint(renderedPoint));
+      const livePoint = new MapPolylinePoint(
+        {
+          latitude: renderedPoint.latitude,
+          longitude: renderedPoint.longitude
+        }
+        // 车标是否恰好落在抽稀点 boundary 上。若落在上面，两条线都不必重复追加这一点，
+        // 否则会产生长度为 0 的线段，部分渲染库对此处理异常。
+      );
+      const boundaryPoint = boundary >= 0 ? rawPoints[boundary] : null;
+      const needLivePoint = boundaryPoint == null || Math.abs(boundaryPoint.latitude - renderedPoint.latitude) > 1e-9 || Math.abs(boundaryPoint.longitude - renderedPoint.longitude) > 1e-9;
+      let grayEndIndex = thinnedCount;
+      let blueStartIndex = 0;
+      if (isPlaying.value) {
+        const clipRadius = getVisibleRadiusMeters();
+        grayEndIndex = findGrayClipEnd(Math.max(boundary + 1, 0), clipRadius);
+        blueStartIndex = findBlueClipStart(boundary, clipRadius);
       }
-      if (unplayedPoints.length >= 2) {
+      let grayPoints = rawPoints;
+      if (isPlaying.value) {
+        grayPoints = [];
+        if (needLivePoint) {
+          grayPoints.push(livePoint);
+        }
+        for (let i = Math.max(boundary + 1, 0); i < grayEndIndex; i++) {
+          grayPoints.push(rawPoints[i]);
+        }
+      }
+      if (grayPoints.length >= 2) {
         lines.push(new MpPolylineData({
-          points: toThinnedMpPoints(unplayedPoints),
+          points: grayPoints,
           color: "#999999",
           width: 3,
           dottedLine: true,
@@ -521,21 +678,50 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           borderWidth: 0
         }));
       }
-      if (playedPoints.length >= 2) {
-        lines.push(new MpPolylineData({
-          points: toThinnedMpPoints(playedPoints),
-          color: "#1890FF",
-          width: 3,
-          dottedLine: false,
-          arrowLine: false,
-          borderColor: "#FFFFFF",
-          borderWidth: 0
-        }));
+      if (boundary >= 0) {
+        const playedPoints = rawPoints.slice(blueStartIndex, boundary + 1);
+        if (needLivePoint) {
+          playedPoints.push(livePoint);
+        }
+        if (playedPoints.length >= 2) {
+          lines.push(new MpPolylineData({
+            points: playedPoints,
+            color: "#1890FF",
+            width: 3,
+            dottedLine: false,
+            arrowLine: false,
+            borderColor: "#FFFFFF",
+            borderWidth: 0
+          }));
+        }
       }
       polyline.value = lines;
+      polylineForceNext = false;
+      markPolylineRendered();
     }
     function initPolyline() {
+      buildThinnedPoints();
+      invalidatePolylineAnchor();
       updatePolyline();
+    }
+    function getMetersPerPixelOfScale(latitude) {
+      let cosLat = Math.cos(latitude * Math.PI / 180);
+      if (cosLat < 0.01)
+        cosLat = 0.01;
+      const scale = trueMapScale > 0 ? trueMapScale : mapScale.value;
+      const resolution = EARTH_RESOLUTION_BASE * cosLat / Math.pow(2, scale);
+      return resolution > 1e-4 ? resolution : 1;
+    }
+    function getVisibleRadiusMeters() {
+      let width = mapViewWidth;
+      let height = mapViewHeight;
+      if (width <= 0 || height <= 0) {
+        width = 375;
+        height = 640;
+      }
+      const halfDiagonalPx = Math.sqrt(width * width + height * height) / 2;
+      const radius = halfDiagonalPx * getMetersPerPixelOfScale(renderedPoint.latitude) * POLYLINE_CLIP_MARGIN;
+      return radius > 1 ? radius : 1;
     }
     function updateCarPosition(force) {
       const marker = carMarker.value;
@@ -670,8 +856,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       carMarker.value = null;
       markers.value = [];
       lastCarMarkerRotation = 0;
-      lastPolylineRenderAt = 0;
       polyline.value = [];
+      invalidatePolylineAnchor();
+      stopMapScaleSync();
+      trueMapScale = 0;
+      mapContext = null;
     }
     function clearPlaybackTimer() {
       const timer = playbackTimer;
@@ -683,11 +872,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function pausePlayback() {
       isPlaying.value = false;
       clearPlaybackTimer();
+      stopMapScaleSync();
       showCarOverlay.value = false;
       if (carMarker.value != null && trackPoints.value.length > 0) {
         updateCarPosition(true);
         applyFullMarkers();
       }
+      updatePolyline();
     }
     function renderPlaybackIndex() {
       if (trackPoints.value.length == 0)
@@ -696,8 +887,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         resetRenderedPoint(trackPoints.value[currentIndex.value]);
       }
       updateCarPosition(true);
+      if (!isPlaying.value) {
+        invalidatePolylineAnchor();
+      }
       updatePolyline();
-      lastPolylineRenderAt = Date.now();
       if (!isPlaying.value) {
         applyFullMarkers();
       }
@@ -746,7 +939,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isTrackPlayable.value = processedPoints.length > 1;
       currentIndex.value = 0;
       activeSegmentTargetIndex.value = -1;
-      lastPolylineRenderAt = 0;
       if (processedPoints.length == 0)
         return null;
       resetRenderedPoint(processedPoints[0]);
@@ -782,7 +974,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             showCurrentPosition(res.msg || "轨迹加载失败");
             return Promise.resolve(null);
           }
-          common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1101", "加载轨迹成功:", res);
+          common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1486", "加载轨迹成功:", res);
           const trackData = res.data;
           if (trackData == null) {
             showCurrentPosition();
@@ -800,7 +992,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:1119", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:1504", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -878,10 +1070,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         currentTime.value = renderedPoint.deviceTime;
         updateCarPosition(false);
         const frameNow = Date.now();
-        const polylineDue = frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS;
-        if (polylineDue) {
-          lastPolylineRenderAt = frameNow;
-        }
+        let polylineDue = false;
+        polylineDue = shouldPushPolyline();
         if (progress >= 1) {
           currentIndex.value = targetIndex;
           activeSegmentTargetIndex.value = -1;
@@ -921,8 +1111,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showCarOverlay.value = true;
       carOverlayRotation.value = renderedPoint.rotation;
       markers.value = markers.value.slice(1);
+      invalidatePolylineAnchor();
+      syncTrueMapScale();
+      startMapScaleSync();
       focusMapOnVehicle();
-      lastPolylineRenderAt = 0;
       const sessionId = ++replaySessionId;
       animateNextSegment(sessionId);
     }
@@ -985,7 +1177,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_h = option.lng) !== null && _h !== void 0 ? _h : null;
       startTime.value = (_j = option.startTime) !== null && _j !== void 0 ? _j : "";
       endTime.value = (_k = option.endTime) !== null && _k !== void 0 ? _k : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1340", "plateNo:", plateNo.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1743", "plateNo:", plateNo.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {
@@ -1001,6 +1193,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (trackPoints.value.length > 0 && !isPlaying.value)
           adjustMapToFitTrack();
       });
+      syncTrueMapScale();
     });
     common_vendor.onHide(() => {
       pausePlayback();

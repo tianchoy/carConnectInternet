@@ -185,11 +185,53 @@ import { showAppToast } from '../../utils/toast.uts'
 	const MAX_SEGMENT_DURATION_MS = 6000
 	const FALLBACK_SPEED_KMH = 20
 	// #ifdef MP-WEIXIN
-	// 折线每次更新都要把整条轨迹的点跨线程传一遍、再由原生层整条重画，是小程序端最贵的
-	// 一次 setData，也是安卓端闪动的主要来源。它只需让"已走/未走"的分界大致跟上即可，
-	// 不需要和车标同频（车标已经压在分界前面，两者最多差一根线的宽度），因此间隔放大到
-	// 1000ms，把跨线程通信预算尽量留给车标。
-	const POLYLINE_RENDER_INTERVAL_MS = 1000
+	// 折线重绘的屏幕位移死区（像素）——微信端播放期折线重绘的唯一闸门。
+	//
+	// 背景：微信小程序端每收到一次 polyline 赋值，安卓机都会销毁并重建整条折线图层，
+	// 重建耗时与"数组里有多少个点"成正比；重建期间旧图层已被移除而新图层尚未就位，
+	// 那一帧的空白与半成品就是肉眼看到的"线路在闪烁"。
+	// 这与此前车标闪动是同一个根因（markers 每帧赋值 → 覆盖物层反复重建），
+	// 区别在于车标可以移出原生图层（改成普通 view 覆盖物）而折线必须画在地图坐标系上，
+	// 移不走，因此只能把重绘频率压到最低。
+	//
+	// 为什么死区取 8px 不会让"蓝线跟不上车标"：
+	// 播放期车标是钉在屏幕中心的 .car-overlay 覆盖物，图标 50rpx（≈25px），半径约 12px。
+	// 只要两次重绘之间车标在屏幕上移动不超过 8px，那截"蓝线末端暂时落后于车标"的空隙
+	// （以及灰线起点同样落后的一小段）就完全落在图标底下，肉眼看不到。
+	// 于是"降频"不再以"蓝线滞后"为代价——这正是前几轮调参无解的那个死结被打开的地方：
+	// 此前用 1000ms 时间闸门降频，蓝线会滞后几百米；用 50ms 时间闸门，闪烁又回来。
+	// 改成按"屏幕上走了多少像素"来降频，两件事第一次不再互相冲突。
+	const POLYLINE_SCREEN_DEADBAND_PX = 8
+	// 死区上限（像素）。
+	 //
+	// 这里必须小于车标图标半径（约 12px），因为**滞后的容忍上限是由遮挡物理决定的，
+	// 不是可以拿来换闪烁的筹码**：死区一旦超过图标半径，蓝线末端就会露在车标图标外面，
+	// 用户看到的就是"车已经开过去了，蓝线还停在后面"——这正是本轮要修的那个现象。
+	// 曾经的 64px 是错的：它把"闪烁"换成了"整段蓝线滞后"，只是把问题挪了个位置。
+	// 因此正确做法不是放宽上限，而是把每次重绘的**成本**降下来（见下方裁剪）。
+	const POLYLINE_MAX_DEADBAND_PX = 10
+	// 两次重绘的最小间隔（毫秒）。与死区是"或"的关系：位移够大 或 时间够久 才重画，
+	// 用来在原地不动/极慢速时彻底不产生重绘。
+	const POLYLINE_MIN_PUSH_GAP_MS = 200
+	// ---- 播放期可见窗口裁剪 ------------------------------------------------
+	// 播放期地图中心恒等于车标，因此"当前看得见的地面范围"是一个以车标为中心、
+	// 半径固定的圆：视口半对角线 × 米/像素。圆外的折线点根本不会被画出来，
+	// 却要实打实地占用 setData 带宽和原生图层的重建耗时——这是纯浪费，
+	// 而闪烁的物理成因恰恰就是"每次重建的代价太大、耗时太久"。
+	// 裁剪之后载荷从"整条轨迹（400 点）"降到"可见窗口内的点（高倍速下仅数十个）"，
+	// 重建代价随之下降，于是死区就能压回 12px 以内——
+	// **闪烁与实时覆盖第一次可以同时成立，因为不再需要在两者之间取舍。**
+	// 余量取 1.35：裁剪圆必须大于视口半对角线，线段才不会在屏幕内提前断掉。
+	const POLYLINE_CLIP_MARGIN = 1.35
+	// 裁剪边界容差：允许把恰好越界的那一个抽稀点也带上，
+	// 这样线段能一直画到裁剪圆边而不是提前一格结束；同时防止"越界的那个点
+	// 其实离得很远"（轨迹有大段稀疏间隔）时被连成一条横穿屏幕的长直线。
+	const POLYLINE_CLIP_EDGE_TOLERANCE = 1.3
+	// 真实缩放级别的同步周期（毫秒）。
+	// mapScale 是"我们命令地图去到的缩放级别"，而 getScale 返回的是"地图当前实际
+	// 渲染的缩放级别"。用户双指放大后二者会脱节，��死区所依赖的像素↔米换算会被放大
+	// 十几倍（实测可达 128px 以上的真实滞后）。播放期周期同步即可把误差压到亚秒级。
+	const MAP_SCALE_SYNC_INTERVAL_MS = 300
 	// #endif
 	// #ifdef APP-ANDROID || APP-IOS
 	// 车标与地图中心逐帧刷新；折线重绘是 O(n) 操作，按时间节流即可，肉眼无差别
@@ -643,53 +685,329 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	// #ifdef MP-WEIXIN
 	// 单次 setData 下发给地图的折线点数上限。长轨迹动辄上千个点，全量传输会把
-	// JS↔原生桥打满，安卓机上直接表现为覆盖物反复重建、车标闪动。
+	// JS↔原生桥打满，安卓机上直接表现为折线反复重建、整条线闪烁。
 	// 手机屏幕只有几百像素宽，抽稀到 400 点形状上完全看不出差别。
 	const MAX_POLYLINE_POINTS = 400
 
-	// 等距抽稀后转换为小程序折线点。关键在于"先抽稀、再转换"：若先转换再抽稀，
-	// 会为每个原始点都创建一个对象再把大部分丢掉，长轨迹下这是纯粹的 CPU 浪费，
-	// 而这段代码正跑在动画帧的关键路径上，会挤占车标下发的时机。
-	function toThinnedMpPoints(points : Array<TrackPoint>) : Array<MapPolylinePoint> {
-		const total = points.length
-		if (total <= MAX_POLYLINE_POINTS || MAX_POLYLINE_POINTS < 2) return toMpPoints(points)
-		const step = (total - 1) / (MAX_POLYLINE_POINTS - 1)
-		const thinned : Array<MapPolylinePoint> = []
-		let lastIndex = -1
-		for (let i = 0; i < MAX_POLYLINE_POINTS; i++) {
-			// 保证首尾两点（车标所在端）不被丢掉
-			const index = Math.round(step * i)
-			if (index == lastIndex) continue
-			lastIndex = index
-			const point = points[index]
-			thinned.push({ latitude: point.latitude, longitude: point.longitude })
+	// 抽稀一次即固定：整条轨迹的抽稀结果缓存下来，并记录每个抽稀点对应的原始下标。
+	// 这是本次优化最关键的一步——原先每次重绘都要对"已走 + 未走"两个子集**各自重新抽稀**，
+	// 而两次抽稀的取点基准不同（一个按已走子集的头尾均分，另一个按未走子集的头尾均分），
+	// 于是同一条路在不同时刻落点不一样，视觉上就是整条线在轻微抖动；
+	// 叠加安卓端每次 polyline 赋值的图层重建，就成了用户看到的"线路闪烁"。
+	// 现在整条轨迹只抽稀一次，播放期间灰线与蓝线都只是它的 slice，取点恒定、不再抖动。
+	// 整条轨迹只抽稀一次，结果缓存为两个平行数组：
+	//   thinnedSourceIndex —— 每个抽稀点对应的原始下标，播放时按 currentIndex 定位分界；
+	//   rawPoints           —— 每个抽稀点的纯经纬度，画线时直接复用。
+	// 播放过程中这两者恒定不变，每帧只需 slice，不会再出现"同一条路取点不同"的抖动。
+	let thinnedSourceIndex : Array<number> = []
+	let rawPoints : Array<MapPolylinePoint> = []
+	// 抽稀后的点数。播放过程中恒定不变，仅用于边界判断
+	let thinnedCount = 0
+
+	// ---- 折线重绘的屏幕位移死区 ----------------------------------------------
+	// 锚点记录"上一次真正把折线下发给地图那一刻，车标所在的经纬度"。
+	// 下一次是否允许重绘，就看车标从锚点出发在**屏幕上**挪了多远：
+	// 不足 POLYLINE_SCREEN_DEADBAND_PX 则本次跳过，把省下来的 setData 全部让给车标与镜头。
+	// 换算用 Web Mercator 的地面分辨率（见 getMetersPerPixelOfScale）。
+	let polylineAnchorLat = 0
+	let polylineAnchorLng = 0
+	// 锚点对应的缩放级别。用户中途放大/缩小地图会让"像素↔米"的换算关系改变，
+	// 此时旧锚点算出的位移不可信，直接作废重画一次。
+	let polylineAnchorScale = 0
+	// 锚点是否有效。首次播放、切换轨迹、缩放变化后都要置失效，强制重画一次对齐。
+	let polylineAnchorValid = false
+
+	// 强制下一次 updatePolyline 必定下发（跳过死区）。
+	// 用于所有"位置必须立即精确对齐"的场合：起播、暂停、段末、重置、拖动进度、切换轨迹。
+	let polylineForceNext = false
+	// 当前生效的屏幕位移死区。基准值 POLYLINE_SCREEN_DEADBAND_PX，会按实际推送速率自适应放大
+	// （见 markPolylineRendered），因此这里不能是常量。
+	let polylineDeadbandPx = POLYLINE_SCREEN_DEADBAND_PX
+	// 上一次真正下发折线的时刻，用于反推自适应死区。
+	let polylineLastPushAt = 0
+
+	// ---- 地图"实际渲染"的缩放级别（真值） --------------------------------
+	// mapScale 是我们下发给地图的目标值；用户双指缩放后地图会自行改变 zoom，
+	// 而 mapScale 仍停留在旧值上。此时若还用 mapScale 做"像素↔米"换算，
+	// 换出来���米/像素会偏大十几倍，死区 8px 就等于一百多真实像素——
+	// 表现为"车开到很后面了，蓝线还远远落在后面"。因此必须以地图自报的真值为准。
+	let trueMapScale = 0
+	// 沿用 deviceList 的既有写法用 any：uvue 下 MapContext 的类型来自全局声明，
+	// 显式标注反而容易在编译期出多余的类型摩擦。
+	let mapContext : any = null
+	let mapScaleSyncTimer : number | null = null
+
+	function ensureMapContext() : any {
+		if (mapContext == null) {
+			mapContext = uni.createMapContext('myMap', getCurrentInstance()?.proxy ?? null)
 		}
-		return thinned
+		return mapContext
+	}
+
+	// 向地图取一次当前真实缩放级别。取到就更新；取不到（旧机型/首帧未就绪）则保留旧值。
+	function syncTrueMapScale() : void {
+		const ctx = ensureMapContext()
+		if (ctx == null) return
+		ctx.getScale({
+			success: (result : any) : void => {
+				const scale = result != null ? result.scale : 0
+				// 合法范围按微信 map 的 3~20 放宽到 24，防御异常值把换算彻底带偏
+				if (scale <= 0 || scale > 24) return
+				if (Math.abs(scale - trueMapScale) < 0.01) return
+				trueMapScale = scale
+				// 缩放变了：像素↔米换算随之改变，旧锚点算出的位移不再可信，立即作废并重画。
+				// 这一步同时也让下面裁剪的可见窗口按新缩放重新计算。
+				invalidatePolylineAnchor()
+			},
+			fail: () : void => {}
+		})
+	}
+
+	// 播放期间周期同步真实缩放：用户随时可能双指缩放，一次性的取值不足以覆盖全程。
+	function startMapScaleSync() : void {
+		stopMapScaleSync()
+		const tick = () : void => {
+			syncTrueMapScale()
+			mapScaleSyncTimer = setTimeout(tick, MAP_SCALE_SYNC_INTERVAL_MS)
+		}
+		tick()
+	}
+
+	function stopMapScaleSync() : void {
+		const timer = mapScaleSyncTimer
+		if (timer != null) {
+			clearTimeout(timer)
+			mapScaleSyncTimer = null
+		}
+	}
+
+	// 当前生效的缩放级别：优先地图自报的真值，取不到才回退到我们下发的目标值。
+	function getEffectiveMapScale() : number {
+		return trueMapScale > 0 ? trueMapScale : mapScale.value
+	}
+
+	function markPolylineRendered() : void {
+		// ---- 死区微调 ------------------------------------------------------
+		// 死区的基准值（8px）已经远小于车标图标半径，滞后一定遮得住；
+		// 这里只做一件事：当车标在屏幕上跑得极快时按比例略微放大死区，
+		// 把重绘次数压到"安卓端来得及重建图层"的节奏上。
+		// 放大后仍被 POLYLINE_MAX_DEADBAND_PX（< 图标半径）硬性截断，
+		// 所以无论车速多快，"蓝线落后车标"都不会超过图标能遮住的范围。
+		//
+		// 注意必须放在"真正下发之后"更新，不能放在判定里：
+		// shouldPushPolyline 会被调用两次（帧内决定要不要排任务、updatePolyline 内再确认一次），
+		// 若在判定里就抬高死区，第二次判定会因为死区已被抬高而误判为"还没走够"，把本次重绘吞掉。
+		if (polylineAnchorValid && polylineAnchorScale == getEffectiveMapScale()) {
+			const elapsed = Date.now() - polylineLastPushAt
+			const movedPx = getScreenDistancePx(
+				polylineAnchorLat, polylineAnchorLng,
+				renderedPoint.latitude, renderedPoint.longitude
+			)
+			if (elapsed > 0 && movedPx > 0) {
+				let required = movedPx / elapsed * POLYLINE_MIN_PUSH_GAP_MS
+				if (required > POLYLINE_MAX_DEADBAND_PX) {
+					required = POLYLINE_MAX_DEADBAND_PX
+				}
+				// 只增不减：宁可偏保守，也不要在两档之间来回抖动造成节奏不稳
+				if (required > polylineDeadbandPx) {
+					polylineDeadbandPx = required
+				}
+			}
+		}
+		polylineAnchorLat = renderedPoint.latitude
+		polylineAnchorLng = renderedPoint.longitude
+		polylineAnchorScale = getEffectiveMapScale()
+		polylineAnchorValid = true
+		polylineLastPushAt = Date.now()
+	}
+
+	// 丢弃锚点，使下一次 updatePolyline 无条件重画一次。
+	function invalidatePolylineAnchor() : void {
+		polylineAnchorValid = false
+		polylineForceNext = true
+		// 死区回到基准值：新的播放会话从最灵敏的状态起步，
+		// 只有确实跟不上时才逐步放大，避免把上一段行程"学到的"宽容度带过来。
+		polylineDeadbandPx = POLYLINE_SCREEN_DEADBAND_PX
+	}
+
+	// 两个经纬度之间在当前缩放级别下折算成多少屏幕像素。
+	function getScreenDistancePx(lat1 : number, lng1 : number, lat2 : number, lng2 : number) : number {
+		const metersPerPixel = getMetersPerPixelOfScale(lat1)
+		if (metersPerPixel <= 0) return 0
+		// 纬度 1 度的地面距离；经度方向还要乘 cos(lat) 收缩
+		const dLatMeters = (lat2 - lat1) * METERS_PER_DEGREE_LAT
+		let cosLat = Math.cos(lat1 * Math.PI / 180.0)
+		if (cosLat < 0.01) cosLat = 0.01
+		const dLngMeters = (lng2 - lng1) * METERS_PER_DEGREE_LNG * cosLat
+		const distMeters = Math.sqrt(dLatMeters * dLatMeters + dLngMeters * dLngMeters)
+		return distMeters / metersPerPixel
+	}
+
+	// 本次 updatePolyline 是否值得真正下发。
+	// 纯判定，不带任何副作用——它会被帧循环与 updatePolyline 各调用一次，
+	// 若在这里改变死区，第二次调用就会把本次重绘误判掉。
+	// 死区的自适应更新放在 markPolylineRendered（真正下发之后）里做。
+	function shouldPushPolyline() : boolean {
+		// 非播放态（刚查出轨迹 / 暂停 / 重置）没有闪烁压力，且必须与 UI 状态严格一致，直接画。
+		if (!isPlaying.value) return true
+		if (polylineForceNext) return true
+		if (!polylineAnchorValid) return true
+		// 缩放级别在播放期间被用户改动过：像素/米的换算关系变了，锚点失效，重画一次。
+		// （双指缩放由 syncTrueMapScale 侦测；这里再比一次作为兜底，
+		//   覆盖"缩放已变但真值尚未取到"的窗口期。）
+		if (polylineAnchorScale != getEffectiveMapScale()) return true
+		const movedPx = getScreenDistancePx(
+			polylineAnchorLat, polylineAnchorLng,
+			renderedPoint.latitude, renderedPoint.longitude
+		)
+		return movedPx >= polylineDeadbandPx
+	}
+
+	function buildThinnedPoints() : void {
+		thinnedSourceIndex.length = 0
+		rawPoints.length = 0
+		const total = trackPoints.value.length
+		if (total == 0) return
+
+		if (total <= MAX_POLYLINE_POINTS || MAX_POLYLINE_POINTS < 2) {
+			for (let i = 0; i < total; i++) {
+				const point = trackPoints.value[i]
+				thinnedSourceIndex.push(i)
+				rawPoints.push({ latitude: point.latitude, longitude: point.longitude })
+			}
+		} else {
+			const step = (total - 1) / (MAX_POLYLINE_POINTS - 1)
+			let lastIndex = -1
+			for (let i = 0; i < MAX_POLYLINE_POINTS; i++) {
+				// 保证首尾两点（车标所在端）不被丢掉
+				const index = Math.round(step * i)
+				if (index == lastIndex) continue
+				lastIndex = index
+				const point = trackPoints.value[index]
+				thinnedSourceIndex.push(index)
+				rawPoints.push({ latitude: point.latitude, longitude: point.longitude })
+			}
+		}
+		thinnedCount = rawPoints.length
+	}
+
+	// 抽稀点到车标当前位置的地面距离（米）
+	function distanceToCarMeters(point : MapPolylinePoint) : number {
+		const dLat = (point.latitude - renderedPoint.latitude) * METERS_PER_DEGREE_LAT
+		let cosLat = Math.cos(renderedPoint.latitude * Math.PI / 180.0)
+		if (cosLat < 0.01) cosLat = 0.01
+		const dLng = (point.longitude - renderedPoint.longitude) * METERS_PER_DEGREE_LNG * cosLat
+		return Math.sqrt(dLat * dLat + dLng * dLng)
+	}
+
+	// 灰线（车标前方）：返回应当绘制到的下标（不含）。
+	// 越过可见半径后，若只是刚刚越界就把它带上，让线段一直画到裁剪圆边；
+	// 若越界很远（轨迹在此处有大段稀疏间隔）则就地收尾，
+	// 否则最后两点会被连成一条横穿屏幕的长直线，比不断线难看得多。
+	function findGrayClipEnd(fromIndex : number, clipRadius : number) : number {
+		const limit = clipRadius * POLYLINE_CLIP_EDGE_TOLERANCE
+		for (let i = fromIndex; i < thinnedCount; i++) {
+			if (distanceToCarMeters(rawPoints[i]) > limit) {
+				return i + 1
+			}
+		}
+		return thinnedCount
+	}
+
+	// 蓝线（已走部分）：返回应当绘制到的起始下标（含）。
+	// 与灰线同理，向车标后方回溯，越界点同样带上，保证蓝线一直画回裁剪圆边。
+	function findBlueClipStart(boundaryIndex : number, clipRadius : number) : number {
+		const limit = clipRadius * POLYLINE_CLIP_EDGE_TOLERANCE
+		for (let i = boundaryIndex; i >= 0; i--) {
+			if (distanceToCarMeters(rawPoints[i]) > limit) {
+				return i
+			}
+		}
+		return 0
 	}
 
 	function updatePolyline() {
-		if (trackPoints.value.length < 2) {
+		// 播放期的屏幕位移死区：车标在屏幕上还没挪够当前死区时，本次直接跳过、
+		// 不给地图赋值。这是抑制"线路闪烁"的唯一有效手段——
+		// 闪烁的物理成因是原生折线图层的销毁重建，只要不重建就没有闪烁。
+		// 代价（蓝线末端短暂落后车标）被车标图标本身遮住，因此视觉无损；
+		// 死区上限被 POLYLINE_MAX_DEADBAND_PX 钉死在图标半径之内，保证永远遮得住。
+		if (!shouldPushPolyline()) {
+			return
+		}
+		if (trackPoints.value.length < 2 || thinnedCount < 2) {
 			polyline.value = []
+			polylineForceNext = false
 			return
 		}
 
-		const isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value
-		const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
-		if (isAnimatingSegment) {
-			playedPoints.push(copyTrackPoint(renderedPoint))
+		// 找到车标所在的抽稀点下标：sourceIndex <= currentIndex 的最后一个点。
+		// 播放过程中 currentIndex 单调递增，因此这个下标也是单调递增的，
+		// 可以从上次的下标继续往后找，不必每次从头扫。
+		let boundary = -1
+		for (let i = 0; i < thinnedCount; i++) {
+			if (thinnedSourceIndex[i] <= currentIndex.value) {
+				boundary = i
+			} else {
+				break
+			}
 		}
-		const unplayedStartIndex = isAnimatingSegment ? activeSegmentTargetIndex.value : currentIndex.value
+
 		const lines : Array<MpPolylineData> = []
-		const unplayedPoints = trackPoints.value.slice(unplayedStartIndex)
-		if (isAnimatingSegment) {
-			unplayedPoints.unshift(copyTrackPoint(renderedPoint))
+
+		// 车标实时位置对象。播放态下灰线与蓝线共用同一个实例，避免每帧新建两个相同对象。
+		// 它同时是蓝线的末端和灰线的起点——两者在此精确相接，车标脚下永不断线。
+		const livePoint : MapPolylinePoint = {
+			latitude: renderedPoint.latitude,
+			longitude: renderedPoint.longitude
 		}
-		// 与 Flutter 端（car_flutter/lib/views/vehicle/playback）保持一致：
-		// 未播放 = 灰色虚线，已播放 = 蓝色实线，两条线宽相同，蓝色画在灰色之上正好盖住已走过的部分。
-		// 绘制顺序即数组顺序，灰色在前、蓝色在后。
-		if (unplayedPoints.length >= 2) {
+
+		// 车标是否恰好落在抽稀点 boundary 上。若落在上面，两条线都不必重复追加这一点，
+		// 否则会产生长度为 0 的线段，部分渲染库对此处理异常。
+		const boundaryPoint = boundary >= 0 ? rawPoints[boundary] : null
+		const needLivePoint = boundaryPoint == null ||
+			Math.abs(boundaryPoint.latitude - renderedPoint.latitude) > 1e-9 ||
+			Math.abs(boundaryPoint.longitude - renderedPoint.longitude) > 1e-9
+
+		// 播放态的可见窗口半径（米）。屏外的折线点画出来也看不见，
+		// 却要占满 setData 预算并让原生图层多花时间重建——把重建代价压下来，
+		// 死区才敢一直保持在图标半径以内，"不闪"与"实时覆盖"才不用互相让步。
+		let grayEndIndex = thinnedCount
+		let blueStartIndex = 0
+		if (isPlaying.value) {
+			const clipRadius = getVisibleRadiusMeters()
+			grayEndIndex = findGrayClipEnd(Math.max(boundary + 1, 0), clipRadius)
+			blueStartIndex = findBlueClipStart(boundary, clipRadius)
+		}
+
+		// 灰色虚线（未播放部分）的点集。
+		// 按播放状态分两种走法，视觉结果完全一致，但通信量差一倍：
+		//
+		//   非播放态（刚查出轨迹 / 回到起点 / 暂停）：直接用整条抽稀结果，**完全不依赖 boundary**。
+		//     这一态是静止的，整条线只下发一次，没有额外开销。
+		//     此前灰线统一走"车标位置往后接"的后缀分支，而该分支的起点由 boundary 推出；
+		//     未播放时 currentIndex = 0，边界一旦判定偏前，整条线看起来就是残缺的
+		//     （表现为轨迹下半截凭空消失），且它与车标是否在动无关，必须独立处理。
+		//
+		//   播放态：车标身后的灰线完全被同宽蓝线盖住，下发它纯属浪费，
+		//     因此只画车标前方、且仍在可见窗口内的后缀。
+		//     若这里也画全长，单帧点数会翻到 2N，而折线是本项目最贵的一次 setData，
+		//     翻倍必然让安卓端重新出现线条闪烁。
+		let grayPoints : Array<MapPolylinePoint> = rawPoints
+		if (isPlaying.value) {
+			grayPoints = []
+			// 起点用车标实时位置，保证灰线与蓝线在车标脚下精确相接、绝不断开。
+			if (needLivePoint) {
+				grayPoints.push(livePoint)
+			}
+			for (let i = Math.max(boundary + 1, 0); i < grayEndIndex; i++) {
+				grayPoints.push(rawPoints[i])
+			}
+		}
+		// 至少要有两个点才画得出线段。
+		if (grayPoints.length >= 2) {
 			lines.push({
-				points: toThinnedMpPoints(unplayedPoints),
+				points: grayPoints,
 				color: '#999999',
 				width: 3,
 				dottedLine: true,
@@ -698,21 +1016,41 @@ import { showAppToast } from '../../utils/toast.uts'
 				borderWidth: 0
 			})
 		}
-		if (playedPoints.length >= 2) {
-			lines.push({
-				points: toThinnedMpPoints(playedPoints),
-				color: '#1890FF',
-				width: 3,
-				dottedLine: false,
-				arrowLine: false,
-				borderColor: '#FFFFFF',
-				borderWidth: 0
-			})
+
+		// 蓝色实线 = 已播放部分（抽稀点的前缀）+ 车标实时位置。
+		// 车标可能落在两个抽稀点之间，因此末端额外追加当前插值位置，
+		// 让蓝线末端始终精确压在车标脚下 —— 这是"蓝线跟得上车标"的关键。
+		if (boundary >= 0) {
+			// slice 复用的是 rawPoints 里的同一批点对象（不新建对象），
+			// 每帧真正的分配只有 livePoint 这一个，开销远低于原先整条重新抽稀。
+			// 播放期只取仍落在可见窗口内的那一段（车标后方远处屏幕上根本看不见），
+			// 非播放态取全长，保证"查出轨迹后虚线贯通起点""暂停后仍是完整灰线"不受影响。
+			const playedPoints = rawPoints.slice(blueStartIndex, boundary + 1)
+			if (needLivePoint) {
+				playedPoints.push(livePoint)
+			}
+			if (playedPoints.length >= 2) {
+				lines.push({
+					points: playedPoints,
+					color: '#1890FF',
+					width: 3,
+					dottedLine: false,
+					arrowLine: false,
+					borderColor: '#FFFFFF',
+					borderWidth: 0
+				})
+			}
 		}
+
 		polyline.value = lines
+		// 记录锚点：这一次真正下发了图层，从此刻起按屏幕位移死区计算下一次何时该重画
+		polylineForceNext = false
+		markPolylineRendered()
 	}
 
 	function initPolyline() {
+		buildThinnedPoints()
+		invalidatePolylineAnchor()
 		updatePolyline()
 	}
 	// #endif
@@ -767,11 +1105,31 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	// #ifdef MP-WEIXIN
 	// 当前缩放级别下 1 个屏幕像素对应的地面距离（米）
+	// 优先使用地图自报的真实缩放级别；尚未取到时回退到我们下发的目标值 mapScale。
+	// 之所以必须区分二者：用户双指放大后地图的 zoom 由用户决定，mapScale 并不知道；
+	// 若拿它做换算，"死区 8px"会被放大成上百真实像素，蓝线就再也追不上车标。
 	function getMetersPerPixelOfScale(latitude : number) : number {
 		let cosLat = Math.cos(latitude * Math.PI / 180.0)
 		if (cosLat < 0.01) cosLat = 0.01
-		const resolution = EARTH_RESOLUTION_BASE * cosLat / Math.pow(2.0, mapScale.value)
+		const scale = trueMapScale > 0 ? trueMapScale : mapScale.value
+		const resolution = EARTH_RESOLUTION_BASE * cosLat / Math.pow(2.0, scale)
 		return resolution > 0.0001 ? resolution : 1.0
+	}
+
+	// 播放期的可见地面半径（米）。
+	// 播放期地图中心恒等于车标，所以视口就是一个以车标为中心的矩形，
+	// 它外接圆半径 = 视口半对角线，乘上"米/像素"就是可见地面半径。
+	function getVisibleRadiusMeters() : number {
+		let width = mapViewWidth
+		let height = mapViewHeight
+		if (width <= 0 || height <= 0) {
+			// 容器尺寸还没量出来时用兜底值，保证裁剪半径不会退化成 0（那会把线裁光）
+			width = 375.0
+			height = 640.0
+		}
+		const halfDiagonalPx = Math.sqrt(width * width + height * height) / 2.0
+		const radius = halfDiagonalPx * getMetersPerPixelOfScale(renderedPoint.latitude) * POLYLINE_CLIP_MARGIN
+		return radius > 1.0 ? radius : 1.0
 	}
 	// #endif
 
@@ -948,10 +1306,18 @@ function clearTrackDisplay() : void {
 		playedPolyline = null
 		polyline.value = []
 		// #endif
-		// #ifdef MP-WEIXIN || APP-IOS
-		polyline.value = []
-		// #endif
-		}
+	// #ifdef MP-WEIXIN || APP-IOS
+	polyline.value = []
+	// #endif
+	// #ifdef MP-WEIXIN
+	// 轨迹已清空，锚点一并作废，下一次装载时强制重画
+	invalidatePolylineAnchor()
+	// 地图组件马上要按 v-if 重建，旧的 mapContext 会失效，这里一并丢弃重新创建
+	stopMapScaleSync()
+	trueMapScale = 0
+	mapContext = null
+	// #endif
+	}
 
 		function clearPlaybackTimer() : void {
 		const timer = playbackTimer
@@ -965,6 +1331,8 @@ function clearTrackDisplay() : void {
 		isPlaying.value = false
 		clearPlaybackTimer()
 		// #ifdef MP-WEIXIN
+		// 停止周期同步真实缩放：不在播放就不需要它。
+		stopMapScaleSync()
 		// 收尾：隐藏覆盖层车标，交还给原生 markers 车标。
 		// 两者切换发生在同一帧，地图中心本就停在车标经纬度上，因此视觉上是同一个位置无缝接力，
 		// 不会看到车标跳动或消失。
@@ -977,6 +1345,12 @@ function clearTrackDisplay() : void {
 			updateCarPosition(true)
 			applyFullMarkers()
 		}
+		// #ifdef MP-WEIXIN
+		// 暂停瞬间强制重画一次折线：播放中最后几帧可能被死区跳过，
+		// 而暂停后车标要交还给原生 markers，必须与折线末端精确对齐，
+		// 否则会看到车标压在蓝线之外。
+		updatePolyline()
+		// #endif
 	}
 
 	function renderPlaybackIndex() : void {
@@ -988,6 +1362,17 @@ function clearTrackDisplay() : void {
 		// 微信端播放中该调用只更新覆盖层车标朝向、不碰 markers（见 updateCarPosition）；
 		// 非播放时则用它把原生车标 marker 落到准确位置。
 		updateCarPosition(true)
+		// #ifdef MP-WEIXIN
+		// 段末 / 重置 / 拖动进度 / 载入完成都会走到这里，位置是"跳变后的确定值"，
+		// 必须精确对齐，因此作废锚点强制重画一次，不受死区限制。
+		// 但播放态的段末不强制：段末位置与上一帧的插值位置是连续的（车并没有瞬移），
+		// 此时若每段都强制下发，长轨迹会退化成"每段重建一次"，闪烁立刻回来。
+		// 播放态交给死区判定；真正跳变的那一帧（起播、暂停、重置、拖动、换轨迹）
+		// 都已由各自入口显式 invalidatePolylineAnchor。
+		if (!isPlaying.value) {
+			invalidatePolylineAnchor()
+		}
+		// #endif
 		updatePolyline()
 		// 这里已经完整重画过一次折线，重置节流时间戳，避免紧接着的动画帧马上再重画一次
 		lastPolylineRenderAt = Date.now()
@@ -1205,7 +1590,18 @@ function clearTrackDisplay() : void {
 			// 表现为车标周期性地"顿"一下。所以先算好下一帧的调度时刻（纯整数运算，开销可忽略），
 			// 让车标与镜头先完成下发，再把折线重绘排到它后面的独立任务里执行。
 			const frameNow = Date.now()
-			const polylineDue = frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS
+			// 是否到了该重画折线的时机。
+			// 微信端不看时间，只看屏幕位移死区（见 shouldPushPolyline）：
+			// 时间闸门在这里是有害的——间隔调大蓝线滞后肉眼可见，调小闪烁立刻回来，
+			// 而"屏幕上走了 8px"这个量与播放速度无关，无论 1x 还是 32x 都能保证滞后被车标盖住。
+			// 这里提前算好、下一帧再执行，避免抢在本帧车标 setData 的前面。
+			let polylineDue = false
+			// #ifdef MP-WEIXIN
+			polylineDue = shouldPushPolyline()
+			// #endif
+			// #ifdef APP-ANDROID || APP-IOS
+			polylineDue = frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS
+			// #endif
 			if (polylineDue) {
 				lastPolylineRenderAt = frameNow
 			}
@@ -1260,6 +1656,13 @@ function clearTrackDisplay() : void {
 		showCarOverlay.value = true
 		carOverlayRotation.value = renderedPoint.rotation
 		markers.value = markers.value.slice(1)
+		// 起播这一帧强制重画折线：暂停期间的最后一次绘制可能停在死区内，
+		// 若不强制对齐，起播瞬间会看到蓝线末端落后车标一小段（然后才跳回来）。
+		invalidatePolylineAnchor()
+		// 起播即开始周期同步地图的真实缩放级别。必须先取一次再播：
+		// 死区的像素↔米换算完全依赖它，若沿用一个陈旧值，蓝线会从第一帧就落后。
+		syncTrueMapScale()
+		startMapScaleSync()
 		// #endif
 		// 开始播放：此刻才把车标定为地图中心（查询阶段保持整条轨迹全览）
 		focusMapOnVehicle()
@@ -1356,6 +1759,11 @@ function clearTrackDisplay() : void {
 		measureMapViewportSize(() => {
 			if (trackPoints.value.length > 0 && !isPlaying.value) adjustMapToFitTrack()
 		})
+		// #ifdef MP-WEIXIN
+		// 先取一次地图的真实缩放级别。播放期的死区要用它做"像素↔米"换算，
+		// 越早拿到真值，就越不会出现"起播第一帧蓝线就落后"的空档。
+		syncTrueMapScale()
+		// #endif
 	})
 
 	onHide(() => {
