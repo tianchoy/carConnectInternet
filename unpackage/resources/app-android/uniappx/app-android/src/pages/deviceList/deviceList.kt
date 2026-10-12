@@ -35,6 +35,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
             val showOverlapPicker = ref(false)
             val overlapDevices = ref(_uA<UTSJSONObject>())
             val overlapPanelMaxHeight = ref(600)
+            val searchKeyword = ref("")
             val updateOverlapPanelMaxHeight = fun(){
                 val systemInfo = uni_getSystemInfoSync()
                 val windowHeight = if (systemInfo.windowHeight != null) {
@@ -52,6 +53,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
             val pickerStateTitle = ref("全部状态")
             val showWhat = fun(){
                 showMap.value = !showMap.value
+                searchKeyword.value = ""
             }
             val originalDeviceList = ref(_uA<UTSJSONObject>())
             val deviceListItems = computed(fun(): UTSArray<DeviceItem> {
@@ -66,6 +68,37 @@ open class GenPagesDeviceListDeviceList : BasePage {
                     , deviceId = item.getString("deviceId", ""), iccid = item.getString("iccid", ""), simMerchant = item.getString("simMerchant", ""), connectionStatus = item.getString("connectionStatus", ""))
                 }
                 )
+            }
+            )
+            val filteredDeviceListItems = computed(fun(): UTSArray<DeviceItem> {
+                if (searchKeyword.value.trim() == "") {
+                    return deviceListItems.value
+                }
+                val kw = searchKeyword.value.trim().toLowerCase()
+                return deviceListItems.value.filter(fun(item: DeviceItem): Boolean {
+                    return (item.deviceName.toLowerCase().indexOf(kw) >= 0) || (item.plateNo.toLowerCase().indexOf(kw) >= 0) || (item.deviceNo.toLowerCase().indexOf(kw) >= 0)
+                }
+                )
+            }
+            )
+            val listPageSize: Number = 10
+            val listRendered = ref<Number>(listPageSize)
+            val pagedDeviceListItems = computed<UTSArray<DeviceItem>>(fun(): UTSArray<DeviceItem> {
+                return filteredDeviceListItems.value.slice(0, listRendered.value)
+            }
+            )
+            val listHasMore = computed<Boolean>(fun(): Boolean {
+                return listRendered.value < filteredDeviceListItems.value.length
+            }
+            )
+            val onListLoadMore = fun(){
+                if (listHasMore.value) {
+                    listRendered.value += listPageSize
+                }
+            }
+            watchEffect(fun(){
+                filteredDeviceListItems.value
+                listRendered.value = listPageSize
             }
             )
             val filteredDevices = computed(fun(): UTSArray<UTSJSONObject> {
@@ -418,6 +451,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_map = resolveComponent("map")
                 val _component_i_tag = resolveEasyComponent("i-tag", GenUniModulesIUiXComponentsITagITagClass)
+                val _component_i_input = resolveEasyComponent("i-input", GenUniModulesIUiXComponentsIInputIInputClass)
                 val _component_indexListMode = resolveEasyComponent("indexListMode", GenComponentsIndexListModeIndexListModeClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 return _cE(Fragment, null, _uA(
@@ -460,9 +494,21 @@ open class GenPagesDeviceListDeviceList : BasePage {
                                 }
                             ))
                         } else {
-                            _cE("view", _uM("key" to 1), _uA(
-                                _cV(_component_indexListMode, _uM("lists" to deviceListItems.value, "onUnbindDevice" to unbindDevice), null, 8, _uA(
-                                    "lists"
+                            _cE("view", _uM("key" to 1, "class" to "list-mode"), _uA(
+                                _cE("view", _uM("class" to "search-bar"), _uA(
+                                    _cV(_component_i_input, _uM("modelValue" to searchKeyword.value, "onUpdate:modelValue" to fun(`$event`: String){
+                                        searchKeyword.value = `$event`
+                                    }
+                                    , "placeholder" to "搜索设备名称 / 车牌号 / 设备号", "clearable" to "", "height" to "72rpx", "round" to "36rpx", "border" to "none", "bg-color" to "#ffffff", "font-size" to "13px"), null, 8, _uA(
+                                        "modelValue",
+                                        "onUpdate:modelValue"
+                                    ))
+                                )),
+                                _cE("view", _uM("class" to "list-mode-body"), _uA(
+                                    _cV(_component_indexListMode, _uM("lists" to pagedDeviceListItems.value, "has-more" to listHasMore.value, "onUnbindDevice" to unbindDevice, "onLoadMore" to onListLoadMore), null, 8, _uA(
+                                        "lists",
+                                        "has-more"
+                                    ))
                                 ))
                             ))
                         }
@@ -513,7 +559,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tool-nav" to _uM(".container " to _uM("position" to "absolute", "top" to "200rpx", "right" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "35rpx")), "btn-map-list" to _uM(".container .tool-nav " to _uM("paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "#1296db", "color" to "#ffffff", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx")), "right-bar" to _uM(".container " to _uM("position" to "absolute", "top" to "25rpx", "left" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "status-spacing" to _uM(".container .right-bar " to _uM("marginLeft" to "20rpx")), "allCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#1296db")), "onlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#0da117")), "offlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#d81e06")), "overlap-mask" to _uM(".container " to _uM("position" to "fixed", "top" to 0, "left" to 0, "right" to 0, "bottom" to 0, "zIndex" to 999, "backgroundColor" to "rgba(0,0,0,0.45)", "display" to "flex", "flexDirection" to "column", "justifyContent" to "flex-end")), "overlap-panel" to _uM(".container " to _uM("width" to "100%", "maxHeight" to "900rpx", "paddingTop" to "24rpx", "paddingRight" to 0, "paddingBottom" to "40rpx", "paddingLeft" to 0, "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "24rpx", "borderTopRightRadius" to "24rpx", "display" to "flex", "flexDirection" to "column")), "overlap-title" to _uM(".container " to _uM("paddingTop" to "12rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0, "fontSize" to "30rpx", "fontWeight" to 600, "color" to "#333333", "textAlign" to "center")), "overlap-list" to _uM(".container " to _uM("maxHeight" to "700rpx")), "overlap-item" to _uM(".container " to _uM("paddingTop" to "28rpx", "paddingRight" to "32rpx", "paddingBottom" to "28rpx", "paddingLeft" to "32rpx", "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between", "borderTopWidth" to "1rpx", "borderTopStyle" to "solid", "borderTopColor" to "#f0f0f0")), "overlap-item-name" to _uM(".container " to _uM("fontSize" to "30rpx", "color" to "#333333")), "overlap-item-status" to _uM(".container " to _uM("fontSize" to "26rpx")), "status-online" to _uM(".container " to _uM("color" to "#0da117")), "status-offline" to _uM(".container " to _uM("color" to "#999999")))
+                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tool-nav" to _uM(".container " to _uM("position" to "absolute", "top" to "200rpx", "right" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "35rpx")), "btn-map-list" to _uM(".container .tool-nav " to _uM("paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "#1296db", "color" to "#ffffff", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx")), "right-bar" to _uM(".container " to _uM("position" to "absolute", "top" to "25rpx", "left" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "status-spacing" to _uM(".container .right-bar " to _uM("marginLeft" to "20rpx")), "allCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#1296db")), "onlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#0da117")), "offlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#d81e06")), "list-mode" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "display" to "flex", "flexDirection" to "column", "minHeight" to 0)), "search-bar" to _uM(".container " to _uM("flexShrink" to 0, "paddingTop" to "20rpx", "paddingRight" to "24rpx", "paddingBottom" to "20rpx", "paddingLeft" to "24rpx", "backgroundColor" to "#f1f1f1")), "list-mode-body" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "minHeight" to 0)), "overlap-mask" to _uM(".container " to _uM("position" to "fixed", "top" to 0, "left" to 0, "right" to 0, "bottom" to 0, "zIndex" to 999, "backgroundColor" to "rgba(0,0,0,0.45)", "display" to "flex", "flexDirection" to "column", "justifyContent" to "flex-end")), "overlap-panel" to _uM(".container " to _uM("width" to "100%", "maxHeight" to "900rpx", "paddingTop" to "24rpx", "paddingRight" to 0, "paddingBottom" to "40rpx", "paddingLeft" to 0, "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "24rpx", "borderTopRightRadius" to "24rpx", "display" to "flex", "flexDirection" to "column")), "overlap-title" to _uM(".container " to _uM("paddingTop" to "12rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0, "fontSize" to "30rpx", "fontWeight" to 600, "color" to "#333333", "textAlign" to "center")), "overlap-list" to _uM(".container " to _uM("maxHeight" to "700rpx")), "overlap-item" to _uM(".container " to _uM("paddingTop" to "28rpx", "paddingRight" to "32rpx", "paddingBottom" to "28rpx", "paddingLeft" to "32rpx", "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between", "borderTopWidth" to "1rpx", "borderTopStyle" to "solid", "borderTopColor" to "#f0f0f0")), "overlap-item-name" to _uM(".container " to _uM("fontSize" to "30rpx", "color" to "#333333")), "overlap-item-status" to _uM(".container " to _uM("fontSize" to "26rpx")), "status-online" to _uM(".container " to _uM("color" to "#0da117")), "status-offline" to _uM(".container " to _uM("color" to "#999999")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

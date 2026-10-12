@@ -1,6 +1,6 @@
 <template>
 	<view class="list-container">
-		<scroll-view class="content" scroll-y v-if="props.lists.length != 0">
+		<scroll-view class="content" scroll-y v-if="props.lists.length != 0" @scrolltolower="onScrollToLower">
 			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.deviceNo,item.deviceId)">
 				<view class="title">
 					<view class="car-number">
@@ -18,6 +18,10 @@
 					<text class="imei">ID: {{item.deviceNo}}</text>
 				</view>
 			</view>
+			<view class="list-footer">
+				<text v-if="props.hasMore == true" class="list-footer-text">上滑加载更多</text>
+				<text v-else class="list-footer-text">没有更多了</text>
+			</view>
 		</scroll-view>
 
 		<view class="empty" v-else>
@@ -33,11 +37,13 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { DeviceItem } from '../../utils/device.uts'
 	const props = defineProps<{
 		lists : DeviceItem[]
+		hasMore? : boolean
 	}>()
 		// 解绑设备
 	// 定义emit事件
 	const emit = defineEmits<{
 		(e: 'unbindDevice', deviceId: string): void
+		(e: 'loadMore'): void
 	}>()
 	const modal = ref<boolean>(false)
 	const selectedDeviceId = ref('')
@@ -108,6 +114,17 @@ import { showAppToast } from '../../utils/toast.uts'
 			url: '/pages/carInfoDetail/carInfoDetail?deptId='+companyId+ '&deviceNo=' + deviceNo + '&deviceId=' + deviceId
 		})
 	}
+	// 触底加载更多：加锁避免触底事件连续触发导致重复加载
+	const lock = ref<boolean>(false)
+	const onScrollToLower = () => {
+		if (lock.value) return
+		if (props.hasMore != true) return
+		lock.value = true
+		emit('loadMore')
+		setTimeout(() => {
+			lock.value = false
+		}, 300)
+	}
 </script>
 
 <style lang="scss">
@@ -118,6 +135,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		padding: 0 20rpx;
 
 		.content {
+			height: 100%;
 
 			.list-item {
 				padding: 20rpx;
@@ -162,6 +180,19 @@ import { showAppToast } from '../../utils/toast.uts'
 			justify-content: center;
 			align-items: center;
 			color: #ccc;
+		}
+
+		.list-footer {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			padding: 30rpx 0;
+		}
+
+		.list-footer-text {
+			font-size: 24rpx;
+			color: #999999;
 		}
 	}
 </style>

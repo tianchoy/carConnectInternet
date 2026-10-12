@@ -78,6 +78,22 @@
 .container .right-bar .offlineCar[class] {
   background-color: #d81e06;
 }
+.container .list-mode[class] {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.container .search-bar[class] {
+  flex-shrink: 0;
+  padding: 20rpx 24rpx;
+  background-color: #f1f1f1;
+}
+.container .list-mode-body[class] {
+  flex: 1;
+  min-height: 0;
+}
 .container .overlap-mask[class] {
   position: fixed;
   top: 0;

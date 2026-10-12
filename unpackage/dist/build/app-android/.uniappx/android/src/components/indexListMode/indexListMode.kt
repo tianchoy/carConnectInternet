@@ -16,6 +16,7 @@ import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 open class GenComponentsIndexListModeIndexListMode : VueComponent {
     constructor(__ins: ComponentInternalInstance) : super(__ins) {}
     open var lists: UTSArray<DeviceItem> by `$props`
+    open var hasMore: Boolean? by `$props`
     companion object {
         @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
         var setup: (__props: GenComponentsIndexListModeIndexListMode) -> Any? = fun(__props): Any? {
@@ -43,12 +44,27 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
             val todetail = fun(companyId: String, deviceNo: String, deviceId: String){
                 uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&deviceNo=" + deviceNo + "&deviceId=" + deviceId))
             }
+            val lock = ref<Boolean>(false)
+            val onScrollToLower = fun(){
+                if (lock.value) {
+                    return
+                }
+                if (props.hasMore != true) {
+                    return
+                }
+                lock.value = true
+                emit("loadMore")
+                setTimeout(fun(){
+                    lock.value = false
+                }
+                , 300)
+            }
             return fun(): Any? {
                 val _component_i_tag = resolveEasyComponent("i-tag", GenUniModulesIUiXComponentsITagITagClass)
                 val _component_i_modal = resolveEasyComponent("i-modal", GenUniModulesIUiXComponentsIModalIModalClass)
                 return _cE("view", _uM("class" to "list-container"), _uA(
                     if (props.lists.length != 0) {
-                        _cE("scroll-view", _uM("key" to 0, "class" to "content", "scroll-y" to ""), _uA(
+                        _cE("scroll-view", _uM("key" to 0, "class" to "content", "scroll-y" to "", "onScrolltolower" to onScrollToLower), _uA(
                             _cE(Fragment, null, RenderHelpers.renderList(props.lists, fun(item, index, __index, _cached): Any {
                                 return _cE("view", _uM("class" to "list-item", "key" to index, "onClick" to fun(){
                                     todetail(item.companyId, item.deviceNo, item.deviceId)
@@ -89,8 +105,15 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
                                 ), 8, _uA(
                                     "onClick"
                                 ))
-                            }), 128)
-                        ))
+                            }), 128),
+                            _cE("view", _uM("class" to "list-footer"), _uA(
+                                if (props.hasMore == true) {
+                                    _cE("text", _uM("key" to 0, "class" to "list-footer-text"), "上滑加载更多")
+                                } else {
+                                    _cE("text", _uM("key" to 1, "class" to "list-footer-text"), "没有更多了")
+                                }
+                            ))
+                        ), 32)
                     } else {
                         _cE("view", _uM("key" to 1, "class" to "empty"), " 暂无数据 ")
                     }
@@ -108,13 +131,15 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("list-container" to _pS(_uM("width" to "100%", "height" to "100%", "backgroundColor" to "#f5f5f5", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "20rpx")), "list-item" to _uM(".list-container .content " to _uM("paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginBottom" to "20rpx")), "title" to _uM(".list-container .content .list-item " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "20rpx")), "car-number" to _uM(".list-container .content .list-item .title " to _uM("display" to "flex", "fontSize" to "35rpx", "fontWeight" to "bold", "marginRight" to "20rpx", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "car-status-spacing" to _uM(".list-container .content .list-item .title " to _uM("marginLeft" to "10rpx")), "device-tool-spacing" to _uM(".list-container .content .list-item .title " to _uM("marginLeft" to "10rpx")), "device-tools" to _uM(".list-container .content .list-item .title " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-end", "alignItems" to "center")), "imei" to _uM(".list-container .content .list-item " to _uM("color" to "#cccccc")), "empty" to _uM(".list-container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "color" to "#cccccc")))
+                return _uM("list-container" to _pS(_uM("width" to "100%", "height" to "100%", "backgroundColor" to "#f5f5f5", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "20rpx")), "content" to _uM(".list-container " to _uM("height" to "100%")), "list-item" to _uM(".list-container .content " to _uM("paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginBottom" to "20rpx")), "title" to _uM(".list-container .content .list-item " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "20rpx")), "car-number" to _uM(".list-container .content .list-item .title " to _uM("display" to "flex", "fontSize" to "35rpx", "fontWeight" to "bold", "marginRight" to "20rpx", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "car-status-spacing" to _uM(".list-container .content .list-item .title " to _uM("marginLeft" to "10rpx")), "device-tool-spacing" to _uM(".list-container .content .list-item .title " to _uM("marginLeft" to "10rpx")), "device-tools" to _uM(".list-container .content .list-item .title " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-end", "alignItems" to "center")), "imei" to _uM(".list-container .content .list-item " to _uM("color" to "#cccccc")), "empty" to _uM(".list-container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "color" to "#cccccc")), "list-footer" to _uM(".list-container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "paddingTop" to "30rpx", "paddingRight" to 0, "paddingBottom" to "30rpx", "paddingLeft" to 0)), "list-footer-text" to _uM(".list-container " to _uM("fontSize" to "24rpx", "color" to "#999999")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
-        var emits: Map<String, Any?> = _uM("unbindDevice" to null)
-        var props = _nP(_uM("lists" to _uM("type" to "Array", "required" to true)))
-        var propsNeedCastKeys: UTSArray<String> = _uA()
+        var emits: Map<String, Any?> = _uM("unbindDevice" to null, "loadMore" to null)
+        var props = _nP(_uM("lists" to _uM("type" to "Array", "required" to true), "hasMore" to _uM("type" to "Boolean", "required" to false)))
+        var propsNeedCastKeys = _uA(
+            "hasMore"
+        )
         var components: Map<String, CreateVueComponent> = _uM()
     }
 }

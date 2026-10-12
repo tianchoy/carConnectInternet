@@ -9,16 +9,18 @@ const utils_device = require("../../utils/device.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_tag_1 = common_vendor.resolveComponent("i-tag");
+  const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
   const _easycom_indexListMode_1 = common_vendor.resolveComponent("indexListMode");
   const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
-  (_easycom_custom_navBar_1 + _easycom_i_tag_1 + _easycom_indexListMode_1 + _easycom_app_toast_1)();
+  (_easycom_custom_navBar_1 + _easycom_i_tag_1 + _easycom_i_input_1 + _easycom_indexListMode_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_tag = () => "../../uni_modules/i-ui-x/components/i-tag/i-tag.js";
+const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
 const _easycom_indexListMode = () => "../../components/indexListMode/indexListMode.js";
 const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_tag + _easycom_indexListMode + _easycom_app_toast)();
+  (_easycom_custom_navBar + _easycom_i_tag + _easycom_i_input + _easycom_indexListMode + _easycom_app_toast)();
 }
 const OVERLAP_THRESHOLD_METERS = 12;
 const SPREAD_REFERENCE_ZOOM = 19;
@@ -92,6 +94,7 @@ class ClusterMarker extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+const listPageSize = 10;
 class OverlapAnalysis extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -129,6 +132,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const showOverlapPicker = common_vendor.ref(false);
     const overlapDevices = common_vendor.ref([]);
     const overlapPanelMaxHeight = common_vendor.ref(600);
+    const searchKeyword = common_vendor.ref("");
     const updateOverlapPanelMaxHeight = () => {
       const systemInfo = common_vendor.index.getSystemInfoSync();
       const windowHeight = systemInfo.windowHeight != null ? systemInfo.windowHeight : 600;
@@ -147,7 +151,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         context.addMarkers(toPlainObject(new common_vendor.UTSJSONObject({ markers: markers.value, clear: true })));
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:124", "车标同步到聚合器失败:", error);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:145", "车标同步到聚合器失败:", error);
       }
     };
     const setupMarkerCluster = () => {
@@ -201,7 +205,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         clusterReady = true;
         syncClusterMarkers();
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:178", "点聚合初始化失败，回退为普通标记点:", error);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:199", "点聚合初始化失败，回退为普通标记点:", error);
       }
     };
     const EMPTY_MARKERS = [];
@@ -213,6 +217,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const pickerStateTitle = common_vendor.ref("全部状态");
     const showWhat = () => {
       showMap.value = !showMap.value;
+      searchKeyword.value = "";
       if (showMap.value) {
         clusterReady = false;
         setTimeout(() => {
@@ -239,6 +244,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           connectionStatus: item.getString("connectionStatus", "")
         });
       });
+    });
+    const filteredDeviceListItems = common_vendor.computed(() => {
+      if (searchKeyword.value.trim() == "")
+        return deviceListItems.value;
+      const kw = searchKeyword.value.trim().toLowerCase();
+      return deviceListItems.value.filter((item) => {
+        return item.deviceName.toLowerCase().indexOf(kw) >= 0 || item.plateNo.toLowerCase().indexOf(kw) >= 0 || item.deviceNo.toLowerCase().indexOf(kw) >= 0;
+      });
+    });
+    const listRendered = common_vendor.ref(listPageSize);
+    const pagedDeviceListItems = common_vendor.computed(() => {
+      return filteredDeviceListItems.value.slice(0, listRendered.value);
+    });
+    const listHasMore = common_vendor.computed(() => {
+      return listRendered.value < filteredDeviceListItems.value.length;
+    });
+    const onListLoadMore = () => {
+      if (listHasMore.value) {
+        listRendered.value += listPageSize;
+      }
+    };
+    common_vendor.watchEffect(() => {
+      void filteredDeviceListItems.value;
+      listRendered.value = listPageSize;
     });
     const filteredDevices = common_vendor.computed(() => {
       if (!Array.isArray(originalDeviceList.value))
@@ -421,7 +450,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             const res = yield api_request.getUserDeviceList(params);
             const list = api_response.isBusinessSuccessCode(res.code) && res.data != null ? res.data.list : null;
             if (list == null || !Array.isArray(list)) {
-              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:435", "获取设备列表返回异常:", res);
+              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:488", "获取设备列表返回异常:", res);
               originalDeviceList.value = [];
               markers.value = [];
               return Promise.resolve(null);
@@ -433,7 +462,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
           updateMarkers(originalDeviceList.value);
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:446", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:499", "获取设备列表失败:", err);
           originalDeviceList.value = [];
           markers.value = [];
           utils_toast.showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -509,7 +538,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       }
       if (selectedIndex < 0) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:534", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:587", "未找到对应的设备信息", markerId);
         return null;
       }
       const analysis = analyzeOverlap(list);
@@ -583,15 +612,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           text: `离线 ${offlineCount.value}`
         })
       } : {}) : {
-        q: common_vendor.o(unbindDevice, "d2"),
+        q: common_vendor.o(($event) => {
+          return searchKeyword.value = $event;
+        }, "69"),
         r: common_vendor.p({
-          lists: deviceListItems.value
+          placeholder: "搜索设备名称 / 车牌号 / 设备号",
+          clearable: true,
+          height: "72rpx",
+          round: "36rpx",
+          border: "none",
+          ["bg-color"]: "#ffffff",
+          ["font-size"]: "13px",
+          modelValue: searchKeyword.value
+        }),
+        s: common_vendor.o(unbindDevice, "23"),
+        t: common_vendor.o(onListLoadMore, "46"),
+        v: common_vendor.p({
+          lists: pagedDeviceListItems.value,
+          ["has-more"]: listHasMore.value
         })
       }, {
-        s: showOverlapPicker.value
+        w: showOverlapPicker.value
       }, showOverlapPicker.value ? {
-        t: common_vendor.t(overlapDevices.value.length),
-        v: common_vendor.f(overlapDevices.value, (device, index, i0) => {
+        x: common_vendor.t(overlapDevices.value.length),
+        y: common_vendor.f(overlapDevices.value, (device, index, i0) => {
           return {
             a: common_vendor.t(deviceDisplayName(device)),
             b: common_vendor.t(isDeviceOnline(device) ? "在线" : "离线"),
@@ -602,12 +646,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, index)
           };
         }),
-        w: overlapPanelMaxHeight.value + "px",
-        x: common_vendor.o(keepOverlapPicker, "cb"),
-        y: common_vendor.o(closeOverlapPicker, "06")
+        z: overlapPanelMaxHeight.value + "px",
+        A: common_vendor.o(keepOverlapPicker, "72"),
+        B: common_vendor.o(closeOverlapPicker, "17")
       } : {}, {
-        z: `${_ctx.u_s_b_h}px`,
-        A: `${_ctx.u_s_a_i_b}px`
+        C: `${_ctx.u_s_b_h}px`,
+        D: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

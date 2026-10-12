@@ -13,8 +13,27 @@
 			<i-tag type="danger" @click="changeState('离线')" :text="`离线 ${offlineCount}`"></i-tag>
             </view>
 		</view>
-		<view v-else>
-			<indexListMode :lists="deviceListItems" @unbindDevice="unbindDevice" />
+		<view v-else class="list-mode">
+			<view class="search-bar">
+				<i-input
+					v-model="searchKeyword"
+					placeholder="搜索设备名称 / 车牌号 / 设备号"
+					clearable
+					height="72rpx"
+					round="36rpx"
+					border="none"
+					bg-color="#ffffff"
+					font-size="13px"
+				/>
+			</view>
+			<view class="list-mode-body">
+				<indexListMode
+					:lists="pagedDeviceListItems"
+					:has-more="listHasMore"
+					@unbindDevice="unbindDevice"
+					@load-more="onListLoadMore"
+				/>
+			</view>
 		</view>
 
 		<!-- 重合设备选择：多台设备位置重合（放大到最大也无法分开）时，点击车标后从这里分别查看 -->
@@ -68,6 +87,8 @@ import { showAppToast } from '../../utils/toast.uts'
 	const overlapDevices = ref<Array<UTSJSONObject>>([])
 	// 弹层最大高度（px）：uvue 的 max-height 不支持百分比，只能按屏幕高度换算成像素
 	const overlapPanelMaxHeight = ref(600)
+	// 列表模式检索关键字
+	const searchKeyword = ref('')
 
 	const updateOverlapPanelMaxHeight = () => {
 		const systemInfo = uni.getSystemInfoSync()
@@ -196,6 +217,8 @@ import { showAppToast } from '../../utils/toast.uts'
 	// 切换显示模式
 	const showWhat = () => {
 		showMap.value = !showMap.value
+		// 切换显示模式时清空检索，避免残留
+		searchKeyword.value = ''
 		// #ifdef MP-WEIXIN
 		if (showMap.value) {
 			// 地图按 v-if 重建后上下文会失效，需重新创建并重新初始化聚合
@@ -227,6 +250,36 @@ import { showAppToast } from '../../utils/toast.uts'
 				connectionStatus: item.getString('connectionStatus', '')
 			}
 		})
+	})
+
+	// 列表模式：按 设备名称 / 车牌号 / 设备号 模糊检索
+	const filteredDeviceListItems = computed((): Array<DeviceItem> => {
+		if (searchKeyword.value.trim() == '') return deviceListItems.value
+		const kw = searchKeyword.value.trim().toLowerCase()
+		return deviceListItems.value.filter((item: DeviceItem) => {
+			return (item.deviceName.toLowerCase().indexOf(kw) >= 0)
+				|| (item.plateNo.toLowerCase().indexOf(kw) >= 0)
+				|| (item.deviceNo.toLowerCase().indexOf(kw) >= 0)
+		})
+	})
+
+	// 列表模式分页：默认每页 10 条，上滑加载更多
+	const listPageSize = 10
+	const listRendered = ref<number>(listPageSize)
+	const pagedDeviceListItems = computed<Array<DeviceItem>>(() => {
+		return filteredDeviceListItems.value.slice(0, listRendered.value)
+	})
+	const listHasMore = computed<boolean>(() => listRendered.value < filteredDeviceListItems.value.length)
+	const onListLoadMore = () => {
+		if (listHasMore.value) {
+			listRendered.value += listPageSize
+		}
+	}
+	// 检索关键字或筛选结果变化后，重置分页（回到第一页）
+	watchEffect(() => {
+		// 读取以建立依赖
+		void filteredDeviceListItems.value
+		listRendered.value = listPageSize
 	})
 
 	// 计算属性 筛选逻辑
@@ -627,6 +680,26 @@ import { showAppToast } from '../../utils/toast.uts'
 			.offlineCar {
 				background-color: #d81e06;
 			}
+		}
+
+		// 列表模式：检索栏 + 列表区域
+		.list-mode {
+			flex: 1;
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			min-height: 0;
+		}
+
+		.search-bar {
+			flex-shrink: 0;
+			padding: 20rpx 24rpx;
+			background-color: #f1f1f1;
+		}
+
+		.list-mode-body {
+			flex: 1;
+			min-height: 0;
 		}
 
 		// 重合设备选择弹层

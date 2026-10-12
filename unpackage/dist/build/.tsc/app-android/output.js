@@ -10,6 +10,8 @@ require('uts.sdk.modules.DCloudUniMapTencent.LocationObject');
 
 const iIcon_uvue_vue_type_style_index_0_lang = {};
 
+const iInput_uvue_vue_type_style_index_0_lang = {};
+
 const lOverlay_uvue_vue_type_style_index_0_lang = {};
 
 const lPopup_uvue_vue_type_style_index_0_lang = {};
@@ -33,8 +35,6 @@ const message_uvue_vue_type_style_index_0_lang = {};
 const iBadge_uvue_vue_type_style_index_0_lang = {};
 
 const userCenter_uvue_vue_type_style_index_0_lang = {};
-
-const iInput_uvue_vue_type_style_index_0_lang = {};
 
 const iCheckbox_uvue_vue_type_style_index_0_lang = {};
 

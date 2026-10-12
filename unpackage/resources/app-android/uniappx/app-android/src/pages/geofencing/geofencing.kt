@@ -33,6 +33,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             val mapScale = ref<Number>(16)
             val isMapReady = ref(false)
             val isInitialPositionSettled = ref(false)
+            val hasUserLocationFallback = ref(false)
             val markers = ref(_uA<Marker>())
             val carMarker = ref<Marker?>(null)
             val circles = ref(_uA<Circle>())
@@ -94,11 +95,39 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 }
             }
             )
+            val showUserLocationFallback = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        val userLoc = await(getUserCurrentLocation())
+                        if (userLoc == null) {
+                            return@w1
+                        }
+                        hasUserLocationFallback.value = true
+                        center["latitude"] = userLoc.latitude
+                        center["longitude"] = userLoc.longitude
+                        mapScale.value = 12
+                        val marker = Marker(id = 10003, latitude = userLoc.latitude, longitude = userLoc.longitude, width = 25, height = 25, iconPath = "/static/current-location.png", callout = MapMarkerCallout(content = "当前位置", color = if (connectionStatus.value == "online") {
+                            "#ffffff"
+                        } else {
+                            "#999999"
+                        }
+                        , borderRadius = 10, bgColor = if (connectionStatus.value == "online") {
+                            "#1296db"
+                        } else {
+                            "#CCCCCC"
+                        }
+                        , padding = 5, display = "ALWAYS"))
+                        markers.value = _uA(
+                            marker
+                        )
+                        isMapReady.value = true
+                })
+            }
             val loadInitialPosition = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         uni_showLoading(ShowLoadingOptions(title = "获取车辆位置中..."))
                         try {
                             isMapReady.value = false
+                            hasUserLocationFallback.value = false
                             val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to deviceNo.value)
                             val res = await(getDevicePos(data))
                             val positions = res.data
@@ -109,14 +138,18 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                     "获取车辆位置失败"
                                 }
                                 , icon = "none"))
+                                await(showUserLocationFallback())
                                 return@w1
                             }
+                            var foundDevice = false
                             positions.forEach(fun(item){
                                 if (item.getString("deviceNo", "") == deviceNo.value) {
+                                    foundDevice = true
                                     val deviceData = item
                                     val latitude = deviceData.getNumber("latitude", 0)
                                     val longitude = deviceData.getNumber("longitude", 0)
                                     if (!isFinite(latitude) || !isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180 || latitude == 0 || longitude == 0) {
+                                        showUserLocationFallback()
                                         return
                                     }
                                     val convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
@@ -174,6 +207,10 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 }
                             }
                             )
+                            if (!foundDevice) {
+                                showAppToast(ShowToastOptions(title = "未找到设备位置", icon = "none"))
+                                await(showUserLocationFallback())
+                            }
                         }
                          catch (err: Throwable) {
                             console.error("获取初始位置失败:", err)
@@ -349,7 +386,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 )
                 polygons.value = fencePolygons
                 circles.value = fenceCircles
-                if (fenceCircles.length > 0 && !isTruthy(selectedFence.value) && isInitialPositionSettled.value && carMarker.value == null) {
+                if (fenceCircles.length > 0 && !isTruthy(selectedFence.value) && isInitialPositionSettled.value && carMarker.value == null && !hasUserLocationFallback.value) {
                     val firstCircle = fenceCircles[0]
                     center["latitude"] = firstCircle.latitude
                     center["longitude"] = firstCircle.longitude

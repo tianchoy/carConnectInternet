@@ -15,6 +15,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
+	import { getUserCurrentLocation } from '../../utils/getUserLocation.uts'
 
 	type Coordinate = LocationObject;
 	type PaginationState = {
@@ -76,6 +77,8 @@ const deviceNo = ref<string | null>(null)
 	const mapScale = ref<number>(16)
 	const isMapReady = ref(false)
 	const isInitialPositionSettled = ref(false)
+	// 已回退到用户当前位置；用于阻止下方「设备无位置时定位到第一个围栏」的逻辑覆盖用户位置
+	const hasUserLocationFallback = ref(false)
 	const markers = ref<Array<Marker>>([]) // 标记点
 	const carMarker = ref<Marker | null>(null) // 车辆标记点
 	const circles = ref<Array<Circle>>([]) // 圆形围栏
@@ -156,6 +159,34 @@ const deviceNo = ref<string | null>(null)
 
 
 
+	// 设备无有效位置时，回退到用户当前位置并展示「当前位置」标记
+	const showUserLocationFallback = async () => {
+		const userLoc = await getUserCurrentLocation()
+		if (userLoc == null) return
+		hasUserLocationFallback.value = true
+		center.latitude = userLoc.latitude
+		center.longitude = userLoc.longitude
+		mapScale.value = 12
+		const marker = {
+			id: 10003,
+			latitude: userLoc.latitude,
+			longitude: userLoc.longitude,
+			width: 25,
+			height: 25,
+			iconPath: '/static/current-location.png',
+			callout: {
+				content: '当前位置',
+				color: connectionStatus.value == 'online' ? '#ffffff' : '#999999',
+				borderRadius: 10,
+				bgColor: connectionStatus.value == 'online' ? '#1296db' : '#CCCCCC',
+				padding: 5,
+				display: 'ALWAYS'
+			}
+		} as Marker
+		markers.value = [marker]
+		isMapReady.value = true
+	}
+
 	const loadInitialPosition = async () => {
 		uni.showLoading({
 			title: '获取车辆位置中...'
@@ -163,20 +194,27 @@ const deviceNo = ref<string | null>(null)
 
 		try {
 			isMapReady.value = false
+			hasUserLocationFallback.value = false
 			const data = { deptId: deptId.value, deviceids: deviceNo.value }
 			const res = await getDevicePos(data)
 			const positions = res.data
 			if (!isBusinessSuccessCode(res.code) || positions == null) {
 				showAppToast({ title: res.msg || '获取车辆位置失败', icon: 'none' })
+				// 设备无位置数据，回退展示用户当前位置（与首页统一：在线/离线都回退）
+				await showUserLocationFallback()
 				return
 			}
 
+			let foundDevice = false
 			positions.forEach(item => {
 				if (item.getString('deviceNo', '') == deviceNo.value) {
+					foundDevice = true
 					const deviceData = item
 					const latitude = deviceData.getNumber('latitude', 0)
 					const longitude = deviceData.getNumber('longitude', 0)
 					if (!isFinite(latitude) || !isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180 || latitude == 0 || longitude == 0) {
+						// 设备无有效位置，回退展示用户当前位置
+						showUserLocationFallback()
 						return
 					}
 					// 转换坐标到腾讯地图坐标系
@@ -226,6 +264,11 @@ const deviceNo = ref<string | null>(null)
 					connectionStatus.value = deviceData.connectionStatus ? deviceData.connectionStatus.toString() : 'unknown'
 				}
 			})
+			if (!foundDevice) {
+				showAppToast({ title: '未找到设备位置', icon: 'none' })
+				// 设备无位置数据，回退展示用户当前位置（与首页统一：在线/离线都回退）
+				await showUserLocationFallback()
+			}
 
 		} catch (err) {
 			console.error('获取初始位置失败:', err)
@@ -457,7 +500,7 @@ const deviceNo = ref<string | null>(null)
 		circles.value = fenceCircles
 
 		// 确保圆形围栏能显示在地图视野中
-		if (fenceCircles.length > 0 && !selectedFence.value && isInitialPositionSettled.value && carMarker.value == null) {
+		if (fenceCircles.length > 0 && !selectedFence.value && isInitialPositionSettled.value && carMarker.value == null && !hasUserLocationFallback.value) {
 			// 设备初始位置不可用时，自动定位到第一个圆形围栏
 			const firstCircle = fenceCircles[0]
 			center.latitude = firstCircle.latitude

@@ -1,5 +1,6 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue'
+import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
 import _easycom_indexListMode from '@/components/indexListMode/indexListMode.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { isBusinessSuccessCode } from '../../api/response.uts'
@@ -49,6 +50,8 @@ const mapScale = ref(4)
 	const overlapDevices = ref<Array<UTSJSONObject>>([])
 	// 弹层最大高度（px）：uvue 的 max-height 不支持百分比，只能按屏幕高度换算成像素
 	const overlapPanelMaxHeight = ref(600)
+	// 列表模式检索关键字
+	const searchKeyword = ref('')
 
 	const updateOverlapPanelMaxHeight = () => {
 		const systemInfo = uni.getSystemInfoSync()
@@ -177,6 +180,8 @@ const mapScale = ref(4)
 	// 切换显示模式
 	const showWhat = () => {
 		showMap.value = !showMap.value
+		// 切换显示模式时清空检索，避免残留
+		searchKeyword.value = ''
 
 
 
@@ -208,6 +213,36 @@ const mapScale = ref(4)
 				connectionStatus: item.getString('connectionStatus', '')
 			}
 		})
+	})
+
+	// 列表模式：按 设备名称 / 车牌号 / 设备号 模糊检索
+	const filteredDeviceListItems = computed((): Array<DeviceItem> => {
+		if (searchKeyword.value.trim() == '') return deviceListItems.value
+		const kw = searchKeyword.value.trim().toLowerCase()
+		return deviceListItems.value.filter((item: DeviceItem) => {
+			return (item.deviceName.toLowerCase().indexOf(kw) >= 0)
+				|| (item.plateNo.toLowerCase().indexOf(kw) >= 0)
+				|| (item.deviceNo.toLowerCase().indexOf(kw) >= 0)
+		})
+	})
+
+	// 列表模式分页：默认每页 10 条，上滑加载更多
+	const listPageSize = 10
+	const listRendered = ref<number>(listPageSize)
+	const pagedDeviceListItems = computed<Array<DeviceItem>>(() => {
+		return filteredDeviceListItems.value.slice(0, listRendered.value)
+	})
+	const listHasMore = computed<boolean>(() => listRendered.value < filteredDeviceListItems.value.length)
+	const onListLoadMore = () => {
+		if (listHasMore.value) {
+			listRendered.value += listPageSize
+		}
+	}
+	// 检索关键字或筛选结果变化后，重置分页（回到第一页）
+	watchEffect(() => {
+		// 读取以建立依赖
+		void filteredDeviceListItems.value
+		listRendered.value = listPageSize
 	})
 
 	// 计算属性 筛选逻辑
@@ -545,6 +580,7 @@ return (): any | null => {
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
 const _component_map = resolveComponent("map")
 const _component_i_tag = resolveEasyComponent("i-tag",_easycom_i_tag)
+const _component_i_input = resolveEasyComponent("i-input",_easycom_i_input)
 const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_indexListMode)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
@@ -599,11 +635,31 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
                 ])
               : _cC("v-if", true)
           ])
-        : _cE("view", _uM({ key: 1 }), [
-            _cV(_component_indexListMode, _uM({
-              lists: deviceListItems.value,
-              onUnbindDevice: unbindDevice
-            }), null, 8 /* PROPS */, ["lists"])
+        : _cE("view", _uM({
+            key: 1,
+            class: "list-mode"
+          }), [
+            _cE("view", _uM({ class: "search-bar" }), [
+              _cV(_component_i_input, _uM({
+                modelValue: searchKeyword.value,
+                "onUpdate:modelValue": $event => {(searchKeyword).value = $event},
+                placeholder: "搜索设备名称 / 车牌号 / 设备号",
+                clearable: "",
+                height: "72rpx",
+                round: "36rpx",
+                border: "none",
+                "bg-color": "#ffffff",
+                "font-size": "13px"
+              }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+            ]),
+            _cE("view", _uM({ class: "list-mode-body" }), [
+              _cV(_component_indexListMode, _uM({
+                lists: pagedDeviceListItems.value,
+                "has-more": listHasMore.value,
+                onUnbindDevice: unbindDevice,
+                onLoadMore: onListLoadMore
+              }), null, 8 /* PROPS */, ["lists", "has-more"])
+            ])
           ]),
       isTrue(showOverlapPicker.value)
         ? _cE("view", _uM({
@@ -645,4 +701,4 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
 
 })
 export default __sfc__
-const GenPagesDeviceListDeviceListStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "35rpx"]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["paddingTop", "10rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "10rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["right-bar", _uM([[".container ", _uM([["position", "absolute"], ["top", "25rpx"], ["left", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["status-spacing", _uM([[".container .right-bar ", _uM([["marginLeft", "20rpx"]])]])], ["allCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#1296db"]])]])], ["onlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#0da117"]])]])], ["offlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#d81e06"]])]])], ["overlap-mask", _uM([[".container ", _uM([["position", "fixed"], ["top", 0], ["left", 0], ["right", 0], ["bottom", 0], ["zIndex", 999], ["backgroundColor", "rgba(0,0,0,0.45)"], ["display", "flex"], ["flexDirection", "column"], ["justifyContent", "flex-end"]])]])], ["overlap-panel", _uM([[".container ", _uM([["width", "100%"], ["maxHeight", "900rpx"], ["paddingTop", "24rpx"], ["paddingRight", 0], ["paddingBottom", "40rpx"], ["paddingLeft", 0], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["display", "flex"], ["flexDirection", "column"]])]])], ["overlap-title", _uM([[".container ", _uM([["paddingTop", "12rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["fontSize", "30rpx"], ["fontWeight", 600], ["color", "#333333"], ["textAlign", "center"]])]])], ["overlap-list", _uM([[".container ", _uM([["maxHeight", "700rpx"]])]])], ["overlap-item", _uM([[".container ", _uM([["paddingTop", "28rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "32rpx"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#f0f0f0"]])]])], ["overlap-item-name", _uM([[".container ", _uM([["fontSize", "30rpx"], ["color", "#333333"]])]])], ["overlap-item-status", _uM([[".container ", _uM([["fontSize", "26rpx"]])]])], ["status-online", _uM([[".container ", _uM([["color", "#0da117"]])]])], ["status-offline", _uM([[".container ", _uM([["color", "#999999"]])]])]])]
+const GenPagesDeviceListDeviceListStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "35rpx"]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["paddingTop", "10rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "10rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["right-bar", _uM([[".container ", _uM([["position", "absolute"], ["top", "25rpx"], ["left", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["status-spacing", _uM([[".container .right-bar ", _uM([["marginLeft", "20rpx"]])]])], ["allCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#1296db"]])]])], ["onlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#0da117"]])]])], ["offlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#d81e06"]])]])], ["list-mode", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["display", "flex"], ["flexDirection", "column"], ["minHeight", 0]])]])], ["search-bar", _uM([[".container ", _uM([["flexShrink", 0], ["paddingTop", "20rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "24rpx"], ["backgroundColor", "#f1f1f1"]])]])], ["list-mode-body", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["minHeight", 0]])]])], ["overlap-mask", _uM([[".container ", _uM([["position", "fixed"], ["top", 0], ["left", 0], ["right", 0], ["bottom", 0], ["zIndex", 999], ["backgroundColor", "rgba(0,0,0,0.45)"], ["display", "flex"], ["flexDirection", "column"], ["justifyContent", "flex-end"]])]])], ["overlap-panel", _uM([[".container ", _uM([["width", "100%"], ["maxHeight", "900rpx"], ["paddingTop", "24rpx"], ["paddingRight", 0], ["paddingBottom", "40rpx"], ["paddingLeft", 0], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["display", "flex"], ["flexDirection", "column"]])]])], ["overlap-title", _uM([[".container ", _uM([["paddingTop", "12rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["fontSize", "30rpx"], ["fontWeight", 600], ["color", "#333333"], ["textAlign", "center"]])]])], ["overlap-list", _uM([[".container ", _uM([["maxHeight", "700rpx"]])]])], ["overlap-item", _uM([[".container ", _uM([["paddingTop", "28rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "32rpx"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#f0f0f0"]])]])], ["overlap-item-name", _uM([[".container ", _uM([["fontSize", "30rpx"], ["color", "#333333"]])]])], ["overlap-item-status", _uM([[".container ", _uM([["fontSize", "26rpx"]])]])], ["status-online", _uM([[".container ", _uM([["color", "#0da117"]])]])], ["status-offline", _uM([[".container ", _uM([["color", "#999999"]])]])]])]

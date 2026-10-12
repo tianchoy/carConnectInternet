@@ -53,11 +53,13 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val MAX_SEGMENT_DURATION_MS: Number = 6000
             val FALLBACK_SPEED_KMH: Number = 20
             val POLYLINE_RENDER_INTERVAL_MS: Number = 80
+            val MARKER_ROTATION_UPDATE_THRESHOLD: Number = 2
             val renderedPoint = reactive<TrackPoint>(TrackPoint(latitude = 0, longitude = 0, rotation = 0, deviceTime = "", speed = 0))
             val activeSegmentTargetIndex = ref(-1)
             var playbackTimer: Number? = null
             var replaySessionId: Number = 0
             var lastPolylineRenderAt: Number = 0
+            var lastCarMarkerRotation: Number = 0
             fun gen_copyTrackPoint_fn(point: TrackPoint): TrackPoint {
                 return TrackPoint(latitude = point.latitude, longitude = point.longitude, rotation = point.rotation, deviceTime = point.deviceTime, speed = point.speed)
             }
@@ -70,6 +72,16 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 renderedPoint.speed = point.speed
             }
             val resetRenderedPoint = ::gen_resetRenderedPoint_fn
+            fun gen_shortestAngleDiff_fn(from: Number, to: Number): Number {
+                var difference = to - from
+                if (difference > 180) {
+                    difference -= 360
+                } else if (difference < -180) {
+                    difference += 360
+                }
+                return difference
+            }
+            val shortestAngleDiff = ::gen_shortestAngleDiff_fn
             fun gen_formatPlaybackTime_fn(timestamp: Number): String {
                 return formatTimes(timestamp) ?: ""
             }
@@ -338,23 +350,46 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 setPlaybackTimeRange(formatPlaybackTime(now.getTime() - 21600000), formatPlaybackTime(now.getTime()))
             }
             val initDateTime = ::gen_initDateTime_fn
+            var startMarker: MapMarker? = null
+            var endMarker: MapMarker? = null
             fun gen_initCarMarker_fn() {
                 if (trackPoints.value.length == 0) {
                     return
                 }
                 val firstPoint = trackPoints.value[0]
-                val marker = MapMarker(id = 999, latitude = firstPoint.latitude, longitude = firstPoint.longitude, iconPath = getDeviceIcon(carStatus.value ?: "", carType.value ?: ""), width = 25, height = 25, rotate = firstPoint.rotation, anchor = Anchor(x = 0.5, y = 0.5))
+                val deviceIcon = getDeviceIcon(carStatus.value ?: "", carType.value ?: "")
+                val marker = MapMarker(id = 999, latitude = firstPoint.latitude, longitude = firstPoint.longitude, iconPath = deviceIcon, width = 25, height = 25, rotate = firstPoint.rotation, anchor = Anchor(x = 0.5, y = 0.5))
                 carMarker.value = marker
-                val startMarker = MapMarker(id = 1000, latitude = firstPoint.latitude, longitude = firstPoint.longitude, iconPath = "/static/start.png", width = 24, height = 24, anchor = Anchor(x = 0.5, y = 0.5), callout = MapMarkerCallout(content = "起点", borderRadius = 5, padding = 5, display = "BYCLICK"))
+                lastCarMarkerRotation = firstPoint.rotation
+                val start = MapMarker(id = 1000, latitude = firstPoint.latitude, longitude = firstPoint.longitude, iconPath = "/static/start.png", width = 24, height = 24, anchor = Anchor(x = 0.5, y = 0.5), callout = MapMarkerCallout(content = "起点", borderRadius = 5, padding = 5, display = "BYCLICK"))
                 val lastPoint = trackPoints.value[trackPoints.value.length - 1]
-                val endMarker = MapMarker(id = 1001, latitude = lastPoint.latitude, longitude = lastPoint.longitude, iconPath = "/static/end.png", width = 24, height = 24, anchor = Anchor(x = 0.5, y = 0.5), callout = MapMarkerCallout(content = "终点", borderRadius = 5, padding = 5, display = "BYCLICK"))
+                val end = MapMarker(id = 1001, latitude = lastPoint.latitude, longitude = lastPoint.longitude, iconPath = "/static/end.png", width = 24, height = 24, anchor = Anchor(x = 0.5, y = 0.5), callout = MapMarkerCallout(content = "终点", borderRadius = 5, padding = 5, display = "BYCLICK"))
+                startMarker = start
+                endMarker = end
                 markers.value = _uA(
                     marker,
-                    startMarker,
-                    endMarker
+                    start,
+                    end
                 )
             }
             val initCarMarker = ::gen_initCarMarker_fn
+            fun gen_applyFullMarkers_fn() {
+                val car = carMarker.value
+                if (car == null) {
+                    return
+                }
+                val list = _uA(
+                    car
+                ) as UTSArray<MapMarker>
+                if (startMarker != null) {
+                    list.push(startMarker)
+                }
+                if (endMarker != null) {
+                    list.push(endMarker)
+                }
+                markers.value = list
+            }
+            val applyFullMarkers = ::gen_applyFullMarkers_fn
             fun gen_toNativePoints_fn(points: UTSArray<TrackPoint>): UTSArray<LocationObject__1> {
                 return points.map(fun(point: TrackPoint): LocationObject__1 {
                     return LocationObject__1(point.latitude, point.longitude)
@@ -419,18 +454,25 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 )
             }
             val updatePolyline = ::gen_updatePolyline_fn
-            fun gen_updateCarPosition_fn() {
+            fun gen_updateCarPosition_fn(force: Boolean) {
                 val marker = carMarker.value
                 if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
-                    val updatedMarker = MapMarker(id = marker.id, latitude = renderedPoint.latitude, longitude = renderedPoint.longitude, iconPath = marker.iconPath, width = marker.width, height = marker.height, rotate = renderedPoint.rotation, anchor = marker.anchor, callout = marker.callout, label = marker.label)
-                    carMarker.value = updatedMarker
-                    markers.value = _uA(
-                        updatedMarker
-                    ).concat(markers.value.slice(1))
                     if (isPlaying.value) {
                         center["latitude"] = renderedPoint.latitude
                         center["longitude"] = renderedPoint.longitude
                     }
+                    val rotationDiff = shortestAngleDiff(renderedPoint.rotation, lastCarMarkerRotation)
+                    val markerRotation = if (Math.abs(rotationDiff) >= MARKER_ROTATION_UPDATE_THRESHOLD) {
+                        renderedPoint.rotation
+                    } else {
+                        lastCarMarkerRotation
+                    }
+                    lastCarMarkerRotation = markerRotation
+                    val updatedMarker = MapMarker(id = marker.id, latitude = renderedPoint.latitude, longitude = renderedPoint.longitude, iconPath = marker.iconPath, width = marker.width, height = marker.height, rotate = markerRotation, anchor = marker.anchor, callout = marker.callout, label = marker.label)
+                    carMarker.value = updatedMarker
+                    markers.value = _uA(
+                        updatedMarker
+                    ).concat(markers.value.slice(1))
                 }
             }
             val updateCarPosition = ::gen_updateCarPosition_fn
@@ -452,6 +494,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 val originalLng = parseFloat(originalLngText)
                 if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
                     showAppToast(ShowToastOptions(title = message, icon = "none", duration = 2000))
+                    showUserLocationFallback()
                     return
                 }
                 showAppToast(ShowToastOptions(title = message, icon = "none", duration = 2000))
@@ -467,6 +510,32 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     marker
                 )
                 isMapReady.value = true
+            }
+            val showUserLocationFallback = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        val userLoc = await(getUserCurrentLocation())
+                        if (userLoc == null) {
+                            return@w1
+                        }
+                        center["latitude"] = userLoc.latitude
+                        center["longitude"] = userLoc.longitude
+                        mapScale.value = 12
+                        val userMarker = Marker(id = 10004, latitude = userLoc.latitude, longitude = userLoc.longitude, width = 25, height = 25, iconPath = "/static/current-location.png", callout = MapMarkerCallout(content = "当前位置", color = if (carStatus.value == "online") {
+                            "#ffffff"
+                        } else {
+                            "#999999"
+                        }
+                        , borderRadius = 10, bgColor = if (carStatus.value == "online") {
+                            "#1296db"
+                        } else {
+                            "#CCCCCC"
+                        }
+                        , padding = 5, display = "ALWAYS"))
+                        markers.value = _uA(
+                            userMarker
+                        )
+                        isMapReady.value = true
+                })
             }
             fun gen_clearTrackDisplay_fn(): Unit {
                 isMapReady.value = false
@@ -484,6 +553,8 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 totalDistance.value = 0
                 carMarker.value = null
                 markers.value = _uA()
+                lastCarMarkerRotation = 0
+                lastPolylineRenderAt = 0
                 unplayedPolyline = null
                 playedPolyline = null
                 polyline.value = _uA()
@@ -500,6 +571,10 @@ open class GenPagesPlayBackPlayBack : BasePage {
             fun gen_pausePlayback_fn(): Unit {
                 isPlaying.value = false
                 clearPlaybackTimer()
+                if (carMarker.value != null && trackPoints.value.length > 0) {
+                    updateCarPosition(true)
+                    applyFullMarkers()
+                }
             }
             val pausePlayback = ::gen_pausePlayback_fn
             fun gen_renderPlaybackIndex_fn(): Unit {
@@ -509,8 +584,12 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 if (activeSegmentTargetIndex.value <= currentIndex.value) {
                     resetRenderedPoint(trackPoints.value[currentIndex.value])
                 }
-                updateCarPosition()
+                updateCarPosition(true)
                 updatePolyline()
+                lastPolylineRenderAt = Date.now()
+                if (!isPlaying.value) {
+                    applyFullMarkers()
+                }
                 val point = trackPoints.value[currentIndex.value]
                 currentSpeed.value = point.speed
                 currentTime.value = point.deviceTime
@@ -699,11 +778,12 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     renderedPoint.speed = targetPoint.speed
                     currentSpeed.value = renderedPoint.speed
                     currentTime.value = renderedPoint.deviceTime
-                    updateCarPosition()
+                    updateCarPosition(false)
                     val frameNow = Date.now()
-                    if (frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS) {
+                    var polylineDue = false
+                    polylineDue = frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS
+                    if (polylineDue) {
                         lastPolylineRenderAt = frameNow
-                        updatePolyline()
                     }
                     if (progress >= 1) {
                         currentIndex.value = targetIndex
@@ -714,10 +794,27 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         return
                     }
                     if (renderFrame != null) {
+                        val nextFrameAt = startedAt + (Math.floor((frameNow - startedAt) / PLAYBACK_FRAME_INTERVAL_MS) + 1) * PLAYBACK_FRAME_INTERVAL_MS
+                        val delay = nextFrameAt - frameNow
                         playbackTimer = setTimeout(fun(){
                             renderFrame?.invoke()
                         }
-                        , PLAYBACK_FRAME_INTERVAL_MS)
+                        , if (delay > 0) {
+                            delay
+                        } else {
+                            0
+                        }
+                        )
+                    }
+                    if (polylineDue) {
+                        val polylineSessionId = sessionId
+                        setTimeout(fun(){
+                            if (!isPlaying.value || polylineSessionId != replaySessionId) {
+                                return
+                            }
+                            updatePolyline()
+                        }
+                        , 0)
                     }
                 }
                 renderFrame?.invoke()

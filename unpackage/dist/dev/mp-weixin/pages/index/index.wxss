@@ -524,15 +524,35 @@
   flex-direction: column;
   padding-top: 30rpx;
 }
+.car-picker .car-picker-header[class].data-v-00a60067 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40rpx 20rpx 40rpx;
+}
 .car-picker .car-picker-title[class].data-v-00a60067 {
-  padding-bottom: 24rpx;
   font-size: 34rpx;
   font-weight: 600;
   color: #333333;
-  text-align: center;
+  text-align: left;
+}
+.car-picker .car-picker-search[class].data-v-00a60067 {
+  margin-left: 30rpx;
 }
 .car-picker .car-picker-list[class].data-v-00a60067 {
   max-height: 900rpx;
+}
+.car-picker .car-picker-empty[class].data-v-00a60067 {
+  padding: 60rpx 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.car-picker .car-picker-empty .car-picker-empty-text[class].data-v-00a60067 {
+  font-size: 28rpx;
+  color: #9A9A9A;
 }
 .car-picker .car-picker-item[class].data-v-00a60067 {
   padding: 30rpx 40rpx;

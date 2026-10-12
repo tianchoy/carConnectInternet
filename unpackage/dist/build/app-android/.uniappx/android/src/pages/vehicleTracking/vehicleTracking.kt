@@ -81,6 +81,36 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 return Marker(id = 1, latitude = currentPosition.latitude, longitude = currentPosition.longitude, iconPath = iconPath, width = 25, height = 25, rotate = currentRotation.value, anchor = Anchor(x = 0.5, y = 0.5), alpha = 1)
             }
             val createVehicleMarker = ::gen_createVehicleMarker_fn
+            val showUserLocationFallback = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        val userLoc = await(getUserCurrentLocation())
+                        if (userLoc == null) {
+                            return@w1
+                        }
+                        center["latitude"] = userLoc.latitude
+                        center["longitude"] = userLoc.longitude
+                        currentPosition.latitude = userLoc.latitude
+                        currentPosition.longitude = userLoc.longitude
+                        targetPosition.latitude = userLoc.latitude
+                        targetPosition.longitude = userLoc.longitude
+                        mapScale.value = 12
+                        markers.value = _uA(
+                            Marker(id = 10002, latitude = userLoc.latitude, longitude = userLoc.longitude, width = 25, height = 25, iconPath = "/static/current-location.png", callout = MapMarkerCallout(content = "当前位置", color = if (connectionStatus.value == "online") {
+                                "#ffffff"
+                            } else {
+                                "#999999"
+                            }
+                            , borderRadius = 10, bgColor = if (connectionStatus.value == "online") {
+                                "#1296db"
+                            } else {
+                                "#CCCCCC"
+                            }
+                            , padding = 5, display = "ALWAYS"))
+                        )
+                        markerInitialized.value = true
+                        isMapReady.value = true
+                })
+            }
             fun gen_loadInitialPosition_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         isMapReady.value = false
@@ -95,6 +125,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                                     "获取位置失败"
                                 }
                                 , icon = "none"))
+                                showUserLocationFallback()
                                 return@w1
                             }
                             var foundDevice = false
@@ -106,6 +137,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                                     val longitude = item.getNumber("longitude", 0)
                                     if (latitude == 0 || longitude == 0) {
                                         showAppToast(ShowToastOptions(title = "位置信息缺失", icon = "none"))
+                                        showUserLocationFallback()
                                         return
                                     }
                                     val direction = item.getNumber("direction", 0)

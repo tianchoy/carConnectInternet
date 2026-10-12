@@ -9,6 +9,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
+	import { getUserCurrentLocation } from '../../utils/getUserLocation.uts'
 
 	import Polyline from 'uts.sdk.modules.DCloudUniMapTencent.Polyline'
 	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
@@ -144,6 +145,38 @@ const deviceNo = ref<string>('')
 		} as Marker
 	}
 
+	// 设备无有效位置时，回退到用户当前位置并展示「当前位置」标记
+	// 注意：本页地图绑定的是 currentPosition，必须同步更新它（否则会停留在默认的北京坐标）
+	const showUserLocationFallback = async () => {
+		const userLoc = await getUserCurrentLocation()
+		if (userLoc == null) return
+		center.latitude = userLoc.latitude
+		center.longitude = userLoc.longitude
+		currentPosition.latitude = userLoc.latitude
+		currentPosition.longitude = userLoc.longitude
+		targetPosition.latitude = userLoc.latitude
+		targetPosition.longitude = userLoc.longitude
+		mapScale.value = 12
+		markers.value = [{
+			id: 10002,
+			latitude: userLoc.latitude,
+			longitude: userLoc.longitude,
+			width: 25,
+			height: 25,
+			iconPath: '/static/current-location.png',
+			callout: {
+				content: '当前位置',
+				color: connectionStatus.value == 'online' ? '#ffffff' : '#999999',
+				borderRadius: 10,
+				bgColor: connectionStatus.value == 'online' ? '#1296db' : '#CCCCCC',
+				padding: 5,
+				display: 'ALWAYS'
+			}
+		} as Marker]
+		markerInitialized.value = true
+		isMapReady.value = true
+	}
+
 	async function loadInitialPosition() {
 		isMapReady.value = false
 		try {
@@ -159,6 +192,7 @@ const deviceNo = ref<string>('')
 					title: res.msg || '获取位置失败',
 					icon: 'none'
 				})
+				showUserLocationFallback()
 				return
 			}
 			let foundDevice = false
@@ -174,6 +208,7 @@ const deviceNo = ref<string>('')
 								title: '位置信息缺失',
 								icon: 'none'
 							})
+							showUserLocationFallback()
 							return
 						}
 

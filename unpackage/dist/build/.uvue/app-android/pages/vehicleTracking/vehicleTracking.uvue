@@ -9,6 +9,7 @@ import { getDevicePos } from '../../api/request.uts';
 import { getDeviceIcon } from '../../utils/cars';
 // 导入坐标转换插件
 import CoordTransform from '../../utils/coordTransform.uts';
+import { getUserCurrentLocation } from '../../utils/getUserLocation.uts';
 import Polyline from 'uts.sdk.modules.DCloudUniMapTencent.Polyline';
 import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject';
 type CoordinatePoint = {
@@ -121,6 +122,38 @@ const __sfc__ = defineComponent({
                 alpha: 1
             } as Marker;
         }
+        // 设备无有效位置时，回退到用户当前位置并展示「当前位置」标记
+        // 注意：本页地图绑定的是 currentPosition，必须同步更新它（否则会停留在默认的北京坐标）
+        const showUserLocationFallback = async (): Promise<void> => {
+            const userLoc = await getUserCurrentLocation();
+            if (userLoc == null)
+                return;
+            center["latitude"] = userLoc.latitude;
+            center["longitude"] = userLoc.longitude;
+            currentPosition.latitude = userLoc.latitude;
+            currentPosition.longitude = userLoc.longitude;
+            targetPosition.latitude = userLoc.latitude;
+            targetPosition.longitude = userLoc.longitude;
+            mapScale.value = 12;
+            markers.value = [{
+                    id: 10002,
+                    latitude: userLoc.latitude,
+                    longitude: userLoc.longitude,
+                    width: 25,
+                    height: 25,
+                    iconPath: '/static/current-location.png',
+                    callout: {
+                        content: '当前位置',
+                        color: connectionStatus.value == 'online' ? '#ffffff' : '#999999',
+                        borderRadius: 10,
+                        bgColor: connectionStatus.value == 'online' ? '#1296db' : '#CCCCCC',
+                        padding: 5,
+                        display: 'ALWAYS'
+                    } as MapMarkerCallout
+                } as Marker];
+            markerInitialized.value = true;
+            isMapReady.value = true;
+        };
         async function loadInitialPosition(): Promise<void> {
             isMapReady.value = false;
             try {
@@ -135,6 +168,7 @@ const __sfc__ = defineComponent({
                         title: res.msg != "" ? res.msg : '获取位置失败',
                         icon: 'none'
                     } as ShowToastOptions);
+                    showUserLocationFallback();
                     return;
                 }
                 let foundDevice = false;
@@ -149,6 +183,7 @@ const __sfc__ = defineComponent({
                                 title: '位置信息缺失',
                                 icon: 'none'
                             } as ShowToastOptions);
+                            showUserLocationFallback();
                             return;
                         }
                         const direction = item.getNumber('direction', 0);
