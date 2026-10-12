@@ -520,6 +520,7 @@
 }
 .car-picker[class].data-v-00a60067 {
   width: 100%;
+  height: 900rpx;
   display: flex;
   flex-direction: column;
   padding-top: 30rpx;
@@ -538,9 +539,12 @@
   text-align: left;
 }
 .car-picker .car-picker-search[class].data-v-00a60067 {
-  margin-left: 30rpx;
+  flex: 1;
+  margin-left: 50rpx;
 }
 .car-picker .car-picker-list[class].data-v-00a60067 {
+  flex: 1;
+  min-height: 0;
   max-height: 900rpx;
 }
 .car-picker .car-picker-empty[class].data-v-00a60067 {

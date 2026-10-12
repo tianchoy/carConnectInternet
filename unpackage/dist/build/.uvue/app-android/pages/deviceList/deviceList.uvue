@@ -1,5 +1,6 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue';
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue';
+import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue';
 import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue';
 import _easycom_indexListMode from '@/components/indexListMode/indexListMode.uvue';
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
@@ -416,6 +417,7 @@ const __sfc__ = defineComponent({
             const _component_custom_navBar = resolveEasyComponent("custom-navBar", _easycom_custom_navBar);
             const _component_map = resolveComponent("map");
             const _component_i_tag = resolveEasyComponent("i-tag", _easycom_i_tag);
+            const _component_i_icon = resolveEasyComponent("i-icon", _easycom_i_icon);
             const _component_i_input = resolveEasyComponent("i-input", _easycom_i_input);
             const _component_indexListMode = resolveEasyComponent("indexListMode", _easycom_indexListMode);
             const _component_app_toast = resolveEasyComponent("app-toast", _easycom_app_toast);
@@ -485,7 +487,16 @@ const __sfc__ = defineComponent({
                                     border: "none",
                                     "bg-color": "#ffffff",
                                     "font-size": "13px"
-                                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                                }), _uM({
+                                    prefix: withSlotCtx((): any[] => [
+                                        _cV(_component_i_icon, _uM({
+                                            name: "search",
+                                            color: "#999999",
+                                            customStyle: "margin-right: 12rpx;"
+                                        }))
+                                    ]),
+                                    _: 1 /* STABLE */
+                                }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
                             ]),
                             _cE("view", _uM({ class: "list-mode-body" }), [
                                 _cV(_component_indexListMode, _uM({

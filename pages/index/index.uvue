@@ -215,7 +215,7 @@
         bg-color="#ffffff"
     >
         <!-- touchmove.stop：截断 touchmove 向上传播，第二道防穿透 -->
-        <view class="car-picker" @touchmove.stop>
+        <view class="car-picker" @touchmove.stop :style="{ height: pickerPanelHeight + 'px' }">
             <view class="car-picker-header">
                 <text class="car-picker-title">选择车辆</text>
                 <view class="car-picker-search">
@@ -228,7 +228,11 @@
                         border="none"
                         bg-color="#f2f3f5"
                         font-size="13px"
-                    />
+                    >
+                        <template #prefix>
+                            <i-icon name="search" color="#999999" customStyle="margin-right: 12rpx;" />
+                        </template>
+                    </i-input>
                 </view>
             </view>
             <scroll-view
@@ -249,10 +253,10 @@
                         <text :class="isDeviceOnline(device) ? 'car-picker-status-text car-picker-status-text--online' : 'car-picker-status-text car-picker-status-text--offline'">{{ isDeviceOnline(device) ? '在线' : '离线' }}</text>
                     </view>
                 </view>
+                <view v-if="filteredPickerDeviceList.length == 0" class="car-picker-empty">
+                    <text class="car-picker-empty-text">无匹配设备</text>
+                </view>
             </scroll-view>
-            <view v-if="filteredPickerDeviceList.length == 0" class="car-picker-empty">
-                <text class="car-picker-empty-text">无匹配设备</text>
-            </view>
             <view class="car-picker-cancel" @click="closePicker">
                 <text class="car-picker-cancel-text">取消</text>
             </view>
@@ -341,6 +345,8 @@ const deviceList = ref<Array<Device>>([])
 const showPicker = ref(false)
 // 设备列表区域最大高度（px），超出后列表整体可上下滑动
 const pickerListMaxHeight = ref(600)
+// 弹框整体固定高度（px），占屏幕高度的 60%，避免搜索结果多少导致弹框忽上忽下
+const pickerPanelHeight = ref(600)
 // 弹框内检索关键字
 const pickerSearchKeyword = ref('')
 // 是否正在切换设备：切换过程中忽略再次点击，避免连点重复请求
@@ -457,6 +463,8 @@ const initDimensions = () => {
     // 设备列表最多占屏幕高度的 60%，保证弹框标题与「取消」按钮始终可见
     const windowHeight = systemInfo.windowHeight != null ? systemInfo.windowHeight : 600
     pickerListMaxHeight.value = Math.floor(windowHeight * 0.6)
+    // 弹框整体固定为屏幕高度的 60%，搜索结果多少都不会改变弹框高度
+    pickerPanelHeight.value = Math.floor(windowHeight * 0.6)
 }
 
 // 延迟函数
@@ -2180,6 +2188,8 @@ onLoad(() => {
 // 这里不要再给 .car-picker 设背景和圆角，否则会盖掉 l-popup 的圆角。
 .car-picker {
     width: 100%;
+    // 固定高度由行内样式按屏幕高度的 60% 覆盖；flex 列布局让列表区域自适应填满剩余空间
+    height: 900rpx;
     display: flex;
     flex-direction: column;
     padding-top: 30rpx;
@@ -2202,12 +2212,14 @@ onLoad(() => {
 
     // 检索输入框
     .car-picker-search {
-        
-        margin-left: 30rpx;
+        flex: 1;
+        margin-left: 50rpx;
     }
 
-    // 设备多时列表整体上下滑动（行内样式按屏幕高度覆盖这里的值）
+    // 列表区域自适应填满弹框剩余空间，超出后内部滚动（行内 maxHeight 作为安全上限）
     .car-picker-list {
+        flex: 1;
+        min-height: 0;
         max-height: 900rpx;
     }
 

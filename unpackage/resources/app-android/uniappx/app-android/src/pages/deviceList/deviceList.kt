@@ -451,6 +451,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_map = resolveComponent("map")
                 val _component_i_tag = resolveEasyComponent("i-tag", GenUniModulesIUiXComponentsITagITagClass)
+                val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
                 val _component_i_input = resolveEasyComponent("i-input", GenUniModulesIUiXComponentsIInputIInputClass)
                 val _component_indexListMode = resolveEasyComponent("indexListMode", GenComponentsIndexListModeIndexListModeClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
@@ -499,7 +500,12 @@ open class GenPagesDeviceListDeviceList : BasePage {
                                     _cV(_component_i_input, _uM("modelValue" to searchKeyword.value, "onUpdate:modelValue" to fun(`$event`: String){
                                         searchKeyword.value = `$event`
                                     }
-                                    , "placeholder" to "搜索设备名称 / 车牌号 / 设备号", "clearable" to "", "height" to "72rpx", "round" to "36rpx", "border" to "none", "bg-color" to "#ffffff", "font-size" to "13px"), null, 8, _uA(
+                                    , "placeholder" to "搜索设备名称 / 车牌号 / 设备号", "clearable" to "", "height" to "72rpx", "round" to "36rpx", "border" to "none", "bg-color" to "#ffffff", "font-size" to "13px"), _uM("prefix" to withSlotCtx(fun(): UTSArray<Any> {
+                                        return _uA(
+                                            _cV(_component_i_icon, _uM("name" to "search", "color" to "#999999", "customStyle" to "margin-right: 12rpx;"))
+                                        )
+                                    }
+                                    ), "_" to 1), 8, _uA(
                                         "modelValue",
                                         "onUpdate:modelValue"
                                     ))

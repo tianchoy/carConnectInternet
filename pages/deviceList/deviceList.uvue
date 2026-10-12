@@ -24,7 +24,11 @@
 					border="none"
 					bg-color="#ffffff"
 					font-size="13px"
-				/>
+				>
+					<template #prefix>
+						<i-icon name="search" color="#999999" customStyle="margin-right: 12rpx;" />
+					</template>
+				</i-input>
 			</view>
 			<view class="list-mode-body">
 				<indexListMode

@@ -9,18 +9,20 @@ const utils_device = require("../../utils/device.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_tag_1 = common_vendor.resolveComponent("i-tag");
+  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
   const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
   const _easycom_indexListMode_1 = common_vendor.resolveComponent("indexListMode");
   const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
-  (_easycom_custom_navBar_1 + _easycom_i_tag_1 + _easycom_i_input_1 + _easycom_indexListMode_1 + _easycom_app_toast_1)();
+  (_easycom_custom_navBar_1 + _easycom_i_tag_1 + _easycom_i_icon_1 + _easycom_i_input_1 + _easycom_indexListMode_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_tag = () => "../../uni_modules/i-ui-x/components/i-tag/i-tag.js";
+const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
 const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
 const _easycom_indexListMode = () => "../../components/indexListMode/indexListMode.js";
 const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_tag + _easycom_i_input + _easycom_indexListMode + _easycom_app_toast)();
+  (_easycom_custom_navBar + _easycom_i_tag + _easycom_i_icon + _easycom_i_input + _easycom_indexListMode + _easycom_app_toast)();
 }
 const OVERLAP_THRESHOLD_METERS = 12;
 const SPREAD_REFERENCE_ZOOM = 19;
@@ -151,7 +153,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         context.addMarkers(toPlainObject(new common_vendor.UTSJSONObject({ markers: markers.value, clear: true })));
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:145", "车标同步到聚合器失败:", error);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:149", "车标同步到聚合器失败:", error);
       }
     };
     const setupMarkerCluster = () => {
@@ -205,7 +207,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         clusterReady = true;
         syncClusterMarkers();
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:199", "点聚合初始化失败，回退为普通标记点:", error);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:203", "点聚合初始化失败，回退为普通标记点:", error);
       }
     };
     const EMPTY_MARKERS = [];
@@ -450,7 +452,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             const res = yield api_request.getUserDeviceList(params);
             const list = api_response.isBusinessSuccessCode(res.code) && res.data != null ? res.data.list : null;
             if (list == null || !Array.isArray(list)) {
-              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:488", "获取设备列表返回异常:", res);
+              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:492", "获取设备列表返回异常:", res);
               originalDeviceList.value = [];
               markers.value = [];
               return Promise.resolve(null);
@@ -462,7 +464,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
           updateMarkers(originalDeviceList.value);
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:499", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:503", "获取设备列表失败:", err);
           originalDeviceList.value = [];
           markers.value = [];
           utils_toast.showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -538,7 +540,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       }
       if (selectedIndex < 0) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:587", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:591", "未找到对应的设备信息", markerId);
         return null;
       }
       const analysis = analyzeOverlap(list);
@@ -612,10 +614,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           text: `离线 ${offlineCount.value}`
         })
       } : {}) : {
-        q: common_vendor.o(($event) => {
+        q: common_vendor.p({
+          name: "search",
+          color: "#999999",
+          customStyle: "margin-right: 12rpx;"
+        }),
+        r: common_vendor.o(($event) => {
           return searchKeyword.value = $event;
         }, "69"),
-        r: common_vendor.p({
+        s: common_vendor.p({
           placeholder: "搜索设备名称 / 车牌号 / 设备号",
           clearable: true,
           height: "72rpx",
@@ -625,17 +632,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["font-size"]: "13px",
           modelValue: searchKeyword.value
         }),
-        s: common_vendor.o(unbindDevice, "23"),
-        t: common_vendor.o(onListLoadMore, "46"),
-        v: common_vendor.p({
+        t: common_vendor.o(unbindDevice, "1b"),
+        v: common_vendor.o(onListLoadMore, "12"),
+        w: common_vendor.p({
           lists: pagedDeviceListItems.value,
           ["has-more"]: listHasMore.value
         })
       }, {
-        w: showOverlapPicker.value
+        x: showOverlapPicker.value
       }, showOverlapPicker.value ? {
-        x: common_vendor.t(overlapDevices.value.length),
-        y: common_vendor.f(overlapDevices.value, (device, index, i0) => {
+        y: common_vendor.t(overlapDevices.value.length),
+        z: common_vendor.f(overlapDevices.value, (device, index, i0) => {
           return {
             a: common_vendor.t(deviceDisplayName(device)),
             b: common_vendor.t(isDeviceOnline(device) ? "在线" : "离线"),
@@ -646,12 +653,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, index)
           };
         }),
-        z: overlapPanelMaxHeight.value + "px",
-        A: common_vendor.o(keepOverlapPicker, "72"),
-        B: common_vendor.o(closeOverlapPicker, "17")
+        A: overlapPanelMaxHeight.value + "px",
+        B: common_vendor.o(keepOverlapPicker, "49"),
+        C: common_vendor.o(closeOverlapPicker, "8b")
       } : {}, {
-        C: `${_ctx.u_s_b_h}px`,
-        D: `${_ctx.u_s_a_i_b}px`
+        D: `${_ctx.u_s_b_h}px`,
+        E: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };
