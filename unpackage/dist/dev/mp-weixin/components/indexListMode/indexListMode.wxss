@@ -75,6 +75,7 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  padding-top: 200rpx;
   color: #ccc;
 }
 .list-container .list-footer {

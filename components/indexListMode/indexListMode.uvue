@@ -179,6 +179,8 @@ import { showAppToast } from '../../utils/toast.uts'
 			flex-direction: row;
 			justify-content: center;
 			align-items: center;
+			// 往下偏移，避免紧贴检索框显得太靠上
+			padding-top: 200rpx;
 			color: #ccc;
 		}
 
