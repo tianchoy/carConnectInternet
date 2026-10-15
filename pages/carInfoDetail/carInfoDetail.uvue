@@ -1280,9 +1280,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 
 			.grid-text {
 				padding: 10rpx 0 0;
-				/* #ifndef APP-PLUS */
 				box-sizing: border-box;
-				/* #endif */
 				font-size: 24rpx;
 			}
 		}

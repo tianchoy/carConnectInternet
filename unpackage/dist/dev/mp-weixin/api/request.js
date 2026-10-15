@@ -35,7 +35,6 @@ const appCommandSendUrl = "/app/command/send";
 const appCommandListUrl = "/app/command/list";
 const appCommandDetailUrl = "/app/command/";
 const appCommandRetryUrl = "/app/command/retry/";
-const pushUnbindUrl = "/app/push/unbind";
 const messageUnreadCountUrl = "/app/message/unreadCount";
 const homePlatformAppUrl = "/home/platform/app";
 const geocoderAddressUrl = "/geocoder/address";
@@ -62,31 +61,6 @@ class BasicResponse extends common_vendor.UTS.UTSType {
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.code = this.__props__.code;
     this.msg = this.__props__.msg;
-    delete this.__props__;
-  }
-}
-class PushDeviceBindRequest extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          registrationId: { type: String, optional: false },
-          platform: { type: String, optional: false },
-          deviceName: { type: String, optional: false },
-          appVersion: { type: String, optional: false }
-        };
-      },
-      name: "PushDeviceBindRequest"
-    };
-  }
-  constructor(options, metadata = PushDeviceBindRequest.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.registrationId = this.__props__.registrationId;
-    this.platform = this.__props__.platform;
-    this.deviceName = this.__props__.deviceName;
-    this.appVersion = this.__props__.appVersion;
     delete this.__props__;
   }
 }
@@ -1315,11 +1289,6 @@ const retryAppCommand = (commandId) => {
     return basicResponse(raw);
   });
 };
-const unbindPushDevice = (registrationId) => {
-  return api_http.postSilently(pushUnbindUrl + "?registrationId=" + encodeURIComponent(registrationId), new common_vendor.UTSJSONObject()).then((raw = null) => {
-    return basicResponse(raw);
-  });
-};
 const getDeviceShareEnabled = () => {
   return api_http.get(deviceShareEnabledUrl).then((raw = null) => {
     return deviceShareEnabledResponse(raw);
@@ -1401,7 +1370,6 @@ exports.sendSmsForgotPasswordCode = sendSmsForgotPasswordCode;
 exports.sendSmsRegisterCode = sendSmsRegisterCode;
 exports.setMsgState = setMsgState;
 exports.unbindDevices = unbindDevices;
-exports.unbindPushDevice = unbindPushDevice;
 exports.updateGeofence = updateGeofence;
 exports.updatePassword = updatePassword;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

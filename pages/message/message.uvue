@@ -64,9 +64,7 @@
 		</i-modal>
 	</view>
 	<app-toast></app-toast>
-	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
 	<app-modal></app-modal>
-	<!-- #endif -->
 </template>
 
 <script setup lang="uts">
@@ -74,7 +72,6 @@
 	import { ref, computed, nextTick, onActivated, onDeactivated } from 'vue'
 	import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 	import { getUserMsgList, setMsgState, readAllMessages } from '../../api/request.uts'
-	import { consumePendingMessageId, consumePushStaleFlag } from '../../services/push.uts'
 	import { parseLocalDateTime } from '../../utils/formateTime.uts'
 
 	const modal = ref<boolean>(false)
@@ -422,22 +419,6 @@
 		})
 	}
 
-	async function openPendingPushMessage() : Promise<void> {
-		if (isListLoading.value || isCheckingNewMessages.value) {
-			setTimeout(() => {
-				void openPendingPushMessage()
-			}, 150)
-			return
-		}
-		const messageId = consumePendingMessageId()
-		const shouldRefresh = consumePushStaleFlag()
-		if (messageId == '' && !shouldRefresh) return
-		await loadMsgList(true)
-		if (messageId == '') return
-		const message = msgList.value.find((item : UTSJSONObject) : boolean => item.getString('messageId', '') == messageId)
-		if (message != null) await handleItemClick(message)
-	}
-
 	const finishPageLifecycle = (): void => {
 		isPageActive.value = false
 		stopNewMessageCheck()
@@ -448,7 +429,6 @@
 		stopScrollResumeTimer()
 		isPageActive.value = true
 		startNewMessageCheck()
-		void openPendingPushMessage()
 		void checkNewMessages()
 	}
 
@@ -516,18 +496,6 @@
 
 	const onMessageScroll = (event : UniScrollEvent) : void => {
 		pauseNewMessageCheckWhileScrolling()
-		// #ifdef APP-IOS
-		const viewportHeight = messageScrollViewportHeight.value
-		if (viewportHeight <= 0) return
-		const remainingDistance = event.detail.scrollHeight - event.detail.scrollTop - viewportHeight
-		const isNearBottom = event.detail.deltaY > 0 && remainingDistance <= 100
-		if (isNearBottom && !isNearMessageListBottom.value) {
-			isNearMessageListBottom.value = true
-			loadMore()
-		} else if (!isNearBottom) {
-			isNearMessageListBottom.value = false
-		}
-		// #endif
 	}
 
 

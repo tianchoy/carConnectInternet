@@ -164,7 +164,6 @@ import { showAppToast } from '../../../utils/toast.uts'
 		// 设置需要刷新的标志
 		needRefresh.value = true
 
-		//#ifdef MP-WEIXIN
 		uni.openEmbeddedMiniProgram({
 			appId: 'wx1d647f2cfdc089e6',
 			path: '/pages/home/userSimRecharge?iccid=' + iccid,
@@ -181,15 +180,7 @@ import { showAppToast } from '../../../utils/toast.uts'
 				})
 			}
 		})
-		//#endif
 
-		//#ifndef MP-WEIXIN
-		needRefresh.value = false
-		showAppToast({
-			title: '请在微信小程序中完成充值',
-			icon: 'none'
-		})
-		//#endif
 	}
 
 	const payDevice = (item : UTSJSONObject) => {

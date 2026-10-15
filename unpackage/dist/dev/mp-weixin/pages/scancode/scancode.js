@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-require("../../utils/modal.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   _easycom_custom_navBar_1();
@@ -21,7 +20,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       common_vendor.index.vibrateLong();
       scanFunctionIsUseable.value = false;
-      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:55", "扫码结果:", scanResult);
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:25", "扫码结果:", scanResult);
       common_vendor.index.setStorageSync("scanCodeResult", scanResult);
       common_vendor.index.showToast({
         title: "扫码成功",
@@ -35,7 +34,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, 1e3);
     };
     const error = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:73", "摄像头错误:", e);
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:43", "摄像头错误:", e);
       common_vendor.index.showToast({
         title: "摄像头初始化失败",
         icon: "none"
@@ -45,13 +44,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.getSetting({
         success: (res) => {
           if (res.authSetting["scope.camera"]) {
-            common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:84", "已有摄像头权限");
+            common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:54", "已有摄像头权限");
             return null;
           }
           common_vendor.index.authorize({
             scope: "scope.camera",
             success: () => {
-              common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:91", "摄像头权限授权成功");
+              common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:61", "摄像头权限授权成功");
             },
             fail: () => {
               common_vendor.index.showModal(new common_vendor.UTSJSONObject({
@@ -83,8 +82,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: false
         }),
-        b: common_vendor.o(handleScan, "ef"),
-        c: common_vendor.o(error, "1e"),
+        b: common_vendor.o(handleScan, "1e"),
+        c: common_vendor.o(error, "5e"),
         d: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         e: `${_ctx.u_s_b_h}px`,
         f: `${_ctx.u_s_a_i_b}px`,

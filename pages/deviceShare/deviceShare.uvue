@@ -46,7 +46,7 @@
 							<text class="status" :class="statusClass(item.getString('status', ''))">{{statusText(item.getString('status', ''))}}</text>
 						</view>
 						<view class="detail-line"><text>分享给</text><text class="detail-value">{{getSharePerson(item, 'targetNickName', '')}}</text></view>
-						<view class="detail-line"><text>手机号</text><text class="detail-value">{{item.getString('targetPhoneMasked', '')}}</text></view>
+						<view class="detail-line" v-if="item.getString('targetPhoneMasked', '') != ''"><text>手机号</text><text class="detail-value">{{item.getString('targetPhoneMasked', '')}}</text></view>
 						<view class="detail-line"><text>角色</text><text class="detail-value">{{item.getString('roleName', 'view')}}</text></view>
 						<view class="detail-line"><text>分享时间</text><text class="detail-value">{{formatTimestamp(item.getNumber('shareTime', 0))}}</text></view>
 						<view class="detail-line"><text>到期时间</text><text class="detail-value">{{formatExpireTime(item)}}</text></view>
@@ -60,9 +60,7 @@
 		</scroll-view>
 	</view>
 	<app-toast></app-toast>
-	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
 	<app-modal></app-modal>
-	<!-- #endif -->
 </template>
 
 <script setup lang="uts">

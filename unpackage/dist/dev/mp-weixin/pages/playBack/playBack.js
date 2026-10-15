@@ -260,7 +260,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:355", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:312", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -334,7 +334,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           callback();
         }).exec();
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/playBack/playBack.uvue:455", "测量地图容器尺寸失败:", error);
+        common_vendor.index.__f__("warn", "at pages/playBack/playBack.uvue:412", "测量地图容器尺寸失败:", error);
         callback();
       }
     }
@@ -974,7 +974,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             showCurrentPosition(res.msg || "轨迹加载失败");
             return Promise.resolve(null);
           }
-          common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1486", "加载轨迹成功:", res);
+          common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1305", "加载轨迹成功:", res);
           const trackData = res.data;
           if (trackData == null) {
             showCurrentPosition();
@@ -992,7 +992,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:1504", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:1323", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -1177,7 +1177,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_h = option.lng) !== null && _h !== void 0 ? _h : null;
       startTime.value = (_j = option.startTime) !== null && _j !== void 0 ? _j : "";
       endTime.value = (_k = option.endTime) !== null && _k !== void 0 ? _k : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1743", "plateNo:", plateNo.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1550", "plateNo:", plateNo.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {
@@ -1243,10 +1243,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         p: common_vendor.t(getPlaybackClock(startTime.value)),
         q: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "49"),
+        }, "e1"),
         r: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "67"),
+        }, "41"),
         s: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15",
@@ -1256,25 +1256,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         v: common_vendor.t(getPlaybackClock(endTime.value)),
         w: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "9e"),
+        }, "e8"),
         x: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "30"),
+        }, "ee"),
         y: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15",
           class: "date-arrow"
         }),
-        z: common_vendor.o(togglePlayback, "c2"),
+        z: common_vendor.o(togglePlayback, "cf"),
         A: common_vendor.p({
           type: "primary",
           size: "small",
           text: isPlaying.value ? "暂停" : "播放"
         }),
-        B: common_vendor.o(setPlaybackSpeedFromValue, "1a"),
+        B: common_vendor.o(setPlaybackSpeedFromValue, "53"),
         C: common_vendor.o(($event) => {
           return playbackSpeed.value = $event;
-        }, "7d"),
+        }, "cc"),
         D: common_vendor.p({
           min: 1,
           max: 30,
@@ -1285,8 +1285,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         F: common_vendor.t(currentTime.value),
         G: common_vendor.t(currentSpeed.value),
         H: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        I: common_vendor.o(onConfirm, "8e"),
-        J: common_vendor.o(onCancel, "4c"),
+        I: common_vendor.o(onConfirm, "cc"),
+        J: common_vendor.o(onCancel, "3b"),
         K: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
@@ -1299,7 +1299,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         L: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }, "09"),
+        }, "2d"),
         M: common_vendor.p({
           position: "bottom",
           closeable: false,

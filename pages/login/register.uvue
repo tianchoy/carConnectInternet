@@ -112,7 +112,6 @@
 	import { showAppModal } from '../../utils/modal.uts'
 	import { sendSmsRegisterCode, registerPersonalUser } from '../../api/request.uts'
 	import { resetTokenExpiredState } from '../../api/http.uts'
-	import { schedulePostLoginInitialization } from '../../services/app-startup.uts'
 	import { userAgreement, privacyPolicy } from '../../utils/legal.uts'
 
 	type RegisterForm = {
@@ -248,12 +247,7 @@
 		resetTokenExpiredState()
 		showAppToast({ title: message || '注册成功', icon: 'success' })
 		setTimeout(() => {
-			uni.reLaunch({
-				url: '/pages/index/index',
-				success: () => {
-					schedulePostLoginInitialization()
-				}
-			})
+			uni.reLaunch({ url: '/pages/index/index' })
 		}, 500)
 	}
 

@@ -27,14 +27,12 @@ export type DeviceAuthorizeOutcome = {
  * 设备订阅能力探测：非微信小程序端或基础库 < 2.20.0 时不可用，调用方应隐藏入口
  */
 export function isDeviceSubscribeSupported() : boolean {
-    // #ifdef MP-WEIXIN
     try {
         return wx.canIUse('requestSubscribeDeviceMessage')
     } catch (error) {
         console.warn('[notify] 能力探测失败:', error)
         return false
     }
-    // #endif
     return false
 }
 
@@ -183,7 +181,6 @@ export async function authorizeDevice(deviceNo : string, bizCode : string = DEFA
 
 function callDeviceSubscribe(sn : string, snTicket : string, modelId : string, templateId : string) : Promise<DeviceAuthorizeOutcome> {
     return new Promise((resolve) => {
-        // #ifdef MP-WEIXIN
         wx.requestSubscribeDeviceMessage({
             sn: sn,
             snTicket: snTicket,
@@ -210,10 +207,6 @@ function callDeviceSubscribe(sn : string, snTicket : string, modelId : string, t
                 resolve({ status: 'fail', errMsg: normalizeDeviceError(errMsg, errCode), errCode: errCode, templateId: templateId })
             }
         })
-        // #endif
-        // #ifndef MP-WEIXIN
-        resolve({ status: 'unsupported', errMsg: '当前环境不支持设备订阅', errCode: 0, templateId: templateId })
-        // #endif
     })
 }
 
@@ -247,7 +240,6 @@ export function checkTemplateSubscribed(templateId : string) : Promise<boolean> 
             resolve(false)
             return
         }
-        // #ifdef MP-WEIXIN
         wx.getSetting({
             withSubscriptions: true,
             success: (res : any) => {
@@ -271,10 +263,6 @@ export function checkTemplateSubscribed(templateId : string) : Promise<boolean> 
             },
             fail: () => resolve(false)
         })
-        // #endif
-        // #ifndef MP-WEIXIN
-        resolve(false)
-        // #endif
     })
 }
 
@@ -303,7 +291,6 @@ export async function requestSubscribeOnce(bizCodes : Array<string>) : Promise<U
 
 function callOnceSubscribe(tmplIds : Array<string>) : Promise<UTSJSONObject | null> {
     return new Promise((resolve) => {
-        // #ifdef MP-WEIXIN
         uni.requestSubscribeMessage({
             tmplIds: tmplIds,
             success: (res : any) => {
@@ -316,10 +303,6 @@ function callOnceSubscribe(tmplIds : Array<string>) : Promise<UTSJSONObject | nu
                 resolve(null)
             }
         })
-        // #endif
-        // #ifndef MP-WEIXIN
-        resolve(null)
-        // #endif
     })
 }
 

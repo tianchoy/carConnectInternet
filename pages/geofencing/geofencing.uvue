@@ -161,9 +161,7 @@
 		</i-popup>
 	</view>
 	<app-toast></app-toast>
-	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
 	<app-modal></app-modal>
-	<!-- #endif -->
 </template>
 
 <script setup>

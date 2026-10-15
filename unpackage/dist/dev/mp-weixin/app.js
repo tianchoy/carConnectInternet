@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
-const services_appStartup = require("./services/app-startup.js");
 if (!Math) {
   "./pages/index/index.js";
   "./pages/message/message.js";
@@ -36,16 +35,16 @@ function checkForUpdates() {
     updateManager = common_vendor.index.getUpdateManager();
     if (updateManager) {
       updateManager.onCheckForUpdate((res = null) => {
-        common_vendor.index.__f__("log", "at App.uvue:23", "检查更新结果:", res);
+        common_vendor.index.__f__("log", "at App.uvue:13", "检查更新结果:", res);
         if (res.hasUpdate) {
-          common_vendor.index.__f__("log", "at App.uvue:26", "发现新版本，正在后台下载...");
+          common_vendor.index.__f__("log", "at App.uvue:16", "发现新版本，正在后台下载...");
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "下载新版本中"
           }));
         }
       });
       updateManager.onUpdateReady(() => {
-        common_vendor.index.__f__("log", "at App.uvue:35", "新版本下载完成");
+        common_vendor.index.__f__("log", "at App.uvue:25", "新版本下载完成");
         common_vendor.index.hideLoading();
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新提示",
@@ -60,7 +59,7 @@ function checkForUpdates() {
         }));
       });
       updateManager.onUpdateFailed(() => {
-        common_vendor.index.__f__("error", "at App.uvue:55", "新版本下载失败");
+        common_vendor.index.__f__("error", "at App.uvue:45", "新版本下载失败");
         common_vendor.index.hideLoading();
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新失败",
@@ -80,20 +79,17 @@ function checkForUpdates() {
 }
 const _sfc_main = common_vendor.defineComponent({
   onLaunch: function() {
-    common_vendor.index.__f__("log", "at App.uvue:80", "App onLaunch");
+    common_vendor.index.__f__("log", "at App.uvue:69", "App onLaunch");
     checkForUpdates();
-    if (common_vendor.index.getStorageSync("token", true) != null) {
-      services_appStartup.schedulePostLoginInitialization();
-    }
   },
   onShow: function() {
-    common_vendor.index.__f__("log", "at App.uvue:93", "App Show");
+    common_vendor.index.__f__("log", "at App.uvue:73", "App Show");
   },
   onHide: function() {
-    common_vendor.index.__f__("log", "at App.uvue:98", "App Hide");
+    common_vendor.index.__f__("log", "at App.uvue:76", "App Hide");
   },
   onExit: function() {
-    common_vendor.index.__f__("log", "at App.uvue:120", "App Exit");
+    common_vendor.index.__f__("log", "at App.uvue:79", "App Exit");
   }
 });
 function createApp() {

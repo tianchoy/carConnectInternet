@@ -31,17 +31,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (simMerchant.toLowerCase() == "zddx") {
         iccid = iccid.substring(0, iccid.length - 1);
       }
-      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:58", iccid);
+      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:56", iccid);
       needRefresh.value = true;
       common_vendor.index.openEmbeddedMiniProgram({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:70", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:67", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:74", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:71", "打开小程序失败", res);
           needRefresh.value = false;
           utils_toast.showAppToast({
             title: "打开支付页面失败",
@@ -122,8 +122,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, props.hasMore == true ? {} : {}, {
         f: common_vendor.o(onScrollToLower, "e7")
       }) : {}, {
-        g: common_vendor.o(confirm, "de"),
-        h: common_vendor.o(cancel, "cd"),
+        g: common_vendor.o(confirm, "3e"),
+        h: common_vendor.o(cancel, "24"),
         i: common_vendor.p({
           show: common_vendor.unref(modal),
           title: "提示",

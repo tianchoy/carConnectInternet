@@ -1,9 +1,5 @@
-import { clearPushSessionState } from '../services/push.uts'
 import { asJSONObject, getResponseCode, getResponseMessage } from './response.uts'
 import { showAppToast } from '../utils/toast.uts'
-// #ifdef APP-ANDROID
-import AndroidLog from 'android.util.Log'
-// #endif
 // 定义类型
 type RequestOptions = {
     url?: string
@@ -57,7 +53,6 @@ export function handleTokenExpired(): void {
     
     // 清除本地token
     uni.removeStorageSync('token')
-    clearPushSessionState()
     
     // 显示提示
     showAppToast({
@@ -90,23 +85,12 @@ function requestInterceptor(config: RequestOptions): RequestOptions {
     const token = uni.getStorageSync('token')
     const authorization = 'Bearer ' + (token != null ? token.toString() : '')
 
-    //#ifdef MP-WEIXIN
     if (config.header == null) {
         config.header = {}
     }
     config.header['Authorization'] = authorization
     config.header['clientId'] = CLIENT_ID
     config.header['tenantId'] = DEFAULT_TENANT_ID
-    //#endif
-
-    //#ifndef MP-WEIXIN
-    if (config.header == null) {
-        config.header = new UTSJSONObject()
-    }
-    config.header!.set('Authorization', authorization)
-    config.header!.set('clientId', CLIENT_ID)
-    config.header!.set('tenantId', DEFAULT_TENANT_ID)
-    //#endif
 
     // 显示加载中
     // if (config.showLoading !== false) {
@@ -140,9 +124,6 @@ function responseInterceptor(response: RequestSuccess<any>, config: RequestOptio
 
 function logHttpError(error: HttpError): void {
     const detail = 'statusCode=' + error.statusCode + ', message=' + error.message + ', data=' + (error.data != null ? error.data.toString() : '')
-    // #ifdef APP-ANDROID
-    AndroidLog.e('HttpRequest', detail)
-    // #endif
     console.error('[HttpRequest] ' + detail)
 }
 

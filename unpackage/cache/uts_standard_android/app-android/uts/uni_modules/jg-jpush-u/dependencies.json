@@ -1,9 +1,0 @@
-{
-  "version": "1",
-  "dependencies": {
-    "dependencies": [
-      "cn.jiguang.sdk:jpush:6.2.0",
-      "cn.jiguang.sdk:jcore:5.5.0"
-    ]
-  }
-}

@@ -228,7 +228,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         return configs;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:381", "解析指令参数配置失败:", error);
+        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:380", "解析指令参数配置失败:", error);
         paramConfigError.value = "指令参数配置无效";
         return [];
       }
@@ -322,7 +322,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载可用指令失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:474", "加载可用指令失败:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:468", "加载可用指令失败:", error);
           utils_toast.showAppToast({ title: "加载可用指令失败，请检查网络", icon: "none" });
         } finally {
           isCommandLoading.value = false;
@@ -382,7 +382,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           historyPageNum.value = requestedPage + 1;
           hasMoreHistory.value = historyRecords.value.length < historyTotal.value && rows.length > 0;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:526", "加载指令记录失败:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:520", "加载指令记录失败:", error);
           utils_toast.showAppToast({ title: "加载指令记录失败，请检查网络", icon: "none" });
         } finally {
           hasLoadedHistory.value = true;
@@ -432,7 +432,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令下发失败", icon: "none", duration: 3e3 });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:570", "下发指令失败:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:564", "下发指令失败:", error);
           utils_toast.showAppToast({ title: "指令下发失败，请检查网络", icon: "none" });
         } finally {
           isSending.value = false;
@@ -481,10 +481,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const reason = getString(record, "reason");
       return reason != "" ? reason : getString(record, "responseContent");
     }
-    function markHistoryScroll(event) {
-      if (activeTab.value != "history")
-        return null;
-    }
     function loadMoreHistory() {
       if (activeTab.value != "history")
         return null;
@@ -506,7 +502,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令详情失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:650", "加载指令详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:633", "加载指令详情失败:", error);
           utils_toast.showAppToast({ title: "加载指令详情失败，请检查网络", icon: "none" });
         } finally {
           isDetailLoading.value = false;
@@ -540,7 +536,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "重试下发失败", icon: "none", duration: 3e3 });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:677", "重试下发失败:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:660", "重试下发失败:", error);
           utils_toast.showAppToast({ title: "重试下发失败，请检查网络", icon: "none" });
         } finally {
           isRetrying.value = false;
@@ -600,7 +596,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: deviceNo.value == "" && deviceId.value == ""
       }, deviceNo.value == "" && deviceId.value == "" ? {} : activeTab.value == "send" ? common_vendor.e({
-        h: common_vendor.o(loadAvailableCommands, "7c"),
+        h: common_vendor.o(loadAvailableCommands, "88"),
         i: isCommandLoading.value
       }, isCommandLoading.value ? {} : availableCommands.value.length == 0 ? {} : {
         k: common_vendor.f(availableCommands.value, (command, index, i0) => {
@@ -671,7 +667,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         q: paramConfigs.value.length == 0 && paramConfigError.value == ""
       }, paramConfigs.value.length == 0 && paramConfigError.value == "" ? {} : {}, {
-        r: common_vendor.o(confirmSendCommand, "58"),
+        r: common_vendor.o(confirmSendCommand, "df"),
         s: common_vendor.p({
           type: "primary",
           text: "确认下发指令",
@@ -680,7 +676,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "send-button data-v-c4271740"
         })
       }) : {}) : common_vendor.e({
-        t: common_vendor.o(reloadHistory, "d3"),
+        t: common_vendor.o(reloadHistory, "74"),
         v: isHistoryInitialLoading.value
       }, isHistoryInitialLoading.value ? {} : historyRecords.value.length == 0 ? {} : {
         x: common_vendor.f(historyRecords.value, (record, index, i0) => {
@@ -709,41 +705,40 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         A: !hasMoreHistory.value
       }) : {}), {
         g: activeTab.value == "send",
-        B: common_vendor.o(markHistoryScroll, "d6"),
-        C: common_vendor.o(loadMoreHistory, "b8"),
-        D: common_vendor.o(($event) => {
+        B: common_vendor.o(loadMoreHistory, "f6"),
+        C: common_vendor.o(($event) => {
           return selectOption($event);
-        }, "4b"),
-        E: common_vendor.o(($event) => {
+        }, "34"),
+        D: common_vendor.o(($event) => {
           return optionSheetVisible.value = $event;
-        }, "b8"),
-        F: common_vendor.p({
+        }, "ff"),
+        E: common_vendor.p({
           title: optionSheetTitle.value,
           actions: optionActions.value,
           cancelText: "取消",
           show: optionSheetVisible.value,
           class: "data-v-c4271740"
         }),
-        G: isDetailLoading.value
+        F: isDetailLoading.value
       }, isDetailLoading.value ? {} : common_vendor.e({
-        H: common_vendor.t(getRecordName(detailRecord.value)),
-        I: common_vendor.t(getStatusText(detailRecord.value)),
-        J: common_vendor.t(getRecordTime(detailRecord.value)),
-        K: getDetailResponse() != ""
+        G: common_vendor.t(getRecordName(detailRecord.value)),
+        H: common_vendor.t(getStatusText(detailRecord.value)),
+        I: common_vendor.t(getRecordTime(detailRecord.value)),
+        J: getDetailResponse() != ""
       }, getDetailResponse() != "" ? {
-        L: common_vendor.t(getDetailResponse())
+        K: common_vendor.t(getDetailResponse())
       } : {}, {
-        M: getDetailReason() != ""
+        L: getDetailReason() != ""
       }, getDetailReason() != "" ? {
-        N: common_vendor.t(getDetailReason())
+        M: common_vendor.t(getDetailReason())
       } : {}, {
-        O: getDetailParams() != ""
+        N: getDetailParams() != ""
       }, getDetailParams() != "" ? {
-        P: common_vendor.t(getDetailParams())
+        O: common_vendor.t(getDetailParams())
       } : {}), {
-        Q: common_vendor.o(closeDetail, "6e"),
-        R: common_vendor.o(confirmRetryFromDetail, "9a"),
-        S: common_vendor.p({
+        P: common_vendor.o(closeDetail, "5c"),
+        Q: common_vendor.o(confirmRetryFromDetail, "bd"),
+        R: common_vendor.p({
           show: detailVisible.value,
           title: "指令详情",
           confirmText: "关闭",
@@ -751,9 +746,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           cancelText: "重试下发",
           class: "data-v-c4271740"
         }),
-        T: `${_ctx.u_s_b_h}px`,
-        U: `${_ctx.u_s_a_i_b}px`,
-        V: common_vendor.p({
+        S: `${_ctx.u_s_b_h}px`,
+        T: `${_ctx.u_s_a_i_b}px`,
+        U: common_vendor.p({
           class: "data-v-c4271740"
         })
       });

@@ -3,7 +3,6 @@ const common_vendor = require("../../common/vendor.js");
 const api_request = require("../../api/request.js");
 const api_response = require("../../api/response.js");
 const api_http = require("../../api/http.js");
-const services_appStartup = require("../../services/app-startup.js");
 const utils_toast = require("../../utils/toast.js");
 const services_auth_smsRegisterContext = require("../../services/auth/sms-register-context.js");
 if (!Array) {
@@ -75,12 +74,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       services_auth_smsRegisterContext.clearSmsRegisterContext();
       utils_toast.showAppToast({ title: message || "注册成功", icon: "success" });
       setTimeout(() => {
-        common_vendor.index.reLaunch({
-          url: "/pages/index/index",
-          success: () => {
-            services_appStartup.schedulePostLoginInitialization();
-          }
-        });
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
       }, 500);
     };
     const isValidPassword = () => {

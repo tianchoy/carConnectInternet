@@ -6,9 +6,7 @@ const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const utils_modal = require("../../utils/modal.js");
 const utils_legal = require("../../utils/legal.js");
-const services_appStartup = require("../../services/app-startup.js");
 const api_http = require("../../api/http.js");
-require("../../services/auth/sms-register-context.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
@@ -26,27 +24,6 @@ const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 const _easycom_app_modal = () => "../../components/app-modal/app-modal.js";
 if (!Math) {
   (_easycom_custom_navBar + _easycom_i_input + _easycom_i_checkbox + _easycom_i_button + _easycom_app_toast + _easycom_app_modal)();
-}
-class PersonalLoginForm extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          username: { type: String, optional: false },
-          password: { type: String, optional: false }
-        };
-      },
-      name: "PersonalLoginForm"
-    };
-  }
-  constructor(options, metadata = PersonalLoginForm.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.username = this.__props__.username;
-    this.password = this.__props__.password;
-    delete this.__props__;
-  }
 }
 class EnterpriseLoginForm extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -80,28 +57,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }));
     const rememberPassword = common_vendor.ref(false);
     const enterpriseSubmitting = common_vendor.ref(false);
-    const smsLoginMode = common_vendor.ref(false);
-    const personalForm = common_vendor.ref(new PersonalLoginForm({
-      username: "",
-      password: ""
-    }));
-    const personalSubmitting = common_vendor.ref(false);
-    const smsMobile = common_vendor.ref("");
-    const smsCode = common_vendor.ref("");
-    common_vendor.ref(0);
-    common_vendor.ref(false);
-    const smsSubmitting = common_vendor.ref(false);
-    const isPersonalPasswordLoginReady = common_vendor.computed(() => {
-      return personalForm.value.username != "" && personalForm.value.password != "";
-    });
-    const isSmsLoginReady = common_vendor.computed(() => {
-      return /^1[3-9]\d{9}$/.test(smsMobile.value) && /^\d{6}$/.test(smsCode.value);
-    });
-    common_vendor.computed(() => {
-      const isFormReady = smsLoginMode.value ? isSmsLoginReady.value : isPersonalPasswordLoginReady.value;
-      const isSubmitting = smsLoginMode.value ? smsSubmitting.value : personalSubmitting.value;
-      return isFormReady && docState.value && !isSubmitting;
-    });
     const isDocState = () => {
       docState.value = !docState.value;
     };
@@ -114,12 +69,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       api_http.resetTokenExpiredState();
       utils_toast.showAppToast({ title: message || "登录成功", icon: "success" });
       setTimeout(() => {
-        common_vendor.index.reLaunch({
-          url: "/pages/index/index",
-          success: () => {
-            services_appStartup.schedulePostLoginInitialization();
-          }
-        });
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
       }, 500);
     };
     const ensureAgreementAccepted = () => {
@@ -182,7 +132,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           completeLogin(token, res.msg);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:504", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:150", "微信登录失败:", error);
           utils_toast.showAppToast({ title: "微信登录失败", icon: "none" });
         } finally {
           common_vendor.index.hideLoading();
@@ -204,7 +154,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         enterpriseForm.value.password = password != null ? String(password) : "";
         rememberPassword.value = enterpriseForm.value.username != "" || enterpriseForm.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/login/login.uvue:528", "加载保存的企业账号失败:", error);
+        common_vendor.index.__f__("warn", "at pages/login/login.uvue:173", "加载保存的企业账号失败:", error);
       }
     };
     const toggleEnterpriseLogin = () => {
@@ -264,8 +214,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const gotoPrivacy = () => {
       utils_modal.showAppModal(new common_vendor.UTSJSONObject({ title: "隐私政策", content: utils_legal.privacyPolicy, showCancel: false }));
     };
-    common_vendor.onUnmounted(() => {
-    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
@@ -282,7 +230,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, pswLogin.value ? {
         d: common_vendor.o(($event) => {
           return enterpriseForm.value.username = $event;
-        }, "11"),
+        }, "09"),
         e: common_vendor.p({
           placeholder: "请输入账号",
           clearable: true,
@@ -297,7 +245,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.o(($event) => {
           return enterpriseForm.value.password = $event;
-        }, "74"),
+        }, "f5"),
         g: common_vendor.p({
           placeholder: "请输入登录密码",
           password: true,
@@ -310,13 +258,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: enterpriseForm.value.password,
           class: "login-input password-input data-v-27a30816"
         }),
-        h: common_vendor.o(toggleRememberPassword, "b8"),
+        h: common_vendor.o(toggleRememberPassword, "8e"),
         i: common_vendor.p({
           checked: rememberPassword.value,
           label: "记住密码",
           class: "data-v-27a30816"
         }),
-        j: common_vendor.o(submitEnterpriseLogin, "ba"),
+        j: common_vendor.o(submitEnterpriseLogin, "24"),
         k: common_vendor.p({
           type: "primary",
           block: true,
@@ -329,11 +277,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : common_vendor.e({
         l: !docState.value
       }, !docState.value ? {
-        m: common_vendor.o(loginBt, "3a")
+        m: common_vendor.o(loginBt, "62")
       } : {
-        n: common_vendor.o(handleGetPhoneNumber, "63")
+        n: common_vendor.o(handleGetPhoneNumber, "a7")
       }), {
-        o: common_vendor.o(isDocState, "63"),
+        o: common_vendor.o(isDocState, "e9"),
         p: common_vendor.p({
           checked: docState.value,
           size: "40rpx",
@@ -342,11 +290,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           inactiveColor: "#a9bfd7",
           class: "data-v-27a30816"
         }),
-        q: common_vendor.o(gotoAgreement, "24"),
-        r: common_vendor.o(gotoPrivacy, "02"),
-        s: common_vendor.o(gotoIndex, "5b"),
+        q: common_vendor.o(gotoAgreement, "d8"),
+        r: common_vendor.o(gotoPrivacy, "20"),
+        s: common_vendor.o(gotoIndex, "0c"),
         t: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
-        v: common_vendor.o(toggleEnterpriseLogin, "4c"),
+        v: common_vendor.o(toggleEnterpriseLogin, "2d"),
         w: `${_ctx.u_s_b_h}px`,
         x: `${_ctx.u_s_a_i_b}px`,
         y: common_vendor.p({

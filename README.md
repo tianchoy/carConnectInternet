@@ -2,6 +2,7 @@
   - 项目名称：carConnectInternet
   - 项目描述：这是一个基于uni-app-x的车辆定位器项目，用于车辆定位。
   - 项目架构:
+    - 运行平台：微信小程序（uni-app x，仅 mp-weixin）
     - 前端：uniAppX + Vue3 + TypeScript + uv-ui
     - 后端：Java + Spring Boot
     - 数据库：MySQL

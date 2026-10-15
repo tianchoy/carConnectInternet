@@ -6,7 +6,6 @@
 			<map v-if="isMapReady" id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="false" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 			</map>
-			<!-- #ifdef MP-WEIXIN -->
 			<!--
 				播放期车标：普通 view 覆盖在 map 之上，固定钉在屏幕中心。
 				这是"车标零闪动"的根本原因——车标不再属于原生 markers 覆盖物图层，
@@ -16,7 +15,6 @@
 			<view v-if="showCarOverlay" class="car-overlay">
 				<image class="car-overlay-icon" :src="carOverlayIcon" :style="'transform: rotate(' + carOverlayRotation + 'deg);'"></image>
 			</view>
-			<!-- #endif -->
 			<sub-navBar class="sub-nav-overlay" :showTime="false" :currentCar="plateNo" :showCar="true" :carStatus='carStatus'></sub-navBar>
 		</view>
 
@@ -38,16 +36,9 @@
 			<view class="tool-tag-item">
 				<i-button type="primary" @click="togglePlayback" size="small" :text="isPlaying ? '暂停':'播放'"></i-button>
 				<view class="slider">
-					<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
 					<i-slider v-model="playbackSpeed" :min="1" :max="30" :step="1"
 						@change="setPlaybackSpeedFromValue">
 					</i-slider>
-					<!-- #endif -->
-					<!-- #ifdef APP-IOS -->
-					<slider :value="playbackSpeed" :min="1" :max="30" :step="1"
-						@changing="setPlaybackSpeed" @change="setPlaybackSpeed">
-					</slider>
-					<!-- #endif -->
 				</view>
 				<text class="speed-label">{{playbackSpeed}}x</text>
 			</view>
@@ -85,10 +76,6 @@ import { showAppToast } from '../../utils/toast.uts'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getUserCurrentLocation } from '../../utils/getUserLocation.uts'
-	// #ifdef APP-ANDROID
-	import Polyline from 'uts.sdk.modules.DCloudUniMapTencent.Polyline'
-	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
-	// #endif
 
 	type TrackPoint = {
 		latitude : number;
@@ -141,14 +128,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	type MapMarker = Marker
 
 	const trackPoints = ref<Array<TrackPoint>>([])
-	// #ifdef APP-ANDROID
-	const polyline = ref<Array<Polyline>>([])
-	let unplayedPolyline : Polyline | null = null
-	let playedPolyline : Polyline | null = null
-	// #endif
-	// #ifdef MP-WEIXIN || APP-IOS
 	const polyline = ref<Array<MpPolylineData>>([])
-	// #endif
 	const isPlaying = ref(false)
 	const isTrackPlayable = ref(false)
 	const playbackSpeed = ref(1)
@@ -157,7 +137,6 @@ import { showAppToast } from '../../utils/toast.uts'
 	const currentTime = ref('')
 	const currentIndex = ref(0)
 	const carMarker = ref<MapMarker | null>(null)
-	// #ifdef MP-WEIXIN
 	// 微信小程序里逻辑层与原生地图层是跨线程通信。关键认知：
 	// "地图中心"和"车标"是两笔开销完全不同的 setData，编译后它们各自是一个独立的顶层绑定
 	//（latitude/longitude 与 markers）：
@@ -168,11 +147,6 @@ import { showAppToast } from '../../utils/toast.uts'
 	// 因此最终方案是把播放期车标整体移出原生图层，改用普通 view 覆盖（.car-overlay）：
 	// 覆盖层车标恒定钉在屏幕中心，只有地图在动，播放期间 markers 一次都不下发。
 	const PLAYBACK_FRAME_INTERVAL_MS = 50
-	// #endif
-	// #ifdef APP-ANDROID || APP-IOS
-	const PLAYBACK_FRAME_INTERVAL_MS = 30
-	// #endif
-	// #ifdef MP-WEIXIN
 	// 播放期车标改为普通 view 覆盖物（见模板中的 .car-overlay），彻底移出原生 markers 图层。
 	// 状态：是否显示覆盖层车标、覆盖层车标的图标与角度。
 	// 覆盖层车标恒定钉在地图容器正中，因此它自身永远不需要移动——需要移动的只有地图。
@@ -180,11 +154,9 @@ import { showAppToast } from '../../utils/toast.uts'
 	const showCarOverlay = ref(false)
 	const carOverlayIcon = ref('/static/cars/online/default.png')
 	const carOverlayRotation = ref(0)
-	// #endif
 	const MIN_SEGMENT_DURATION_MS = 500
 	const MAX_SEGMENT_DURATION_MS = 6000
 	const FALLBACK_SPEED_KMH = 20
-	// #ifdef MP-WEIXIN
 	// 折线重绘的屏幕位移死区（像素）——微信端播放期折线重绘的唯一闸门。
 	//
 	// 背景：微信小程序端每收到一次 polyline 赋值，安卓机都会销毁并重建整条折线图层，
@@ -232,11 +204,6 @@ import { showAppToast } from '../../utils/toast.uts'
 	// 渲染的缩放级别"。用户双指放大后二者会脱节，��死区所依赖的像素↔米换算会被放大
 	// 十几倍（实测可达 128px 以上的真实滞后）。播放期周期同步即可把误差压到亚秒级。
 	const MAP_SCALE_SYNC_INTERVAL_MS = 300
-	// #endif
-	// #ifdef APP-ANDROID || APP-IOS
-	// 车标与地图中心逐帧刷新；折线重绘是 O(n) 操作，按时间节流即可，肉眼无差别
-	const POLYLINE_RENDER_INTERVAL_MS = 80
-	// #endif
 	// 车标角度变化小于该度数时不下发新的 rotate：地图端每收到一个不同的 rotate 都要重建
 	// 车标视图，而 2° 以内的差异肉眼完全看不出来
 	const MARKER_ROTATION_UPDATE_THRESHOLD = 2
@@ -253,16 +220,6 @@ import { showAppToast } from '../../utils/toast.uts'
 	let lastPolylineRenderAt = 0
 	// 上一次真正下发给地图的车标角度（用于过滤无意义的 rotate 变化）
 	let lastCarMarkerRotation = 0
-
-	function copyTrackPoint(point : TrackPoint) : TrackPoint {
-		return {
-			latitude: point.latitude,
-			longitude: point.longitude,
-			rotation: point.rotation,
-			deviceTime: point.deviceTime,
-			speed: point.speed
-		}
-	}
 
 	function resetRenderedPoint(point : TrackPoint) : void {
 		renderedPoint.latitude = point.latitude
@@ -572,11 +529,9 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 		carMarker.value = marker
 		lastCarMarkerRotation = firstPoint.rotation
-		// #ifdef MP-WEIXIN
 		// 覆盖层车标复用同一张车辆图标，起播时直接可用
 		carOverlayIcon.value = deviceIcon
 		carOverlayRotation.value = firstPoint.rotation
-		// #endif
 
 		const start : MapMarker = {
 			id: 1000,
@@ -614,76 +569,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		markers.value = list
 	}
 
-	// #ifdef APP-ANDROID
-	function toNativePoints(points : Array<TrackPoint>) : Array<LocationObject> {
-		return points.map((point : TrackPoint) : LocationObject => {
-			return new LocationObject(point.latitude, point.longitude)
-		})
-	}
 
-	function initPolyline() {
-		if (trackPoints.value.length < 2) {
-			unplayedPolyline = null
-			playedPolyline = null
-			polyline.value = []
-			return
-		}
-
-		const initialUnplayedPolyline = new Polyline(
-			toNativePoints(trackPoints.value), '#444444', 3, true, false, '', '#444444', 0, []
-		)
-		initialUnplayedPolyline.color = '#444444'
-		initialUnplayedPolyline.width = 3
-		initialUnplayedPolyline.dottedLine = true
-		initialUnplayedPolyline.arrowLine = false
-		initialUnplayedPolyline.borderColor = '#444444'
-		initialUnplayedPolyline.borderWidth = 0
-
-		const initialPlayedPolyline = new Polyline(
-			toNativePoints(trackPoints.value.slice(0, 1)), '#3c5cff', 5, false, true, '', '#FFFFFF', 1, []
-		)
-		initialPlayedPolyline.color = '#3c5cff'
-		initialPlayedPolyline.width = 5
-		initialPlayedPolyline.dottedLine = false
-		initialPlayedPolyline.arrowLine = true
-		initialPlayedPolyline.borderColor = '#FFFFFF'
-		initialPlayedPolyline.borderWidth = 1
-		unplayedPolyline = initialUnplayedPolyline
-		playedPolyline = initialPlayedPolyline
-		polyline.value = [initialUnplayedPolyline, initialPlayedPolyline]
-	}
-
-	function updatePolyline() {
-		const currentUnplayedPolyline = unplayedPolyline
-		const currentPlayedPolyline = playedPolyline
-		if (trackPoints.value.length == 0 || currentUnplayedPolyline == null || currentPlayedPolyline == null) return
-
-		const isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value
-		const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
-		if (isAnimatingSegment) {
-			playedPoints.push(copyTrackPoint(renderedPoint))
-		}
-		const unplayedStartIndex = isAnimatingSegment ? activeSegmentTargetIndex.value : currentIndex.value
-		const unplayedPoints = trackPoints.value.slice(unplayedStartIndex)
-		if (isAnimatingSegment) {
-			unplayedPoints.unshift(copyTrackPoint(renderedPoint))
-		}
-		currentUnplayedPolyline.points = toNativePoints(unplayedPoints)
-		currentPlayedPolyline.points = toNativePoints(playedPoints)
-		polyline.value = [currentUnplayedPolyline, currentPlayedPolyline]
-	}
-	// #endif
-
-	// #ifdef MP-WEIXIN || APP-IOS
-	function toMpPoints(points : Array<TrackPoint>) : Array<MapPolylinePoint> {
-		return points.map((point : TrackPoint) : MapPolylinePoint => ({
-			latitude: point.latitude,
-			longitude: point.longitude
-		}))
-	}
-	// #endif
-
-	// #ifdef MP-WEIXIN
 	// 单次 setData 下发给地图的折线点数上限。长轨迹动辄上千个点，全量传输会把
 	// JS↔原生桥打满，安卓机上直接表现为折线反复重建、整条线闪烁。
 	// 手机屏幕只有几百像素宽，抽稀到 400 点形状上完全看不出差别。
@@ -1053,57 +939,8 @@ import { showAppToast } from '../../utils/toast.uts'
 		invalidatePolylineAnchor()
 		updatePolyline()
 	}
-	// #endif
 
-	// #ifdef APP-IOS
-	function updatePolyline() {
-		if (trackPoints.value.length < 2) {
-			polyline.value = []
-			return
-		}
 
-		const isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value
-		const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
-		if (isAnimatingSegment) {
-			playedPoints.push(copyTrackPoint(renderedPoint))
-		}
-		const unplayedStartIndex = isAnimatingSegment ? activeSegmentTargetIndex.value : currentIndex.value
-		const lines : Array<MpPolylineData> = []
-		const unplayedPoints = trackPoints.value.slice(unplayedStartIndex)
-		if (isAnimatingSegment) {
-			unplayedPoints.unshift(copyTrackPoint(renderedPoint))
-		}
-		if (unplayedPoints.length >= 2) {
-			lines.push({
-				points: toMpPoints(unplayedPoints),
-				color: '#444444',
-				width: 3,
-				dottedLine: true,
-				arrowLine: false,
-				borderColor: '#FFFFFF',
-				borderWidth: 1
-			})
-		}
-		if (playedPoints.length >= 2) {
-			lines.push({
-				points: toMpPoints(playedPoints),
-				color: '#1890FF',
-				width: 5,
-				dottedLine: false,
-				arrowLine: true,
-				borderColor: '#FFFFFF',
-				borderWidth: 1
-			})
-		}
-		polyline.value = lines
-	}
-
-	function initPolyline() {
-		updatePolyline()
-	}
-	// #endif
-
-	// #ifdef MP-WEIXIN
 	// 当前缩放级别下 1 个屏幕像素对应的地面距离（米）
 	// 优先使用地图自报的真实缩放级别；尚未取到时回退到我们下发的目标值 mapScale。
 	// 之所以必须区分二者：用户双指放大后地图的 zoom 由用户决定，mapScale 并不知道；
@@ -1131,7 +968,6 @@ import { showAppToast } from '../../utils/toast.uts'
 		const radius = halfDiagonalPx * getMetersPerPixelOfScale(renderedPoint.latitude) * POLYLINE_CLIP_MARGIN
 		return radius > 1.0 ? radius : 1.0
 	}
-	// #endif
 
 	// 更新小车位置。force = true 时跳过节流强制下发一帧，用于"位置必须立即对齐"的场合：
 	// 起播、重置、以及每段动画结束（否则车标会停在最后一次推送处，播放结束时与终点差一小段）。
@@ -1148,7 +984,6 @@ import { showAppToast } from '../../utils/toast.uts'
 				center.longitude = renderedPoint.longitude
 			}
 
-			// #ifdef MP-WEIXIN
 			// 播放期间：车标由 .car-overlay 这个普通 view 承担，它恒定钉在屏幕中心，
 			// 地图中心又已经精确跟到车标经上，因此覆盖层车标不需要再移动，只需要更新朝向。
 			// 这里是全文件最重要的分支：它让播放过程彻底不再触碰 markers，
@@ -1162,7 +997,6 @@ import { showAppToast } from '../../utils/toast.uts'
 				// 地图中心已在上面更新完毕，覆盖层车标角度也已刷新，二者已完全同频。
 				return
 			}
-			// #endif
 
 			// 角度变化小于阈值时沿用上一次下发的角度：地图端每收到一个不同的 rotate 都要
 			// 重建车标视图，小程序（尤其安卓）上会表现为车标闪动，而 2° 以内看不出来
@@ -1301,22 +1135,13 @@ function clearTrackDisplay() : void {
 		markers.value = []
 		lastCarMarkerRotation = 0
 		lastPolylineRenderAt = 0
-		// #ifdef APP-ANDROID
-		unplayedPolyline = null
-		playedPolyline = null
-		polyline.value = []
-		// #endif
-	// #ifdef MP-WEIXIN || APP-IOS
 	polyline.value = []
-	// #endif
-	// #ifdef MP-WEIXIN
 	// 轨迹已清空，锚点一并作废，下一次装载时强制重画
 	invalidatePolylineAnchor()
 	// 地图组件马上要按 v-if 重建，旧的 mapContext 会失效，这里一并丢弃重新创建
 	stopMapScaleSync()
 	trueMapScale = 0
 	mapContext = null
-	// #endif
 	}
 
 		function clearPlaybackTimer() : void {
@@ -1330,14 +1155,12 @@ function clearTrackDisplay() : void {
 	function pausePlayback() : void {
 		isPlaying.value = false
 		clearPlaybackTimer()
-		// #ifdef MP-WEIXIN
 		// 停止周期同步真实缩放：不在播放就不需要它。
 		stopMapScaleSync()
 		// 收尾：隐藏覆盖层车标，交还给原生 markers 车标。
 		// 两者切换发生在同一帧，地图中心本就停在车标经纬度上，因此视觉上是同一个位置无缝接力，
 		// 不会看到车标跳动或消失。
 		showCarOverlay.value = false
-		// #endif
 		// 暂停 / 播放结束时的收尾对齐：强制下发一帧车标。
 		// 覆盖层车标只是显示层的一层薄纱，真实位置由原生 markers 车标承载，
 		// 因此必须让它精确落在最后一个渲染点上，否则暂停后会看到车标与覆盖层错位一小段。
@@ -1345,12 +1168,10 @@ function clearTrackDisplay() : void {
 			updateCarPosition(true)
 			applyFullMarkers()
 		}
-		// #ifdef MP-WEIXIN
 		// 暂停瞬间强制重画一次折线：播放中最后几帧可能被死区跳过，
 		// 而暂停后车标要交还给原生 markers，必须与折线末端精确对齐，
 		// 否则会看到车标压在蓝线之外。
 		updatePolyline()
-		// #endif
 	}
 
 	function renderPlaybackIndex() : void {
@@ -1362,7 +1183,6 @@ function clearTrackDisplay() : void {
 		// 微信端播放中该调用只更新覆盖层车标朝向、不碰 markers（见 updateCarPosition）；
 		// 非播放时则用它把原生车标 marker 落到准确位置。
 		updateCarPosition(true)
-		// #ifdef MP-WEIXIN
 		// 段末 / 重置 / 拖动进度 / 载入完成都会走到这里，位置是"跳变后的确定值"，
 		// 必须精确对齐，因此作废锚点强制重画一次，不受死区限制。
 		// 但播放态的段末不强制：段末位置与上一帧的插值位置是连续的（车并没有瞬移），
@@ -1372,7 +1192,6 @@ function clearTrackDisplay() : void {
 		if (!isPlaying.value) {
 			invalidatePolylineAnchor()
 		}
-		// #endif
 		updatePolyline()
 		// 这里已经完整重画过一次折线，重置节流时间戳，避免紧接着的动画帧马上再重画一次
 		lastPolylineRenderAt = Date.now()
@@ -1596,12 +1415,7 @@ function clearTrackDisplay() : void {
 			// 而"屏幕上走了 8px"这个量与播放速度无关，无论 1x 还是 32x 都能保证滞后被车标盖住。
 			// 这里提前算好、下一帧再执行，避免抢在本帧车标 setData 的前面。
 			let polylineDue = false
-			// #ifdef MP-WEIXIN
 			polylineDue = shouldPushPolyline()
-			// #endif
-			// #ifdef APP-ANDROID || APP-IOS
-			polylineDue = frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS
-			// #endif
 			if (polylineDue) {
 				lastPolylineRenderAt = frameNow
 			}
@@ -1648,7 +1462,6 @@ function clearTrackDisplay() : void {
 
 		activeSegmentTargetIndex.value = -1
 		isPlaying.value = true
-		// #ifdef MP-WEIXIN
 		// 起播这一刻完成车标交接：显示覆盖层车标，同时把原生 markers 里的车标剔除，
 		// 只留下静止的起点 / 终点标记。
 		// 从这一帧起，整段播放过程 markers 数组再也不会被赋值——
@@ -1663,7 +1476,6 @@ function clearTrackDisplay() : void {
 		// 死区的像素↔米换算完全依赖它，若沿用一个陈旧值，蓝线会从第一帧就落后。
 		syncTrueMapScale()
 		startMapScaleSync()
-		// #endif
 		// 开始播放：此刻才把车标定为地图中心（查询阶段保持整条轨迹全览）
 		focusMapOnVehicle()
 		lastPolylineRenderAt = 0
@@ -1709,13 +1521,8 @@ function clearTrackDisplay() : void {
 		animateNextSegment(sessionId)
 	}
 
-	// i-slider 对外发送数值，原生 slider 发送事件对象
 	function setPlaybackSpeedFromValue(value : number) : void {
 		applyPlaybackSpeed(value)
-	}
-
-	function setPlaybackSpeed(event : UniSliderChangeEvent) : void {
-		applyPlaybackSpeed(event.detail.value)
 	}
 
 	const normalizeRouteValue = (value: any | null): string => {
@@ -1759,11 +1566,9 @@ function clearTrackDisplay() : void {
 		measureMapViewportSize(() => {
 			if (trackPoints.value.length > 0 && !isPlaying.value) adjustMapToFitTrack()
 		})
-		// #ifdef MP-WEIXIN
 		// 先取一次地图的真实缩放级别。播放期的死区要用它做"像素↔米"换算，
 		// 越早拿到真值，就越不会出现"起播第一帧蓝线就落后"的空档。
 		syncTrueMapScale()
-		// #endif
 	})
 
 	onHide(() => {
@@ -1802,7 +1607,6 @@ function clearTrackDisplay() : void {
 				z-index: 100;
 			}
 
-			/* #ifdef MP-WEIXIN */
 			/*
 			 * 播放期车标覆盖层。
 			 * 关键：它只是地图正中一层 25x25 的图片，本身从不移动，
@@ -1827,7 +1631,6 @@ function clearTrackDisplay() : void {
 				width: 50rpx;
 				height: 50rpx;
 			}
-			/* #endif */
 		}
 
 		.tools-panel {

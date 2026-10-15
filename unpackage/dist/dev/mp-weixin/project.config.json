@@ -10,8 +10,7 @@
     "minified": true,
     "newFeature": true,
     "bigPackageSizeSupport": true,
-    "useMiniAppAuthorizePage": true,
-    "copyMiniAppJsonPath": "../../../src/project.miniapp.json"
+    "useMiniAppAuthorizePage": true
   },
   "compileType": "miniprogram",
   "libVersion": "",

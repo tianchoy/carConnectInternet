@@ -6,12 +6,7 @@
     -->
     <scroll-view class="container" :scroll-y="showPicker ? 'false' : 'true'" :show-scrollbar="false">
         <view class="page-bg">
-            <!--#ifdef MP-WEIXIN-->
             <view class="top" :style="{paddingTop: statusBarHeight + 43 + 'px'}">
-            <!--#endif-->
-            <!--#ifndef MP-WEIXIN-->
-            <view class="top" :style="{paddingTop: statusBarHeight+ 10 + 'px'}">
-            <!--#endif-->
                 <view class="device-car">
                     <!-- 整条（除右侧三个按钮外）都是选择设备的触发区域，下三角紧贴设备名 -->
                     <view class="current-car" @click="handlePicker">
@@ -33,7 +28,6 @@
                 <view class="banner">
                     <image src="../../static/banner.png" mode="aspectFit" class="banner-image"></image>
                 </view>
-                <!--#ifdef MP-WEIXIN-->
                 <view class="subscribe-row" v-if="subscribeAvailable && checkToken() && hasDevice" @click="handleSubscribeTap">
                     <image src="../../static/msg.png" mode="aspectFit" class="subscribe-icon"></image>
                     <view class="subscribe-text">
@@ -44,7 +38,6 @@
                         <text class="subscribe-btn-text">{{ deviceSubscribed ? '已订阅' : '开启通知' }}</text>
                     </view>
                 </view>
-                <!--#endif-->
                 <view class="car-state">
                     <view class="state-item">
                         <text class="state-label">设备状态</text>
@@ -263,9 +256,7 @@
         </view>
     </l-popup>
 	<app-toast></app-toast>
-	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
 	<app-modal></app-modal>
-	<!-- #endif -->
 </template>
 
 <script setup lang="ts">
@@ -274,17 +265,12 @@ import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
-import { clearPushSessionState } from '../../services/push.uts'
-import { unbindPushDeviceOnLogout } from '../../services/push-binding.uts'
 import { isDeviceSubscribeSupported, authorizeDevice, checkTemplateSubscribed, fetchNotifyQuota, fetchNotifyStatusEnabled, getCachedQuota } from '../../utils/notify.uts'
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount, getHomePlatformAppId } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
 import { getDeviceIcon } from '../../utils/cars'
-// #ifdef APP-ANDROID
-import AndroidLog from 'android.util.Log'
-// #endif
 
 
 type Device = {
@@ -736,9 +722,6 @@ function getUserLocation() {
         provider:'system',
         success: (res) => {
             console.log('用户当前位置:', res)
-            // #ifdef APP-ANDROID
-            AndroidLog.i('用户当前位置:', JSON.stringify(res))
-            // #endif
             userLocation.latitude = res.latitude
             userLocation.longitude = res.longitude
             hasUserLocation.value = true
@@ -884,7 +867,7 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
 }
 
 // 地图已被用户拖动后，响应式 center 属性不会强制改变原生地图视野。
-// 重新挂载地图以确保各端都按受控中心点和缩放级别显示，避免单点 includePoints 在 iOS 上放大视野。
+// 重新挂载地图以确保按受控中心点和缩放级别显示，避免单点 includePoints 放大视野。
 const centerMapOnDevice = async (latitude: number, longitude: number): Promise<void> => {
     center.latitude = latitude
     center.longitude = longitude
@@ -1363,7 +1346,6 @@ const toFence = () => {
 }
 
 // 联系客服
-// #ifdef MP-WEIXIN
 const contactCustomerService = () => {
     uni.openCustomerServiceChat({
         extInfo: {url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a'},
@@ -1379,15 +1361,6 @@ const contactCustomerService = () => {
         }
     })
 }
-// #endif
-// #ifdef APP-IOS || APP-ANDROID
-const contactCustomerService = () => {
-    showAppToast({
-        title: '请在微信小程序中联系客服',
-        icon: 'none'
-    })
-}
-// #endif
 
 // 支付
 const needRefresh = ref(false)
@@ -1417,7 +1390,6 @@ const toPay = (iccid : string) => {
         payUrl.value = '/pages/home/userSimRecharge?iccid=' + iccid
     }
 
-    //#ifdef MP-WEIXIN
     uni.openEmbeddedMiniProgram({
         appId: platformAppId.value,
         path: payUrl.value,
@@ -1434,18 +1406,7 @@ const toPay = (iccid : string) => {
             })
         }
     })
-    //#endif
 
-    //#ifndef MP-WEIXIN
-    console.log('iccid',iccid)
-    needRefresh.value = false
-    showAppToast({
-        title: '请在微信小程序中完成充值',
-        icon: 'none',
-        duration: 2000,
-        mask: true
-    })
-    //#endif
 }
 
 // 跳转登录页
@@ -1494,13 +1455,11 @@ const unbindDevice = () : void => {
 }
 
 async function performLogout(): Promise<void> {
-    await unbindPushDeviceOnLogout()
     const res = await logoutRequest()
     if(isBusinessSuccessCode(res.code)){
         clearSavedSelectedDevice()
         clearSavedSelectedDeviceIndex()
         uni.removeStorageSync('token')
-        clearPushSessionState()
         uni.reLaunch({
             url:'/pages/login/login'
         })
@@ -1576,9 +1535,7 @@ const handleSubscribeTap = async (): Promise<void> => {
             content: '已开启车辆告警通知，如需关闭，请点击确定后在订阅消息中手动关闭',
             success: (res: AppModalSuccess): void => {
                 if (res.confirm) {
-                    // #ifdef MP-WEIXIN
                     uni.openSetting({})
-                    // #endif
                 }
             }
         })
@@ -1645,12 +1602,7 @@ onLoad(() => {
 .container {
     height: 100%;
     background-color: #E6F9E6;
-    // #ifdef MP-WEIXIN
     background-image: linear-gradient(90deg, #E6F9E6, #E0F0FF);
-    // #endif
-     // #ifndef MP-WEIXIN
-     background-image: linear-gradient(to right, #E6F9E6, #E0F0FF);
-     // #endif
 
     .page-bg {
         padding: 0 30rpx 30rpx 30rpx;
@@ -1698,9 +1650,7 @@ onLoad(() => {
                     color: #000;
                     text-align: center;
                     position: relative;
-                    // #ifdef MP-WEIXIN
                     margin-right: 10rpx;
-                    // #endif
                 }
                 .login{
                     font-size: 36rpx;

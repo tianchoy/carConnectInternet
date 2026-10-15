@@ -153,7 +153,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         context.addMarkers(toPlainObject(new common_vendor.UTSJSONObject({ markers: markers.value, clear: true })));
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:149", "车标同步到聚合器失败:", error);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:147", "车标同步到聚合器失败:", error);
       }
     };
     const setupMarkerCluster = () => {
@@ -207,7 +207,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         clusterReady = true;
         syncClusterMarkers();
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:203", "点聚合初始化失败，回退为普通标记点:", error);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:201", "点聚合初始化失败，回退为普通标记点:", error);
       }
     };
     const EMPTY_MARKERS = [];
@@ -452,7 +452,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             const res = yield api_request.getUserDeviceList(params);
             const list = api_response.isBusinessSuccessCode(res.code) && res.data != null ? res.data.list : null;
             if (list == null || !Array.isArray(list)) {
-              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:492", "获取设备列表返回异常:", res);
+              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:481", "获取设备列表返回异常:", res);
               originalDeviceList.value = [];
               markers.value = [];
               return Promise.resolve(null);
@@ -464,7 +464,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
           updateMarkers(originalDeviceList.value);
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:503", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:492", "获取设备列表失败:", err);
           originalDeviceList.value = [];
           markers.value = [];
           utils_toast.showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -540,7 +540,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       }
       if (selectedIndex < 0) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:591", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:580", "未找到对应的设备信息", markerId);
         return null;
       }
       const analysis = analyzeOverlap(list);

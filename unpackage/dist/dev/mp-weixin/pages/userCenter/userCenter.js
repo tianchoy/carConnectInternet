@@ -80,7 +80,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         extInfo: { url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" },
         corpId: "ww686122ec6a4db85a",
         success(res) {
-          common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:128", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:125", res);
         }
       });
     };

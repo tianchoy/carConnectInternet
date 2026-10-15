@@ -33,7 +33,7 @@ function isDeviceSubscribeSupported() {
   try {
     return common_vendor.wx$1.canIUse("requestSubscribeDeviceMessage");
   } catch (error) {
-    common_vendor.index.__f__("warn", "at utils/notify.uts:34", "[notify] 能力探测失败:", error);
+    common_vendor.index.__f__("warn", "at utils/notify.uts:33", "[notify] 能力探测失败:", error);
     return false;
   }
   return false;
@@ -61,14 +61,14 @@ function doFetchQuota() {
     try {
       const res = yield api_request.getNotifyQuota();
       if (!api_response.isBusinessSuccessCode(res.code)) {
-        common_vendor.index.__f__("warn", "at utils/notify.uts:67", "[notify] 拉取订阅额度失败:", res.msg);
+        common_vendor.index.__f__("warn", "at utils/notify.uts:65", "[notify] 拉取订阅额度失败:", res.msg);
         return readCachedQuota();
       }
       cacheQuota(res.data);
       quotaFetchedAt = Date.now();
       return res.data;
     } catch (error) {
-      common_vendor.index.__f__("warn", "at utils/notify.uts:74", "[notify] 拉取订阅额度异常:", error);
+      common_vendor.index.__f__("warn", "at utils/notify.uts:72", "[notify] 拉取订阅额度异常:", error);
       return readCachedQuota();
     } finally {
       quotaInFlight = null;
@@ -83,7 +83,7 @@ function fetchNotifyStatusEnabled() {
         return false;
       return res.data.getBoolean("enabled", false);
     } catch (error) {
-      common_vendor.index.__f__("warn", "at utils/notify.uts:91", "[notify] 查询订阅开关失败:", error);
+      common_vendor.index.__f__("warn", "at utils/notify.uts:89", "[notify] 查询订阅开关失败:", error);
       return false;
     }
   });
@@ -92,7 +92,7 @@ function cacheQuota(list) {
   try {
     common_vendor.index.setStorageSync(QUOTA_STORAGE_KEY, common_vendor.UTS.JSON.stringify(list));
   } catch (error) {
-    common_vendor.index.__f__("warn", "at utils/notify.uts:100", "[notify] 缓存订阅额度失败:", error);
+    common_vendor.index.__f__("warn", "at utils/notify.uts:98", "[notify] 缓存订阅额度失败:", error);
   }
 }
 function getCachedQuota(bizCode) {
@@ -147,7 +147,7 @@ function authorizeDevice(deviceNo, bizCode = DEFAULT_BIZ_CODE) {
       const ticketRes = yield api_request.getDeviceTicket(deviceNo);
       if (!api_response.isBusinessSuccessCode(ticketRes.code) || ticketRes.data == null) {
         const msg = ticketRes.msg != "" ? ticketRes.msg : "获取设备票据失败，请稍后重试";
-        common_vendor.index.__f__("warn", "at utils/notify.uts:165", "[notify] 换票失败:", msg);
+        common_vendor.index.__f__("warn", "at utils/notify.uts:163", "[notify] 换票失败:", msg);
         return { status: "fail", errMsg: msg, errCode: 0, templateId: item.templateId };
       }
       const sn = ticketRes.data.getString("sn", "");
@@ -155,12 +155,12 @@ function authorizeDevice(deviceNo, bizCode = DEFAULT_BIZ_CODE) {
       const modelId = ticketRes.data.getString("modelId", "");
       const templateId = ticketRes.data.getString("templateId", "") != "" ? ticketRes.data.getString("templateId", "") : item.templateId;
       if (sn == "" || snTicket == "" || templateId == "") {
-        common_vendor.index.__f__("warn", "at utils/notify.uts:173", "[notify] 票据字段不完整:", ticketRes.data);
+        common_vendor.index.__f__("warn", "at utils/notify.uts:171", "[notify] 票据字段不完整:", ticketRes.data);
         return { status: "fail", errMsg: "设备票据不完整，请稍后重试", errCode: 0, templateId };
       }
       return yield callDeviceSubscribe(sn, snTicket, modelId, templateId);
     } catch (error) {
-      common_vendor.index.__f__("error", "at utils/notify.uts:179", "[notify] 设备订阅异常:", error);
+      common_vendor.index.__f__("error", "at utils/notify.uts:177", "[notify] 设备订阅异常:", error);
       return { status: "fail", errMsg: "订阅请求异常，请稍后重试", errCode: 0, templateId: item.templateId };
     }
   });
@@ -189,7 +189,7 @@ function callDeviceSubscribe(sn, snTicket, modelId, templateId) {
           if (!isNaN(parsed))
             errCode = parsed;
         }
-        common_vendor.index.__f__("warn", "at utils/notify.uts:209", "[notify] 设备订阅授权失败, errCode=" + errCode.toString() + ":", errMsg);
+        common_vendor.index.__f__("warn", "at utils/notify.uts:206", "[notify] 设备订阅授权失败, errCode=" + errCode.toString() + ":", errMsg);
         resolve({ status: "fail", errMsg: normalizeDeviceError(errMsg, errCode), errCode, templateId });
       }
     }));
@@ -254,7 +254,7 @@ function checkTemplateSubscribed(templateId) {
           const state = items[templateId];
           resolve(state != null && state.toString() == "accept");
         } catch (error) {
-          common_vendor.index.__f__("warn", "at utils/notify.uts:268", "[notify] 解析订阅状态失败:", error);
+          common_vendor.index.__f__("warn", "at utils/notify.uts:260", "[notify] 解析订阅状态失败:", error);
           resolve(false);
         }
       },

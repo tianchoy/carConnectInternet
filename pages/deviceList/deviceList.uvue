@@ -104,8 +104,6 @@ import { showAppToast } from '../../utils/toast.uts'
 	// ===== 车标点聚合 =====
 	// 仅微信小程序端提供原生点聚合（MapContext.initMarkerCluster）
 	// 注意：参与聚合的车标必须通过 MapContext.addMarkers 添加，组件的 markers 属性不会进入聚合器
-	// App 端 uni-app x 的 map 组件未暴露聚合能力，保持普通标记点渲染
-	// #ifdef MP-WEIXIN
 	type ClusterLabel = {
 		content : string
 		fontSize : number
@@ -203,16 +201,13 @@ import { showAppToast } from '../../utils/toast.uts'
 			console.warn('点聚合初始化失败，回退为普通标记点:', error)
 		}
 	}
-	// #endif
 
 	// 小程序端车标由 MapContext.addMarkers 交给聚合器管理，组件的 markers 属性置空
 	// 用固定引用，避免数据更新时触发 markers 属性 setData 把聚合器里的车标清掉
 	const EMPTY_MARKERS : Array<Marker> = []
 	const mapMarkers = computed<Array<Marker>>(() => {
 		let result : Array<Marker> = markers.value
-		// #ifdef MP-WEIXIN
 		result = EMPTY_MARKERS
-		// #endif
 		return result
 	})
 
@@ -223,7 +218,6 @@ import { showAppToast } from '../../utils/toast.uts'
 		showMap.value = !showMap.value
 		// 切换显示模式时清空检索，避免残留
 		searchKeyword.value = ''
-		// #ifdef MP-WEIXIN
 		if (showMap.value) {
 			// 地图按 v-if 重建后上下文会失效，需重新创建并重新初始化聚合
 			clusterReady = false
@@ -232,7 +226,6 @@ import { showAppToast } from '../../utils/toast.uts'
 				setupMarkerCluster()
 			}, 100)
 		}
-		// #endif
 	}
 
 	// 原始设备列表
@@ -446,13 +439,11 @@ import { showAppToast } from '../../utils/toast.uts'
 				iconPath: getDeviceIcon(connectionStatus, carType),
 				width: 30,
 				height: 30,
-				// #ifdef MP-WEIXIN
 				// 所有设备一律交给原生聚合器，保证聚合簇的数量统计与设备总数一致。
 				// 重合设备能否散开由"偏移间距 vs 聚合网格"决定：缩小视角时偏移不足 1 像素，
 				// 它们照常并入聚合簇；放大到 19 级以上时间距超过网格，才会各自单独显示。
 				// 注意：这里千万不能设成 false，否则这些设备会退出聚合，导致聚合数量少算。
 				joinCluster: true,
-				// #endif
 				callout: {
 					content: deviceName,
 					display: 'ALWAYS',
@@ -464,11 +455,9 @@ import { showAppToast } from '../../utils/toast.uts'
 			} as Marker)
 		}
 		markers.value = nextMarkers
-		// #ifdef MP-WEIXIN
 		// 数据可能早于 onReady 到达，这里兜底初始化聚合（内部幂等），并把车标同步给聚合器
 		setupMarkerCluster()
 		syncClusterMarkers()
-		// #endif
 		if (nextMarkers.length > 0 && userLocation.value.latitude == 0 && userLocation.value.longitude == 0) {
 			const firstMarker = nextMarkers[0]
 			userLocation.value.latitude = firstMarker.latitude
@@ -613,10 +602,8 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 	onReady(() => {
-		// #ifdef MP-WEIXIN
 		clusterContext = uni.createMapContext('myMap', getCurrentInstance()?.proxy ?? null)
 		setupMarkerCluster()
-		// #endif
 	})
 
 	onLoad((options) => {
@@ -629,9 +616,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		position: relative;
 		width: 100%;
 		height: 100%;
-		//#ifdef MP-WEIXIN
 		min-height: 100%;
-		//#endif
 		display: flex;
 		flex-direction: column;
 		background-color: #f5f7fa;

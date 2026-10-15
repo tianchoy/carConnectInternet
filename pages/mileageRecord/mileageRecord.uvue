@@ -319,9 +319,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 <style lang="scss">
 	.container {
-		// #ifdef MP-WEIXIN
 		min-height: 100%;
-		// #endif
 		height: 100%;
 		display: flex;
 		flex-direction: column;
@@ -390,9 +388,6 @@ import { showAppToast } from '../../utils/toast.uts'
 			margin: 0 20rpx;
 			background-color: #fff;
 			border-radius: 20rpx;
-			// #ifndef MP-WEIXIN
-			margin-bottom: 20%;
-			// #endif
 
 			.trip-list {
 				width: 100%;

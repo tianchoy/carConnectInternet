@@ -6,7 +6,6 @@ const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const utils_modal = require("../../utils/modal.js");
 const api_http = require("../../api/http.js");
-const services_appStartup = require("../../services/app-startup.js");
 const utils_legal = require("../../utils/legal.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -63,9 +62,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const isLoginReady = common_vendor.computed(() => {
       return form.value.username != "" && form.value.password != "";
     });
+    const createFormRule = (name, message) => {
+      const rule = new common_vendor.UTSJSONObject();
+      rule.set("name", name);
+      rule.set("required", true);
+      rule.set("message", message);
+      return rule;
+    };
     const rules = [
-      new common_vendor.UTSJSONObject({ name: "username", required: true, message: "请输入账号" }),
-      new common_vendor.UTSJSONObject({ name: "password", required: true, message: "请输入密码" })
+      createFormRule("username", "请输入账号"),
+      createFormRule("password", "请输入密码")
     ];
     const toggleAgreement = () => {
       agreementAccepted.value = !agreementAccepted.value;
@@ -90,12 +96,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       api_http.resetTokenExpiredState();
       utils_toast.showAppToast({ title: message || "登录成功", icon: "success" });
       setTimeout(() => {
-        common_vendor.index.reLaunch({
-          url: "/pages/index/index",
-          success: () => {
-            services_appStartup.schedulePostLoginInitialization();
-          }
-        });
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
       }, 500);
     };
     const submitLogin = () => {

@@ -133,7 +133,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (sentHasMore.value)
             sentPage.value = currentPage + 1;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:175", "获取发起分享列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:173", "获取发起分享列表失败:", error);
           utils_toast.showAppToast({ title: "获取分享列表失败，请重试", icon: "none" });
         } finally {
           sentLoading.value = false;
@@ -181,7 +181,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "分享失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:225", "发起设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:223", "发起设备分享失败:", error);
           utils_toast.showAppToast({ title: "分享失败，请重试", icon: "none" });
         } finally {
           submitting.value = false;
@@ -200,7 +200,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           } else
             utils_toast.showAppToast({ title: res.msg || "撤销失败", icon: "none" });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:241", "撤销设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:239", "撤销设备分享失败:", error);
           utils_toast.showAppToast({ title: "撤销失败，请重试", icon: "none" });
         }
       });
@@ -232,7 +232,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (enabled.value)
             yield loadSent(true);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:267", "初始化设备分享失败:", error);
+          common_vendor.index.__f__("error", "at pages/deviceShare/deviceShare.uvue:265", "初始化设备分享失败:", error);
           utils_toast.showAppToast({ title: "加载分享功能失败，请重试", icon: "none" });
         } finally {
           loadingEnabled.value = false;
@@ -244,7 +244,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       deviceId.value = normalizeRouteValue((_a = options.deviceId) !== null && _a !== void 0 ? _a : "");
       deviceName.value = normalizeRouteValue((_b = options.deviceName) !== null && _b !== void 0 ? _b : "");
       deviceNo.value = normalizeRouteValue((_c = options.deviceNo) !== null && _c !== void 0 ? _c : "");
-      common_vendor.index.__f__("log", "at pages/deviceShare/deviceShare.uvue:278", "deviceNo:", deviceNo.value, deviceName.value);
+      common_vendor.index.__f__("log", "at pages/deviceShare/deviceShare.uvue:276", "deviceNo:", deviceNo.value, deviceName.value);
       void initializeDeviceShare();
     });
     return (_ctx, _cache) => {
@@ -282,24 +282,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             c: common_vendor.t(statusText(item.getString("status", ""))),
             d: common_vendor.n(statusClass(item.getString("status", ""))),
             e: common_vendor.t(getSharePerson(item, "targetNickName", "")),
-            f: common_vendor.t(item.getString("targetPhoneMasked", "")),
-            g: common_vendor.t(item.getString("roleName", "view")),
-            h: common_vendor.t(formatTimestamp(item.getNumber("shareTime", 0))),
-            i: common_vendor.t(formatExpireTime(item)),
-            j: item.getString("status", "") == "active"
+            f: item.getString("targetPhoneMasked", "") != ""
+          }, item.getString("targetPhoneMasked", "") != "" ? {
+            g: common_vendor.t(item.getString("targetPhoneMasked", ""))
+          } : {}, {
+            h: common_vendor.t(item.getString("roleName", "view")),
+            i: common_vendor.t(formatTimestamp(item.getNumber("shareTime", 0))),
+            j: common_vendor.t(formatExpireTime(item)),
+            k: item.getString("status", "") == "active"
           }, item.getString("status", "") == "active" ? {
-            k: common_vendor.o(($event) => {
+            l: common_vendor.o(($event) => {
               return confirmRevoke(item);
             }, item.getString("shareId", ""))
           } : {}, {
-            l: item.getString("shareId", "")
+            m: item.getString("shareId", "")
           });
         }),
         p: sentHasMore.value
       }, sentHasMore.value ? {
         q: common_vendor.t(sentLoading.value ? "加载中..." : "加载更多"),
         r: sentLoading.value,
-        s: common_vendor.o(loadMore, "f6")
+        s: common_vendor.o(loadMore, "f1")
       } : {}), {
         c: !enabled.value,
         t: common_vendor.o(loadMore, "88"),

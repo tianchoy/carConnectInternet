@@ -1,4 +1,4 @@
-import { get, getSilently, post, postSilently, put, remove } from "./http";
+import { get, getSilently, post, put, remove } from "./http";
 import { asJSONObject, getResponseCode, getResponseDataArray, getResponseDataObject, getResponseMessage } from "./response";
 
 const loginUrl = '/sys/login'
@@ -43,8 +43,6 @@ const appCommandSendUrl = '/app/command/send'
 const appCommandListUrl = '/app/command/list'
 const appCommandDetailUrl = '/app/command/'
 const appCommandRetryUrl = '/app/command/retry/'
-const pushBindUrl = '/app/push/bind'
-const pushUnbindUrl = '/app/push/unbind'
 const messageUnreadCountUrl = '/app/message/unreadCount'
 const homePlatformAppUrl = '/home/platform/app'
 const geocoderAddressUrl = '/geocoder/address'
@@ -59,12 +57,6 @@ const notifySubscribeReportUrl = '/app/notify/subscribeReport'
 const notifyStatusUrl = '/app/notify/status'
 
 export type BasicResponse = { code: number, msg: string }
-export type PushDeviceBindRequest = {
-    registrationId: string
-    platform: string
-    deviceName: string
-    appVersion: string
-}
 // 订阅消息通道（后端文档 v1.0 /app/notify）：
 // mode=device → wx.requestSubscribeDeviceMessage（长期，无需上报）；mode=once → wx.requestSubscribeMessage（需上报记账）
 export type NotifyQuotaItem = {
@@ -94,7 +86,6 @@ function notifyQuotaResponse(raw: any): NotifyQuotaResponse {
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
 export type LegacyEnterpriseLoginRequest = { username: string, password: string, clientId?: string, tenantId?: string }
 export type WechatLoginRequest = { phoneCode: string, loginCode: string, encryptedData: string, iv: string, clientId?: string, tenantId?: string }
-export type UniVerifyLoginRequest = UTSJSONObject
 export type SendSmsCodeRequest = { phonenumber: string, tenantId?: string }
 export type SmsLoginRequest = { phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
 export type PersonalPasswordLoginRequest = { username: string, password: string, clientId?: string, tenantId?: string }
@@ -329,8 +320,6 @@ export const PostWechatlogin = (data: WechatLoginRequest): Promise<JsonDataRespo
     return post(wechatLogin, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 }
 
-// 后端待实现的示例接口：服务端必须使用 openId/accessToken 换取手机号，前端不可上传手机号作为一键登录凭据。
-export const uniVerifyLogin = (data: UniVerifyLoginRequest): Promise<JsonDataResponse> => post(authLoginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 export const sendSmsLoginCode = (data: SendSmsCodeRequest): Promise<BasicResponse> => get(smsSendCodeUrl, {
     phonenumber: data.phonenumber,
     tenantId: data.tenantId != null ? data.tenantId : defaultTenantId
@@ -459,16 +448,6 @@ export const getAppCommandDetail = (commandId: string | number): Promise<AppComm
 export const retryAppCommand = (commandId: string | number): Promise<BasicResponse> => get(`${appCommandRetryUrl}${commandId.toString()}`).then((raw: any): BasicResponse => {
     return basicResponse(raw)
 })
-
-export const unbindPushDevice = (registrationId: string): Promise<BasicResponse> => postSilently(pushUnbindUrl + '?registrationId=' + encodeURIComponent(registrationId), new UTSJSONObject()).then((raw: any): BasicResponse => { return basicResponse(raw) })
-export const bindPushDevice = (data: PushDeviceBindRequest): Promise<BasicResponse> => {
-    const requestData = new UTSJSONObject()
-    requestData.set('registrationId', data.registrationId)
-    requestData.set('platform', data.platform)
-    requestData.set('deviceName', data.deviceName)
-    requestData.set('appVersion', data.appVersion)
-    return postSilently(pushBindUrl, requestData).then((raw: any): BasicResponse => { return basicResponse(raw) })
-}
 
 export const getDeviceShareEnabled = (): Promise<DeviceShareEnabledResponse> => get(deviceShareEnabledUrl).then((raw: any): DeviceShareEnabledResponse => {
     return deviceShareEnabledResponse(raw)
