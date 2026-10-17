@@ -234,7 +234,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 
 		if (isNaN(signalValue)) {
 			return {
-				experience: "信号数据无效",
+				experience: "无数据",
 				quality: "无服务",
 				color: "#999",
 				level: 0
@@ -372,8 +372,9 @@ import { openLocation } from '../../utils/openLocation.uts'
 	}
 
 	const loadData = async (data : UTSJSONObject, retryCount : number): Promise<boolean> => {
-		signalRssi.value = null
-		signalSat.value = null
+		// 不在请求前清空 signalRssi / signalSat：轮询间隔内接口未返回时若先置空，
+		// 信号块会闪一下"无信号"再跳回真实值。改为请求成功后整体赋值，
+		// 请求失败时保留上一次的值，避免整行数据反复跳动。
 		let retry = retryCount;
 
 		const tryLoad = async (attempt : number): Promise<boolean> => {
@@ -1164,18 +1165,18 @@ import { openLocation } from '../../utils/openLocation.uts'
 							align-items: center;
 							justify-content: center;
 							background: #f0f8ff;
-							padding: 10rpx 20rpx;
+							padding: 10rpx 16rpx;
 							border-radius: 10rpx;
 
 							.signal-bars-horizontal {
 								display: flex;
 								flex-direction: row;
 								align-items: flex-end;
-								height: 40rpx;
-								margin-right: 5rpx;
+								height: 32rpx;
+								margin-right: 4rpx;
 								.signal-bar-h {
-									width: 8rpx;
-									margin-right: 3rpx;
+									width: 6rpx;
+									margin-right: 2rpx;
 									border-radius: 2rpx 2rpx 0 0;
 									transition: all 0.3s ease;
 											&.signal-bar-h-1 { height: 12rpx; }
@@ -1191,15 +1192,23 @@ import { openLocation } from '../../utils/openLocation.uts'
 								flex-direction: column;
 								justify-content: center;
 								align-items: center;
+								// 固定最小宽度：文案会在"无信号 / 无数据 / 极好"之间变化，
+								// 宽度不固定时右侧卫星数、电压、电量会整行左右跳动。
+								// 70rpx 可容纳最长文案（3 字 @22rpx = 66rpx）。
+								min-width: 70rpx;
 
 								.signal-value {
 									font-size: 18rpx;
 									color: #333;
+									text-align: center;
+									transition: color 0.3s ease;
 								}
 
 								.experience {
-									font-size: 18rpx;
-									font-weight: normal;
+									font-size: 22rpx;
+									font-weight: bold;
+									text-align: center;
+									transition: color 0.3s ease;
 								}
 							}
 						}
