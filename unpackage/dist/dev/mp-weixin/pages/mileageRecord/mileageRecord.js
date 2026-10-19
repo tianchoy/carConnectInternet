@@ -32,7 +32,8 @@ class GroupType extends common_vendor.UTS.UTSType {
         return {
           date: { type: String, optional: false },
           trips: { type: "Unknown", optional: false },
-          totalDistance: { type: Number, optional: false }
+          totalDistance: { type: Number, optional: false },
+          totalDuration: { type: Number, optional: false }
         };
       },
       name: "GroupType"
@@ -44,6 +45,7 @@ class GroupType extends common_vendor.UTS.UTSType {
     this.date = this.__props__.date;
     this.trips = this.__props__.trips;
     this.totalDistance = this.__props__.totalDistance;
+    this.totalDuration = this.__props__.totalDuration;
     delete this.__props__;
   }
 }
@@ -114,10 +116,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return timeB - timeA;
         });
         let totalDistance = 0;
+        let totalDuration = 0;
         dateGroup.trips.forEach((trip) => {
           totalDistance += trip.getNumber("distance", 0);
+          totalDuration += trip.getNumber("duration", 0);
         });
-        groups.push(new GroupType({ date: dateGroup.date, trips: dateGroup.trips, totalDistance }));
+        groups.push(new GroupType({ date: dateGroup.date, trips: dateGroup.trips, totalDistance, totalDuration }));
       });
       return groups.sort((a, b) => {
         const timeA = utils_formateTime.parseLocalDateTime(a.date);
@@ -144,6 +148,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getTripDuration = (trip) => {
       return trip.getNumber("duration", 0);
     };
+    const expandedGroup = common_vendor.ref("");
+    const toggleGroup = (date) => {
+      expandedGroup.value = expandedGroup.value == date ? "" : date;
+    };
     const totalTrips = common_vendor.computed(() => {
       return tripData.value.length;
     });
@@ -163,6 +171,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return Date.now();
     });
     const processTripData = (data) => {
+      expandedGroup.value = "";
       const trips = data.getArray("trips");
       if (trips != null && trips.length > 0) {
         tripData.value = trips;
@@ -204,13 +213,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: res.msg || "数据加载失败", icon: "none" });
             return Promise.resolve(null);
           }
-          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:230", "获取里程数据成功:", res);
+          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:249", "获取里程数据成功:", res);
           const trackData = res.data;
           if (trackData != null) {
             processTripData(trackData);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:236", "获取里程数据失败:", e);
+          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:255", "获取里程数据失败:", e);
           utils_toast.showAppToast({
             title: "数据加载失败",
             icon: "none"
@@ -337,16 +346,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })
       } : {
         v: common_vendor.f(groupedTrips.value, (group, groupIndex, i0) => {
-          return {
-            a: common_vendor.t(group.date),
-            b: "5f5c5231-7-" + i0,
-            c: common_vendor.p({
+          return common_vendor.e({
+            a: "5f5c5231-7-" + i0,
+            b: common_vendor.p({
+              name: "/static/xiangxia.png",
+              fontSize: "15",
+              rotation: expandedGroup.value == group.date ? 180 : 0
+            }),
+            c: common_vendor.t(group.date),
+            d: "5f5c5231-8-" + i0,
+            e: common_vendor.p({
               text: group.trips.length + "段",
               type: "success",
               size: "small"
             }),
-            d: common_vendor.t((group.totalDistance / 1e3).toFixed(2)),
-            e: common_vendor.f(group.trips, (item, index, i1) => {
+            f: common_vendor.t((group.totalDistance / 1e3).toFixed(2)),
+            g: common_vendor.t(formatDuration(group.totalDuration)),
+            h: common_vendor.o(($event) => {
+              return toggleGroup(group.date);
+            }, groupIndex),
+            i: expandedGroup.value == group.date
+          }, expandedGroup.value == group.date ? {
+            j: common_vendor.f(group.trips, (item, index, i1) => {
               return {
                 a: common_vendor.t(index + 1),
                 b: common_vendor.t(getTripHourRange(item)),
@@ -357,9 +378,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   return gotoTripDetail(getTripStartTime(item), getTripEndTime(item));
                 }, index)
               };
-            }),
-            f: groupIndex
-          };
+            })
+          } : {}, {
+            k: groupIndex
+          });
         })
       }, {
         w: `${_ctx.u_s_b_h}px`,
