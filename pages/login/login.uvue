@@ -475,31 +475,47 @@
 		}
 		try {
 			uni.showLoading({ title: '登录中...' })
-			const loginRes = await new Promise<UniApp.LoginRes>((resolve, reject) => {
-				uni.login({ provider: 'weixin', success: resolve, fail: reject })
-			})
-			const loginCode = loginRes.code != null ? loginRes.code : ''
-			if (loginCode == '') {
-				showAppToast({ title: '获取微信登录凭证失败，请重试', icon: 'none' })
-				return
+			const encryptedData = e.detail.encryptedData != null ? e.detail.encryptedData.toString() : ''
+			const iv = e.detail.iv != null ? e.detail.iv.toString() : ''
+			// 登录抖动（服务端返回 4301）时，复用同一个 phoneCode 自动重试一次：
+			// phoneCode 未被服务端兑换过（服务端失败在换取 session 阶段），5 分钟内仍然有效，
+			// 直接复用可避免再次弹出手机号授权（微信按次计费，重复授权 = 重复成本）。
+			let lastMessage = '微信登录失败'
+			for (let attempt = 0; attempt < 2; attempt++) {
+				const loginRes = await new Promise<UniApp.LoginRes>((resolve, reject) => {
+					uni.login({ provider: 'weixin', success: resolve, fail: reject })
+				})
+				const loginCode = loginRes.code != null ? loginRes.code : ''
+				if (loginCode == '') {
+					lastMessage = '获取微信登录凭证失败，请重试'
+					break
+				}
+				// 重试时不再带 encryptedData/iv：新的 wx.login 会换新的 session_key，旧密文必然解不开
+				const useCipher = attempt == 0
+				const res = await PostWechatlogin({
+					phoneCode,
+					loginCode,
+					encryptedData: useCipher ? encryptedData : '',
+					iv: useCipher ? iv : ''
+				})
+				const loginData = res.data
+				if (isBusinessSuccessCode(res.code) && loginData != null) {
+					const token = loginData.getString('token', '')
+					if (token == '') {
+						lastMessage = '登录失败: 未获取到token'
+						break
+					}
+					completeLogin(token)
+					return
+				}
+				lastMessage = res.msg != '' ? res.msg : '登录失败'
+				// 仅网络抖动类失败（4301）值得用同一 phoneCode 重试；其余错误重试无意义
+				if (res.code != 4301) {
+					break
+				}
+				console.log('微信登录网络抖动，复用手机号授权凭证重试一次')
 			}
-			const res = await PostWechatlogin({
-				phoneCode,
-				loginCode,
-				encryptedData: e.detail.encryptedData != null ? e.detail.encryptedData.toString() : '',
-				iv: e.detail.iv != null ? e.detail.iv.toString() : ''
-			})
-			const loginData = res.data
-			if (!isBusinessSuccessCode(res.code) || loginData == null) {
-				showAppToast({ title: res.msg || '登录失败', icon: 'none' })
-				return
-			}
-			const token = loginData.getString('token', '')
-			if (token == '') {
-				showAppToast({ title: '登录失败: 未获取到token', icon: 'none' })
-				return
-			}
-			completeLogin(token)
+			showAppToast({ title: lastMessage, icon: 'none' })
 		} catch (error) {
 			console.error('微信登录失败:', error)
 			showAppToast({ title: '微信登录失败', icon: 'none' })
