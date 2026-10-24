@@ -4,6 +4,7 @@ const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 const utils_formateTime = require("../../utils/formateTime.js");
+const utils_gettime = require("../../utils/gettime.js");
 const utils_cars = require("../../utils/cars.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
 const utils_getUserLocation = require("../../utils/getUserLocation.js");
@@ -210,9 +211,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       return (_a = utils_formateTime.formatTimes(timestamp)) !== null && _a !== void 0 ? _a : "";
     }
-    const now = /* @__PURE__ */ new Date();
-    const initialEndTime = utils_formateTime.formatTimes(now.getTime());
-    const initialStartTime = utils_formateTime.formatTimes(now.getTime() - 36e5 * 6);
+    const todayRange = utils_gettime.getTodayZeroTime();
+    const initialEndTime = utils_formateTime.formatTimes(todayRange.nowTime);
+    const initialStartTime = utils_formateTime.formatTimes(todayRange.todayZero);
     const startTime = common_vendor.ref(initialStartTime);
     const endTime = common_vendor.ref(initialEndTime);
     function normalizePlaybackTime(value, fallback) {
@@ -223,8 +224,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return currentPickerType.value == "start" ? startTime.value : endTime.value;
     });
     const pickerMinTime = common_vendor.computed(() => {
-      const now2 = /* @__PURE__ */ new Date();
-      return new Date(now2.getFullYear(), now2.getMonth() - 6, now2.getDate(), 0, 0, 0).getTime();
+      const now = /* @__PURE__ */ new Date();
+      return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate(), 0, 0, 0).getTime();
     });
     const pickerMaxTime = common_vendor.computed(() => {
       return Date.now();
@@ -260,7 +261,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const milliseconds = utils_formateTime.parseLocalDateTime(decoded);
         return milliseconds == null ? null : formatPlaybackTime(milliseconds);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:312", "解析回放时间失败:", error);
+        common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:314", "解析回放时间失败:", error);
         return null;
       }
     }
@@ -334,7 +335,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           callback();
         }).exec();
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/playBack/playBack.uvue:412", "测量地图容器尺寸失败:", error);
+        common_vendor.index.__f__("warn", "at pages/playBack/playBack.uvue:414", "测量地图容器尺寸失败:", error);
         callback();
       }
     }
@@ -403,8 +404,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     function initDateTime() {
-      const now2 = /* @__PURE__ */ new Date();
-      setPlaybackTimeRange(formatPlaybackTime(now2.getTime() - 36e5 * 6), formatPlaybackTime(now2.getTime()));
+      const range = utils_gettime.getTodayZeroTime();
+      setPlaybackTimeRange(formatPlaybackTime(range.todayZero), formatPlaybackTime(range.nowTime));
     }
     let startMarker = null;
     let endMarker = null;
@@ -974,7 +975,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             showCurrentPosition(res.msg || "轨迹加载失败");
             return Promise.resolve(null);
           }
-          common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1305", "加载轨迹成功:", res);
+          common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1307", "加载轨迹成功:", res);
           const trackData = res.data;
           if (trackData == null) {
             showCurrentPosition();
@@ -992,7 +993,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:1323", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:1325", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_a = lat.value) !== null && _a !== void 0 ? _a : "")) && !isNaN(parseFloat((_b = lng.value) !== null && _b !== void 0 ? _b : ""))) {
             showCurrentPosition();
@@ -1177,7 +1178,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_h = option.lng) !== null && _h !== void 0 ? _h : null;
       startTime.value = (_j = option.startTime) !== null && _j !== void 0 ? _j : "";
       endTime.value = (_k = option.endTime) !== null && _k !== void 0 ? _k : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1550", "plateNo:", plateNo.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:1552", "plateNo:", plateNo.value);
       const routeStartTime = resolveRouteDateTime(startTime.value);
       const routeEndTime = resolveRouteDateTime(endTime.value);
       if (routeStartTime != null && routeEndTime != null) {

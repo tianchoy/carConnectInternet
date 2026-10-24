@@ -72,6 +72,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, watch } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
 	import { formatTimes, normalizeLocalDateTime, parseLocalDateTime } from '../../utils/formateTime.uts'
+	import { getTodayZeroTime } from '../../utils/gettime.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -241,9 +242,10 @@ import { showAppToast } from '../../utils/toast.uts'
 	function formatPlaybackTime(timestamp : number) : string {
 		return formatTimes(timestamp) ?? ''
 	}
-	const now = new Date()
-	const initialEndTime = formatTimes(now.getTime())
-	const initialStartTime = formatTimes(now.getTime() - 3600000 * 6)
+	// 兜底默认值：当天 0 点 → 当前（与首页"更多轨迹"、设备详情"轨迹回放"入口一致）。
+	const todayRange = getTodayZeroTime()
+	const initialEndTime = formatTimes(todayRange.nowTime)
+	const initialStartTime = formatTimes(todayRange.todayZero)
 	const startTime = ref(initialStartTime)
 	const endTime = ref(initialEndTime)
 
@@ -496,12 +498,12 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 	}
 
-	// 初始化时间
+	// 初始化时间（兜底默认值）：当天 0 点 → 当前，与首页"更多轨迹"、设备详情"轨迹回放"入口一致。
 	function initDateTime() {
-		const now = new Date()
+		const range = getTodayZeroTime()
 		setPlaybackTimeRange(
-			formatPlaybackTime(now.getTime() - 3600000 * 6),
-			formatPlaybackTime(now.getTime())
+			formatPlaybackTime(range.todayZero),
+			formatPlaybackTime(range.nowTime)
 		)
 	}
 

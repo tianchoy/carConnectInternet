@@ -118,6 +118,8 @@ import { openLocation } from '../../utils/openLocation.uts'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getUserCurrentLocation, isValidLatLng } from '../../utils/getUserLocation.uts'
+	import { formatTimes } from '../../utils/formateTime.uts'
+	import { getTodayZeroTime } from '../../utils/gettime.uts'
 
 	const deptId = ref<string | null>('')
 	const deviceNo = ref<string | null>('')
@@ -816,8 +818,10 @@ import { openLocation } from '../../utils/openLocation.uts'
 		const routeCarType = currentCarInfo.value.getString('carType', '')
 		if (itemTo == '轨迹回放') {
 			stopAutoRefresh() // 停止刷新
+			// 与首页"更多轨迹"保持一致：开始时间取当天 0 点，结束时间取当前时刻。
+			const timeRange = getTodayZeroTime()
 			uni.navigateTo({
-				url: '/pages/playBack/playBack?deviceNo=' + deviceNo.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType) + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude
+				url: '/pages/playBack/playBack?deviceNo=' + deviceNo.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType) + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude + '&startTime=' + encodeURIComponent(formatTimes(timeRange.todayZero)) + '&endTime=' + encodeURIComponent(formatTimes(timeRange.nowTime))
 			})
 		}
 		if (itemTo == '车辆跟踪') {
