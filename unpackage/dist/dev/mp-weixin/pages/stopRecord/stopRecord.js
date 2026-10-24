@@ -78,7 +78,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           deviceNo: deviceNo.value,
           startTime: startTime.value,
           endTime: endTime.value,
-          minParkTime: 10,
+          minParkTime: 2,
           withStop: true,
           withPos: false,
           withTrip: false

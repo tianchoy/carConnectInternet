@@ -6,7 +6,6 @@ const api_response = require("../../api/response.js");
 const utils_toast = require("../../utils/toast.js");
 const utils_modal = require("../../utils/modal.js");
 const api_http = require("../../api/http.js");
-const services_appStartup = require("../../services/app-startup.js");
 const utils_legal = require("../../utils/legal.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -63,9 +62,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const isLoginReady = common_vendor.computed(() => {
       return form.value.username != "" && form.value.password != "";
     });
+    const createFormRule = (name, message) => {
+      const rule = new common_vendor.UTSJSONObject();
+      rule.set("name", name);
+      rule.set("required", true);
+      rule.set("message", message);
+      return rule;
+    };
     const rules = [
-      new common_vendor.UTSJSONObject({ name: "username", required: true, message: "请输入账号" }),
-      new common_vendor.UTSJSONObject({ name: "password", required: true, message: "请输入密码" })
+      createFormRule("username", "请输入账号"),
+      createFormRule("password", "请输入密码")
     ];
     const toggleAgreement = () => {
       agreementAccepted.value = !agreementAccepted.value;
@@ -85,17 +91,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       return true;
     };
-    const completeLogin = (token) => {
+    const completeLogin = (token, message = "登录成功") => {
       common_vendor.index.setStorageSync("token", token);
       api_http.resetTokenExpiredState();
-      utils_toast.showAppToast({ title: "登录成功", icon: "success" });
+      utils_toast.showAppToast({ title: message || "登录成功", icon: "success" });
       setTimeout(() => {
-        common_vendor.index.reLaunch({
-          url: "/pages/index/index",
-          success: () => {
-            services_appStartup.schedulePostLoginInitialization();
-          }
-        });
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
       }, 500);
     };
     const submitLogin = () => {
@@ -112,7 +113,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }));
           const token = response.data != null ? response.data.getString("access_token", "") : "";
           if (api_response.isBusinessSuccessCode(response.code) && token != "") {
-            completeLogin(token);
+            completeLogin(token, response.msg);
             return Promise.resolve(null);
           }
           utils_toast.showAppToast({ title: response.msg || "登录失败，请检查账号和密码", icon: "none" });

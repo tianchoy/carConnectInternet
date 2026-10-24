@@ -1,6 +1,4 @@
 <template>
-	<!-- ===== 微信小程序：先请求 scope.camera，再渲染 camera 扫码 ===== -->
-	<!-- #ifdef MP-WEIXIN -->
 	<view class="container">
 		<custom-navBar title="扫码添加ID" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
@@ -10,39 +8,11 @@
 		</view>
 		<view class="tip">请将设备编号二维码放入框内,自动扫描</view>
 	</view>
-	<!-- #endif -->
-
-	<!-- ===== App：保留原有 camera 组件扫码实现 ===== -->
-	<!-- #ifndef MP-WEIXIN -->
-	<view class="container">
-		<view class="scancode-box">
-			<camera
-				v-if="cameraVisible"
-				device-position="back"
-				mode="scanCode"
-				flash="auto"
-				class="scan-code"
-				resolution="high"
-				@initdone="handleCameraInitDone"
-				@scancode="handleScan"
-				@stop="handleCameraStop"
-				@error="handleCameraError">
-			</camera>
-		</view>
-		<view class="tip">请将设备二维码或条形码放入框内，自动扫描</view>
-		<app-toast></app-toast>
-	</view>
-	<!-- #endif -->
 </template>
 
 <script setup lang="uts">
 	import { ref } from 'vue'
-	import { showAppToast } from '../../utils/toast.uts'
-	import { showAppModal } from '../../utils/modal.uts'
 
-	// ===== 微信小程序：先检查权限，未授权时主动请求后再显示 camera =====
-	// #ifdef MP-WEIXIN
-	
 	const scanFunctionIsUseable = ref(true)
 
 	const handleScan = (e: any) => {
@@ -111,105 +81,9 @@
 	onLoad(() => {
 		requestCameraPermission()
 	})
-	// #endif
-
-	// ===== App：保留原有 camera 组件事件和资源释放逻辑 =====
-	// #ifndef MP-WEIXIN
-	const scanFunctionIsUseable = ref(true)
-	const cameraVisible = ref(true)
-	const hasFinished = ref(false)
-	const pendingBack = ref(false)
-	let backTimer : number | null = null
-
-	const clearBackTimer = () => {
-		const timer = backTimer
-		if (timer != null) {
-			clearTimeout(timer)
-			backTimer = null
-		}
-	}
-
-	const releaseCamera = () => {
-		cameraVisible.value = false
-	}
-
-	const completeBack = () => {
-		if (!pendingBack.value) return
-		pendingBack.value = false
-		clearBackTimer()
-		console.log('扫码页已释放相机，返回添加设备页')
-		uni.navigateBack({ delta: 1 })
-	}
-
-	const requestBack = () => {
-		if (pendingBack.value) return
-		pendingBack.value = true
-		releaseCamera()
-		backTimer = setTimeout(() => {
-			completeBack()
-		}, 1200)
-	}
-
-	const handleCameraInitDone = () => {
-		console.log('扫码摄像头初始化完成')
-	}
-
-	const handleScan = (e : UniCameraScanCodeEvent) => {
-		if (hasFinished.value || !scanFunctionIsUseable.value) return
-		const scanResult = e.detail.result
-		if (scanResult == null) return
-		const result = scanResult!!
-		if (result.length == 0) return
-
-		hasFinished.value = true
-		scanFunctionIsUseable.value = false
-		uni.vibrateLong({})
-		console.log('扫码结果:', result)
-		uni.setStorageSync('scanCodeResult', result)
-		showAppToast({
-			title: '扫码成功',
-			icon: 'success',
-			duration: 500
-		})
-		requestBack()
-	}
-
-	const handleCameraStop = () => {
-		console.warn('扫码摄像头已停止')
-		if (pendingBack.value) {
-			console.log('等待相机资源释放完成后返回添加设备页')
-			return
-		}
-		console.warn('摄像头停止但扫码页仍保持打开，等待用户返回或重试')
-	}
-
-	const handleCameraError = (e : UniCameraErrorEvent) => {
-		if (hasFinished.value) return
-		hasFinished.value = true
-		console.error('摄像头初始化失败:', e.detail)
-		showAppToast({
-			title: '摄像头初始化失败，请检查相机权限',
-			icon: 'none',
-			duration: 500
-		})
-		requestBack()
-	}
-
-	onHide(() => {
-		console.log('扫码页隐藏')
-		releaseCamera()
-	})
-
-	onUnload(() => {
-		console.log('扫码页卸载')
-		clearBackTimer()
-		releaseCamera()
-	})
-	// #endif
 </script>
 
 <style lang="scss">
-	/* 微信小程序与 App 均使用 camera 扫码预览，权限与行为在脚本条件编译中隔离。 */
 	.container {
 		height: 100%;
 		display: flex;

@@ -21,7 +21,7 @@ const DEFAULT_JPUSH_IOS_IS_PRODUCTION = true;
 import AndroidLog from 'android.util.Log';
 import { init as initAndroidJPush, setEventCallBack as setJPushEventCallBack, getRegistrationId as getAndroidJPushRegistrationId, setBadgeNumber as setAndroidJPushBadgeNumber } from '@/uni_modules/jg-jpush-u';
 import { init as initHuaweiJPushVendor } from '@/uni_modules/jg-jpush-u-huawei';
-const JPUSH_APP_KEY = 'a53c28d734057573f67e16f7';
+const JPUSH_APP_KEY = '0ee065e1a4024ce1801fa6d3';
 const JPUSH_CHANNEL = 'developer-default';
 function pushDebug(message: string): void {
     AndroidLog.e('PushManager', message);
@@ -61,7 +61,7 @@ function payloadValue(payload: any, key: string): string {
         return '';
     if (typeof payload == 'string') {
         try {
-            const parsedPayload = JSON.parse<UTSJSONObject>(payload as string);
+            const parsedPayload = JSON.parse(payload as string) as any;
             if (parsedPayload == null)
                 return '';
             return payloadValue(parsedPayload, key);
@@ -71,8 +71,12 @@ function payloadValue(payload: any, key: string): string {
         }
     }
     try {
-        const object = payload as UTSJSONObject;
-        return object.getString(key, '');
+        // 微信小程序下推送 payload / JSON.parse 结果为普通对象，没有 UTSJSONObject 的 getString，需兼容
+        const object = payload as any;
+        if (typeof object.getString == 'function')
+            return object.getString(key, '');
+        const v = object[key];
+        return v != null ? (typeof v == 'string' ? v as string : String(v)) : '';
     }
     catch (error: any) {
         return '';
@@ -248,7 +252,7 @@ class PushManager {
             uni.setStorageSync(PUSH_MESSAGE_STALE_KEY, true);
         }
         if (event.kind == 'clicked') {
-            uni.switchTab({ url: '/pages/message/message' });
+            uni.reLaunch({ url: '/pages/message/message' });
         }
     }
     private clearRegistrationTimers(): void {

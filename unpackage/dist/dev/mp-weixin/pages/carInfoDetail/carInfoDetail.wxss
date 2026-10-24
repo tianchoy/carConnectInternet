@@ -179,6 +179,14 @@
   font-size: 22rpx;
   line-height: 1.4;
 }
+.container .tools-panel .imei-box .pos-date .address-row .addr-action[class],
+.container .tools-panel .imei-box .pos-adress .address-row .addr-action[class] {
+  flex-shrink: 0;
+  margin-left: 20rpx;
+  color: #007AFF;
+  font-weight: bold;
+  font-size: 22rpx;
+}
 .container .tools-panel .imei-box .pos-date .address-row .pos-icon[class],
 .container .tools-panel .imei-box .pos-adress .address-row .pos-icon[class] {
   width: 30rpx;
@@ -203,19 +211,19 @@
   align-items: center;
   justify-content: center;
   background: #f0f8ff;
-  padding: 10rpx 20rpx;
+  padding: 10rpx 16rpx;
   border-radius: 10rpx;
 }
 .container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal[class] {
   display: flex;
   flex-direction: row;
   align-items: flex-end;
-  height: 40rpx;
-  margin-right: 5rpx;
+  height: 32rpx;
+  margin-right: 4rpx;
 }
 .container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h[class] {
-  width: 8rpx;
-  margin-right: 3rpx;
+  width: 6rpx;
+  margin-right: 2rpx;
   border-radius: 2rpx 2rpx 0 0;
   transition: all 0.3s ease;
 }
@@ -239,14 +247,19 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  min-width: 70rpx;
 }
 .container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h .signal-value[class] {
   font-size: 18rpx;
   color: #333;
+  text-align: center;
+  transition: color 0.3s ease;
 }
 .container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h .experience[class] {
-  font-size: 18rpx;
-  font-weight: normal;
+  font-size: 22rpx;
+  font-weight: bold;
+  text-align: center;
+  transition: color 0.3s ease;
 }
 .container .tools-panel .imei-box .signal-container .satellite-item-h[class] {
   display: flex;

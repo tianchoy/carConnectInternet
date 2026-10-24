@@ -166,7 +166,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             editInfo.value.plateNo = plateNo;
             isEditing.value = false;
             carIconSelectorVisible.value = false;
-            utils_toast.showAppToast({ title: "保存成功", icon: "success" });
+            utils_toast.showAppToast({ title: res.msg || "保存成功", icon: "success" });
           } else {
             utils_toast.showAppToast({ title: res.msg || "保存失败", icon: "none" });
           }

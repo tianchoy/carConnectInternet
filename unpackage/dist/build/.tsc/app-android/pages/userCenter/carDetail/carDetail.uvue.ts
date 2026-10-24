@@ -143,7 +143,7 @@ const _cache = __ins.renderCache;
 				editInfo.value.plateNo = plateNo
 				isEditing.value = false
 				carIconSelectorVisible.value = false
-				showAppToast({ title: '保存成功', icon: 'success' })
+				showAppToast({ title: res.msg || '保存成功', icon: 'success' })
 			} else {
 				showAppToast({ title: res.msg || '保存失败', icon: 'none' })
 			}

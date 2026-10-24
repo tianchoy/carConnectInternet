@@ -1,8 +1,0 @@
-{
-  "name": "univerify",
-  "dependencies": {},
-  "extensions": {
-    "uni-cloud-verify": {}
-  },
-  "main": "index.js"
-}

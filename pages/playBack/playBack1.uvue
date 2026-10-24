@@ -27,35 +27,20 @@
 			<view class="tool-tag-item">
 				<i-button type="primary" @click="togglePlayback" size="small" :text="isPlaying ? '暂停':'播放'"></i-button>
 				<view class="slider">
-					<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
 					<i-slider v-model="playbackSpeed" :min="1" :max="30" :step="1"
 						@change="setPlaybackSpeedFromValue">
 					</i-slider>
-					<!-- #endif -->
-					<!-- #ifdef APP-IOS -->
-					<slider :value="playbackSpeed" :min="1" :max="30" :step="1"
-						@changing="setPlaybackSpeed" @change="setPlaybackSpeed">
-					</slider>
-					<!-- #endif -->
 				</view>
 				<text class="speed-label">{{playbackSpeed}}x</text>
 			</view>
 				<view class="track-progress">
 					<text class="progress-time">{{getPlaybackClock(startTime)}}</text>
 					<view class="progress-slider">
-						<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
 						<i-slider v-model="playbackProgress" :min="0" :max="100" :step="0.1"
 							:disabled="!isTrackPlayable" trackColor="#1890FF"
 							@dragStart="startPlaybackScrub" @changing="handlePlaybackProgressChanging"
 							@dragEnd="finishPlaybackScrub">
 						</i-slider>
-						<!-- #endif -->
-						<!-- #ifdef APP-IOS -->
-						<slider :value="playbackProgress" :min="0" :max="100" :step="0.1"
-							:disabled="!isTrackPlayable" activeColor="#1890FF"
-							@changing="setPlaybackProgress" @change="finishNativePlaybackScrub">
-						</slider>
-						<!-- #endif -->
 					</view>
 					<text class="progress-time">{{getPlaybackClock(endTime)}}</text>
 				</view>
@@ -92,10 +77,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
-	// #ifdef APP-ANDROID
-	import Polyline from 'uts.sdk.modules.DCloudUniMapTencent.Polyline'
-	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
-	// #endif
+	import { getUserCurrentLocation } from '../../utils/getUserLocation.uts'
 
 	type TrackPoint = {
 		latitude : number;
@@ -153,14 +135,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	type MapMarker = Marker
 
 	const trackPoints = ref<Array<TrackPoint>>([])
-	// #ifdef APP-ANDROID
-	const polyline = ref<Array<Polyline>>([])
-	let unplayedPolyline : Polyline | null = null
-	let playedPolyline : Polyline | null = null
-	// #endif
-	// #ifdef MP-WEIXIN || APP-IOS
 	const polyline = ref<Array<MpPolylineData>>([])
-	// #endif
 	const isPlaying = ref(false)
 	const isTrackPlayable = ref(false)
 	const playbackSpeed = ref(1)
@@ -496,67 +471,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		markers.value = [marker, startMarker, endMarker]
 	}
 
-	// #ifdef APP-ANDROID
-	function toNativePoints(points : Array<TrackPoint>) : Array<LocationObject> {
-		return points.map((point : TrackPoint) : LocationObject => {
-			return new LocationObject(point.latitude, point.longitude)
-		})
-	}
 
-	function initPolyline() {
-		if (trackPoints.value.length < 2) {
-			unplayedPolyline = null
-			playedPolyline = null
-			polyline.value = []
-			return
-		}
-
-		const initialUnplayedPolyline = new Polyline(
-			toNativePoints(trackPoints.value), '#888787', 3, true, false, '', '#888787', 0, []
-		)
-		initialUnplayedPolyline.color = '#888787'
-		initialUnplayedPolyline.width = 3
-		initialUnplayedPolyline.dottedLine = true
-		initialUnplayedPolyline.arrowLine = false
-		initialUnplayedPolyline.borderColor = '#888787'
-		initialUnplayedPolyline.borderWidth = 0
-
-		const initialPlayedPolyline = new Polyline(
-			toNativePoints(trackPoints.value.slice(0, 1)), '#3c5cff', 5, false, true, '', '#FFFFFF', 1, []
-		)
-		initialPlayedPolyline.color = '#3c5cff'
-		initialPlayedPolyline.width = 5
-		initialPlayedPolyline.dottedLine = false
-		initialPlayedPolyline.arrowLine = true
-		initialPlayedPolyline.borderColor = '#FFFFFF'
-		initialPlayedPolyline.borderWidth = 1
-		unplayedPolyline = initialUnplayedPolyline
-		playedPolyline = initialPlayedPolyline
-		polyline.value = [initialUnplayedPolyline, initialPlayedPolyline]
-	}
-
-	function updatePolyline() {
-		const currentUnplayedPolyline = unplayedPolyline
-		const currentPlayedPolyline = playedPolyline
-		if (trackPoints.value.length == 0 || currentUnplayedPolyline == null || currentPlayedPolyline == null) return
-
-		const isAnimatingSegment = activeSegmentTargetIndex.value > currentIndex.value
-		const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
-		if (isAnimatingSegment) {
-			playedPoints.push(copyTrackPoint(renderedPoint))
-		}
-		const unplayedStartIndex = isAnimatingSegment ? activeSegmentTargetIndex.value : currentIndex.value
-		const unplayedPoints = trackPoints.value.slice(unplayedStartIndex)
-		if (isAnimatingSegment) {
-			unplayedPoints.unshift(copyTrackPoint(renderedPoint))
-		}
-		currentUnplayedPolyline.points = toNativePoints(unplayedPoints)
-		currentPlayedPolyline.points = toNativePoints(playedPoints)
-		polyline.value = [currentUnplayedPolyline, currentPlayedPolyline]
-	}
-	// #endif
-
-	// #ifdef MP-WEIXIN || APP-IOS
 	function toMpPoints(points : Array<TrackPoint>) : Array<MapPolylinePoint> {
 		return points.map((point : TrackPoint) : MapPolylinePoint => ({
 			latitude: point.latitude,
@@ -584,7 +499,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		if (unplayedPoints.length >= 2) {
 			lines.push({
 				points: toMpPoints(unplayedPoints),
-				color: '#999999',
+				color: '#333333',
 				width: 3,
 				dottedLine: true,
 				arrowLine: false,
@@ -609,7 +524,6 @@ import { showAppToast } from '../../utils/toast.uts'
 	function initPolyline() {
 		updatePolyline()
 	}
-	// #endif
 
 	// 更新小车位置
 	function updateCarPosition() {
@@ -689,7 +603,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 	// 显示当前位置
-	function showCurrentPosition() {
+	function showCurrentPosition(message : string = '这段时间没有数据') {
 		isTrackPlayable.value = false
 		const originalLatText = lat.value ?? ''
 		const originalLngText = lng.value ?? ''
@@ -697,15 +611,17 @@ import { showAppToast } from '../../utils/toast.uts'
 		const originalLng = parseFloat(originalLngText)
 		if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
 			showAppToast({
-				title: '这段时间没有数据',
+				title: message,
 				icon: 'none',
 				duration: 2000
 			})
+			// 设备无有效位置，回退展示用户当前位置
+			showUserLocationFallback()
 			return
 		}
 
 		showAppToast({
-			title: '这段时间没有数据',
+			title: message,
 			icon: 'none',
 			duration: 2000
 		})
@@ -746,7 +662,34 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 
-	function clearTrackDisplay() : void {
+	// 设备无有效位置（无轨迹 / 无车辆位置）时，回退到用户当前位置并展示「当前位置」标记
+const showUserLocationFallback = async () => {
+	const userLoc = await getUserCurrentLocation()
+	if (userLoc == null) return
+	center.latitude = userLoc.latitude
+	center.longitude = userLoc.longitude
+	mapScale.value = 12
+	const userMarker = {
+		id: 10004,
+		latitude: userLoc.latitude,
+		longitude: userLoc.longitude,
+		width: 25,
+		height: 25,
+		iconPath: '/static/current-location.png',
+		callout: {
+			content: '当前位置',
+			color: carStatus.value == 'online' ? '#ffffff' : '#999999',
+			borderRadius: 10,
+			bgColor: carStatus.value == 'online' ? '#1296db' : '#CCCCCC',
+			padding: 5,
+			display: 'ALWAYS'
+		}
+	} as Marker
+	markers.value = [userMarker]
+	isMapReady.value = true
+}
+
+function clearTrackDisplay() : void {
 		isMapReady.value = false
 		trackPoints.value = []
 		isTrackPlayable.value = false
@@ -772,14 +715,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		totalDistance.value = 0
 		carMarker.value = null
 		markers.value = []
-		// #ifdef APP-ANDROID
-		unplayedPolyline = null
-		playedPolyline = null
 		polyline.value = []
-		// #endif
-		// #ifdef MP-WEIXIN || APP-IOS
-		polyline.value = []
-		// #endif
 	}
 
 	function clearPlaybackTimer() : void {
@@ -876,6 +812,8 @@ import { showAppToast } from '../../utils/toast.uts'
 		center.longitude = firstPoint.longitude
 		playbackProgress.value = 0
 		renderPlaybackIndex()
+		// 未开始播放时车辆处于静止状态，速度显示 0；播放中由渲染帧更新为对应点的速度
+		currentSpeed.value = 0
 		isMapReady.value = true
 	}
 	const loadTrackPos = async () => {
@@ -898,8 +836,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			if (requestId != replaySessionId) return
 
 			if (!isBusinessSuccessCode(res.code)) {
-				showAppToast({ title: res.msg || '轨迹加载失败', icon: 'none' })
-				showCurrentPosition()
+				showCurrentPosition(res.msg || '轨迹加载失败')
 				return
 			}
 
@@ -957,6 +894,8 @@ import { showAppToast } from '../../utils/toast.uts'
 	function finishPlayback() : void {
 		pausePlayback()
 		activeSegmentTargetIndex.value = -1
+		// 播放结束后车辆为停止状态，速度显示 0
+		currentSpeed.value = 0
 		showAppToast({
 			title: '轨迹回放完成',
 			icon: 'none',

@@ -20,6 +20,7 @@ const defaultTenantId = '000000'
 const changePasswordUrl = '/user/profile/updatePassword'
 const userMsgList = '/usermessage/listForUser'
 const msgState = '/usermessage/detail/'
+const msgReadAllUrl = '/usermessage/readAll'
 const updateDevice = '/device/update'
 const deviceDetail = '/device/info/'
 const carType = '/carType/listAll'
@@ -45,12 +46,17 @@ const appCommandRetryUrl = '/app/command/retry/'
 const pushBindUrl = '/app/push/bind'
 const pushUnbindUrl = '/app/push/unbind'
 const messageUnreadCountUrl = '/app/message/unreadCount'
+const homePlatformAppUrl = '/home/platform/app'
 const geocoderAddressUrl = '/geocoder/address'
 const deviceShareUrl = '/share/device'
 const deviceShareSentUrl = '/share/device/sent'
 const deviceShareReceivedUrl = '/share/device/received'
 const deviceShareEnabledUrl = '/share/device/enabled'
 const deviceShareExitUrl = '/share/device/exit'
+const notifyQuotaUrl = '/app/notify/quota'
+const notifyDeviceTicketUrl = '/app/notify/deviceTicket'
+const notifySubscribeReportUrl = '/app/notify/subscribeReport'
+const notifyStatusUrl = '/app/notify/status'
 
 export type BasicResponse = { code: number, msg: string }
 export type PushDeviceBindRequest = {
@@ -59,9 +65,35 @@ export type PushDeviceBindRequest = {
     deviceName: string
     appVersion: string
 }
+// 订阅消息通道（后端文档 v1.0 /app/notify）：
+// mode=device → wx.requestSubscribeDeviceMessage（长期，无需上报）；mode=once → wx.requestSubscribeMessage（需上报记账）
+export type NotifyQuotaItem = {
+    bizCode: string
+    templateId: string
+    remaining: number
+    mode: string
+}
+export type NotifyQuotaResponse = { code: number, msg: string, data: Array<NotifyQuotaItem> }
+export type SubscribeReportRequest = { results: UTSJSONObject }
+
+function notifyQuotaResponse(raw: any): NotifyQuotaResponse {
+    const response = asJSONObject(raw)
+    const rows = getResponseDataArray(response)
+    const list: Array<NotifyQuotaItem> = []
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i]
+        list.push({
+            bizCode: row.getString('bizCode', ''),
+            templateId: row.getString('templateId', ''),
+            remaining: row.getNumber('remaining', -1),
+            mode: row.getString('mode', '')
+        })
+    }
+    return { code: getResponseCode(response), msg: getResponseMessage(response), data: list }
+}
 export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
 export type LegacyEnterpriseLoginRequest = { username: string, password: string, clientId?: string, tenantId?: string }
-export type WechatLoginRequest = { code: string, encryptedData: string, iv: string, clientId?: string, tenantId?: string }
+export type WechatLoginRequest = { phoneCode: string, loginCode: string, encryptedData: string, iv: string, clientId?: string, tenantId?: string }
 export type UniVerifyLoginRequest = UTSJSONObject
 export type SendSmsCodeRequest = { phonenumber: string, tenantId?: string }
 export type SmsLoginRequest = { phonenumber: string, smsCode: string, clientId?: string, tenantId?: string }
@@ -85,6 +117,7 @@ export type AppCommandDetailResponse = { code: number, msg: string, data: UTSJSO
 export type ChangePasswordRequest = { oldPassword: string, newPassword: string, confirmPassword: string }
 export type MessageResponse = { code: number, msg: string, data: UserDeviceListData }
 export type MessageUnreadCountResponse = { code: number, msg: string, data: number }
+export type HomePlatformAppResponse = { code: number, msg: string, data: string | null }
 export type GeocoderAddressResponse = { code: number, msg: string, data: UTSJSONObject }
 export type DeviceSharePageData = {
     list: Array<UTSJSONObject>
@@ -194,6 +227,16 @@ function messagePageResponse(raw: any): MessageResponse {
     }
 }
 
+function homePlatformAppResponse(raw: any): HomePlatformAppResponse {
+    const response = asJSONObject(raw)
+    const appId = response.getString('data', '').trim()
+    return {
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: appId != '' ? appId : null
+    }
+}
+
 function userInfoResponse(raw: any): UserInfoResponse {
     const response = jsonDataResponse(raw)
     return { code: response.code, msg: response.msg, data: response.data }
@@ -231,7 +274,6 @@ export const getCustomDeviceList = (deptId: string): Promise<JsonDataResponse> =
 export const getUserGroupList = (): Promise<JsonDataResponse> => get(groupList).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 export const sendCommand = (data: UTSJSONObject): Promise<BasicResponse> => post(sendcmd, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const restoreOilPower = (data: UTSJSONObject): Promise<BasicResponse> => put(sendcmd, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
-
 export const getDevicePos = (data: UTSJSONObject): Promise<DevicePositionResponse> => get(devicePos, data).then((raw: any): DevicePositionResponse => {
     const response = asJSONObject(raw)
     return {
@@ -262,9 +304,24 @@ export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListRe
     return userDevicePageResponse(raw)
 })
 
+// 查询各场景模板 ID 与通道（mode=device / once），未配置模板的场景不会返回
+export const getNotifyQuota = (): Promise<NotifyQuotaResponse> => getSilently(notifyQuotaUrl).then((raw: any): NotifyQuotaResponse => {
+    return notifyQuotaResponse(raw)
+})
+
+// 设备订阅换票：snTicket 5 分钟有效，必须现取现用，不可缓存
+export const getDeviceTicket = (deviceNo: string): Promise<JsonDataResponse> => get(`${notifyDeviceTicketUrl}?deviceNo=${encodeURIComponent(deviceNo)}`).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+
+// 上报一次性订阅授权结果（仅 mode=once；设备订阅长期有效，无需上报）
+export const reportSubscribeResults = (results: UTSJSONObject): Promise<BasicResponse> => post(notifySubscribeReportUrl, { results: results } as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
+
+// 查询订阅引导是否展示（后端开关），data.enabled 控制
+export const getNotifyStatus = (): Promise<JsonDataResponse> => getSilently(notifyStatusUrl).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+
 export const PostWechatlogin = (data: WechatLoginRequest): Promise<JsonDataResponse> => {
     const requestData = new UTSJSONObject()
-    requestData.set('code', data.code)
+    requestData.set('phoneCode', data.phoneCode)
+    requestData.set('code', data.loginCode)
     requestData.set('encryptedData', data.encryptedData)
     requestData.set('iv', data.iv)
     requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
@@ -331,6 +388,8 @@ export const getUserMsgList = (data?: UTSJSONObject): Promise<MessageResponse> =
     return messagePageResponse(raw)
 })
 export const setMsgState = (msgId: string): Promise<BasicResponse> => get(`${msgState}${msgId}`).then((raw: any): BasicResponse => { return basicResponse(raw) })
+// 一键已读：POST /usermessage/readAll，无请求体，服务端幂等（无未读时同样返回成功）
+export const readAllMessages = (): Promise<BasicResponse> => post(msgReadAllUrl, {} as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const getMessageUnreadCount = (): Promise<MessageUnreadCountResponse> => getSilently(messageUnreadCountUrl).then((raw: any): MessageUnreadCountResponse => {
     const response = asJSONObject(raw)
     return {
@@ -338,6 +397,9 @@ export const getMessageUnreadCount = (): Promise<MessageUnreadCountResponse> => 
         msg: getResponseMessage(response),
         data: response.getNumber('data', 0)
     }
+})
+export const getHomePlatformAppId = (): Promise<HomePlatformAppResponse> => getSilently(homePlatformAppUrl).then((raw: any): HomePlatformAppResponse => {
+    return homePlatformAppResponse(raw)
 })
 export const editDeviceInfo = (data: UTSJSONObject): Promise<BasicResponse> => put(updateDevice, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const getDeviceDetail = (deviceId: string): Promise<DeviceDetailResponse> => get(`${deviceDetail}${deviceId}`).then((raw: any): DeviceDetailResponse => {
@@ -371,10 +433,15 @@ export const sendCmd = (data: UTSJSONObject): Promise<SendCmdResponse> => post(c
 })
 export const getCmdRecordById = (id: string): Promise<JsonDataResponse> => get(`${cmdRecordByIdUrl}${id}`).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 
-export const getAppAvailableCommands = (deviceId: string): Promise<CommandListResponse> => get(appCommandAvailableUrl, { deviceId } as UTSJSONObject).then((raw: any): CommandListResponse => {
-    const response = asJSONObject(raw)
-    return { code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) }
-})
+export const getAppAvailableCommands = (deviceNo: string, deviceId: string): Promise<CommandListResponse> => {
+    const params = new UTSJSONObject()
+    if (deviceNo != '') params.set('deviceNo', deviceNo)
+    else if (deviceId != '') params.set('deviceId', deviceId)
+    return get(appCommandAvailableUrl, params).then((raw: any): CommandListResponse => {
+        const response = asJSONObject(raw)
+        return { code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) }
+    })
+}
 export const sendAppCommand = (data: UTSJSONObject): Promise<SendCmdResponse> => post(appCommandSendUrl, data).then((raw: any): SendCmdResponse => {
     const response = asJSONObject(raw)
     return { code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString('data', '') }

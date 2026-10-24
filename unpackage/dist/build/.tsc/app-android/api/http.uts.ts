@@ -1,5 +1,5 @@
 import { clearPushSessionState } from '../services/push.uts'
-import { asJSONObject, getResponseCode } from './response.uts'
+import { asJSONObject, getResponseCode, getResponseMessage } from './response.uts'
 import { showAppToast } from '../utils/toast.uts'
 
 import AndroidLog from 'android.util.Log'
@@ -40,6 +40,8 @@ type RequestFailure = {
 // const BASE_URL = 'https://car.zdiot.cn:18443/api'
 const BASE_URL = 'https://gpsapp.zdiot.cn'
 const CLIENT_ID = '428a8310cd442757ae699df5d894f051'
+// 全局默认租户 ID：所有后端接口统一通过请求头 defaultTenantId 传递
+const DEFAULT_TENANT_ID = '000000'
 
 // 处理token过期的函数
 let isHandlingTokenExpired = false
@@ -97,11 +99,13 @@ function requestInterceptor(config: RequestOptions): RequestOptions {
 
 
 
+
     if (config.header == null) {
         config.header = new UTSJSONObject()
     }
     config.header!.set('Authorization', authorization)
     config.header!.set('clientId', CLIENT_ID)
+    config.header!.set('tenantId', DEFAULT_TENANT_ID)
 
 
     // 显示加载中
@@ -142,6 +146,15 @@ function logHttpError(error: HttpError): void {
     console.error('[HttpRequest] ' + detail)
 }
 
+function getHttpResponseMessage(data: any): string {
+    if (data == null) return ''
+    try {
+        return getResponseMessage(asJSONObject(data))
+    } catch (error) {
+        return ''
+    }
+}
+
 // 错误处理
 function errorHandler(error: HttpError, config: RequestOptions): void {
     // 隐藏加载中
@@ -156,30 +169,32 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
     }
     if (config.showError == false) return
 
+    const responseMessage = getHttpResponseMessage(error.data)
+
     // 处理错误状态码
     if (error.statusCode != 0) {
         switch (error.statusCode) {
             case 403:
                 showAppToast({
-                    title: '没有权限访问',
+                    title: responseMessage != '' ? responseMessage : '没有权限访问',
                     icon: 'none'
                 })
                 break
             case 404:
                 showAppToast({
-                    title: '请求资源不存在',
+                    title: responseMessage != '' ? responseMessage : '请求资源不存在',
                     icon: 'none'
                 })
                 break
             case 500:
                 showAppToast({
-                    title: '服务器错误',
+                    title: responseMessage != '' ? responseMessage : '服务器错误',
                     icon: 'none'
                 })
                 break
             default:
                 showAppToast({
-                    title: error.message != null ? error.message : `请求错误: ${error.statusCode}`,
+                    title: responseMessage != '' ? responseMessage : (error.message != '' ? error.message : `请求错误: ${error.statusCode}`),
                     icon: 'none'
                 })
         }

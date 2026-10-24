@@ -112,15 +112,12 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 
 		// 获取小程序版本号
-		//#ifdef MP-WEIXIN
 		const accountInfo = wx.getAccountInfoSync();
 		const appVersion = accountInfo.miniProgram.version;
 		version.value = appVersion
-		//#endif
 	})
 
 	const contactCustomerService = () => {
-		//#ifdef MP-WEIXIN
 		uni.openCustomerServiceChat({
 			extInfo: {url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a'},
 			corpId: 'ww686122ec6a4db85a',
@@ -128,14 +125,7 @@ import { showAppToast } from '../../utils/toast.uts'
 				console.log(res)
 			}
 		})
-		//#endif
 
-		//#ifndef MP-WEIXIN
-		showAppToast({
-			title: '请在微信小程序中联系人工客服',
-			icon: 'none'
-		})
-		//#endif
 	}
 
 

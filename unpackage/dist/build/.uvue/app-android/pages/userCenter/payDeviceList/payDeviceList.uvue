@@ -35,9 +35,9 @@ const __sfc__ = defineComponent({
             hasMore.value = true;
         };
         // 加载车辆列表数据
-        const loadPayDeviceListData = async (): Promise<void> => {
+        const loadPayDeviceListData = async (): Promise<boolean> => {
             if (loading.value || !hasMore.value)
-                return;
+                return false;
             loading.value = true;
             try {
                 const data = {
@@ -50,12 +50,12 @@ const __sfc__ = defineComponent({
                         title: res.msg != "" ? res.msg : '加载失败',
                         icon: 'none'
                     } as ShowToastOptions);
-                    return;
+                    return false;
                 }
                 const pageData = res.data;
                 if (pageData == null) {
                     hasMore.value = false;
-                    return;
+                    return true;
                 }
                 const list: Array<UTSJSONObject> = pageData.list;
                 const pageCount = pageData.totalPage;

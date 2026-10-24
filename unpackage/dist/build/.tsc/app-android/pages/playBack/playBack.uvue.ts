@@ -14,6 +14,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
+	import { getUserCurrentLocation } from '../../utils/getUserLocation.uts'
 
 	import Polyline from 'uts.sdk.modules.DCloudUniMapTencent.Polyline'
 	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
@@ -64,7 +65,7 @@ const center = reactive({
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(12)
+	const mapScale = ref<number>(12)
 	const isMapReady = ref(false)
 	const deviceNo = ref<string | null>('')
 	const carStatus = ref<string | null>('')
@@ -94,10 +95,89 @@ const center = reactive({
 	const currentTime = ref('')
 	const currentIndex = ref(0)
 	const carMarker = ref<MapMarker | null>(null)
+
+
+
+
+
+
+
+
+
+
+
+
+
 	const PLAYBACK_FRAME_INTERVAL_MS = 30
+
+
+
+
+
+
+
+
+
+
 	const MIN_SEGMENT_DURATION_MS = 500
 	const MAX_SEGMENT_DURATION_MS = 6000
 	const FALLBACK_SPEED_KMH = 20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// 车标与地图中心逐帧刷新；折线重绘是 O(n) 操作，按时间节流即可，肉眼无差别
+	const POLYLINE_RENDER_INTERVAL_MS = 80
+
+	// 车标角度变化小于该度数时不下发新的 rotate：地图端每收到一个不同的 rotate 都要重建
+	// 车标视图，而 2° 以内的差异肉眼完全看不出来
+	const MARKER_ROTATION_UPDATE_THRESHOLD = 2
 	const renderedPoint = reactive<TrackPoint>({
 		latitude: 0,
 		longitude: 0,
@@ -108,6 +188,9 @@ const center = reactive({
 	const activeSegmentTargetIndex = ref(-1)
 	let playbackTimer : number | null = null
 	let replaySessionId = 0
+	let lastPolylineRenderAt = 0
+	// 上一次真正下发给地图的车标角度（用于过滤无意义的 rotate 变化）
+	let lastCarMarkerRotation = 0
 
 	function copyTrackPoint(point : TrackPoint) : TrackPoint {
 		return {
@@ -125,6 +208,15 @@ const center = reactive({
 		renderedPoint.rotation = point.rotation
 		renderedPoint.deviceTime = point.deviceTime
 		renderedPoint.speed = point.speed
+	}
+
+	// 两个角度之间的最短差值（-180~180）。朝向是环形量，必须按最短路径比较：
+	// 从 359° 转到 1° 实际只转了 2°，直接相减会得到 -358°，导致每帧都误判为"大幅转向"。
+	function shortestAngleDiff(from : number, to : number) : number {
+		let difference = to - from
+		if (difference > 180) difference -= 360
+		else if (difference < -180) difference += 360
+		return difference
 	}
 
 	function formatPlaybackTime(timestamp : number) : string {
@@ -265,23 +357,111 @@ const center = reactive({
 		}
 	}
 
-	// 调整地图以适应轨迹
+	// ===== 视野控制 =====
+	// 需求：查询出轨迹时整条路线要完整落在可视区内；只有开始播放后，才把车标定位到地图中心。
+	// 因此这里按轨迹包围盒反算所需缩放级别（而不是拍几个固定档位），并在播放前保持全览视角。
+	const MIN_TRACK_FIT_SCALE = 5.0      // 全览轨迹时的最小缩放级别
+	const MAX_TRACK_FIT_SCALE = 17.0     // 全览轨迹时的最大缩放级别（避免短轨迹放得过近）
+	const TRACK_FIT_MARGIN = 0.85        // 轨迹占可视区的比例，留边距防止端点贴屏
+	const METERS_PER_DEGREE_LAT = 110540.0
+	const METERS_PER_DEGREE_LNG = 111320.0
+	const EARTH_RESOLUTION_BASE = 156543.03392  // zoom 为 0 时赤道上的地面分辨率（米/像素）
+
+	// 地图容器的实际显示尺寸（px），用于把轨迹跨度换算成所需缩放级别
+	let mapViewWidth = 0.0
+	let mapViewHeight = 0.0
+	let mapViewSizeMeasured = false
+
+	// 测量地图容器尺寸；测不到就保留估算值，保证后续计算始终可用
+	function measureMapViewportSize(callback : () => void) {
+		try {
+			const query = uni.createSelectorQuery()
+			query.select('#track-map-container').boundingClientRect((rect : any) => {
+				if (rect != null) {
+					const nodeInfo = rect as NodeInfo
+					const width = nodeInfo.width ?? 0
+					const height = nodeInfo.height ?? 0
+					if (width > 0 && height > 0) {
+						mapViewWidth = width
+						mapViewHeight = height
+						mapViewSizeMeasured = true
+					}
+				}
+				callback()
+			}).exec()
+		} catch (error) {
+			console.warn('测量地图容器尺寸失败:', error)
+			callback()
+		}
+	}
+
+	// 用系统信息估算可视区尺寸，避免测量完成前没有尺寸可用
+	function ensureMapViewportEstimate() {
+		if (mapViewWidth > 0 && mapViewHeight > 0) return
+		try {
+			const info = uni.getSystemInfoSync()
+			mapViewWidth = info.windowWidth
+			// 地图区位于顶部导航栏与底部控制面板之间，按约一半屏高估算
+			mapViewHeight = info.windowHeight * 0.5
+		} catch (error) {
+			mapViewWidth = 375.0
+			mapViewHeight = 300.0
+		}
+	}
+
+	// 调整地图以完整显示整条轨迹：中心取包围盒中心，缩放按包围盒跨度反算
 	function adjustMapToFitTrack() {
 		const nullableBounds = calculateTrackBounds()
 		if (nullableBounds == null) return
 		const bounds = nullableBounds
 
-		center.latitude = (bounds.minLat + bounds.maxLat) / 2
-		center.longitude = (bounds.minLng + bounds.maxLng) / 2
+		const midLat = (bounds.minLat + bounds.maxLat) / 2
+		const midLng = (bounds.minLng + bounds.maxLng) / 2
+		center.latitude = midLat
+		center.longitude = midLng
 
-		const latDiff = bounds.maxLat - bounds.minLat
-		const lngDiff = bounds.maxLng - bounds.minLng
-		const maxDiff = Math.max(latDiff, lngDiff)
+		ensureMapViewportEstimate()
+		const usableWidth = mapViewWidth * TRACK_FIT_MARGIN
+		const usableHeight = mapViewHeight * TRACK_FIT_MARGIN
+		if (usableWidth <= 0 || usableHeight <= 0) return
 
-		if (maxDiff > 0.1) mapScale.value = 10
-		else if (maxDiff > 0.05) mapScale.value = 12
-		else if (maxDiff > 0.02) mapScale.value = 15
-		else mapScale.value = 16
+		let cosLat = Math.cos(midLat * Math.PI / 180.0)
+		if (cosLat < 0.01) cosLat = 0.01
+
+		// 包围盒在南北、东西方向的实际跨度（米）
+		const spanLatMeters = (bounds.maxLat - bounds.minLat) * METERS_PER_DEGREE_LAT
+		const spanLngMeters = (bounds.maxLng - bounds.minLng) * METERS_PER_DEGREE_LNG * cosLat
+
+		// 需要的地面分辨率（米/像素）：取两个方向中更严格的一侧
+		const neededResolution = Math.max(spanLatMeters / usableHeight, spanLngMeters / usableWidth)
+
+		// Web Mercator：地面分辨率 = EARTH_RESOLUTION_BASE × cos(lat) / 2^zoom
+		let zoom = MAX_TRACK_FIT_SCALE
+		if (neededResolution > 0.0001) {
+			const baseResolution = EARTH_RESOLUTION_BASE * cosLat
+			zoom = Math.log(baseResolution / neededResolution) / Math.log(2.0)
+		}
+		// 向下取整，确保整条轨迹确实放得下
+		let finalZoom = Math.floor(zoom)
+		if (finalZoom > MAX_TRACK_FIT_SCALE) finalZoom = MAX_TRACK_FIT_SCALE
+		if (finalZoom < MIN_TRACK_FIT_SCALE) finalZoom = MIN_TRACK_FIT_SCALE
+		mapScale.value = finalZoom
+	}
+
+	// 适配视野：先用当前尺寸算一次，测到地图容器精确尺寸后再校正一次
+	function applyTrackViewportFit() {
+		adjustMapToFitTrack()
+		if (mapViewSizeMeasured) return
+		measureMapViewportSize(() => {
+			adjustMapToFitTrack()
+		})
+	}
+
+	// 播放阶段把车标置于地图中心（查询出轨迹时不做这件事，保持整条路线全览）
+	function focusMapOnVehicle() {
+		if (trackPoints.value.length == 0) return
+		center.latitude = renderedPoint.latitude
+		center.longitude = renderedPoint.longitude
 	}
 
 	// 计算轨迹总距离
@@ -306,24 +486,37 @@ const center = reactive({
 		)
 	}
 
+	// 起点 / 终点标记。必须持有引用而不能是 initCarMarker 的局部变量：
+	// 微信小程序播放期间车标改由 .car-overlay 覆盖物承担（原生 markers 里只剩起终点），
+	// 暂停或播放结束时由 applyFullMarkers 重新组装完整数组。
+	let startMarker : MapMarker | null = null
+	let endMarker : MapMarker | null = null
+
 	// 初始化小车标记
 	function initCarMarker() {
 		if (trackPoints.value.length == 0) return
 
 		const firstPoint = trackPoints.value[0]
+		const deviceIcon = getDeviceIcon(carStatus.value ?? '', carType.value ?? '')
 		const marker : MapMarker = {
 			id: 999,
 			latitude: firstPoint.latitude,
 			longitude: firstPoint.longitude,
-			iconPath: getDeviceIcon(carStatus.value ?? '', carType.value ?? ''),
+			iconPath: deviceIcon,
 			width: 25,
 			height: 25,
 			rotate: firstPoint.rotation,
 			anchor: { x: 0.5, y: 0.5 }
 		}
 		carMarker.value = marker
+		lastCarMarkerRotation = firstPoint.rotation
 
-		const startMarker : MapMarker = {
+
+
+
+
+
+		const start : MapMarker = {
 			id: 1000,
 			latitude: firstPoint.latitude,
 			longitude: firstPoint.longitude,
@@ -334,7 +527,7 @@ const center = reactive({
 			callout: { content: '起点', borderRadius: 5, padding: 5, display: 'BYCLICK' }
 		}
 		const lastPoint = trackPoints.value[trackPoints.value.length - 1]
-		const endMarker : MapMarker = {
+		const end : MapMarker = {
 			id: 1001,
 			latitude: lastPoint.latitude,
 			longitude: lastPoint.longitude,
@@ -344,7 +537,19 @@ const center = reactive({
 			anchor: { x: 0.5, y: 0.5 },
 			callout: { content: '终点', borderRadius: 5, padding: 5, display: 'BYCLICK' }
 		}
-		markers.value = [marker, startMarker, endMarker]
+		startMarker = start
+		endMarker = end
+		markers.value = [marker, start, end]
+	}
+
+	// 把车标与起终点标记组装成完整的 markers 数组（暂停、结束、换轨迹时调用）
+	function applyFullMarkers() {
+		const car = carMarker.value
+		if (car == null) return
+		const list : Array<MapMarker> = [car]
+		if (startMarker != null) list.push(startMarker)
+		if (endMarker != null) list.push(endMarker)
+		markers.value = list
 	}
 
 
@@ -363,13 +568,13 @@ const center = reactive({
 		}
 
 		const initialUnplayedPolyline = new Polyline(
-			toNativePoints(trackPoints.value), '#888787', 3, true, false, '', '#888787', 0, []
+			toNativePoints(trackPoints.value), '#444444', 3, true, false, '', '#444444', 0, []
 		)
-		initialUnplayedPolyline.color = '#888787'
+		initialUnplayedPolyline.color = '#444444'
 		initialUnplayedPolyline.width = 3
 		initialUnplayedPolyline.dottedLine = true
 		initialUnplayedPolyline.arrowLine = false
-		initialUnplayedPolyline.borderColor = '#888787'
+		initialUnplayedPolyline.borderColor = '#444444'
 		initialUnplayedPolyline.borderWidth = 0
 
 		const initialPlayedPolyline = new Polyline(
@@ -462,10 +667,449 @@ const center = reactive({
 
 
 
-	// 更新小车位置
-	function updateCarPosition() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// 更新小车位置。force = true 时跳过节流强制下发一帧，用于"位置必须立即对齐"的场合：
+	// 起播、重置、以及每段动画结束（否则车标会停在最后一次推送处，播放结束时与终点差一小段）。
+	function updateCarPosition(force : boolean) {
 		const marker = carMarker.value
 		if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
+			// 地图中心每帧都跟随车标：center 编译后只是 latitude/longitude 两个数字的
+			// 独立顶层绑定，下发成本极轻，不会触发安卓端的覆盖物重建，因此可以放心逐帧更新。
+			// 只有播放中才跟随——未播放时地图保持整条轨迹全览。
+			// 这一段必须放在下面的 markers 死区判断之前：早先把两者绑在同一个门控上，
+			// 导致低缩放下每秒才下发一次，镜头和车标一起"顿"一下，观感就是"一顿一顿"。
+			if (isPlaying.value) {
+				center.latitude = renderedPoint.latitude
+				center.longitude = renderedPoint.longitude
+			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			// 角度变化小于阈值时沿用上一次下发的角度：地图端每收到一个不同的 rotate 都要
+			// 重建车标视图，小程序（尤其安卓）上会表现为车标闪动，而 2° 以内看不出来
+			const rotationDiff = shortestAngleDiff(renderedPoint.rotation, lastCarMarkerRotation)
+			const markerRotation = Math.abs(rotationDiff) >= MARKER_ROTATION_UPDATE_THRESHOLD
+				? renderedPoint.rotation
+				: lastCarMarkerRotation
+			lastCarMarkerRotation = markerRotation
+
 			const updatedMarker : MapMarker = {
 				id: marker.id,
 				latitude: renderedPoint.latitude,
@@ -473,19 +1117,13 @@ const center = reactive({
 				iconPath: marker.iconPath,
 				width: marker.width,
 				height: marker.height,
-				rotate: renderedPoint.rotation,
+				rotate: markerRotation,
 				anchor: marker.anchor,
 				callout: marker.callout,
 				label: marker.label
 			}
 			carMarker.value = updatedMarker
 			markers.value = [updatedMarker, ...markers.value.slice(1)]
-
-			if (currentIndex.value % 5 == 0 ||
-				currentIndex.value == trackPoints.value.length - 1) {
-				center.latitude = renderedPoint.latitude
-				center.longitude = renderedPoint.longitude
-			}
 		}
 	}
 
@@ -497,7 +1135,7 @@ const center = reactive({
 	}
 
 	// 显示当前位置
-	function showCurrentPosition() {
+	function showCurrentPosition(message : string = '这段时间没有数据') {
 		isTrackPlayable.value = false
 		const originalLatText = lat.value ?? ''
 		const originalLngText = lng.value ?? ''
@@ -505,15 +1143,17 @@ const center = reactive({
 		const originalLng = parseFloat(originalLngText)
 		if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
 			showAppToast({
-				title: '这段时间没有数据',
+				title: message,
 				icon: 'none',
 				duration: 2000
 			})
+			// 设备无有效位置，回退展示用户当前位置
+			showUserLocationFallback()
 			return
 		}
 
 		showAppToast({
-			title: '这段时间没有数据',
+			title: message,
 			icon: 'none',
 			duration: 2000
 		})
@@ -554,7 +1194,34 @@ const center = reactive({
 	}
 
 
-	function clearTrackDisplay() : void {
+	// 设备无有效位置（无轨迹 / 无车辆位置）时，回退到用户当前位置并展示「当前位置」标记
+const showUserLocationFallback = async () => {
+	const userLoc = await getUserCurrentLocation()
+	if (userLoc == null) return
+	center.latitude = userLoc.latitude
+	center.longitude = userLoc.longitude
+	mapScale.value = 12
+	const userMarker = {
+		id: 10004,
+		latitude: userLoc.latitude,
+		longitude: userLoc.longitude,
+		width: 25,
+		height: 25,
+		iconPath: '/static/current-location.png',
+		callout: {
+			content: '当前位置',
+			color: carStatus.value == 'online' ? '#ffffff' : '#999999',
+			borderRadius: 10,
+			bgColor: carStatus.value == 'online' ? '#1296db' : '#CCCCCC',
+			padding: 5,
+			display: 'ALWAYS'
+		}
+	} as Marker
+	markers.value = [userMarker]
+	isMapReady.value = true
+}
+
+function clearTrackDisplay() : void {
 		isMapReady.value = false
 		trackPoints.value = []
 		isTrackPlayable.value = false
@@ -570,6 +1237,8 @@ const center = reactive({
 		totalDistance.value = 0
 		carMarker.value = null
 		markers.value = []
+		lastCarMarkerRotation = 0
+		lastPolylineRenderAt = 0
 
 		unplayedPolyline = null
 		playedPolyline = null
@@ -578,9 +1247,17 @@ const center = reactive({
 
 
 
+
+
+
+
+
+
+
+
 	}
 
-	function clearPlaybackTimer() : void {
+		function clearPlaybackTimer() : void {
 		const timer = playbackTimer
 		if (timer != null) {
 			clearTimeout(timer)
@@ -591,6 +1268,27 @@ const center = reactive({
 	function pausePlayback() : void {
 		isPlaying.value = false
 		clearPlaybackTimer()
+
+
+
+
+
+
+
+
+		// 暂停 / 播放结束时的收尾对齐：强制下发一帧车标。
+		// 覆盖层车标只是显示层的一层薄纱，真实位置由原生 markers 车标承载，
+		// 因此必须让它精确落在最后一个渲染点上，否则暂停后会看到车标与覆盖层错位一小段。
+		if (carMarker.value != null && trackPoints.value.length > 0) {
+			updateCarPosition(true)
+			applyFullMarkers()
+		}
+
+
+
+
+
+
 	}
 
 	function renderPlaybackIndex() : void {
@@ -598,8 +1296,30 @@ const center = reactive({
 		if (activeSegmentTargetIndex.value <= currentIndex.value) {
 			resetRenderedPoint(trackPoints.value[currentIndex.value])
 		}
-		updateCarPosition()
+		// 强制下发一帧：这里的位置是"跳变后的确定值"（段末、重置、载入完成），必须精确对齐。
+		// 微信端播放中该调用只更新覆盖层车标朝向、不碰 markers（见 updateCarPosition）；
+		// 非播放时则用它把原生车标 marker 落到准确位置。
+		updateCarPosition(true)
+
+
+
+
+
+
+
+
+
+
+
 		updatePolyline()
+		// 这里已经完整重画过一次折线，重置节流时间戳，避免紧接着的动画帧马上再重画一次
+		lastPolylineRenderAt = Date.now()
+		// 非播放状态下组装完整的 markers（车标 + 起点 + 终点）。
+		// 播放中必须跳过：此时原生 markers 里只有静止的起终点，
+		// 一旦在这里把车标补回，播放过程就会重新开始下发 markers，闪动立刻回来。
+		if (!isPlaying.value) {
+			applyFullMarkers()
+		}
 		const point = trackPoints.value[currentIndex.value]
 		currentSpeed.value = point.speed
 		currentTime.value = point.deviceTime
@@ -663,16 +1383,18 @@ const center = reactive({
 		isTrackPlayable.value = processedPoints.length > 1
 		currentIndex.value = 0
 		activeSegmentTargetIndex.value = -1
+		lastPolylineRenderAt = 0
 		if (processedPoints.length == 0) return
 		resetRenderedPoint(processedPoints[0])
 		calculateTrackDistance()
 		initCarMarker()
 		initPolyline()
-		adjustMapToFitTrack()
-		const firstPoint = trackPoints.value[0]
-		center.latitude = firstPoint.latitude
-		center.longitude = firstPoint.longitude
+		// 查出轨迹后先完整展示整条路线；此处不再把中心改成轨迹起点，
+		// 播放时改由 focusMapOnVehicle() 与逐帧跟随把车标定位到地图中心。
+		applyTrackViewportFit()
 		renderPlaybackIndex()
+		// 未开始播放时车辆处于静止状态，速度显示 0；播放中由渲染帧更新为对应点的速度
+		currentSpeed.value = 0
 		isMapReady.value = true
 	}
 	const loadTrackPos = async () => {
@@ -695,10 +1417,11 @@ const center = reactive({
 			if (requestId != replaySessionId) return
 
 			if (!isBusinessSuccessCode(res.code)) {
-				showAppToast({ title: res.msg || '轨迹加载失败', icon: 'none' })
-				showCurrentPosition()
+				showCurrentPosition(res.msg || '轨迹加载失败')
 				return
 			}
+
+			console.log('加载轨迹成功:', res)
 
 			const trackData = res.data
 			if (trackData == null) {
@@ -733,6 +1456,8 @@ const center = reactive({
 		currentIndex.value = 0
 		activeSegmentTargetIndex.value = -1
 		renderPlaybackIndex()
+		// 回到未播放状态，视野同步恢复为整条轨迹全览
+		applyTrackViewportFit()
 	}
 
 	function getShortestRotationDifference(from : number, to : number) : number {
@@ -753,6 +1478,8 @@ const center = reactive({
 	function finishPlayback() : void {
 		pausePlayback()
 		activeSegmentTargetIndex.value = -1
+		// 播放结束后车辆为停止状态，速度显示 0
+		currentSpeed.value = 0
 		showAppToast({
 			title: '轨迹回放完成',
 			icon: 'none',
@@ -790,8 +1517,32 @@ const center = reactive({
 			renderedPoint.rotation = (startPoint.rotation + rotationDifference * progress + 360) % 360
 			renderedPoint.deviceTime = targetPoint.deviceTime
 			renderedPoint.speed = targetPoint.speed
-			updateCarPosition()
-			updatePolyline()
+			// 播放过程中同步展示当前对应点的速度与时间
+			currentSpeed.value = renderedPoint.speed
+			currentTime.value = renderedPoint.deviceTime
+			// 动画帧内按节流下发
+			updateCarPosition(false)
+
+			// 折线重绘是O(n) 的计算（切片 + 坐标转换 + 抽稀），长轨迹下足以占用几十毫秒。
+			// 它与车标共用同一条跨线程通道，若在帧内同步执行，会推迟本帧车标的 setData，
+			// 表现为车标周期性地"顿"一下。所以先算好下一帧的调度时刻（纯整数运算，开销可忽略），
+			// 让车标与镜头先完成下发，再把折线重绘排到它后面的独立任务里执行。
+			const frameNow = Date.now()
+			// 是否到了该重画折线的时机。
+			// 微信端不看时间，只看屏幕位移死区（见 shouldPushPolyline）：
+			// 时间闸门在这里是有害的——间隔调大蓝线滞后肉眼可见，调小闪烁立刻回来，
+			// 而"屏幕上走了 8px"这个量与播放速度无关，无论 1x 还是 32x 都能保证滞后被车标盖住。
+			// 这里提前算好、下一帧再执行，避免抢在本帧车标 setData 的前面。
+			let polylineDue = false
+
+
+
+
+			polylineDue = frameNow - lastPolylineRenderAt >= POLYLINE_RENDER_INTERVAL_MS
+
+			if (polylineDue) {
+				lastPolylineRenderAt = frameNow
+			}
 
 			if (progress >= 1) {
 				currentIndex.value = targetIndex
@@ -802,7 +1553,21 @@ const center = reactive({
 				return
 			}
 			if (renderFrame != null) {
-				playbackTimer = setTimeout(() => { renderFrame?.() }, PLAYBACK_FRAME_INTERVAL_MS)
+				// 自校正调度：setTimeout 递归调用会逐帧累积漂移（安卓上尤甚），实际帧率
+				// 会明显低于设定值，表现为"一顿一顿"。这里始终以本段起点为基准计算下一帧的
+				// 目标时刻，若已落后于该时刻则立即补帧，从而把帧率稳定在设定值上。
+				const nextFrameAt = startedAt + (Math.floor((frameNow - startedAt) / PLAYBACK_FRAME_INTERVAL_MS) + 1) * PLAYBACK_FRAME_INTERVAL_MS
+				const delay = nextFrameAt - frameNow
+				playbackTimer = setTimeout(() => { renderFrame?.() }, delay > 0 ? delay : 0)
+			}
+			// 折线重绘放在下一帧的调度之后：此时车标与镜头的 setData 已经被收集并发出，
+			// 这段计算不会再抢在它们前面。若播放状态已变化则直接跳过，避免多余开销。
+			if (polylineDue) {
+				const polylineSessionId = sessionId
+				setTimeout(() => {
+					if (!isPlaying.value || polylineSessionId != replaySessionId) return
+					updatePolyline()
+				}, 0)
 			}
 		}
 
@@ -821,6 +1586,25 @@ const center = reactive({
 
 		activeSegmentTargetIndex.value = -1
 		isPlaying.value = true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		// 开始播放：此刻才把车标定为地图中心（查询阶段保持整条轨迹全览）
+		focusMapOnVehicle()
+		lastPolylineRenderAt = 0
 		const sessionId = ++replaySessionId
 		animateNextSegment(sessionId)
 	}
@@ -907,6 +1691,19 @@ const center = reactive({
 
 	})
 
+	onReady(() => {
+		// 页面渲染完成后用实测的地图容器尺寸再校正一次全览视野，
+		// 避免只依赖系统信息的估算值导致整条轨迹没有完全落在可视区内
+		measureMapViewportSize(() => {
+			if (trackPoints.value.length > 0 && !isPlaying.value) adjustMapToFitTrack()
+		})
+
+
+
+
+
+	})
+
 	onHide(() => {
 		pausePlayback()
 		++replaySessionId
@@ -941,7 +1738,10 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         textColor: "#333",
         showCapsule: false
       })),
-      _cE("view", _uM({ class: "map-container" }), [
+      _cE("view", _uM({
+        class: "map-container",
+        id: "track-map-container"
+      }), [
         isTrue(isMapReady.value)
           ? _cV(_component_map, _uM({
               key: 0,

@@ -32,7 +32,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadPayDeviceListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (loading.value || !hasMore.value)
-          return Promise.resolve(null);
+          return false;
         loading.value = true;
         try {
           const data = new common_vendor.UTSJSONObject({
@@ -45,12 +45,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               title: res.msg || "加载失败",
               icon: "none"
             });
-            return Promise.resolve(null);
+            return false;
           }
           const pageData = res.data;
           if (pageData == null) {
             hasMore.value = false;
-            return Promise.resolve(null);
+            return true;
           }
           const list = pageData.list;
           const pageCount = pageData.totalPage;
@@ -93,22 +93,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:163", iccid);
       needRefresh.value = true;
-      common_vendor.index.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
+      common_vendor.index.openEmbeddedMiniProgram({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:173", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:172", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:176", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:175", "打开小程序失败", res);
           needRefresh.value = false;
           utils_toast.showAppToast({
             title: "打开支付页面失败",
             icon: "none"
           });
         }
-      }));
+      });
     }
     const payDevice = (item) => {
       const iccid = item.getString("iccid", "");

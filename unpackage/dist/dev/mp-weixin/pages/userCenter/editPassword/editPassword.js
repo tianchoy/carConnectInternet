@@ -2,7 +2,6 @@
 const common_vendor = require("../../../common/vendor.js");
 const api_request = require("../../../api/request.js");
 const api_response = require("../../../api/response.js");
-const services_push = require("../../../services/push.js");
 const utils_toast = require("../../../utils/toast.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -108,7 +107,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const returnToLogin = () => {
       sessionEnding.value = true;
       common_vendor.index.removeStorageSync("token");
-      services_push.clearPushSessionState();
       form.value = { oldPassword: "", newPassword: "", confirmPassword: "" };
       setTimeout(() => {
         common_vendor.index.reLaunch({ url: "/pages/login/login" });
@@ -132,7 +130,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: response.msg || "密码修改失败，请稍后重试", icon: "none" });
             return Promise.resolve(null);
           }
-          utils_toast.showAppToast({ title: "密码修改成功，请重新登录", icon: "success" });
+          utils_toast.showAppToast({ title: response.msg || "密码修改成功，请重新登录", icon: "success" });
           returnToLogin();
         } catch (error) {
           if (!sessionEnding.value) {

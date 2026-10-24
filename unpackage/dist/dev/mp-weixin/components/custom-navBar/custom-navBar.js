@@ -48,7 +48,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (pages.length > 1) {
         common_vendor.index.navigateBack();
       } else {
-        common_vendor.index.switchTab({ url: "/pages/index/index" });
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
       }
       emit("back");
     };
@@ -92,7 +92,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {
         l: common_vendor.t(__props.rightText)
       }, {
-        m: common_vendor.o(handleCapsuleClick, "ba")
+        m: common_vendor.o(handleCapsuleClick, "d2")
       }) : {}, {
         n: "200rpx",
         o: common_vendor.s(__props.isShowStyle ? {

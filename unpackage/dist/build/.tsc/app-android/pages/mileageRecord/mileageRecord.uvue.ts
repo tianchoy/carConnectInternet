@@ -153,13 +153,16 @@ const carStatus = ref('在线')
 		uni.showLoading({
 			title: '加载中...',
 		})
-		if (!deviceNo.value) return;
+		if (!deviceNo.value) {
+			uni.hideLoading()
+			return
+		}
 		try {
 			const data = {
 				deviceNo: deviceNo.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
-				minParkTime: 120,
+				minParkTime: 2,
 				withStop: false,
 				withPos: false,
 				withTrip: true,

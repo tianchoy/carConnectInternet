@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const services_push = require("../services/push.js");
 const api_response = require("./response.js");
 const utils_toast = require("../utils/toast.js");
 class RequestOptions extends common_vendor.UTS.UTSType {
@@ -124,6 +123,7 @@ class RequestFailure extends common_vendor.UTS.UTSType {
 }
 const BASE_URL = "https://gpsapp.zdiot.cn";
 const CLIENT_ID = "428a8310cd442757ae699df5d894f051";
+const DEFAULT_TENANT_ID = "000000";
 let isHandlingTokenExpired = false;
 function resetTokenExpiredState() {
   isHandlingTokenExpired = false;
@@ -132,23 +132,22 @@ function handleTokenExpired() {
   if (isHandlingTokenExpired)
     return null;
   isHandlingTokenExpired = true;
-  common_vendor.index.__f__("log", "at api/http.uts:54", "检测到token过期，执行跳转登录页逻辑");
+  common_vendor.index.__f__("log", "at api/http.uts:52", "检测到token过期，执行跳转登录页逻辑");
   common_vendor.index.removeStorageSync("token");
-  services_push.clearPushSessionState();
   utils_toast.showAppToast({
     title: "登录已过期，请重新登录",
     icon: "none",
     duration: 2e3
   });
   setTimeout(() => {
-    common_vendor.index.__f__("log", "at api/http.uts:69", "正在跳转到登录页...");
+    common_vendor.index.__f__("log", "at api/http.uts:66", "正在跳转到登录页...");
     common_vendor.index.redirectTo({
       url: "/pages/login/login",
       success: () => {
-        common_vendor.index.__f__("log", "at api/http.uts:73", "跳转登录页成功");
+        common_vendor.index.__f__("log", "at api/http.uts:70", "跳转登录页成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at api/http.uts:76", "跳转登录页失败:", err);
+        common_vendor.index.__f__("log", "at api/http.uts:73", "跳转登录页失败:", err);
         common_vendor.index.reLaunch({
           url: "/pages/login/login"
         });
@@ -157,13 +156,14 @@ function handleTokenExpired() {
   }, 500);
 }
 function requestInterceptor(config) {
-  const token = common_vendor.index.getStorageSync("token");
+  const token = common_vendor.index.getStorageSync("token", true);
   const authorization = "Bearer " + (token != null ? token.toString() : "");
   if (config.header == null) {
     config.header = new common_vendor.UTSJSONObject({});
   }
   config.header["Authorization"] = authorization;
   config.header["clientId"] = CLIENT_ID;
+  config.header["tenantId"] = DEFAULT_TENANT_ID;
   return config;
 }
 function isBusinessTokenExpired(data = null) {
@@ -185,7 +185,16 @@ function responseInterceptor(response, config) {
 }
 function logHttpError(error) {
   const detail = "statusCode=" + error.statusCode + ", message=" + error.message + ", data=" + (error.data != null ? error.data.toString() : "");
-  common_vendor.index.__f__("error", "at api/http.uts:142", "[HttpRequest] " + detail);
+  common_vendor.index.__f__("error", "at api/http.uts:127", "[HttpRequest] " + detail);
+}
+function getHttpResponseMessage(data = null) {
+  if (data == null)
+    return "";
+  try {
+    return api_response.getResponseMessage(api_response.asJSONObject(data));
+  } catch (error) {
+    return "";
+  }
 }
 function errorHandler(error, config) {
   if (config.showLoading != false) {
@@ -198,29 +207,30 @@ function errorHandler(error, config) {
   }
   if (config.showError == false)
     return null;
+  const responseMessage = getHttpResponseMessage(error.data);
   if (error.statusCode != 0) {
     switch (error.statusCode) {
       case 403:
         utils_toast.showAppToast({
-          title: "没有权限访问",
+          title: responseMessage != "" ? responseMessage : "没有权限访问",
           icon: "none"
         });
         break;
       case 404:
         utils_toast.showAppToast({
-          title: "请求资源不存在",
+          title: responseMessage != "" ? responseMessage : "请求资源不存在",
           icon: "none"
         });
         break;
       case 500:
         utils_toast.showAppToast({
-          title: "服务器错误",
+          title: responseMessage != "" ? responseMessage : "服务器错误",
           icon: "none"
         });
         break;
       default:
         utils_toast.showAppToast({
-          title: error.message != null ? error.message : `请求错误: ${error.statusCode}`,
+          title: responseMessage != "" ? responseMessage : error.message != "" ? error.message : `请求错误: ${error.statusCode}`,
           icon: "none"
         });
     }
@@ -277,7 +287,8 @@ function request(options) {
         });
         errorHandler(httpError, processedConfig);
         reject(httpError);
-      }
+      },
+      isUTS: true
     });
   });
 }
@@ -324,15 +335,6 @@ function post(url, data = new common_vendor.UTSJSONObject({}), options = new Req
     showError: options.showError
   }));
 }
-function postSilently(url, data = null) {
-  return request(new common_vendor.UTSJSONObject({
-    url,
-    method: "POST",
-    data,
-    showLoading: false,
-    showError: false
-  }));
-}
 function put(url, data = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
   url: null,
   method: null,
@@ -370,7 +372,6 @@ function remove(url, data = new common_vendor.UTSJSONObject({}), options = new R
 exports.get = get;
 exports.getSilently = getSilently;
 exports.post = post;
-exports.postSilently = postSilently;
 exports.put = put;
 exports.remove = remove;
 exports.resetTokenExpiredState = resetTokenExpiredState;

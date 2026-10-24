@@ -1,7 +1,5 @@
 "use strict";
-require("../utssdk/interface.js");
 const uni_modules_limeDayuts_common_constant = require("./constant.js");
-require("./use.js");
 function padStart(string, length, pad) {
   const str = string;
   if (str.length >= length)
@@ -19,7 +17,6 @@ function isNumber(value) {
   return typeof value === "number" && !isNaN(value);
 }
 function prettyUnit(u) {
-  var _a;
   const special = /* @__PURE__ */ new Map([
     ["M", uni_modules_limeDayuts_common_constant.M],
     ["y", uni_modules_limeDayuts_common_constant.Y],
@@ -32,7 +29,7 @@ function prettyUnit(u) {
     ["ms", uni_modules_limeDayuts_common_constant.MS],
     ["Q", uni_modules_limeDayuts_common_constant.Q]
   ]);
-  return (_a = special.get(u)) !== null && _a !== void 0 ? _a : `${u}`.toLowerCase().replace(/s$/, "");
+  return special.get(u) ?? `${u}`.toLowerCase().replace(/s$/, "");
 }
 function monthDiff(a, b) {
   if (a.date() < b.date())

@@ -2,24 +2,6 @@
     "version" : "1.0",
     "configurations" : [
         {
-            "customPlaygroundType" : "device",
-            "playground" : "standard",
-            "type" : "uni-app:app-ios"
-        },
-        {
-            "iOSProjectStandardBaseHistory" : {
-                "current" : "Pandora_simulator_debug_5.22.2026072503-alpha.app",
-                "previous" : "Pandora_simulator_debug_5.21.2026071110-alpha.app"
-            },
-            "playground" : "standard",
-            "type" : "uni-app:app-ios_simulator"
-        },
-        {
-            "customPlaygroundType" : "device",
-            "playground" : "standard",
-            "type" : "uni-app:app-android"
-        },
-        {
             "app" : {
                 "launchtype" : "remote"
             },

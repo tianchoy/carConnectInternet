@@ -6185,9 +6185,11 @@ function hyphenateCssProperty(str) {
   }
   return hyphenate(str);
 }
+let uniAnimationNextId = 0;
 class UniAnimation {
   constructor(id, scope, keyframes, options = {}) {
     var _a;
+    this._animationId = 0;
     this._playState = "idle";
     this.parsedKeyframes = [];
     this.options = {};
@@ -6217,6 +6219,7 @@ class UniAnimation {
     toRaw(this.scope).setData({
       ["$eA." + this.id]: JSON.stringify({
         id: this.id,
+        animationId: this._animationId,
         playState: "idle",
         keyframes: this.parsedKeyframes,
         options: this.options
@@ -6234,9 +6237,11 @@ class UniAnimation {
     throw new Error("pause not implemented.");
   }
   play() {
+    this._animationId = ++uniAnimationNextId;
     this.scope.setData({
       ["$eA." + this.id]: JSON.stringify({
         id: this.id,
+        animationId: this._animationId,
         playState: "running",
         keyframes: this.parsedKeyframes,
         options: this.options
@@ -6277,6 +6282,13 @@ function normalizeKeyframes(keyframes, direction = "normal") {
     });
   });
   keyframes = handleDirection(keyframes, direction);
+  if (keyframes.length === 1) {
+    keyframes[0].offset = 0;
+    return keyframes.map((kf) => {
+      kf.offset = Number(kf.offset.toFixed(5));
+      return kf;
+    });
+  }
   const existingOffsets = keyframes.map((kf, index2) => ({
     index: index2,
     offset: kf.offset
@@ -6322,11 +6334,19 @@ function coverAnimateToStyle(keyframes, options) {
   const direction = (options === null || options === void 0 ? void 0 : options.direction) || "normal";
   if (!Array.isArray(keyframes)) {
     const propertyNames = Object.keys(keyframes);
-    const arrayLength = keyframes[propertyNames[0]].length;
+    const arrayLength = propertyNames.reduce((max, prop) => {
+      const value = keyframes[prop];
+      return Array.isArray(value) && value.length > max ? value.length : max;
+    }, 0);
+    if (arrayLength === 0) {
+      return coverAnimateToStyle([keyframes], options);
+    }
     const frames2 = Array.from({ length: arrayLength }, (_2, i2) => {
       const frame = {};
       propertyNames.forEach((prop) => {
-        frame[prop] = keyframes[prop][i2];
+        var _a;
+        const value = keyframes[prop];
+        frame[prop] = Array.isArray(value) ? (_a = value[i2]) !== null && _a !== void 0 ? _a : value[value.length - 1] : value;
       });
       return frame;
     });
@@ -6656,7 +6676,7 @@ function setUniElementScrollOffset(uniElement, res) {
     }
   });
 }
-function vOn(value, key) {
+function vOn(value, key, flags = 0) {
   const instance = getCurrentInstance();
   const ctx = instance.ctx;
   const extraKey = typeof key !== "undefined" && (ctx.$mpPlatform === "mp-weixin" || ctx.$mpPlatform === "mp-qq" || ctx.$mpPlatform === "mp-xhs") && (isString(key) || typeof key === "number") ? "_" + key : "";
@@ -6670,12 +6690,16 @@ function vOn(value, key) {
   if (existingInvoker) {
     existingInvoker.value = value;
   } else {
-    mpInstance[name] = createInvoker(value, instance);
+    mpInstance[name] = createInvoker(value, instance, (flags & 1) !== 0);
   }
   return name;
 }
-function createInvoker(initialValue, instance) {
+function createInvoker(initialValue, instance, isOnce = false) {
   const invoker = (e2) => {
+    if (invoker.once && invoker.called) {
+      return;
+    }
+    invoker.called = true;
     patchMPEvent(e2, instance);
     let args = [e2];
     if (instance && instance.ctx.$getTriggerEventDetail) {
@@ -6700,6 +6724,8 @@ function createInvoker(initialValue, instance) {
       return res;
     }
   };
+  invoker.once = isOnce;
+  invoker.called = false;
   invoker.value = initialValue;
   return invoker;
 }
@@ -6987,7 +7013,7 @@ function parseVirtualHostClass(className) {
   className = normalizeClass(className);
   return patchClassList(className.split(/\s+/)).join(" ");
 }
-const o$1 = (value, key) => vOn(value, key);
+const o$1 = (value, key, flags) => vOn(value, key, flags);
 const f$1 = (source, renderItem) => vFor(source, renderItem);
 const r$1 = (name, props, key) => renderSlot(name, props, key);
 const s$1 = (value) => stringifyStyle(value);
@@ -7870,12 +7896,36 @@ const offPushMessage = (fn2) => {
     }
   }
 };
+const uasmCache = /* @__PURE__ */ new Map();
+function loadUasm(module2) {
+  const descriptor = module2;
+  if (!descriptor || typeof descriptor.id !== "string" || typeof descriptor.loader !== "function") {
+    return Promise.reject(new Error("uni.loadUasm 参数未经过编译处理"));
+  }
+  let promise = uasmCache.get(descriptor.id);
+  if (!promise) {
+    promise = descriptor.loader().then((loaded) => {
+      if (typeof loaded.default !== "function") {
+        throw new Error(`uasm 插件[${descriptor.id}]的默认导出必须是函数`);
+      }
+      return loaded.default();
+    });
+    uasmCache.set(descriptor.id, promise);
+    promise.catch(() => {
+      if (uasmCache.get(descriptor.id) === promise) {
+        uasmCache.delete(descriptor.id);
+      }
+    });
+  }
+  return promise;
+}
 const SYNC_API_RE = /^\$|__f__|getLocale|setLocale|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|rpx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64|getDeviceInfo|getAppBaseInfo|getWindowInfo|getSystemSetting|getAppAuthorizeSetting/;
 const SYNC_API_RE_X = /getElementById/;
 const CONTEXT_API_RE = /^create|Manager$/;
 const CONTEXT_API_RE_EXC = ["createBLEConnection"];
 const TASK_APIS = ["request", "downloadFile", "uploadFile", "connectSocket"];
 const ASYNC_API = ["createBLEConnection"];
+const PROMISE_API = ["loadUasm"];
 const CALLBACK_API_RE = /^on|^off/;
 function isContextApi(name) {
   return CONTEXT_API_RE.test(name) && CONTEXT_API_RE_EXC.indexOf(name) === -1;
@@ -7893,6 +7943,9 @@ function isTaskApi(name) {
   return TASK_APIS.indexOf(name) !== -1;
 }
 function shouldPromise(name) {
+  if (PROMISE_API.includes(name)) {
+    return false;
+  }
   if (isContextApi(name) || isSyncApi(name) || isCallbackApi(name)) {
     return false;
   }
@@ -7931,36 +7984,13 @@ function createUTSJSONObjectIfNeed(obj) {
   }
   return UTS.JSON.parse(JSON.stringify(obj));
 }
-const request = {
-  returnValue: (res) => {
-    const { data } = res;
-    res.data = createUTSJSONObjectIfNeed(data);
-    return res;
-  }
-};
-const getStorage = {
-  returnValue: (res) => {
-    return createUTSJSONObjectIfNeed(res);
-  }
-};
-const getStorageSync = getStorage;
-var protocols$1 = /* @__PURE__ */ Object.freeze({
-  __proto__: null,
-  getStorage,
-  getStorageSync,
-  request
-});
 function parseXReturnValue(methodName, res) {
   if (isObject(res) && hasOwn(res, "errno")) {
     res.errCode = res.errno;
   }
-  const protocol = protocols$1[methodName];
-  if (protocol && isFunction(protocol.returnValue)) {
-    return protocol.returnValue(res);
-  }
   return res;
 }
-function shouldKeepReturnValue(methodName) {
+function forceReturnValueResult(methodName) {
   return methodName === "getStorage" || methodName === "getStorageSync";
 }
 const CALLBACKS = ["success", "fail", "cancel", "complete"];
@@ -8001,11 +8031,11 @@ function initWrapper(protocols2) {
     }
     return processCallback(methodName, callback, returnValue2);
   }
-  function processArgs(methodName, fromArgs, argsOption = {}, returnValue2 = {}, keepFromArgs = false) {
+  function processArgs(methodName, fromArgs, argsOption = {}, returnValue2 = {}, keepFromArgs = false, restArgs = []) {
     if (isPlainObject$1(fromArgs)) {
       const toArgs = keepFromArgs === true ? fromArgs : {};
       if (isFunction(argsOption)) {
-        argsOption = argsOption(fromArgs, toArgs) || {};
+        argsOption = argsOption(fromArgs, toArgs, restArgs) || {};
       }
       for (const key in fromArgs) {
         if (hasOwn(argsOption, key)) {
@@ -8034,9 +8064,11 @@ function initWrapper(protocols2) {
       return toArgs;
     } else if (isFunction(fromArgs)) {
       if (isFunction(argsOption)) {
-        argsOption(fromArgs, {});
+        argsOption(fromArgs, {}, restArgs);
       }
       fromArgs = processEventCallback(methodName, fromArgs, returnValue2);
+    } else if (isFunction(argsOption)) {
+      argsOption(fromArgs, {}, restArgs);
     }
     return fromArgs;
   }
@@ -8044,8 +8076,13 @@ function initWrapper(protocols2) {
     if (isFunction(protocols2.returnValue)) {
       res = protocols2.returnValue(methodName, res);
     }
-    const realKeepReturnValue = keepReturnValue || shouldKeepReturnValue(methodName);
-    return processArgs(methodName, res, returnValue2, {}, realKeepReturnValue);
+    const useReturnValueResult = forceReturnValueResult(methodName);
+    if (useReturnValueResult) {
+      if (typeof returnValue2 === "function") {
+        return returnValue2(res);
+      }
+    }
+    return processArgs(methodName, res, returnValue2, {}, keepReturnValue, []);
   }
   return function wrapper(methodName, method) {
     const hasProtocol = hasOwn(protocols2, methodName);
@@ -8070,7 +8107,7 @@ function initWrapper(protocols2) {
       if (isFunction(protocol)) {
         options = protocol(arg1);
       }
-      arg1 = processArgs(methodName, arg1, options.args, options.returnValue);
+      arg1 = processArgs(methodName, arg1, options.args, options.returnValue, false, [arg2]);
       const args = [arg1];
       if (typeof arg2 !== "undefined") {
         args.push(arg2);
@@ -8207,9 +8244,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.5",
     appVersionCode: "105",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "5.25",
-    uniCompilerVersion: "5.25",
-    uniRuntimeVersion: "5.25",
+    uniCompileVersion: "5.32",
+    uniCompilerVersion: "5.32",
+    uniRuntimeVersion: "5.32",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -8239,8 +8276,10 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("5.25");
-      parameters.uniRuntimeVersionCode = parseFloat("5.25");
+      parameters.uniCompilerVersionCode = parseFloat("5.32");
+      parameters.uniRuntimeVersionCode = parseFloat("5.32");
+      if (false)
+        ;
     } catch (error) {
     }
   }
@@ -8376,20 +8415,24 @@ const getAppBaseInfo = {
       hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "5.25",
-      uniCompilerVersion: "5.25",
-      uniRuntimeVersion: "5.25"
+      uniCompileVersion: "5.32",
+      uniCompilerVersion: "5.32",
+      uniRuntimeVersion: "5.32"
     };
     try {
       if (typeof wx.getAccountInfoSync === "function") {
-        parameters.packagename = wx.getAccountInfoSync().miniProgram.appId;
+        const miniProgramAppId = wx.getAccountInfoSync().miniProgram.appId;
+        if (miniProgramAppId) {
+          parameters.packagename = miniProgramAppId;
+          parameters.packageName = miniProgramAppId;
+        }
       }
     } catch (error) {
     }
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("5.25");
-        parameters.uniRuntimeVersionCode = parseFloat("5.25");
+        parameters.uniCompilerVersionCode = parseFloat("5.32");
+        parameters.uniRuntimeVersionCode = parseFloat("5.32");
       } catch (error) {
       }
     }
@@ -8463,6 +8506,34 @@ const onSocketOpen = {
   }
 };
 const onSocketMessage = onSocketOpen;
+const getStorage = {
+  args(fromArgs) {
+    if (fromArgs.isUTS) {
+      const oldSuccess = fromArgs.success;
+      if (oldSuccess) {
+        fromArgs.success = (res) => {
+          res.data = createUTSJSONObjectIfNeed(res.data);
+          oldSuccess(res);
+        };
+      }
+    }
+  }
+};
+const getStorageSync = () => {
+  let isUTS = false;
+  return {
+    args(fromArgs, toArgs, restArgs) {
+      isUTS = restArgs[0];
+    },
+    returnValue(fromRes) {
+      if (isUTS) {
+        return createUTSJSONObjectIfNeed(fromRes);
+      } else {
+        return fromRes;
+      }
+    }
+  };
+};
 const baseApis = {
   $on,
   $off,
@@ -8483,6 +8554,7 @@ const baseApis = {
   offPushMessage,
   invokePushCallback,
   __f__,
+  loadUasm,
   getElementById,
   createCanvasContextAsync,
   createEditorContextAsync
@@ -8659,6 +8731,19 @@ const compressImage = {
     }
   }
 };
+const request = {
+  args(fromArgs) {
+    if (fromArgs.isUTS) {
+      const oldSuccess = fromArgs.success;
+      if (oldSuccess) {
+        fromArgs.success = (res) => {
+          res.data = createUTSJSONObjectIfNeed(res.data);
+          oldSuccess(res);
+        };
+      }
+    }
+  }
+};
 var protocols = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   chooseFile,
@@ -8666,6 +8751,8 @@ var protocols = /* @__PURE__ */ Object.freeze({
   getAppAuthorizeSetting,
   getAppBaseInfo,
   getDeviceInfo,
+  getStorage,
+  getStorageSync,
   getSystemInfo,
   getSystemInfoSync,
   getWindowInfo,
@@ -8675,6 +8762,7 @@ var protocols = /* @__PURE__ */ Object.freeze({
   onSocketOpen,
   previewImage,
   redirectTo,
+  request,
   returnValue,
   showActionSheet
 });
@@ -9229,9 +9317,9 @@ function isConsoleWritable() {
 }
 const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.1.121";
+  const hosts = "127.0.0.1,192.168.1.45,192.168.1.21,169.254.185.41";
   const port = "8090";
-  const id = "mp-weixin_U0ggax";
+  const id = "mp-weixin_PNGveK";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {
@@ -10497,208 +10585,181 @@ typeof SuppressedError === "function" ? SuppressedError : function(error, suppre
   var e2 = new Error(message);
   return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
 };
-const easycom = new UTSJSONObject({
+const easycom = {
   autoscan: true,
-  custom: new UTSJSONObject({
+  custom: {
     "^uv-(.*)": "@climblee/uv-ui/components/uv-$1/uv-$1.vue"
-  })
-});
+  }
+};
 const pages = [
-  new UTSJSONObject({
+  {
     path: "pages/index/index",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "车联网"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/message/message",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "消息"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/userCenter/userCenter",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "我的"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/login/login",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "登陆"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/login/personal-password-login",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "个人账号登录"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/login/register",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "个人用户注册"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/login/forgot-password",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "忘记密码"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/login/set-password",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "设置登录密码"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/carInfoDetail/carInfoDetail",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "车辆详情"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/addCar/addCar",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "添加车辆"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/playBack/playBack",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "轨迹回放"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "uni_modules/lime-action-sheet/pages/index"
-  }),
-  new UTSJSONObject({
+  },
+  {
     path: "pages/vehicleTracking/vehicleTracking",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "车辆跟踪"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/mileageRecord/mileageRecord",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/stopRecord/stopRecord",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/userCenter/userInfo/userInfo",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/userCenter/editPassword/editPassword",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/userCenter/carList/carList",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/userCenter/carDetail/carDetail",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/geofencing/geofencing",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/scancode/scancode",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/userCenter/payDeviceList/payDeviceList",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/cmd/cmd",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/webview/webview",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: ""
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/deviceList/deviceList",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "设备列表"
-    })
-  }),
-  new UTSJSONObject({
+    }
+  },
+  {
     path: "pages/deviceShare/deviceShare",
-    style: new UTSJSONObject({
+    style: {
       navigationBarTitleText: "设备分享"
-    })
-  })
+    }
+  }
 ];
-const tabBar = new UTSJSONObject({
-  color: "#2c2c2c",
-  selectedColor: "#d81e06",
-  borderStyle: "black",
-  backgroundColor: "#ffffff",
-  list: [
-    new UTSJSONObject({
-      pagePath: "pages/index/index",
-      iconPath: "/static/tabBar/home.png",
-      selectedIconPath: "/static/tabBar/home1.png",
-      text: "首页"
-    }),
-    new UTSJSONObject({
-      pagePath: "pages/message/message",
-      iconPath: "/static/tabBar/message.png",
-      selectedIconPath: "/static/tabBar/message1.png",
-      text: "消息"
-    }),
-    new UTSJSONObject({
-      pagePath: "pages/userCenter/userCenter",
-      iconPath: "/static/tabBar/userCenter.png",
-      selectedIconPath: "/static/tabBar/userCenter1.png",
-      text: "我的"
-    })
-  ]
-});
-const globalStyle = new UTSJSONObject({
+const globalStyle = {
   navigationStyle: "custom",
   navigationBarTextStyle: "black",
   navigationBarTitleText: "车联网",
   navigationBarBackgroundColor: "#F8F8F8",
   backgroundColor: "#F8F8F8"
-});
-const uniIdRouter = new UTSJSONObject({});
-const t = new UTSJSONObject({
+};
+const uniIdRouter = {};
+const t = {
   easycom,
   pages,
-  tabBar,
   globalStyle,
   uniIdRouter
-});
+};
 var define_process_env_UNI_SECURE_NETWORK_CONFIG_default = [];
 function n(e2) {
   return e2 && e2.__esModule && Object.prototype.hasOwnProperty.call(e2, "default") ? e2.default : e2;
@@ -10849,8 +10910,8 @@ var r = s(function(e2, t2) {
         var s3 = t4 + n3, r3 = e4[s3];
         e4[s3] = 16711935 & (r3 << 8 | r3 >>> 24) | 4278255360 & (r3 << 24 | r3 >>> 8);
       }
-      var i3 = this._hash.words, o3 = e4[t4 + 0], c3 = e4[t4 + 1], p2 = e4[t4 + 2], f2 = e4[t4 + 3], g2 = e4[t4 + 4], m2 = e4[t4 + 5], y2 = e4[t4 + 6], _2 = e4[t4 + 7], w2 = e4[t4 + 8], v2 = e4[t4 + 9], I2 = e4[t4 + 10], S2 = e4[t4 + 11], k2 = e4[t4 + 12], A2 = e4[t4 + 13], C2 = e4[t4 + 14], T2 = e4[t4 + 15], b2 = i3[0], P2 = i3[1], x2 = i3[2], O2 = i3[3];
-      b2 = u2(b2, P2, x2, O2, o3, 7, a2[0]), O2 = u2(O2, b2, P2, x2, c3, 12, a2[1]), x2 = u2(x2, O2, b2, P2, p2, 17, a2[2]), P2 = u2(P2, x2, O2, b2, f2, 22, a2[3]), b2 = u2(b2, P2, x2, O2, g2, 7, a2[4]), O2 = u2(O2, b2, P2, x2, m2, 12, a2[5]), x2 = u2(x2, O2, b2, P2, y2, 17, a2[6]), P2 = u2(P2, x2, O2, b2, _2, 22, a2[7]), b2 = u2(b2, P2, x2, O2, w2, 7, a2[8]), O2 = u2(O2, b2, P2, x2, v2, 12, a2[9]), x2 = u2(x2, O2, b2, P2, I2, 17, a2[10]), P2 = u2(P2, x2, O2, b2, S2, 22, a2[11]), b2 = u2(b2, P2, x2, O2, k2, 7, a2[12]), O2 = u2(O2, b2, P2, x2, A2, 12, a2[13]), x2 = u2(x2, O2, b2, P2, C2, 17, a2[14]), b2 = l2(b2, P2 = u2(P2, x2, O2, b2, T2, 22, a2[15]), x2, O2, c3, 5, a2[16]), O2 = l2(O2, b2, P2, x2, y2, 9, a2[17]), x2 = l2(x2, O2, b2, P2, S2, 14, a2[18]), P2 = l2(P2, x2, O2, b2, o3, 20, a2[19]), b2 = l2(b2, P2, x2, O2, m2, 5, a2[20]), O2 = l2(O2, b2, P2, x2, I2, 9, a2[21]), x2 = l2(x2, O2, b2, P2, T2, 14, a2[22]), P2 = l2(P2, x2, O2, b2, g2, 20, a2[23]), b2 = l2(b2, P2, x2, O2, v2, 5, a2[24]), O2 = l2(O2, b2, P2, x2, C2, 9, a2[25]), x2 = l2(x2, O2, b2, P2, f2, 14, a2[26]), P2 = l2(P2, x2, O2, b2, w2, 20, a2[27]), b2 = l2(b2, P2, x2, O2, A2, 5, a2[28]), O2 = l2(O2, b2, P2, x2, p2, 9, a2[29]), x2 = l2(x2, O2, b2, P2, _2, 14, a2[30]), b2 = d2(b2, P2 = l2(P2, x2, O2, b2, k2, 20, a2[31]), x2, O2, m2, 4, a2[32]), O2 = d2(O2, b2, P2, x2, w2, 11, a2[33]), x2 = d2(x2, O2, b2, P2, S2, 16, a2[34]), P2 = d2(P2, x2, O2, b2, C2, 23, a2[35]), b2 = d2(b2, P2, x2, O2, c3, 4, a2[36]), O2 = d2(O2, b2, P2, x2, g2, 11, a2[37]), x2 = d2(x2, O2, b2, P2, _2, 16, a2[38]), P2 = d2(P2, x2, O2, b2, I2, 23, a2[39]), b2 = d2(b2, P2, x2, O2, A2, 4, a2[40]), O2 = d2(O2, b2, P2, x2, o3, 11, a2[41]), x2 = d2(x2, O2, b2, P2, f2, 16, a2[42]), P2 = d2(P2, x2, O2, b2, y2, 23, a2[43]), b2 = d2(b2, P2, x2, O2, v2, 4, a2[44]), O2 = d2(O2, b2, P2, x2, k2, 11, a2[45]), x2 = d2(x2, O2, b2, P2, T2, 16, a2[46]), b2 = h2(b2, P2 = d2(P2, x2, O2, b2, p2, 23, a2[47]), x2, O2, o3, 6, a2[48]), O2 = h2(O2, b2, P2, x2, _2, 10, a2[49]), x2 = h2(x2, O2, b2, P2, C2, 15, a2[50]), P2 = h2(P2, x2, O2, b2, m2, 21, a2[51]), b2 = h2(b2, P2, x2, O2, k2, 6, a2[52]), O2 = h2(O2, b2, P2, x2, f2, 10, a2[53]), x2 = h2(x2, O2, b2, P2, I2, 15, a2[54]), P2 = h2(P2, x2, O2, b2, c3, 21, a2[55]), b2 = h2(b2, P2, x2, O2, w2, 6, a2[56]), O2 = h2(O2, b2, P2, x2, T2, 10, a2[57]), x2 = h2(x2, O2, b2, P2, y2, 15, a2[58]), P2 = h2(P2, x2, O2, b2, A2, 21, a2[59]), b2 = h2(b2, P2, x2, O2, g2, 6, a2[60]), O2 = h2(O2, b2, P2, x2, S2, 10, a2[61]), x2 = h2(x2, O2, b2, P2, p2, 15, a2[62]), P2 = h2(P2, x2, O2, b2, v2, 21, a2[63]), i3[0] = i3[0] + b2 | 0, i3[1] = i3[1] + P2 | 0, i3[2] = i3[2] + x2 | 0, i3[3] = i3[3] + O2 | 0;
+      var i3 = this._hash.words, o3 = e4[t4 + 0], c3 = e4[t4 + 1], p2 = e4[t4 + 2], f2 = e4[t4 + 3], g2 = e4[t4 + 4], m2 = e4[t4 + 5], y2 = e4[t4 + 6], _2 = e4[t4 + 7], w2 = e4[t4 + 8], v2 = e4[t4 + 9], S2 = e4[t4 + 10], I2 = e4[t4 + 11], k2 = e4[t4 + 12], A2 = e4[t4 + 13], T2 = e4[t4 + 14], C2 = e4[t4 + 15], b2 = i3[0], P2 = i3[1], x2 = i3[2], O2 = i3[3];
+      b2 = u2(b2, P2, x2, O2, o3, 7, a2[0]), O2 = u2(O2, b2, P2, x2, c3, 12, a2[1]), x2 = u2(x2, O2, b2, P2, p2, 17, a2[2]), P2 = u2(P2, x2, O2, b2, f2, 22, a2[3]), b2 = u2(b2, P2, x2, O2, g2, 7, a2[4]), O2 = u2(O2, b2, P2, x2, m2, 12, a2[5]), x2 = u2(x2, O2, b2, P2, y2, 17, a2[6]), P2 = u2(P2, x2, O2, b2, _2, 22, a2[7]), b2 = u2(b2, P2, x2, O2, w2, 7, a2[8]), O2 = u2(O2, b2, P2, x2, v2, 12, a2[9]), x2 = u2(x2, O2, b2, P2, S2, 17, a2[10]), P2 = u2(P2, x2, O2, b2, I2, 22, a2[11]), b2 = u2(b2, P2, x2, O2, k2, 7, a2[12]), O2 = u2(O2, b2, P2, x2, A2, 12, a2[13]), x2 = u2(x2, O2, b2, P2, T2, 17, a2[14]), b2 = l2(b2, P2 = u2(P2, x2, O2, b2, C2, 22, a2[15]), x2, O2, c3, 5, a2[16]), O2 = l2(O2, b2, P2, x2, y2, 9, a2[17]), x2 = l2(x2, O2, b2, P2, I2, 14, a2[18]), P2 = l2(P2, x2, O2, b2, o3, 20, a2[19]), b2 = l2(b2, P2, x2, O2, m2, 5, a2[20]), O2 = l2(O2, b2, P2, x2, S2, 9, a2[21]), x2 = l2(x2, O2, b2, P2, C2, 14, a2[22]), P2 = l2(P2, x2, O2, b2, g2, 20, a2[23]), b2 = l2(b2, P2, x2, O2, v2, 5, a2[24]), O2 = l2(O2, b2, P2, x2, T2, 9, a2[25]), x2 = l2(x2, O2, b2, P2, f2, 14, a2[26]), P2 = l2(P2, x2, O2, b2, w2, 20, a2[27]), b2 = l2(b2, P2, x2, O2, A2, 5, a2[28]), O2 = l2(O2, b2, P2, x2, p2, 9, a2[29]), x2 = l2(x2, O2, b2, P2, _2, 14, a2[30]), b2 = d2(b2, P2 = l2(P2, x2, O2, b2, k2, 20, a2[31]), x2, O2, m2, 4, a2[32]), O2 = d2(O2, b2, P2, x2, w2, 11, a2[33]), x2 = d2(x2, O2, b2, P2, I2, 16, a2[34]), P2 = d2(P2, x2, O2, b2, T2, 23, a2[35]), b2 = d2(b2, P2, x2, O2, c3, 4, a2[36]), O2 = d2(O2, b2, P2, x2, g2, 11, a2[37]), x2 = d2(x2, O2, b2, P2, _2, 16, a2[38]), P2 = d2(P2, x2, O2, b2, S2, 23, a2[39]), b2 = d2(b2, P2, x2, O2, A2, 4, a2[40]), O2 = d2(O2, b2, P2, x2, o3, 11, a2[41]), x2 = d2(x2, O2, b2, P2, f2, 16, a2[42]), P2 = d2(P2, x2, O2, b2, y2, 23, a2[43]), b2 = d2(b2, P2, x2, O2, v2, 4, a2[44]), O2 = d2(O2, b2, P2, x2, k2, 11, a2[45]), x2 = d2(x2, O2, b2, P2, C2, 16, a2[46]), b2 = h2(b2, P2 = d2(P2, x2, O2, b2, p2, 23, a2[47]), x2, O2, o3, 6, a2[48]), O2 = h2(O2, b2, P2, x2, _2, 10, a2[49]), x2 = h2(x2, O2, b2, P2, T2, 15, a2[50]), P2 = h2(P2, x2, O2, b2, m2, 21, a2[51]), b2 = h2(b2, P2, x2, O2, k2, 6, a2[52]), O2 = h2(O2, b2, P2, x2, f2, 10, a2[53]), x2 = h2(x2, O2, b2, P2, S2, 15, a2[54]), P2 = h2(P2, x2, O2, b2, c3, 21, a2[55]), b2 = h2(b2, P2, x2, O2, w2, 6, a2[56]), O2 = h2(O2, b2, P2, x2, C2, 10, a2[57]), x2 = h2(x2, O2, b2, P2, y2, 15, a2[58]), P2 = h2(P2, x2, O2, b2, A2, 21, a2[59]), b2 = h2(b2, P2, x2, O2, g2, 6, a2[60]), O2 = h2(O2, b2, P2, x2, I2, 10, a2[61]), x2 = h2(x2, O2, b2, P2, p2, 15, a2[62]), P2 = h2(P2, x2, O2, b2, v2, 21, a2[63]), i3[0] = i3[0] + b2 | 0, i3[1] = i3[1] + P2 | 0, i3[2] = i3[2] + x2 | 0, i3[3] = i3[3] + O2 | 0;
     }, _doFinalize: function() {
       var t4 = this._data, n3 = t4.words, s3 = 8 * this._nDataBytes, r3 = 8 * t4.sigBytes;
       n3[r3 >>> 5] |= 128 << 24 - r3 % 32;
@@ -10966,8 +11027,8 @@ function w(e2) {
     }
   };
 }
-const v = "REJECTED", I = "NOT_PENDING";
-class S {
+const v = "REJECTED", S = "NOT_PENDING";
+class I {
   constructor({ createPromise: e2, retryRule: t2 = v } = {}) {
     this.createPromise = e2, this.status = null, this.promise = null, this.retryRule = t2;
   }
@@ -10977,7 +11038,7 @@ class S {
     switch (this.retryRule) {
       case v:
         return this.status === g;
-      case I:
+      case S:
         return this.status !== p;
     }
   }
@@ -10988,7 +11049,13 @@ class S {
 function k(e2) {
   return e2 && "string" == typeof e2 ? JSON.parse(e2) : e2;
 }
-const A = true, C = "mp-weixin", T = k(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), b = C, P = k('{"address":["127.0.0.1","192.168.1.121"],"servePort":7001,"debugPort":9000,"initialLaunchType":"remote","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), x = k('[{"provider":"aliyun","spaceName":"zdiot-car","spaceId":"mp-3320fffa-3587-42c6-81f3-3de8de86e2ff","clientSecret":"s9pFKgenncFnOUhRGOJpcw==","endpoint":"https://api.next.bspapp.com","failoverEndpoint":""}]') || [];
+const A = true, T = "mp-weixin", C = k(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), b = T, P = k('{"address":["127.0.0.1","192.168.1.45","192.168.1.21","169.254.185.41"],"debugPort":9000,"servePort":7001,"skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"],"initialLaunchType":"remote"}'), x = k(function() {
+  var d2 = [10699, 6589, 56321, 17169, 40494, 36450, 39889, 23041, 39658, 15399, 17505, 10196, 12469, 9348, 57972, 29518, 34480, 45057, 60066, 63050, 166, 53643, 33902, 34440, 3175, 15429, 22648, 1178, 6158, 54371, 48213, 57722, 49197, 24510, 31080, 52144, 63e3, 37191, 22452, 42320, 8252, 37743, 39063, 12104, 52892, 13301, 25043, 50931, 50251, 42579, 58717, 4594, 41923, 43010, 58143, 8971, 8368, 4902, 4263, 42472, 18160, 44355, 57403, 58445, 65370, 31044, 13999, 38745, 40807, 12957, 37514, 6353, 18811, 48380, 63435, 8240, 27677, 48377, 20312, 12958, 48805, 43186, 20359, 4680, 49224, 10795, 58383, 56979, 63428, 65280, 36035, 39498, 36357, 55423, 1898, 30101, 62018, 38973, 47416, 13751, 7318, 8657, 9050, 64889, 32403, 11342, 1473, 12403, 46310, 37850, 40569, 25009, 23699, 32839, 15329, 18126, 44559, 58427, 15850, 42319, 37359, 32488, 13229, 57652, 44146, 20176, 6591, 25999, 9579, 6264, 24062, 17885, 19441, 52551, 57449, 28808, 40891, 61626, 47253, 55567, 47372, 38589, 54288, 11667, 36436, 33025, 15814, 15631, 10425, 13555, 20951, 34686, 11451, 34926, 3402, 7331, 57388, 45068, 59165, 30593, 64679, 21841, 7825, 32133, 63278, 5310, 48403, 12192, 44223, 1097, 41519, 54533, 59634, 62125, 31715, 15720, 9759, 25387, 1644, 64082, 29999, 37343, 6419, 64351, 12050, 16925, 11227, 2698, 25249, 63529, 47640, 47025, 2409, 4866, 48183, 44267, 57553, 54532, 20360, 12328, 38077, 7576, 40026, 41713], m2 = [10640, 6598, 56355, 17249, 40540, 36365, 39847, 23144, 39566, 15426, 17427, 10230, 12431, 9382, 57877, 29474, 34521, 45176, 60119, 63012, 132, 53671, 33868, 34555, 3095, 15396, 22555, 1279, 6208, 54274, 48184, 57631, 49167, 24452, 31050, 52170, 63100, 37166, 22491, 42276, 8209, 37644, 39158, 12090, 52926, 13273, 25073, 50816, 50235, 42546, 58686, 4503, 41866, 43110, 58173, 9009, 8338, 4939, 4311, 42437, 18115, 44400, 57353, 58493, 65340, 31010, 14025, 38712, 40778, 12974, 37567, 6377, 18764, 48337, 63487, 8194, 27774, 48335, 20341, 12966, 48788, 43220, 20404, 4709, 49275, 10831, 58474, 57003, 63392, 65381, 36091, 39548, 36448, 55373, 1804, 30195, 62048, 38929, 47386, 13780, 7418, 8632, 9023, 64791, 32487, 11293, 1444, 12304, 46228, 37823, 40461, 24979, 23721, 32869, 15250, 18167, 44671, 58493, 15777, 42280, 37258, 32390, 13251, 57687, 44084, 20158, 6640, 26074, 9475, 6186, 23993, 17810, 19387, 52535, 57354, 28927, 40838, 61575, 47287, 55587, 47406, 38616, 54398, 11767, 36388, 33134, 15791, 15713, 10445, 13521, 20973, 34652, 11475, 34842, 3390, 7379, 57439, 45110, 59186, 30638, 64710, 21793, 7928, 32171, 63296, 5339, 48491, 12244, 44177, 1067, 41564, 54645, 59539, 62173, 31635, 15686, 9852, 25412, 1537, 64112, 29955, 37373, 6517, 64318, 12155, 17009, 11188, 2812, 25284, 63579, 47709, 47071, 2317, 4978, 48216, 44162, 57535, 54640, 20394, 12306, 38047, 7610, 39975, 41644], s2 = "";
+  for (var i2 = 0; i2 < d2.length; i2++) {
+    s2 += String.fromCharCode(d2[i2] ^ m2[i2]);
+  }
+  return s2;
+}()) || [];
 let E = "";
 try {
   E = "__UNI__662B0B4";
@@ -11161,11 +11228,11 @@ var ye = class {
     ["spaceId", "clientSecret"].forEach((t2) => {
       if (!Object.prototype.hasOwnProperty.call(e2, t2))
         throw new Error(`${t2} required`);
-    }), this.config = Object.assign({}, { endpoint: 0 === e2.spaceId.indexOf("mp-") ? "https://api.next.bspapp.com" : "https://api.bspapp.com" }, e2), this.config.provider = "aliyun", this.config.requestUrl = this.config.endpoint + "/client", this.config.envType = this.config.envType || "public", this.config.accessTokenKey = "access_token_" + this.config.spaceId, this.adapter = oe, this._getAccessTokenPromiseHub = new S({ createPromise: () => this.requestAuth(this.setupRequest({ method: "serverless.auth.user.anonymousAuthorize", params: "{}" }, "auth")).then((e3) => {
+    }), this.config = Object.assign({}, { endpoint: 0 === e2.spaceId.indexOf("mp-") ? "https://api.next.bspapp.com" : "https://api.bspapp.com" }, e2), this.config.provider = "aliyun", this.config.requestUrl = this.config.endpoint + "/client", this.config.envType = this.config.envType || "public", this.config.accessTokenKey = "access_token_" + this.config.spaceId, this.adapter = oe, this._getAccessTokenPromiseHub = new I({ createPromise: () => this.requestAuth(this.setupRequest({ method: "serverless.auth.user.anonymousAuthorize", params: "{}" }, "auth")).then((e3) => {
       if (!e3.result || !e3.result.accessToken)
         throw new ie({ code: "AUTH_FAILED", message: "获取accessToken失败" });
       this.setAccessToken(e3.result.accessToken);
-    }), retryRule: I });
+    }), retryRule: S });
   }
   get hasAccessToken() {
     return !!this.accessToken;
@@ -11282,8 +11349,8 @@ var ve;
 !function(e2) {
   e2.local = "local", e2.none = "none", e2.session = "session";
 }(ve || (ve = {}));
-var Ie = function() {
-}, Se = s(function(e2, t2) {
+var Se = function() {
+}, Ie = s(function(e2, t2) {
   var n2;
   e2.exports = (n2 = i, function(e3) {
     var t3 = n2, s2 = t3.lib, r2 = s2.WordArray, i2 = s2.Hasher, o2 = t3.algo, a2 = [], c2 = [];
@@ -11323,10 +11390,10 @@ var Ie = function() {
     } });
     t3.SHA256 = i2._createHelper(l2), t3.HmacSHA256 = i2._createHmacHelper(l2);
   }(Math), n2.SHA256);
-}), ke = Se, Ae = s(function(e2, t2) {
+}), ke = Ie, Ae = s(function(e2, t2) {
   e2.exports = i.HmacSHA256;
 });
-const Ce = () => {
+const Te = () => {
   let e2;
   if (!Promise) {
     e2 = () => {
@@ -11341,7 +11408,7 @@ const Ce = () => {
   });
   return e2.promise = t2, e2;
 };
-function Te(e2) {
+function Ce(e2) {
   return void 0 === e2;
 }
 function be(e2) {
@@ -11371,7 +11438,7 @@ function Ee(e2) {
   e2.WEB = "web", e2.WX_MP = "wx_mp";
 }(Oe || (Oe = {}));
 const Le = { adapter: null, runtime: void 0 }, Re = ["anonymousUuidKey"];
-class Ue extends Ie {
+class Ue extends Se {
   constructor() {
     super(), Le.adapter.root.tcbObject || (Le.adapter.root.tcbObject = {});
   }
@@ -11417,7 +11484,7 @@ class De {
       if (t2 && Re.includes(e3))
         continue;
       const r2 = this._storage.getItem(s2);
-      Te(r2) || be(r2) || (n2.setItem(s2, r2), this._storage.removeItem(s2));
+      Ce(r2) || be(r2) || (n2.setItem(s2, r2), this._storage.removeItem(s2));
     }
     this._storage = n2;
   }
@@ -11983,7 +12050,7 @@ class ft {
   }
 }
 const gt = function(e2, t2) {
-  t2 = t2 || Ce();
+  t2 = t2 || Te();
   const n2 = ot(this.config.env), { cloudPath: s2, filePath: r2, onUploadProgress: i2, fileType: o2 = "image" } = e2;
   return n2.send("storage.getUploadMetadata", { path: s2 }).then((e3) => {
     const { data: { url: a2, authorization: c2, token: u2, fileId: l2, cosFileId: d2 }, requestId: h2 } = e3, p2 = { key: s2, signature: c2, "x-cos-meta-fileid": d2, success_action_status: "201", "x-cos-security-token": u2 };
@@ -11996,7 +12063,7 @@ const gt = function(e2, t2) {
     t2(e3);
   }), t2.promise;
 }, mt = function(e2, t2) {
-  t2 = t2 || Ce();
+  t2 = t2 || Te();
   const n2 = ot(this.config.env), { cloudPath: s2 } = e2;
   return n2.send("storage.getUploadMetadata", { path: s2 }).then((e3) => {
     t2(null, e3);
@@ -12004,7 +12071,7 @@ const gt = function(e2, t2) {
     t2(e3);
   }), t2.promise;
 }, yt = function({ fileList: e2 }, t2) {
-  if (t2 = t2 || Ce(), !e2 || !Array.isArray(e2))
+  if (t2 = t2 || Te(), !e2 || !Array.isArray(e2))
     return { code: "INVALID_PARAM", message: "fileList必须是非空的数组" };
   for (let t3 of e2)
     if (!t3 || "string" != typeof t3)
@@ -12016,7 +12083,7 @@ const gt = function(e2, t2) {
     t2(e3);
   }), t2.promise;
 }, _t = function({ fileList: e2 }, t2) {
-  t2 = t2 || Ce(), e2 && Array.isArray(e2) || t2(null, { code: "INVALID_PARAM", message: "fileList必须是非空的数组" });
+  t2 = t2 || Te(), e2 && Array.isArray(e2) || t2(null, { code: "INVALID_PARAM", message: "fileList必须是非空的数组" });
   let n2 = [];
   for (let s3 of e2)
     "object" == typeof s3 ? (s3.hasOwnProperty("fileID") && s3.hasOwnProperty("maxAge") || t2(null, { code: "INVALID_PARAM", message: "fileList的元素必须是包含fileID和maxAge的对象" }), n2.push({ fileid: s3.fileID, max_age: s3.maxAge })) : "string" == typeof s3 ? n2.push({ fileid: s3 }) : t2(null, { code: "INVALID_PARAM", message: "fileList的元素必须是字符串" });
@@ -12038,7 +12105,7 @@ const gt = function(e2, t2) {
     return s2.download({ url: r2 });
   t2(await s2.download({ url: r2 }));
 }, vt = function({ name: e2, data: t2, query: n2, parse: s2, search: r2, timeout: i2 }, o2) {
-  const a2 = o2 || Ce();
+  const a2 = o2 || Te();
   let c2;
   try {
     c2 = t2 ? JSON.stringify(t2) : "";
@@ -12066,13 +12133,13 @@ const gt = function(e2, t2) {
   }).catch((e3) => {
     a2(e3);
   }), a2.promise;
-}, It = { timeout: 15e3, persistence: "session" }, St = {};
+}, St = { timeout: 15e3, persistence: "session" }, It = {};
 class kt {
   constructor(e2) {
     this.config = e2 || this.config, this.authObj = void 0;
   }
   init(e2) {
-    switch (Le.adapter || (this.requestClient = new Le.adapter.reqClass({ timeout: e2.timeout || 5e3, timeoutMsg: `请求在${(e2.timeout || 5e3) / 1e3}s内未完成，已中断` })), this.config = { ...It, ...e2 }, true) {
+    switch (Le.adapter || (this.requestClient = new Le.adapter.reqClass({ timeout: e2.timeout || 5e3, timeoutMsg: `请求在${(e2.timeout || 5e3) / 1e3}s内未完成，已中断` })), this.config = { ...St, ...e2 }, true) {
       case this.config.timeout > 6e5:
         console.warn("timeout大于可配置上限[10分钟]，已重置为上限数值"), this.config.timeout = 6e5;
         break;
@@ -12084,7 +12151,7 @@ class kt {
   auth({ persistence: e2 } = {}) {
     if (this.authObj)
       return this.authObj;
-    const t2 = e2 || Le.adapter.primaryStorage || It.persistence;
+    const t2 = e2 || Le.adapter.primaryStorage || St.persistence;
     var n2;
     return t2 !== this.config.persistence && (this.config.persistence = t2), function(e3) {
       const { env: t3 } = e3;
@@ -12116,10 +12183,10 @@ class kt {
     return mt.apply(this, [e2, t2]);
   }
   registerExtension(e2) {
-    St[e2.name] = e2;
+    It[e2.name] = e2;
   }
   async invokeExtension(e2, t2) {
-    const n2 = St[e2];
+    const n2 = It[e2];
     if (!n2)
       throw new ie({ message: `扩展${e2} 必须先注册` });
     return await n2.invoke(t2, this);
@@ -12130,18 +12197,18 @@ class kt {
   }
 }
 var At = new kt();
-function Ct(e2, t2, n2) {
+function Tt(e2, t2, n2) {
   void 0 === n2 && (n2 = {});
   var s2 = /\?/.test(t2), r2 = "";
   for (var i2 in n2)
     "" === r2 ? !s2 && (t2 += "?") : r2 += "&", r2 += i2 + "=" + encodeURIComponent(n2[i2]);
   return /^http(s)?:\/\//.test(t2 += r2) ? t2 : "" + e2 + t2;
 }
-class Tt {
+class Ct {
   get(e2) {
     const { url: t2, data: n2, headers: s2, timeout: r2 } = e2;
     return new Promise((e3, i2) => {
-      oe.request({ url: Ct("https:", t2), data: n2, method: "GET", header: s2, timeout: r2, success(t3) {
+      oe.request({ url: Tt("https:", t2), data: n2, method: "GET", header: s2, timeout: r2, success(t3) {
         e3(t3);
       }, fail(e4) {
         i2(e4);
@@ -12151,7 +12218,7 @@ class Tt {
   post(e2) {
     const { url: t2, data: n2, headers: s2, timeout: r2 } = e2;
     return new Promise((e3, i2) => {
-      oe.request({ url: Ct("https:", t2), data: n2, method: "POST", header: s2, timeout: r2, success(t3) {
+      oe.request({ url: Tt("https:", t2), data: n2, method: "POST", header: s2, timeout: r2, success(t3) {
         e3(t3);
       }, fail(e4) {
         i2(e4);
@@ -12160,7 +12227,7 @@ class Tt {
   }
   upload(e2) {
     return new Promise((t2, n2) => {
-      const { url: s2, file: r2, data: i2, headers: o2, fileType: a2 } = e2, c2 = oe.uploadFile({ url: Ct("https:", s2), name: "file", formData: Object.assign({}, i2), filePath: r2, fileType: a2, header: o2, success(e3) {
+      const { url: s2, file: r2, data: i2, headers: o2, fileType: a2 } = e2, c2 = oe.uploadFile({ url: Tt("https:", s2), name: "file", formData: Object.assign({}, i2), filePath: r2, fileType: a2, header: o2, success(e3) {
         const n3 = { statusCode: e3.statusCode, data: e3.data || {} };
         200 === e3.statusCode && i2.success_action_status && (n3.statusCode = parseInt(i2.success_action_status, 10)), t2(n3);
       }, fail(e3) {
@@ -12180,7 +12247,7 @@ const bt = { setItem(e2, t2) {
   oe.clearStorageSync();
 } };
 var Pt = { genAdapter: function() {
-  return { root: {}, reqClass: Tt, localStorage: bt, primaryStorage: "local" };
+  return { root: {}, reqClass: Ct, localStorage: bt, primaryStorage: "local" };
 }, isMatch: function() {
   return true;
 }, runtime: "uni_app" };
@@ -12679,11 +12746,11 @@ const hn = "none", pn = "request", fn = "response", gn = "both", mn = { code: 2e
 function vn(e2) {
   return new ie({ subject: e2.errSubject || "uni-secure-network", code: e2.errCode || e2.code || mn.code, message: e2.errMsg || e2.message || mn.message });
 }
-function In(e2) {
+function Sn(e2) {
   const { errSubject: t2, subject: n2, errCode: s2, errMsg: r2, code: i2, message: o2, cause: a2 } = e2 || {};
   return new ie({ subject: t2 || n2 || "uni-secure-network", code: s2 || i2 || mn.code, message: r2 || o2, cause: a2 });
 }
-class Sn {
+class In {
   constructor({ secretType: e2, uniCloudIns: t2 } = {}) {
     this.clientType = "", this.secretType = e2 || hn, this.uniCloudIns = t2;
     const { provider: n2, spaceId: s2 } = this.uniCloudIns.config;
@@ -12949,13 +13016,13 @@ var kn = s(function(e2, t2) {
     }, keySize: 8 });
     e3.AES = t3._createHelper(g2);
   }(), n2.AES);
-}), An = kn, Cn = s(function(e2, t2) {
+}), An = kn, Tn = s(function(e2, t2) {
   var n2;
   e2.exports = ((n2 = i).pad.NoPadding = { pad: function() {
   }, unpad: function() {
   } }, n2.pad.NoPadding);
 });
-function Tn(e2, t2) {
+function Cn(e2, t2) {
   const n2 = u.parse(e2);
   if (-1 === [16, 24, 32].indexOf(n2.sigBytes))
     throw new Error("invalid key size (must be 16, 24 or 32 bytes)");
@@ -12968,14 +13035,14 @@ function bn(e2, t2) {
   return e2.words[t2 >>> 2] >>> 24 - t2 % 4 * 8 & 255;
 }
 function Pn(e2, t2, n2) {
-  const { key: s2, ivBuffer: r2 } = Tn(t2, n2);
+  const { key: s2, ivBuffer: r2 } = Cn(t2, n2);
   return An.encrypt(a.parse(e2), s2, { iv: r2 }).ciphertext.toString(u);
 }
 function xn(e2, t2, n2) {
   const s2 = u.parse(e2);
   if (s2.sigBytes % 16 != 0)
     throw new Error("invalid ciphertext size (must be multiple of 16 bytes)");
-  const { key: r2, ivBuffer: i2 } = Tn(t2, n2);
+  const { key: r2, ivBuffer: i2 } = Cn(t2, n2);
   return function(e3) {
     if (e3.sigBytes < 16)
       throw new Error("PKCS#7 invalid length");
@@ -12987,10 +13054,10 @@ function xn(e2, t2, n2) {
       if (bn(e3, n3 + s3) !== t3)
         throw new Error("PKCS#7 invalid padding byte");
     return e3.sigBytes = n3, e3.clamp(), e3;
-  }(An.decrypt({ ciphertext: s2 }, r2, { iv: i2, padding: Cn })).toString(a);
+  }(An.decrypt({ ciphertext: s2 }, r2, { iv: i2, padding: Tn })).toString(a);
 }
 let En, Ln = null;
-class Rn extends Sn {
+class Rn extends In {
   constructor(e2) {
     super(e2), this.clientType = "mp-weixin", this.userEncryptKey = null;
   }
@@ -13017,7 +13084,7 @@ class Rn extends Sn {
       index.getUserCryptoManager().getLatestUserKey({ success: (t3) => {
         Ln = t3, this.userEncryptKey = t3, e2(this.userEncryptKey);
       }, fail: (e3) => {
-        t2(In({ ..._n, cause: e3 }));
+        t2(Sn({ ..._n, cause: e3 }));
       } });
     });
   }
@@ -13051,7 +13118,7 @@ function Fn({ provider: e2, spaceId: t2, functionName: n2 } = {}) {
   let o2 = r2;
   "app" === r2 && (o2 = i2);
   const a2 = function({ provider: e3, spaceId: t3 } = {}) {
-    const n3 = T;
+    const n3 = C;
     if (!n3)
       return {};
     e3 = /* @__PURE__ */ function(e4) {
@@ -13077,20 +13144,22 @@ function Fn({ provider: e2, spaceId: t2, functionName: n2 } = {}) {
     return false;
   if ((c2[l2] || []).find((e3 = {}) => e3.appId === s2 && (e3.platform || "").toLowerCase() === o2.toLowerCase()))
     return true;
-  throw console.error(`此应用[appId: ${s2}, platform: ${o2}]不在云端配置的允许访问的应用列表内，参考：https://uniapp.dcloud.net.cn/uniCloud/secure-network.html#verify-client`), In(yn);
+  throw console.error(`此应用[appId: ${s2}, platform: ${o2}]不在云端配置的允许访问的应用列表内，参考：https://uniapp.dcloud.net.cn/uniCloud/secure-network.html#verify-client`), Sn(yn);
 }
-function qn({ functionName: e2, result: t2, logPvd: n2 }) {
+En = Rn;
+const qn = b.startsWith("mp");
+function Kn({ functionName: e2, result: t2, logPvd: n2 }) {
   if (this.__dev__.debugLog && t2 && t2.requestId) {
     const s2 = JSON.stringify({ spaceId: this.config.spaceId, functionName: e2, requestId: t2.requestId });
     console.log(`[${n2}-request]${s2}[/${n2}-request]`);
   }
 }
-function Kn(t2) {
+function jn(t2) {
   const n2 = t2.callFunction, s2 = function(e2) {
     const s3 = e2.name;
     e2.data = Gt.call(t2, { data: e2.data });
     const r2 = { aliyun: "aliyun", tencent: "tcb", tcb: "tcb", alipay: "alipay", dcloud: "dcloud" }[this.config.provider], i2 = Dn(e2), o2 = Mn(e2), a2 = i2 || o2;
-    return n2.call(this, e2).then((e3) => (e3.errCode = 0, !a2 && qn.call(this, { functionName: s3, result: e3, logPvd: r2 }), Promise.resolve(e3)), (t3) => (!a2 && qn.call(this, { functionName: s3, result: t3, logPvd: r2 }), t3 && t3.message && (t3.message = function({ message: e3 = "", extraInfo: t4 = {}, formatter: n3 = [] } = {}) {
+    return n2.call(this, e2).then((e3) => (e3.errCode = 0, !a2 && Kn.call(this, { functionName: s3, result: e3, logPvd: r2 }), Promise.resolve(e3)), (t3) => (!a2 && Kn.call(this, { functionName: s3, result: t3, logPvd: r2 }), t3 && t3.message && (t3.message = function({ message: e3 = "", extraInfo: t4 = {}, formatter: n3 = [] } = {}) {
       for (let s4 = 0; s4 < n3.length; s4++) {
         const { rule: r3, content: i3, mode: o3 } = n3[s4], a3 = e3.match(r3);
         if (!a3)
@@ -13105,28 +13174,33 @@ function Kn(t2) {
       return e3;
     }({ message: `[${e2.name}]: ${t3.message}`, formatter: cn, extraInfo: { functionName: s3 } })), Promise.reject(t3)));
   };
-  t2.callFunction = function(n3) {
-    const { provider: r2, spaceId: i2 } = t2.config, o2 = n3.name;
-    let a2, c2;
-    if (n3.data = n3.data || {}, t2.__dev__.debugInfo && !t2.__dev__.debugInfo.forceRemote && x && t2._isDefault ? (t2._callCloudFunction || (t2._callCloudFunction = s2, t2._callLocalFunction = an), a2 = an) : a2 = s2, a2 = a2.bind(t2), Mn(n3))
+  t2.callFunction = function(n3, r2 = false) {
+    const { provider: i2, spaceId: o2 } = t2.config, a2 = n3.name;
+    let c2, u2;
+    if (n3.data = n3.data || {}, t2.__dev__.debugInfo && !t2.__dev__.debugInfo.forceRemote && x && t2._isDefault ? (t2._callCloudFunction || (t2._callCloudFunction = s2, t2._callLocalFunction = an), c2 = an) : c2 = s2, c2 = c2.bind(t2), Mn(n3))
       ;
     else if (function({ name: e2, data: t3 = {} }) {
       return "uni-id-co" === e2 && "secureNetworkHandshakeByWeixin" === t3.method;
     }(n3))
-      c2 = a2.call(t2, n3);
+      u2 = c2.call(t2, n3);
     else if (Dn(n3)) {
-      c2 = new En({ secretType: n3.secretType, uniCloudIns: t2 }).wrapEncryptDataCallFunction(s2.bind(t2))(n3);
-    } else if (Fn({ provider: r2, spaceId: i2, functionName: o2 })) {
-      c2 = new En({ secretType: n3.secretType, uniCloudIns: t2 }).wrapVerifyClientCallFunction(s2.bind(t2))(n3);
+      u2 = new En({ secretType: n3.secretType, uniCloudIns: t2 }).wrapEncryptDataCallFunction(s2.bind(t2))(n3);
+    } else if (Fn({ provider: i2, spaceId: o2, functionName: a2 })) {
+      u2 = new En({ secretType: n3.secretType, uniCloudIns: t2 }).wrapVerifyClientCallFunction(s2.bind(t2))(n3);
     } else
-      c2 = a2(n3);
-    return Object.defineProperty(c2, "result", { get: () => (console.warn("当前返回结果为Promise类型，不可直接访问其result属性，详情请参考：https://uniapp.dcloud.net.cn/uniCloud/faq?id=promise"), {}) }), c2.then((t3) => (t3.result = UTS.JSON.parse(JSON.stringify(t3.result)), t3));
+      u2 = c2(n3);
+    return Object.defineProperty(u2, "result", { get: () => (console.warn("当前返回结果为Promise类型，不可直接访问其result属性，详情请参考：https://uniapp.dcloud.net.cn/uniCloud/faq?id=promise"), {}) }), u2.then((t3) => {
+      if (!qn || qn && r2) {
+        const n4 = qn ? UTS : globalThis.UTS;
+        t3.result = n4.JSON.parse(JSON.stringify(t3.result));
+      }
+      return t3;
+    });
   };
 }
-En = Rn;
-const jn = Symbol("CLIENT_DB_INTERNAL");
-function Bn(e2, t2) {
-  return e2.then = "DoNotReturnProxyWithAFunctionNamedThen", e2._internalType = jn, e2.inspect = null, e2.__v_raw = void 0, new Proxy(e2, { get(e3, n2, s2) {
+const Bn = Symbol("CLIENT_DB_INTERNAL");
+function $n(e2, t2) {
+  return e2.then = "DoNotReturnProxyWithAFunctionNamedThen", e2._internalType = Bn, e2.inspect = null, e2.__v_raw = void 0, new Proxy(e2, { get(e3, n2, s2) {
     if ("_uniClient" === n2)
       return null;
     if ("symbol" == typeof n2)
@@ -13138,7 +13212,7 @@ function Bn(e2, t2) {
     return t2.get(e3, n2, s2);
   } });
 }
-function $n(e2) {
+function Hn(e2) {
   return { on: (t2, n2) => {
     e2[t2] = e2[t2] || [], e2[t2].indexOf(n2) > -1 || e2[t2].push(n2);
   }, off: (t2, n2) => {
@@ -13147,17 +13221,17 @@ function $n(e2) {
     -1 !== s2 && e2[t2].splice(s2, 1);
   } };
 }
-const Hn = ["db.Geo", "db.command", "command.aggregate"];
-function Wn(e2, t2) {
-  return Hn.indexOf(`${e2}.${t2}`) > -1;
+const Wn = ["db.Geo", "db.command", "command.aggregate"];
+function Jn(e2, t2) {
+  return Wn.indexOf(`${e2}.${t2}`) > -1;
 }
-function Jn(e2) {
+function zn(e2) {
   switch (m(e2 = ae(e2))) {
     case "array":
-      return e2.map((e3) => Jn(e3));
+      return e2.map((e3) => zn(e3));
     case "object":
-      return e2._internalType === jn || Object.keys(e2).forEach((t2) => {
-        e2[t2] = Jn(e2[t2]);
+      return e2._internalType === Bn || Object.keys(e2).forEach((t2) => {
+        e2[t2] = zn(e2[t2]);
       }), e2;
     case "regexp":
       return { $regexp: { source: e2.source, flags: e2.flags } };
@@ -13167,10 +13241,10 @@ function Jn(e2) {
       return e2;
   }
 }
-function zn(e2) {
+function Vn(e2) {
   return e2 && e2.content && e2.content.$method;
 }
-class Vn {
+class Gn {
   constructor(e2, t2, n2) {
     this.content = e2, this.prevStage = t2 || null, this.udb = null, this._database = n2;
   }
@@ -13179,7 +13253,7 @@ class Vn {
     const t2 = [e2.content];
     for (; e2.prevStage; )
       e2 = e2.prevStage, t2.push(e2.content);
-    return { $db: t2.reverse().map((e3) => ({ $method: e3.$method, $param: Jn(e3.$param) })) };
+    return { $db: t2.reverse().map((e3) => ({ $method: e3.$method, $param: zn(e3.$param) })) };
   }
   toString() {
     return JSON.stringify(this.toJSON());
@@ -13194,7 +13268,7 @@ class Vn {
   get isAggregate() {
     let e2 = this;
     for (; e2; ) {
-      const t2 = zn(e2), n2 = zn(e2.prevStage);
+      const t2 = Vn(e2), n2 = Vn(e2.prevStage);
       if ("aggregate" === t2 && "collection" === n2 || "pipeline" === t2)
         return true;
       e2 = e2.prevStage;
@@ -13204,7 +13278,7 @@ class Vn {
   get isCommand() {
     let e2 = this;
     for (; e2; ) {
-      if ("command" === zn(e2))
+      if ("command" === Vn(e2))
         return true;
       e2 = e2.prevStage;
     }
@@ -13213,7 +13287,7 @@ class Vn {
   get isAggregateCommand() {
     let e2 = this;
     for (; e2; ) {
-      const t2 = zn(e2), n2 = zn(e2.prevStage);
+      const t2 = Vn(e2), n2 = Vn(e2.prevStage);
       if ("aggregate" === t2 && "command" === n2)
         return true;
       e2 = e2.prevStage;
@@ -13223,7 +13297,7 @@ class Vn {
   getNextStageFn(e2) {
     const t2 = this;
     return function() {
-      return Gn({ $method: e2, $param: Jn(Array.from(arguments)) }, t2, t2._database);
+      return Qn({ $method: e2, $param: zn(Array.from(arguments)) }, t2, t2._database);
     };
   }
   get count() {
@@ -13257,22 +13331,22 @@ class Vn {
   }
   _send(e2, t2) {
     const n2 = this.getAction(), s2 = this.getCommand();
-    if (s2.$db.push({ $method: e2, $param: Jn(t2) }), A) {
+    if (s2.$db.push({ $method: e2, $param: zn(t2) }), A) {
       const e3 = s2.$db.find((e4) => "collection" === e4.$method), t3 = e3 && e3.$param;
       t3 && 1 === t3.length && "string" == typeof e3.$param[0] && e3.$param[0].indexOf(",") > -1 && console.warn("检测到使用JQL语法联表查询时，未使用getTemp先过滤主表数据，在主表数据量大的情况下可能会查询缓慢。\n- 如何优化请参考此文档：https://uniapp.dcloud.net.cn/uniCloud/jql?id=lookup-with-temp \n- 如果主表数据量很小请忽略此信息，项目发行时不会出现此提示。");
     }
     return this._database._callCloudFunction({ action: n2, command: s2 });
   }
 }
-function Gn(e2, t2, n2) {
-  return Bn(new Vn(e2, t2, n2), { get(e3, t3) {
+function Qn(e2, t2, n2) {
+  return $n(new Gn(e2, t2, n2), { get(e3, t3) {
     let s2 = "db";
-    return e3 && e3.content && (s2 = e3.content.$method), Wn(s2, t3) ? Gn({ $method: t3 }, e3, n2) : function() {
-      return Gn({ $method: t3, $param: Jn(Array.from(arguments)) }, e3, n2);
+    return e3 && e3.content && (s2 = e3.content.$method), Jn(s2, t3) ? Qn({ $method: t3 }, e3, n2) : function() {
+      return Qn({ $method: t3, $param: zn(Array.from(arguments)) }, e3, n2);
     };
   } });
 }
-function Qn({ path: e2, method: t2 }) {
+function Yn({ path: e2, method: t2 }) {
   return class {
     constructor() {
       this.param = Array.from(arguments);
@@ -13285,14 +13359,14 @@ function Qn({ path: e2, method: t2 }) {
     }
   };
 }
-function Yn(e2, t2 = {}) {
-  return Bn(new e2(t2), { get: (e3, t3) => Wn("db", t3) ? Gn({ $method: t3 }, null, e3) : function() {
-    return Gn({ $method: t3, $param: Jn(Array.from(arguments)) }, null, e3);
+function Xn(e2, t2 = {}) {
+  return $n(new e2(t2), { get: (e3, t3) => Jn("db", t3) ? Qn({ $method: t3 }, null, e3) : function() {
+    return Qn({ $method: t3, $param: zn(Array.from(arguments)) }, null, e3);
   } });
 }
-class Xn extends class {
+class Zn extends class {
   constructor({ uniClient: e2 = {}, isJQL: t2 = false } = {}) {
-    this._uniClient = e2, this._authCallBacks = {}, this._dbCallBacks = {}, e2._isDefault && (this._dbCallBacks = U("_globalUniCloudDatabaseCallback")), t2 || (this.auth = $n(this._authCallBacks)), this._isJQL = t2, Object.assign(this, $n(this._dbCallBacks)), this.env = Bn({}, { get: (e3, t3) => ({ $env: t3 }) }), this.Geo = Bn({}, { get: (e3, t3) => Qn({ path: ["Geo"], method: t3 }) }), this.serverDate = Qn({ path: [], method: "serverDate" }), this.RegExp = Qn({ path: [], method: "RegExp" });
+    this._uniClient = e2, this._authCallBacks = {}, this._dbCallBacks = {}, e2._isDefault && (this._dbCallBacks = U("_globalUniCloudDatabaseCallback")), t2 || (this.auth = Hn(this._authCallBacks)), this._isJQL = t2, Object.assign(this, Hn(this._dbCallBacks)), this.env = $n({}, { get: (e3, t3) => ({ $env: t3 }) }), this.Geo = $n({}, { get: (e3, t3) => Yn({ path: ["Geo"], method: t3 }) }), this.serverDate = Yn({ path: [], method: "serverDate" }), this.RegExp = Yn({ path: [], method: "RegExp" });
   }
   getCloudEnv(e2) {
     if ("string" != typeof e2 || !e2.trim())
@@ -13330,71 +13404,75 @@ class Xn extends class {
     throw new Error("JQL 事务仅支持在云端使用");
   }
 } {
+  constructor({ uniClient: e2, isJQL: t2 = false, isUTS: n2 = false } = {}) {
+    super({ uniClient: e2, isJQL: t2 }), this._isUTS = n2;
+  }
   _parseResult(e2) {
     return this._isJQL ? e2.result : e2;
   }
   _callCloudFunction({ action: e2, command: t2, multiCommand: n2, queryList: s2 }) {
-    function r2(e3, t3) {
+    const r2 = this._isUTS;
+    function i2(e3, t3) {
       if (n2 && s2)
         for (let n3 = 0; n3 < s2.length; n3++) {
           const r3 = s2[n3];
           r3.udb && "function" == typeof r3.udb.setResult && (t3 ? r3.udb.setResult(t3) : r3.udb.setResult(e3.result.dataList[n3]));
         }
     }
-    const i2 = this, o2 = this._isJQL ? "databaseForJQL" : "database";
-    function a2(e3) {
-      return i2._callback("error", [e3]), K(j(o2, "fail"), e3).then(() => K(j(o2, "complete"), e3)).then(() => (r2(null, e3), ee(H, { type: V, content: e3 }), Promise.reject(e3)));
+    const o2 = this, a2 = this._isJQL ? "databaseForJQL" : "database";
+    function c2(e3) {
+      return o2._callback("error", [e3]), K(j(a2, "fail"), e3).then(() => K(j(a2, "complete"), e3)).then(() => (i2(null, e3), ee(H, { type: V, content: e3 }), Promise.reject(e3)));
     }
-    const c2 = K(j(o2, "invoke")), u2 = this._uniClient;
-    return c2.then(() => u2.callFunction({ name: "DCloud-clientDB", type: h, data: { action: e2, command: t2, multiCommand: n2 } })).then((e3) => {
-      const { code: t3, message: n3, token: s3, tokenExpired: c3, systemInfo: u3 = [] } = e3.result;
+    const u2 = K(j(a2, "invoke")), l2 = this._uniClient;
+    return u2.then(() => l2.callFunction({ name: "DCloud-clientDB", type: h, data: { action: e2, command: t2, multiCommand: n2 } }, r2)).then((e3) => {
+      const { code: t3, message: n3, token: s3, tokenExpired: r3, systemInfo: u3 = [] } = e3.result;
       if (u3)
         for (let e4 = 0; e4 < u3.length; e4++) {
-          const { level: t4, message: n4, detail: s4 } = u3[e4], r3 = console[t4] || console.log;
+          const { level: t4, message: n4, detail: s4 } = u3[e4], r4 = console[t4] || console.log;
           let i3 = "[System Info]" + n4;
           s4 && (i3 = `${i3}
-详细信息：${s4}`), r3(i3);
+详细信息：${s4}`), r4(i3);
         }
       if (t3) {
-        return a2(new ie({ code: t3, message: n3, requestId: e3.requestId }));
+        return c2(new ie({ code: t3, message: n3, requestId: e3.requestId }));
       }
-      e3.result.errCode = e3.result.errCode || e3.result.code, e3.result.errMsg = e3.result.errMsg || e3.result.message, s3 && c3 && (ue({ token: s3, tokenExpired: c3 }), this._callbackAuth("refreshToken", [{ token: s3, tokenExpired: c3 }]), this._callback("refreshToken", [{ token: s3, tokenExpired: c3 }]), ee(J, { token: s3, tokenExpired: c3 }));
-      const l2 = [{ prop: "affectedDocs", tips: "affectedDocs不再推荐使用，请使用inserted/deleted/updated/data.length替代" }, { prop: "code", tips: "code不再推荐使用，请使用errCode替代" }, { prop: "message", tips: "message不再推荐使用，请使用errMsg替代" }];
-      for (let t4 = 0; t4 < l2.length; t4++) {
-        const { prop: n4, tips: s4 } = l2[t4];
+      e3.result.errCode = e3.result.errCode || e3.result.code, e3.result.errMsg = e3.result.errMsg || e3.result.message, s3 && r3 && (ue({ token: s3, tokenExpired: r3 }), this._callbackAuth("refreshToken", [{ token: s3, tokenExpired: r3 }]), this._callback("refreshToken", [{ token: s3, tokenExpired: r3 }]), ee(J, { token: s3, tokenExpired: r3 }));
+      const l3 = [{ prop: "affectedDocs", tips: "affectedDocs不再推荐使用，请使用inserted/deleted/updated/data.length替代" }, { prop: "code", tips: "code不再推荐使用，请使用errCode替代" }, { prop: "message", tips: "message不再推荐使用，请使用errMsg替代" }];
+      for (let t4 = 0; t4 < l3.length; t4++) {
+        const { prop: n4, tips: s4 } = l3[t4];
         if (n4 in e3.result) {
           const t5 = e3.result[n4];
           Object.defineProperty(e3.result, n4, { get: () => (console.warn(s4), t5) });
         }
       }
       return function(e4) {
-        return K(j(o2, "success"), e4).then(() => K(j(o2, "complete"), e4)).then(() => {
-          r2(e4, null);
-          const t4 = i2._parseResult(e4);
+        return K(j(a2, "success"), e4).then(() => K(j(a2, "complete"), e4)).then(() => {
+          i2(e4, null);
+          const t4 = o2._parseResult(e4);
           return ee(H, { type: V, content: t4 }), Promise.resolve(t4);
         });
       }(e3);
     }, (e3) => {
       /fc_function_not_found|FUNCTION_NOT_FOUND/g.test(e3.message) && console.warn("clientDB未初始化，请在web控制台保存一次schema以开启clientDB");
-      return a2(new ie({ code: e3.code || "SYSTEM_ERROR", message: e3.message, requestId: e3.requestId }));
+      return c2(new ie({ code: e3.code || "SYSTEM_ERROR", message: e3.message, requestId: e3.requestId }));
     });
   }
 }
-const Zn = "token无效，跳转登录页面", es = "token过期，跳转登录页面", ts = { TOKEN_INVALID_TOKEN_EXPIRED: es, TOKEN_INVALID_INVALID_CLIENTID: Zn, TOKEN_INVALID: Zn, TOKEN_INVALID_WRONG_TOKEN: Zn, TOKEN_INVALID_ANONYMOUS_USER: Zn }, ns = { "uni-id-token-expired": es, "uni-id-check-token-failed": Zn, "uni-id-token-not-exist": Zn, "uni-id-check-device-feature-failed": Zn }, ss = { ...ts, ...ns, default: "用户未登录或登录状态过期，自动跳转登录页面" };
-function rs(e2, t2) {
+const es = "token无效，跳转登录页面", ts = "token过期，跳转登录页面", ns = { TOKEN_INVALID_TOKEN_EXPIRED: ts, TOKEN_INVALID_INVALID_CLIENTID: es, TOKEN_INVALID: es, TOKEN_INVALID_WRONG_TOKEN: es, TOKEN_INVALID_ANONYMOUS_USER: es }, ss = { "uni-id-token-expired": ts, "uni-id-check-token-failed": es, "uni-id-token-not-exist": es, "uni-id-check-device-feature-failed": es }, rs = { ...ns, ...ss, default: "用户未登录或登录状态过期，自动跳转登录页面" };
+function is(e2, t2) {
   let n2 = "";
   return n2 = e2 ? `${e2}/${t2}` : t2, n2.replace(/^\//, "");
 }
-function is(e2 = [], t2 = "") {
+function os(e2 = [], t2 = "") {
   const n2 = [], s2 = [];
   return e2.forEach((e3) => {
-    true === e3.needLogin ? n2.push(rs(t2, e3.path)) : false === e3.needLogin && s2.push(rs(t2, e3.path));
+    true === e3.needLogin ? n2.push(is(t2, e3.path)) : false === e3.needLogin && s2.push(is(t2, e3.path));
   }), { needLoginPage: n2, notNeedLoginPage: s2 };
 }
-function os(e2) {
+function as(e2) {
   return e2.split("?")[0].replace(/^\//, "");
 }
-function as() {
+function cs() {
   return function(e2) {
     let t2 = e2 && e2.route;
     return t2 ? ("/" !== t2.charAt(0) && (t2 = "/" + t2), t2) : "";
@@ -13403,32 +13481,32 @@ function as() {
     return e2[e2.length - 1];
   }());
 }
-function cs() {
-  return os(as());
+function us() {
+  return as(cs());
 }
-function us(e2 = "", t2 = {}) {
+function ls(e2 = "", t2 = {}) {
   if (!e2)
     return false;
   if (!(t2 && t2.list && t2.list.length))
     return false;
-  const n2 = t2.list, s2 = os(e2);
+  const n2 = t2.list, s2 = as(e2);
   return n2.some((e3) => e3.pagePath === s2);
 }
-const ls = !!t.uniIdRouter;
-const { loginPage: ds, routerNeedLogin: hs, resToLogin: ps, needLoginPage: fs, notNeedLoginPage: gs, loginPageInTabBar: ms } = function({ pages: e2 = [], subPackages: n2 = [], uniIdRouter: s2 = {}, tabBar: r2 = {} } = t) {
-  const { loginPage: i2, needLogin: o2 = [], resToLogin: a2 = true } = s2, { needLoginPage: c2, notNeedLoginPage: u2 } = is(e2), { needLoginPage: l2, notNeedLoginPage: d2 } = function(e3 = []) {
+const ds = !!t.uniIdRouter;
+const { loginPage: hs, routerNeedLogin: ps, resToLogin: fs, needLoginPage: gs, notNeedLoginPage: ms, loginPageInTabBar: ys } = function({ pages: e2 = [], subPackages: n2 = [], uniIdRouter: s2 = {}, tabBar: r2 = {} } = t) {
+  const { loginPage: i2, needLogin: o2 = [], resToLogin: a2 = true } = s2, { needLoginPage: c2, notNeedLoginPage: u2 } = os(e2), { needLoginPage: l2, notNeedLoginPage: d2 } = function(e3 = []) {
     const t2 = [], n3 = [];
     return e3.forEach((e4) => {
-      const { root: s3, pages: r3 = [] } = e4, { needLoginPage: i3, notNeedLoginPage: o3 } = is(r3, s3);
+      const { root: s3, pages: r3 = [] } = e4, { needLoginPage: i3, notNeedLoginPage: o3 } = os(r3, s3);
       t2.push(...i3), n3.push(...o3);
     }), { needLoginPage: t2, notNeedLoginPage: n3 };
   }(n2);
-  return { loginPage: i2, routerNeedLogin: o2, resToLogin: a2, needLoginPage: [...c2, ...l2], notNeedLoginPage: [...u2, ...d2], loginPageInTabBar: us(i2, r2) };
+  return { loginPage: i2, routerNeedLogin: o2, resToLogin: a2, needLoginPage: [...c2, ...l2], notNeedLoginPage: [...u2, ...d2], loginPageInTabBar: ls(i2, r2) };
 }();
-if (fs.indexOf(ds) > -1)
-  throw new Error(`Login page [${ds}] should not be "needLogin", please check your pages.json`);
-function ys(e2) {
-  const t2 = cs();
+if (gs.indexOf(hs) > -1)
+  throw new Error(`Login page [${hs}] should not be "needLogin", please check your pages.json`);
+function _s(e2) {
+  const t2 = us();
   if ("/" === e2.charAt(0))
     return e2;
   const [n2, s2] = e2.split("?"), r2 = n2.replace(/^\//, "").split("/"), i2 = t2.split("/");
@@ -13439,20 +13517,20 @@ function ys(e2) {
   }
   return "" === i2[0] && i2.shift(), "/" + i2.join("/") + (s2 ? "?" + s2 : "");
 }
-function _s(e2, t2) {
+function ws(e2, t2) {
   return new RegExp(t2).test(e2);
 }
-function ws({ redirect: e2 }) {
-  const t2 = os(e2), n2 = os(ds);
-  return cs() !== n2 && t2 !== n2;
+function vs({ redirect: e2 }) {
+  const t2 = as(e2), n2 = as(hs);
+  return us() !== n2 && t2 !== n2;
 }
-function vs({ api: e2, redirect: t2 } = {}) {
-  if (!t2 || !ws({ redirect: t2 }))
+function Ss({ api: e2, redirect: t2 } = {}) {
+  if (!t2 || !vs({ redirect: t2 }))
     return;
   const n2 = function(e3, t3) {
     return "/" !== e3.charAt(0) && (e3 = "/" + e3), t3 ? e3.indexOf("?") > -1 ? e3 + `&uniIdRedirectUrl=${encodeURIComponent(t3)}` : e3 + `?uniIdRedirectUrl=${encodeURIComponent(t3)}` : e3;
-  }(ds, t2);
-  ms ? "navigateTo" !== e2 && "redirectTo" !== e2 || (e2 = "switchTab") : "switchTab" === e2 && (e2 = "navigateTo");
+  }(hs, t2);
+  ys ? "navigateTo" !== e2 && "redirectTo" !== e2 || (e2 = "switchTab") : "switchTab" === e2 && (e2 = "navigateTo");
   const s2 = { navigateTo: index.navigateTo, redirectTo: index.redirectTo, switchTab: index.switchTab, reLaunch: index.reLaunch };
   setTimeout(() => {
     s2[e2]({ url: n2 });
@@ -13465,17 +13543,17 @@ function Is({ url: e2 } = {}) {
     if (e3) {
       if (t3 < Date.now()) {
         const e4 = "uni-id-token-expired";
-        n3 = { errCode: e4, errMsg: ss[e4] };
+        n3 = { errCode: e4, errMsg: rs[e4] };
       }
     } else {
       const e4 = "uni-id-check-token-failed";
-      n3 = { errCode: e4, errMsg: ss[e4] };
+      n3 = { errCode: e4, errMsg: rs[e4] };
     }
     return n3;
   }();
   if (function(e3) {
-    const t3 = os(ys(e3));
-    return !(gs.indexOf(t3) > -1) && (fs.indexOf(t3) > -1 || hs.some((n3) => _s(t3, n3) || _s(e3, n3)));
+    const t3 = as(_s(e3));
+    return !(ms.indexOf(t3) > -1) && (gs.indexOf(t3) > -1 || ps.some((n3) => ws(t3, n3) || ws(e3, n3)));
   }(e2) && n2) {
     n2.uniIdRedirectUrl = e2;
     if (Y(W).length > 0)
@@ -13486,22 +13564,22 @@ function Is({ url: e2 } = {}) {
   }
   return t2;
 }
-function Ss() {
-  const e2 = as(), { abortLoginPageJump: t2, autoToLoginPage: n2 } = Is({ url: e2 });
-  t2 || n2 && vs({ api: "redirectTo", redirect: e2 });
-}
 function ks$1() {
-  Ss();
+  const e2 = cs(), { abortLoginPageJump: t2, autoToLoginPage: n2 } = Is({ url: e2 });
+  t2 || n2 && Ss({ api: "redirectTo", redirect: e2 });
+}
+function As() {
+  ks$1();
   const e2 = ["navigateTo", "redirectTo", "reLaunch", "switchTab"];
   for (let t2 = 0; t2 < e2.length; t2++) {
     const n2 = e2[t2];
     index.addInterceptor(n2, { invoke(e3) {
       const { abortLoginPageJump: t3, autoToLoginPage: s2 } = Is({ url: e3.url });
-      return t3 ? e3 : s2 ? (vs({ api: n2, redirect: ys(e3.url) }), false) : e3;
+      return t3 ? e3 : s2 ? (Ss({ api: n2, redirect: _s(e3.url) }), false) : e3;
     } });
   }
 }
-function As() {
+function Ts() {
   this.onResponse((e2) => {
     const { type: t2, content: n2 } = e2;
     let s2 = false;
@@ -13511,7 +13589,7 @@ function As() {
           if ("object" != typeof e3)
             return false;
           const { errCode: t3 } = e3 || {};
-          return t3 in ss;
+          return t3 in rs;
         }(n2);
         break;
       case "clientdb":
@@ -13519,15 +13597,15 @@ function As() {
           if ("object" != typeof e3)
             return false;
           const { errCode: t3 } = e3 || {};
-          return t3 in ts;
+          return t3 in ns;
         }(n2);
     }
     s2 && function(e3 = {}) {
       const t3 = Y(W);
       se().then(() => {
-        const n3 = as();
-        if (n3 && ws({ redirect: n3 }))
-          return t3.length > 0 ? ee(W, Object.assign({ uniIdRedirectUrl: n3 }, e3)) : void (ds && vs({ api: "navigateTo", redirect: n3 }));
+        const n3 = cs();
+        if (n3 && vs({ redirect: n3 }))
+          return t3.length > 0 ? ee(W, Object.assign({ uniIdRedirectUrl: n3 }, e3)) : void (hs && Ss({ api: "navigateTo", redirect: n3 }));
       });
     }(n2);
   });
@@ -13537,11 +13615,11 @@ function Cs(e2) {
     X(W, e3);
   }, e2.offNeedLogin = function(e3) {
     Z(W, e3);
-  }, ls && (U("_globalUniCloudStatus").needLoginInit || (U("_globalUniCloudStatus").needLoginInit = true, se().then(() => {
-    ks$1.call(e2);
-  }), ps && As.call(e2)));
+  }, ds && (U("_globalUniCloudStatus").needLoginInit || (U("_globalUniCloudStatus").needLoginInit = true, se().then(() => {
+    As.call(e2);
+  }), fs && Ts.call(e2)));
 }
-function Ts(e2) {
+function bs(e2) {
   e2.onFailover = function(e3) {
     X(z, e3);
   }, e2.offFailover = function(e3) {
@@ -13558,7 +13636,7 @@ function Ts(e2) {
     }();
   };
 }
-function bs(e2) {
+function Ps(e2) {
   !function(e3) {
     e3.onResponse = function(e4) {
       X(H, e4);
@@ -13571,35 +13649,35 @@ function bs(e2) {
     }, e3.offRefreshToken = function(e4) {
       Z(J, e4);
     };
-  }(e2), Ts(e2);
+  }(e2), bs(e2);
 }
-const Ps = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", xs = /^(?:[A-Za-z\d+/]{4})*?(?:[A-Za-z\d+/]{2}(?:==)?|[A-Za-z\d+/]{3}=?)?$/;
-function Os(e2) {
+const xs = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", Os = /^(?:[A-Za-z\d+/]{4})*?(?:[A-Za-z\d+/]{2}(?:==)?|[A-Za-z\d+/]{3}=?)?$/;
+function Es(e2) {
   return decodeURIComponent(function(e3) {
-    if (e3 = String(e3).replace(/[\t\n\f\r ]+/g, ""), !xs.test(e3))
+    if (e3 = String(e3).replace(/[\t\n\f\r ]+/g, ""), !Os.test(e3))
       throw new Error("Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.");
     var t2;
     e3 += "==".slice(2 - (3 & e3.length));
     for (var n2, s2, r2 = "", i2 = 0; i2 < e3.length; )
-      t2 = Ps.indexOf(e3.charAt(i2++)) << 18 | Ps.indexOf(e3.charAt(i2++)) << 12 | (n2 = Ps.indexOf(e3.charAt(i2++))) << 6 | (s2 = Ps.indexOf(e3.charAt(i2++))), r2 += 64 === n2 ? String.fromCharCode(t2 >> 16 & 255) : 64 === s2 ? String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255) : String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255, 255 & t2);
+      t2 = xs.indexOf(e3.charAt(i2++)) << 18 | xs.indexOf(e3.charAt(i2++)) << 12 | (n2 = xs.indexOf(e3.charAt(i2++))) << 6 | (s2 = xs.indexOf(e3.charAt(i2++))), r2 += 64 === n2 ? String.fromCharCode(t2 >> 16 & 255) : 64 === s2 ? String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255) : String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255, 255 & t2);
     return r2;
   }(e2).split("").map(function(e3) {
     return "%" + ("00" + e3.charCodeAt(0).toString(16)).slice(-2);
   }).join(""));
 }
-function Es() {
+function Ls() {
   const e2 = ce().token || "", t2 = e2.split(".");
   if (!e2 || 3 !== t2.length)
     return { uid: null, role: [], permission: [], tokenExpired: 0 };
   let n2;
   try {
-    n2 = JSON.parse(Os(t2[1]));
+    n2 = JSON.parse(Es(t2[1]));
   } catch (e3) {
     throw new Error("获取当前用户信息出错，详细错误信息为：" + e3.message);
   }
   return n2.tokenExpired = 1e3 * n2.exp, delete n2.exp, delete n2.iat, n2;
 }
-var Ls = s(function(e2, t2) {
+var Rs = s(function(e2, t2) {
   Object.defineProperty(t2, "__esModule", { value: true });
   const n2 = "chooseAndUploadFile:ok", s2 = "chooseAndUploadFile:fail";
   function r2(e3, t3) {
@@ -13674,9 +13752,9 @@ var Ls = s(function(e2, t2) {
       }(t3), t3);
     };
   };
-}), Rs = n(Ls);
-const Us = "manual";
-function Ns(e2) {
+}), Us = n(Rs);
+const Ns = "manual";
+function Ds(e2) {
   return { props: { localdata: { type: Array, default: () => [] }, options: { type: [Object, Array], default: () => ({}) }, spaceInfo: { type: Object, default: () => ({}) }, collection: { type: [String, Array], default: "" }, action: { type: String, default: "" }, field: { type: String, default: "" }, orderby: { type: String, default: "" }, where: { type: [String, Object], default: "" }, pageData: { type: String, default: "add" }, pageCurrent: { type: Number, default: 1 }, pageSize: { type: Number, default: 20 }, getcount: { type: [Boolean, String], default: false }, gettree: { type: [Boolean, String], default: false }, gettreepath: { type: [Boolean, String], default: false }, startwith: { type: String, default: "" }, limitlevel: { type: Number, default: 10 }, groupby: { type: String, default: "" }, groupField: { type: String, default: "" }, distinct: { type: [Boolean, String], default: false }, foreignKey: { type: String, default: "" }, loadtime: { type: String, default: "auto" }, manual: { type: Boolean, default: false } }, data: () => ({ mixinDatacomLoading: false, mixinDatacomHasMore: false, mixinDatacomResData: [], mixinDatacomErrorMessage: "", mixinDatacomPage: {}, mixinDatacomError: null }), created() {
     this.mixinDatacomPage = { current: this.pageCurrent, size: this.pageSize, count: 0 }, this.$watch(() => {
       var e3 = [];
@@ -13684,7 +13762,7 @@ function Ns(e2) {
         e3.push(this[t2]);
       }), e3;
     }, (e3, t2) => {
-      if (this.loadtime === Us)
+      if (this.loadtime === Ns)
         return;
       let n2 = false;
       const s2 = [];
@@ -13727,86 +13805,88 @@ function Ns(e2) {
     return f2 && (m2.getTree = y2), g2 && (m2.getTreePath = y2), n2 = n2.skip(h2 * (d2 - 1)).limit(h2).get(m2), n2;
   } } };
 }
-function Ds(e2) {
-  return function(t2, n2 = {}) {
-    n2 = function(e3, t3 = {}) {
+function Ms(e2) {
+  return function(t2, n2 = {}, s2 = false) {
+    "boolean" == typeof n2 && (s2 = n2, n2 = {});
+    let r2 = n2;
+    r2 = function(e3, t3 = {}) {
       return e3.customUI = t3.customUI || e3.customUI, e3.parseSystemError = t3.parseSystemError || e3.parseSystemError, Object.assign(e3.loadingOptions, t3.loadingOptions), Object.assign(e3.errorOptions, t3.errorOptions), "object" == typeof t3.secretMethods && (e3.secretMethods = t3.secretMethods), e3;
-    }({ customUI: false, loadingOptions: { title: "加载中...", mask: true }, errorOptions: { type: "modal", retry: false } }, n2);
-    const { customUI: s2, loadingOptions: r2, errorOptions: i2, parseSystemError: o2 } = n2, a2 = !s2;
-    return new Proxy({}, { get(s3, c2) {
-      switch (c2) {
+    }({ customUI: false, loadingOptions: { title: "加载中...", mask: true }, errorOptions: { type: "modal", retry: false } }, r2 || {});
+    const { customUI: i2, loadingOptions: o2, errorOptions: a2, parseSystemError: c2 } = r2, u2 = !i2;
+    return new Proxy({}, { get(n3, i3) {
+      switch (i3) {
         case "toString":
           return "[object UniCloudObject]";
         case "toJSON":
           return {};
       }
-      return function({ fn: e3, interceptorName: t3, getCallbackArgs: n3 } = {}) {
-        return async function(...s4) {
-          const r3 = n3 ? n3({ params: s4 }) : {};
-          let i3, o3;
+      return function({ fn: e3, interceptorName: t3, getCallbackArgs: n4 } = {}) {
+        return async function(...s3) {
+          const r3 = n4 ? n4({ params: s3 }) : {};
+          let i4, o3;
           try {
-            return await K(j(t3, "invoke"), { ...r3 }), i3 = await e3(...s4), await K(j(t3, "success"), { ...r3, result: i3 }), i3;
+            return await K(j(t3, "invoke"), { ...r3 }), i4 = await e3(...s3), await K(j(t3, "success"), { ...r3, result: i4 }), i4;
           } catch (e4) {
             throw o3 = e4, await K(j(t3, "fail"), { ...r3, error: o3 }), o3;
           } finally {
-            await K(j(t3, "complete"), o3 ? { ...r3, error: o3 } : { ...r3, result: i3 });
+            await K(j(t3, "complete"), o3 ? { ...r3, error: o3 } : { ...r3, result: i4 });
           }
         };
-      }({ fn: async function s4(...u2) {
-        let l2;
-        a2 && index.showLoading({ title: r2.title, mask: r2.mask });
-        const h2 = { name: t2, type: d, data: { method: c2, params: u2 } };
-        "object" == typeof n2.secretMethods && function(e3, t3) {
-          const n3 = t3.data.method, s5 = e3.secretMethods || {}, r3 = s5[n3] || s5["*"];
+      }({ fn: async function n4(...l2) {
+        let h2;
+        u2 && index.showLoading({ title: o2.title, mask: o2.mask });
+        const p2 = { name: t2, type: d, data: { method: i3, params: l2 } };
+        "object" == typeof r2.secretMethods && function(e3, t3) {
+          const n5 = t3.data.method, s3 = e3.secretMethods || {}, r3 = s3[n5] || s3["*"];
           r3 && (t3.secretType = r3);
-        }(n2, h2);
-        let p2 = false;
+        }(r2, p2);
+        let f2 = false;
         try {
-          l2 = await e2.callFunction(h2);
+          h2 = await e2.callFunction(p2, s2);
         } catch (e3) {
-          p2 = true, l2 = { result: new ie(e3) };
+          f2 = true, h2 = { result: new ie(e3) };
         }
-        const { errSubject: f2, errCode: g2, errMsg: m2, newToken: y2 } = l2.result || {};
-        if (a2 && index.hideLoading(), y2 && y2.token && y2.tokenExpired && (ue(y2), ee(J, { ...y2 })), g2) {
-          let e3 = m2;
-          if (p2 && o2) {
-            e3 = (await o2({ objectName: t2, methodName: c2, params: u2, errSubject: f2, errCode: g2, errMsg: m2 })).errMsg || m2;
+        const { errSubject: g2, errCode: m2, errMsg: y2, newToken: _2 } = h2.result || {};
+        if (u2 && index.hideLoading(), _2 && _2.token && _2.tokenExpired && (ue(_2), ee(J, { ..._2 })), m2) {
+          let e3 = y2;
+          if (f2 && c2) {
+            e3 = (await c2({ objectName: t2, methodName: i3, params: l2, errSubject: g2, errCode: m2, errMsg: y2 })).errMsg || y2;
           }
-          if (a2)
-            if ("toast" === i2.type)
+          if (u2)
+            if ("toast" === a2.type)
               index.showToast({ title: e3, icon: "none" });
             else {
-              if ("modal" !== i2.type)
-                throw new Error(`Invalid errorOptions.type: ${i2.type}`);
+              if ("modal" !== a2.type)
+                throw new Error(`Invalid errorOptions.type: ${a2.type}`);
               {
-                const { confirm: t3 } = await async function({ title: e4, content: t4, showCancel: n4, cancelText: s5, confirmText: r3 } = {}) {
-                  return new Promise((i3, o3) => {
-                    index.showModal({ title: e4, content: t4, showCancel: n4, cancelText: s5, confirmText: r3, success(e5) {
-                      i3(e5);
+                const { confirm: t3 } = await async function({ title: e4, content: t4, showCancel: n5, cancelText: s4, confirmText: r3 } = {}) {
+                  return new Promise((i4, o3) => {
+                    index.showModal({ title: e4, content: t4, showCancel: n5, cancelText: s4, confirmText: r3, success(e5) {
+                      i4(e5);
                     }, fail() {
-                      i3({ confirm: false, cancel: true });
+                      i4({ confirm: false, cancel: true });
                     } });
                   });
-                }({ title: "提示", content: e3, showCancel: i2.retry, cancelText: "取消", confirmText: i2.retry ? "重试" : "确定" });
-                if (i2.retry && t3)
-                  return s4(...u2);
+                }({ title: "提示", content: e3, showCancel: a2.retry, cancelText: "取消", confirmText: a2.retry ? "重试" : "确定" });
+                if (a2.retry && t3)
+                  return n4(...l2);
               }
             }
-          const n3 = new ie({ subject: f2, code: g2, message: m2, requestId: l2.requestId });
-          throw n3.detail = l2.result, ee(H, { type: Q, content: n3 }), n3;
+          const s3 = new ie({ subject: g2, code: m2, message: y2, requestId: h2.requestId });
+          throw s3.detail = h2.result, ee(H, { type: Q, content: s3 }), s3;
         }
-        return ee(H, { type: Q, content: l2.result }), l2.result;
+        return ee(H, { type: Q, content: h2.result }), h2.result;
       }, interceptorName: "callObject", getCallbackArgs: function({ params: e3 } = {}) {
-        return { objectName: t2, methodName: c2, params: e3 };
+        return { objectName: t2, methodName: i3, params: e3 };
       } });
     } });
   };
 }
-function Ms(e2) {
+function Fs(e2) {
   return U("_globalUniCloudSecureNetworkCache__{spaceId}".replace("{spaceId}", e2.config.spaceId));
 }
-async function Fs({ openid: e2, callLoginByWeixin: t2 = false } = {}) {
-  const n2 = Ms(this);
+async function qs({ openid: e2, callLoginByWeixin: t2 = false } = {}) {
+  const n2 = Fs(this);
   if (e2 && t2)
     throw new Error("[SecureNetwork] openid and callLoginByWeixin cannot be passed at the same time");
   if (e2)
@@ -13820,23 +13900,23 @@ async function Fs({ openid: e2, callLoginByWeixin: t2 = false } = {}) {
   }), r2 = this.importObject("uni-id-co", { customUI: true });
   return await r2.secureNetworkHandshakeByWeixin({ code: s2, callLoginByWeixin: t2 }), n2.mpWeixinCode = s2, { code: s2 };
 }
-async function qs(e2) {
-  const t2 = Ms(this);
-  return t2.initPromise || (t2.initPromise = Fs.call(this, e2).then((e3) => e3).catch((e3) => {
+async function Ks(e2) {
+  const t2 = Fs(this);
+  return t2.initPromise || (t2.initPromise = qs.call(this, e2).then((e3) => e3).catch((e3) => {
     throw delete t2.initPromise, e3;
   })), t2.initPromise;
 }
-function Ks(e2) {
+function js(e2) {
   return function({ openid: t2, callLoginByWeixin: n2 = false } = {}) {
-    return qs.call(e2, { openid: t2, callLoginByWeixin: n2 });
+    return Ks.call(e2, { openid: t2, callLoginByWeixin: n2 });
   };
 }
-function js(e2) {
+function Bs(e2) {
   !function(e3) {
     fe = e3;
   }(e2);
 }
-function Bs(e2) {
+function $s(e2) {
   const t2 = wx$1.canIUse("getAppBaseInfo"), n2 = { getAppBaseInfo: t2 ? index.getAppBaseInfo : index.getSystemInfo, getPushClientId: index.getPushClientId };
   return function(s2) {
     return new Promise((r2, i2) => {
@@ -13848,7 +13928,7 @@ function Bs(e2) {
     });
   };
 }
-class $s extends class {
+class Hs extends class {
   constructor() {
     this._callback = {};
   }
@@ -13889,7 +13969,7 @@ class $s extends class {
     super(), this._uniPushMessageCallback = this._receivePushMessage.bind(this), this._currentMessageId = -1, this._payloadQueue = [];
   }
   init() {
-    return Promise.all([Bs("getAppBaseInfo")(), Bs("getPushClientId")()]).then(([{ appId: e2 } = {}, { cid: t2 } = {}] = []) => {
+    return Promise.all([$s("getAppBaseInfo")(), $s("getPushClientId")()]).then(([{ appId: e2 } = {}, { cid: t2 } = {}] = []) => {
       if (!e2)
         throw new Error("Invalid appId, please check the manifest.json file");
       if (!t2)
@@ -13945,7 +14025,7 @@ class $s extends class {
     this._destroy(), this.emit("close");
   }
 }
-async function Hs(e2) {
+async function Ws(e2) {
   const t2 = e2.__dev__;
   if (!t2.debugInfo)
     return;
@@ -13958,8 +14038,8 @@ async function Hs(e2) {
     throw new Error(o2);
   i2(o2);
 }
-function Ws(e2) {
-  e2._initPromiseHub || (e2._initPromiseHub = new S({ createPromise: function() {
+function Js(e2) {
+  e2._initPromiseHub || (e2._initPromiseHub = new I({ createPromise: function() {
     let t2 = Promise.resolve();
     var n2;
     n2 = 1, t2 = new Promise((e3) => {
@@ -13971,11 +14051,11 @@ function Ws(e2) {
     return t2.then(() => s2.getLoginState()).then((e3) => e3 ? Promise.resolve() : s2.signInAnonymously());
   } }));
 }
-const Js = { tcb: Et, tencent: Et, aliyun: _e, private: Dt, dcloud: Dt, alipay: Vt };
-let zs = new class {
+const zs = { tcb: Et, tencent: Et, aliyun: _e, private: Dt, dcloud: Dt, alipay: Vt };
+let Vs = new class {
   init(e2) {
     let t2 = {};
-    const n2 = Js[e2.provider];
+    const n2 = zs[e2.provider];
     if (!n2)
       throw new Error("未提供正确的provider参数");
     t2 = n2.init(e2), function(e3) {
@@ -13983,37 +14063,39 @@ let zs = new class {
       e3.__dev__ = t3, t3.debugLog = "mp-harmony" === b;
       const n3 = P;
       n3 && !n3.code && (t3.debugInfo = n3);
-      const s2 = new S({ createPromise: function() {
-        return Hs(e3);
+      const s2 = new I({ createPromise: function() {
+        return Ws(e3);
       } });
       t3.initLocalNetwork = function() {
         return s2.exec();
       };
-    }(t2), Ws(t2), Kn(t2), function(e3) {
+    }(t2), Js(t2), jn(t2), function(e3) {
       const t3 = e3.uploadFile;
       e3.uploadFile = function(e4) {
         return t3.call(this, e4);
       };
     }(t2), function(e3) {
-      e3.database = function(t3) {
-        if (t3 && Object.keys(t3).length > 0)
-          return e3.init(t3).database();
+      e3.database = function(t3, n3 = false) {
+        let s2 = {};
+        if ("boolean" == typeof t3 ? n3 = t3 : s2 = t3 || {}, s2 && Object.keys(s2).length > 0)
+          return e3.init(s2).database();
         if (this._database)
           return this._database;
-        const n3 = Yn(Xn, { uniClient: e3 });
-        return this._database = n3, n3;
-      }, e3.databaseForJQL = function(t3) {
-        if (t3 && Object.keys(t3).length > 0)
-          return e3.init(t3).databaseForJQL();
+        const r2 = Xn(Zn, { uniClient: e3, isUTS: n3 });
+        return this._database = r2, r2;
+      }, e3.databaseForJQL = function(t3, n3 = false) {
+        let s2 = {};
+        if ("boolean" == typeof t3 ? n3 = t3 : s2 = t3 || {}, s2 && Object.keys(s2).length > 0)
+          return e3.init(s2).databaseForJQL();
         if (this._databaseForJQL)
           return this._databaseForJQL;
-        const n3 = Yn(Xn, { uniClient: e3, isJQL: true });
-        return this._databaseForJQL = n3, n3;
+        const r2 = Xn(Zn, { uniClient: e3, isJQL: true, isUTS: n3 });
+        return this._databaseForJQL = r2, r2;
       };
     }(t2), function(e3) {
-      e3.getCurrentUserInfo = Es, e3.chooseAndUploadFile = Rs.initChooseAndUploadFile(e3), Object.assign(e3, { get mixinDatacom() {
-        return Ns(e3);
-      } }), e3.SSEChannel = $s, e3.initSecureNetworkByWeixin = Ks(e3), e3.setCustomClientInfo = js, e3.importObject = Ds(e3);
+      e3.getCurrentUserInfo = Ls, e3.chooseAndUploadFile = Us.initChooseAndUploadFile(e3), Object.assign(e3, { get mixinDatacom() {
+        return Ds(e3);
+      } }), e3.SSEChannel = Hs, e3.initSecureNetworkByWeixin = js(e3), e3.setCustomClientInfo = Bs, e3.importObject = Ms(e3);
     }(t2);
     return ["callFunction", "uploadFile", "deleteFile", "getTempFileURL", "downloadFile", "chooseAndUploadFile"].forEach((e3) => {
       if (!t2[e3])
@@ -14022,21 +14104,21 @@ let zs = new class {
       t2[e3] = function() {
         return n3.apply(t2, Array.from(arguments));
       }, t2[e3] = (/* @__PURE__ */ function(e4, t3) {
-        return function(n4) {
-          let s2 = false;
+        return function(n4, ...s2) {
+          let r2 = false;
           if ("callFunction" === t3) {
             const e5 = n4 && n4.type || l;
-            s2 = e5 !== l;
+            r2 = e5 !== l;
           }
-          const r2 = "callFunction" === t3 && !s2, i2 = this._initPromiseHub.exec();
+          const i2 = "callFunction" === t3 && !r2, o2 = this._initPromiseHub.exec();
           n4 = n4 || {};
-          const { success: o2, fail: a2, complete: c2 } = re(n4), u2 = i2.then(() => s2 ? Promise.resolve() : K(j(t3, "invoke"), n4)).then(() => e4.call(this, n4)).then((e5) => s2 ? Promise.resolve(e5) : K(j(t3, "success"), e5).then(() => K(j(t3, "complete"), e5)).then(() => (r2 && ee(H, { type: G, content: e5 }), Promise.resolve(e5))), (e5) => s2 ? Promise.reject(e5) : K(j(t3, "fail"), e5).then(() => K(j(t3, "complete"), e5)).then(() => (ee(H, { type: G, content: e5 }), Promise.reject(e5))));
-          if (!(o2 || a2 || c2))
-            return u2;
-          u2.then((e5) => {
-            o2 && o2(e5), c2 && c2(e5), r2 && ee(H, { type: G, content: e5 });
+          const { success: a2, fail: c2, complete: u2 } = re(n4), d2 = o2.then(() => r2 ? Promise.resolve() : K(j(t3, "invoke"), n4)).then(() => e4.call(this, n4, ...s2)).then((e5) => r2 ? Promise.resolve(e5) : K(j(t3, "success"), e5).then(() => K(j(t3, "complete"), e5)).then(() => (i2 && ee(H, { type: G, content: e5 }), Promise.resolve(e5))), (e5) => r2 ? Promise.reject(e5) : K(j(t3, "fail"), e5).then(() => K(j(t3, "complete"), e5)).then(() => (ee(H, { type: G, content: e5 }), Promise.reject(e5))));
+          if (!(a2 || c2 || u2))
+            return d2;
+          d2.then((e5) => {
+            a2 && a2(e5), u2 && u2(e5), i2 && ee(H, { type: G, content: e5 });
           }, (e5) => {
-            a2 && a2(e5), c2 && c2(e5), r2 && ee(H, { type: G, content: e5 });
+            c2 && c2(e5), u2 && u2(e5), i2 && ee(H, { type: G, content: e5 });
           });
         };
       }(t2[e3], e3)).bind(t2);
@@ -14049,25 +14131,25 @@ let zs = new class {
     return t3 && t3.enable && y(t3.space) ? t3.space : e3;
   }();
   if (1 === e2)
-    zs = zs.init(t2), zs._isDefault = true;
+    Vs = Vs.init(t2), Vs._isDefault = true;
   else {
     const t3 = ["database", "getCurrentUserInfo", "importObject"];
     let n2;
     n2 = e2 > 0 ? "应用有多个服务空间，请通过uniCloud.init方法指定要使用的服务空间" : "应用未关联服务空间，请在uniCloud目录右键关联服务空间", [...["auth", "callFunction", "uploadFile", "deleteFile", "getTempFileURL", "downloadFile"], ...t3].forEach((e3) => {
-      zs[e3] = function() {
+      Vs[e3] = function() {
         if (console.error(n2), -1 === t3.indexOf(e3))
           return Promise.reject(new ie({ code: "SYS_ERR", message: n2 }));
         console.error(n2);
       };
     });
   }
-  if (Object.assign(zs, { get mixinDatacom() {
-    return Ns(zs);
-  } }), bs(zs), zs.addInterceptor = F, zs.removeInterceptor = q, zs.interceptObject = B, "web" === b)
+  if (Object.assign(Vs, { get mixinDatacom() {
+    return Ds(Vs);
+  } }), Ps(Vs), Vs.addInterceptor = F, Vs.removeInterceptor = q, Vs.interceptObject = B, "web" === b)
     ;
   {
     const e3 = N();
-    e3.uniCloud = e3.uniCloud || zs, e3.UniCloudError = e3.UniCloudError || ie;
+    e3.uniCloud = e3.uniCloud || Vs, e3.UniCloudError = e3.UniCloudError || ie;
   }
   !function() {
     const { failoverEndpoint: e3 } = en();
@@ -14087,7 +14169,7 @@ let zs = new class {
 })();
 {
   const e2 = N();
-  zs = e2.uniCloud, e2.UniCloudError;
+  Vs = e2.uniCloud, e2.UniCloudError;
 }
 function isUniApp(target) {
   const proxy = target === null || target === void 0 ? void 0 : target.proxy;
@@ -14182,6 +14264,11 @@ const onLoad = /* @__PURE__ */ createLifeCycleHook(
   2
   /* HookFlags.PAGE */
 );
+const onReady = /* @__PURE__ */ createLifeCycleHook(
+  ON_READY,
+  2
+  /* HookFlags.PAGE */
+);
 const onUnload = /* @__PURE__ */ createLifeCycleHook(
   ON_UNLOAD,
   2
@@ -14226,6 +14313,7 @@ exports.onLoad = onLoad;
 exports.onMounted = onMounted;
 exports.onPullDownRefresh = onPullDownRefresh;
 exports.onReachBottom = onReachBottom;
+exports.onReady = onReady;
 exports.onShow = onShow;
 exports.onUnload = onUnload;
 exports.onUnmounted = onUnmounted;

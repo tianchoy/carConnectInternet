@@ -18,6 +18,7 @@ const defaultTenantId = "000000";
 const changePasswordUrl = "/user/profile/updatePassword";
 const userMsgList = "/usermessage/listForUser";
 const msgState = "/usermessage/detail/";
+const msgReadAllUrl = "/usermessage/readAll";
 const updateDevice = "/device/update";
 const deviceDetail = "/device/info/";
 const logoutUrl = "/auth/logout";
@@ -34,11 +35,14 @@ const appCommandSendUrl = "/app/command/send";
 const appCommandListUrl = "/app/command/list";
 const appCommandDetailUrl = "/app/command/";
 const appCommandRetryUrl = "/app/command/retry/";
-const pushUnbindUrl = "/app/push/unbind";
 const messageUnreadCountUrl = "/app/message/unreadCount";
+const homePlatformAppUrl = "/home/platform/app";
 const geocoderAddressUrl = "/geocoder/address";
 const deviceShareUrl = "/share/device";
 const deviceShareEnabledUrl = "/share/device/enabled";
+const notifyQuotaUrl = "/app/notify/quota";
+const notifyDeviceTicketUrl = "/app/notify/deviceTicket";
+const notifyStatusUrl = "/app/notify/status";
 class BasicResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -60,30 +64,87 @@ class BasicResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-class PushDeviceBindRequest extends common_vendor.UTS.UTSType {
+class NotifyQuotaItem extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
       get fields() {
         return {
-          registrationId: { type: String, optional: false },
-          platform: { type: String, optional: false },
-          deviceName: { type: String, optional: false },
-          appVersion: { type: String, optional: false }
+          bizCode: { type: String, optional: false },
+          templateId: { type: String, optional: false },
+          remaining: { type: Number, optional: false },
+          mode: { type: String, optional: false }
         };
       },
-      name: "PushDeviceBindRequest"
+      name: "NotifyQuotaItem"
     };
   }
-  constructor(options, metadata = PushDeviceBindRequest.get$UTSMetadata$(), isJSONParse = false) {
+  constructor(options, metadata = NotifyQuotaItem.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.registrationId = this.__props__.registrationId;
-    this.platform = this.__props__.platform;
-    this.deviceName = this.__props__.deviceName;
-    this.appVersion = this.__props__.appVersion;
+    this.bizCode = this.__props__.bizCode;
+    this.templateId = this.__props__.templateId;
+    this.remaining = this.__props__.remaining;
+    this.mode = this.__props__.mode;
     delete this.__props__;
   }
+}
+class NotifyQuotaResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: "Unknown", optional: false }
+        };
+      },
+      name: "NotifyQuotaResponse"
+    };
+  }
+  constructor(options, metadata = NotifyQuotaResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
+class SubscribeReportRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          results: { type: "Unknown", optional: false }
+        };
+      },
+      name: "SubscribeReportRequest"
+    };
+  }
+  constructor(options, metadata = SubscribeReportRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.results = this.__props__.results;
+    delete this.__props__;
+  }
+}
+function notifyQuotaResponse(raw = null) {
+  const response = api_response.asJSONObject(raw);
+  const rows = api_response.getResponseDataArray(response);
+  const list = [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    list.push(new NotifyQuotaItem({
+      bizCode: row.getString("bizCode", ""),
+      templateId: row.getString("templateId", ""),
+      remaining: row.getNumber("remaining", -1),
+      mode: row.getString("mode", "")
+    }));
+  }
+  return new NotifyQuotaResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response), data: list });
 }
 class JsonDataResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -680,6 +741,29 @@ class MessageUnreadCountResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class HomePlatformAppResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: String, optional: true }
+        };
+      },
+      name: "HomePlatformAppResponse"
+    };
+  }
+  constructor(options, metadata = HomePlatformAppResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
 class GeocoderAddressResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -908,6 +992,15 @@ function messagePageResponse(raw = null) {
     })
   });
 }
+function homePlatformAppResponse(raw = null) {
+  const response = api_response.asJSONObject(raw);
+  const appId = response.getString("data", "").trim();
+  return new HomePlatformAppResponse({
+    code: api_response.getResponseCode(response),
+    msg: api_response.getResponseMessage(response),
+    data: appId != "" ? appId : null
+  });
+}
 function userInfoResponse(raw = null) {
   const response = jsonDataResponse(raw);
   return new UserInfoResponse({ code: response.code, msg: response.msg, data: response.data });
@@ -995,6 +1088,21 @@ const getUserDeviceList = (data) => {
     return userDevicePageResponse(raw);
   });
 };
+const getNotifyQuota = () => {
+  return api_http.getSilently(notifyQuotaUrl).then((raw = null) => {
+    return notifyQuotaResponse(raw);
+  });
+};
+const getDeviceTicket = (deviceNo) => {
+  return api_http.get(`${notifyDeviceTicketUrl}?deviceNo=${encodeURIComponent(deviceNo)}`).then((raw = null) => {
+    return jsonDataResponse(raw);
+  });
+};
+const getNotifyStatus = () => {
+  return api_http.getSilently(notifyStatusUrl).then((raw = null) => {
+    return jsonDataResponse(raw);
+  });
+};
 const PostWechatlogin = (data) => {
   const requestData = new common_vendor.UTSJSONObject();
   requestData.set("phoneCode", data.phoneCode);
@@ -1076,6 +1184,11 @@ const setMsgState = (msgId) => {
     return basicResponse(raw);
   });
 };
+const readAllMessages = () => {
+  return api_http.post(msgReadAllUrl, new common_vendor.UTSJSONObject({})).then((raw = null) => {
+    return basicResponse(raw);
+  });
+};
 const getMessageUnreadCount = () => {
   return api_http.getSilently(messageUnreadCountUrl).then((raw = null) => {
     const response = api_response.asJSONObject(raw);
@@ -1084,6 +1197,11 @@ const getMessageUnreadCount = () => {
       msg: api_response.getResponseMessage(response),
       data: response.getNumber("data", 0)
     });
+  });
+};
+const getHomePlatformAppId = () => {
+  return api_http.getSilently(homePlatformAppUrl).then((raw = null) => {
+    return homePlatformAppResponse(raw);
   });
 };
 const editDeviceInfo = (data) => {
@@ -1137,8 +1255,13 @@ const unbindDevices = (data) => {
     return basicResponse(raw);
   });
 };
-const getAppAvailableCommands = (deviceId) => {
-  return api_http.get(appCommandAvailableUrl, new common_vendor.UTSJSONObject({ deviceId })).then((raw = null) => {
+const getAppAvailableCommands = (deviceNo, deviceId) => {
+  const params = new common_vendor.UTSJSONObject();
+  if (deviceNo != "")
+    params.set("deviceNo", deviceNo);
+  else if (deviceId != "")
+    params.set("deviceId", deviceId);
+  return api_http.get(appCommandAvailableUrl, params).then((raw = null) => {
     const response = api_response.asJSONObject(raw);
     return new CommandListResponse({ code: api_response.getResponseCode(response), msg: api_response.getResponseMessage(response), data: api_response.getResponseDataArray(response) });
   });
@@ -1163,11 +1286,6 @@ const getAppCommandDetail = (commandId) => {
 };
 const retryAppCommand = (commandId) => {
   return api_http.get(`${appCommandRetryUrl}${commandId.toString()}`).then((raw = null) => {
-    return basicResponse(raw);
-  });
-};
-const unbindPushDevice = (registrationId) => {
-  return api_http.postSilently(pushUnbindUrl + "?registrationId=" + encodeURIComponent(registrationId), new common_vendor.UTSJSONObject()).then((raw = null) => {
     return basicResponse(raw);
   });
 };
@@ -1204,6 +1322,7 @@ exports.ChangePasswordRequest = ChangePasswordRequest;
 exports.DeviceShareCreateRequest = DeviceShareCreateRequest;
 exports.ForgotPasswordResetRequest = ForgotPasswordResetRequest;
 exports.LegacyEnterpriseLoginRequest = LegacyEnterpriseLoginRequest;
+exports.NotifyQuotaItem = NotifyQuotaItem;
 exports.PersonalPasswordLoginRequest = PersonalPasswordLoginRequest;
 exports.PostWechatlogin = PostWechatlogin;
 exports.RegisterRequest = RegisterRequest;
@@ -1224,9 +1343,13 @@ exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
 exports.getDeviceShareEnabled = getDeviceShareEnabled;
 exports.getDeviceSharees = getDeviceSharees;
+exports.getDeviceTicket = getDeviceTicket;
 exports.getGeocoderAddress = getGeocoderAddress;
 exports.getGeofenceList = getGeofenceList;
+exports.getHomePlatformAppId = getHomePlatformAppId;
 exports.getMessageUnreadCount = getMessageUnreadCount;
+exports.getNotifyQuota = getNotifyQuota;
+exports.getNotifyStatus = getNotifyStatus;
 exports.getTrackPos = getTrackPos;
 exports.getUnboundDevices = getUnboundDevices;
 exports.getUserDeviceList = getUserDeviceList;
@@ -1235,6 +1358,7 @@ exports.getUserMsgList = getUserMsgList;
 exports.login = login;
 exports.logout = logout;
 exports.personalPasswordLogin = personalPasswordLogin;
+exports.readAllMessages = readAllMessages;
 exports.registerPersonalUser = registerPersonalUser;
 exports.resetForgotPassword = resetForgotPassword;
 exports.restoreOilPower = restoreOilPower;
@@ -1246,7 +1370,6 @@ exports.sendSmsForgotPasswordCode = sendSmsForgotPasswordCode;
 exports.sendSmsRegisterCode = sendSmsRegisterCode;
 exports.setMsgState = setMsgState;
 exports.unbindDevices = unbindDevices;
-exports.unbindPushDevice = unbindPushDevice;
 exports.updateGeofence = updateGeofence;
 exports.updatePassword = updatePassword;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

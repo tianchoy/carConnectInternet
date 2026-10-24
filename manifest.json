@@ -7,7 +7,6 @@
 	"uni-app-x": {
 		"styleIsolationVersion": "2"
 	},
-	"quickapp": {},
 	"mp-weixin": {
 		"appid": "wx2ebcdca9a6dfc8f0",
 		"embeddedAppIdList": [
@@ -18,8 +17,7 @@
 			"es6": true,
 			"postcss": true,
 			"minified": true,
-			"useMiniAppAuthorizePage": true,
-			"copyMiniAppJsonPath": "../../../src/project.miniapp.json"
+			"useMiniAppAuthorizePage": true
 		},
 		"permission": {
 			"scope.userLocation": {
@@ -47,127 +45,8 @@
 		"requestSubscribeMessage"
 	],
 	"usingComponents": true,
-	"app-android": {
-		"distribute": {
-			"permissions": [
-				"<uses-permission android:name=\"android.permission.CAMERA\"/>",
-				"<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
-				"<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
-				"<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
-				"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
-				"<uses-permission android:name=\"android.permission.INTERNET\"/>",
-				"<uses-permission android:name=\"android.permission.POST_NOTIFICATIONS\"/>"
-			],
-			"modules": {
-				"uni-verify": {},
-				"uni-barcode-scanning": {},
-				"uni-camera": {},
-				"uni-map": {
-					"tencent": {
-						"key": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
-					}
-				},
-				"uni-location": {
-					"system": {}
-				}
-			},
-			"icons": {
-				"hdpi": "/Users/xyhc/Downloads/logo/432.png",
-				"xxxhdpi": "/Users/xyhc/Downloads/logo/432.png",
-				"xxhdpi": "/Users/xyhc/Downloads/logo/432.png",
-				"xhdpi": "/Users/xyhc/Downloads/logo/432.png"
-			},
-			"splashScreens": {
-				"default": {
-					"xhdpi": "/Users/xyhc/Downloads/logo/横版.png",
-					"xxhdpi": "/Users/xyhc/Downloads/logo/横版.png",
-					"xxxhdpi": "/Users/xyhc/Downloads/logo/横版.png"
-				}
-			}
-		}
-	},
-	"app-plus": {
-		"distribute": {
-			"android": {
-				"permissions": [
-					"<uses-permission android:name=\"android.permission.CAMERA\"/>",
-					"<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
-					"<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
-					"<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
-					"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
-					"<uses-permission android:name=\"android.permission.INTERNET\"/>",
-					"<uses-permission android:name=\"android.permission.POST_NOTIFICATIONS\"/>"
-				],
-				"maps": {
-					"amap": {
-						"appkey_android": "您的高德地图Android Key"
-					},
-					"qqmap": {
-						"appkey_android": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
-					}
-				}
-			},
-			"ios": {
-				"maps": {
-					"amap": {
-						"appkey_ios": "您的高德地图iOS Key"
-					},
-					"qqmap": {
-						"appkey_ios": "您的腾讯地图iOS Key"
-					}
-				},
-				"UIBackgroundModes": [
-					"location",
-					"remote-notification"
-				],
-				"NSLocationWhenInUseUsageDescription": "需要使用您的位置信息提供导航服务",
-				"NSLocationAlwaysAndWhenInUseUsageDescription": "需要使用您的位置信息提供导航服务",
-				"NSLocationAlwaysUsageDescription": "需要使用您的位置信息提供导航服务"
-			}
-		}
-	},
-	"mp-alipay": {
-		"usingComponents": true
-	},
-	"mp-baidu": {
-		"usingComponents": true
-	},
-	"mp-toutiao": {
-		"usingComponents": true
-	},
 	"uniStatistics": {
 		"enable": false
 	},
-	"vueVersion": "3",
-	"web": {
-		"router": {
-			"mode": "hash"
-		},
-		"sdkConfigs": {
-			"maps": {}
-		}
-	},
-	"app-ios": {
-		"distribute": {
-			"UIBackgroundModes": [
-				"location",
-				"remote-notification"
-			],
-			"privacyDescription": {
-				"NSCameraUsageDescription": "需要使用您的摄像头扫描设备二维码"
-			},
-			"modules": {
-				"uni-verify": {},
-				"uni-barcode-scanning": {},
-				"uni-map": {
-					"tencent": {
-						"key": "WDHBZ-AWV6Q-S6I52-2TE5D-UBMX2-NEBAY"
-					}
-				}
-			},
-			"icons": {
-				"appstore": "/Users/xyhc/Downloads/logo/1024.png"
-			}
-		}
-	}
+	"vueVersion": "3"
 }

@@ -34,7 +34,7 @@ export function clampLocalDateTime(timestamp: string, minTimestamp: string, maxT
 
 /**
  * 解析本地日期时间。支持 yyyy-MM-dd、yyyy/MM/dd 及其 HH:mm[:ss] 形式。
- * 不使用 Date 的字符串构造，避免部分 iOS 平台解析失败。
+ * 不使用 Date 的字符串构造，避免不同运行环境解析结果不一致。
  */
 export function parseLocalDateTime(timestamp: string): number | null {
   const match = timestamp.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/)

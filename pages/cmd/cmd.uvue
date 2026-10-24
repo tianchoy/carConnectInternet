@@ -29,7 +29,6 @@
 				scroll-y="true"
 				:show-scrollbar="false"
 				:lower-threshold="80"
-				@scroll="markHistoryScroll"
 				@scrolltolower="loadMoreHistory"
 			>
 				<view v-if="deviceNo == '' && deviceId == ''" class="state-card">
@@ -426,13 +425,8 @@ function openOptionSheet(index: number): void {
 
 function getEventItem(event: any): UTSJSONObject | null {
 	if (event == null || typeof event != 'object') return null
-	// #ifdef APP-ANDROID
-	return (event as UTSJSONObject).getJSON('item')
-	// #endif
-	// #ifndef APP-ANDROID
 	const item = event['item']
 	return item == null ? null : item as UTSJSONObject
-	// #endif
 }
 
 function selectOption(event: any): void {
@@ -561,7 +555,7 @@ async function sendSelectedCommand(): Promise<void> {
 		const response = await sendAppCommand(requestData)
 		if (isBusinessSuccessCode(response.code)) {
 			const requestIdText = response.data != '' ? '追踪编号：' + response.data : '请在指令记录中查看下发结果'
-			showAppToast({ title: '指令已提交，' + requestIdText, icon: 'success', duration: 3500 })
+			showAppToast({ title: response.msg != '' ? response.msg : '指令已提交，' + requestIdText, icon: 'success', duration: 3500 })
 			await reloadHistory()
 		} else {
 			showAppToast({ title: response.msg != '' ? response.msg : '指令下发失败', icon: 'none', duration: 3000 })
@@ -617,19 +611,8 @@ function getRecordSummary(record: UTSJSONObject | null): string {
 }
 
 
-function markHistoryScroll(event: UniScrollEvent): void {
-	if (activeTab.value != 'history') return
-	// #ifdef APP-IOS
-	if (event.detail.deltaY <= 0) hasReachedHistoryBottom.value = false
-	// #endif
-}
-
 function loadMoreHistory(): void {
 	if (activeTab.value != 'history') return
-	// #ifdef APP-IOS
-	if (hasReachedHistoryBottom.value) return
-	hasReachedHistoryBottom.value = true
-	// #endif
 	void loadHistoryPage(false)
 }
 

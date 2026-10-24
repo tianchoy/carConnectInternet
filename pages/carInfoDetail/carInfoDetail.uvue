@@ -30,9 +30,10 @@
 				<view class="pos-adress">
 					<view class="address-row">
 						<text class="address-label" style="margin-right:10rpx; font-size: 22rpx;">当前位置:</text>
-						<text v-if="address" class="address-text">{{address}}</text>
-						<text v-if="!address" style="color: #007AFF; margin-left: 20rpx;font-weight: bold; font-size: 22rpx;"
-							@click="refreshAdress">查看中文地址</text>
+						<text v-if="!showAddress" class="address-text">{{latLngText}}</text>
+						<text v-if="showAddress && address" class="address-text">{{address}}</text>
+						<text v-if="!showAddress" class="addr-action" @click="refreshAdress">查看中文地址</text>
+						<text v-if="showAddress" class="addr-action" @click="toggleToLatLng">查看经纬度</text>
 					</view>
 				</view>
 				<!-- 信号强度显示区域 -->
@@ -71,10 +72,10 @@
 						<image class="power-icon" src="/static/v.png" />
 						<text class="satellite-text">{{carVoltage || 0}}V</text>
 					</view>
-					<view class="battery"
+					<view class="battery" v-if="batteryPercent"
 						:style="{ color: getBatteryColor(batteryPercent) }">
 						<image class="battery-icon" src="/static/pow.png" alt="" />
-						<text class="satellite-text">{{batteryPercent || 0}}%</text>
+						<text class="satellite-text">{{batteryPercent}}%</text>
 					</view>
 				</view>
 			</view>
@@ -116,6 +117,9 @@ import { openLocation } from '../../utils/openLocation.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
+	import { getUserCurrentLocation, isValidLatLng } from '../../utils/getUserLocation.uts'
+	import { formatTimes } from '../../utils/formateTime.uts'
+	import { getTodayZeroTime } from '../../utils/gettime.uts'
 
 	const deptId = ref<string | null>('')
 	const deviceNo = ref<string | null>('')
@@ -133,6 +137,14 @@ import { openLocation } from '../../utils/openLocation.uts'
 	const isMapReady = ref(false)
 	const datainfo = ref<UTSJSONObject>({})
 	const address = ref('')
+	// 当前位置展示开关：默认显示经纬度，点击「查看中文地址」后切换为中文地址
+	const showAddress = ref(false)
+	const latLngText = computed<string>(() => {
+		return center.latitude.toFixed(6) + ', ' + center.longitude.toFixed(6)
+	})
+	const toggleToLatLng = (): void => {
+		showAddress.value = false
+	}
 	const currentTime = ref('5s')
 	const onCurrentTimeChange = (value: string) => {
 		currentTime.value = value
@@ -148,6 +160,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 	])
 	const refreshTimer = ref<number | null>(null)
 	const isRefreshing = ref(false)
+	const isLoadingDeviceData = ref(false)
 
 	const popupRef = ref(false);
 	const psw = ref('')
@@ -223,7 +236,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 
 		if (isNaN(signalValue)) {
 			return {
-				experience: "信号数据无效",
+				experience: "无数据",
 				quality: "无服务",
 				color: "#999",
 				level: 0
@@ -325,6 +338,33 @@ import { openLocation } from '../../utils/openLocation.uts'
 		return marker
 	}
 
+	// 设备无有效位置时，回退到用户当前位置并展示「当前位置」标记
+	const showUserLocationFallback = async () => {
+		const userLoc = await getUserCurrentLocation()
+		if (userLoc == null) return
+		center.latitude = userLoc.latitude
+		center.longitude = userLoc.longitude
+		mapScale.value = 12
+		const userMarker = {
+			id: 10001,
+			latitude: userLoc.latitude,
+			longitude: userLoc.longitude,
+			width: 25,
+			height: 25,
+			iconPath: '/static/current-location.png',
+			callout: {
+				content: '当前位置',
+				color: datainfo.value != null && datainfo.value.connectionStatus == 'online' ? '#ffffff' : '#999999',
+				borderRadius: 10,
+				bgColor: datainfo.value != null && datainfo.value.connectionStatus == 'online' ? '#1296db' : '#CCCCCC',
+				padding: 5,
+				display: 'ALWAYS'
+			}
+		} as Marker
+		markers.value = [userMarker]
+		isMapReady.value = true
+	}
+
 	const delay = (ms: number): Promise<void> => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
@@ -334,8 +374,9 @@ import { openLocation } from '../../utils/openLocation.uts'
 	}
 
 	const loadData = async (data : UTSJSONObject, retryCount : number): Promise<boolean> => {
-		signalRssi.value = null
-		signalSat.value = null
+		// 不在请求前清空 signalRssi / signalSat：轮询间隔内接口未返回时若先置空，
+		// 信号块会闪一下"无信号"再跳回真实值。改为请求成功后整体赋值，
+		// 请求失败时保留上一次的值，避免整行数据反复跳动。
 		let retry = retryCount;
 
 		const tryLoad = async (attempt : number): Promise<boolean> => {
@@ -345,7 +386,13 @@ import { openLocation } from '../../utils/openLocation.uts'
 				// 检查返回结果是否有效
 				const positions = res.data
 				if (!isBusinessSuccessCode(res.code) || positions == null || positions.length == 0) {
-					throw new Error(res.msg || '返回数据为空');
+					showAppToast({
+						title: res.msg || '返回数据为空',
+						icon: 'none'
+					})
+					// 设备无位置数据，回退展示用户当前位置（与首页统一：在线/离线都回退）
+					await showUserLocationFallback()
+					return false
 				}
 
 				let foundDevice = false;
@@ -362,23 +409,15 @@ import { openLocation } from '../../utils/openLocation.uts'
 						signalRssi.value = attribute != null ? attribute['rssi'] as string | number | null : null;
 						signalSat.value = attribute != null ? attribute['sat'] as string | number | null : null;
 
-						const latitude = item.getNumber('latitude', 0);
-						const longitude = item.getNumber('longitude', 0);
-						if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
+						const lat = item.getNumber('latitude', 0)
+						const lng = item.getNumber('longitude', 0)
+						if (!isValidLatLng(lat, lng)) {
 							console.error('位置信息缺失', item);
 							showAppToast({
 								title: '位置信息缺失',
 								icon: 'none'
 							})
-							return false;
-						}
-
-						// 确保经纬度是数字类型
-						const lat = parseFloat(latitude.toString());
-						const lng = parseFloat(longitude.toString());
-
-						if (isNaN(lat) || isNaN(lng)) {
-							console.error('经纬度格式错误', latitude, longitude);
+							await showUserLocationFallback()
 							return false;
 						}
 
@@ -396,10 +435,8 @@ import { openLocation } from '../../utils/openLocation.uts'
 						center.latitude = convertedLat;
 						center.longitude = convertedLng;
 
-						// 在 UTS 环境中，使用 setTimeout 替代 $nextTick
-						await delay(50);
-
-						// 更新设备标记
+						// 更新设备标记：id 固定为 1，整体替换数组，原生按 id 做 in-place 更新，
+						// 避免「清空 → 延迟 → 重设」在同一 id 上反复删建导致的 callout 浮层泄漏（部分安卓机双气泡）
 						const deviceMarker = createMarker(
 							1,
 							convertedLat,
@@ -407,10 +444,6 @@ import { openLocation } from '../../utils/openLocation.uts'
 							'device',
 							currentCarInfo.value.getString('deviceName', getDisplayCarName())
 						);
-
-						// 使用强制响应式更新
-						markers.value = [];
-						await delay(50);
 						markers.value = [deviceMarker];
 						isMapReady.value = true;
 
@@ -441,7 +474,13 @@ import { openLocation } from '../../utils/openLocation.uts'
 
 				// 如果没有找到对应设备
 				if (!foundDevice) {
-					throw new Error('未找到对应的设备数据');
+					showAppToast({
+						title: '未找到对应的设备数据',
+						icon: 'none'
+					})
+					// 设备无位置数据，回退展示用户当前位置（与首页统一：在线/离线都回退）
+					await showUserLocationFallback()
+					return false
 				}
 
 				return true; // 成功标志
@@ -489,6 +528,17 @@ import { openLocation } from '../../utils/openLocation.uts'
 		return tryLoad(1);
 	}
 
+	// 带互斥的数据加载：上一轮未结束时跳过本轮，避免并发加载叠加导致地图浮层竞态
+	const safeLoadData = async (data : UTSJSONObject, retryCount : number): Promise<boolean> => {
+		if (isLoadingDeviceData.value) return false
+		isLoadingDeviceData.value = true
+		try {
+			return await loadData(data, retryCount)
+		} finally {
+			isLoadingDeviceData.value = false
+		}
+	}
+
 	// 手动刷新方法
 	const manualRefresh = async () => {
 		uni.showLoading({
@@ -497,7 +547,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 		});
 
 		try {
-			const success = await loadData({
+			const success = await safeLoadData({
 				deptId: deptId.value,
 				deviceids: deviceNo.value
 			} as UTSJSONObject, 3);
@@ -558,14 +608,14 @@ import { openLocation } from '../../utils/openLocation.uts'
 			const intervalMs = intervalSeconds * 1000
 
 			// 立即加载一次数据
-			loadData({
+			safeLoadData({
 				deptId: deptId.value,
 				deviceids: deviceNo.value
 			} as UTSJSONObject, 3)
 
 			// 设置定时器
 			refreshTimer.value = setInterval(() => {
-				loadData({
+				safeLoadData({
 					deptId: deptId.value,
 					deviceids: deviceNo.value
 				} as UTSJSONObject, 3)
@@ -685,7 +735,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 			// 根据响应处理结果
 			if (isBusinessSuccessCode(res.code)) {
 				showAppToast({
-					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
+					title: res.msg || (operationType == 1 ? '恢复油电成功' : '断开油电成功'),
 					icon: 'success'
 				})
 
@@ -736,9 +786,16 @@ import { openLocation } from '../../utils/openLocation.uts'
 				lng: center.longitude,
 				deviceId: deviceId.value
 			});
-			address.value = addr.data.getString('address', '');
+			const text = addr.data.getString('address', '')
+			if (text != '') {
+				address.value = text
+				showAddress.value = true
+			} else {
+				showAppToast({ title: '未获取到中文地址', icon: 'none' })
+			}
 		} catch (error) {
 			console.error('获取地址信息失败:', error);
+			showAppToast({ title: '获取地址失败，请重试', icon: 'none' })
 		}
 	}
 
@@ -761,8 +818,10 @@ import { openLocation } from '../../utils/openLocation.uts'
 		const routeCarType = currentCarInfo.value.getString('carType', '')
 		if (itemTo == '轨迹回放') {
 			stopAutoRefresh() // 停止刷新
+			// 与首页"更多轨迹"保持一致：开始时间取当天 0 点，结束时间取当前时刻。
+			const timeRange = getTodayZeroTime()
 			uni.navigateTo({
-				url: '/pages/playBack/playBack?deviceNo=' + deviceNo.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType) + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude
+				url: '/pages/playBack/playBack?deviceNo=' + deviceNo.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + encodeURIComponent(routeDeviceName) + '&carType=' + encodeURIComponent(routeCarType) + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude + '&startTime=' + encodeURIComponent(formatTimes(timeRange.todayZero)) + '&endTime=' + encodeURIComponent(formatTimes(timeRange.nowTime))
 			})
 		}
 		if (itemTo == '车辆跟踪') {
@@ -864,7 +923,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 			};
 
 			uni.showLoading({ title: '加载中...' });
-			loadData(data, 3).then((success: boolean) => {
+			safeLoadData(data, 3).then((success: boolean) => {
 				uni.hideLoading();
 				if (success && datainfo.value.connectionStatus == 'online') {
 					setupAutoRefresh(currentTime.value);
@@ -1073,6 +1132,14 @@ import { openLocation } from '../../utils/openLocation.uts'
 							line-height: 1.4;
 						}
 
+						.addr-action {
+							flex-shrink: 0;
+							margin-left: 20rpx;
+							color: #007AFF;
+							font-weight: bold;
+							font-size: 22rpx;
+						}
+
 
 						.pos-icon {
 							width: 30rpx;
@@ -1102,18 +1169,18 @@ import { openLocation } from '../../utils/openLocation.uts'
 							align-items: center;
 							justify-content: center;
 							background: #f0f8ff;
-							padding: 10rpx 20rpx;
+							padding: 10rpx 16rpx;
 							border-radius: 10rpx;
 
 							.signal-bars-horizontal {
 								display: flex;
 								flex-direction: row;
 								align-items: flex-end;
-								height: 40rpx;
-								margin-right: 5rpx;
+								height: 32rpx;
+								margin-right: 4rpx;
 								.signal-bar-h {
-									width: 8rpx;
-									margin-right: 3rpx;
+									width: 6rpx;
+									margin-right: 2rpx;
 									border-radius: 2rpx 2rpx 0 0;
 									transition: all 0.3s ease;
 											&.signal-bar-h-1 { height: 12rpx; }
@@ -1129,15 +1196,23 @@ import { openLocation } from '../../utils/openLocation.uts'
 								flex-direction: column;
 								justify-content: center;
 								align-items: center;
+								// 固定最小宽度：文案会在"无信号 / 无数据 / 极好"之间变化，
+								// 宽度不固定时右侧卫星数、电压、电量会整行左右跳动。
+								// 70rpx 可容纳最长文案（3 字 @22rpx = 66rpx）。
+								min-width: 70rpx;
 
 								.signal-value {
 									font-size: 18rpx;
 									color: #333;
+									text-align: center;
+									transition: color 0.3s ease;
 								}
 
 								.experience {
-									font-size: 18rpx;
-									font-weight: normal;
+									font-size: 22rpx;
+									font-weight: bold;
+									text-align: center;
+									transition: color 0.3s ease;
 								}
 							}
 						}
@@ -1218,9 +1293,7 @@ import { openLocation } from '../../utils/openLocation.uts'
 
 			.grid-text {
 				padding: 10rpx 0 0;
-				/* #ifndef APP-PLUS */
 				box-sizing: border-box;
-				/* #endif */
 				font-size: 24rpx;
 			}
 		}

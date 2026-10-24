@@ -1,7 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
 const utils_toast = require("./toast.js");
-require("./coordTransform.js");
 class OpenLocationParams extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -34,7 +33,11 @@ function showInvalidLocationToast() {
     icon: "none"
   });
 }
-function openBuiltInLocation(params) {
+function openLocation(params) {
+  if (!isValidCoordinate(params.latitude, params.longitude)) {
+    showInvalidLocationToast();
+    return null;
+  }
   try {
     common_vendor.index.openLocation({
       latitude: params.latitude,
@@ -42,10 +45,10 @@ function openBuiltInLocation(params) {
       name: params.name != "" ? params.name : "当前位置",
       scale: 18,
       success: () => {
-        common_vendor.index.__f__("log", "at utils/openLocation.uts:141", "成功打开位置地图");
+        common_vendor.index.__f__("log", "at utils/openLocation.uts:36", "成功打开位置地图");
       },
       fail: (error) => {
-        common_vendor.index.__f__("error", "at utils/openLocation.uts:144", "打开位置地图失败:", error);
+        common_vendor.index.__f__("error", "at utils/openLocation.uts:39", "打开位置地图失败:", error);
         utils_toast.showAppToast({
           title: "打开位置地图失败，请稍后重试",
           icon: "none"
@@ -53,19 +56,12 @@ function openBuiltInLocation(params) {
       }
     });
   } catch (error) {
-    common_vendor.index.__f__("error", "at utils/openLocation.uts:152", "打开位置地图异常:", error);
+    common_vendor.index.__f__("error", "at utils/openLocation.uts:47", "打开位置地图异常:", error);
     utils_toast.showAppToast({
       title: "打开位置地图失败，请稍后重试",
       icon: "none"
     });
   }
-}
-function openLocation(params) {
-  if (!isValidCoordinate(params.latitude, params.longitude)) {
-    showInvalidLocationToast();
-    return null;
-  }
-  openBuiltInLocation(params);
 }
 exports.OpenLocationParams = OpenLocationParams;
 exports.openLocation = openLocation;

@@ -1,18 +1,8 @@
 <script lang="uts">
-	import {
-		schedulePostLoginInitialization,
-		refreshInitializedPushServices,
-		clearInitializedPushBadge
-	} from './services/app-startup.uts'
-	import { ensureNotificationPermission } from './utils/cameraPermission.uts'
-
-	let firstBackTime = 0
 	// 添加热更新相关变量
 	let updateManager: any = null
 	let hasUpdate = false
 	function checkForUpdates() {
-		// 仅在小程序平台生效
-		// #ifdef MP-WEIXIN
 		// 检查是否支持 getUpdateManager API
 		if (uni.canIUse('getUpdateManager')) {
 			updateManager = uni.getUpdateManager()
@@ -72,50 +62,19 @@
 				showCancel: false
 			})
 		}
-		// #endif
 	}
-	
+
 	export default {
 		onLaunch: function () {
 			console.log('App onLaunch')
 			checkForUpdates()
-			// Push/APNs 首次注册会抢占 iOS 冷启动主线程，改为登录成功后的延后阶段。
-			if (uni.getStorageSync('token') != null) {
-				schedulePostLoginInitialization()
-			}
-			// #ifdef APP-ANDROID
-			ensureNotificationPermission((status) => {
-				console.log('[NotificationPermission] ' + status)
-			})
-			// #endif
 		},
 		onShow: function () {
 			console.log('App Show')
-			clearInitializedPushBadge()
-			refreshInitializedPushServices()
 		},
 		onHide: function () {
 			console.log('App Hide')
-			clearInitializedPushBadge()
 		},
-		// #ifdef APP-ANDROID
-		onLastPageBackPress: function () {
-			console.log('App LastPageBackPress')
-			if (firstBackTime == 0) {
-				uni.showToast({
-					title: '再按一次退出应用',
-					position: 'bottom',
-				})
-				firstBackTime = Date.now()
-				setTimeout(() => {
-					firstBackTime = 0
-				}, 2000)
-			} else if (Date.now() - firstBackTime < 2000) {
-				firstBackTime = Date.now()
-				uni.exit()
-			}
-		},
-		// #endif
 		onExit: function () {
 			console.log('App Exit')
 		}

@@ -55,6 +55,11 @@
   align-items: center;
 }
 .container .page-bg .top .device-car .current-car[class].data-v-00a60067 {
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  justify-content: flex-start;
+  margin-right: 60rpx;
   position: relative;
   display: flex;
   flex-direction: row;
@@ -90,12 +95,9 @@
   display: flex;
   width: 40rpx;
   height: 40rpx;
+  border-radius: 50%;
   align-items: center;
   justify-content: center;
-}
-.container .page-bg .top .device-car .nav-tools .nav-tool-add-image[class].data-v-00a60067 {
-  width: 36rpx;
-  height: 36rpx;
 }
 .container .page-bg .top .device-car .nav-tools .exit[class].data-v-00a60067 {
   display: flex;
@@ -110,45 +112,56 @@
   width: 40rpx;
   height: 40rpx;
 }
-.container .page-bg .top .device-info[class].data-v-00a60067 {
-  display: flex;
-  flex-direction: column;
-  padding: 20rpx;
-  border-radius: 16rpx;
-  width: 50%;
-}
-.container .page-bg .top .device-info .batteryPercent-info[class].data-v-00a60067 {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-}
-.container .page-bg .top .device-info .battery-label[class].data-v-00a60067 {
-  flex-shrink: 0;
-  margin-right: 12rpx;
-  font-size: 26rpx;
-  color: #333;
-}
-.container .page-bg .top .device-info .battery-progress[class].data-v-00a60067 {
-  flex: 1;
-  min-width: 0;
-}
-.container .page-bg .top .device-info .battery-value[class].data-v-00a60067 {
-  flex-shrink: 0;
-  margin-left: 12rpx;
-  font-size: 24rpx;
-  color: #333;
-}
-.container .page-bg .top .device-info .info + .info[class].data-v-00a60067 {
-  margin-top: 16rpx;
-}
-.container .page-bg .top .device-info .info[class].data-v-00a60067 {
-  font-size: 26rpx;
-  color: #333;
-}
 .container .page-bg .top .banner-image[class].data-v-00a60067 {
   width: 100%;
   height: 300rpx;
+}
+.container .page-bg .top .subscribe-row[class].data-v-00a60067 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 30rpx;
+  padding: 20rpx;
+  margin: 15rpx 0 12rpx 0;
+}
+.container .page-bg .top .subscribe-row .subscribe-icon[class].data-v-00a60067 {
+  width: 56rpx;
+  height: 56rpx;
+  flex-shrink: 0;
+}
+.container .page-bg .top .subscribe-row .subscribe-text[class].data-v-00a60067 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 16rpx;
+}
+.container .page-bg .top .subscribe-row .subscribe-text .subscribe-title[class].data-v-00a60067 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+.container .page-bg .top .subscribe-row .subscribe-text .subscribe-desc[class].data-v-00a60067 {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+.container .page-bg .top .subscribe-row .subscribe-btn[class].data-v-00a60067 {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 32rpx;
+  background-color: #07C160;
+}
+.container .page-bg .top .subscribe-row .subscribe-btn .subscribe-btn-text[class].data-v-00a60067 {
+  font-size: 24rpx;
+  color: #fff;
+}
+.container .page-bg .top .subscribe-row .subscribe-btn.subscribed[class].data-v-00a60067 {
+  background-color: #eee;
+}
+.container .page-bg .top .subscribe-row .subscribe-btn.subscribed .subscribe-btn-text[class].data-v-00a60067 {
+  color: #999;
 }
 .container .page-bg .top .car-state[class].data-v-00a60067 {
   display: flex;
@@ -198,7 +211,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 20rpx 30rpx;
+  padding: 20rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
 .container .page-bg .content .map-box .map-header .map-title[class].data-v-00a60067 {
@@ -263,7 +276,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 20rpx 30rpx;
+  padding: 20rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
 .container .page-bg .content .mile-record .record-header .record-title[class].data-v-00a60067 {
@@ -291,29 +304,29 @@
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  padding: 30rpx 20rpx;
+  padding: 20rpx;
   background-color: #edf7ff;
   border-radius: 24rpx;
   margin: 20rpx;
 }
 .container .page-bg .content .mile-record .ring-item[class].data-v-00a60067 {
   position: relative;
-  width: 250rpx;
-  height: 250rpx;
+  width: 180rpx;
+  height: 180rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .container .page-bg .content .mile-record .ring-bg[class].data-v-00a60067 {
   position: absolute;
-  width: 250rpx;
-  height: 250rpx;
+  width: 180rpx;
+  height: 180rpx;
   z-index: 2;
 }
 .container .page-bg .content .mile-record .ring-quarter[class].data-v-00a60067 {
   position: absolute;
-  width: 126rpx;
-  height: 126rpx;
+  width: 120rpx;
+  height: 120rpx;
   overflow: hidden;
 }
 .container .page-bg .content .mile-record .ring-quarter--top-left[class].data-v-00a60067 {
@@ -334,10 +347,10 @@
 }
 .container .page-bg .content .mile-record .ring-stroke[class].data-v-00a60067 {
   position: absolute;
-  width: 250rpx;
-  height: 250rpx;
+  width: 180rpx;
+  height: 180rpx;
   box-sizing: border-box;
-  border: 16rpx solid;
+  border: 10rpx solid;
   border-radius: 999px;
 }
 .container .page-bg .content .mile-record .ring-quarter--top-left .ring-stroke[class].data-v-00a60067 {
@@ -371,20 +384,20 @@
   z-index: 10;
 }
 .container .page-bg .content .mile-record .num[class].data-v-00a60067 {
-  font-size: 45rpx;
+  font-size: 35rpx;
   font-weight: bold;
   color: #333;
   text-align: center;
 }
 .container .page-bg .content .mile-record .unit[class].data-v-00a60067 {
   font-size: 20rpx;
-  color: #666;
+  color: #999999;
   text-align: right;
 }
 .container .page-bg .content .mile-record .label[class].data-v-00a60067 {
-  font-size: 25rpx;
-  color: #666;
-  margin-top: 12rpx;
+  font-size: 18rpx;
+  color: #999999;
+  margin-top: 5rpx;
   text-align: center;
 }
 .container .page-bg .content .device-list[class].data-v-00a60067 {
@@ -400,7 +413,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 24rpx;
+  padding: 20rpx;
   background-color: #fff;
   border-radius: 20rpx;
 }
@@ -453,9 +466,8 @@
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
-  padding: 20rpx 30rpx;
+  padding: 20rpx;
   border-bottom: 1rpx solid #f0f0f0;
-  margin-bottom: 30rpx;
 }
 .container .page-bg .content .service .service-content[class].data-v-00a60067 {
   display: flex;
@@ -505,4 +517,105 @@
   margin-top: 10rpx;
   font-size: 25rpx;
   color: #222;
+}
+.car-picker[class].data-v-00a60067 {
+  width: 100%;
+  height: 900rpx;
+  display: flex;
+  flex-direction: column;
+  padding-top: 30rpx;
+}
+.car-picker .car-picker-header[class].data-v-00a60067 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40rpx 20rpx 40rpx;
+}
+.car-picker .car-picker-title[class].data-v-00a60067 {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333333;
+  text-align: left;
+}
+.car-picker .car-picker-search[class].data-v-00a60067 {
+  flex: 1;
+  margin-left: 50rpx;
+}
+.car-picker .car-picker-list[class].data-v-00a60067 {
+  flex: 1;
+  min-height: 0;
+  max-height: 900rpx;
+}
+.car-picker .car-picker-empty[class].data-v-00a60067 {
+  padding: 60rpx 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.car-picker .car-picker-empty .car-picker-empty-text[class].data-v-00a60067 {
+  font-size: 28rpx;
+  color: #9A9A9A;
+}
+.car-picker .car-picker-item[class].data-v-00a60067 {
+  padding: 30rpx 40rpx;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-top-width: 1rpx;
+  border-top-style: solid;
+  border-top-color: #F0EAEA;
+}
+.car-picker .car-picker-item-name[class].data-v-00a60067 {
+  flex: 1;
+  min-width: 0;
+  padding-right: 20rpx;
+  font-size: 32rpx;
+  color: #333333;
+}
+.car-picker .car-picker-item-name--active[class].data-v-00a60067 {
+  color: #3C6ECF;
+}
+.car-picker .car-picker-item-status[class].data-v-00a60067 {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.car-picker .car-picker-dot[class].data-v-00a60067 {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+}
+.car-picker .car-picker-dot--online[class].data-v-00a60067 {
+  background-color: #5BBF6A;
+}
+.car-picker .car-picker-dot--offline[class].data-v-00a60067 {
+  background-color: #9A9A9A;
+}
+.car-picker .car-picker-status-text[class].data-v-00a60067 {
+  margin-left: 10rpx;
+  font-size: 28rpx;
+}
+.car-picker .car-picker-status-text--online[class].data-v-00a60067 {
+  color: #5BBF6A;
+}
+.car-picker .car-picker-status-text--offline[class].data-v-00a60067 {
+  color: #9A9A9A;
+}
+.car-picker .car-picker-cancel[class].data-v-00a60067 {
+  padding: 32rpx 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-top-width: 1rpx;
+  border-top-style: solid;
+  border-top-color: #F0EAEA;
+}
+.car-picker .car-picker-cancel .car-picker-cancel-text[class].data-v-00a60067 {
+  font-size: 32rpx;
+  color: #333333;
 }

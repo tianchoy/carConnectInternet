@@ -13,7 +13,7 @@ node_modules/
 .env
 .env.local
 
-# 私钥与签名证书（AG Connect 配置文件需保留在 nativeResources/android/）
+# 私钥与签名证书
 *.p8
 *.pem
 *.key

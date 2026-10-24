@@ -115,7 +115,7 @@ const _cache = __ins.renderCache;
 				showAppToast({ title: response.msg || '密码修改失败，请稍后重试', icon: 'none' })
 				return
 			}
-			showAppToast({ title: '密码修改成功，请重新登录', icon: 'success' })
+			showAppToast({ title: response.msg || '密码修改成功，请重新登录', icon: 'success' })
 			returnToLogin()
 		} catch (error) {
 			if (!sessionEnding.value) {

@@ -64,10 +64,10 @@ const _cache = __ins.renderCache;
 		return true
 	}
 
-	const completeLogin = (token: string): void => {
+	const completeLogin = (token: string, message: string = '登录成功'): void => {
 		uni.setStorageSync('token', token)
 		resetTokenExpiredState()
-		showAppToast({ title: '登录成功', icon: 'success' })
+		showAppToast({ title: message || '登录成功', icon: 'success' })
 		setTimeout(() => {
 			uni.reLaunch({
 				url: '/pages/index/index',
@@ -88,7 +88,7 @@ const _cache = __ins.renderCache;
 			})
 			const token = response.data != null ? response.data.getString('access_token', '') : ''
 			if (isBusinessSuccessCode(response.code) && token != '') {
-				completeLogin(token)
+				completeLogin(token, response.msg)
 				return
 			}
 			showAppToast({ title: response.msg || '登录失败，请检查账号和密码', icon: 'none' })

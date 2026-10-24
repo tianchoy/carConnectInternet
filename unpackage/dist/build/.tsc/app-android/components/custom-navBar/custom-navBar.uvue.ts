@@ -53,7 +53,7 @@ __ins.emit(event, ...do_not_transform_spread)
 		if (pages.length > 1) {
 			uni.navigateBack();
 		} else {
-			uni.switchTab({ url: '/pages/index/index' });
+			uni.reLaunch({ url: '/pages/index/index' });
 		}
 		emit('back');
 	};

@@ -136,7 +136,7 @@ const __sfc__ = defineComponent({
                     editInfo.value.plateNo = plateNo;
                     isEditing.value = false;
                     carIconSelectorVisible.value = false;
-                    showAppToast({ title: '保存成功', icon: 'success' } as ShowToastOptions);
+                    showAppToast({ title: res.msg != "" ? res.msg : '保存成功', icon: 'success' } as ShowToastOptions);
                 }
                 else {
                     showAppToast({ title: res.msg != "" ? res.msg : '保存失败', icon: 'none' } as ShowToastOptions);

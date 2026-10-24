@@ -47,7 +47,7 @@ const __sfc__ = defineComponent({
                 uni.navigateBack();
             }
             else {
-                uni.switchTab({ url: '/pages/index/index' });
+                uni.reLaunch({ url: '/pages/index/index' });
             }
             emit('back');
         };

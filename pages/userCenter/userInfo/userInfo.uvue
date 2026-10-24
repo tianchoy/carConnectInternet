@@ -52,8 +52,6 @@
 <script setup lang="uts">
 import { isBusinessSuccessCode } from '../../../api/response.uts'
 import { showAppToast } from '../../../utils/toast.uts'
-	import { clearPushSessionState } from '../../../services/push.uts'
-	import { unbindPushDeviceOnLogout } from '../../../services/push-binding.uts'
 	import {logout} from '../../../api/request.uts'
 	type UserInfo = {
 		id : string,
@@ -97,11 +95,9 @@ import { showAppToast } from '../../../utils/toast.uts'
 
 	// 退出登录方法
 	const logoutBtn = async () => {
-		await unbindPushDeviceOnLogout()
 		const res = await logout()
 		if(isBusinessSuccessCode(res.code)){
 			uni.removeStorageSync('token')
-			clearPushSessionState()
 			uni.reLaunch({
 				url:'/pages/login/login'
 			})

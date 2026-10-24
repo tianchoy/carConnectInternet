@@ -1,6 +1,6 @@
 <template>
 	<view class="list-container">
-		<scroll-view class="content" scroll-y v-if="props.lists.length != 0">
+		<scroll-view class="content" scroll-y v-if="props.lists.length != 0" @scrolltolower="onScrollToLower">
 			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.deviceNo,item.deviceId)">
 				<view class="title">
 					<view class="car-number">
@@ -8,15 +8,17 @@
 						<i-tag class="car-status-spacing" size="mini" shape="circle" :text="item.connectionStatus == 'online' ? '在线' : '离线'" :type="item.connectionStatus== 'online' ? 'success' : 'error'"></i-tag>
 					</view>
 					<view class="device-tools">
-						<!--#ifdef MP-WEIXIN-->
 						<i-tag text="充值" type="success" @click.stop="pay(item.iccid,item.simMerchant)"></i-tag>
-						<!--#endif-->
 						<i-tag class="device-tool-spacing" text="解绑" type="warning" @click.stop="unbindDevice(item.deviceId)"></i-tag>
 					</view>
 				</view>
 				<view>
 					<text class="imei">ID: {{item.deviceNo}}</text>
 				</view>
+			</view>
+			<view class="list-footer">
+				<text v-if="props.hasMore == true" class="list-footer-text">上滑加载更多</text>
+				<text v-else class="list-footer-text">没有更多了</text>
 			</view>
 		</scroll-view>
 
@@ -33,11 +35,13 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { DeviceItem } from '../../utils/device.uts'
 	const props = defineProps<{
 		lists : DeviceItem[]
+		hasMore? : boolean
 	}>()
 		// 解绑设备
 	// 定义emit事件
 	const emit = defineEmits<{
 		(e: 'unbindDevice', deviceId: string): void
+		(e: 'loadMore'): void
 	}>()
 	const modal = ref<boolean>(false)
 	const selectedDeviceId = ref('')
@@ -53,7 +57,6 @@ import { showAppToast } from '../../utils/toast.uts'
 		// 设置需要刷新的标志
 		needRefresh.value = true
 
-		//#ifdef MP-WEIXIN
 		//拉起半屏小程序
 		uni.openEmbeddedMiniProgram({
 			appId: 'wx1d647f2cfdc089e6',
@@ -75,15 +78,7 @@ import { showAppToast } from '../../utils/toast.uts'
 			}
 		})
 
-		//#endif
 
-		//#ifndef MP-WEIXIN
-		needRefresh.value = false
-		showAppToast({
-			title: '请在微信小程序中完成充值',
-			icon: 'none'
-		})
-		//#endif
 	}
 	// 解绑设备
 	const unbindDevice = (deviceId : string) => {
@@ -108,6 +103,17 @@ import { showAppToast } from '../../utils/toast.uts'
 			url: '/pages/carInfoDetail/carInfoDetail?deptId='+companyId+ '&deviceNo=' + deviceNo + '&deviceId=' + deviceId
 		})
 	}
+	// 触底加载更多：加锁避免触底事件连续触发导致重复加载
+	const lock = ref<boolean>(false)
+	const onScrollToLower = () => {
+		if (lock.value) return
+		if (props.hasMore != true) return
+		lock.value = true
+		emit('loadMore')
+		setTimeout(() => {
+			lock.value = false
+		}, 300)
+	}
 </script>
 
 <style lang="scss">
@@ -118,6 +124,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		padding: 0 20rpx;
 
 		.content {
+			height: 100%;
 
 			.list-item {
 				padding: 20rpx;
@@ -161,7 +168,22 @@ import { showAppToast } from '../../utils/toast.uts'
 			flex-direction: row;
 			justify-content: center;
 			align-items: center;
+			// 往下偏移，避免紧贴检索框显得太靠上
+			padding-top: 200rpx;
 			color: #ccc;
+		}
+
+		.list-footer {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			padding: 30rpx 0;
+		}
+
+		.list-footer-text {
+			font-size: 24rpx;
+			color: #999999;
 		}
 	}
 </style>

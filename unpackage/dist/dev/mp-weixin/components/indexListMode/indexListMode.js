@@ -16,9 +16,10 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "indexListMode",
   props: {
-    lists: {}
+    lists: {},
+    hasMore: { type: Boolean }
   },
-  emits: ["unbindDevice"],
+  emits: ["unbindDevice", "loadMore"],
   setup(__props, _a) {
     var __emit = _a.emit;
     const props = __props;
@@ -30,24 +31,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (simMerchant.toLowerCase() == "zddx") {
         iccid = iccid.substring(0, iccid.length - 1);
       }
-      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:52", iccid);
+      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:56", iccid);
       needRefresh.value = true;
-      common_vendor.index.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
+      common_vendor.index.openEmbeddedMiniProgram({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:64", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:67", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:68", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:71", "打开小程序失败", res);
           needRefresh.value = false;
           utils_toast.showAppToast({
             title: "打开支付页面失败",
             icon: "none"
           });
         }
-      }));
+      });
     };
     const unbindDevice = (deviceId) => {
       selectedDeviceId.value = deviceId;
@@ -65,11 +66,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&deviceNo=" + deviceNo + "&deviceId=" + deviceId
       });
     };
+    const lock = common_vendor.ref(false);
+    const onScrollToLower = () => {
+      if (lock.value)
+        return null;
+      if (props.hasMore != true)
+        return null;
+      lock.value = true;
+      emit("loadMore");
+      setTimeout(() => {
+        lock.value = false;
+      }, 300);
+    };
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
         a: props.lists.length != 0
-      }, props.lists.length != 0 ? {
+      }, props.lists.length != 0 ? common_vendor.e({
         b: common_vendor.f(props.lists, (item, index, i0) => {
           return {
             a: common_vendor.t(item.deviceName || item.deviceNo),
@@ -104,11 +117,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           text: "解绑",
           type: "warning",
           class: "device-tool-spacing"
-        })
-      } : {}, {
-        e: common_vendor.o(confirm, "a5"),
-        f: common_vendor.o(cancel, "fb"),
-        g: common_vendor.p({
+        }),
+        e: props.hasMore == true
+      }, props.hasMore == true ? {} : {}, {
+        f: common_vendor.o(onScrollToLower, "e7")
+      }) : {}, {
+        g: common_vendor.o(confirm, "3e"),
+        h: common_vendor.o(cancel, "24"),
+        i: common_vendor.p({
           show: common_vendor.unref(modal),
           title: "提示",
           content: "是否要解绑设备？",
@@ -118,10 +134,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           cancelText: "取消",
           showCancelButton: true
         }),
-        h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        i: `${_ctx.u_s_b_h}px`,
-        j: `${_ctx.u_s_a_i_b}px`,
-        k: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        k: `${_ctx.u_s_b_h}px`,
+        l: `${_ctx.u_s_a_i_b}px`,
+        m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

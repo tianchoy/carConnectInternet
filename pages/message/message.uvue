@@ -1,5 +1,8 @@
 <template>
-	<custom-navBar title="消息中心" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false" :isShowStyle="true">
+	<custom-navBar title="消息中心" :show-back="true" backgroundColor="#fff" textColor="#333"
+		:showCapsule="Login" :isIcon="true"
+		:Icon="hasUnreadMessage ? '/static/read-all.png' : '/static/read-all-disabled.png'"
+		:isShowStyle="true" @capsuleClick="handleReadAll">
 	</custom-navBar>
 	<view class="container">
 		<!-- 新消息提示：点击后才将暂存消息插入列表 -->
@@ -55,19 +58,20 @@
 
 		<i-modal
 			:show="modal"
-			:title="getMessageTypeText(modalContent.getNumber('messageType', 0))"
+			:title="modalContent.getString('title', '')"
 			:content="modalContent.getString('content', '')"
 			@confirm="ReadIt">
 		</i-modal>
 	</view>
 	<app-toast></app-toast>
+	<app-modal></app-modal>
 </template>
 
 <script setup lang="uts">
 	import { isBusinessSuccessCode } from '../../api/response.uts'
 	import { ref, computed, nextTick, onActivated, onDeactivated } from 'vue'
-	import { getUserMsgList, setMsgState } from '../../api/request.uts'
-	import { consumePendingMessageId, consumePushStaleFlag } from '../../services/push.uts'
+	import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
+	import { getUserMsgList, setMsgState, readAllMessages } from '../../api/request.uts'
 	import { parseLocalDateTime } from '../../utils/formateTime.uts'
 
 	const modal = ref<boolean>(false)
@@ -90,6 +94,7 @@
 	const Login = ref(false)
 	const messageScrollViewportHeight = ref(0)
 	const isNearMessageListBottom = ref(false)
+	const isReadingAll = ref(false) // 是否正在执行一键已读
 
 	const isInitialLoading = computed<boolean>(() => {
 		return isListLoading.value && !hasLoadedInitial.value && msgList.value.length == 0
@@ -101,6 +106,11 @@
 
 	const showLoadMore = computed<boolean>(() => {
 		return msgList.value.length > 0 && (isListLoading.value || loadStatus.value == 'loadmore' || loadStatus.value == 'nomore')
+	})
+
+	// 当前列表中是否存在未读（status == 1）消息，决定标题栏一键已读图标是否出现
+	const hasUnreadMessage = computed<boolean>(() => {
+		return msgList.value.some((item : UTSJSONObject) : boolean => item.getNumber('status', 0) == 1)
 	})
 
 	// 定时器相关
@@ -346,20 +356,67 @@
 		}
 	}
 
-	async function openPendingPushMessage() : Promise<void> {
+	// 执行一键已读请求：调用 POST /usermessage/readAll，成功后把本地未读状态同步为已读
+	async function executeReadAll() : Promise<void> {
+		isReadingAll.value = true
+		try {
+			const res = await readAllMessages()
+			console.log('一键已读结果:', res)
+			if (isBusinessSuccessCode(res.code)) {
+				msgList.value.forEach((item : UTSJSONObject) : void => {
+					if (item.getNumber('status', 0) == 1) item.set('status', 0)
+				})
+				// 暂存的新消息同样已被服务端置为已读，保持一致
+				pendingNewMessages.value.forEach((message : UTSJSONObject) : void => {
+					if (message.getNumber('status', 0) == 1) message.set('status', 0)
+				})
+				msgList.value = [...msgList.value]
+				uni.showToast({
+					title: res.msg || '已全部标为已读',
+					icon: 'none'
+				})
+			} else {
+				uni.showToast({
+					title: res.msg != '' ? res.msg : '操作失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			// 网络与服务端异常已由 http 层统一提示
+			console.error('一键已读失败:', error)
+		} finally {
+			isReadingAll.value = false
+		}
+	}
+
+	// 一键已读：先由用户确认，取消时不发起请求
+	function handleReadAll() : void {
+		console.log('一键已读触发')
+		if (isReadingAll.value) return
 		if (isListLoading.value || isCheckingNewMessages.value) {
-			setTimeout(() => {
-				void openPendingPushMessage()
-			}, 150)
+			uni.showToast({
+				title: '列表加载中，请稍候',
+				icon: 'none'
+			})
 			return
 		}
-		const messageId = consumePendingMessageId()
-		const shouldRefresh = consumePushStaleFlag()
-		if (messageId == '' && !shouldRefresh) return
-		await loadMsgList(true)
-		if (messageId == '') return
-		const message = msgList.value.find((item : UTSJSONObject) : boolean => item.getString('messageId', '') == messageId)
-		if (message != null) await handleItemClick(message)
+		if (!hasUnreadMessage.value) {
+			uni.showToast({
+				title: '没有未读消息',
+				icon: 'none'
+			})
+			return
+		}
+		showAppModal({
+			title: '一键已读',
+			content: '确定将全部消息标记为已读吗？',
+			showCancel: true,
+			confirmText: '确定',
+			cancelText: '取消',
+			success: (result: AppModalSuccess): void => {
+				if (result.confirm) void executeReadAll()
+			}
+		})
 	}
 
 	const finishPageLifecycle = (): void => {
@@ -372,7 +429,6 @@
 		stopScrollResumeTimer()
 		isPageActive.value = true
 		startNewMessageCheck()
-		void openPendingPushMessage()
 		void checkNewMessages()
 	}
 
@@ -440,18 +496,6 @@
 
 	const onMessageScroll = (event : UniScrollEvent) : void => {
 		pauseNewMessageCheckWhileScrolling()
-		// #ifdef APP-IOS
-		const viewportHeight = messageScrollViewportHeight.value
-		if (viewportHeight <= 0) return
-		const remainingDistance = event.detail.scrollHeight - event.detail.scrollTop - viewportHeight
-		const isNearBottom = event.detail.deltaY > 0 && remainingDistance <= 100
-		if (isNearBottom && !isNearMessageListBottom.value) {
-			isNearMessageListBottom.value = true
-			loadMore()
-		} else if (!isNearBottom) {
-			isNearMessageListBottom.value = false
-		}
-		// #endif
 	}
 
 
@@ -473,6 +517,10 @@
 		return item.getString('content', '')
 	}
 
+	const getMessageTitle = (item : UTSJSONObject) : string => {
+		return item.getString('title', '')
+	}
+
 	const isMessageUnread = (item : UTSJSONObject) : boolean => {
 		return item.getNumber('status', 0) == 1
 	}
@@ -485,9 +533,6 @@
 		}
 	}
 
-	const getMessageTitle = (item : UTSJSONObject) : string => {
-		return getMessageTypeText(item.getNumber('messageType', 0)) + ' - ' + getMessageCreateTime(item)
-	}
 
 	// 工具函数
 	const formatTime = (timeString: string) => {
