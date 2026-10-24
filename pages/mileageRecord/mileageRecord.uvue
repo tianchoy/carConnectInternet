@@ -236,7 +236,8 @@ import { showAppToast } from '../../utils/toast.uts'
 				deviceNo: deviceNo.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
-				minParkTime: 2,
+				// 单位是「秒」（后端按秒解析）：传 2 会被当成 2 秒，行程被切碎、里程偏小
+				minParkTime: 300,
 				withStop: false,
 				withPos: false,
 				withTrip: true,

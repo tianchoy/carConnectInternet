@@ -806,25 +806,29 @@ const clearCurrentCar = (): void => {
 }
 
 // 处理行程数据
+// 今日里程优先用后端 totalDistance：它与轨迹回放页取的是同一个值，避免两端各算一套出现两个数
+//（2026-10-24 实测首页 3.52km vs 回放页 4.3km）。旧包没该字段时回退为累加 trips.distance。
 const processTripData = (data : UTSJSONObject) : void => {
     const trips = data.getArray<UTSJSONObject>('trips')
+    const backendTotalDistance = data.getNumber('totalDistance', -1)
+
     if (trips != null && trips.length > 0) {
         tripData.value = trips
 
         let totalDistance = 0
-        let totalDuration = 0
         let totalAvgSpeed = 0
 
         trips.forEach((trip : UTSJSONObject) : void => {
             totalDistance += trip.getNumber('distance', 0)
-            totalDuration += trip.getNumber('duration', 0)
             totalAvgSpeed += trip.getNumber('averageSpeed', 0)
         })
 
-        totalMileage.value = totalDistance
+        totalMileage.value = backendTotalDistance >= 0 ? backendTotalDistance : totalDistance
         averageSpeed.value = totalAvgSpeed / trips.length
     } else {
-        clearTripData()
+        tripData.value = []
+        averageSpeed.value = 0
+        totalMileage.value = backendTotalDistance >= 0 ? backendTotalDistance : 0
     }
 }
 
@@ -834,7 +838,9 @@ const createTrackRequestData = (deviceNo: string) : UTSJSONObject => {
         deviceNo: deviceNo,
         startTime: formatTimes(timeRange.todayZero),
         endTime: formatTimes(timeRange.nowTime),
-        minParkTime: 2,
+        // 单位是「秒」：此前传 2（本意 2 分钟）被后端按 2 秒执行，任何 2 秒静止都切断行程，
+        // 行程被切碎、段间位移丢失 ⇒ 今日里程偏小（2026-10-24 实测 3.52km，正确口径约 4.2km）。
+        minParkTime: 300,
         withStop: false,
         withPos: false,
         withTrip: true,

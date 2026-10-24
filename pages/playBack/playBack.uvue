@@ -52,7 +52,7 @@
 					<text class="info-label">速度</text>
 				</view>
 				<view class="item-info">
-					<text class="info-label">{{(totalDistance/1000).toFixed(1)}}Km</text>
+					<text class="info-label">{{(totalDistance/1000).toFixed(2)}}Km</text>
 					<text class="info-label">里程</text>
 				</view>
 			</view>
@@ -134,6 +134,10 @@ import { showAppToast } from '../../utils/toast.uts'
 	const isTrackPlayable = ref(false)
 	const playbackSpeed = ref(1)
 	const totalDistance = ref(0)
+	// 后端 totalDistance（米）：与首页「今日里程」同一个口径。>=0 时直接展示，
+	// 不再本地累加 positions —— 本地累加会把行程窗口外的停车漂移/冷启动跳变算进去
+	//（2026-10-24 实测：首页 3.52km、本地累加 4.3km，同一窗口两个数）。
+	const backendTotalDistance = ref(-1)
 	const currentSpeed = ref(0)
 	const currentTime = ref('')
 	const currentIndex = ref(0)
@@ -487,6 +491,12 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	// 计算轨迹总距离
 	function calculateTrackDistance() {
+		// 优先后端口径：与首页「今日里程」同源，保证同一窗口两个页面数字一致
+		if (backendTotalDistance.value >= 0) {
+			totalDistance.value = backendTotalDistance.value
+			return
+		}
+		// 旧包兜底：后端未返回 totalDistance 时按点位累加（会含停车漂移，仅作降级）
 		totalDistance.value = 0
 		for (let i = 1; i < trackPoints.value.length; i++) {
 			totalDistance.value += getDistance(
@@ -1122,6 +1132,7 @@ const showUserLocationFallback = async () => {
 function clearTrackDisplay() : void {
 		isMapReady.value = false
 		trackPoints.value = []
+		backendTotalDistance.value = -1
 		isTrackPlayable.value = false
 		currentIndex.value = 0
 		activeSegmentTargetIndex.value = -1
@@ -1289,7 +1300,8 @@ function clearTrackDisplay() : void {
 			deviceNo: deviceNo.value,
 			startTime: startTime.value.replace(/\//g, '-'),
 			endTime: endTime.value.replace(/\//g, '-'),
-			minParkTime: 2,
+			// 单位是「秒」（后端按秒解析）：传 2 会被当成 2 秒，行程被切碎、里程偏小
+			minParkTime: 300,
 			withStop: false,
 			withPos: true,
 			withTrip: false,
@@ -1311,6 +1323,7 @@ function clearTrackDisplay() : void {
 				showCurrentPosition()
 				return
 			}
+			backendTotalDistance.value = trackData.getNumber('totalDistance', -1)
 			const positions = trackData.getArray<UTSJSONObject>('positions')
 			if (positions != null && positions.length > 0) {
 				processTrackData(positions)

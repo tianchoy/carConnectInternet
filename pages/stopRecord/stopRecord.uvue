@@ -126,7 +126,8 @@ import { openLocation } from '../../utils/openLocation.uts'
 			deviceNo: deviceNo.value,
 			startTime: startTime.value,
 			endTime: endTime.value,
-			minParkTime: 2,
+			// 单位是「秒」（后端按秒解析）：传 2 会被当成 2 秒，停车段全被判成 LONG、行程被切碎
+			minParkTime: 300,
 			withStop: true,
 			withPos: false,
 			withTrip: false
