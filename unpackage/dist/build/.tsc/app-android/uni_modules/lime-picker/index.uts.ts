@@ -1,6 +1,0 @@
-// @ts-nocheck
-export * from './components/l-picker/type'
-// export { LimePickerValue } from './components/l-picker/type'
-
-// export type PickerValue = string | number;
-// export type LimePickerValue = PickerValue;

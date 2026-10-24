@@ -21,3 +21,5 @@ node_modules/
 *.jks
 *.p12
 *.mobileprovision
+# uni-app 构建产物与编译缓存（不入库，可随时重新生成）
+unpackage/

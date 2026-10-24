@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon"
-  }
-}

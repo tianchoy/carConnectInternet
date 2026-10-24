@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "i-grid": "../../uni_modules/i-ui-x/components/i-grid/i-grid",
-    "i-popup": "../../uni_modules/i-ui-x/components/i-popup/i-popup"
-  }
-}
