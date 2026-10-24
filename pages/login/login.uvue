@@ -46,6 +46,7 @@
 	</view>
 	<app-toast></app-toast>
 	<app-modal></app-modal>
+	<i-toast ref="toastRef"></i-toast>
 </template>
 
 <script setup lang="uts">
@@ -75,6 +76,9 @@
 		docState.value = !docState.value
 	}
 
+	// 自定义 i-toast 组件 ref：用它弹出登录成功提示，时长由其自身 timer 控制（不受微信原生 toast 时长限制）。
+	const toastRef = ref(null)
+
 	const completeLogin = (token: string, message: string = '登录成功'): void => {
 		if (token == '') {
 			showAppToast({ title: message || '登录失败，请重试', icon: 'none' })
@@ -82,10 +86,12 @@
 		}
 		uni.setStorageSync('token', token)
 		resetTokenExpiredState()
-		showAppToast({ title: message || '登录成功', icon: 'success' })
+		// 提示显示 2 秒（i-toast 默认 duration 即 2000，自行计时关闭，再跳转首页）。
+		// type 用 default → 黑色半透明背景；icon 置空 → 不显示图标。
+		;(toastRef.value as any).open({ title: message || '登录成功', type: 'default', icon: '', duration: 2000 })
 		setTimeout(() => {
 			uni.reLaunch({ url: '/pages/index/index' })
-		}, 500)
+		}, 2000)
 	}
 
 	const ensureAgreementAccepted = (): boolean => {
