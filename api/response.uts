@@ -1,5 +1,8 @@
 export const BUSINESS_SUCCESS_CODE = 200
 
+// 账号已注销（可由本人确认后恢复）：登录命中后弹确认框，用户确认则调复活接口。
+export const ACCOUNT_CANCELED_CODE = 4306
+
 // `code` is the backend business response code; it is not the HTTP status code.
 export function isBusinessSuccessCode(code: number): boolean {
     return code == BUSINESS_SUCCESS_CODE

@@ -50,10 +50,11 @@
 </template>
 
 <script setup lang="uts">
-	import { isBusinessSuccessCode } from '../../api/response.uts'
+	import { isBusinessSuccessCode, ACCOUNT_CANCELED_CODE } from '../../api/response.uts'
 	import { ref } from 'vue'
 	import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
+	import { handleAccountCanceledRevival } from '../../utils/accountRevive.uts'
 	import { userAgreement, privacyPolicy } from '../../utils/legal.uts'
 	import { resetTokenExpiredState } from '../../api/http.uts'
 	import { PostWechatlogin, login } from '../../api/request.uts'
@@ -150,6 +151,18 @@
 					encryptedData: useCipher ? encryptedData : '',
 					iv: useCipher ? iv : ''
 				})
+				// 命中 4306：账号已注销但可复活，弹确认框走复活流程（微信登录链路对应 /authLogin/revive）。
+				// 先隐藏「登录中...」loading，否则其遮罩会盖住确认框按钮。
+				if (res.code === ACCOUNT_CANCELED_CODE && res.data != null) {
+					uni.hideLoading()
+					const outcome = await handleAccountCanceledRevival('authLogin', res.data, res.msg)
+					if (outcome.status == 'revived') {
+						completeLogin(outcome.token, outcome.msg)
+					} else if (outcome.status == 'needPhone') {
+						// 复活成功但无手机号：停留在微信登录页，用户重新点击「个人用户登录」授权手机号并重新登录即可绑定。
+					}
+					return
+				}
 				const loginData = res.data
 				if (isBusinessSuccessCode(res.code) && loginData != null) {
 					const token = loginData.getString('token', '')
