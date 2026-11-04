@@ -1563,6 +1563,22 @@ const showSubscribeSettingsGuide = (): void => {
     })
 }
 
+// 用户只选了「接收」（accept / acceptWithAudio），没有「接收并提醒」（acceptWithAlert）：
+// 已订阅但不会收到横幅提醒，引导去设置页把该模板改成「接收并提醒」。
+const showAlertUpgradeGuide = (): void => {
+    showAppModal({
+        title: '开启横幅提醒',
+        content: '已开启接收通知。如需在微信中收到横幅提醒，请点击「去设置」-「订阅消息」-「车辆定位器告警」改为「接收并提醒」',
+        confirmText: '去设置',
+        cancelText: '暂不',
+        success: (res: AppModalSuccess): void => {
+            if (res.confirm) {
+                openSubscribeSettings()
+            }
+        }
+    })
+}
+
 // 用户主动点击订阅（device 通道：换票 → 授权；必须在 tap 手势链内）
 const handleSubscribeTap = async (): Promise<void> => {
     if (!isLogin()) return
@@ -1598,8 +1614,13 @@ const handleSubscribeTap = async (): Promise<void> => {
             // 记录授权成功：微信无接口可查设备订阅状态，后续以该缓存为准（重启后仍显示已订阅）
             uni.setStorageSync(SUBSCRIBE_ACCEPTED_KEY, true)
             deviceSubscribed.value = true
-            const title = outcome.status == 'acceptWithAlert' ? '订阅成功，已在微信中开启强提醒' : '订阅成功，车辆告警将通过微信通知'
-            showAppToast({ title: title, icon: 'none' })
+            if (outcome.status == 'acceptWithAlert') {
+                // 目标权限：接收并提醒（强提醒 / 横幅）
+                showAppToast({ title: '订阅成功，已开启接收并提醒', icon: 'none' })
+            } else {
+                // 仅「接收」：已订阅但不弹横幅，引导去设置改为「接收并提醒」
+                showAlertUpgradeGuide()
+            }
         } else if (outcome.status == 'reject') {
             // 用户点了「拒绝」：记录标记，下次点击「开启通知」直接引导去设置页手动开启
             uni.removeStorageSync(SUBSCRIBE_ACCEPTED_KEY)
