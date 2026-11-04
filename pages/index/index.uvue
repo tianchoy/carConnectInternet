@@ -1398,16 +1398,12 @@ const toPay = (iccid : string) => {
     }
     needRefresh.value = true
 
-    console.log('iccid:', iccid)
 
-    payUrl.value = '/pages/home/userSimRecharge?iccid=' + iccid
-    platformAppId.value = 'wx1d647f2cfdc089e6'
-    
-    // if(platformAppId.value == 'wxf451813ad3364a12'){
-    //     payUrl.value = '/pages/recharge/recharge?rechargeNo=' + iccid
-    // }else{
-    //     payUrl.value = '/pages/home/userSimRecharge?iccid=' + iccid
-    // }
+    if(platformAppId.value == 'wxf451813ad3364a12'){
+        payUrl.value = '/pages/recharge/recharge?rechargeNo=' + iccid
+    }else{
+        payUrl.value = '/pages/home/userSimRecharge?iccid=' + iccid
+    }
 
     uni.openEmbeddedMiniProgram({
         appId: platformAppId.value,
