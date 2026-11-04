@@ -267,6 +267,39 @@ export function checkTemplateSubscribed(templateId : string) : Promise<boolean> 
 }
 
 /**
+ * 订阅消息总开关是否被关闭（用户在小程序设置里整体关闭「订阅消息」）。
+ *
+ * 重要：设备订阅消息（requestSubscribeDeviceMessage）的订阅状态**无法**通过
+ * wx.getSetting().subscriptionsSetting.itemSettings 查询 —— 官方文档明确 itemSettings
+ * 只返回「一次性订阅消息的模板 id / 系统订阅消息的类型」，且仅限用户勾选过
+ * 「总是保持以上选择，不再询问」的项。设备订阅模板不会出现在其中，checkTemplateSubscribed
+ * 对设备模板恒为 false。
+ *
+ * 因此设备订阅状态只能以「授权回调结果 + 本地缓存」为准，这里只兜底判断总开关是否被关掉。
+ */
+export function isSubscribeMainSwitchOff() : Promise<boolean> {
+    return new Promise((resolve) => {
+        try {
+            wx.getSetting({
+                withSubscriptions: true,
+                success: (res : any) => {
+                    const resObj = res as UTSJSONObject
+                    const settingRaw = res != null ? resObj['subscriptionsSetting'] : null
+                    if (settingRaw == null) { resolve(false); return }
+                    const setting = settingRaw as UTSJSONObject
+                    const mainSwitch = setting['mainSwitch']
+                    resolve(mainSwitch == false)
+                },
+                fail: () => resolve(false)
+            })
+        } catch (error) {
+            console.warn('[notify] 查询订阅总开关失败:', error)
+            resolve(false)
+        }
+    })
+}
+
+/**
  * 一次性订阅授权（order / expire / share），成功后原样上报后端记账
  * ⚠️ 必须在用户 tap 手势回调链内调用，单次最多 3 个模板
  */

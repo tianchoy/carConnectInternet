@@ -24,24 +24,53 @@
 		</view> -->
 		<scroll-view class="content-box" scroll-y="true">
 			<i-empty text="当前时间暂无停车数据" :showButton="false" description="" v-if="sortedCarStopDetail.length == 0" ></i-empty>
-			<view class="content" v-else v-for="(item,index) in sortedCarStopDetail" :key="index">
-				<view class="item">
-					<image class="icons" mode="aspectFit" src="/static/startTime.png" />
-					<text>{{item.startTime}}</text>
+			<view v-else>
+				<!-- 主列表：长停（无 stopType 时全部记录都落在这里，行为与旧版一致） -->
+				<view class="content" v-for="(item,index) in longStops" :key="'long-'+index">
+					<view class="item">
+						<image class="icons" mode="aspectFit" src="/static/startTime.png" />
+						<text>{{item.startTime}}</text>
+					</view>
+					<view class="item">
+						<image class="icons" mode="aspectFit" src="/static/endTime.png" />
+						<text>{{item.endTime}}</text>
+					</view>
+					<view class="item">
+						<image class="icons" mode="aspectFit" src="/static/stopTime.png" />
+						<text>停留 {{calculateDuration(item.getNumber('duration', 0))}}</text>
+					</view>
+					<view class="item">
+						<image class="icons" mode="aspectFit" src="/static/user_location.png" />
+						<text class="address" v-if="item.address">{{item.address || '加载中...'}}</text>
+						<text v-else @click="showAddress(item.getNumber('latitude', 0), item.getNumber('longitude', 0))">点击查看停车位置</text>
+					</view>
 				</view>
-				<view class="item">
-					<image class="icons" mode="aspectFit" src="/static/endTime.png" />
-					<text>{{item.endTime}}</text>
+				<!-- 短停折叠条：只折叠、不过滤，展开后仍可逐条查看 -->
+				<view class="short-fold" v-if="shortStops.length > 0" @click="toggleShort">
+					<text class="short-fold-text">{{ shortFoldText() }}</text>
+					<text class="short-fold-action">{{ shortExpanded ? '收起' : '展开' }}</text>
 				</view>
-				<view class="item">
-					<image class="icons" mode="aspectFit" src="/static/stopTime.png" />
-					<text>停留 {{calculateDuration(item.getNumber('duration', 0))}}</text>
-				</view>
-				<view class="item">
-					<image class="icons" mode="aspectFit" src="/static/user_location.png" />
-					<text class="address" v-if="item.address">{{item.address || '加载中...'}}</text>
-					<text v-else @click="showAddress(item.getNumber('latitude', 0), item.getNumber('longitude', 0))">点击查看停车位置</text>
-				</view>
+				<template v-if="shortExpanded">
+					<view class="content" v-for="(item,index) in shortStops" :key="'short-'+index">
+						<view class="item">
+							<image class="icons" mode="aspectFit" src="/static/startTime.png" />
+							<text>{{item.startTime}}</text>
+						</view>
+						<view class="item">
+							<image class="icons" mode="aspectFit" src="/static/endTime.png" />
+							<text>{{item.endTime}}</text>
+						</view>
+						<view class="item">
+							<image class="icons" mode="aspectFit" src="/static/stopTime.png" />
+							<text>停留 {{calculateDuration(item.getNumber('duration', 0))}}</text>
+						</view>
+						<view class="item">
+							<image class="icons" mode="aspectFit" src="/static/user_location.png" />
+							<text class="address" v-if="item.address">{{item.address || '加载中...'}}</text>
+							<text v-else @click="showAddress(item.getNumber('latitude', 0), item.getNumber('longitude', 0))">点击查看停车位置</text>
+						</view>
+					</view>
+				</template>
 			</view>
 		</scroll-view>
 	</view>
@@ -86,6 +115,37 @@ import { openLocation } from '../../utils/openLocation.uts'
 		})
 		return sorted
 	})
+
+	// 依据 stopType 细分：主列表只放非 SHORT；SHORT 折叠展示（只折叠、不过滤，数据不丢）。
+	// 后端未返回 stopType 时（当前仓库即为该情况），所有记录 stopType 均为空串，会全部留在主列表，行为与旧版完全一致。
+	const longStops = computed((): Array<StopRecord> => {
+		return sortedCarStopDetail.value.filter((item: StopRecord): boolean => item.getString('stopType', '') != 'SHORT')
+	})
+	const shortStops = computed((): Array<StopRecord> => {
+		return sortedCarStopDetail.value.filter((item: StopRecord): boolean => item.getString('stopType', '') == 'SHORT')
+	})
+	const shortExpanded = ref(false)
+	const toggleShort = (): void => {
+		shortExpanded.value = !shortExpanded.value
+	}
+	// 折叠条用的紧凑时长（duration 与列表 calculateDuration 口径一致，按毫秒处理）
+	const formatShortDuration = (ms: number): string => {
+		const totalMinutes = Math.floor(ms / 60000)
+		if (totalMinutes >= 60) {
+			const h = Math.floor(totalMinutes / 60)
+			const m = totalMinutes % 60
+			return `${h}小时${m}分`
+		}
+		if (totalMinutes > 0) return `${totalMinutes}分钟`
+		return '不足1分钟'
+	}
+	const shortFoldText = (): string => {
+		let total = 0
+		shortStops.value.forEach((item: StopRecord): void => {
+			total += item.getNumber('duration', 0)
+		})
+		return `本段行程含 ${shortStops.value.length} 次短暂停留，累计 ${formatShortDuration(total)}`
+	}
 
 	onLoad((option) => {
 		deviceNo.value = option.deviceNo
@@ -250,6 +310,29 @@ import { openLocation } from '../../utils/openLocation.uts'
 			flex: 1;
 			min-height: 0;
 			margin-bottom: 30rpx;
+		}
+
+		.short-fold {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+			margin: 0 40rpx 20rpx;
+			padding: 24rpx 30rpx;
+			background-color: #eef6fd;
+			border-radius: 15rpx;
+
+			.short-fold-text {
+				font-size: 26rpx;
+				color: #5b92cc;
+				flex: 1;
+			}
+
+			.short-fold-action {
+				font-size: 26rpx;
+				color: #3485df;
+				margin-left: 20rpx;
+			}
 		}
 
 		.content {
