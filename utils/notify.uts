@@ -13,6 +13,8 @@ import { getNotifyQuota, getDeviceTicket, getNotifyStatus, reportSubscribeResult
 
 const QUOTA_STORAGE_KEY = 'wx_subscribe_quota'
 const DEFAULT_BIZ_CODE = 'alarm'
+/** 围栏进出告警的专属模板场景码（后端 wx.subscribe.templates.geofence，mode=longterm） */
+const GEOFENCE_BIZ_CODE = 'geofence'
 
 export type DeviceAuthorizeStatus = 'accept' | 'acceptWithAudio' | 'acceptWithAlert' | 'reject' | 'ban' | 'filter' | 'fail' | 'unsupported' | 'noTemplate'
 
@@ -172,11 +174,70 @@ export async function authorizeDevice(deviceNo : string, bizCode : string = DEFA
             return { status: 'fail', errMsg: '设备票据不完整，请稍后重试', errCode: 0, templateId: templateId }
         }
         // 订阅与下发必须同源同值，否则微信报 9800006
-        return await callDeviceSubscribe(sn, snTicket, modelId, templateId)
+        const outcome = await callDeviceSubscribe(sn, snTicket, modelId, templateId)
+        // 只有拿到 accept 才记为「该设备已订阅」，用于首页按设备展示状态
+        if (outcome.status == 'accept' || outcome.status == 'acceptWithAudio' || outcome.status == 'acceptWithAlert') {
+            markDeviceSubscribed(deviceNo, templateId)
+        }
+        return outcome
     } catch (error) {
         console.error('[notify] 设备订阅异常:', error)
         return { status: 'fail', errMsg: '订阅请求异常，请稍后重试', errCode: 0, templateId: item.templateId }
     }
+}
+
+/**
+ * 围栏进出告警授权（专属模板「围栏进出通知」）
+ *
+ * 为什么单独一个通道：设备订阅模板（type=3）的关键词枚举由微信平台生成且封闭，
+ * 本小程序在「设备管理」类目下的设备模板 enum 只有「超速/停留超时/震动/低电量」四值，
+ * **无法表达"进入围栏/离开围栏"**。围栏告警因此改走长期订阅模板（含 phrase「活动状态」字段）。
+ *
+ * 该模板是「长期订阅」：用 wx.requestSubscribeMessage 授权（**不是** requestSubscribeDeviceMessage），
+ * 一次授权长期可达、不消耗额度，也无需上报记账。
+ * ⚠️ 必须在用户 tap 手势回调链内调用。
+ */
+export async function authorizeGeofence() : Promise<DeviceAuthorizeOutcome> {
+    let item = getCachedQuota(GEOFENCE_BIZ_CODE)
+    if (item == null) {
+        await fetchNotifyQuota()
+        item = getCachedQuota(GEOFENCE_BIZ_CODE)
+    }
+    if (item == null || item.templateId == '') {
+        return { status: 'noTemplate', errMsg: '', errCode: 0, templateId: '' }
+    }
+    return await callGeofenceAuthorize(item.templateId)
+}
+
+function callGeofenceAuthorize(templateId : string) : Promise<DeviceAuthorizeOutcome> {
+    return new Promise((resolve) => {
+        uni.requestSubscribeMessage({
+            tmplIds: [templateId],
+            success: (res : any) => {
+                const resObj = res as UTSJSONObject
+                const rawValue = resObj[templateId]
+                const value = rawValue != null ? rawValue.toString() : ''
+                let status : DeviceAuthorizeStatus = 'reject'
+                if (value == 'accept') status = 'accept'
+                else if (value == 'ban') status = 'ban'
+                else if (value == 'filter') status = 'filter'
+                resolve({ status: status, errMsg: '', errCode: 0, templateId: templateId })
+            },
+            fail: (err : any) => {
+                const errObj = err as UTSJSONObject
+                const rawErr = errObj['errMsg']
+                const rawCode = errObj['errCode']
+                const errMsg = rawErr != null ? rawErr.toString() : ''
+                let errCode = 0
+                if (rawCode != null) {
+                    const parsed = parseInt(rawCode.toString())
+                    if (!isNaN(parsed)) errCode = parsed
+                }
+                console.warn('[notify] 围栏订阅授权失败, errCode=' + errCode.toString() + ':', errMsg)
+                resolve({ status: 'fail', errMsg: errMsg, errCode: errCode, templateId: templateId })
+            }
+        })
+    })
 }
 
 function callDeviceSubscribe(sn : string, snTicket : string, modelId : string, templateId : string) : Promise<DeviceAuthorizeOutcome> {
@@ -229,6 +290,64 @@ function parseDeviceStatus(value : string) : DeviceAuthorizeStatus {
     if (value == 'ban') return 'ban'
     if (value == 'filter') return 'filter'
     return 'reject'
+}
+
+/**
+ * 【2026-11-04 修复】按设备维度判定订阅状态
+ *
+ * 背景：微信的 `wx.getSetting(withSubscriptions)` 只按**模板**返回 itemSettings，
+ * 不区分设备。原实现直接用它判定「已订阅」，导致多设备用户的必然缺陷：
+ * 用户给 A 设备授权后，切到 B 设备时首页仍显示「已订阅」，
+ * 点击直接走「去设置页关闭」分支，**永远不会为 B 发起授权** —— 表现为「明明开了订阅却收不到 B 的告警」。
+ *
+ * 修复口径：以「本机为该设备成功授权过」的本地记录为准，再叠加微信侧模板状态兜底。
+ * 本地无记录即视为未订阅，允许再次点击（重复授权是幂等的，微信侧不会报错）。
+ */
+const DEVICE_SUBSCRIBED_KEY_PREFIX : string = 'wx_device_subscribed:'
+
+function readSubscribedDevices(templateId : string) : Array<string> {
+    try {
+        const raw = uni.getStorageSync(DEVICE_SUBSCRIBED_KEY_PREFIX + templateId)
+        if (raw == null || raw.toString() == '') return []
+        const parsed = JSON.parse(raw.toString()) as Array<any>
+        const list : Array<string> = []
+        for (let i = 0; i < parsed.length; i++) {
+            const row = parsed[i]
+            if (row != null) list.push(row.toString())
+        }
+        return list
+    } catch (error) {
+        return []
+    }
+}
+
+function markDeviceSubscribed(deviceNo : string, templateId : string) : void {
+    if (deviceNo == '' || templateId == '') return
+    try {
+        const list = readSubscribedDevices(templateId)
+        for (let i = 0; i < list.length; i++) {
+            if (list[i] == deviceNo) return
+        }
+        list.push(deviceNo)
+        uni.setStorageSync(DEVICE_SUBSCRIBED_KEY_PREFIX + templateId, JSON.stringify(list))
+    } catch (error) {
+        console.warn('[notify] 记录设备订阅状态失败:', error)
+    }
+}
+
+/**
+ * 查询「该设备」是否已订阅（模板 + 设备两个维度同时满足才算已订阅）。
+ */
+export async function checkDeviceSubscribed(deviceNo : string, templateId : string) : Promise<boolean> {
+    if (deviceNo == '' || templateId == '') return false
+    const list = readSubscribedDevices(templateId)
+    let hit = false
+    for (let i = 0; i < list.length; i++) {
+        if (list[i] == deviceNo) { hit = true; break }
+    }
+    // 本机从未为该设备授权过 → 一律视为未订阅，允许重新发起授权（不做"按模板"误判）
+    if (!hit) return false
+    return await checkTemplateSubscribed(templateId)
 }
 
 /**
