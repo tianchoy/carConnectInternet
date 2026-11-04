@@ -265,7 +265,7 @@ import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
-import { isDeviceSubscribeSupported, authorizeDevice, authorizeGeofence, checkDeviceSubscribed, checkTemplateSubscribed, fetchNotifyQuota, fetchNotifyStatusEnabled, getCachedQuota, isSubscribeMainSwitchOff } from '../../utils/notify.uts'
+import { isDeviceSubscribeSupported, authorizeDevice, authorizeGeofence, checkTemplateSubscribed, fetchNotifyQuota, fetchNotifyStatusEnabled, getCachedQuota, isSubscribeMainSwitchOff, getDeviceSubscribeStatus, isAcceptDeviceStatus, clearDeviceSubscribeStatus, clearAllDeviceSubscribeStatus } from '../../utils/notify.uts'
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount, getHomePlatformAppId } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
@@ -802,6 +802,11 @@ const clearCurrentCar = (): void => {
     lastUpdateTime.value = '--:--:--'
     positionState.value = 'empty'
     devicePosInfo.value = null
+    // 订阅状态按设备维度记录，设备被清空时必须同步收起订阅入口
+    subscribeAvailable.value = false
+    deviceSubscribed.value = false
+    geofenceSubscribed.value = false
+    subscribeRejected.value = false
     clearTripData()
 }
 
@@ -1441,6 +1446,8 @@ async function unbindCurrentDevice() : Promise<void> {
             title: result.msg || '解绑成功',
             icon: 'none'
         })
+        // 设备已解绑，清掉该设备的订阅记录，避免重新绑定后误判为已订阅
+        clearDeviceSubscribeStatus(currentCarDeviceNo.value)
         clearSavedSelectedDevice()
         clearSavedSelectedDeviceIndex()
 
@@ -1471,6 +1478,8 @@ const unbindDevice = () : void => {
 async function performLogout(): Promise<void> {
     const res = await logoutRequest()
     if(isBusinessSuccessCode(res.code)){
+        // 账号切换后 openid 变化，旧账号的设备订阅记录不再适用，必须清空
+        clearAllDeviceSubscribeStatus()
         clearSavedSelectedDevice()
         clearSavedSelectedDeviceIndex()
         uni.removeStorageSync('token')
@@ -1500,12 +1509,22 @@ const logout = (): void => {
 const deviceSubscribed = ref(false)
 // 围栏进出告警走独立的长期订阅模板（模板级授权，不区分设备）
 const geofenceSubscribed = ref(false)
+// 当前设备此前被拒绝过（或已被微信置为 ban）：微信不会再弹授权，改为引导去设置页手动开启
+const subscribeRejected = ref(false)
 const subscribeAvailable = ref(false)
 const subscribeRequesting = ref(false)
-// 用户此前拒绝过通知授权（或已被微信置为 ban）：微信不会再弹授权，改为引导去设置页手动开启
-const SUBSCRIBE_REJECTED_KEY = 'alarm_subscribe_rejected'
-// 设备订阅授权成功结果：微信无接口可查设备订阅状态，只能以本地缓存的授权结果为准
-const SUBSCRIBE_ACCEPTED_KEY = 'alarm_subscribe_accepted'
+// 合并并发调用：onShow、切设备、设备列表加载都会触发刷新，避免重复请求
+let subscribeRefreshing = false
+// 刷新过程中又收到新请求（如刚切完设备）时，标记待重跑，避免状态停留在旧设备
+let subscribeRefreshPending = false
+// 老版本用一条全局标记（不区分设备）记录订阅状态，无法判断属于哪台设备，升级后清理：
+// 让用户对当前设备重新授权一次，确保微信侧真的建立订阅关系
+try {
+    uni.removeStorageSync('alarm_subscribe_accepted')
+    uni.removeStorageSync('alarm_subscribe_rejected')
+} catch (error) {
+    console.warn('清理旧订阅标记失败:', error)
+}
 const subscribeRowDesc = computed<string>(() => {
     if (deviceSubscribed.value && geofenceSubscribed.value) {
         return '车辆发生进/出围栏、超速等告警时将通过微信提醒'
@@ -1517,20 +1536,15 @@ const subscribeRowDesc = computed<string>(() => {
     return '开启后，告警将通过微信服务通知提醒'
 })
 
-// 拉取订阅展示开关（/app/notify/status）与告警模板，并用微信设置页状态判断当前是否已订阅
-const refreshSubscribeState = async (): Promise<void> => {
-    if (!isDeviceSubscribeSupported() || !checkToken()) {
-        subscribeAvailable.value = false
-        deviceSubscribed.value = false
-        geofenceSubscribed.value = false
-        return
-    }
+// 真正执行一次订阅状态计算：拉后端开关 + 告警模板，再按「当前设备 + 当前模板」取授权记录
+const applySubscribeState = async (): Promise<void> => {
     // 后端开关控制订阅引导的展示与否
     const enabled = await fetchNotifyStatusEnabled()
     if (!enabled) {
         subscribeAvailable.value = false
         deviceSubscribed.value = false
         geofenceSubscribed.value = false
+        subscribeRejected.value = false
         return
     }
     // 模板 ID 以后端配置为准，前端不硬编码
@@ -1541,19 +1555,21 @@ const refreshSubscribeState = async (): Promise<void> => {
         subscribeAvailable.value = false
         deviceSubscribed.value = false
         geofenceSubscribed.value = false
+        subscribeRejected.value = false
         return
     }
     subscribeAvailable.value = true
     // 设备订阅状态无法通过 wx.getSetting 查询（官方限制：itemSettings 不含设备订阅模板），
-    // 以「本机为该设备成功授权过」的本地记录为准；用户关闭了「订阅消息总开关」时降级为未开启。
+    // 以「本机为这台设备成功授权过」的本地记录为准；用户关闭「订阅消息总开关」时降级为未开启。
     // 【2026-11-04 修复】必须按「当前这台设备」判定，不能按模板判定：
     // 微信 getSetting(withSubscriptions) 只返回模板级状态，多设备用户给 A 授权后
     // 会把 B 也显示成「已订阅」，点击时直接走"去设置页关闭"分支、永不再发起授权。
+    // 也不能再叠加模板状态兜底 —— 设备模板不出现在 itemSettings 里，叠加后恒为 false。
+    const status = getDeviceSubscribeStatus(currentCarDeviceNo.value, item.templateId)
+    // 总开关关闭时所有订阅都不生效，仅降级展示为未开启（不清记录：用户重新打开后仍有效）
     const mainSwitchOff = await isSubscribeMainSwitchOff()
-    if (mainSwitchOff) uni.removeStorageSync(SUBSCRIBE_ACCEPTED_KEY)
-    deviceSubscribed.value = !mainSwitchOff && await checkDeviceSubscribed(currentCarDeviceNo.value, item.templateId)
-    // 已订阅时清掉「曾拒绝」标记，避免后续误引导
-    if (deviceSubscribed.value) uni.removeStorageSync(SUBSCRIBE_REJECTED_KEY)
+    deviceSubscribed.value = !mainSwitchOff && isAcceptDeviceStatus(status)
+    subscribeRejected.value = !deviceSubscribed.value && (status == 'reject' || status == 'ban')
     // 围栏模板是「模板级」长期订阅（不按设备区分），直接用模板状态判定
     const gItem = getCachedQuota('geofence')
     if (gItem != null && gItem.templateId != '') {
@@ -1561,6 +1577,37 @@ const refreshSubscribeState = async (): Promise<void> => {
     } else {
         geofenceSubscribed.value = true  // 后端未配置围栏模板时不阻塞主流程
     }
+}
+
+// 拉取订阅展示开关（/app/notify/status）与告警模板，并按「当前设备」判断是否已订阅
+const refreshSubscribeState = async (): Promise<void> => {
+    // 没有设备时直接收起入口，不必发请求
+    if (!isDeviceSubscribeSupported() || !checkToken() || currentCarDeviceNo.value == '') {
+        subscribeAvailable.value = false
+        deviceSubscribed.value = false
+        geofenceSubscribed.value = false
+        subscribeRejected.value = false
+        return
+    }
+    // 刷新途中又来请求（如刚切完设备）：标记待重跑，避免状态停留在旧设备
+    if (subscribeRefreshing) {
+        subscribeRefreshPending = true
+        return
+    }
+    subscribeRefreshing = true
+    try {
+        do {
+            subscribeRefreshPending = false
+            await applySubscribeState()
+        } while (subscribeRefreshPending)
+    } finally {
+        subscribeRefreshing = false
+    }
+}
+
+// 设备订阅按 sn 逐台生效：只授权了当前设备，其它设备切过去后仍需单独开启
+const hasMoreDevices = (): boolean => {
+    return deviceList.value.length > 1
 }
 
 // 打开小程序设置页；返回后重新校准订阅状态（用户可能刚在设置里关闭了订阅消息）
@@ -1576,7 +1623,7 @@ const openSubscribeSettings = (): void => {
 const showSubscribeSettingsGuide = (): void => {
     showAppModal({
         title: '开启通知',
-        content: '您已拒绝授权通知，无法再次弹窗授权，请在设置中手动开启订阅消息',
+        content: '您已拒绝接收通知，微信不会再弹出授权框。请点击「去开启」，在「订阅消息」中打开「车辆定位器告警」',
         confirmText: '去开启',
         cancelText: '取消',
         success: (res: AppModalSuccess): void => {
@@ -1587,14 +1634,15 @@ const showSubscribeSettingsGuide = (): void => {
     })
 }
 
-// 用户只选了「接收」（accept / acceptWithAudio），没有「接收并提醒」（acceptWithAlert）：
-// 已订阅但不会收到横幅提醒，引导去设置页把该模板改成「接收并提醒」。
+// 设备订阅返回 accept 只代表「允许接收」，微信不会弹横幅/响铃，
+// 消息会静默落在微信会话列表的「服务通知」里 —— 必须讲清楚，否则用户会认为没收到通知。
+// 需要横幅提醒时，引导去设置页把该模板改成「接收并提醒」。
 const showAlertUpgradeGuide = (): void => {
     showAppModal({
-        title: '开启横幅提醒',
-        content: '已开启接收通知。如需在微信中收到横幅提醒，请点击「去设置」-「订阅消息」-「车辆定位器告警」改为「接收并提醒」',
+        title: '已开启接收通知',
+        content: '告警消息会出现在微信「服务通知」中。如需弹出横幅提醒，请点击「去设置」-「订阅消息」-「车辆定位器告警」改为「接收并提醒」',
         confirmText: '去设置',
-        cancelText: '暂不',
+        cancelText: '知道了',
         success: (res: AppModalSuccess): void => {
             if (res.confirm) {
                 openSubscribeSettings()
@@ -1617,7 +1665,11 @@ const handleSubscribeTap = async (): Promise<void> => {
     if (deviceSubscribed.value && geofenceSubscribed.value) {
         showAppModal({
             title: '车辆告警通知',
-            content: '已开启车辆告警通知，如需关闭，请点击确定后在订阅消息中手动关闭',
+            content: hasMoreDevices()
+                ? '当前设备已开启告警通知，其它设备需切换后单独开启。如需关闭，请点击「去设置」后在「订阅消息」中关闭'
+                : '当前设备已开启告警通知。如需关闭，请点击「去设置」后在「订阅消息」中关闭',
+            confirmText: '去设置',
+            cancelText: '取消',
             success: (res: AppModalSuccess): void => {
                 if (res.confirm) {
                     openSubscribeSettings()
@@ -1626,11 +1678,13 @@ const handleSubscribeTap = async (): Promise<void> => {
         })
         return
     }
-    // 已拒绝过授权：微信不会再次弹窗，直接引导到设置页手动开启
-    if (uni.getStorageSync(SUBSCRIBE_REJECTED_KEY) == true) {
+    // 当前设备已被拒绝过：微信不会再次弹窗，直接引导到设置页手动开启
+    if (subscribeRejected.value) {
         showSubscribeSettingsGuide()
         return
     }
+    // 锁定本次授权针对的设备：授权弹窗期间用户可能切换设备，结果只能写回发起授权的设备
+    const tappingDeviceNo = currentCarDeviceNo.value
     subscribeRequesting.value = true
     try {
         let deviceOk = deviceSubscribed.value
@@ -1639,27 +1693,27 @@ const handleSubscribeTap = async (): Promise<void> => {
         let deviceAlertOn = false
         // —— 1) 设备订阅：覆盖超速/低电量/震动等（按设备逐台授权）——
         if (!deviceOk) {
-            const outcome = await authorizeDevice(currentCarDeviceNo.value, 'alarm')
-            if (outcome.status == 'accept' || outcome.status == 'acceptWithAudio' || outcome.status == 'acceptWithAlert') {
+            const outcome = await authorizeDevice(tappingDeviceNo, 'alarm')
+            // 授权结果已由 authorizeDevice 按「设备 + 模板」写入本地记录
+            if (isAcceptDeviceStatus(outcome.status)) {
                 deviceOk = true
                 deviceJustAccepted = true
                 deviceAlertOn = outcome.status == 'acceptWithAlert'
-                deviceSubscribed.value = true
-                uni.removeStorageSync(SUBSCRIBE_REJECTED_KEY)
-                // 记录授权成功：微信无接口可查设备订阅状态，本机按设备记录，重启后仍显示已订阅
-                uni.setStorageSync(SUBSCRIBE_ACCEPTED_KEY, true)
+                // 弹窗期间已切到别的设备：不要用旧设备的结果覆盖新设备的状态
+                if (tappingDeviceNo == currentCarDeviceNo.value) {
+                    deviceSubscribed.value = true
+                    subscribeRejected.value = false
+                }
             } else if (outcome.status == 'reject') {
-                // 用户点了「拒绝」：记录标记，下次点击「开启通知」直接引导去设置页手动开启
-                uni.removeStorageSync(SUBSCRIBE_ACCEPTED_KEY)
-                uni.setStorageSync(SUBSCRIBE_REJECTED_KEY, true)
+                // 用户点了「拒绝」：下次点击「开启通知」直接引导去设置页手动开启
+                if (tappingDeviceNo == currentCarDeviceNo.value) subscribeRejected.value = true
                 if (outcome.errMsg.indexOf('cancel') < 0) {
                     showAppToast({ title: '您已拒绝授权通知，可点击按钮前往设置手动开启', icon: 'none' })
                 }
                 return
             } else if (outcome.status == 'ban') {
                 // ban = 微信已记住拒绝且不再弹窗，只能去设置页手动开启
-                uni.removeStorageSync(SUBSCRIBE_ACCEPTED_KEY)
-                uni.setStorageSync(SUBSCRIBE_REJECTED_KEY, true)
+                if (tappingDeviceNo == currentCarDeviceNo.value) subscribeRejected.value = true
                 showSubscribeSettingsGuide()
                 return
             } else if (outcome.status == 'filter') {

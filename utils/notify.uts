@@ -16,6 +16,15 @@ const DEFAULT_BIZ_CODE = 'alarm'
 /** 围栏进出告警的专属模板场景码（后端 wx.subscribe.templates.geofence，mode=longterm） */
 const GEOFENCE_BIZ_CODE = 'geofence'
 
+/**
+ * 设备订阅状态缓存前缀。
+ * 微信没有查询「设备订阅消息」状态的接口，只能以授权回调结果为准；
+ * 且必须按「设备 + 模板」维度逐台记录 —— 多设备共用一个标记会导致切换设备后
+ * 被误判为「已订阅」而跳过授权，那台设备实际从未授权成功，于是收不到它的告警通知。
+ * 值格式：`${templateId}|${status}`
+ */
+const DEVICE_SUBSCRIBE_PREFIX = 'wx_dev_sub_'
+
 export type DeviceAuthorizeStatus = 'accept' | 'acceptWithAudio' | 'acceptWithAlert' | 'reject' | 'ban' | 'filter' | 'fail' | 'unsupported' | 'noTemplate'
 
 export type DeviceAuthorizeOutcome = {
@@ -23,6 +32,80 @@ export type DeviceAuthorizeOutcome = {
     errMsg: string
     errCode: number
     templateId: string
+    /** 授权时使用的设备 sn：服务端下发必须同源同值，否则微信报 9800006（围栏等模板级通道为空） */
+    sn: string
+    /** 授权时使用的设备型号 ID（模板级通道为空） */
+    modelId: string
+}
+
+/**
+ * accept / acceptWithAudio / acceptWithAlert 都属于「已订阅」，
+ * 区别只是微信服务通知的提醒强度（accept=仅接收，不弹横幅）
+ */
+export function isAcceptDeviceStatus(status : string) : boolean {
+    return status == 'accept' || status == 'acceptWithAudio' || status == 'acceptWithAlert'
+}
+
+function deviceSubscribeKey(deviceNo : string) : string {
+    return DEVICE_SUBSCRIBE_PREFIX + deviceNo
+}
+
+/**
+ * 读取某台设备的授权结果；模板 ID 不一致（后端换过模板）时视为未订阅，强制重新授权
+ */
+export function getDeviceSubscribeStatus(deviceNo : string, templateId : string) : string {
+    if (deviceNo == '' || templateId == '') return ''
+    try {
+        const raw = uni.getStorageSync(deviceSubscribeKey(deviceNo))
+        if (raw == null || raw.toString() == '') return ''
+        const text = raw.toString()
+        const idx = text.indexOf('|')
+        if (idx <= 0) return ''
+        const cachedTemplate = text.substring(0, idx)
+        if (cachedTemplate != templateId) return ''
+        return text.substring(idx + 1)
+    } catch (error) {
+        console.warn('[notify] 读取设备订阅状态失败:', error)
+        return ''
+    }
+}
+
+/**
+ * 记录某台设备的授权结果（accept 系列 = 已订阅，reject = 用户拒绝过需引导去设置页）
+ */
+export function saveDeviceSubscribeStatus(deviceNo : string, templateId : string, status : string) : void {
+    if (deviceNo == '' || templateId == '' || status == '') return
+    try {
+        uni.setStorageSync(deviceSubscribeKey(deviceNo), templateId + '|' + status)
+    } catch (error) {
+        console.warn('[notify] 保存设备订阅状态失败:', error)
+    }
+}
+
+export function clearDeviceSubscribeStatus(deviceNo : string) : void {
+    if (deviceNo == '') return
+    try {
+        uni.removeStorageSync(deviceSubscribeKey(deviceNo))
+    } catch (error) {
+        console.warn('[notify] 清除设备订阅状态失败:', error)
+    }
+}
+
+/**
+ * 清空全部设备订阅记录（切换账号 / 退出登录时调用：openid 变了，旧的订阅关系不再适用）
+ */
+export function clearAllDeviceSubscribeStatus() : void {
+    try {
+        const info = uni.getStorageInfoSync()
+        const keys = info.keys
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i].indexOf(DEVICE_SUBSCRIBE_PREFIX) == 0) {
+                uni.removeStorageSync(keys[i])
+            }
+        }
+    } catch (error) {
+        console.warn('[notify] 清空设备订阅状态失败:', error)
+    }
 }
 
 /**
@@ -139,10 +222,10 @@ function readCachedQuota() : Array<NotifyQuotaItem> {
  */
 export async function authorizeDevice(deviceNo : string, bizCode : string = DEFAULT_BIZ_CODE) : Promise<DeviceAuthorizeOutcome> {
     if (!isDeviceSubscribeSupported()) {
-        return { status: 'unsupported', errMsg: '当前微信版本不支持设备订阅', errCode: 0, templateId: '' }
+        return { status: 'unsupported', errMsg: '当前微信版本不支持设备订阅', errCode: 0, templateId: '', sn: '', modelId: '' }
     }
     if (deviceNo == '') {
-        return { status: 'fail', errMsg: '未选择设备', errCode: 0, templateId: '' }
+        return { status: 'fail', errMsg: '未选择设备', errCode: 0, templateId: '', sn: '', modelId: '' }
     }
 
     let item = getCachedQuota(bizCode)
@@ -152,10 +235,10 @@ export async function authorizeDevice(deviceNo : string, bizCode : string = DEFA
     }
     if (item == null) {
         // 未配置模板的场景不会出现在 /quota 返回值中，按「隐藏引导 UI」处理，不算错误
-        return { status: 'noTemplate', errMsg: '', errCode: 0, templateId: '' }
+        return { status: 'noTemplate', errMsg: '', errCode: 0, templateId: '', sn: '', modelId: '' }
     }
     if (item.mode != 'device') {
-        return { status: 'noTemplate', errMsg: '当前场景未启用设备订阅', errCode: 0, templateId: item.templateId }
+        return { status: 'noTemplate', errMsg: '当前场景未启用设备订阅', errCode: 0, templateId: item.templateId, sn: '', modelId: '' }
     }
 
     try {
@@ -163,7 +246,7 @@ export async function authorizeDevice(deviceNo : string, bizCode : string = DEFA
         if (!isBusinessSuccessCode(ticketRes.code) || ticketRes.data == null) {
             const msg = ticketRes.msg != '' ? ticketRes.msg : '获取设备票据失败，请稍后重试'
             console.warn('[notify] 换票失败:', msg)
-            return { status: 'fail', errMsg: msg, errCode: 0, templateId: item.templateId }
+            return { status: 'fail', errMsg: msg, errCode: 0, templateId: item.templateId, sn: '', modelId: '' }
         }
         const sn = ticketRes.data.getString('sn', '')
         const snTicket = ticketRes.data.getString('snTicket', '')
@@ -171,18 +254,25 @@ export async function authorizeDevice(deviceNo : string, bizCode : string = DEFA
         const templateId = ticketRes.data.getString('templateId', '') != '' ? ticketRes.data.getString('templateId', '') : item.templateId
         if (sn == '' || snTicket == '' || templateId == '') {
             console.warn('[notify] 票据字段不完整:', ticketRes.data)
-            return { status: 'fail', errMsg: '设备票据不完整，请稍后重试', errCode: 0, templateId: templateId }
+            return { status: 'fail', errMsg: '设备票据不完整，请稍后重试', errCode: 0, templateId: templateId, sn: sn, modelId: modelId }
+        }
+        // 换票返回的 sn 必须与下发侧完全一致，否则微信报 9800006（用户授权了但收不到通知）
+        if (templateId != item.templateId) {
+            console.warn('[notify] 换票模板与 /quota 模板不一致，订阅与下发可能不同源: quota=' + item.templateId + ', ticket=' + templateId)
+        }
+        if (modelId == '') {
+            console.warn('[notify] 换票未返回 modelId，设备订阅可能被微信拒绝（19720736）')
         }
         // 订阅与下发必须同源同值，否则微信报 9800006
         const outcome = await callDeviceSubscribe(sn, snTicket, modelId, templateId)
-        // 只有拿到 accept 才记为「该设备已订阅」，用于首页按设备展示状态
-        if (outcome.status == 'accept' || outcome.status == 'acceptWithAudio' || outcome.status == 'acceptWithAlert') {
-            markDeviceSubscribed(deviceNo, templateId)
+        // 授权结果按「设备 + 模板」落库：微信不支持查询设备订阅状态，后续只能以这里为准
+        if (isAcceptDeviceStatus(outcome.status) || outcome.status == 'reject') {
+            saveDeviceSubscribeStatus(deviceNo, item.templateId, outcome.status)
         }
         return outcome
     } catch (error) {
         console.error('[notify] 设备订阅异常:', error)
-        return { status: 'fail', errMsg: '订阅请求异常，请稍后重试', errCode: 0, templateId: item.templateId }
+        return { status: 'fail', errMsg: '订阅请求异常，请稍后重试', errCode: 0, templateId: item.templateId, sn: '', modelId: '' }
     }
 }
 
@@ -204,7 +294,7 @@ export async function authorizeGeofence() : Promise<DeviceAuthorizeOutcome> {
         item = getCachedQuota(GEOFENCE_BIZ_CODE)
     }
     if (item == null || item.templateId == '') {
-        return { status: 'noTemplate', errMsg: '', errCode: 0, templateId: '' }
+        return { status: 'noTemplate', errMsg: '', errCode: 0, templateId: '', sn: '', modelId: '' }
     }
     return await callGeofenceAuthorize(item.templateId)
 }
@@ -217,11 +307,12 @@ function callGeofenceAuthorize(templateId : string) : Promise<DeviceAuthorizeOut
                 const resObj = res as UTSJSONObject
                 const rawValue = resObj[templateId]
                 const value = rawValue != null ? rawValue.toString() : ''
-                let status : DeviceAuthorizeStatus = 'reject'
+                let status : DeviceAuthorizeStatus = 'fail'
                 if (value == 'accept') status = 'accept'
                 else if (value == 'ban') status = 'ban'
                 else if (value == 'filter') status = 'filter'
-                resolve({ status: status, errMsg: '', errCode: 0, templateId: templateId })
+                // 未拿到该模板结果时按失败处理（可重试），不能当成「用户拒绝」
+                resolve({ status: status, errMsg: status == 'fail' ? '未获取到授权结果，请重试' : '', errCode: 0, templateId: templateId, sn: '', modelId: '' })
             },
             fail: (err : any) => {
                 const errObj = err as UTSJSONObject
@@ -234,7 +325,7 @@ function callGeofenceAuthorize(templateId : string) : Promise<DeviceAuthorizeOut
                     if (!isNaN(parsed)) errCode = parsed
                 }
                 console.warn('[notify] 围栏订阅授权失败, errCode=' + errCode.toString() + ':', errMsg)
-                resolve({ status: 'fail', errMsg: errMsg, errCode: errCode, templateId: templateId })
+                resolve({ status: 'fail', errMsg: errMsg, errCode: errCode, templateId: templateId, sn: '', modelId: '' })
             }
         })
     })
@@ -252,7 +343,14 @@ function callDeviceSubscribe(sn : string, snTicket : string, modelId : string, t
                 const resObj = res as UTSJSONObject
                 const rawValue = res != null ? resObj[templateId] : null
                 const value = rawValue != null ? rawValue.toString() : ''
-                resolve({ status: parseDeviceStatus(value), errMsg: '', errCode: 0, templateId: templateId })
+                const status = parseDeviceStatus(value)
+                if (status == 'fail') {
+                    // 未拿到该模板的授权结果：可能是基础库/机型兼容问题，绝不能当成「用户拒绝」落库
+                    console.warn('[notify] 未取到设备订阅授权结果, templateId=' + templateId + ', value=' + value)
+                    resolve({ status: 'fail', errMsg: '未获取到授权结果，请重试', errCode: 0, templateId: templateId, sn: sn, modelId: modelId })
+                    return
+                }
+                resolve({ status: status, errMsg: '', errCode: 0, templateId: templateId, sn: sn, modelId: modelId })
             },
             fail: (err : any) => {
                 const errObj = err as UTSJSONObject
@@ -265,7 +363,7 @@ function callDeviceSubscribe(sn : string, snTicket : string, modelId : string, t
                     if (!isNaN(parsed)) errCode = parsed
                 }
                 console.warn('[notify] 设备订阅授权失败, errCode=' + errCode.toString() + ':', errMsg)
-                resolve({ status: 'fail', errMsg: normalizeDeviceError(errMsg, errCode), errCode: errCode, templateId: templateId })
+                resolve({ status: 'fail', errMsg: normalizeDeviceError(errMsg, errCode), errCode: errCode, templateId: templateId, sn: sn, modelId: modelId })
             }
         })
     })
@@ -289,65 +387,25 @@ function parseDeviceStatus(value : string) : DeviceAuthorizeStatus {
     if (value == 'reject') return 'reject'
     if (value == 'ban') return 'ban'
     if (value == 'filter') return 'filter'
-    return 'reject'
+    // 未知/空结果按失败处理：不能当成「用户拒绝」，否则会把可重试的异常永久记为拒绝，
+    // 后续点击只会被引导去设置页，再也拿不到授权弹窗
+    return 'fail'
 }
 
 /**
- * 【2026-11-04 修复】按设备维度判定订阅状态
+ * 【2026-11-04 修复】按「设备 + 模板」判定订阅状态
  *
  * 背景：微信的 `wx.getSetting(withSubscriptions)` 只按**模板**返回 itemSettings，
  * 不区分设备。原实现直接用它判定「已订阅」，导致多设备用户的必然缺陷：
  * 用户给 A 设备授权后，切到 B 设备时首页仍显示「已订阅」，
  * 点击直接走「去设置页关闭」分支，**永远不会为 B 发起授权** —— 表现为「明明开了订阅却收不到 B 的告警」。
  *
- * 修复口径：以「本机为该设备成功授权过」的本地记录为准，再叠加微信侧模板状态兜底。
- * 本地无记录即视为未订阅，允许再次点击（重复授权是幂等的，微信侧不会报错）。
+ * 修复口径：只认「本机为这台设备授权成功」的记录（见 getDeviceSubscribeStatus）。
+ * 注意**不能**再叠加 checkTemplateSubscribed 兜底 —— 设备订阅模板不会出现在
+ * itemSettings 里，叠加后恒为 false，「已订阅」永远显示不出来，用户会一直被重复拉起授权。
  */
-const DEVICE_SUBSCRIBED_KEY_PREFIX : string = 'wx_device_subscribed:'
-
-function readSubscribedDevices(templateId : string) : Array<string> {
-    try {
-        const raw = uni.getStorageSync(DEVICE_SUBSCRIBED_KEY_PREFIX + templateId)
-        if (raw == null || raw.toString() == '') return []
-        const parsed = JSON.parse(raw.toString()) as Array<any>
-        const list : Array<string> = []
-        for (let i = 0; i < parsed.length; i++) {
-            const row = parsed[i]
-            if (row != null) list.push(row.toString())
-        }
-        return list
-    } catch (error) {
-        return []
-    }
-}
-
-function markDeviceSubscribed(deviceNo : string, templateId : string) : void {
-    if (deviceNo == '' || templateId == '') return
-    try {
-        const list = readSubscribedDevices(templateId)
-        for (let i = 0; i < list.length; i++) {
-            if (list[i] == deviceNo) return
-        }
-        list.push(deviceNo)
-        uni.setStorageSync(DEVICE_SUBSCRIBED_KEY_PREFIX + templateId, JSON.stringify(list))
-    } catch (error) {
-        console.warn('[notify] 记录设备订阅状态失败:', error)
-    }
-}
-
-/**
- * 查询「该设备」是否已订阅（模板 + 设备两个维度同时满足才算已订阅）。
- */
-export async function checkDeviceSubscribed(deviceNo : string, templateId : string) : Promise<boolean> {
-    if (deviceNo == '' || templateId == '') return false
-    const list = readSubscribedDevices(templateId)
-    let hit = false
-    for (let i = 0; i < list.length; i++) {
-        if (list[i] == deviceNo) { hit = true; break }
-    }
-    // 本机从未为该设备授权过 → 一律视为未订阅，允许重新发起授权（不做"按模板"误判）
-    if (!hit) return false
-    return await checkTemplateSubscribed(templateId)
+export function checkDeviceSubscribed(deviceNo : string, templateId : string) : Promise<boolean> {
+    return Promise.resolve(isAcceptDeviceStatus(getDeviceSubscribeStatus(deviceNo, templateId)))
 }
 
 /**
