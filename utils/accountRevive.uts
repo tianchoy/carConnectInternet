@@ -1,0 +1,108 @@
+import { showAppModal } from './modal.uts'
+import { showAppToast } from './toast.uts'
+import { reviveAccount } from '../api/request.uts'
+import { isBusinessSuccessCode, ACCOUNT_CANCELED_CODE } from '../api/response.uts'
+
+export type ReviveOutcome = {
+	status: 'revived' | 'declined' | 'failed' | 'needPhone'
+	token: string
+	msg: string
+}
+
+// 构建「账号已注销」确认框文案；canceledTime / maskedPhone 任一为空时自动省略对应部分。
+const buildReviveContent = (canceledData: UTSJSONObject): string => {
+	const time = canceledData.getString('canceledTime', '')
+	const phone = canceledData.getString('maskedPhone', '')
+	let content = '该账号'
+	content += time != '' ? '已于 ' + time + ' 注销' : '已注销'
+	if (phone != '') content += '（手机号 ' + phone + '）'
+	content += '。恢复后可继续使用原有设备与数据，是否恢复？'
+	return content
+}
+
+// 将回调式的 showAppModal 包装成 Promise，便于在 async 流程里 await。
+const showReviveConfirm = (content: string): Promise<boolean> => {
+	return new Promise<boolean>((resolve) => {
+		showAppModal({
+			title: '账号已注销',
+			content: content,
+			confirmText: '恢复使用',
+			cancelText: '暂不恢复',
+			success: (res: AppModalSuccess) => { resolve(res.confirm) }
+		})
+	})
+}
+
+// ticket 为空时，重新取一次 wx.login code 作为兜底凭证。
+const getFreshWechatCode = (): Promise<string> => {
+	return new Promise<string>((resolve, reject) => {
+		uni.login({
+			provider: 'weixin',
+			success: (res: UniApp.LoginRes) => { resolve(res.code != null ? res.code : '') },
+			fail: (err: any) => { reject(err) }
+		})
+	})
+}
+
+// 登录命中 4306（账号已注销可复活）时的统一处理：
+// 弹确认框（内容优先用服务端返回的 msg，为空时回退前端拼接文案）→ 用户确认 → 调复活接口（优先 reviveTicket，为空则取新 wx.login code）。
+// - revived   : 复活成功，调用方用 outcome.token / outcome.msg 走登录成功流程（写 token、跳首页）。
+// - declined  : 用户点「暂不恢复」，停在登录页。
+// - needPhone : 复活成功但账号无手机号（4304），需重新登录授权手机号。
+// - failed    : 其它失败，已 toast 提示，停在登录页重走即可。
+export const handleAccountCanceledRevival = async (chain: 'auth' | 'authLogin', canceledData: UTSJSONObject, serverMsg: string = ''): Promise<ReviveOutcome> => {
+	const outcome: ReviveOutcome = { status: 'failed', token: '', msg: '' }
+	const content = serverMsg.trim() != '' ? serverMsg : buildReviveContent(canceledData)
+	const confirmed = await showReviveConfirm(content)
+	if (!confirmed) {
+		outcome.status = 'declined'
+		return outcome
+	}
+	try {
+		// 确认框已关闭，此时再显示 loading（复活请求耗时期间给用户反馈），结束时统一隐藏。
+		uni.showLoading({ title: '账号恢复中...', mask: true })
+		const payload = new UTSJSONObject()
+		const ticket = canceledData.getString('reviveTicket', '')
+		if (ticket != '') {
+			payload.set('reviveTicket', ticket)
+		} else {
+			const code = await getFreshWechatCode()
+			if (code == '') {
+				showAppToast({ title: '获取微信登录凭证失败，请重试', icon: 'none' })
+				return outcome
+			}
+			payload.set('xcxCode', code)
+		}
+		const res = await reviveAccount(chain, payload)
+		if (isBusinessSuccessCode(res.code) && res.data != null) {
+			const token = res.data.getString('access_token', res.data.getString('token', ''))
+			if (token == '') {
+				outcome.msg = res.msg
+				return outcome
+			}
+			const restored = res.data.getNumber('restoredDevices', 0)
+			if (restored > 0) showAppToast({ title: '已为您找回 ' + restored + ' 台设备', icon: 'none' })
+			outcome.status = 'revived'
+			outcome.token = token
+			outcome.msg = res.msg
+			return outcome
+		}
+		// 4304：复活成功但账号无手机号，无法进入 App。需重新走登录授权手机号（不是再调 revive）。
+		// 调用方据此把用户引导回「手机号授权」入口（微信登录页的 getPhoneNumber），重新登录即可绑定手机号。
+		if (res.code == 4304) {
+			showAppToast({ title: '该账号需绑定手机号，请重新授权手机号后登录', icon: 'none' })
+			outcome.status = 'needPhone'
+			return outcome
+		}
+		showAppToast({ title: res.msg != '' ? res.msg : '恢复失败，请重新登录', icon: 'none' })
+		outcome.msg = res.msg
+		return outcome
+	} catch (error) {
+		console.error('账号复活失败:', error)
+		showAppToast({ title: '恢复失败，请检查网络后重试', icon: 'none' })
+		return outcome
+	} finally {
+		// 所有退出路径统一隐藏 loading。
+		uni.hideLoading()
+	}
+}

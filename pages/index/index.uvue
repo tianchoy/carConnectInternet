@@ -265,7 +265,7 @@ import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
-import { isDeviceSubscribeSupported, authorizeDevice, authorizeGeofence, checkDeviceSubscribed, checkTemplateSubscribed, fetchNotifyQuota, fetchNotifyStatusEnabled, getCachedQuota } from '../../utils/notify.uts'
+import { isDeviceSubscribeSupported, authorizeDevice, authorizeGeofence, checkDeviceSubscribed, checkTemplateSubscribed, fetchNotifyQuota, fetchNotifyStatusEnabled, getCachedQuota, isSubscribeMainSwitchOff } from '../../utils/notify.uts'
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount, getHomePlatformAppId } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
@@ -1393,17 +1393,21 @@ const toPay = (iccid : string) => {
     }
     needRefresh.value = true
 
+    console.log('iccid:', iccid)
+
+    payUrl.value = '/pages/home/userSimRecharge?iccid=' + iccid
+    platformAppId.value = 'wx1d647f2cfdc089e6'
     
-    if(platformAppId.value == 'wxf451813ad3364a12'){
-        payUrl.value = '/pages/recharge/recharge?rechargeNo=' + iccid
-    }else{
-        payUrl.value = '/pages/home/userSimRecharge?iccid=' + iccid
-    }
+    // if(platformAppId.value == 'wxf451813ad3364a12'){
+    //     payUrl.value = '/pages/recharge/recharge?rechargeNo=' + iccid
+    // }else{
+    //     payUrl.value = '/pages/home/userSimRecharge?iccid=' + iccid
+    // }
 
     uni.openEmbeddedMiniProgram({
         appId: platformAppId.value,
         path: payUrl.value,
-        envVersion: 'release',
+        envVersion: 'trial',
         success(res: any) {
             console.log('打开小程序成功', res)
         },
@@ -1498,6 +1502,10 @@ const deviceSubscribed = ref(false)
 const geofenceSubscribed = ref(false)
 const subscribeAvailable = ref(false)
 const subscribeRequesting = ref(false)
+// 用户此前拒绝过通知授权（或已被微信置为 ban）：微信不会再弹授权，改为引导去设置页手动开启
+const SUBSCRIBE_REJECTED_KEY = 'alarm_subscribe_rejected'
+// 设备订阅授权成功结果：微信无接口可查设备订阅状态，只能以本地缓存的授权结果为准
+const SUBSCRIBE_ACCEPTED_KEY = 'alarm_subscribe_accepted'
 const subscribeRowDesc = computed<string>(() => {
     if (deviceSubscribed.value && geofenceSubscribed.value) {
         return '车辆发生进/出围栏、超速等告警时将通过微信提醒'
@@ -1536,17 +1544,47 @@ const refreshSubscribeState = async (): Promise<void> => {
         return
     }
     subscribeAvailable.value = true
-    // 【2026-11-04 修复】必须按「当前这台设备」判定，不能按模板判定。
+    // 设备订阅状态无法通过 wx.getSetting 查询（官方限制：itemSettings 不含设备订阅模板），
+    // 以「本机为该设备成功授权过」的本地记录为准；用户关闭了「订阅消息总开关」时降级为未开启。
+    // 【2026-11-04 修复】必须按「当前这台设备」判定，不能按模板判定：
     // 微信 getSetting(withSubscriptions) 只返回模板级状态，多设备用户给 A 授权后
     // 会把 B 也显示成「已订阅」，点击时直接走"去设置页关闭"分支、永不再发起授权。
-    deviceSubscribed.value = await checkDeviceSubscribed(currentCarDeviceNo.value, item.templateId)
+    const mainSwitchOff = await isSubscribeMainSwitchOff()
+    if (mainSwitchOff) uni.removeStorageSync(SUBSCRIBE_ACCEPTED_KEY)
+    deviceSubscribed.value = !mainSwitchOff && await checkDeviceSubscribed(currentCarDeviceNo.value, item.templateId)
+    // 已订阅时清掉「曾拒绝」标记，避免后续误引导
+    if (deviceSubscribed.value) uni.removeStorageSync(SUBSCRIBE_REJECTED_KEY)
     // 围栏模板是「模板级」长期订阅（不按设备区分），直接用模板状态判定
     const gItem = getCachedQuota('geofence')
     if (gItem != null && gItem.templateId != '') {
-        geofenceSubscribed.value = await checkTemplateSubscribed(gItem.templateId)
+        geofenceSubscribed.value = !mainSwitchOff && await checkTemplateSubscribed(gItem.templateId)
     } else {
         geofenceSubscribed.value = true  // 后端未配置围栏模板时不阻塞主流程
     }
+}
+
+// 打开小程序设置页；返回后重新校准订阅状态（用户可能刚在设置里关闭了订阅消息）
+const openSubscribeSettings = (): void => {
+    uni.openSetting({
+        complete: () => {
+            void refreshSubscribeState()
+        }
+    })
+}
+
+// 拒绝授权后微信不再弹窗，引导用户到设置页手动开启「订阅消息」
+const showSubscribeSettingsGuide = (): void => {
+    showAppModal({
+        title: '开启通知',
+        content: '您已拒绝授权通知，无法再次弹窗授权，请在设置中手动开启订阅消息',
+        confirmText: '去开启',
+        cancelText: '取消',
+        success: (res: AppModalSuccess): void => {
+            if (res.confirm) {
+                openSubscribeSettings()
+            }
+        }
+    })
 }
 
 // 用户主动点击订阅（device 通道：换票 → 授权；必须在 tap 手势链内）
@@ -1566,10 +1604,15 @@ const handleSubscribeTap = async (): Promise<void> => {
             content: '已开启车辆告警通知，如需关闭，请点击确定后在订阅消息中手动关闭',
             success: (res: AppModalSuccess): void => {
                 if (res.confirm) {
-                    uni.openSetting({})
+                    openSubscribeSettings()
                 }
             }
         })
+        return
+    }
+    // 已拒绝过授权：微信不会再次弹窗，直接引导到设置页手动开启
+    if (uni.getStorageSync(SUBSCRIBE_REJECTED_KEY) == true) {
+        showSubscribeSettingsGuide()
         return
     }
     subscribeRequesting.value = true
@@ -1581,13 +1624,24 @@ const handleSubscribeTap = async (): Promise<void> => {
             if (outcome.status == 'accept' || outcome.status == 'acceptWithAudio' || outcome.status == 'acceptWithAlert') {
                 deviceOk = true
                 deviceSubscribed.value = true
+                uni.removeStorageSync(SUBSCRIBE_REJECTED_KEY)
+                // 记录授权成功：微信无接口可查设备订阅状态，本机按设备记录，重启后仍显示已订阅
+                uni.setStorageSync(SUBSCRIBE_ACCEPTED_KEY, true)
             } else if (outcome.status == 'reject') {
-                // 用户取消弹窗时不打扰
+                // 用户点了「拒绝」：记录标记，下次点击「开启通知」直接引导去设置页手动开启
+                uni.removeStorageSync(SUBSCRIBE_ACCEPTED_KEY)
+                uni.setStorageSync(SUBSCRIBE_REJECTED_KEY, true)
                 if (outcome.errMsg.indexOf('cancel') < 0) {
-                    showAppToast({ title: '您拒绝了通知授权，可再次点击开启', icon: 'none' })
+                    showAppToast({ title: '您已拒绝授权通知，可点击按钮前往设置手动开启', icon: 'none' })
                 }
                 return
-            } else if (outcome.status == 'ban' || outcome.status == 'filter') {
+            } else if (outcome.status == 'ban') {
+                // ban = 微信已记住拒绝且不再弹窗，只能去设置页手动开启
+                uni.removeStorageSync(SUBSCRIBE_ACCEPTED_KEY)
+                uni.setStorageSync(SUBSCRIBE_REJECTED_KEY, true)
+                showSubscribeSettingsGuide()
+                return
+            } else if (outcome.status == 'filter') {
                 showAppToast({ title: '通知模板暂不可用，请联系客服', icon: 'none' })
                 return
             } else if (outcome.status == 'noTemplate') {

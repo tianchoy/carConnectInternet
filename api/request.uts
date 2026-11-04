@@ -12,6 +12,9 @@ const userDeviceList = '/userDevice/list'
 const wechatLogin = '/authLogin'
 // 个人一键、短信验证码和账号密码登录均通过 grantType 区分。
 const authLoginUrl = '/auth/login'
+// 注销账号复活接口：与登录链路一一对应，明文传输、不加密。
+const accountReviveUrl = '/auth/revive'
+const accountReviveLegacyUrl = '/authLogin/revive'
 const smsSendCodeUrl = '/resource/sms/code'
 const registerUrl = '/auth/register'
 const forgotPasswordResetUrl = '/auth/forgot-password/reset'
@@ -342,6 +345,19 @@ export const personalPasswordLogin = (data: PersonalPasswordLoginRequest): Promi
     requestData.set('tenantId', data.tenantId != null ? data.tenantId : defaultTenantId)
     requestData.set('clientId', data.clientId != null ? data.clientId : smsClientId)
     return post(authLoginUrl, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+}
+// 注销账号复活：chain 对应登录链路，'auth' → /auth/revive，'authLogin' → /authLogin/revive。
+// payload 仅携带 reviveTicket 或 xcxCode 其一；clientId/tenantId 与登录一致，明文、不解密。
+export const reviveAccount = (chain: 'auth' | 'authLogin', payload: UTSJSONObject): Promise<JsonDataResponse> => {
+    const url = chain == 'authLogin' ? accountReviveLegacyUrl : accountReviveUrl
+    const requestData = new UTSJSONObject()
+    const ticket = payload.getString('reviveTicket', '')
+    const xcxCode = payload.getString('xcxCode', '')
+    if (ticket != '') requestData.set('reviveTicket', ticket)
+    if (xcxCode != '') requestData.set('xcxCode', xcxCode)
+    requestData.set('clientId', smsClientId)
+    requestData.set('tenantId', defaultTenantId)
+    return post(url, requestData).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 }
 export const registerPersonalUser = (data: RegisterRequest): Promise<JsonDataResponse> => {
     const requestData = new UTSJSONObject()

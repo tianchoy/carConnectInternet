@@ -23,7 +23,7 @@
 		<view class="summary-panel">
 			<view class="summary-item">
 				<text class="label">总里程</text>
-				<text class="value">{{(totalMileage/1000).toFixed(2)}} Km</text>
+				<text class="value">{{ formatMileageValue() }}</text>
 			</view>
 			<view class="summary-item">
 				<text class="label">行程次数</text>
@@ -31,7 +31,7 @@
 			</view>
 			<view class="summary-item">
 				<text class="label">平均速度</text>
-				<text class="value">{{averageSpeed.toFixed(1)}} km/h</text>
+				<text class="value">{{ formatAverageSpeed() }}</text>
 			</view>
 		</view>
 
@@ -90,6 +90,8 @@ import { showAppToast } from '../../utils/toast.uts'
 	const carType = ref('')
 	const totalMileage = ref(0)
 	const averageSpeed = ref(0)
+	// 里程口径标记：ESTIMATED（含 Haversine 估算）/ DEVICE_ODOMETER（设备里程表）/ NONE（无可用里程）
+	const mileageSource = ref('')
 	const tripData = ref<Array<UTSJSONObject>>([])
 
 	// 日期时间选择器相关
@@ -198,10 +200,39 @@ import { showAppToast } from '../../utils/toast.uts'
 	})
 
 
+	// 解析里程口径：优先顶层 mileageSource，其次 dailyMileage 每项（任一天为估算则整体按估算展示，避免夸大精度）
+	const resolveMileageSource = (data : UTSJSONObject) : string => {
+		const top = data.getString('mileageSource', '')
+		if (top != '') return top
+		const daily = data.getArray<UTSJSONObject>('dailyMileage')
+		if (daily == null || daily.length == 0) return ''
+		let first = ''
+		for (let i = 0; i < daily.length; i++) {
+			const s = daily[i].getString('mileageSource', '')
+			if (s == 'ESTIMATED') return 'ESTIMATED'
+			if (first == '' && s != '') first = s
+		}
+		return first
+	}
+
+	// 总里程展示：无数据或口径为 NONE 时显示「—」，估算口径追加「（估算）」角标
+	const formatMileageValue = () : string => {
+		if (totalTrips.value == 0 || mileageSource.value == 'NONE') return '—'
+		const km = (totalMileage.value / 1000).toFixed(2) + ' Km'
+		if (mileageSource.value == 'ESTIMATED') return km + '（估算）'
+		return km
+	}
+
+	const formatAverageSpeed = () : string => {
+		if (totalTrips.value == 0) return '—'
+		return averageSpeed.value.toFixed(1) + ' km/h'
+	}
+
 	// 处理行程数据
 	const processTripData = (data : UTSJSONObject) : void => {
 		// 数据重载（切换统计时间）后恢复默认全部收起
 		expandedGroup.value = ''
+		mileageSource.value = resolveMileageSource(data)
 		const trips = data.getArray<UTSJSONObject>('trips')
 		if (trips != null && trips.length > 0) {
 			tripData.value = trips
