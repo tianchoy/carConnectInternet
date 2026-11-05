@@ -25,6 +25,13 @@ const GEOFENCE_BIZ_CODE = 'geofence'
  */
 const DEVICE_SUBSCRIBE_PREFIX = 'wx_dev_sub_'
 
+/**
+ * 围栏模板（长期订阅）的本地授权记录，值为 templateId。
+ * 为什么不能只靠 wx.getSetting：itemSettings 只包含用户勾选过「总是保持以上选择」的模板，
+ * 用户未勾选时每次都查不到，会把已授权误判成未授权（按钮永远停在「开启围栏提醒」）。
+ */
+const GEOFENCE_STORAGE_KEY = 'wx_geofence_subscribed'
+
 export type DeviceAuthorizeStatus = 'accept' | 'acceptWithAudio' | 'acceptWithAlert' | 'reject' | 'ban' | 'filter' | 'fail' | 'unsupported' | 'noTemplate'
 
 export type DeviceAuthorizeOutcome = {
@@ -103,8 +110,33 @@ export function clearAllDeviceSubscribeStatus() : void {
                 uni.removeStorageSync(keys[i])
             }
         }
+        uni.removeStorageSync(GEOFENCE_STORAGE_KEY)
     } catch (error) {
         console.warn('[notify] 清空设备订阅状态失败:', error)
+    }
+}
+
+/**
+ * 围栏模板是否已在本机授权过（模板 ID 变更后旧记录失效）
+ */
+export function getGeofenceSubscribed(templateId : string) : boolean {
+    if (templateId == '') return false
+    try {
+        const raw = uni.getStorageSync(GEOFENCE_STORAGE_KEY)
+        if (raw == null || raw.toString() == '') return false
+        return raw.toString() == templateId
+    } catch (error) {
+        console.warn('[notify] 读取围栏订阅状态失败:', error)
+        return false
+    }
+}
+
+export function saveGeofenceSubscribed(templateId : string) : void {
+    if (templateId == '') return
+    try {
+        uni.setStorageSync(GEOFENCE_STORAGE_KEY, templateId)
+    } catch (error) {
+        console.warn('[notify] 保存围栏订阅状态失败:', error)
     }
 }
 
@@ -311,6 +343,8 @@ function callGeofenceAuthorize(templateId : string) : Promise<DeviceAuthorizeOut
                 if (value == 'accept') status = 'accept'
                 else if (value == 'ban') status = 'ban'
                 else if (value == 'filter') status = 'filter'
+                // 授权成功后按本机记录（微信侧可能查不到该模板）
+                if (status == 'accept') saveGeofenceSubscribed(templateId)
                 // 未拿到该模板结果时按失败处理（可重试），不能当成「用户拒绝」
                 resolve({ status: status, errMsg: status == 'fail' ? '未获取到授权结果，请重试' : '', errCode: 0, templateId: templateId, sn: '', modelId: '' })
             },

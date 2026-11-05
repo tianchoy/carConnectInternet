@@ -34,8 +34,8 @@
                         <text class="subscribe-title">车辆告警通知</text>
                         <text class="subscribe-desc">{{ subscribeRowDesc }}</text>
                     </view>
-                    <view class="subscribe-btn" :class="{ 'subscribed': deviceSubscribed }">
-                        <text class="subscribe-btn-text">{{ deviceSubscribed ? '已订阅' : '开启通知' }}</text>
+                    <view class="subscribe-btn" :class="{ 'subscribed': deviceSubscribed && geofenceSubscribed }">
+                        <text class="subscribe-btn-text">{{ subscribeBtnText }}</text>
                     </view>
                 </view>
                 <view class="car-state">
@@ -265,7 +265,7 @@ import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
-import { isDeviceSubscribeSupported, authorizeDevice, authorizeGeofence, checkTemplateSubscribed, fetchNotifyQuota, fetchNotifyStatusEnabled, getCachedQuota, isSubscribeMainSwitchOff, getDeviceSubscribeStatus, isAcceptDeviceStatus, clearDeviceSubscribeStatus, clearAllDeviceSubscribeStatus } from '../../utils/notify.uts'
+import { isDeviceSubscribeSupported, authorizeDevice, authorizeGeofence, checkTemplateSubscribed, fetchNotifyQuota, fetchNotifyStatusEnabled, getCachedQuota, isSubscribeMainSwitchOff, getDeviceSubscribeStatus, isAcceptDeviceStatus, clearDeviceSubscribeStatus, clearAllDeviceSubscribeStatus, getGeofenceSubscribed } from '../../utils/notify.uts'
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount, getHomePlatformAppId } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
@@ -1521,10 +1521,23 @@ try {
 } catch (error) {
     console.warn('清理旧订阅标记失败:', error)
 }
+// 「车辆定位器告警」（设备订阅）与「围栏进出通知」（长期模板）是两个独立模板，
+// 微信要求各自授权一次、各自出现在「通知管理」里；无法合并成一个授权弹窗。
+// 因此按钮做成三态：第一次点击连着申请两个模板，围栏那步被微信拦截时按钮停留为
+// 「开启围栏提醒」，用户再点一次即可补上，确保通知管理里两个选项都在。
+const subscribeBtnText = computed<string>(() => {
+    if (deviceSubscribed.value && geofenceSubscribed.value) return '已订阅'
+    if (deviceSubscribed.value) return '开启围栏提醒'
+    return '开启通知'
+})
 const subscribeRowDesc = computed<string>(() => {
-    return deviceSubscribed.value
-        ? '车辆发生进/出围栏、超速等告警时将通过微信提醒'
-        : '开启后，告警将通过微信服务通知提醒'
+    if (deviceSubscribed.value && geofenceSubscribed.value) {
+        return '车辆发生进/出围栏、超速等告警时将通过微信提醒'
+    }
+    if (deviceSubscribed.value) {
+        return '车辆告警已开启，再点一次开启围栏进出提醒'
+    }
+    return '开启后，告警将通过微信服务通知提醒'
 })
 
 // 真正执行一次订阅状态计算：拉后端开关 + 告警模板，再按「当前设备 + 当前模板」取授权记录
@@ -1561,10 +1574,12 @@ const applySubscribeState = async (): Promise<void> => {
     const mainSwitchOff = await isSubscribeMainSwitchOff()
     deviceSubscribed.value = !mainSwitchOff && isAcceptDeviceStatus(status)
     subscribeRejected.value = !deviceSubscribed.value && (status == 'reject' || status == 'ban')
-    // 围栏模板是「模板级」长期订阅（不按设备区分），直接用模板状态判定
+    // 围栏模板是「模板级」长期订阅（不按设备区分）。
+    // 本地授权记录为准，微信侧状态兜底：用户没勾「总是保持以上选择」时 itemSettings 查不到该模板。
     const gItem = getCachedQuota('geofence')
     if (gItem != null && gItem.templateId != '') {
-        geofenceSubscribed.value = !mainSwitchOff && await checkTemplateSubscribed(gItem.templateId)
+        const localGeofence = getGeofenceSubscribed(gItem.templateId)
+        geofenceSubscribed.value = !mainSwitchOff && (localGeofence || await checkTemplateSubscribed(gItem.templateId))
     } else {
         geofenceSubscribed.value = true  // 后端未配置围栏模板时不阻塞主流程
     }
@@ -1631,7 +1646,7 @@ const showSubscribeSettingsGuide = (): void => {
 const showAlertUpgradeGuide = (): void => {
     showAppModal({
         title: '已开启接收通知',
-        content: '告警消息会出现在微信「服务通知」中。如需弹出横幅提醒，请点击「去设置」-「订阅消息」-「车辆定位器告警」改为「接收并提醒」',
+        content: '告警消息会出现在微信「服务通知」中。如需弹出横幅提醒，请点击「去设置」-「订阅消息」，把每条通知都改为「接收并提醒」',
         confirmText: '去设置',
         cancelText: '知道了',
         success: (res: AppModalSuccess): void => {
@@ -1643,25 +1658,28 @@ const showAlertUpgradeGuide = (): void => {
 }
 
 // 围栏进出告警走独立的长期订阅模板（设备订阅模板没有「进出围栏」枚举）。
-// 同一次点击内尽力申请一次；微信可能拦截连续第二次弹窗，失败就静默 ——
-// 不影响「已订阅」状态，也不再让用户「再点一次」（围栏告警另有 App 推送与站内信）。
-const tryAuthorizeGeofence = async (): Promise<void> => {
-    if (geofenceSubscribed.value) return
+// 必须在用户点击手势内申请，微信才认；被拦截时返回 false，由调用方提示再点一次，
+// 保证「通知管理」里最终能看到「围栏进出通知」这一条。
+const tryAuthorizeGeofence = async (): Promise<boolean> => {
+    if (geofenceSubscribed.value) return true
     try {
         const g = await authorizeGeofence()
         if (g.status == 'accept' || g.status == 'noTemplate') {
             // noTemplate：后端未配置围栏模板，不阻塞主流程
             geofenceSubscribed.value = true
-        } else {
-            console.warn('[index] 围栏模板授权未完成:', g.status, g.errMsg)
+            return true
         }
+        console.warn('[index] 围栏模板授权未完成:', g.status, g.errMsg)
+        return false
     } catch (error) {
         console.warn('[index] 围栏模板授权异常:', error)
+        return false
     }
 }
 
-// 用户主动点击订阅（device 通道：换票 → 授权；必须在 tap 手势链内）
-// 一次点击完成：设备订阅授权成功即视为「已订阅」，成功后引导把提醒强度改成「接收并提醒」
+// 用户主动点击订阅：一次点击内依次申请两个模板
+// ——「车辆定位器告警」（设备订阅）与「围栏进出通知」（长期模板）——
+// 两个模板都授权成功，微信「通知管理」里才会同时出现这两条，且都能单独设为「接收并提醒」。
 const handleSubscribeTap = async (): Promise<void> => {
     if (!isLogin()) return
     if (!isCarSelected()) return
@@ -1670,8 +1688,8 @@ const handleSubscribeTap = async (): Promise<void> => {
         showAppToast({ title: '当前微信版本不支持设备订阅', icon: 'none' })
         return
     }
-    // 已订阅时不再重复弹授权，引导到设置页自行管理
-    if (deviceSubscribed.value) {
+    // 两个模板都已授权：引导到设置页管理
+    if (deviceSubscribed.value && geofenceSubscribed.value) {
         showAppModal({
             title: '车辆告警通知',
             content: hasMoreDevices()
@@ -1696,42 +1714,57 @@ const handleSubscribeTap = async (): Promise<void> => {
     const tappingDeviceNo = currentCarDeviceNo.value
     subscribeRequesting.value = true
     try {
-        const outcome = await authorizeDevice(tappingDeviceNo, 'alarm')
-        // 授权结果已由 authorizeDevice 按「设备 + 模板」写入本地记录
-        if (isAcceptDeviceStatus(outcome.status)) {
-            // 弹窗期间已切到别的设备：不要用旧设备的结果覆盖新设备的状态
-            if (tappingDeviceNo == currentCarDeviceNo.value) {
-                deviceSubscribed.value = true
-                subscribeRejected.value = false
+        // —— 1) 设备订阅「车辆定位器告警」：按设备逐台授权 ——
+        if (!deviceSubscribed.value) {
+            const outcome = await authorizeDevice(tappingDeviceNo, 'alarm')
+            // 授权结果已由 authorizeDevice 按「设备 + 模板」写入本地记录
+            if (isAcceptDeviceStatus(outcome.status)) {
+                // 弹窗期间已切到别的设备：不要用旧设备的结果覆盖新设备的状态
+                if (tappingDeviceNo == currentCarDeviceNo.value) {
+                    deviceSubscribed.value = true
+                    subscribeRejected.value = false
+                }
+            } else if (outcome.status == 'reject') {
+                // 用户点了「拒绝」：下次点击「开启通知」直接引导去设置页手动开启
+                if (tappingDeviceNo == currentCarDeviceNo.value) subscribeRejected.value = true
+                if (outcome.errMsg.indexOf('cancel') < 0) {
+                    showAppToast({ title: '您已拒绝授权通知，可点击按钮前往设置手动开启', icon: 'none' })
+                }
+                return
+            } else if (outcome.status == 'ban') {
+                // ban = 微信已记住拒绝且不再弹窗，只能去设置页手动开启
+                if (tappingDeviceNo == currentCarDeviceNo.value) subscribeRejected.value = true
+                showSubscribeSettingsGuide()
+                return
+            } else if (outcome.status == 'filter') {
+                showAppToast({ title: '通知模板暂不可用，请联系客服', icon: 'none' })
+                return
+            } else if (outcome.status == 'noTemplate') {
+                subscribeAvailable.value = false
+                return
+            } else if (outcome.status == 'fail') {
+                if (outcome.errMsg.indexOf('cancel') < 0) {
+                    showAppToast({ title: outcome.errMsg != '' ? outcome.errMsg : '订阅失败，请稍后重试', icon: 'none' })
+                }
+                return
             }
-            // 围栏模板在同一次点击里顺带申请，成功与否都不影响「已订阅」
-            await tryAuthorizeGeofence()
-            if (outcome.status == 'acceptWithAlert') {
-                // 已是最强提醒：接收 + 提醒（横幅）
-                showAppToast({ title: '订阅成功，已开启接收并提醒', icon: 'none' })
-            } else {
-                // accept / acceptWithAudio：只进微信「服务通知」，不弹横幅 ——
-                // 订阅成功后立刻弹框，引导用户去设置改成「接收并提醒」
-                showAlertUpgradeGuide()
-            }
-        } else if (outcome.status == 'reject') {
-            // 用户点了「拒绝」：下次点击「开启通知」直接引导去设置页手动开启
-            if (tappingDeviceNo == currentCarDeviceNo.value) subscribeRejected.value = true
-            if (outcome.errMsg.indexOf('cancel') < 0) {
-                showAppToast({ title: '您已拒绝授权通知，可点击按钮前往设置手动开启', icon: 'none' })
-            }
-        } else if (outcome.status == 'ban') {
-            // ban = 微信已记住拒绝且不再弹窗，只能去设置页手动开启
-            if (tappingDeviceNo == currentCarDeviceNo.value) subscribeRejected.value = true
-            showSubscribeSettingsGuide()
-        } else if (outcome.status == 'filter') {
-            showAppToast({ title: '通知模板暂不可用，请联系客服', icon: 'none' })
-        } else if (outcome.status == 'noTemplate') {
-            subscribeAvailable.value = false
-        } else if (outcome.status == 'fail') {
-            if (outcome.errMsg.indexOf('cancel') < 0) {
-                showAppToast({ title: outcome.errMsg != '' ? outcome.errMsg : '订阅失败，请稍后重试', icon: 'none' })
-            }
+        }
+        // —— 2) 围栏进出通知：独立长期模板，必须在本手势内申请才会出现在「通知管理」 ——
+        const geofenceOk = await tryAuthorizeGeofence()
+        if (!geofenceOk) {
+            // 微信不允许同一手势内连弹两个订阅框：按钮已变成「开启围栏提醒」，再点一次即可补上
+            showAppToast({ title: '还差一步：再点一次开启围栏进出提醒', icon: 'none' })
+            return
+        }
+        // —— 3) 两个模板都授权成功：按本地记录的提醒强度提示 ——
+        // accept / acceptWithAudio 只进微信「服务通知」，不弹横幅，必须引导改成「接收并提醒」；
+        // 用本地记录判断，保证上一步被微信拦断、这次才补齐围栏时也不会漏掉该提示。
+        const alarmItem = getCachedQuota('alarm')
+        const devStatus = alarmItem != null ? getDeviceSubscribeStatus(tappingDeviceNo, alarmItem.templateId) : ''
+        if (devStatus == 'acceptWithAlert') {
+            showAppToast({ title: '订阅成功，已开启接收并提醒', icon: 'none' })
+        } else {
+            showAlertUpgradeGuide()
         }
     } finally {
         subscribeRequesting.value = false
