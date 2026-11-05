@@ -515,7 +515,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 	// 设备告警订阅已由硬件设备长期订阅能力承接，入口在首页「车辆告警通知」行
-	// 实现见 utils/deviceSubscribe.uts（wx.requestSubscribeDeviceMessage，按设备 sn 授权）
+	// 实现见 utils/notify.uts（wx.requestSubscribeDeviceMessage，按设备 sn 授权，状态按设备维度记录）
 
 	// 切换筛选状态
 	const changeState= (type : string) => {
