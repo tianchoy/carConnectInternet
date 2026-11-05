@@ -1676,6 +1676,54 @@ const showAlertUpgradeGuide = (): void => {
     })
 }
 
+// 「围栏进出通知」是普通一次性订阅模板，微信只允许它出现在 requestSubscribeMessage 的弹窗里，
+// 无法和设备订阅（车辆定位器告警，type=3）合并进同一个授权框 —— 微信按 API 区分模板类别。
+// 这里用本小程序自己的确认框承接第二次授权：modal 的「继续开启」属于用户点击手势，
+// 在回调里同步调用 authorizeGeofence()，微信才认（否则报 can only be invoked by user TAP gesture）。
+const showGeofenceGuide = (needUpgrade : boolean): void => {
+    showAppModal({
+        title: '再开启一步',
+        content: '车辆告警已开启。再开启「围栏进出通知」，车辆进出围栏时才会收到微信提醒。',
+        confirmText: '继续开启',
+        cancelText: '稍后',
+        success: (res: AppModalSuccess): void => {
+            if (res.confirm) {
+                // 直接调用：finishGeofenceAuthorize 在第一个 await 之前同步执行，仍在手势链内
+                void finishGeofenceAuthorize(needUpgrade)
+            }
+            // 选「稍后」不再追问，也不弹改接收并提醒的框（尊重用户选择，按钮已变成「开启围栏提醒」）
+        }
+    })
+}
+
+const finishGeofenceAuthorize = async (needUpgrade : boolean): Promise<void> => {
+    try {
+        // 第一行同步发起，保证处于点击手势链内
+        const g = await authorizeGeofence()
+        if (g.status == 'accept' || g.status == 'noTemplate') {
+            geofenceSubscribed.value = true
+            if (needUpgrade) {
+                showAlertUpgradeGuide()
+            } else {
+                showAppToast({ title: '订阅成功，已开启提醒', icon: 'none' })
+            }
+            return
+        }
+        if (g.errMsg.indexOf('cancel') >= 0) {
+            // 用户主动取消：不打扰，按钮保持「开启围栏提醒」
+            return
+        }
+        if (g.status == 'ban' || g.status == 'filter') {
+            showSubscribeSettingsGuide()
+            return
+        }
+        showAppToast({ title: '围栏提醒未开启，可点按钮重试', icon: 'none' })
+    } catch (error) {
+        console.warn('[index] 围栏模板授权异常:', error)
+        showAppToast({ title: '围栏提醒未开启，可点按钮重试', icon: 'none' })
+    }
+}
+
 // 用户主动点击订阅
 // 两个模板的授权机制不同，必须分两次点击、每次只弹一个授权框：
 //  · 车辆定位器告警：设备订阅（type=3），需先换票（snTicket 5 分钟有效），可异步发起；
@@ -1748,14 +1796,18 @@ const handleSubscribeTap = async (): Promise<void> => {
                 deviceSubscribed.value = true
                 subscribeRejected.value = false
             }
-            // 按本地记录判断提醒强度：accept / acceptWithAudio 只进微信「服务通知」，不弹横幅，
-            // 订阅成功后直接弹框引导用户改成「接收并提醒」。
+            // 按本地记录判断提醒强度：accept / acceptWithAudio 只进微信「服务通知」，不弹横幅。
             const alarmItem = getCachedQuota('alarm')
             const devStatus = alarmItem != null ? getDeviceSubscribeStatus(tappingDeviceNo, alarmItem.templateId) : ''
-            if (devStatus == 'acceptWithAlert') {
-                showAppToast({ title: '订阅成功，已开启接收并提醒', icon: 'none' })
-            } else {
+            const needUpgrade = devStatus != 'acceptWithAlert'
+            if (!geofenceSubscribed.value) {
+                // 还差围栏模板：用本小程序自己的确认框承接第二次授权，
+                // 用户不用再自己去找首页按钮（详见 showGeofenceGuide）
+                showGeofenceGuide(needUpgrade)
+            } else if (needUpgrade) {
                 showAlertUpgradeGuide()
+            } else {
+                showAppToast({ title: '订阅成功，已开启接收并提醒', icon: 'none' })
             }
         } else if (outcome.status == 'reject') {
             // 用户点了「拒绝」：下次点击「开启通知」直接引导去设置页手动开启
