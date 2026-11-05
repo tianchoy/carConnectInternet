@@ -4,16 +4,24 @@ import { getNotifyQuota, getDeviceTicket, getNotifyStatus, reportSubscribeResult
 /**
  * 订阅消息前端封装（对接 /app/notify）
  *
- * 两条通道，由 /app/notify/quota 返回的 mode 决定，前端不硬编码：
+ * 三条通道，由 /app/notify/quota 返回的 mode 决定，前端不硬编码：
  * - device（alarm 告警）：GET /app/notify/deviceTicket 换票 → wx.requestSubscribeDeviceMessage → 长期有效，无需上报
  * - once（order / expire / share）：wx.requestSubscribeMessage → POST /app/notify/subscribeReport 上报记账
+ * - geofence（围栏进出）：wx.requestSubscribeMessage → 微信侧 type=2 **一次性订阅**，一次授权=1 条额度
+ *
+ * ⚠️ 微信硬性规则（2026-11-05 实测 gettemplate 确认）：
+ * 1) 「围栏进出通知」是 type=2 一次性订阅，不是长期订阅；一次授权只给 1 条下发额度，用完即 43101。
+ * 2) wx.requestSubscribeMessage **必须在用户 tap 手势链内同步调用**；onShow / setTimeout /
+ *    任何 await 之后调用都会被微信拒绝（`can only be invoked by user TAP gesture`）。
+ * 3) 用户勾选「总是保持以上选择」后，后续在点击链内调用不再弹窗，但每次仍 +1 额度。
+ *    因此首页要在每次点击时同步续攒额度，否则围栏告警只能回落到设备模板（文案显示「震动告警」）。
  *
  * 后端文档：微信小程序订阅消息-前端对接API完整文档.md
  */
 
 const QUOTA_STORAGE_KEY = 'wx_subscribe_quota'
 const DEFAULT_BIZ_CODE = 'alarm'
-/** 围栏进出告警的专属模板场景码（后端 wx.subscribe.templates.geofence，mode=longterm） */
+/** 围栏进出告警的专属模板场景码（后端 wx.subscribe.templates.geofence，微信侧为一次性订阅） */
 const GEOFENCE_BIZ_CODE = 'geofence'
 
 export type DeviceAuthorizeStatus = 'accept' | 'acceptWithAudio' | 'acceptWithAlert' | 'reject' | 'ban' | 'filter' | 'fail' | 'unsupported' | 'noTemplate'
@@ -190,23 +198,59 @@ export async function authorizeDevice(deviceNo : string, bizCode : string = DEFA
  * 围栏进出告警授权（专属模板「围栏进出通知」）
  *
  * 为什么单独一个通道：设备订阅模板（type=3）的关键词枚举由微信平台生成且封闭，
- * 本小程序在「设备管理」类目下的设备模板 enum 只有「超速/停留超时/震动/低电量」四值，
- * **无法表达"进入围栏/离开围栏"**。围栏告警因此改走长期订阅模板（含 phrase「活动状态」字段）。
+ * 本小程序「设备管理」类目下设备模板 enum_string5 只有「超速/停留超时/震动/低电量」四值，
+ * 实测把「进围栏」填进去微信直接 47003，**物理上无法表达进出围栏**。围栏告警因此走
+ * 「围栏进出通知」模板（thing1 围栏名称 / phrase5 活动状态 = 进入围栏·离开围栏）。
  *
- * 该模板是「长期订阅」：用 wx.requestSubscribeMessage 授权（**不是** requestSubscribeDeviceMessage），
- * 一次授权长期可达、不消耗额度，也无需上报记账。
- * ⚠️ 必须在用户 tap 手势回调链内调用。
+ * ⚠️ 该模板微信侧是 **type=2 一次性订阅**：一次授权 = 1 条额度，用完即 43101。
+ * ⚠️ 本函数**必须同步发起**，内部不得 await 任何网络请求：模板 ID 只从本地缓存读取
+ *    （缓存由 refreshSubscribeState 在 onShow 时预热）；缓存缺失时直接返回 noTemplate。
+ *    旧实现在这里 await fetchNotifyQuota() 且排在 await authorizeDevice() 之后，
+ *    早就脱离 tap 手势链，微信静默拒绝 ⇒ 用户「点了允许」却始终 43101。
  */
-export async function authorizeGeofence() : Promise<DeviceAuthorizeOutcome> {
-    let item = getCachedQuota(GEOFENCE_BIZ_CODE)
-    if (item == null) {
-        await fetchNotifyQuota()
-        item = getCachedQuota(GEOFENCE_BIZ_CODE)
-    }
+export function authorizeGeofence() : Promise<DeviceAuthorizeOutcome> {
+    const item = getCachedQuota(GEOFENCE_BIZ_CODE)
     if (item == null || item.templateId == '') {
-        return { status: 'noTemplate', errMsg: '', errCode: 0, templateId: '' }
+        return Promise.resolve({ status: 'noTemplate', errMsg: '', errCode: 0, templateId: '' })
     }
-    return await callGeofenceAuthorize(item.templateId)
+    return callGeofenceAuthorize(item.templateId)
+}
+
+/**
+ * 静默续攒围栏额度：挂在首页高频用户点击回调的**第一行**（同步、无 await）。
+ *
+ * 用户勾选「总是保持以上选择」后，每次在点击链内调用 requestSubscribeMessage 不再弹窗，
+ * 但微信仍会为该用户 +1 条额度。这样用户正常用小程序就能持续攒出围栏告警的下发额度；
+ * 否则围栏模板一旦额度耗尽就回落设备模板，卡片文案退化成「震动告警」。
+ *
+ * @param alwaysKeep 用户是否已在设置页勾选「总是保持以上选择」（= checkTemplateSubscribed 结果）。
+ *                   为 false 时必须跳过：未勾选时每次调用都会弹订阅窗，会严重打扰用户。
+ *
+ * 本函数刻意 fire-and-forget：不阻塞业务点击、不弹 toast、不改 UI，失败只留一行调试日志。
+ */
+export function topUpGeofenceQuota(alwaysKeep : boolean) : void {
+    if (!alwaysKeep) {
+        return
+    }
+    const item = getCachedQuota(GEOFENCE_BIZ_CODE)
+    if (item == null || item.templateId == '') {
+        return
+    }
+    try {
+        uni.requestSubscribeMessage({
+            tmplIds: [item.templateId],
+            success: () => {},
+            fail: (err : any) => {
+                const errObj = err as UTSJSONObject
+                const rawErr = errObj['errMsg']
+                if (rawErr != null && rawErr.toString().indexOf('TAP gesture') >= 0) {
+                    console.warn('[notify] 围栏额度续攒脱离点击手势链，请检查调用位置:', rawErr.toString())
+                }
+            }
+        })
+    } catch (error) {
+        console.warn('[notify] 围栏额度续攒异常:', error)
+    }
 }
 
 function callGeofenceAuthorize(templateId : string) : Promise<DeviceAuthorizeOutcome> {
@@ -355,9 +399,17 @@ export async function checkDeviceSubscribed(deviceNo : string, templateId : stri
  */
 export function checkTemplateSubscribed(templateId : string) : Promise<boolean> {
     return new Promise((resolve) => {
-        if (templateId == '' || !isDeviceSubscribeSupported()) {
+        // 普通订阅消息用 wx.requestSubscribeMessage，与设备订阅能力无关；
+        // 旧实现误用 isDeviceSubscribeSupported()（探测 requestSubscribeDeviceMessage），
+        // 在部分基础库上会让围栏模板状态恒为 false。
+        if (templateId == '') {
             resolve(false)
             return
+        }
+        try {
+            if (!wx.canIUse('requestSubscribeMessage')) { resolve(false); return }
+        } catch (error) {
+            console.warn('[notify] 订阅消息能力探测失败:', error)
         }
         wx.getSetting({
             withSubscriptions: true,
