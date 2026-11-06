@@ -57,6 +57,8 @@ const props = defineProps({
   adsorption: { type: Boolean, default: true },
   disabled: { type: Boolean, default: false },
   zIndex: { type: Number, default: 87 },
+  /** 是否显示浮球投影；需要纯图标悬浮（无底色、无阴影）时传 false */
+  shadow: { type: Boolean, default: true },
   icon: { type: String, default: '+' },
   color: { type: String, default: '#ffffff' },
 })
@@ -88,6 +90,7 @@ const windowHeight = ref(667)
 const fabStyle = computed(() => {
   const bg = bgColor.value.length > 0 ? bgColor.value : '#1296f7'
   const transition = moving.value ? '0ms' : String(props.duration) + 'ms'
+  const shadowStyle = props.shadow ? '0 8px 22px rgba(18, 150, 247, 0.28)' : 'none'
   return (
     'left:' +
     String(Math.round(x.value)) +
@@ -101,6 +104,8 @@ const fabStyle = computed(() => {
     formatSize(props.round) +
     ';background:' +
     bg +
+    ';box-shadow:' +
+    shadowStyle +
     ';z-index:' +
     String(props.zIndex) +
     ';transition-duration:' +
