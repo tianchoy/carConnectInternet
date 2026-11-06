@@ -175,10 +175,6 @@
                             <image src="../../static/pay.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title">一键续费</text>
                         </view>
-                        <view class="service-item" @click="contactCustomerService">
-                            <image src="../../static/online.png" mode="aspectFit" class="icon-image"></image>
-                            <text class="item-title">在线客服</text>
-                        </view>
                         <view class="service-item" @click="unbindDevice">
                             <image src="../../static/del.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title" style="color: #d81e06;">删除设备</text>
@@ -192,6 +188,26 @@
             </view>
         </view>
     </scroll-view>
+    <!--
+      在线客服悬浮球：放在根 scroll-view 之外（scroll-view 内的 fixed 会跟着内容一起滚）。
+      i-fab 自带拖动 + 左右吸附 + 边界限制，拖动后的 click 会被组件过滤，不会误触发跳转。
+    -->
+    <i-fab
+        :offset="csFabOffset"
+        :width="52"
+        :height="52"
+        :round="26"
+        bg-color="#ffffff"
+        :threshold="10"
+        :threshold-top="csFabTopLimit"
+        :threshold-bottom="csFabBottomLimit"
+        :z-index="95"
+        :duration="180"
+        @click="contactCustomerService"
+    >
+        <!-- slot 内容用内联尺寸：父组件 scoped 样式对子组件插槽节点不保证生效 -->
+        <image src="/static/server-man.png" mode="aspectFit" style="width: 34px; height: 34px;"></image>
+    </i-fab>
     <!--
       选择车辆弹框：必须放在根 scroll-view 之外。
       嵌在页面滚动容器里会形成 scroll-view 套 scroll-view，
@@ -440,6 +456,29 @@ const filteredPickerDeviceList = computed<Array<Device>>(() => {
 // 关闭 picker
 const closePicker = () => {
     showPicker.value = false
+}
+
+// —— 在线客服悬浮球 ——
+// 位置单位 px（组件内部按 clientX/clientY 计算，用 px 才能和触摸坐标对齐）
+const csFabOffset = ref<Array<number>>([0, 0])
+const csFabTopLimit = ref(116)
+const csFabBottomLimit = ref(40)
+const initCsFab = () => {
+    const systemInfo = uni.getSystemInfoSync()
+    const windowWidth = systemInfo.windowWidth != null ? systemInfo.windowWidth : 375
+    const windowHeight = systemInfo.windowHeight != null ? systemInfo.windowHeight : 667
+    const statusTop = systemInfo.statusBarHeight != null ? systemInfo.statusBarHeight : 20
+    const size = 52
+    const edge = 10
+    // 顶部避开自定义导航栏，底部留出安全距离，避免压住服务中心最后一行
+    csFabTopLimit.value = statusTop + 96
+    csFabBottomLimit.value = 40
+    let top = Math.floor(windowHeight * 0.62)
+    const maxTop = windowHeight - size - csFabBottomLimit.value
+    if (top > maxTop) top = maxTop
+    if (top < csFabTopLimit.value) top = csFabTopLimit.value
+    // 初始贴右侧，垂直方向略偏下（拇指好点）
+    csFabOffset.value = [Math.floor(windowWidth - size - edge), top]
 }
 
 // 初始化尺寸数据
@@ -1853,6 +1892,7 @@ const handleReload = () => {
 // 页面加载
 onLoad(() => {
     initDimensions()
+    initCsFab()
     void loadHomePlatformAppId()
 
     if (checkToken()) {
