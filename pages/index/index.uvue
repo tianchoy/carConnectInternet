@@ -190,7 +190,7 @@
     </scroll-view>
     <!--
       在线客服悬浮球：放在根 scroll-view 之外（scroll-view 内的 fixed 会跟着内容一起滚）。
-      i-fab 自带拖动 + 左右吸附 + 边界限制，拖动后的 click 会被组件过滤，不会误触发跳转。
+      拖动与边界限制由 i-fab 承担；点击由插槽内容自己处理，原因见下方注释。
     -->
     <i-fab
         :offset="csFabOffset"
@@ -205,15 +205,27 @@
         :z-index="95"
         :duration="180"
         :adsorption="false"
-        @click="contactCustomerService"
     >
-        <!-- 悬浮球整体透明无阴影，白色圆底单独加在 icon 上；尺寸用内联兜底，动画走 .cs-fab-icon -->
-        <image
-            src="/static/server-man.png"
-            mode="aspectFit"
-            class="cs-fab-icon"
-            style="width: 40px; height: 40px; background-color: #ffffff; border-radius: 20px;"
-        ></image>
+        <!--
+          点击直接绑在插槽节点上，不走 i-fab 的 click emit：
+          组件内部只要触发过 touchmove 就置 moved=true 吞掉 click（手指轻微抖动也会），
+          导致点了没反应。这里自己按 8px 位移阈值区分「点击」与「拖动」。
+        -->
+        <view
+            class="cs-fab-hit"
+            style="width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;"
+            @touchstart="onCsFabPressStart"
+            @touchmove="onCsFabPressMove"
+            @click="onCsFabClick"
+        >
+            <!-- 悬浮球整体透明无阴影，白色圆底单独加在 icon 上 -->
+            <image
+                src="/static/server-man.png"
+                mode="aspectFit"
+                class="cs-fab-icon"
+                style="width: 40px; height: 40px; background-color: #ffffff; border-radius: 20px;"
+            ></image>
+        </view>
     </i-fab>
     <!--
       选择车辆弹框：必须放在根 scroll-view 之外。
@@ -468,6 +480,35 @@ const closePicker = () => {
 // —— 在线客服悬浮球 ——
 // 位置单位 px（组件内部按 clientX/clientY 计算，用 px 才能和触摸坐标对齐）
 const csFabOffset = ref<Array<number>>([0, 0])
+// 点击/拖动的区分：位移超过 8px 视为拖动，不触发进入客服
+const CS_FAB_TAP_TOLERANCE = 8
+let csFabPressX = 0
+let csFabPressY = 0
+let csFabPressMoved = false
+const onCsFabPressStart = (e: any) => {
+    const touch = e.touches != null && e.touches.length > 0 ? e.touches[0] : null
+    if (touch == null) return
+    csFabPressX = Number(touch.clientX)
+    csFabPressY = Number(touch.clientY)
+    csFabPressMoved = false
+}
+const onCsFabPressMove = (e: any) => {
+    const touch = e.touches != null && e.touches.length > 0 ? e.touches[0] : null
+    if (touch == null) return
+    const dx = Number(touch.clientX) - csFabPressX
+    const dy = Number(touch.clientY) - csFabPressY
+    if (dx > CS_FAB_TAP_TOLERANCE || dx < -CS_FAB_TAP_TOLERANCE || dy > CS_FAB_TAP_TOLERANCE || dy < -CS_FAB_TAP_TOLERANCE) {
+        csFabPressMoved = true
+    }
+}
+const onCsFabClick = () => {
+    if (csFabPressMoved) {
+        // 拖动松手：不当作点击
+        csFabPressMoved = false
+        return
+    }
+    contactCustomerService()
+}
 const csFabTopLimit = ref(116)
 const csFabBottomLimit = ref(40)
 const initCsFab = () => {
