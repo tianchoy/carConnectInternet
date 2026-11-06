@@ -194,7 +194,7 @@
     -->
     <view
         class="cs-float"
-        :style="{ left: csFabLeft + 'px', top: csFabTop + 'px' }"
+        :style="{ left: csFabLeft + 'px', top: csFabTop + 'px', transition: csFabDragging ? 'none' : 'left 0.3s ease' }"
         @touchstart="onCsFabTouchStart"
         @touchmove.stop="onCsFabTouchMove"
         @touchend="onCsFabTouchEnd"
@@ -459,23 +459,62 @@ const closePicker = () => {
 }
 
 // —— 在线客服悬浮球 ——
-// 自己实现拖动与点击，不再用 i-fab：该组件的 click 走内部 emit + moved 过滤，
-// 真机上轻点会被吞掉（拖动正常但点不开客服）。
+// 页面内自己实现拖动 + 点击（i-fab 的 click 会被组件内部 moved 过滤吞掉）。
+// 贴边收起：5 秒没有任何操作就把按钮往所在侧移出屏幕一半；
+// 点一下收起状态的按钮先完整露出，再点一次才进企业微信客服。
 const CS_FAB_SIZE = 52
 const CS_FAB_EDGE = 10
 const CS_FAB_TAP_TOLERANCE = 8
+const CS_FAB_HIDE_DELAY = 5000
 const csFabLeft = ref(0)
 const csFabTop = ref(0)
+const csFabDragging = ref(false)
+const csFabHidden = ref(false)
 const csFabTopLimit = ref(116)
 const csFabBottomLimit = ref(40)
 let csFabWindowWidth = 375
 let csFabWindowHeight = 667
-let csFabDragging = false
 let csFabMoved = false
 let csFabStartClientX = 0
 let csFabStartClientY = 0
 let csFabStartLeft = 0
 let csFabStartTop = 0
+// 收起前的位置，展开时还原
+let csFabRestoreLeft = 0
+let csFabIdleTimer = 0
+
+// 清掉旧的空闲计时并重新开始：5 秒没有任何操作就收起
+const scheduleCsFabHide = () => {
+    if (csFabIdleTimer != 0) {
+        clearTimeout(csFabIdleTimer)
+        csFabIdleTimer = 0
+    }
+    csFabIdleTimer = setTimeout(() => {
+        csFabIdleTimer = 0
+        collapseCsFab()
+    }, CS_FAB_HIDE_DELAY)
+}
+
+// 按当前所在侧收起：右半屏向右移出屏幕一半，左半屏向左移出
+const collapseCsFab = () => {
+    if (csFabHidden.value || csFabDragging.value) return
+    csFabRestoreLeft = csFabLeft.value
+    csFabHidden.value = true
+    const centerX = csFabLeft.value + CS_FAB_SIZE / 2
+    if (centerX >= csFabWindowWidth / 2) {
+        csFabLeft.value = csFabWindowWidth - CS_FAB_SIZE / 2
+    } else {
+        csFabLeft.value = -CS_FAB_SIZE / 2
+    }
+}
+
+// 点击收起状态的按钮：先整个露出来，不直接进客服
+const expandCsFab = () => {
+    if (!csFabHidden.value) return
+    csFabHidden.value = false
+    csFabLeft.value = csFabRestoreLeft
+    scheduleCsFabHide()
+}
 
 const initCsFab = () => {
     const systemInfo = uni.getSystemInfoSync()
@@ -489,13 +528,14 @@ const initCsFab = () => {
     const maxTop = csFabWindowHeight - CS_FAB_SIZE - csFabBottomLimit.value
     if (top > maxTop) top = maxTop
     if (top < csFabTopLimit.value) top = csFabTopLimit.value
-    // 初始贴右侧，垂直方向略偏下（拇指好点）
+    // 初始紧贴右侧，垂直方向略偏下（拇指好点）
     csFabLeft.value = Math.floor(csFabWindowWidth - CS_FAB_SIZE - CS_FAB_EDGE)
     csFabTop.value = top
+    scheduleCsFabHide()
 }
 
 // click 可能因连续轻点触发多次，节流防止重复打开客服会话；
-// 这里必须是同步调用（不能先 await），否则同样脱离手势链
+// 这里必须是同步调用（不能先 await），否则脱离微信手势链
 let csFabLastOpenAt = 0
 const openCsFabService = () => {
     const now = Date.now()
@@ -505,9 +545,14 @@ const openCsFabService = () => {
 }
 
 const onCsFabTouchStart = (e: any) => {
+    // 开始操作就停掉收起计时，避免拖到一半自己缩回去
+    if (csFabIdleTimer != 0) {
+        clearTimeout(csFabIdleTimer)
+        csFabIdleTimer = 0
+    }
     const touch = e.touches != null && e.touches.length > 0 ? e.touches[0] : null
     if (touch == null) return
-    csFabDragging = true
+    csFabDragging.value = true
     csFabMoved = false
     csFabStartClientX = Number(touch.clientX)
     csFabStartClientY = Number(touch.clientY)
@@ -516,7 +561,9 @@ const onCsFabTouchStart = (e: any) => {
 }
 
 const onCsFabTouchMove = (e: any) => {
-    if (!csFabDragging) return
+    if (!csFabDragging.value) return
+    // 收起状态下不响应拖动：先点一下展开，避免从屏幕外起拖、位置跳变
+    if (csFabHidden.value) return
     const touch = e.touches != null && e.touches.length > 0 ? e.touches[0] : null
     if (touch == null) return
     const dx = Number(touch.clientX) - csFabStartClientX
@@ -540,17 +587,21 @@ const onCsFabTouchMove = (e: any) => {
 }
 
 const onCsFabTouchEnd = () => {
-    csFabDragging = false
-    // 注意：不能在这里调 openCustomerServiceChat。
-    // 微信要求该接口必须在 TAP 手势回调里同步调用，touchend 里调会报
-    // "openCustomerServiceChat:fail can only be invoked by user TAP gesture"，且会占掉节流窗口。
+    csFabDragging.value = false
+    // 松手后重新开始 5 秒计时
+    scheduleCsFabHide()
+    // 注意：不能在这里调 openCustomerServiceChat，微信要求必须是 TAP 手势回调
 }
 
-// 轻点进入企业微信客服；拖动松手不触发。
-// 只用 click（tap）回调触发，保证处于微信认可的手势链内
+// 轻点：收起状态先展开；展开状态进企业微信客服；拖动松手不触发
 const onCsFabClick = () => {
     if (csFabMoved) return
+    if (csFabHidden.value) {
+        expandCsFab()
+        return
+    }
     openCsFabService()
+    scheduleCsFabHide()
 }
 
 // 初始化尺寸数据
@@ -1941,6 +1992,8 @@ const handleSubscribeTap = async (): Promise<void> => {
 }
 
 onShow(async () => {
+    // 回到页面重新开始 5 秒收起计时
+    scheduleCsFabHide()
     if (checkToken()) {
         await loadUnreadMessageCount()
         void refreshSubscribeState()
