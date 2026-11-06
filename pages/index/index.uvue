@@ -207,8 +207,13 @@
         :adsorption="false"
         @click="contactCustomerService"
     >
-        <!-- 尺寸用内联兜底，跳动动画走 .cs-fab-icon（见 style 中的 keyframes） -->
-        <image src="/static/server-man.png" mode="aspectFit" class="cs-fab-icon" style="width: 40px; height: 40px;"></image>
+        <!-- 悬浮球整体透明无阴影，白色圆底单独加在 icon 上；尺寸用内联兜底，动画走 .cs-fab-icon -->
+        <image
+            src="/static/server-man.png"
+            mode="aspectFit"
+            class="cs-fab-icon"
+            style="width: 40px; height: 40px; background-color: #ffffff; border-radius: 20px;"
+        ></image>
     </i-fab>
     <!--
       选择车辆弹框：必须放在根 scroll-view 之外。
