@@ -190,43 +190,24 @@
     </scroll-view>
     <!--
       在线客服悬浮球：放在根 scroll-view 之外（scroll-view 内的 fixed 会跟着内容一起滚）。
-      拖动与边界限制由 i-fab 承担；点击由插槽内容自己处理，原因见下方注释。
+      拖动与点击都在页面内实现：轻点进企业微信客服，拖动只移动位置（位移超 8px 不算点击）。
     -->
-    <i-fab
-        :offset="csFabOffset"
-        :width="52"
-        :height="52"
-        :round="26"
-        bg-color="transparent"
-        :shadow="false"
-        :threshold="10"
-        :threshold-top="csFabTopLimit"
-        :threshold-bottom="csFabBottomLimit"
-        :z-index="95"
-        :duration="180"
-        :adsorption="false"
+    <view
+        class="cs-float"
+        :style="{ left: csFabLeft + 'px', top: csFabTop + 'px' }"
+        @touchstart="onCsFabTouchStart"
+        @touchmove.stop="onCsFabTouchMove"
+        @touchend="onCsFabTouchEnd"
+        @click="onCsFabClick"
     >
-        <!--
-          点击直接绑在插槽节点上，不走 i-fab 的 click emit：
-          组件内部只要触发过 touchmove 就置 moved=true 吞掉 click（手指轻微抖动也会），
-          导致点了没反应。这里自己按 8px 位移阈值区分「点击」与「拖动」。
-        -->
-        <view
-            class="cs-fab-hit"
-            style="width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;"
-            @touchstart="onCsFabPressStart"
-            @touchmove="onCsFabPressMove"
-            @click="onCsFabClick"
-        >
-            <!-- 悬浮球整体透明无阴影，白色圆底单独加在 icon 上 -->
-            <image
-                src="/static/server-man.png"
-                mode="aspectFit"
-                class="cs-fab-icon"
-                style="width: 40px; height: 40px; background-color: #ffffff; border-radius: 20px;"
-            ></image>
-        </view>
-    </i-fab>
+        <!-- 容器透明无阴影，白色圆底只加在 icon 上；跳动动画走 .cs-fab-icon -->
+        <image
+            src="/static/server-man.png"
+            mode="aspectFit"
+            class="cs-fab-icon"
+            style="width: 40px; height: 40px; background-color: #ffffff; border-radius: 20px;"
+        ></image>
+    </view>
     <!--
       选择车辆弹框：必须放在根 scroll-view 之外。
       嵌在页面滚动容器里会形成 scroll-view 套 scroll-view，
@@ -478,55 +459,95 @@ const closePicker = () => {
 }
 
 // —— 在线客服悬浮球 ——
-// 位置单位 px（组件内部按 clientX/clientY 计算，用 px 才能和触摸坐标对齐）
-const csFabOffset = ref<Array<number>>([0, 0])
-// 点击/拖动的区分：位移超过 8px 视为拖动，不触发进入客服
+// 自己实现拖动与点击，不再用 i-fab：该组件的 click 走内部 emit + moved 过滤，
+// 真机上轻点会被吞掉（拖动正常但点不开客服）。
+const CS_FAB_SIZE = 52
+const CS_FAB_EDGE = 10
 const CS_FAB_TAP_TOLERANCE = 8
-let csFabPressX = 0
-let csFabPressY = 0
-let csFabPressMoved = false
-const onCsFabPressStart = (e: any) => {
-    const touch = e.touches != null && e.touches.length > 0 ? e.touches[0] : null
-    if (touch == null) return
-    csFabPressX = Number(touch.clientX)
-    csFabPressY = Number(touch.clientY)
-    csFabPressMoved = false
-}
-const onCsFabPressMove = (e: any) => {
-    const touch = e.touches != null && e.touches.length > 0 ? e.touches[0] : null
-    if (touch == null) return
-    const dx = Number(touch.clientX) - csFabPressX
-    const dy = Number(touch.clientY) - csFabPressY
-    if (dx > CS_FAB_TAP_TOLERANCE || dx < -CS_FAB_TAP_TOLERANCE || dy > CS_FAB_TAP_TOLERANCE || dy < -CS_FAB_TAP_TOLERANCE) {
-        csFabPressMoved = true
-    }
-}
-const onCsFabClick = () => {
-    if (csFabPressMoved) {
-        // 拖动松手：不当作点击
-        csFabPressMoved = false
-        return
-    }
-    contactCustomerService()
-}
+const csFabLeft = ref(0)
+const csFabTop = ref(0)
 const csFabTopLimit = ref(116)
 const csFabBottomLimit = ref(40)
+let csFabWindowWidth = 375
+let csFabWindowHeight = 667
+let csFabDragging = false
+let csFabMoved = false
+let csFabStartClientX = 0
+let csFabStartClientY = 0
+let csFabStartLeft = 0
+let csFabStartTop = 0
+
 const initCsFab = () => {
     const systemInfo = uni.getSystemInfoSync()
-    const windowWidth = systemInfo.windowWidth != null ? systemInfo.windowWidth : 375
-    const windowHeight = systemInfo.windowHeight != null ? systemInfo.windowHeight : 667
+    csFabWindowWidth = systemInfo.windowWidth != null ? systemInfo.windowWidth : 375
+    csFabWindowHeight = systemInfo.windowHeight != null ? systemInfo.windowHeight : 667
     const statusTop = systemInfo.statusBarHeight != null ? systemInfo.statusBarHeight : 20
-    const size = 52
-    const edge = 10
     // 顶部避开自定义导航栏，底部留出安全距离，避免压住服务中心最后一行
     csFabTopLimit.value = statusTop + 96
     csFabBottomLimit.value = 40
-    let top = Math.floor(windowHeight * 0.62)
-    const maxTop = windowHeight - size - csFabBottomLimit.value
+    let top = Math.floor(csFabWindowHeight * 0.62)
+    const maxTop = csFabWindowHeight - CS_FAB_SIZE - csFabBottomLimit.value
     if (top > maxTop) top = maxTop
     if (top < csFabTopLimit.value) top = csFabTopLimit.value
     // 初始贴右侧，垂直方向略偏下（拇指好点）
-    csFabOffset.value = [Math.floor(windowWidth - size - edge), top]
+    csFabLeft.value = Math.floor(csFabWindowWidth - CS_FAB_SIZE - CS_FAB_EDGE)
+    csFabTop.value = top
+}
+
+// touchend 与 click 都会走到这里，用节流保证只打开一次客服会话
+let csFabLastOpenAt = 0
+const openCsFabService = () => {
+    const now = Date.now()
+    if (now - csFabLastOpenAt < 1000) return
+    csFabLastOpenAt = now
+    contactCustomerService()
+}
+
+const onCsFabTouchStart = (e: any) => {
+    const touch = e.touches != null && e.touches.length > 0 ? e.touches[0] : null
+    if (touch == null) return
+    csFabDragging = true
+    csFabMoved = false
+    csFabStartClientX = Number(touch.clientX)
+    csFabStartClientY = Number(touch.clientY)
+    csFabStartLeft = csFabLeft.value
+    csFabStartTop = csFabTop.value
+}
+
+const onCsFabTouchMove = (e: any) => {
+    if (!csFabDragging) return
+    const touch = e.touches != null && e.touches.length > 0 ? e.touches[0] : null
+    if (touch == null) return
+    const dx = Number(touch.clientX) - csFabStartClientX
+    const dy = Number(touch.clientY) - csFabStartClientY
+    // 位移超过阈值才算拖动，避免轻点时手抖被误判
+    if (!csFabMoved && (dx > CS_FAB_TAP_TOLERANCE || dx < -CS_FAB_TAP_TOLERANCE || dy > CS_FAB_TAP_TOLERANCE || dy < -CS_FAB_TAP_TOLERANCE)) {
+        csFabMoved = true
+    }
+    if (!csFabMoved) return
+    let left = csFabStartLeft + dx
+    let top = csFabStartTop + dy
+    // 限制在可视区域内
+    const maxLeft = csFabWindowWidth - CS_FAB_SIZE
+    const maxTop = csFabWindowHeight - CS_FAB_SIZE - csFabBottomLimit.value
+    if (left < 0) left = 0
+    if (left > maxLeft) left = maxLeft
+    if (top < csFabTopLimit.value) top = csFabTopLimit.value
+    if (top > maxTop) top = maxTop
+    csFabLeft.value = left
+    csFabTop.value = top
+}
+
+const onCsFabTouchEnd = () => {
+    csFabDragging = false
+    // touchend 直接触发，不依赖 click 合成（部分机型 touch 事件会吞掉 tap）
+    if (!csFabMoved) openCsFabService()
+}
+
+// 轻点进入企业微信客服；拖动松手不触发
+const onCsFabClick = () => {
+    if (csFabMoved) return
+    openCsFabService()
 }
 
 // 初始化尺寸数据
@@ -1966,6 +1987,16 @@ onLoad(() => {
     width: 40px;
     height: 40px;
     animation: cs-fab-bounce 1.2s ease-in-out infinite;
+}
+
+.cs-float {
+    position: fixed;
+    z-index: 95;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .container {
