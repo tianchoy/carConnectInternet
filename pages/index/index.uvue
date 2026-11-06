@@ -206,8 +206,8 @@
         :adsorption="false"
         @click="contactCustomerService"
     >
-        <!-- slot 内容用内联尺寸：父组件 scoped 样式对子组件插槽节点不保证生效 -->
-        <image src="/static/server-man.png" mode="aspectFit" style="width: 34px; height: 34px;"></image>
+        <!-- 尺寸用内联兜底，跳动动画走 .cs-fab-icon（见 style 中的 keyframes） -->
+        <image src="/static/server-man.png" mode="aspectFit" class="cs-fab-icon" style="width: 40px; height: 40px;"></image>
     </i-fab>
     <!--
       选择车辆弹框：必须放在根 scroll-view 之外。
@@ -1904,6 +1904,23 @@ onLoad(() => {
 
 
 <style scoped lang="scss">
+// —— 在线客服悬浮球：图标 40*40，上下跳动 ——
+// keyframes 必须与使用它的 class 同处一个样式块，否则动画名对不上不会生效
+@keyframes cs-fab-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.cs-fab-icon {
+    width: 40px;
+    height: 40px;
+    animation: cs-fab-bounce 1.2s ease-in-out infinite;
+}
+
 .container {
     height: 100%;
     background-color: #E6F9E6;
