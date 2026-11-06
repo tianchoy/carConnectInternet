@@ -1,0 +1,133 @@
+<template>
+	<!--
+		客服降级弹框：客服二维码 + 客服手机号（可拨号）
+
+		企业微信客服在当前环境不可用（如企微后台未绑定小程序、客服账号停用）或
+		运营只配置了手机号/二维码时展示；内容为空的那一项自动不渲染。
+	-->
+	<i-popup v-model:show="visible" mode="bottom" :closeable="true">
+		<view class="cs-popup">
+			<text class="cs-popup-title">联系客服</text>
+
+			<view class="cs-row" v-if="qrcodeUrl.length > 0">
+				<text class="cs-label">客服二维码</text>
+				<image class="cs-qrcode" :src="qrcodeUrl" mode="aspectFit" show-menu-by-longpress></image>
+				<text class="cs-tip">长按识别二维码添加客服</text>
+			</view>
+
+			<view class="cs-row" v-for="(phone, index) in phoneList" :key="index">
+				<text class="cs-label">客服电话</text>
+				<text class="cs-phone">{{ phone }}</text>
+				<text class="cs-call" @click="callPhone(phone)">拨打电话</text>
+			</view>
+
+			<text class="cs-time" v-if="serviceTimeText.length > 0">服务时间：{{ serviceTimeText }}</text>
+		</view>
+	</i-popup>
+</template>
+
+<script setup lang="uts">
+	import { computed } from 'vue'
+
+	const props = withDefaults(defineProps<{
+		/** 显隐（v-model:show） */
+		show?: boolean
+		/** 客服二维码图片地址，空串不渲染 */
+		qrcode?: string
+		/** 客服手机号列表 */
+		phones?: string[]
+		/** 客服服务时间（自由文案），空串不渲染 */
+		serviceTime?: string
+	}>(), {
+		show: false,
+		qrcode: '',
+		serviceTime: ''
+	})
+
+	// 引用类型不走 withDefaults 默认值（uni-app x 支持有限），模板取值统一兜底：
+	// 否则父组件传 undefined 时模板里 `.length` 会抛
+	// `Cannot read property 'length' of undefined`，整页白屏。
+	const phoneList = computed<string[]>(() => props.phones ?? ([] as string[]))
+	const qrcodeUrl = computed<string>(() => props.qrcode ?? '')
+	const serviceTimeText = computed<string>(() => props.serviceTime ?? '')
+
+	const emit = defineEmits<{
+		'update:show': [value: boolean]
+	}>()
+
+	const visible = computed<boolean>({
+		get: (): boolean => props.show,
+		set: (value: boolean) => {
+			emit('update:show', value)
+		}
+	})
+
+	const callPhone = (phone: string) => {
+		uni.makePhoneCall({
+			phoneNumber: phone
+		})
+	}
+</script>
+
+<style lang="scss">
+	.cs-popup {
+		display: flex;
+		flex-direction: column;
+		padding: 40rpx 32rpx 60rpx 32rpx;
+
+		.cs-popup-title {
+			font-size: 32rpx;
+			font-weight: bold;
+			color: #1f2937;
+			text-align: center;
+			margin-bottom: 24rpx;
+		}
+
+		.cs-row {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 24rpx 0;
+			border-bottom: 1rpx solid #E5E7EB;
+
+			.cs-label {
+				font-size: 26rpx;
+				color: #64748b;
+			}
+
+			.cs-qrcode {
+				width: 300rpx;
+				height: 300rpx;
+				margin-top: 16rpx;
+			}
+
+			.cs-tip {
+				font-size: 22rpx;
+				color: #94a3b8;
+				margin-top: 12rpx;
+			}
+
+			.cs-phone {
+				font-size: 30rpx;
+				color: #1f2937;
+				margin-top: 12rpx;
+			}
+
+			.cs-call {
+				font-size: 26rpx;
+				color: #ffffff;
+				background-color: #2563eb;
+				border-radius: 40rpx;
+				padding: 10rpx 40rpx;
+				margin-top: 16rpx;
+			}
+		}
+
+		.cs-time {
+			font-size: 24rpx;
+			color: #94a3b8;
+			text-align: center;
+			margin-top: 24rpx;
+		}
+	}
+</style>

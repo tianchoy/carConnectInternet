@@ -193,6 +193,7 @@
       拖动与点击都在页面内实现：轻点进企业微信客服，拖动只移动位置（位移超 8px 不算点击）。
     -->
     <view
+        v-if="csEnabled"
         class="cs-float"
         :style="{ left: csFabLeft + 'px', top: csFabTop + 'px', transition: csFabDragging ? 'none' : 'left 0.3s ease' }"
         @touchstart="onCsFabTouchStart"
@@ -200,12 +201,12 @@
         @touchend="onCsFabTouchEnd"
         @click="onCsFabClick"
     >
-        <!-- 容器透明无阴影，白色圆底只加在 icon 上；跳动动画走 .cs-fab-icon -->
+        <!-- 背景透明：只展示客服 logo 本身，不套白底方块；跳动动画走 .cs-fab-icon -->
         <image
-            src="/static/server-man.png"
+            src="/static/service.png"
             mode="aspectFit"
             class="cs-fab-icon"
-            style="width: 40px; height: 40px; background-color: #ffffff; border-radius: 20px;"
+            style="width: 48px; height: 48px; background-color: transparent;"
         ></image>
     </view>
     <!--
@@ -271,6 +272,9 @@
             </view>
         </view>
     </l-popup>
+	<!-- 客服降级弹框：企业微信客服不可用 / 仅配置手机号与二维码时展示 -->
+	<customerServicePopup v-model:show="showCustomerServicePopup" :qrcode="customerServiceConfig.serviceQrcode"
+		:phones="csPhones" :serviceTime="customerServiceConfig.serviceTime"></customerServicePopup>
 	<app-toast></app-toast>
 	<app-modal></app-modal>
 </template>
@@ -282,7 +286,10 @@ import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { isDeviceSubscribeSupported, authorizeDevice, authorizeGeofence, topUpGeofenceQuota, checkTemplateSubscribed, fetchNotifyQuota, fetchNotifyStatusEnabled, getCachedQuota, isSubscribeMainSwitchOff, getDeviceSubscribeStatus, isAcceptDeviceStatus, clearDeviceSubscribeStatus, clearAllDeviceSubscribeStatus, getGeofenceSubscribed } from '../../utils/notify.uts'
-import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount, getHomePlatformAppId } from '../../api/request.uts'
+import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout as logoutRequest, getMessageUnreadCount, getHomePlatformAppId, getCustomerServiceConfig } from '../../api/request.uts'
+import { buildCustomerServiceConfig, emptyCustomerService, getCurrentAppId, hasAnyChannel, legacyCustomerService, openCustomerService, splitServicePhones } from '../../common/customerService.uts'
+import type { CustomerServiceConfig } from '../../common/customerService.uts'
+import customerServicePopup from '../../components/customerServicePopup.uvue'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
@@ -460,16 +467,15 @@ const closePicker = () => {
 
 // —— 在线客服悬浮球 ——
 // 页面内自己实现拖动 + 点击（i-fab 的 click 会被组件内部 moved 过滤吞掉）。
-// 贴边收起：5 秒没有任何操作就把按钮往所在侧移出屏幕一半；
-// 点一下收起状态的按钮先完整露出，再点一次才进企业微信客服。
-const CS_FAB_SIZE = 52
-const CS_FAB_EDGE = 10
+// 交互参考 llk-mini 的 liu-drag-button：松手后按「离屏幕中线更近的一侧」吸附到左/右边缘，
+// 不做 5 秒贴边收起——任何时候（含页面滚动）都完整展示，避免只露半边看不清。
+const CS_FAB_SIZE = 48
+// 吸附后与屏幕左右边缘的间距（px）
+const CS_FAB_EDGE = 2
 const CS_FAB_TAP_TOLERANCE = 8
-const CS_FAB_HIDE_DELAY = 5000
 const csFabLeft = ref(0)
 const csFabTop = ref(0)
 const csFabDragging = ref(false)
-const csFabHidden = ref(false)
 const csFabTopLimit = ref(116)
 const csFabBottomLimit = ref(40)
 let csFabWindowWidth = 375
@@ -479,41 +485,34 @@ let csFabStartClientX = 0
 let csFabStartClientY = 0
 let csFabStartLeft = 0
 let csFabStartTop = 0
-// 收起前的位置，展开时还原
-let csFabRestoreLeft = 0
-let csFabIdleTimer = 0
 
-// 清掉旧的空闲计时并重新开始：5 秒没有任何操作就收起
-const scheduleCsFabHide = () => {
-    if (csFabIdleTimer != 0) {
-        clearTimeout(csFabIdleTimer)
-        csFabIdleTimer = 0
+// —— 客服配置（接口下发，不再写死企业与链接）——
+// 全未配置时 csEnabled=false，悬浮球与入口整体不渲染
+const customerServiceConfig = ref<CustomerServiceConfig>(emptyCustomerService())
+const showCustomerServicePopup = ref(false)
+const csEnabled = computed<boolean>(() => hasAnyChannel(customerServiceConfig.value))
+const csPhones = computed<string[]>(() => splitServicePhones(customerServiceConfig.value))
+
+/**
+ * 拉取客服配置：页面 onLoad 预取，点击时直接用内存值。
+ *
+ * <p>微信要求 {@code openCustomerServiceChat} 必须由用户 TAP <b>同步</b>触发，
+ * 因此点击回调里不能再发请求。</p>
+ */
+const loadCustomerServiceConfig = async () => {
+    try {
+        const res = await getCustomerServiceConfig(getCurrentAppId())
+        if (isBusinessSuccessCode(res.code)) {
+            // 接口成功即以后端为准：字段全空表示运营主动清空，入口必须隐藏
+            customerServiceConfig.value = buildCustomerServiceConfig(res.data)
+        }
+    } catch (e) {
+        // 请求异常：沿用改造前写死的企微客服，避免发版后入口凭空消失
+        console.error('获取客服配置失败，沿用改造前的企业微信客服兜底:', e)
+        if (!hasAnyChannel(customerServiceConfig.value)) {
+            customerServiceConfig.value = legacyCustomerService()
+        }
     }
-    csFabIdleTimer = setTimeout(() => {
-        csFabIdleTimer = 0
-        collapseCsFab()
-    }, CS_FAB_HIDE_DELAY)
-}
-
-// 按当前所在侧收起：右半屏向右移出屏幕一半，左半屏向左移出
-const collapseCsFab = () => {
-    if (csFabHidden.value || csFabDragging.value) return
-    csFabRestoreLeft = csFabLeft.value
-    csFabHidden.value = true
-    const centerX = csFabLeft.value + CS_FAB_SIZE / 2
-    if (centerX >= csFabWindowWidth / 2) {
-        csFabLeft.value = csFabWindowWidth - CS_FAB_SIZE / 2
-    } else {
-        csFabLeft.value = -CS_FAB_SIZE / 2
-    }
-}
-
-// 点击收起状态的按钮：先整个露出来，不直接进客服
-const expandCsFab = () => {
-    if (!csFabHidden.value) return
-    csFabHidden.value = false
-    csFabLeft.value = csFabRestoreLeft
-    scheduleCsFabHide()
 }
 
 const initCsFab = () => {
@@ -531,7 +530,6 @@ const initCsFab = () => {
     // 初始紧贴右侧，垂直方向略偏下（拇指好点）
     csFabLeft.value = Math.floor(csFabWindowWidth - CS_FAB_SIZE - CS_FAB_EDGE)
     csFabTop.value = top
-    scheduleCsFabHide()
 }
 
 // click 可能因连续轻点触发多次，节流防止重复打开客服会话；
@@ -545,11 +543,6 @@ const openCsFabService = () => {
 }
 
 const onCsFabTouchStart = (e: any) => {
-    // 开始操作就停掉收起计时，避免拖到一半自己缩回去
-    if (csFabIdleTimer != 0) {
-        clearTimeout(csFabIdleTimer)
-        csFabIdleTimer = 0
-    }
     const touch = e.touches != null && e.touches.length > 0 ? e.touches[0] : null
     if (touch == null) return
     csFabDragging.value = true
@@ -562,8 +555,6 @@ const onCsFabTouchStart = (e: any) => {
 
 const onCsFabTouchMove = (e: any) => {
     if (!csFabDragging.value) return
-    // 收起状态下不响应拖动：先点一下展开，避免从屏幕外起拖、位置跳变
-    if (csFabHidden.value) return
     const touch = e.touches != null && e.touches.length > 0 ? e.touches[0] : null
     if (touch == null) return
     const dx = Number(touch.clientX) - csFabStartClientX
@@ -588,20 +579,21 @@ const onCsFabTouchMove = (e: any) => {
 
 const onCsFabTouchEnd = () => {
     csFabDragging.value = false
-    // 松手后重新开始 5 秒计时
-    scheduleCsFabHide()
+    // 松手吸附：以图标中心判断靠左还是靠右，吸到对应边缘（拖到中间也不会停在中间挡内容）。
+    // left 有 0.3s 过渡（见模板 :style），所以这里是平滑滑入而不是瞬移。
+    if (csFabMoved) {
+        const centerX = csFabLeft.value + CS_FAB_SIZE / 2
+        csFabLeft.value = centerX < csFabWindowWidth / 2
+            ? CS_FAB_EDGE
+            : (csFabWindowWidth - CS_FAB_SIZE - CS_FAB_EDGE)
+    }
     // 注意：不能在这里调 openCustomerServiceChat，微信要求必须是 TAP 手势回调
 }
 
-// 轻点：收起状态先展开；展开状态进企业微信客服；拖动松手不触发
+// 轻点进企业微信客服；拖动松手不触发
 const onCsFabClick = () => {
     if (csFabMoved) return
-    if (csFabHidden.value) {
-        expandCsFab()
-        return
-    }
     openCsFabService()
-    scheduleCsFabHide()
 }
 
 // 初始化尺寸数据
@@ -1530,20 +1522,10 @@ const toFence = () => {
     })
 }
 
-// 联系客服
+// 联系客服：按「客服地址 → 企业微信客服 → 手机号/二维码」统一降级
 const contactCustomerService = () => {
-    uni.openCustomerServiceChat({
-        extInfo: {url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a'},
-        corpId: 'ww686122ec6a4db85a',
-        success(res) {
-            console.log('联系客服成功', res)
-        },
-        fail(res) {
-            console.log('联系客服失败', res)
-        },
-        complete(res) {
-            console.log('联系客服完成', res)
-        }
+    openCustomerService(customerServiceConfig.value, () => {
+        showCustomerServicePopup.value = true
     })
 }
 
@@ -1992,8 +1974,6 @@ const handleSubscribeTap = async (): Promise<void> => {
 }
 
 onShow(async () => {
-    // 回到页面重新开始 5 秒收起计时
-    scheduleCsFabHide()
     if (checkToken()) {
         await loadUnreadMessageCount()
         void refreshSubscribeState()
@@ -2019,6 +1999,7 @@ onLoad(() => {
     initDimensions()
     initCsFab()
     void loadHomePlatformAppId()
+    void loadCustomerServiceConfig()
 
     if (checkToken()) {
         loadDeviceList()
@@ -2040,19 +2021,22 @@ onLoad(() => {
 }
 
 .cs-fab-icon {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     animation: cs-fab-bounce 1.2s ease-in-out infinite;
 }
 
 .cs-float {
     position: fixed;
-    z-index: 95;
-    width: 52px;
-    height: 52px;
+    z-index: 999;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
+    // uni-app x 的 view 默认 overflow:hidden：容器与图片同尺寸时，
+    // 跳动动画向上位移会被容器裁掉（看起来像「上到一半被页面遮住」）。
+    overflow: visible;
 }
 
 .container {

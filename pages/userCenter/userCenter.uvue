@@ -26,7 +26,7 @@
 			<!-- <view class="list" @click="productMall">产品商城</view> -->
 		</view>
 		<view class="version" v-if="version">当前版本：{{version}}</view>
-		<movable-area class="movable-area">
+		<movable-area class="movable-area" v-if="csEnabled">
 			<movable-view
 				class="movable-view"
 				direction="all"
@@ -35,20 +35,29 @@
 				@change="onMoveChange"
 			>
 				<view class="contact-button-movable" @click="contactCustomerService">
-					<i-icon name="/static/server-man.png" fontSize="20"></i-icon>
+					<!-- 客服 logo 统一用 service.png；不设底色/圆角，只展示图形本身 -->
+					<image src="/static/service.png" mode="aspectFit" style="width: 48px; height: 48px; background-color: transparent;" />
 					<text class="contact-text">人工客服</text>
-					<text class="contact-text">08:00-24:00</text>
+					<!-- 服务时间由后台下发，未配置则不展示（不再写死 08:00-24:00） -->
+					<text class="contact-text" v-if="customerServiceConfig.serviceTime.length > 0">{{customerServiceConfig.serviceTime}}</text>
 				</view>
 			</movable-view>
 		</movable-area>
 	</view>
+	<!-- 客服降级弹框：企业微信客服不可用 / 仅配置手机号与二维码时展示 -->
+	<customerServicePopup v-model:show="showCustomerServicePopup" :qrcode="customerServiceConfig.serviceQrcode"
+		:phones="csPhones" :serviceTime="customerServiceConfig.serviceTime"></customerServicePopup>
 	<app-toast></app-toast>
 </template>
 
 <script setup lang="uts">
+import { computed } from 'vue'
 import { isBusinessSuccessCode } from '../../api/response.uts'
 import { showAppToast } from '../../utils/toast.uts'
-	import { getUserInfo, getUserDeviceList } from '../../api/request';
+	import { getUserInfo, getUserDeviceList, getCustomerServiceConfig } from '../../api/request';
+	import { buildCustomerServiceConfig, emptyCustomerService, getCurrentAppId, hasAnyChannel, legacyCustomerService, openCustomerService, splitServicePhones } from '../../common/customerService.uts'
+	import type { CustomerServiceConfig } from '../../common/customerService.uts'
+	import customerServicePopup from '../../components/customerServicePopup.uvue'
 
 	const userInfo = ref({
 		avatar: '/static/avatar.png',
@@ -57,6 +66,12 @@ import { showAppToast } from '../../utils/toast.uts'
 	const carsnumber = ref(0)
 	const Login = ref(false)
 	const version = ref('')
+
+	// 客服配置（接口下发）：全未配置时入口不渲染
+	const customerServiceConfig = ref<CustomerServiceConfig>(emptyCustomerService())
+	const showCustomerServicePopup = ref(false)
+	const csEnabled = computed<boolean>(() => hasAnyChannel(customerServiceConfig.value))
+	const csPhones = computed<string[]>(() => splitServicePhones(customerServiceConfig.value))
 
 	// 可拖拽相关变量
 	const moveX = ref(0)
@@ -115,17 +130,33 @@ import { showAppToast } from '../../utils/toast.uts'
 		const accountInfo = wx.getAccountInfoSync();
 		const appVersion = accountInfo.miniProgram.version;
 		version.value = appVersion
+
+		// 客服配置：服务时间与渠道由后台下发
+		loadCustomerServiceConfig()
 	})
 
+	// 联系客服：按「客服地址 → 企业微信客服 → 手机号/二维码」统一降级
 	const contactCustomerService = () => {
-		uni.openCustomerServiceChat({
-			extInfo: {url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a'},
-			corpId: 'ww686122ec6a4db85a',
-			success(res) {
-				console.log(res)
-			}
+		openCustomerService(customerServiceConfig.value, () => {
+			showCustomerServicePopup.value = true
 		})
+	}
 
+	/** 拉取客服配置：onShow 预取，点击时直接用内存值（TAP 回调内不能发请求） */
+	const loadCustomerServiceConfig = async () => {
+		try {
+			const res = await getCustomerServiceConfig(getCurrentAppId())
+			if (isBusinessSuccessCode(res.code)) {
+				// 接口成功即以后端为准：字段全空表示运营主动清空，入口必须隐藏
+				customerServiceConfig.value = buildCustomerServiceConfig(res.data)
+			}
+		} catch (e) {
+			// 请求异常：沿用改造前写死的企微客服，避免发版后入口凭空消失
+			console.error('获取客服配置失败，沿用改造前的企业微信客服兜底:', e)
+			if (!hasAnyChannel(customerServiceConfig.value)) {
+				customerServiceConfig.value = legacyCustomerService()
+			}
+		}
 	}
 
 
@@ -277,6 +308,32 @@ import { showAppToast } from '../../utils/toast.uts'
 			pointer-events: none;
 			z-index: 999;
 
+		}
+
+		// movable-view 必须显式给宽高：uni-app x 下不给尺寸会退化成极小区域，
+		// 里面的「客服 logo + 人工客服」会被容器裁掉一半（看起来像贴边半隐藏）。
+		// 尺寸与脚本里的 buttonWidth / buttonHeight 保持一致，保证拖动边界算得准。
+		.movable-view {
+			width: 120px;
+			height: 200px;
+			pointer-events: auto;
+		}
+
+		// 客服按钮内容：纵向居中，背景透明（只展示 logo 本身）
+		.contact-button-movable {
+			width: 120px;
+			height: 200px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			background-color: transparent;
+		}
+
+		.contact-text {
+			font-size: 12px;
+			color: #1f2937;
+			margin-top: 4px;
 		}
 	}
 </style>

@@ -1,0 +1,202 @@
+/**
+ * 客服渠道统一封装（设备小程序）
+ *
+ * <p>统一口径（产品确认）：**客服地址 &gt; 企业微信客服 &gt; 客服手机号/二维码**。</p>
+ *
+ * <p>背景：本端此前把企业ID 与 kfid 链接<b>硬编码在页面</b>（首页悬浮球、个人中心「人工客服」），
+ * 运营改客服账号必须发版。现在改为读后端匿名接口 {@code GET /home/customerService}，
+ * 页面只调用 {@link openCustomerService}，不再关心渠道判定。</p>
+ *
+ * <p>环境能力：小程序内 {@code uni.openCustomerServiceChat} 可用，但必须由用户 TAP
+ * <b>同步</b>调用（点击回调里不能有 await）；客服地址是外部链接，只能经内置 webview 页打开。</p>
+ *
+ * @author zd-iot
+ */
+
+import { showAppToast } from '../utils/toast.uts'
+
+/** 客服渠道标识 */
+export const CS_CHANNEL_NONE = 'none'
+export const CS_CHANNEL_JUMP = 'jump'
+export const CS_CHANNEL_WECOM = 'wecom'
+export const CS_CHANNEL_POPUP = 'popup'
+
+/** 客服配置（与后端下发的 6 个字段一一对应；空串 = 未配置） */
+export type CustomerServiceConfig = {
+	serviceJumpUrl: string
+	serviceCorpId: string
+	serviceKfidUrl: string
+	servicePhone: string
+	serviceQrcode: string
+	serviceTime: string
+}
+
+/** 空配置：接口未返回 / 失败时使用，等价于「什么渠道都没配」 */
+export function emptyCustomerService(): CustomerServiceConfig {
+	return {
+		serviceJumpUrl: '',
+		serviceCorpId: '',
+		serviceKfidUrl: '',
+		servicePhone: '',
+		serviceQrcode: '',
+		serviceTime: ''
+	}
+}
+
+/**
+ * 从接口响应构造客服配置。
+ *
+ * <p>后端对空值**不下发 key**，故用 UTSJSONObject + getString 取值，
+ * 避免字段直读拿到 undefined。</p>
+ */
+export function buildCustomerServiceConfig(data: UTSJSONObject | null): CustomerServiceConfig {
+	if (data == null) {
+		return emptyCustomerService()
+	}
+	return {
+		serviceJumpUrl: data.getString('serviceJumpUrl', ''),
+		serviceCorpId: data.getString('serviceCorpId', ''),
+		serviceKfidUrl: data.getString('serviceKfidUrl', ''),
+		servicePhone: data.getString('servicePhone', ''),
+		serviceQrcode: data.getString('serviceQrcode', ''),
+		serviceTime: data.getString('serviceTime', '')
+	}
+}
+
+/**
+ * 过渡兜底：接口异常且从未成功拿到配置时，沿用改造前写死在页面里的企业微信客服。
+ *
+ * <p>目的：发版后如果后端接口不可用，客服入口不会凭空消失。
+ * <b>仅用于请求异常</b>；接口正常返回但字段为空（运营主动清空）时仍然隐藏入口，
+ * 否则运营会发现「后台清不掉客服」。待所有租户在后台配好企微客服后可删除本函数。</p>
+ */
+export function legacyCustomerService(): CustomerServiceConfig {
+	return {
+		serviceJumpUrl: '',
+		serviceCorpId: 'ww686122ec6a4db85a',
+		serviceKfidUrl: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a',
+		servicePhone: '',
+		serviceQrcode: '',
+		serviceTime: ''
+	}
+}
+
+/** 当前小程序 appid（匿名接口用它反查租户；取不到返回空串） */
+export function getCurrentAppId(): string {
+	// #ifdef MP-WEIXIN
+	try {
+		// @ts-ignore 仅微信小程序提供
+		const account = wx.getAccountInfoSync()
+		const appId = account.miniProgram.appId
+		return appId != null ? appId : ''
+	} catch (e) {
+		return ''
+	}
+	// #endif
+	return ''
+}
+
+/** 企业微信客服是否配置完整（corpId 与 kfid 链接缺一不可） */
+export function hasWecom(cfg: CustomerServiceConfig): boolean {
+	return cfg.serviceCorpId.trim().length > 0 && cfg.serviceKfidUrl.trim().length > 0
+}
+
+/** 是否配置了客服手机号或二维码（降级弹框的两个内容） */
+export function hasPopupChannel(cfg: CustomerServiceConfig): boolean {
+	return cfg.servicePhone.trim().length > 0 || cfg.serviceQrcode.trim().length > 0
+}
+
+/** 是否配置了任意客服渠道：false 时不渲染客服入口 */
+export function hasAnyChannel(cfg: CustomerServiceConfig): boolean {
+	return cfg.serviceJumpUrl.trim().length > 0 || hasWecom(cfg) || hasPopupChannel(cfg)
+}
+
+/**
+ * 解析当前环境下的实际客服渠道。
+ *
+ * <p>小程序内客服地址只能经 webview 页打开（业务域名受限时打开失败），
+ * 但优先级仍按产品口径排在前面。</p>
+ */
+export function resolveChannel(cfg: CustomerServiceConfig): string {
+	if (cfg.serviceJumpUrl.trim().length > 0) {
+		return CS_CHANNEL_JUMP
+	}
+	if (hasWecom(cfg)) {
+		return CS_CHANNEL_WECOM
+	}
+	if (hasPopupChannel(cfg)) {
+		return CS_CHANNEL_POPUP
+	}
+	return CS_CHANNEL_NONE
+}
+
+/** 客服手机号列表（后端用英文逗号分隔） */
+export function splitServicePhones(cfg: CustomerServiceConfig): string[] {
+	const raw = cfg.servicePhone.trim()
+	if (raw.length == 0) {
+		return [] as string[]
+	}
+	const list: string[] = []
+	raw.split(',').forEach((item: string) => {
+		const value = item.trim()
+		if (value.length > 0) {
+			list.push(value)
+		}
+	})
+	return list
+}
+
+/**
+ * 按优先级打开客服。
+ *
+ * @param cfg         客服配置
+ * @param onShowPopup 需要展示手机号/二维码弹框时回调
+ */
+export function openCustomerService(cfg: CustomerServiceConfig, onShowPopup: () => void): void {
+	const channel = resolveChannel(cfg)
+	if (channel == CS_CHANNEL_JUMP) {
+		openUrlInWebview(cfg.serviceJumpUrl)
+		return
+	}
+	if (channel == CS_CHANNEL_WECOM) {
+		openWecom(cfg.serviceCorpId, cfg.serviceKfidUrl)
+		return
+	}
+	if (channel == CS_CHANNEL_POPUP) {
+		onShowPopup()
+	}
+}
+
+/**
+ * 用内置 webview 页打开客服地址。
+ *
+ * <p>小程序不允许直接打开外部网页；若该域名未配置为业务域名，webview 会加载失败并
+ * 由页面给出提示（比静默失败可排查）。</p>
+ */
+function openUrlInWebview(url: string): void {
+	const encoded = encodeURIComponent(url) ?? ''
+	uni.navigateTo({
+		url: '/pages/webview/webview?url=' + encoded + '&title=' + (encodeURIComponent('在线客服') ?? '')
+	})
+}
+
+/** 唤起企业微信客服（必须由 TAP 手势同步触发） */
+function openWecom(corpId: string, kfidUrl: string): void {
+	// @ts-ignore 仅微信小程序提供该 API
+	if (typeof uni.openCustomerServiceChat === 'function') {
+		// @ts-ignore
+		uni.openCustomerServiceChat({
+			corpId: corpId,
+			extInfo: {
+				url: kfidUrl
+			},
+			fail: (res: any) => {
+				// 常见原因：企微后台未绑定当前小程序 / 客服账号已停用
+				console.log('打开企业微信客服失败', res)
+				showAppToast({ title: '客服打开失败，请稍后重试', icon: 'none' })
+			}
+		})
+	} else {
+		showAppToast({ title: '当前环境暂不支持企业微信客服', icon: 'none' })
+	}
+}

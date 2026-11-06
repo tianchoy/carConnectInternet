@@ -48,6 +48,8 @@ const appCommandDetailUrl = '/app/command/'
 const appCommandRetryUrl = '/app/command/retry/'
 const messageUnreadCountUrl = '/app/message/unreadCount'
 const homePlatformAppUrl = '/home/platform/app'
+// 客服配置（匿名）：设备端首页悬浮球与个人中心「人工客服」共用
+const customerServiceUrl = '/home/customerService'
 const geocoderAddressUrl = '/geocoder/address'
 const deviceShareUrl = '/share/device'
 const deviceShareSentUrl = '/share/device/sent'
@@ -406,6 +408,34 @@ export const getMessageUnreadCount = (): Promise<MessageUnreadCountResponse> => 
 export const getHomePlatformAppId = (): Promise<HomePlatformAppResponse> => getSilently(homePlatformAppUrl).then((raw: any): HomePlatformAppResponse => {
     return homePlatformAppResponse(raw)
 })
+
+// 客服配置响应：data 为 { serviceJumpUrl, serviceCorpId, serviceKfidUrl, servicePhone, serviceQrcode, serviceTime }，
+// 后端对空值不下发 key，调用方用 getString(key, '') 取值
+export type CustomerServiceResponse = { code: number, msg: string, data: UTSJSONObject }
+
+function customerServiceResponse(raw: any): CustomerServiceResponse {
+    const response = asJSONObject(raw)
+    return {
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: getResponseDataObject(response)
+    }
+}
+
+/**
+ * 获取客服配置（匿名可访问）。
+ *
+ * @param appId 小程序 appid：未登录时后端用它反查租户；登录后以会话租户为准
+ */
+export const getCustomerServiceConfig = (appId: string = ''): Promise<CustomerServiceResponse> => {
+    const query = new UTSJSONObject()
+    if (appId.length > 0) {
+        query.set('appId', appId)
+    }
+    return getSilently(customerServiceUrl, query).then((raw: any): CustomerServiceResponse => {
+        return customerServiceResponse(raw)
+    })
+}
 export const editDeviceInfo = (data: UTSJSONObject): Promise<BasicResponse> => put(updateDevice, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
 export const getDeviceDetail = (deviceId: string): Promise<DeviceDetailResponse> => get(`${deviceDetail}${deviceId}`).then((raw: any): DeviceDetailResponse => {
     return deviceDetailResponse(raw)
