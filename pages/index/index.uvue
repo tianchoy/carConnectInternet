@@ -494,11 +494,12 @@ const initCsFab = () => {
     csFabTop.value = top
 }
 
-// touchend 与 click 都会走到这里，用节流保证只打开一次客服会话
+// click 可能因连续轻点触发多次，节流防止重复打开客服会话；
+// 这里必须是同步调用（不能先 await），否则同样脱离手势链
 let csFabLastOpenAt = 0
 const openCsFabService = () => {
     const now = Date.now()
-    if (now - csFabLastOpenAt < 1000) return
+    if (now - csFabLastOpenAt < 600) return
     csFabLastOpenAt = now
     contactCustomerService()
 }
@@ -540,11 +541,13 @@ const onCsFabTouchMove = (e: any) => {
 
 const onCsFabTouchEnd = () => {
     csFabDragging = false
-    // touchend 直接触发，不依赖 click 合成（部分机型 touch 事件会吞掉 tap）
-    if (!csFabMoved) openCsFabService()
+    // 注意：不能在这里调 openCustomerServiceChat。
+    // 微信要求该接口必须在 TAP 手势回调里同步调用，touchend 里调会报
+    // "openCustomerServiceChat:fail can only be invoked by user TAP gesture"，且会占掉节流窗口。
 }
 
-// 轻点进入企业微信客服；拖动松手不触发
+// 轻点进入企业微信客服；拖动松手不触发。
+// 只用 click（tap）回调触发，保证处于微信认可的手势链内
 const onCsFabClick = () => {
     if (csFabMoved) return
     openCsFabService()
