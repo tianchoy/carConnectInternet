@@ -274,7 +274,8 @@
     </l-popup>
 	<!-- 客服降级弹框：企业微信客服不可用 / 仅配置手机号与二维码时展示 -->
 	<customerServicePopup v-model:show="showCustomerServicePopup" :qrcode="customerServiceConfig.serviceQrcode"
-		:phones="csPhones" :serviceTime="customerServiceConfig.serviceTime"></customerServicePopup>
+		:phones="csPhones" :serviceTime="customerServiceConfig.serviceTime"
+		@qrcodeError="onCsQrcodeError"></customerServicePopup>
 	<app-toast></app-toast>
 	<app-modal></app-modal>
 </template>
@@ -492,19 +493,29 @@ const customerServiceConfig = ref<CustomerServiceConfig>(emptyCustomerService())
 const showCustomerServicePopup = ref(false)
 const csEnabled = computed<boolean>(() => hasAnyChannel(customerServiceConfig.value))
 const csPhones = computed<string[]>(() => splitServicePhones(customerServiceConfig.value))
+// 后端下发的是 7 天有效的私有桶签名地址；首页是 tab 常驻页，
+// 取 6 天留 1 天余量，过期后 onShow 自动回源换地址。
+const CUSTOMER_SERVICE_CACHE_TTL = 6 * 24 * 60 * 60 * 1000
+let customerServiceLoadedAt = 0
+// onShow 与 onLoad 会在首屏几乎同时触发；异步请求返回前时间戳仍为 0，
+// 没有这个标志会并发发两次请求
+let customerServiceLoading = false
 
 /**
- * 拉取客服配置：页面 onLoad 预取，点击时直接用内存值。
+ * 拉取客服配置：页面 onLoad / onShow 预取，点击时直接用内存值。
  *
  * <p>微信要求 {@code openCustomerServiceChat} 必须由用户 TAP <b>同步</b>触发，
  * 因此点击回调里不能再发请求。</p>
  */
 const loadCustomerServiceConfig = async () => {
+    if (customerServiceLoading) return
+    customerServiceLoading = true
     try {
         const res = await getCustomerServiceConfig(getCurrentAppId())
         if (isBusinessSuccessCode(res.code)) {
             // 接口成功即以后端为准：字段全空表示运营主动清空，入口必须隐藏
             customerServiceConfig.value = buildCustomerServiceConfig(res.data)
+            customerServiceLoadedAt = Date.now()
         }
     } catch (e) {
         // 请求异常：沿用改造前写死的企微客服，避免发版后入口凭空消失
@@ -512,7 +523,23 @@ const loadCustomerServiceConfig = async () => {
         if (!hasAnyChannel(customerServiceConfig.value)) {
             customerServiceConfig.value = legacyCustomerService()
         }
+    } finally {
+        customerServiceLoading = false
     }
+}
+
+/** 签名地址超过 6 天、或从未成功拉取过时重新回源 */
+const refreshCustomerServiceConfigIfStale = () => {
+    if (customerServiceLoadedAt === 0 ||
+        Date.now() - customerServiceLoadedAt >= CUSTOMER_SERVICE_CACHE_TTL) {
+        void loadCustomerServiceConfig()
+    }
+}
+
+/** 弹框二维码 403：清时间戳并强制回源，换一条新签名地址 */
+const onCsQrcodeError = () => {
+    customerServiceLoadedAt = 0
+    void loadCustomerServiceConfig()
 }
 
 const initCsFab = () => {
@@ -1974,6 +2001,8 @@ const handleSubscribeTap = async (): Promise<void> => {
 }
 
 onShow(async () => {
+    // 客服二维码是 7 天签名地址：常驻页每次回到前台检查是否该重拉
+    refreshCustomerServiceConfigIfStale()
     if (checkToken()) {
         await loadUnreadMessageCount()
         void refreshSubscribeState()
@@ -1999,7 +2028,7 @@ onLoad(() => {
     initDimensions()
     initCsFab()
     void loadHomePlatformAppId()
-    void loadCustomerServiceConfig()
+    refreshCustomerServiceConfigIfStale()
 
     if (checkToken()) {
         loadDeviceList()

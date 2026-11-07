@@ -11,7 +11,10 @@
 
 			<view class="cs-row" v-if="qrcodeUrl.length > 0">
 				<text class="cs-label">客服二维码</text>
-				<image class="cs-qrcode" :src="qrcodeUrl" mode="aspectFit" show-menu-by-longpress></image>
+				<!-- 私有桶签名地址 7 天有效：加载失败时通知父页面重新拉配置换地址；
+			     key 递增可强制重建（同一秒重签可能返回完全相同的 URL） -->
+			<image :key="'cs-qrcode-' + String(qrcodeKey)" class="cs-qrcode" :src="qrcodeUrl" mode="aspectFit"
+				show-menu-by-longpress @error="onQrcodeError"></image>
 				<text class="cs-tip">长按识别二维码添加客服</text>
 			</view>
 
@@ -27,7 +30,7 @@
 </template>
 
 <script setup lang="uts">
-	import { computed } from 'vue'
+	import { computed, ref } from 'vue'
 
 	const props = withDefaults(defineProps<{
 		/** 显隐（v-model:show） */
@@ -51,13 +54,31 @@
 	const qrcodeUrl = computed<string>(() => props.qrcode ?? '')
 	const serviceTimeText = computed<string>(() => props.serviceTime ?? '')
 
+	const qrcodeKey = ref(0)
+	// 自动重建上限：避免 OSS 持续不可用或同秒重签 URL 相同时无限打接口
+	const MAX_QRCODE_RETRY = 3
+	let qrcodeRetryCount = 0
+
 	const emit = defineEmits<{
 		'update:show': [value: boolean]
+		'qrcodeError': []
 	}>()
+
+	/** 二维码 403/加载失败：先重建图片，再让父页面重新拉配置换地址 */
+	const onQrcodeError = () => {
+		// 上限后不再递增 key、不再通知父页面，避免「重建→失败→再重建」无限循环
+		if (qrcodeRetryCount >= MAX_QRCODE_RETRY) return
+		qrcodeRetryCount++
+		// 同一秒重签可能返回完全相同的 URL，不递增 key 微信会复用失败缓存
+		qrcodeKey.value++
+		emit('qrcodeError')
+	}
 
 	const visible = computed<boolean>({
 		get: (): boolean => props.show,
 		set: (value: boolean) => {
+			// 弹框关闭时重置重试额度，用户重新打开可再获得 3 次机会
+			if (!value) qrcodeRetryCount = 0
 			emit('update:show', value)
 		}
 	})
