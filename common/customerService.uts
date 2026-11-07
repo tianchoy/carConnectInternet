@@ -1,14 +1,16 @@
 /**
  * 客服渠道统一封装（设备小程序）
  *
- * <p>统一口径（产品确认）：**客服地址 &gt; 企业微信客服 &gt; 客服手机号/二维码**。</p>
+ * <p>统一口径：**企业微信客服 &gt; 客服手机号/二维码**。
+ * 2026-11 起按要求去掉「客服地址（serviceJumpUrl）经内置 webview 打开」这一档，
+ * 该字段仍随接口下发但前端不再使用，也不再作为「有客服入口」的判定条件。</p>
  *
  * <p>背景：本端此前把企业ID 与 kfid 链接<b>硬编码在页面</b>（首页悬浮球、个人中心「人工客服」），
  * 运营改客服账号必须发版。现在改为读后端匿名接口 {@code GET /home/customerService}，
  * 页面只调用 {@link openCustomerService}，不再关心渠道判定。</p>
  *
  * <p>环境能力：小程序内 {@code uni.openCustomerServiceChat} 可用，但必须由用户 TAP
- * <b>同步</b>调用（点击回调里不能有 await）；客服地址是外部链接，只能经内置 webview 页打开。</p>
+ * <b>同步</b>调用（点击回调里不能有 await）。</p>
  *
  * @author zd-iot
  */
@@ -17,11 +19,15 @@ import { showAppToast } from '../utils/toast.uts'
 
 /** 客服渠道标识 */
 export const CS_CHANNEL_NONE = 'none'
-export const CS_CHANNEL_JUMP = 'jump'
 export const CS_CHANNEL_WECOM = 'wecom'
 export const CS_CHANNEL_POPUP = 'popup'
 
-/** 客服配置（与后端下发的 6 个字段一一对应；空串 = 未配置） */
+/**
+ * 客服配置（与后端下发的 6 个字段一一对应；空串 = 未配置）
+ *
+ * <p>注意：{@code serviceJumpUrl} 仍随接口下发、仍参与解析，但**前端不再使用**
+ * （已去掉「客服地址走内置 webview」这一档），也不会因为它而显示客服入口。</p>
+ */
 export type CustomerServiceConfig = {
 	serviceJumpUrl: string
 	serviceCorpId: string
@@ -121,13 +127,12 @@ export function hasAnyChannel(cfg: CustomerServiceConfig): boolean {
 /**
  * 解析当前环境下的实际客服渠道。
  *
- * <p>小程序内客服地址只能经 webview 页打开（业务域名受限时打开失败），
- * 但优先级仍按产品口径排在前面。</p>
+ * <p>只认企业微信客服与手机号/二维码弹框两个通道；
+ * {@code serviceJumpUrl} 已不再参与判定（见文件头说明）。</p>
  */
 export function resolveChannel(cfg: CustomerServiceConfig): string {
-	if (cfg.serviceJumpUrl.trim().length > 0) {
-		return CS_CHANNEL_JUMP
-	}
+	// 已按产品要求去掉「客服地址（serviceJumpUrl）」通道：
+	// 配置里只有客服地址时视为无可用渠道，入口不渲染，也不再用 webview 打开外部链接。
 	if (hasWecom(cfg)) {
 		return CS_CHANNEL_WECOM
 	}
@@ -160,13 +165,7 @@ export function splitServicePhones(cfg: CustomerServiceConfig): string[] {
  * @param onShowPopup 需要展示手机号/二维码弹框时回调
  */
 export function openCustomerService(cfg: CustomerServiceConfig, onShowPopup: () => void): void {
-	// 1) 客服地址优先：小程序内经内置 webview 打开（业务域名未配置时由 webview 页提示）
-	if (cfg.serviceJumpUrl.trim().length > 0) {
-		openUrlInWebview(cfg.serviceJumpUrl)
-		return
-	}
-
-	// 2) 企业微信客服：唤起失败的异步回调里继续降级，不再只弹一句「请稍后重试」
+	// 1) 企业微信客服：唤起失败的异步回调里继续降级，不再只弹一句「请稍后重试」
 	if (hasWecom(cfg)) {
 		openWecom(cfg.serviceCorpId, cfg.serviceKfidUrl, () => {
 			if (hasPopupChannel(cfg)) {
@@ -178,27 +177,14 @@ export function openCustomerService(cfg: CustomerServiceConfig, onShowPopup: () 
 		return
 	}
 
-	// 3) 手机号 / 二维码弹框
+	// 2) 手机号 / 二维码弹框
 	if (hasPopupChannel(cfg)) {
 		onShowPopup()
 		return
 	}
 
-	// 4) 绝不静默返回
+	// 3) 绝不静默返回（serviceJumpUrl 单独存在时也走这里，入口通常已被 hasAnyChannel 隐藏）
 	showAppToast({ title: '暂未配置客服，请联系管理员', icon: 'none' })
-}
-
-/**
- * 用内置 webview 页打开客服地址。
- *
- * <p>小程序不允许直接打开外部网页；若该域名未配置为业务域名，webview 会加载失败并
- * 由页面给出提示（比静默失败可排查）。</p>
- */
-function openUrlInWebview(url: string): void {
-	const encoded = encodeURIComponent(url) ?? ''
-	uni.navigateTo({
-		url: '/pages/webview/webview?url=' + encoded + '&title=' + (encodeURIComponent('在线客服') ?? '')
-	})
 }
 
 /**
