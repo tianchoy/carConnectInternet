@@ -46,20 +46,22 @@ export function emptyCustomerService(): CustomerServiceConfig {
 /**
  * 从接口响应构造客服配置。
  *
- * <p>后端对空值**不下发 key**，故用 UTSJSONObject + getString 取值，
- * 避免字段直读拿到 undefined。</p>
+ * <p>后端空值有两种形态：卡项目的 H5 接口用 putIfNotBlank「不下发 key」，
+ * 设备端匿名接口返回 VO，未配置字段可能序列化成显式 {@code null}。
+ * UTS 的 getString 对显式 null 不保证回落默认值，故再兜一层空串，
+ * 避免 {@link hasAnyChannel} 里 {@code .trim()} 直接抛 undefined/null。</p>
  */
 export function buildCustomerServiceConfig(data: UTSJSONObject | null): CustomerServiceConfig {
 	if (data == null) {
 		return emptyCustomerService()
 	}
 	return {
-		serviceJumpUrl: data.getString('serviceJumpUrl', ''),
-		serviceCorpId: data.getString('serviceCorpId', ''),
-		serviceKfidUrl: data.getString('serviceKfidUrl', ''),
-		servicePhone: data.getString('servicePhone', ''),
-		serviceQrcode: data.getString('serviceQrcode', ''),
-		serviceTime: data.getString('serviceTime', '')
+		serviceJumpUrl: data.getString('serviceJumpUrl', '') ?? '',
+		serviceCorpId: data.getString('serviceCorpId', '') ?? '',
+		serviceKfidUrl: data.getString('serviceKfidUrl', '') ?? '',
+		servicePhone: data.getString('servicePhone', '') ?? '',
+		serviceQrcode: data.getString('serviceQrcode', '') ?? '',
+		serviceTime: data.getString('serviceTime', '') ?? ''
 	}
 }
 
@@ -106,9 +108,14 @@ export function hasPopupChannel(cfg: CustomerServiceConfig): boolean {
 	return cfg.servicePhone.trim().length > 0 || cfg.serviceQrcode.trim().length > 0
 }
 
-/** 是否配置了任意客服渠道：false 时不渲染客服入口 */
+/**
+ * 当前环境是否存在任一可执行动作：false 时不渲染客服入口。
+ *
+ * <p>与 {@link openCustomerService} 的降级链共用 {@link resolveChannel} 判定，
+ * 避免「入口显示」与「点击行为」分叉（显示出来却点了没反应）。</p>
+ */
 export function hasAnyChannel(cfg: CustomerServiceConfig): boolean {
-	return cfg.serviceJumpUrl.trim().length > 0 || hasWecom(cfg) || hasPopupChannel(cfg)
+	return resolveChannel(cfg) != CS_CHANNEL_NONE
 }
 
 /**
@@ -153,18 +160,32 @@ export function splitServicePhones(cfg: CustomerServiceConfig): string[] {
  * @param onShowPopup 需要展示手机号/二维码弹框时回调
  */
 export function openCustomerService(cfg: CustomerServiceConfig, onShowPopup: () => void): void {
-	const channel = resolveChannel(cfg)
-	if (channel == CS_CHANNEL_JUMP) {
+	// 1) 客服地址优先：小程序内经内置 webview 打开（业务域名未配置时由 webview 页提示）
+	if (cfg.serviceJumpUrl.trim().length > 0) {
 		openUrlInWebview(cfg.serviceJumpUrl)
 		return
 	}
-	if (channel == CS_CHANNEL_WECOM) {
-		openWecom(cfg.serviceCorpId, cfg.serviceKfidUrl)
+
+	// 2) 企业微信客服：唤起失败的异步回调里继续降级，不再只弹一句「请稍后重试」
+	if (hasWecom(cfg)) {
+		openWecom(cfg.serviceCorpId, cfg.serviceKfidUrl, () => {
+			if (hasPopupChannel(cfg)) {
+				onShowPopup()
+			} else {
+				showAppToast({ title: '客服打开失败，请稍后重试', icon: 'none' })
+			}
+		})
 		return
 	}
-	if (channel == CS_CHANNEL_POPUP) {
+
+	// 3) 手机号 / 二维码弹框
+	if (hasPopupChannel(cfg)) {
 		onShowPopup()
+		return
 	}
+
+	// 4) 绝不静默返回
+	showAppToast({ title: '暂未配置客服，请联系管理员', icon: 'none' })
 }
 
 /**
@@ -180,8 +201,12 @@ function openUrlInWebview(url: string): void {
 	})
 }
 
-/** 唤起企业微信客服（必须由 TAP 手势同步触发） */
-function openWecom(corpId: string, kfidUrl: string): void {
+/**
+ * 唤起企业微信客服（必须由 TAP 手势同步触发）。
+ *
+ * <p>onFail 在 API 不可用或运行时失败时调用，由上层继续降级到电话/二维码弹框。</p>
+ */
+function openWecom(corpId: string, kfidUrl: string, onFail: () => void): void {
 	// @ts-ignore 仅微信小程序提供该 API
 	if (typeof uni.openCustomerServiceChat === 'function') {
 		// @ts-ignore
@@ -193,10 +218,10 @@ function openWecom(corpId: string, kfidUrl: string): void {
 			fail: (res: any) => {
 				// 常见原因：企微后台未绑定当前小程序 / 客服账号已停用
 				console.log('打开企业微信客服失败', res)
-				showAppToast({ title: '客服打开失败，请稍后重试', icon: 'none' })
+				onFail()
 			}
 		})
 	} else {
-		showAppToast({ title: '当前环境暂不支持企业微信客服', icon: 'none' })
+		onFail()
 	}
 }
